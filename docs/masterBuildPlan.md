@@ -59,12 +59,12 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
-| 1 | Projektkontext und Ziel | in Klärung | Q-02 | G1 |
-| 2 | Umfang | in Klärung | Q-04, Q-08 | G1 |
+| 1 | Projektkontext und Ziel | fertig | – | G1 |
+| 2 | Umfang | in Klärung | Q-09, Q-10, Q-11 (Q-04 nur für Boss-Meilenstein) | G1 |
 | 3 | Tech-Stack | angenommen | – | G1 |
-| 4 | Architektur, Datenmodell, Verträge | leer | – | G1 |
-| 5 | Sicherheit, Datenschutz, Recht, Limits | leer | – | G1 |
-| 6 | Umgebungen, Branches, Deployment | leer | – | G1 |
+| 4 | Architektur, Datenmodell, Verträge | angenommen | Bestätigung PE-21 | G1 |
+| 5 | Sicherheit, Datenschutz, Recht, Limits | angenommen | Bestätigung PE-22 | G1 |
+| 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | leer | – | G2 |
 | 9 | Meilensteine und Wellen | leer | – | G2 |
@@ -74,7 +74,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 13 | Menschliche Schritte | leer | – | G2 |
 | 14 | Budget und Kürzungen | leer | – | G2 |
 | 15 | Risiken | leer | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-02, Q-04, Q-08 | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-04, Q-09–Q-11 | laufend |
 | 17 | Abdeckungsmatrix | leer | – | G2 |
 | 18 | Änderungsprotokoll | leer | – | laufend |
 
@@ -101,7 +101,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | Einzeiler | Rundenbasierter 360°-Survival-Shooter im Pixel-Stil: Die Astronautin in der Bildschirmmitte dreht sich, schießt automatisch und überlebt Monsterwellen, bis der Timer abläuft. |
 | Zielgruppe | Gelegenheitsspieler auf Handy und PC. Im ersten Stich nur der Nutzer selbst (lokal). |
 | Lieferumfang | Stich 1: lokal lauffähiges Spiel mit Level 0–20 auf PC und Handy. Keine Veröffentlichung. Später App Store (Ausblick). |
-| Termin | ⟦offen: Q-02⟧ |
+| Termin | keiner (PE-19) |
 | Kommerzialisierung | später möglich (App Store), PE-01 |
 | Projektdokumentation | `idee.txt` (Spielidee, Gegner, Batches; noch nicht committet, siehe §16 Vorschläge) |
 
@@ -133,12 +133,13 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | F-02 | Automatischer Schuss | Die Laserpistole feuert automatisch, immer in die aktuelle Blickrichtung (PE-03). | ja |
 | F-03 | Runde mit Timer | Eine Runde ist gewonnen, wenn der Timer abläuft und die Astronautin noch lebt. Dauer: erste Hälfte 3 min, zweite Hälfte 5 min, die erste Hälfte wird aufgerundet, bezogen auf die Level eines Batches (PE-05, PE-09). Ergebnis: Wald 0–2 = 3 min, 3–4 = 5 min · Nacht 5–7 = 3 min, 8–9 = 5 min · Elfenwald 10–15 = 3 min, 16–20 = 5 min. | ja |
 | F-04 | Gegner | Verfluchter Baum (Level 0–20, langsam, etwas mehr HP, läuft auf Spieler zu), Wald-Hexe (5–20, schießt Projektile, normale Werte), Zombie-Eichhörnchen (5–20, schnell, wenig HP, läuft), Böser Wald-Spirit (10–20, Dauerschaden in Nähe, wenig HP). Quelle: `idee.txt`. | ja |
-| F-05 | Boss je Level | Jedes Level hat einen Boss. Aussehen und Verhalten beschreibt der Nutzer noch (⟦offen: Q-04⟧). | nein |
+| F-05 | Boss je Level | Jedes Level hat einen Boss. Er erscheint in der letzten Minute. Läuft der Timer ab, während er noch lebt, geht die Runde weiter, bis er besiegt ist (PE-18). Aussehen und Verhalten beschreibt der Nutzer noch (⟦offen: Q-04⟧). Eigener, späterer Meilenstein. | nein |
 | F-06 | Level und Maps 0–20 | Batches Wald, Wald bei Nacht, Elfenwald mit je einer einfachen Map mit Charme. Grenzen: Wald 0–4, Wald bei Nacht 5–9, Elfenwald 10–20 (PE-10). | ja |
-| F-07 | Waffen-Items in der Runde | Besiegte Gegner lassen zufällig Items fallen, die die Laserpistole verändern (schneller, stärker, größer). Die Waffe startet jede Runde bei 0 (PE-12, Details ⟦offen: Q-08⟧). | ja |
+| F-07 | Waffen-Items in der Runde | Besiegte Gegner lassen zufällig Items fallen, die die Laserpistole verändern (schneller, stärker, größer). Die Waffe startet jede Runde bei 0. Ein Item wird eingesammelt, indem die Astronautin es **anschießt**. Es wirkt bis Rundenende und stapelt bis Stufe 5 je Eigenschaft. Die Drop-Chance liegt bei ca. 8 %, ein liegendes Item verschwindet nach 10 s (PE-12, PE-16). | ja |
 | F-08 | Spielerlevel | Das Spielerlevel steigt durch Erfahrung aus Runden, wird lokal gespeichert und angezeigt. Im ersten Stich schaltet es nichts frei (PE-13). | nein |
 | F-09 | Hauptmenü und Level-Freischaltung | Start, Anzeige des Spielerlevels, Level-Auswahl 0–20. Ein Level wird frei, wenn das vorherige geschafft ist (PE-13). | ja |
 | F-10 | iPhone über PWA | Das Spiel läuft auf dem iPhone in Safari, als Homescreen-App im Vollbild, vom PC über das lokale WLAN bereitgestellt (PE-14). | ja |
+| F-11 | Lebenspunkte und Niederlage | Die Astronautin hat 100 HP mit Lebensleiste. Bei 0 HP ist die Runde verloren, ein Teil der Erfahrung geht trotzdem ans Spielerlevel. Heilung gibt es nur als seltenes Item (PE-17). | ja |
 
 ### Optional
 
@@ -193,15 +194,49 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 [W] Wo liegen die gemeinsamen Verträge (Schemas, API-Typen), damit parallel gebaut werden kann?
 -->
 
-**Bausteine:** {{Diagramm (Mermaid oder ASCII) und je Baustein ein Satz}}
+Status: Entwurf des Planners (angenommen, PE-21), Bestätigung durch den Nutzer offen.
 
-**Grundregeln:** {{z. B. „Nur die API spricht mit der Datenbank“}}
+**Bausteine:**
+
+```mermaid
+flowchart TD
+  CFG["src/config<br/>Level-, Gegner-, Item-, Waffendaten"] --> LOG
+  CON["src/contracts<br/>Typen und Events"] --> CFG & LOG & ENT & SCN
+  LOG["src/logic<br/>reine Spiellogik, ohne Phaser"] --> ENT["src/entities<br/>Phaser-Objekte"]
+  LOG --> SCN["src/scenes<br/>Boot, Menu, Game, Hud, Result"]
+  ENT --> SCN
+  PLT["src/platform<br/>Eingabe Maus/Touch, Speicher"] --> SCN
+```
+
+- `src/contracts/`: gemeinsame Typen (`LevelDef`, `EnemyDef`, `ItemDef`, `WeaponStats`, `SaveGame`) und typisierte Event-Namen zwischen Game- und HUD-Szene.
+- `src/config/`: datengetriebene Inhalte. Level 0–20 als Tabelle (Batch, Dauer, Gegnerpool, Spawn-Rate, Boss-Platzhalter), damit Level 21–100 später nur Daten sind.
+- `src/logic/`: reine, mit Vitest getestete Funktionen. Dazu gehören:
+  - die Drehung zum Ziel mit Maximalgeschwindigkeit,
+  - der Rundentimer und der Spawn-Director,
+  - Schaden und HP,
+  - die Item-Wirkung und Stapelung,
+  - Erfahrung, Spielerlevel und Level-Freischaltung.
+- `src/entities/`: Astronautin, Gegnertypen, Projektile (Laser und Hexe), Items.
+- `src/scenes/`: Boot/Preload, Hauptmenü mit Level-Auswahl, Spiel, HUD (Timer, HP, Waffenstufen), Ergebnis.
+- `src/platform/`: vereinheitlichte Zeiger-Eingabe (Maus und Touch) und Speicher-Adapter (`localStorage`).
+- `public/`: Sprites, Manifest, Icons.
+
+**Grundregeln:**
+
+1. Spiellogik in `src/logic` importiert kein Phaser. Sie bekommt Daten und gibt Daten zurück.
+2. Spielwerte (HP, Geschwindigkeit, Drop-Chancen, Drehgeschwindigkeit) stehen nur in `src/config`, nie verstreut im Code.
+3. Nur `src/platform/storage` greift auf `localStorage` zu.
+4. Szenen sprechen über typisierte Events aus `src/contracts`.
 
 | Entität | Wichtige Felder | Gehört zu | Löschverhalten |
 |---|---|---|---|
-| {{…}} | {{…}} | {{…}} | {{…}} |
+| SaveGame | `version`, `playerXp`, `playerLevel`, `highestUnlockedLevel` | Gerät (lokal) | „Fortschritt zurücksetzen“ im Menü löscht ihn (angenommen) |
+| LevelDef | `id`, `batch`, `durationSec`, `enemyPool`, `spawnRate`, `bossId?` | Konfiguration | – |
+| EnemyDef | `id`, `hp`, `speed`, `damage`, `behavior` (chase, shooter, aura) | Konfiguration | – |
+| ItemDef | `id`, `effect` (fireRate, damage, size, heal), `maxStacks`, `dropWeight` | Konfiguration | – |
+| WeaponStats | `fireRate`, `damage`, `projectileSize`, `projectileSpeed` | Runde (flüchtig) | Reset bei Rundenende |
 
-**Verträge:** {{Ort und Format}}. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern.
+**Verträge:** TypeScript-Typen in `src/contracts/`. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern.
 
 ---
 
@@ -220,17 +255,30 @@ Es gelten immer R1–R6 (siehe Agent-Dateien). Dieser Abschnitt konkretisiert si
 
 | Regel | Umsetzung (grob) | Testart | Paket |
 |---|---|---|---|
-| {{z. B. Jede Abfrage filtert nach user_id}} | {{…}} | {{…}} | {{AP-xx}} |
-| Impressum und Datenschutzerklärung (R3) | {{…}} | {{Seite erreichbar}} | {{AP-xx}} |
-| Secrets nur in `.env`, `.env.example` gepflegt (R4) | {{…}} | {{Review}} | alle |
+Status: Entwurf des Planners (angenommen, PE-22).
+
+- **Nutzer und Auth:** keine. Es gibt keine Konten und keine fremden Daten.
+- **Personenbezogene Daten (R2):** keine. Lokal gespeichert wird nur der Spielfortschritt (`SaveGame`). Es gibt kein Tracking, keine Analytics und keine externen Inhalte (Schriften und Assets liegen lokal). Damit sind im ersten Stich keine DSGVO-Pflichten erkennbar.
+- **Öffentliche Webseite (R3):** keine. Das Spiel läuft nur lokal und im Heim-WLAN. Impressum und Datenschutzerklärung entfallen im ersten Stich und werden vor jeder Veröffentlichung (App Store) Pflicht, siehe Q-09 und §16.
+
+| Regel | Umsetzung (grob) | Testart | Paket |
+|---|---|---|---|
+| Keine personenbezogenen Daten, kein Tracking, keine externen Requests (R2) | nur `SaveGame` lokal, keine Netzwerkaufrufe im Spiel | Review, Suche nach `fetch`/externen URLs | alle |
+| Spielstand robust laden | Version prüfen, kaputte oder fremde Werte verwerfen und mit Standard starten | Unit-Test | Speicher-Paket |
+| Dev-Server im WLAN | `--host` nur für das Heimnetz, nie Portweiterleitung oder öffentliches Hosting | Doku (README) | Gerüst-Paket |
+| Asset-Lizenzen (R1) | nur eigene, generierte oder CC0-Assets, Lizenzliste im Repo | Review | Asset-Pakete |
+| Abhängigkeiten (R6) | nur freigegebene Pakete (§3), `npm audit` ohne hohe Befunde | Check des Leads | Gerüst-Paket |
+| Impressum und Datenschutzerklärung (R3) | entfällt im ersten Stich (nicht öffentlich), vor einer Veröffentlichung Pflicht | – | Ausblick |
+| Secrets nur in `.env`, `.env.example` gepflegt (R4) | im ersten Stich keine Secrets nötig | Review | alle |
 
 | Limit | Standard | Ebene |
 |---|---|---|
-| {{…}} | {{…}} | {{pro Nutzer / global}} |
+| Gleichzeitige Gegner auf dem Bildschirm | 150 (angenommen) | Konfiguration |
+| Zielbildrate | 60 fps auf aktuellem iPhone und PC (angenommen) | – |
 
-**Nie kürzbar:** {{Liste}}
+**Nie kürzbar:** keine personenbezogenen Daten und kein Tracking, robustes Laden des Spielstands, Asset-Lizenzen.
 
-**Vom Nutzer rechtlich zu prüfen (vor Kommerzialisierung):** {{z. B. Impressumsangaben, AGB, Auftragsverarbeitungsverträge}}
+**Vom Nutzer rechtlich zu prüfen (vor Kommerzialisierung):** Impressum und Datenschutzerklärung, App-Store-Richtlinien und Datenschutzangaben, Lizenzen aller Assets und Schriften, Altersfreigabe.
 
 ---
 
@@ -245,9 +293,9 @@ Es gelten immer R1–R6 (siehe Agent-Dateien). Dieser Abschnitt konkretisiert si
 
 | Umgebung | Frontend | Backend | Datenbank | Auslöser |
 |---|---|---|---|---|
-| lokal / dev | {{…}} | {{…}} | {{Dev-DB, Agents schreiben}} | – |
-| stage | {{…}} | {{…}} | {{Stage-DB, Agents höchstens lesen}} | {{Merge dev → stage durch den Nutzer}} |
-| Produktion | {{…}} | {{…}} | {{Prod-DB, Agents höchstens lesen}} | {{Merge stage → master durch den Nutzer}} |
+| lokal / dev | `npm run dev` im Browser am PC | – | – (`localStorage` im Browser) | – |
+| stage | Stand von `stage`: `npm run build` und `npm run preview -- --host`, getestet am PC und auf dem iPhone im WLAN | – | – | Merge dev → stage durch den Nutzer |
+| Produktion | Stand von `master`: abgenommener, spielbarer Stand, gleicher Ablauf wie stage | – | – | Merge stage → master durch den Nutzer |
 
 | Branch | Zweck | Wer schreibt darauf |
 |---|---|---|
@@ -256,13 +304,15 @@ Es gelten immer R1–R6 (siehe Agent-Dateien). Dieser Abschnitt konkretisiert si
 | `dev` | Integration, Default-Branch | ma-lead (`merge --no-ff`, `push`), ma-planner (nur Plan-Commits) |
 | `agent/AP-<nr>-c<n>` | ein Arbeitspaket | ma-coder (`commit`), nur lokal, wird nach dem Merge gelöscht |
 
-**Worktrees:** werden beim Start eines Coders automatisch im Ordner `{{PROJEKTNAME}}_worktree/` neben dem Projekt angelegt (ein Unterordner und ein Branch pro Coder, abgezweigt von `dev`). Der Lead entfernt sie nach dem Merge.
+**Remote:** `origin` = `https://github.com/CemDCoding/360shooter.git`, vom Nutzer eingerichtet (PE-20). Der Lead pusht nur `dev`. `stage` und `master` bringt der Nutzer per Pull Request.
 
-**Parallele Coder und lokale Ressourcen:** {{z. B. jede Worktree-Instanz nutzt eigenen Port / eigenes DB-Schema, Variablen in .env.example: PORT, DB_SCHEMA}}
+**Worktrees:** werden beim Start eines Coders automatisch im Ordner `360shooter_worktree/` neben dem Projekt angelegt (ein Unterordner und ein Branch pro Coder, abgezweigt von `dev`). Der Lead entfernt sie nach dem Merge.
 
-**Env-Dateien:** `.env` füllt nur der Nutzer. Agents sehen `.env.example`. {{Welche Variablen braucht ein Worktree, und wie kommt er an sie, ohne dass ein Agent sie liest? z. B. Anwendung lädt ../../.env des Hauptcheckouts}}
+**Parallele Coder und lokale Ressourcen:** keine Datenbank. Tests laufen ohne Server. Startet ein Coder den Dev-Server, wählt Vite automatisch einen freien Port.
 
-**Deployment-Anleitung:** {{Verweis}}
+**Env-Dateien:** Im ersten Stich sind keine Variablen nötig. `.env.example` bleibt ohne Einträge.
+
+**Deployment-Anleitung:** README-Abschnitt „Auf dem iPhone spielen“ (PC und iPhone im selben WLAN, `npm run build`, `npm run preview -- --host`, IP-Adresse in Safari öffnen, „Zum Home-Bildschirm“). Den Abschnitt schreibt das PWA-Paket.
 
 ---
 
@@ -513,19 +563,29 @@ flowchart LR
 | PE-13 | Spielerlevel wird nur angezeigt. Rüstungen und Power-ups kommen im nächsten Stich, Level werden nacheinander freigeschaltet | Q-06, Antwort 3a | Nutzer am 2026-10-23 |
 | PE-14 | iPhone im ersten Stich per PWA über das lokale WLAN, Capacitor/native iOS-App später | Q-07, Antwort 1a (alter Mac) | Nutzer am 2026-10-23 |
 | PE-15 | Höchstens 3 Coder parallel, Freigabe pro Meilenstein (Lead arbeitet autonom bis zum freigegebenen Meilenstein) | Antwort 4 | Nutzer am 2026-10-23 |
+| PE-16 | Items werden durch Anschießen eingesammelt. Wirkung bis Rundenende, Stapel bis 5, Drop ca. 8 %, Verfall nach 10 s | Q-08, Antwort 1b; Zahlenwerte angenommen vom Planner | Nutzer am 2026-10-23 / Werte angenommen |
+| PE-17 | 100 HP, bei 0 HP Niederlage mit anteiliger Erfahrung, Heilung nur als seltenes Item | Antwort 2a | Nutzer am 2026-10-23 |
+| PE-18 | Boss erscheint in der letzten Minute, die Runde endet erst mit seinem Sieg. Boss-Pakete bilden einen eigenen, späteren Meilenstein | Antwort 3a | Nutzer am 2026-10-23 |
+| PE-19 | Kein Termin | Antwort 4a | Nutzer am 2026-10-23 |
+| PE-20 | GitHub-Remote `origin` vorhanden, `stage` = Teststand auf PC und iPhone, `master` = abgenommener Stand | Antwort 4b, 4c | Nutzer am 2026-10-23 |
+| PE-21 | Architektur §4: Daten in `src/config`, reine Logik in `src/logic` ohne Phaser, Verträge in `src/contracts` | Entwurf | angenommen vom Planner |
+| PE-22 | Sicherheit §5: keine personenbezogenen Daten, kein Tracking, keine öffentliche Seite → R3 erst vor einer Veröffentlichung | Entwurf | angenommen vom Planner |
 
 ### Offene Fragen
 
 | ID | Frage | Priorität | Betrifft | Empfehlung | Status |
 |---|---|---|---|---|---|
 | Q-01 | Bewegt sich die Astronautin auch über die Map, oder steht sie fest und dreht sich nur? | K | F-01, §4 | fest in der Mitte, nur Drehen (wie `idee.txt`) | geklärt (PE-08) |
-| Q-02 | Gibt es einen Termin für den ersten Stich? | K | §1, §14 | keiner | offen |
+| Q-02 | Gibt es einen Termin für den ersten Stich? | K | §1, §14 | keiner | geklärt (PE-19) |
 | Q-03 | „Erste Hälfte“ bezogen auf was: die Level eines Batches oder die Level 0–20 insgesamt? | K | F-03 | pro Batch | geklärt (PE-09) |
-| Q-04 | Boss je Level: Aussehen, Verhalten, wann erscheint er (bei Timer-Ende, zur Halbzeit)? Muss er besiegt werden? | K (für Boss-Pakete) | F-05 | Boss erscheint in der letzten Minute; Runde gewonnen, wenn Timer abgelaufen und Boss besiegt | offen |
+| Q-04 | Boss je Level: Aussehen, Verhalten, wann erscheint er (bei Timer-Ende, zur Halbzeit)? Muss er besiegt werden? | W (blockiert nur G2 des Boss-Meilensteins) | F-05 | Ablauf geklärt (PE-18); offen sind Aussehen und Verhalten je Boss | offen (Ablauf geklärt) |
 | Q-05 | Batch-Grenzen überlappen (Wald 0–5, Nacht 5–10, Elfenwald 10–20). Zu welchem Batch gehören Level 5 und 10? | W | F-06 | 0–4 Wald, 5–9 Nacht, 10–20 Elfenwald | geklärt (PE-10) |
 | Q-06 | Wie gibt es Upgrades in der Runde, was bringt das Spielerlevel im ersten Stich (Rüstungen, Power-ups?), wie werden Level freigeschaltet? | K | F-07–F-09 | Erfahrungskristalle sammeln → Auswahl aus 3 Upgrades; Level nacheinander freischalten | geklärt (PE-12, PE-13) |
 | Q-07 | iOS: Der Mac ist sehr alt, das iPhone hat das neueste iOS. Wie kommt das Spiel aufs iPhone? Welches Mac-Modell und welche macOS-Version? | K | §3, §6 | Stich 1: iPhone spielt per Safari/PWA über das lokale WLAN vom PC. Native iOS-App erst später | geklärt (PE-14) |
-| Q-08 | Item-Drops: Wie kommt das Item zur Astronautin (sie läuft nicht)? Wie lange wirkt es, stapelt es sich, wie oft droppt es? | K | F-07 | Item fliegt nach 1 s von selbst zu ihr; wirkt bis Rundenende; stapelt bis Stufe 5 je Eigenschaft; Drop-Chance ca. 8 % | offen |
+| Q-08 | Item-Drops: Wie kommt das Item zur Astronautin (sie läuft nicht)? Wie lange wirkt es, stapelt es sich, wie oft droppt es? | K | F-07 | Item fliegt nach 1 s von selbst zu ihr; wirkt bis Rundenende; stapelt bis Stufe 5 je Eigenschaft; Drop-Chance ca. 8 % | geklärt (PE-16) |
+| Q-09 | Grafik: Woher kommen die Pixel-Sprites (Astronautin, 4 Gegner, 3 Maps, Items, Bosse)? | K | F-04–F-06, §5 Lizenzen | siehe Interview Runde 5 | offen |
+| Q-10 | Bildschirm: Hochformat, Querformat oder beides? | W | §4, Szenen | Querformat | offen |
+| Q-11 | Sound und Musik im ersten Stich? | W | Umfang | nur einfache Effekte | offen |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -553,3 +613,4 @@ flowchart LR
 | 2026-10-23 | Planversion 1: §1 und §2 aus `idee.txt` und den ersten Antworten befüllt, PE-01–PE-07, Q-01–Q-06 | Interview-Start | – | Nutzer |
 | 2026-10-23 | PE-08–PE-11: Bewegung, Rundendauer pro Batch, Batch-Grenzen, Tech-Stack. §3 befüllt, Q-07 (iOS) neu | Interview Runde 2 | – | Nutzer |
 | 2026-10-23 | PE-12–PE-15: Item-Drops, Spielerlevel, iPhone per PWA, 3 Coder mit Freigabe pro Meilenstein. F-10 neu, Q-08 neu | Interview Runde 3 | – | Nutzer |
+| 2026-10-23 | PE-16–PE-22: Items anschießen, HP, Boss-Ablauf, kein Termin, Remote. §4–§6 als Entwurf befüllt, Q-09–Q-11 neu | Interview Runde 4 | – | Nutzer / Entwurf Planner |
