@@ -22,11 +22,11 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
 - **Stand:** 2026-10-23 · Planung abgeschlossen, Bau noch nicht begonnen
-- **Fertig:** – · **Offen:** AP-01 `bereit`; AP-02–AP-15 `offen`; AP-16–AP-19 `blockiert` (Q-04)
+- **Fertig:** – · **Offen:** AP-01 `bereit`; AP-02–AP-20 `offen`
 - **Unterbrochen oder laufend:** nichts
 - **Erkenntnisse:** –
-- **Nächster Schritt:** Nutzer gibt M0 frei → M0 W1 starten: AP-01
-- **Offene Fragen an den Nutzer:** Q-04 Bosse (erst für M3); Bestätigung von M2
+- **Nächster Schritt:** Nutzer gibt den Meilenstein frei, bis zu dem autonom gearbeitet wird (PE-15) → M0 W1 starten: AP-01
+- **Offene Fragen an den Nutzer:** Boss-Verhalten PE-34 vor M3-Freigabe bestätigen
 
 <!-- Ende Lagebericht -->
 
@@ -70,18 +70,18 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | fertig | – | G2 |
-| 9 | Meilensteine und Wellen | angenommen | Bestätigung M2 | G2 |
+| 9 | Meilensteine und Wellen | fertig | – | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0, M1 bestätigt; M2 detailliert (Bestätigung offen); M3 wartet auf Q-04 | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 bestätigt; M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-04 | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34 bestätigen | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0) und G2(M1) erfüllt. G2(M2) nach Bestätigung durch den Nutzer. G2(M3) blockiert durch Q-04.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -145,7 +145,12 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | F-02 | Automatischer Schuss | Die Laserpistole feuert automatisch, immer in die aktuelle Blickrichtung (PE-03). | ja |
 | F-03 | Runde mit Timer | Eine Runde ist gewonnen, wenn der Timer abläuft und die Astronautin noch lebt. Dauer: erste Hälfte 3 min, zweite Hälfte 5 min, die erste Hälfte wird aufgerundet, bezogen auf die Level eines Batches (PE-05, PE-09). Ergebnis: Wald 0–2 = 3 min, 3–4 = 5 min · Nacht 5–7 = 3 min, 8–9 = 5 min · Elfenwald 10–15 = 3 min, 16–20 = 5 min. | ja |
 | F-04 | Gegner | Verfluchter Baum (Level 0–20, langsam, etwas mehr HP, läuft auf Spieler zu), Wald-Hexe (5–20, schießt Projektile, normale Werte), Zombie-Eichhörnchen (5–20, schnell, wenig HP, läuft), Böser Wald-Spirit (10–20, Dauerschaden in Nähe, wenig HP). Quelle: `idee.txt`. | ja |
-| F-05 | Boss je Level | Jedes Level hat einen Boss. Er erscheint in der letzten Minute. Läuft der Timer ab, während er noch lebt, geht die Runde weiter, bis er besiegt ist (PE-18). Aussehen und Verhalten beschreibt der Nutzer noch (⟦offen: Q-04⟧). Eigener, späterer Meilenstein. | nein |
+| F-05 | Boss je Level | Jedes Level hat einen Boss. Er erscheint in der letzten Minute. Läuft der Timer ab, während er noch lebt, geht die Runde weiter, bis er besiegt ist (PE-18). Ein Boss pro Batch, die anderen Level des Batches nutzen ihn in Varianten (PE-33):
+<br>• Wald: verwurzeltes Baummonster
+<br>• Wald bei Nacht: Waldgeist
+<br>• Elfenwald: Riesen-Stein
+
+Verhalten siehe PE-34. Eigener Meilenstein M3. | nein |
 | F-06 | Level und Maps 0–20 | Batches Wald, Wald bei Nacht, Elfenwald mit je einer einfachen Map mit Charme. Grenzen: Wald 0–4, Wald bei Nacht 5–9, Elfenwald 10–20 (PE-10). | ja |
 | F-07 | Waffen-Items in der Runde | Besiegte Gegner lassen zufällig Items fallen, die die Laserpistole verändern (schneller, stärker, größer). Die Waffe startet jede Runde bei 0. Ein Item wird eingesammelt, indem die Astronautin es **anschießt**. Es wirkt bis Rundenende und stapelt bis Stufe 5 je Eigenschaft. Die Drop-Chance liegt bei ca. 8 %, ein liegendes Item verschwindet nach 10 s (PE-12, PE-16). | ja |
 | F-08 | Spielerlevel | Das Spielerlevel steigt durch Erfahrung aus Runden, wird lokal gespeichert und angezeigt. Im ersten Stich schaltet es nichts frei (PE-13). | nein |
@@ -422,7 +427,10 @@ flowchart TD
 | `README.md` | AP-01, später AP-13 | M0 W1, M2 W1 |
 | `src/scenes/GameScene.ts` | AP-10 → AP-12 (Hintergrund) → AP-14 (Sound) | M1 W3, M2 W1, M2 W2 |
 | `src/scenes/{MenuScene,HudScene,ResultScene}.ts` | AP-10 (Hud, Result), AP-11 (Menu) → AP-14 (Sound, Stumm-Taste) | M1 W3, M2 W1, M2 W2 |
-| `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 | M0 W2, M2 W2 |
+| `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M3 W1 |
+| `src/config/assets.ts`, `docs/guides/*` | AP-02 / AP-07 → AP-16 (Boss-Assets) | M0 W2, M1 W1, M3 W1 |
+| `src/logic/{round,spawn}.ts`, `src/contracts/{events,index}.ts` | AP-06 / AP-01 → AP-16 | M1 W1, M0 W1, M3 W1 |
+| `src/scenes/{GameScene,HudScene,ResultScene}.ts` in M3 | AP-20 | M3 W3 |
 
 ---
 
@@ -438,7 +446,7 @@ flowchart TD
 | M0 | Fundament | Werkzeuge, Verträge, Spieldaten 0–20, Platzhalter-Assets, Eingabe und Speicher | `npm run dev` zeigt die Preload-Szene mit allen Platzhalter-Sprites; alle Checks grün |
 | M1 | Kernspiel | Drehen und Auto-Schuss, 4 Gegnertypen, Items durch Anschießen, HP, Timer, Sieg/Niederlage, HUD; Designer-Anleitungen | Level 0 (und per Debug-Parameter jedes Level 0–20) am PC spielbar |
 | M2 | Inhalte, Menü, iPhone | Hauptmenü mit Level-Auswahl und Spielerlevel, Maps je Batch, PWA + Querformat, Platzhalter-Sounds mit Stummschalten, Balancing 0–20 | Level 0–20 nacheinander freispielbar, am PC und auf dem iPhone |
-| M3 | Bosse | Boss-Rahmen und Bosse je Level (PE-18). G2 erst nach Q-04 | jedes Level endet mit Boss |
+| M3 | Bosse | Boss-Rahmen, drei Bosse mit Varianten je Level, Einbindung (PE-18, PE-33, PE-34) | jedes Level endet mit seinem Boss |
 
 ### 9.1 Ablauf einer Welle
 
@@ -514,13 +522,23 @@ flowchart TD
   - [ ] Sounds hörbar, Stummschalten wirkt und bleibt gespeichert
   - [ ] Fortschritt bleibt nach Neuladen erhalten, „Zurücksetzen“ löscht ihn
 
-#### M3 – Bosse (grob, G2 erst nach Q-04)
+#### M3 – Bosse
 
 | Welle | Pakete (parallel) |
 |---|---|
-| W1 | AP-16 Boss-Rahmen (Vertrag, Logik, Basis-Entity, HUD-Leiste) |
-| W2 | AP-17 Bosse Wald, AP-18 Bosse Wald bei Nacht, AP-19 Bosse Elfenwald |
-| W3 | M3-DEP [Mensch] |
+| W1 | AP-16 Boss-Rahmen (Vertrag, Daten, Logik, Basis-Entity, Platzhalter) |
+| W2 | AP-17 Baummonster, AP-18 Waldgeist, AP-19 Riesen-Stein |
+| W3 | AP-20 Boss-Einbindung (Spielszene, HUD, Ergebnis) |
+| W4 | M3-DEP [Mensch] |
+
+##### M3-DEP – Abnahme [Mensch]
+
+- Pull Requests `dev` → `stage` → `master`, Test am PC und auf dem iPhone
+- **Smoke-Test:**
+  - [ ] In der letzten Minute erscheint „Boss kommt!“ und der Boss des Batches
+  - [ ] Der Timer läuft ab, die Runde endet aber erst mit dem Sieg über den Boss
+  - [ ] `?level=0`, `?level=3`, `?level=7`, `?level=18`: Boss passt zum Batch, spätere Level haben stärkere Varianten mit Zusatzangriff
+  - [ ] Jeder Angriff wird vorher sichtbar angekündigt (fair)
 
 ---
 
@@ -550,11 +568,12 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | – | offen |
 | AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | – | offen |
 | M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | offen |
-| AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2, Q-04 | L | opus (high) | – | blockiert (Q-04) |
-| AP-17 | Bosse Wald (0–4) | M3 | GAME | W2 | AP-16 | M | sonnet | – | blockiert (Q-04) |
-| AP-18 | Bosse Wald bei Nacht (5–9) | M3 | GAME | W2 | AP-16 | M | sonnet | – | blockiert (Q-04) |
-| AP-19 | Bosse Elfenwald (10–20) | M3 | GAME | W2 | AP-16 | L | sonnet | – | blockiert (Q-04) |
-| M3-DEP | Abnahme M3 | M3 | HUM | W3 | AP-17–19 | H | – | – | offen |
+| AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2 | L | sonnet (high) | – | offen |
+| AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
+| AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
+| AP-19 | Boss Riesen-Stein (Elfenwald 10–20) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
+| AP-20 | Boss-Einbindung | M3 | GAME | W3 | AP-17–19 | M | sonnet (high) | – | offen |
+| M3-DEP | Abnahme M3 | M3 | HUM | W4 | AP-20 | H | – | – | offen |
 
 ---
 
@@ -579,6 +598,7 @@ flowchart LR
   end
   subgraph M3["M3 Bosse"]
     AP16["AP-16"] --> AP17["AP-17"] & AP18["AP-18"] & AP19["AP-19"]
+    AP17 & AP18 & AP19 --> AP20["AP-20"]
   end
   AP02 & AP03 & AP04 --> AP05 & AP06
   AP02 --> AP07
@@ -586,7 +606,7 @@ flowchart LR
   AP14 & AP15 --> AP16
 ```
 
-**Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11 → AP-14 → (M3) AP-16 → AP-19
+**Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11/AP-12 → AP-14 → (M3) AP-16 → AP-17–AP-19 → AP-20
 
 ---
 
@@ -1209,7 +1229,180 @@ flowchart LR
 
 ### M3 – Bosse
 
-⟦offen: Q-04⟧
+#### AP-16 – Boss-Rahmen
+
+- **Meilenstein, Lane, Welle:** M3 · SH/LOG · W1
+- **Ziel:** Alles Gemeinsame für Bosse:
+  - Vertrag, Daten mit Varianten je Level, Logik für Bossphase und Angriffstakt
+  - Basis-Entity mit Warnanzeigen
+  - Platzhalter-Assets und Anleitungs-Zeilen
+
+  Die drei Boss-Pakete bauen nur noch ihr Verhalten.
+- **Pflichtlektüre:** PE-18, PE-31, PE-33, PE-34, `src/contracts/*`, `src/logic/{round,spawn}.ts`, `src/config/{levels,assets}.ts`, `docs/guides/*`
+- **Abhängigkeiten:** M2
+- **Parallel möglich mit:** –
+- **Dateien (Eigentum):** `src/contracts/{boss,events,index}.ts`, `src/config/{bosses,levels,assets}.ts`, `src/logic/{boss,round,spawn}.ts`, `src/entities/bosses/{BossBase,Telegraph}.ts`, `public/assets/sprites/boss-*`, `public/assets/sounds/boss-*`, `public/assets/.placeholders.json`, `docs/guides/{grafik,sound}-austauschen.md`, zugehörige Tests unter `tests/`
+- **Nicht anfassen:** `src/scenes/*`, `scripts/*`, übrige Entities
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Vertrag `boss.ts`:
+     - `BossId` (`rootMonster` | `forestGhost` | `giantStone`)
+     - `BossAttackDef` mit `id`, `cooldownMs`, `telegraphMs`, `damage`, `extraOnly`
+     - `BossDef` mit `id`, `baseHp`, `baseDamage`, `spriteKey`, `attacks`
+     - `BossVariant` mit `hpMultiplier`, `damageMultiplier`, `tint`, `extraAttack`
+     - Events `boss-warning`, `boss-spawned`, `boss-hp-changed`, `boss-defeated`
+  2. `bosses.ts`: drei `BossDef` nach PE-34. `levels.ts`: `bossId` für alle 21 Level je Batch setzen.
+  3. `logic/boss.ts`:
+     - `variantForLevel(levelId)`:
+       - Index im Batch, HP +15 % und Schaden +10 % je Index
+       - Tönung je Index
+       - `extraAttack` ab Index 2
+     - `AttackScheduler`: wählt Angriffe nach Cooldown und liefert Warnzeit und Ausführungszeitpunkt. Rein und getestet.
+  4. `round.ts`:
+     - `requiresBossDefeat` wird `true`, wenn das Level einen `bossId` hat
+     - Warnung bei 63 s Restzeit, Boss bei 60 s
+     - nach Timer-Ende Zustand `bossFight`, Sieg erst mit `bossDefeated()`, Niederlage hat Vorrang
+     - `spawn.ts`: Während des Bosses halbiert sich die Rate normaler Spawns.
+  5. `BossBase`:
+     - HP, sanftes Aufblinken (PE-31), Varianten-Tönung, Callbacks für HP und Tod
+     - Hooks `onAttack(attackId)` für die Unterklassen
+  6. `Telegraph`: wiederverwendbare Warnanzeigen (Kreis, Linie, Ring), die sich in `telegraphMs` füllen. Jeder Boss-Angriff wird vorher angezeigt (Fairness).
+  7. Assets im Manifest ergänzen, danach `npm run assets:placeholders` und `npm run assets:check`:
+     - Sprites: `boss-root-monster` 64×64 ×4, `boss-root-spike` 16×32 ×3, `boss-forest-ghost` 48×48 ×4, `boss-ghost-orb` 8×8 ×2, `boss-giant-stone` 64×64 ×4
+     - Sounds: `boss-warning`, `boss-defeated`
+     - Den Eintrag `boss-placeholder` entfernen und alle Verweise darauf anpassen
+  8. Beide Anleitungen um die neuen Dateien ergänzen, im gleichen einfachen Stil.
+- **Akzeptanzkriterien:**
+  - Alle 21 Level haben einen passenden Boss
+  - Varianten steigen monoton
+  - Rundenregeln laut PE-18 sind getestet
+  - Bisherige Tests bleiben grün
+- **Tests:** `boss.test.ts` (Varianten, Scheduler); `round.test.ts` und `spawn.test.ts` erweitert (Bossphase, Timer-Ende mit lebendem Boss, Niederlage im Bosskampf); Config-Test für `bossId`
+- **Review-Schwerpunkte:** Abwärtskompatibilität der Verträge, keine Szenenänderung, Fairness (Warnzeit ≥ 700 ms)
+- **Doku-Pflichten:** Anleitungen ergänzen, `LICENSES.md` ergänzen
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-16): add boss framework`
+
+#### AP-17 – Boss Baummonster (Wald 0–4)
+
+- **Meilenstein, Lane, Welle:** M3 · GAME · W2
+- **Ziel:** Das verwurzelte Baummonster nach PE-34.
+- **Pflichtlektüre:** PE-34 (Baummonster), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`
+- **Abhängigkeiten:** AP-16
+- **Parallel möglich mit:** AP-18, AP-19
+- **Dateien (Eigentum):** `src/entities/bosses/{RootMonster,RootSpike}.ts`
+- **Nicht anfassen:** alle anderen Dateien
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Steht verwurzelt am Ring-Rand im Sichtfeld und bewegt sich nicht.
+  2. Angriff „Wurzelstoß“: Warnkreis unter der Astronautin, nach der Warnzeit bricht `RootSpike` hervor.
+  3. Angriff „Ruf des Waldes“: meldet über Callback 3–5 `cursedTree` zum Spawnen.
+  4. Zusatzangriff (nur `extraAttack`): Ring aus Wurzeln mit einer sichtbaren Lücke.
+- **Akzeptanzkriterien:**
+  - Alle Angriffe angekündigt
+  - Werte nur aus Config
+  - Checks grün
+- **Tests:** keine Phaser-Tests; fehlende reine Logik meldet der Coder (nicht selbst in `src/logic` ändern)
+- **Review-Schwerpunkte:** Fairness, Lesbarkeit, Aufräumen der Spikes
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-17): add root monster boss`
+
+#### AP-18 – Boss Waldgeist (Wald bei Nacht 5–9)
+
+- **Meilenstein, Lane, Welle:** M3 · GAME · W2
+- **Ziel:** Der Waldgeist nach PE-34.
+- **Pflichtlektüre:** PE-34 (Waldgeist), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`
+- **Abhängigkeiten:** AP-16
+- **Parallel möglich mit:** AP-17, AP-19
+- **Dateien (Eigentum):** `src/entities/bosses/{ForestGhost,GhostOrb}.ts`
+- **Nicht anfassen:** alle anderen Dateien
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Schwebt auf einer Kreisbahn um die Mitte.
+  2. Phasenweise halbtransparent und dann unverwundbar. Laser gehen durch, das ist deutlich sichtbar. Die Phase wird 1 s vorher angekündigt.
+  3. Angriff „Geisterfächer“: Warnlinien, danach 5 `GhostOrb` im Fächer auf die Mitte.
+  4. Zusatzangriff: teilt sich für einige Sekunden in 2 Trugbilder. Nur das echte nimmt Schaden, die Trugbilder schießen nicht.
+- **Akzeptanzkriterien:**
+  - Unverwundbarkeit klar erkennbar
+  - Alle Angriffe angekündigt
+  - Checks grün
+- **Tests:** wie AP-17
+- **Review-Schwerpunkte:** Fairness, Lesbarkeit bei Nacht-Hintergrund
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja (Trugbilder weglassen)
+- **Commit-Typ:** `feat(AP-18): add forest ghost boss`
+
+#### AP-19 – Boss Riesen-Stein (Elfenwald 10–20)
+
+- **Meilenstein, Lane, Welle:** M3 · GAME · W2
+- **Ziel:** Der Riesen-Stein nach PE-34.
+- **Pflichtlektüre:** PE-34 (Riesen-Stein), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`
+- **Abhängigkeiten:** AP-16
+- **Parallel möglich mit:** AP-17, AP-18
+- **Dateien (Eigentum):** `src/entities/bosses/GiantStone.ts`
+- **Nicht anfassen:** alle anderen Dateien
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Angriff „Rollen“:
+     - Eine Warnlinie zur Mitte erscheint.
+     - Der Stein rollt los. Trifft er die Astronautin, gibt es Schaden, danach prallt er zurück an den Rand.
+  2. Panzerung: Normal nimmt er halben Schaden. Kurz nach dem Aufprall nimmt er für ca. 2 s vollen Schaden, sichtbar durch Risse oder ein Aufleuchten.
+  3. Zusatzangriff: Bei 50 % HP zerbricht er in 2 kleinere Steine.
+     - Halbe Größe, gleiches Verhalten.
+     - Der Boss gilt erst als besiegt, wenn beide kleinen Steine besiegt sind.
+     - Die HP-Leiste zeigt die Summe.
+- **Akzeptanzkriterien:**
+  - Panzerphase gut erkennbar
+  - Sieg erst nach allen Teilen
+  - Checks grün
+- **Tests:** wie AP-17
+- **Review-Schwerpunkte:** Fairness, korrektes Sieg-Callback beim Zerbrechen
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja (Zerbrechen weglassen)
+- **Commit-Typ:** `feat(AP-19): add giant stone boss`
+
+#### AP-20 – Boss-Einbindung
+
+- **Meilenstein, Lane, Welle:** M3 · GAME · W3
+- **Ziel:** Bosse im Spiel: Warnung, Erscheinen, Kollisionen, HP-Leiste, Sieg nach Boss, Ergebnis.
+- **Pflichtlektüre:** PE-18, PE-31, PE-33, PE-34, `src/contracts/{boss,events}.ts`, `src/logic/{round,boss}.ts`, Boss-Entities aus AP-16 bis AP-19
+- **Abhängigkeiten:** AP-17, AP-18, AP-19
+- **Parallel möglich mit:** –
+- **Dateien (Eigentum):** `src/entities/bosses/createBoss.ts`, `src/scenes/{GameScene,HudScene,ResultScene}.ts`
+- **Nicht anfassen:** `src/logic/*`, `src/config/*`, übrige Boss-Dateien
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `createBoss(scene, bossId, variant)`: Fabrik für die drei Bosse.
+  2. `GameScene`:
+     - Bei `boss-warning` zeigt sie „Boss kommt!“ für 3 s und spielt `boss-warning`.
+     - Bei Boss-Start erscheint der Boss aus einer zufälligen Richtung.
+     - Kollisionen:
+       - Laser ↔ Boss und Boss-Teile
+       - Boss-Angriffe ↔ Spielerin
+       - Spawn-Callbacks (Baummonster)
+     - `bossDefeated` an `RoundState`, dazu der Sound `boss-defeated`.
+  3. `HudScene`: Boss-HP-Leiste oben mit Namen (deutsch: „Verwurzeltes Baummonster“, „Waldgeist“, „Riesen-Stein“). Der Timer zeigt nach Ablauf „Boss besiegen!“.
+  4. `ResultScene`: zeigt „Boss besiegt“.
+- **Akzeptanzkriterien:**
+  - Alle Smoke-Test-Punkte von M3-DEP
+  - Keine doppelten Listener nach „Nochmal“
+  - Checks grün
+- **Tests:** keine Phaser-Tests; Handtest-Checkliste im Bericht
+- **Review-Schwerpunkte:** Rundenende-Regeln, Aufräumen, Sound über `SoundService`
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-20): integrate bosses into game`
 
 ---
 
@@ -1220,7 +1413,7 @@ flowchart LR
 | H-01 | Node.js 24 und npm vorhanden (geprüft: Node v24.21.0, npm 11.19.0) | sofort | AP-01 | ☑ |
 | H-02 | Lizenzfrage für öffentliches Repo entscheiden (Q-12) | vor M2-DEP | – | ☑ (PE-27) |
 | H-03 | iPhone im selben WLAN; Windows-Firewall erlaubt Node im privaten Netz (Abfrage beim ersten `npm run preview -- --host` mit „Zulassen“ bestätigen) | M2-DEP | M2-DEP | ☐ |
-| H-04 | Bosse beschreiben (Q-04) | vor M3 | AP-16–AP-19 | ☐ |
+| H-04 | Bosse beschreiben (Q-04); angenommenes Verhalten PE-34 vor M3-Freigabe prüfen | vor M3 | AP-16–AP-20 | ☑ Namen / ☐ PE-34 prüfen |
 | H-05 | Optional: eigene Grafiken und Sounds nach den Anleitungen aus AP-07 austauschen | ab M1 | – | ☐ |
 | H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☐ |
 
@@ -1233,8 +1426,8 @@ flowchart LR
 | M0 | 4 | ≈ 4,5 h (+ Review ≈ 6 h) | ≈ 2–3 |
 | M1 | 6 | ≈ 9,25 h (+ Review ≈ 12 h) | ≈ 4–5 |
 | M2 | 5 | ≈ 6,75 h (+ Review ≈ 9 h) | ≈ 3–4 |
-| M3 (grob) | 4 | ≈ 8 h (+ Review ≈ 10,5 h) | ≈ 4 |
-| **Gesamt** | **19** | **≈ 28,5 h (+ Review ≈ 37 h)** | **≈ 13–16** |
+| M3 | 5 | ≈ 8,5 h (+ Review ≈ 11 h) | ≈ 4–5 |
+| **Gesamt** | **20** | **≈ 29 h (+ Review ≈ 38 h)** | **≈ 14–17** |
 
 Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18).
 
@@ -1243,14 +1436,14 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 **Ehrliche Einschätzung:**
 - **Das Budget ist der Engpass, nicht die Zahl der Coder.** 3 parallele Coder erreichen den 30-%-Zielwert schneller, danach pausiert das Team bis zum nächsten Fenster.
 - **Dauer:** Realistisch sind M0–M2 in etwa 9–12 Fenstern, also über mehrere Tage verteilt.
-- **M3 ist unsicher:** Bei 21 einzelnen Bossen wird der Aufwand deutlich größer als die grobe Schätzung.
+- **M3:** Mit drei Bossen in Varianten (PE-33) ist der Aufwand überschaubar. Das Boss-Verhalten ist angenommen (PE-34). Ändert der Nutzer es stark, wird AP-17 bis AP-19 neu geschätzt.
 
 | Stufe | Kürzung | Ersparnis | Betroffene Pakete |
 |---|---|---|---|
 | K1 | Balancing nur als Kennzahlen-Tabelle, ohne Monotonie-Tests | ≈ 0,5 h | AP-15 |
 | K2 | Maps ohne Partikel | ≈ 0,3 h | AP-12 |
 | K3 | AP-10 mit sonnet statt opus | Budget pro Stunde deutlich geringer, höheres Risiko für Nachbesserung | AP-10 |
-| K4 | Ein Boss je Batch mit Varianten (Werte, Farbe) statt 21 eigener Bosse | ≈ 3–5 h | AP-17–AP-19 |
+| K4 | Zusatzangriffe der Bosse weglassen (Trugbilder, Zerbrechen, Wurzelring) | ≈ 1–1,5 h | AP-17–AP-19 |
 | nie | Sicherheit, Datenschutz, robustes Laden, Asset-Lizenzen, Designer-Anleitungen | – | – |
 
 ---
@@ -1267,7 +1460,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | RI-6 | Leistung auf dem Handy bei vielen Gegnern | Pools, `maxEnemies` in Config, `?fps=1`, Partikel sparsam | AP-08–AP-12 |
 | RI-7 | Platzhalter-Grafik macht das Spiel weniger reizvoll, bis echte Sprites da sind | Anleitungen schon in M1 (AP-07), Austausch ohne Code | AP-02, AP-07 |
 | RI-8 | Öffentliches Repo: versehentlich Secrets oder fremde Assets veröffentlicht | PE-26, Review-Punkt, `LICENSES.md`, keine Secrets nötig | alle |
-| RI-9 | Bosse noch unbeschrieben (21 Level) | M3 blockiert bis Q-04, Kürzung K4 als Option | AP-16–AP-19 |
+| RI-9 | Boss-Verhalten ist vom Planner angenommen (PE-34) und trifft evtl. nicht die Vorstellung des Nutzers | Nutzer prüft PE-34 vor M3-Freigabe; Kürzung K4 | AP-16–AP-20 |
 | RI-10 | Phaser 3 ist nicht die neueste Hauptversion | bewusst festgelegt (PE-11), Version im Lockfile fixiert; Umstieg nur als eigene Entscheidung | AP-01 |
 | RI-11 | Gemeinsame Szenendateien werden in mehreren Wellen geändert | Eigentum je Welle in §8 festgelegt, Merge-Reihenfolge | AP-10, AP-12, AP-14 |
 
@@ -1307,6 +1500,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-27 | Keine Open-Source-Lizenz: keine `LICENSE`-Datei, README-Hinweis „© Cem Dogan, alle Rechte vorbehalten“ (in AP-01) | Q-12, Antwort 3a | Nutzer am 2026-10-23 |
 | PE-28 | Zuschnitt M0 (AP-01–AP-04) bestätigt | Antwort 1 | Nutzer am 2026-10-23 |
 | PE-29 | Pause-Taste und automatische Pause, wenn die App in den Hintergrund geht | wichtig auf dem Handy | Nutzer am 2026-10-23 |
+| PE-32 | Zuschnitt M2 (AP-11–AP-15) bestätigt | Antwort 1 | Nutzer am 2026-10-23 |
+| PE-33 | Ein Boss pro Batch mit Varianten je Level: Wald = verwurzeltes Baummonster, Wald bei Nacht = Waldgeist, Elfenwald = Riesen-Stein. Varianten: HP und Schaden steigen pro Level im Batch, Tönung verändert sich, ab dem 3. Level des Batches kommt ein Zusatzangriff dazu | Antwort 2a + Boss-Beschreibung; Variantenregel vom Planner | Nutzer am 2026-10-23 / Variantenregel angenommen |
+| PE-34 | Boss-Verhalten (angenommen vom Planner, Nutzer kann ändern). **Baummonster:** steht verwurzelt, bewegt sich nicht; Wurzeln brechen nach 1 s Warnmarkierung unter der Astronautin hervor; ruft verfluchte Bäume herbei; Zusatzangriff: Ring aus Wurzeln. **Waldgeist:** schwebt im Kreis um die Mitte, wird zeitweise halbtransparent und dann unverwundbar; schießt Geisterkugeln im Fächer; Zusatzangriff: teilt sich kurz in 2 Trugbilder. **Riesen-Stein:** rollt nach einer Warnlinie auf die Mitte zu und prallt zurück; nimmt nur halben Schaden, außer kurz nach dem Aufprall; Zusatzangriff: zerbricht bei 50 % HP in 2 kleinere Steine | Boss-Beschreibung, Details vom Planner | angenommen vom Planner |
 | PE-30 | Zuschnitt M1 (AP-05–AP-10) bestätigt | Antwort 1 | Nutzer am 2026-10-23 |
 | PE-31 | Treffer-Feedback: nur sanftes, angenehmes Aufblinken; kein Bildschirmwackeln, keine Schadenszahlen | Antwort 3 | Nutzer am 2026-10-23 |
 | PE-26 | Repository ist öffentlich. Folge: niemals Secrets, keine fremden Assets ohne Lizenz, Plan und Idee sind öffentlich lesbar | Antwort 4 | Nutzer am 2026-10-23 |
@@ -1318,7 +1514,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-01 | Bewegt sich die Astronautin auch über die Map, oder steht sie fest und dreht sich nur? | K | F-01, §4 | fest in der Mitte, nur Drehen (wie `idee.txt`) | geklärt (PE-08) |
 | Q-02 | Gibt es einen Termin für den ersten Stich? | K | §1, §14 | keiner | geklärt (PE-19) |
 | Q-03 | „Erste Hälfte“ bezogen auf was: die Level eines Batches oder die Level 0–20 insgesamt? | K | F-03 | pro Batch | geklärt (PE-09) |
-| Q-04 | Boss je Level: Aussehen, Verhalten, wann erscheint er (bei Timer-Ende, zur Halbzeit)? Muss er besiegt werden? | W (blockiert nur G2 des Boss-Meilensteins) | F-05 | Ablauf geklärt (PE-18); offen sind Aussehen und Verhalten je Boss | offen (Ablauf geklärt) |
+| Q-04 | Boss je Level: Aussehen, Verhalten, wann erscheint er (bei Timer-Ende, zur Halbzeit)? Muss er besiegt werden? | W (blockiert nur G2 des Boss-Meilensteins) | F-05 | Ablauf geklärt (PE-18); offen sind Aussehen und Verhalten je Boss | geklärt (PE-33, Verhalten angenommen PE-34) |
 | Q-05 | Batch-Grenzen überlappen (Wald 0–5, Nacht 5–10, Elfenwald 10–20). Zu welchem Batch gehören Level 5 und 10? | W | F-06 | 0–4 Wald, 5–9 Nacht, 10–20 Elfenwald | geklärt (PE-10) |
 | Q-06 | Wie gibt es Upgrades in der Runde, was bringt das Spielerlevel im ersten Stich (Rüstungen, Power-ups?), wie werden Level freigeschaltet? | K | F-07–F-09 | Erfahrungskristalle sammeln → Auswahl aus 3 Upgrades; Level nacheinander freischalten | geklärt (PE-12, PE-13) |
 | Q-07 | iOS: Der Mac ist sehr alt, das iPhone hat das neueste iOS. Wie kommt das Spiel aufs iPhone? Welches Mac-Modell und welche macOS-Version? | K | §3, §6 | Stich 1: iPhone spielt per Safari/PWA über das lokale WLAN vom PC. Native iOS-App erst später | geklärt (PE-14) |
@@ -1344,7 +1540,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | F-02 Automatischer Schuss | AP-05, AP-08 |
 | F-03 Runde mit Timer | AP-03, AP-06, AP-10 |
 | F-04 Gegner | AP-03, AP-09, AP-15 |
-| F-05 Boss je Level | AP-16–AP-19 (blockiert, Q-04) |
+| F-05 Boss je Level | AP-16–AP-20 |
 | F-06 Level und Maps 0–20 | AP-03, AP-12 |
 | F-07 Waffen-Items | AP-03, AP-05, AP-08, AP-10 |
 | F-08 Spielerlevel | AP-06, AP-10, AP-11 |
@@ -1378,3 +1574,4 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-23 | PE-23–PE-26 (Grafik, Sound, Querformat angenommen, öffentliches Repo), §4/§5 bestätigt, G1 erfüllt. §8–§11, §13 und M0-Pakete AP-01–AP-04 geschnitten, M1–M3 grob | Interview Runde 5, Paketierung | AP-01–AP-19 | Nutzer / Planner |
 | 2026-10-23 | M0 bestätigt (PE-28), Querformat (PE-25), Lizenzhinweis (PE-27), M1-Pakete AP-05–AP-10 detailliert, PE-29 Pause angenommen | Interview Runde 6 | AP-01, AP-05–AP-10 | Nutzer / Planner |
 | 2026-10-23 | M1 bestätigt (PE-30), Pause bestätigt, PE-31 sanftes Feedback. M2-Pakete AP-11–AP-15 detailliert, §1 Abnahme, §14 Budget, §15 Risiken, §17 Matrix, Lagebericht | Interview Runde 7 | AP-08–AP-15 | Nutzer / Planner |
+| 2026-10-23 | M2 bestätigt (PE-32), Bosse je Batch (PE-33), Boss-Verhalten angenommen (PE-34), M3 neu geschnitten: AP-16–AP-20 | Interview Runde 8 | AP-16–AP-20 | Nutzer / Planner |
