@@ -1,4 +1,5 @@
 import type { SaveGame } from '../contracts/save';
+import { LEVEL_COUNT } from '../config/levels';
 
 export const SAVE_KEY = '360shooter.save.v1';
 
@@ -12,7 +13,7 @@ export interface StorageLike {
 }
 
 export function defaultSave(): SaveGame {
-  return { version: 1, playerXp: 0, playerLevel: 1, highestUnlockedLevel: 1, muted: false };
+  return { version: 1, playerXp: 0, playerLevel: 1, highestUnlockedLevel: 0, muted: false };
 }
 
 function defaultStorage(): StorageLike | null {
@@ -34,7 +35,7 @@ export function parseSave(data: unknown): SaveGame | null {
   if (d.version !== 1) return null;
   if (!isIntInRange(d.playerXp, 0, MAX_XP)) return null;
   if (!isIntInRange(d.playerLevel, 1, MAX_LEVEL)) return null;
-  if (!isIntInRange(d.highestUnlockedLevel, 1, MAX_LEVEL)) return null;
+  if (!isIntInRange(d.highestUnlockedLevel, 0, LEVEL_COUNT - 1)) return null;
   if (typeof d.muted !== 'boolean') return null;
   return {
     version: 1,
