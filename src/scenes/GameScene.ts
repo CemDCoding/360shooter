@@ -9,6 +9,7 @@ import {
   type WeaponStacks,
 } from '../contracts';
 import { ItemPickup } from '../entities/ItemPickup';
+import { MapBackground } from '../entities/MapBackground';
 import { Laser } from '../entities/Laser';
 import { LaserPool } from '../entities/LaserPool';
 import { Player } from '../entities/Player';
@@ -72,6 +73,7 @@ function pick<T>(a: unknown, b: unknown, ctor: abstract new (...args: never[]) =
 export class GameScene extends Phaser.Scene {
   private level!: LevelDef;
   private rng!: Rng;
+  private background?: MapBackground;
   private lasers!: LaserPool;
   private boltPool!: WitchBoltPool;
   private enemyPool!: EnemyPool;
@@ -109,6 +111,9 @@ export class GameScene extends Phaser.Scene {
     this.rng = createRng(Date.now() >>> 0);
     // endRound() pauses the world; make sure a restarted round ("Nochmal") runs again.
     this.physics.resume();
+
+    // Fixed seed per level: same floor layout every round.
+    this.background = new MapBackground(this, this.level.batch, this.level.id * 7919 + 1);
 
     this.lasers = new LaserPool(this);
     this.boltPool = new WitchBoltPool(this);
@@ -289,6 +294,8 @@ export class GameScene extends Phaser.Scene {
     for (const item of this.items) item.onCollected = undefined;
     this.items = [];
     this.pendingDrops = [];
+    this.background?.destroy();
+    this.background = undefined;
     // AimInput removes its own listeners on SHUTDOWN; game objects, colliders and timers
     // are destroyed by Phaser's scene shutdown.
     if (this.scene.isActive('HudScene') || this.scene.isPaused('HudScene')) {
