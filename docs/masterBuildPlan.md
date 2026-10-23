@@ -21,12 +21,15 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** {{JJJJ-MM-TT}} · Meilenstein {{Mx}} · Welle {{Wn}} abgeschlossen
-- **Fertig:** {{AP-IDs}} · **Offen:** {{AP-IDs mit Status}}
-- **Unterbrochen oder laufend:** {{z. B. AP-07 in Review Runde 2}} | nichts
-- **Erkenntnisse:** {{nur was die nächsten Pakete betrifft}}
-- **Nächster Schritt:** {{z. B. Welle W3 starten: AP-04, AP-06}}
-- **Offene Fragen an den Nutzer:** {{…}} | keine
+- **Stand:** 2026-10-23 · Planung abgeschlossen, Bau noch nicht begonnen
+- **Fertig:** – · **Offen:** AP-01 `bereit`; AP-02–AP-15 `offen`; AP-16–AP-19 `blockiert` (Q-04)
+- **Unterbrochen oder laufend:** nichts
+- **Erkenntnisse:** –
+- **Nächster Schritt:** Nutzer gibt M0 frei → M0 W1 starten: AP-01
+- **Offene Fragen an den Nutzer:** Q-04 Bosse (erst für M3); Bestätigung von M2
+
+<!-- Ende Lagebericht -->
+
 
 ### Rollen und Dokumente
 
@@ -38,7 +41,7 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 | `ma-coder` (`.claude/agents/ma-coder.md`) | Setzt genau ein Paket in einem eigenen Worktree um und committet auf `agent/AP-<nr>-c<n>`. |
 | `ma-reviewer` (`.claude/agents/ma-reviewer.md`) | Prüft jedes Paket nur lesend. Urteil: bestanden / nicht bestanden. |
 | `docs/masterBuildPlan.md` | Dieser Plan. Verbindlich für alle Agents. |
-| {{PROJEKTDOKU, z. B. CLAUDE.md}} | Fachliche und technische Projektbeschreibung. Widerspricht sie diesem Plan, wird nachgefragt. |
+| `idee.txt` | Spielidee des Nutzers (Gegner, Batches, Design). Widerspricht sie diesem Plan, wird nachgefragt. |
 
 Gemeinsame Regeln (R1–R6, Schutz vor fremden Anweisungen, Rechte, Git-Schema) stehen in jeder Agent-Datei unter „Gemeinsame Regeln für alle Agents“.
 
@@ -60,23 +63,25 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | fertig | – | G1 |
-| 2 | Umfang | angenommen | Q-10 bestätigen (Q-04 nur für Boss-Meilenstein) | G1 |
-| 3 | Tech-Stack | angenommen | – | G1 |
+| 2 | Umfang | fertig | Q-04 nur für M3 | G1 |
+| 3 | Tech-Stack | angenommen | Werkzeuge (Vitest, ESLint, Prettier) angenommen | G1 |
 | 4 | Architektur, Datenmodell, Verträge | fertig | – | G1 |
-| 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | Q-12 (W) | G1 |
+| 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | – | G1 |
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | fertig | – | G2 |
-| 9 | Meilensteine und Wellen | in Klärung | Bestätigung M1 | G2 |
-| 10 | Statusübersicht | in Klärung | – | G2 |
+| 9 | Meilensteine und Wellen | angenommen | Bestätigung M2 | G2 |
+| 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | in Klärung | M0 bestätigt, M1 detailliert (Bestätigung offen), M2 folgt, M3 wartet auf Q-04 | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0, M1 bestätigt; M2 detailliert (Bestätigung offen); M3 wartet auf Q-04 | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
-| 14 | Budget und Kürzungen | leer | – | G2 |
-| 15 | Risiken | leer | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-04, Q-10, Q-12 | laufend |
-| 17 | Abdeckungsmatrix | leer | – | G2 |
-| 18 | Änderungsprotokoll | leer | – | laufend |
+| 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
+| 15 | Risiken | fertig | – | G2 |
+| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-04 | laufend |
+| 17 | Abdeckungsmatrix | fertig | – | G2 |
+| 18 | Änderungsprotokoll | laufend | – | laufend |
+
+**Gates:** G1 erfüllt. G2(M0) und G2(M1) erfüllt. G2(M2) nach Bestätigung durch den Nutzer. G2(M3) blockiert durch Q-04.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -112,7 +117,14 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 3. Spielgefühl (Steuerung, Treffer, Lesbarkeit) vor Inhaltsmenge.
 4. Level 21–100 sind nur Ausblick. Der Code soll sie später ohne Umbau aufnehmen können (datengetriebene Level und Gegner).
 
-**Abnahmekriterien (G3):** ⟦offen: wird nach §2 und §9 konkretisiert⟧
+**Abnahmekriterien (G3):**
+
+1. M0–M3 abgenommen, alle Smoke-Tests aus §9 erfüllt.
+2. Level 0–20 sind nacheinander freispielbar, am PC (Maus) und auf dem iPhone (Touch, Homescreen-App, Querformat).
+3. Jedes Level endet mit seinem Boss (nach Q-04).
+4. Grafik und Sound lassen sich nach den Anleitungen in `docs/guides/` ohne Code-Änderung austauschen, `npm run assets:check` ist grün.
+5. Keine personenbezogenen Daten, kein Tracking, keine externen Requests.
+6. Alle Checks grün (`lint`, `typecheck`, `test`, `build`).
 
 ---
 
@@ -267,10 +279,10 @@ Status: Entwurf des Planners (angenommen, PE-22).
 | Regel | Umsetzung (grob) | Testart | Paket |
 |---|---|---|---|
 | Keine personenbezogenen Daten, kein Tracking, keine externen Requests (R2) | nur `SaveGame` lokal, keine Netzwerkaufrufe im Spiel | Review, Suche nach `fetch`/externen URLs | alle |
-| Spielstand robust laden | Version prüfen, kaputte oder fremde Werte verwerfen und mit Standard starten | Unit-Test | Speicher-Paket |
-| Dev-Server im WLAN | `--host` nur für das Heimnetz, nie Portweiterleitung oder öffentliches Hosting | Doku (README) | Gerüst-Paket |
-| Asset-Lizenzen (R1) | nur eigene, generierte oder CC0-Assets, Lizenzliste im Repo | Review | Asset-Pakete |
-| Abhängigkeiten (R6) | nur freigegebene Pakete (§3), `npm audit` ohne hohe Befunde | Check des Leads | Gerüst-Paket |
+| Spielstand robust laden | Version prüfen, kaputte oder fremde Werte verwerfen und mit Standard starten | Unit-Test | AP-04 |
+| Dev-Server im WLAN | `--host` nur für das Heimnetz, nie Portweiterleitung oder öffentliches Hosting | Doku (README) | AP-13 |
+| Asset-Lizenzen (R1) | nur eigene, generierte oder CC0-Assets, Lizenzliste im Repo | Review | AP-02, AP-07 |
+| Abhängigkeiten (R6) | nur freigegebene Pakete (§3), `npm audit` ohne hohe Befunde | Check des Leads | AP-01, alle |
 | Impressum und Datenschutzerklärung (R3) | entfällt im ersten Stich (nicht öffentlich), vor einer Veröffentlichung Pflicht | – | Ausblick |
 | Secrets nur in `.env`, `.env.example` gepflegt (R4) | im ersten Stich keine Secrets nötig | Review | alle |
 
@@ -403,12 +415,14 @@ flowchart TD
 
 | Gemeinsame Datei | Wer ändert sie | Wann |
 |---|---|---|
-| `package.json`, `package-lock.json` | AP-01 (anlegen), AP-02 (Skript `assets:placeholders`); danach nur der Lead beim Merge | M0 W1, M0 W2 |
+| `package.json`, `package-lock.json` | AP-01 (anlegen), AP-02 (`assets:placeholders`), AP-07 (`assets:check`), AP-13 (`preview:lan`, `icons`); sonst nur der Lead beim Merge | M0 W1, M0 W2, M1 W1, M2 W1 |
 | `src/main.ts` (Szenen-Registrierung) | AP-01 registriert alle sechs Szenen als Stubs; danach unverändert | M0 W1 |
-| `src/contracts/*` | AP-01; spätere Erweiterung nur in einem eigenen Vertragspaket eine Welle vorher | M0 W1 |
-| `index.html` | AP-01, später AP-13 (PWA-Meta-Tags) | M0 W1, M2 W1 |
-| `README.md` | AP-01, später AP-13 (Abschnitt iPhone) | M0 W1, M2 W1 |
-| `src/scenes/GameScene.ts` | AP-10, später AP-14 (Sound-Hooks) | M1 W3, M2 W2 |
+| `src/contracts/*` | AP-01; spätere Erweiterung nur in einem eigenen Vertragspaket eine Welle vorher (M3: AP-16) | M0 W1 |
+| `index.html`, `vite.config.ts` | AP-01, später AP-13 | M0 W1, M2 W1 |
+| `README.md` | AP-01, später AP-13 | M0 W1, M2 W1 |
+| `src/scenes/GameScene.ts` | AP-10 → AP-12 (Hintergrund) → AP-14 (Sound) | M1 W3, M2 W1, M2 W2 |
+| `src/scenes/{MenuScene,HudScene,ResultScene}.ts` | AP-10 (Hud, Result), AP-11 (Menu) → AP-14 (Sound, Stumm-Taste) | M1 W3, M2 W1, M2 W2 |
+| `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 | M0 W2, M2 W2 |
 
 ---
 
@@ -533,8 +547,8 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
 | AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
 | AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | – | offen |
-| AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11 | S | sonnet (medium) | – | offen |
-| AP-15 | Balancing Level 0–20 | M2 | SH | W2 | AP-12 | M | sonnet (medium) | – | offen |
+| AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | – | offen |
+| AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | – | offen |
 | M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | offen |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2, Q-04 | L | opus (high) | – | blockiert (Q-04) |
 | AP-17 | Bosse Wald (0–4) | M3 | GAME | W2 | AP-16 | M | sonnet | – | blockiert (Q-04) |
@@ -559,15 +573,16 @@ flowchart LR
   end
   subgraph M2["M2 Inhalte, Menü, iPhone"]
     AP11["AP-11"] --> AP14["AP-14"]
-    AP12["AP-12"] --> AP15["AP-15"]
+    AP12["AP-12"] --> AP14
     AP13["AP-13"]
+    AP15["AP-15"]
   end
   subgraph M3["M3 Bosse"]
     AP16["AP-16"] --> AP17["AP-17"] & AP18["AP-18"] & AP19["AP-19"]
   end
   AP02 & AP03 & AP04 --> AP05 & AP06
   AP02 --> AP07
-  AP10 --> AP11 & AP12 & AP13
+  AP10 --> AP11 & AP12 & AP13 & AP15
   AP14 & AP15 --> AP16
 ```
 
@@ -918,7 +933,7 @@ flowchart LR
      - feuert mit `FireTimer` über `LaserPool` in die aktuelle Blickrichtung
      - hält HP und Waffen-Stacks, `takeDamage`, `heal`, `applyItem`
      - sendet Änderungen über Callbacks (keine Szenen-Imports)
-     - Animationen idle/shoot, kurzes Aufblinken bei Treffer
+     - Animationen idle/shoot, sanftes Aufblinken bei Treffer: kurze helle Tönung, ca. 100–150 ms, kein greller Blitz, **kein Bildschirmwackeln** (PE-31)
   2. `LaserPool`: Objekt-Pool mit Arcade-Gruppe. Skalierung und Schaden nach aktuellen `WeaponStats`, Löschen ab `range`.
   3. `ItemPickup`:
      - erscheint an einer Gegnerposition
@@ -950,7 +965,7 @@ flowchart LR
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
   1. `Enemy` (Basis):
-     - Sprite und Animation aus `spriteKey`, HP aus `EnemyDef`, `takeDamage` mit Aufblinken
+     - Sprite und Animation aus `spriteKey`, HP aus `EnemyDef`, `takeDamage` mit sanftem Aufblinken wie bei der Spielerin (PE-31), keine Schadenszahlen
      - Tod → Callback `onDeath(x, y, xp)`
      - Ausrichtung zur Mitte, Pooling-fähig (`spawn`/`despawn`)
   2. `chase` (`CursedTree`, `ZombieSquirrel`): läuft direkt zur Mitte. Kontaktschaden je Sekunde Kontakt.
@@ -997,7 +1012,7 @@ flowchart LR
      - HP-Leiste
      - Waffenstufen (drei kleine Icons mit Zahl 0–5)
      - Pause-Taste
-  4. Pause: Taste im HUD, `Esc`/`P` am PC. Automatische Pause, wenn die Seite in den Hintergrund geht (`visibilitychange`) (angenommen, PE-29).
+  4. Pause: Taste im HUD, `Esc`/`P` am PC. Automatische Pause, wenn die Seite in den Hintergrund geht (`visibilitychange`) (PE-29). Kein Bildschirmwackeln, keine Schadenszahlen (PE-31).
   5. Rundenende:
      - `applyRoundResult` mit `writeSave`
      - `ResultScene` zeigt „Gewonnen“ oder „Verloren“, XP und Spielerlevel
@@ -1018,7 +1033,179 @@ flowchart LR
 
 ### M2 – Inhalte, Menü, iPhone
 
-⟦Detailbeschreibung folgt nach Bestätigung von M1⟧
+#### AP-11 – Hauptmenü und Fortschritt
+
+- **Meilenstein, Lane, Welle:** M2 · GAME · W1
+- **Ziel:** Hauptmenü mit Spielerlevel, Level-Auswahl 0–20 nach Batches und „Fortschritt zurücksetzen“ (F-08, F-09).
+- **Pflichtlektüre:** F-08, F-09, PE-13, `src/platform/storage.ts`, `src/logic/progression.ts`, `src/config/levels.ts`
+- **Abhängigkeiten:** M1
+- **Parallel möglich mit:** AP-12, AP-13
+- **Dateien (Eigentum):** `src/scenes/MenuScene.ts`, `src/scenes/menu/{LevelGrid,ConfirmDialog,Button}.ts`
+- **Nicht anfassen:** `src/scenes/{GameScene,HudScene,ResultScene}.ts`, `index.html`, `src/config/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Titel „360shooter“, Astronautin (Idle-Animation), Spielerlevel mit XP-Balken bis zum nächsten Level.
+  2. `LevelGrid`:
+     - Level 0–20 in drei Gruppen: Wald, Wald bei Nacht, Elfenwald
+     - Gesperrte Level sind grau mit Schloss, freie Level sind antippbar.
+     - Rundendauer (3:00/5:00) als kleine Angabe
+  3. `Button`: Tasten groß genug für Finger (mindestens 32×32 logische Pixel), Hover am PC, sanftes Feedback.
+  4. „Fortschritt zurücksetzen“ mit `ConfirmDialog` („Wirklich löschen?“) → `resetSave()`.
+  5. Auswahl startet `GameScene` mit `{ levelId }`.
+- **Akzeptanzkriterien:**
+  - Nur freigespielte Level startbar
+  - Nach Sieg in Level n ist n+1 beim Zurückkehren frei
+  - Reset wirkt sofort
+  - Checks grün
+- **Tests:** keine Phaser-Tests; falls Hilfslogik nötig (z. B. Gruppierung), als reine Funktion in `src/scenes/menu/levelGroups.ts` mit Test `tests/scenes/levelGroups.test.ts` (gehört diesem Paket)
+- **Review-Schwerpunkte:** Bedienbarkeit per Touch, keine direkte `localStorage`-Nutzung
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-11): add main menu with level select and progress`
+
+#### AP-12 – Maps je Batch
+
+- **Meilenstein, Lane, Welle:** M2 · GAME · W1
+- **Ziel:** Drei einfache Maps mit Charme: Wald, Wald bei Nacht, Elfenwald (F-06).
+- **Pflichtlektüre:** F-06, PE-10, `idee.txt` (Umgebung, Design-Orientierung Metroid-pixelig), `src/config/assets.ts`
+- **Abhängigkeiten:** M1
+- **Parallel möglich mit:** AP-11, AP-13
+- **Dateien (Eigentum):** `src/config/maps.ts`, `src/entities/MapBackground.ts`, `src/scenes/GameScene.ts` (nur Einbindung des Hintergrunds), `tests/config/maps.test.ts`
+- **Nicht anfassen:** übrige `src/config/*`, `MenuScene`, `index.html`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `maps.ts`: je `BatchId` ein Eintrag mit diesen Feldern:
+     - Tileset-Key
+     - Grundfarbe und Tönung
+     - Dichte der Deko-Kacheln
+     - optionaler Partikel-Effekt:
+       - Wald: keiner
+       - Nacht: Glühwürmchen
+       - Elfenwald: schimmernde Sporen
+     - Rand-Abdunklung (Vignette)
+  2. `MapBackground`:
+     - füllt die Fläche mit Kacheln aus dem Tileset, Verteilung zufällig mit festem Seed pro Level
+     - Partikel leicht und ressourcenschonend (≤ 40)
+     - Keine Hindernisse, nur Optik
+  3. In `GameScene` beim Start den Hintergrund des Batches des Levels einbinden. Sonst bleibt `GameScene` unverändert.
+- **Akzeptanzkriterien:**
+  - Die drei Batches sind auf einen Blick unterscheidbar
+  - Mit Designer-Tilesets funktioniert es ohne Code-Änderung
+  - Spielbarkeit (Lesbarkeit der Gegner) bleibt erhalten
+  - Checks grün
+- **Tests:** jeder `BatchId` hat einen Map-Eintrag mit gültigem Asset-Key
+- **Review-Schwerpunkte:** Leistung auf dem Handy, Lesbarkeit
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja (Partikel weglassen)
+- **Commit-Typ:** `feat(AP-12): add batch maps`
+
+#### AP-13 – PWA und Querformat
+
+- **Meilenstein, Lane, Welle:** M2 · OPS · W1
+- **Ziel:** Das Spiel läuft auf dem iPhone als Homescreen-App im Vollbild, vom PC über das WLAN; im Hochformat erscheint „Bitte drehen“ (F-10, F-14, PE-14, PE-25).
+- **Pflichtlektüre:** PE-14, PE-25, §5 (Dev-Server im WLAN), §6 (Deployment-Anleitung), H-03
+- **Abhängigkeiten:** M1
+- **Parallel möglich mit:** AP-11, AP-12
+- **Dateien (Eigentum):** `index.html`, `public/manifest.webmanifest`, `public/icons/*`, `scripts/generate-icons.mjs`, `vite.config.ts`, `package.json` (nur Skripte `preview:lan`, `icons`), `README.md`
+- **Nicht anfassen:** `src/**`
+- **Freigegebene Abhängigkeiten:** keine (keine PWA-Plugins; Service Worker entfällt, weil iOS ihn über `http://` im LAN nicht zulässt)
+- **Umsetzung:**
+  1. `manifest.webmanifest`: Name, `display: fullscreen`, `orientation: landscape`, Farben, Icons 180/192/512.
+  2. `index.html`:
+     - `apple-mobile-web-app-capable`, Statusleiste, `apple-touch-icon`
+     - `viewport-fit=cover`, Safe-Area-Ränder
+     - Doppeltipp-Zoom, Long-Press-Menü und Textauswahl unterdrücken
+     - CSS-Overlay „Bitte drehen“ bei Hochformat
+  3. `scripts/generate-icons.mjs`: Platzhalter-Icons aus Node-Bordmitteln. Echte Icons kann der Designer ersetzen, die Anleitung bekommt einen Hinweis im README.
+  4. Skript `preview:lan`: `build` und danach `vite preview --host`, die lokale IP im Terminal sichtbar.
+  5. README um diese Abschnitte ergänzen:
+     - „Am PC spielen“
+     - „Auf dem iPhone spielen“: Schritt für Schritt mit gleichem WLAN, Firewall-Abfrage „Zulassen“, IP in Safari, „Teilen → Zum Home-Bildschirm“
+     - Hinweis: nur im Heimnetz, keine Portweiterleitung
+     - „Debug-Parameter“ (`?level=`, `?fps=1`, `?assets=1`)
+     - Verweise auf `docs/guides/grafik-austauschen.md` und `docs/guides/sound-austauschen.md`
+- **Akzeptanzkriterien:**
+  - iPhone: Homescreen-App startet ohne Safari-Leisten
+  - Hochformat zeigt das Overlay
+  - Kein Zoomen und kein Scrollen beim Spielen
+  - Checks grün
+- **Tests:** keine; Handtest-Checkliste im Bericht
+- **Review-Schwerpunkte:** keine externen Requests, Hinweis zum Heimnetz, Verständlichkeit der README-Schritte
+- **Doku-Pflichten:** README
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (iPhone ist Pflicht)
+- **Commit-Typ:** `feat(AP-13): add pwa setup and landscape lock`
+
+#### AP-14 – Sound-Anbindung und Stummschalten
+
+- **Meilenstein, Lane, Welle:** M2 · GAME · W2
+- **Ziel:** Platzhalter-Sounds an den richtigen Stellen, Stummschalt-Taste, Zustand gespeichert (F-13, PE-24).
+- **Pflichtlektüre:** PE-24, `src/config/assets.ts`, `src/platform/storage.ts` (`muted`), `src/contracts/events.ts`
+- **Abhängigkeiten:** AP-11, AP-12
+- **Parallel möglich mit:** AP-15
+- **Dateien (Eigentum):** `src/platform/audio.ts`, `src/scenes/{GameScene,HudScene,ResultScene,MenuScene}.ts` (nur Sound-Aufrufe und Stumm-Taste), `tests/platform/audio.test.ts`
+- **Nicht anfassen:** `src/config/*` (AP-15), `src/entities/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `audio.ts`: `SoundService`.
+     - `play(key)` beachtet `muted`. Der Laser-Sound wird gedrosselt, höchstens alle 80 ms.
+     - `setMuted` speichert über Storage und sendet `mute-changed`.
+     - Auf iOS wird Audio beim ersten Antippen freigeschaltet.
+  2. Sound-Aufrufe:
+     - `laser`, `hit`, `enemy-death`, `item-pickup` und `player-hurt` in `GameScene`
+     - `round-won` und `round-lost` in `ResultScene`
+  3. Stumm-Taste (Icons `ui-icons`) im HUD und im Menü.
+  4. Lautstärke-Grundwert in `src/platform/audio.ts` als eine Konstante (kein Config-Eingriff in dieser Welle).
+- **Akzeptanzkriterien:**
+  - Stumm bleibt nach Neuladen stumm
+  - Auf dem iPhone ist Ton nach dem ersten Antippen hörbar
+  - Ersetzte WAV-Dateien werden ohne Code-Änderung gespielt
+  - Checks grün
+- **Tests:** Drosselung und Mute-Logik mit Fake-Sound und Fake-Storage
+- **Review-Schwerpunkte:** keine doppelten Listener, Drosselung
+- **Doku-Pflichten:** –
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (F-13)
+- **Commit-Typ:** `feat(AP-14): add sound playback and mute`
+
+#### AP-15 – Balancing Level 0–20
+
+- **Meilenstein, Lane, Welle:** M2 · SH · W2
+- **Ziel:** Spielwerte so abstimmen, dass jedes Level etwas schwerer wird, Level 0 leicht ist und Level 20 fordernd, ohne unfair zu sein. Mit Erklärung für den Nutzer zum Nachjustieren.
+- **Pflichtlektüre:** `idee.txt` (Gegner), PE-05, PE-16, PE-17, `src/config/*`, `src/logic/*`
+- **Abhängigkeiten:** M1
+- **Parallel möglich mit:** AP-14
+- **Dateien (Eigentum):** `src/config/{levels,enemies,items,weapon,player,progression}.ts`, `tests/config/*.test.ts` (außer `assets`, `maps`), `tests/logic/balance.test.ts`, `docs/balancing.md`
+- **Nicht anfassen:** `src/config/{assets,maps}.ts`, `src/logic/*`, Szenen
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Kennzahlen pro Level berechnen, als reine Rechnung im Test, mit `src/logic`:
+     - Gegner-HP pro Minute
+     - mögliche Spieler-DPS ohne und mit Items
+     - Schaden pro Minute bei freiem Durchlauf
+  2. Werte anpassen, bis drei Bedingungen gelten:
+     - Die Schwierigkeit steigt pro Level monoton.
+     - Ein Batch-Sprung ist spürbar, aber nicht abrupt.
+     - Die 5-Minuten-Level sind fordernder als die 3-Minuten-Level desselben Batches.
+  3. `balance.test.ts` sichert diese Bedingungen.
+  4. `docs/balancing.md`: in einfacher Sprache erklären, welcher Wert was bewirkt und wo er steht, mit einer Tabelle aller Level und ihrer Kennzahlen.
+- **Akzeptanzkriterien:**
+  - Bedingungen aus Schritt 2 als Tests grün
+  - Handtest durch den Nutzer in M2-DEP: Level 0 gut schaffbar, Level 20 nur mit Items
+  - Checks grün
+- **Tests:** `balance.test.ts`, bestehende Config-Tests angepasst
+- **Review-Schwerpunkte:** Werte nur in Config, nachvollziehbare Doku
+- **Doku-Pflichten:** `docs/balancing.md`
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja (K1: nur Kennzahlen-Tabelle, keine Monotonie-Tests)
+- **Commit-Typ:** `feat(AP-15): balance levels 0-20`
 
 ### M3 – Bosse
 
@@ -1043,16 +1230,28 @@ flowchart LR
 
 | Meilenstein | Pakete | Agent-Aufwand | Geschätzte 5-h-Fenster bei 30 % Team-Budget |
 |---|---|---|---|
-| M{{x}} | {{n}} | {{h}} | {{n}} |
-| **Gesamt** | | | |
+| M0 | 4 | ≈ 4,5 h (+ Review ≈ 6 h) | ≈ 2–3 |
+| M1 | 6 | ≈ 9,25 h (+ Review ≈ 12 h) | ≈ 4–5 |
+| M2 | 5 | ≈ 6,75 h (+ Review ≈ 9 h) | ≈ 3–4 |
+| M3 (grob) | 4 | ≈ 8 h (+ Review ≈ 10,5 h) | ≈ 4 |
+| **Gesamt** | **19** | **≈ 28,5 h (+ Review ≈ 37 h)** | **≈ 13–16** |
 
-**Zeit des Nutzers:** {{Freigaben, Entscheidungen, Deployments, Smoke-Tests – geschätzt h}}
+Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18).
 
-**Ehrliche Einschätzung:** {{…}}
+**Zeit des Nutzers:** Abnahmen und Smoke-Tests ≈ 0,5–1 h je Meilenstein, Freigaben pro Meilenstein, Boss-Beschreibung (Q-04), optional Grafik und Sound. Zusammen ≈ 4–6 h ohne Grafik.
+
+**Ehrliche Einschätzung:**
+- **Das Budget ist der Engpass, nicht die Zahl der Coder.** 3 parallele Coder erreichen den 30-%-Zielwert schneller, danach pausiert das Team bis zum nächsten Fenster.
+- **Dauer:** Realistisch sind M0–M2 in etwa 9–12 Fenstern, also über mehrere Tage verteilt.
+- **M3 ist unsicher:** Bei 21 einzelnen Bossen wird der Aufwand deutlich größer als die grobe Schätzung.
 
 | Stufe | Kürzung | Ersparnis | Betroffene Pakete |
 |---|---|---|---|
-| K1 | {{…}} | {{…}} | {{…}} |
+| K1 | Balancing nur als Kennzahlen-Tabelle, ohne Monotonie-Tests | ≈ 0,5 h | AP-15 |
+| K2 | Maps ohne Partikel | ≈ 0,3 h | AP-12 |
+| K3 | AP-10 mit sonnet statt opus | Budget pro Stunde deutlich geringer, höheres Risiko für Nachbesserung | AP-10 |
+| K4 | Ein Boss je Batch mit Varianten (Werte, Farbe) statt 21 eigener Bosse | ≈ 3–5 h | AP-17–AP-19 |
+| nie | Sicherheit, Datenschutz, robustes Laden, Asset-Lizenzen, Designer-Anleitungen | – | – |
 
 ---
 
@@ -1064,7 +1263,13 @@ flowchart LR
 | RI-2 | Vertrag aus derselben Welle wird genutzt | Verträge eine Welle früher | Vertragsnutzer |
 | RI-3 | Budget reicht nicht für die geplante Parallelität | Parallelität §7.2, Kürzungen §14 | alle |
 | RI-4 | Prompt-Injection über Abhängigkeiten, Doku oder Daten | Wächter, Review-Punkt „Verdächtige Inhalte“, nur freigegebene Abhängigkeiten | alle |
-| RI-{{n}} | {{…}} | {{…}} | {{…}} |
+| RI-5 | iPhone-Safari: Ton erst nach Antippen, kein Service Worker über `http://`, Eigenheiten der Homescreen-App | AP-13/AP-14 behandeln es ausdrücklich; Test auf dem iPhone in M2-DEP | AP-13, AP-14 |
+| RI-6 | Leistung auf dem Handy bei vielen Gegnern | Pools, `maxEnemies` in Config, `?fps=1`, Partikel sparsam | AP-08–AP-12 |
+| RI-7 | Platzhalter-Grafik macht das Spiel weniger reizvoll, bis echte Sprites da sind | Anleitungen schon in M1 (AP-07), Austausch ohne Code | AP-02, AP-07 |
+| RI-8 | Öffentliches Repo: versehentlich Secrets oder fremde Assets veröffentlicht | PE-26, Review-Punkt, `LICENSES.md`, keine Secrets nötig | alle |
+| RI-9 | Bosse noch unbeschrieben (21 Level) | M3 blockiert bis Q-04, Kürzung K4 als Option | AP-16–AP-19 |
+| RI-10 | Phaser 3 ist nicht die neueste Hauptversion | bewusst festgelegt (PE-11), Version im Lockfile fixiert; Umstieg nur als eigene Entscheidung | AP-01 |
+| RI-11 | Gemeinsame Szenendateien werden in mehreren Wellen geändert | Eigentum je Welle in §8 festgelegt, Merge-Reihenfolge | AP-10, AP-12, AP-14 |
 
 ---
 
@@ -1101,7 +1306,9 @@ flowchart LR
 | PE-25 | Querformat, im Hochformat Hinweis „bitte drehen“ | Q-10, Antwort 2 | Nutzer am 2026-10-23 |
 | PE-27 | Keine Open-Source-Lizenz: keine `LICENSE`-Datei, README-Hinweis „© Cem Dogan, alle Rechte vorbehalten“ (in AP-01) | Q-12, Antwort 3a | Nutzer am 2026-10-23 |
 | PE-28 | Zuschnitt M0 (AP-01–AP-04) bestätigt | Antwort 1 | Nutzer am 2026-10-23 |
-| PE-29 | Pause-Taste und automatische Pause, wenn die App in den Hintergrund geht | wichtig auf dem Handy | angenommen vom Planner |
+| PE-29 | Pause-Taste und automatische Pause, wenn die App in den Hintergrund geht | wichtig auf dem Handy | Nutzer am 2026-10-23 |
+| PE-30 | Zuschnitt M1 (AP-05–AP-10) bestätigt | Antwort 1 | Nutzer am 2026-10-23 |
+| PE-31 | Treffer-Feedback: nur sanftes, angenehmes Aufblinken; kein Bildschirmwackeln, keine Schadenszahlen | Antwort 3 | Nutzer am 2026-10-23 |
 | PE-26 | Repository ist öffentlich. Folge: niemals Secrets, keine fremden Assets ohne Lizenz, Plan und Idee sind öffentlich lesbar | Antwort 4 | Nutzer am 2026-10-23 |
 
 ### Offene Fragen
@@ -1133,10 +1340,30 @@ flowchart LR
 
 | Anforderung oder Regel | Pakete |
 |---|---|
-| {{F-01 …}} | {{AP-xx}} |
-| R2 DSGVO | {{…}} |
-| R3 Impressum | {{…}} |
-| R4 Secrets | alle (Review) |
+| F-01 Steuerung (Drehen, Maus/Touch) | AP-04, AP-05, AP-08, AP-10 |
+| F-02 Automatischer Schuss | AP-05, AP-08 |
+| F-03 Runde mit Timer | AP-03, AP-06, AP-10 |
+| F-04 Gegner | AP-03, AP-09, AP-15 |
+| F-05 Boss je Level | AP-16–AP-19 (blockiert, Q-04) |
+| F-06 Level und Maps 0–20 | AP-03, AP-12 |
+| F-07 Waffen-Items | AP-03, AP-05, AP-08, AP-10 |
+| F-08 Spielerlevel | AP-06, AP-10, AP-11 |
+| F-09 Hauptmenü und Freischaltung | AP-06, AP-11 |
+| F-10 iPhone über PWA | AP-13, M2-DEP |
+| F-11 HP und Niederlage | AP-05, AP-10 |
+| F-12 Grafik austauschbar + Anleitung | AP-02, AP-07 |
+| F-13 Sounds austauschbar + Anleitung | AP-02, AP-07, AP-14 |
+| F-14 Querformat | AP-01, AP-13 |
+| PE-29 Pause | AP-10 |
+| PE-31 sanftes Treffer-Feedback | AP-08, AP-09, AP-10 |
+| §5 Robustes Laden des Spielstands | AP-04 |
+| §5 Dev-Server nur im Heimnetz | AP-13 |
+| R1 Recht (Asset-Lizenzen, Lizenzhinweis PE-27) | AP-01, AP-02, AP-07 |
+| R2 DSGVO (keine personenbezogenen Daten, kein Tracking) | AP-04, Review aller Pakete |
+| R3 Impressum | entfällt im ersten Stich (PE-22); vor Veröffentlichung neues Paket |
+| R4 Secrets | alle (Review), PE-26 |
+| R5 Rollen | alle (Wächter, Lead) |
+| R6 Prompt-Injection, Abhängigkeiten | AP-01 (`npm audit`), Review aller Pakete |
 
 ---
 
@@ -1150,3 +1377,4 @@ flowchart LR
 | 2026-10-23 | PE-16–PE-22: Items anschießen, HP, Boss-Ablauf, kein Termin, Remote. §4–§6 als Entwurf befüllt, Q-09–Q-11 neu | Interview Runde 4 | – | Nutzer / Entwurf Planner |
 | 2026-10-23 | PE-23–PE-26 (Grafik, Sound, Querformat angenommen, öffentliches Repo), §4/§5 bestätigt, G1 erfüllt. §8–§11, §13 und M0-Pakete AP-01–AP-04 geschnitten, M1–M3 grob | Interview Runde 5, Paketierung | AP-01–AP-19 | Nutzer / Planner |
 | 2026-10-23 | M0 bestätigt (PE-28), Querformat (PE-25), Lizenzhinweis (PE-27), M1-Pakete AP-05–AP-10 detailliert, PE-29 Pause angenommen | Interview Runde 6 | AP-01, AP-05–AP-10 | Nutzer / Planner |
+| 2026-10-23 | M1 bestätigt (PE-30), Pause bestätigt, PE-31 sanftes Feedback. M2-Pakete AP-11–AP-15 detailliert, §1 Abnahme, §14 Budget, §15 Risiken, §17 Matrix, Lagebericht | Interview Runde 7 | AP-08–AP-15 | Nutzer / Planner |
