@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { LEVEL_COUNT } from '../../src/config/levels';
 import type { SaveGame } from '../../src/contracts/save';
 import {
   SAVE_KEY,
@@ -67,6 +68,19 @@ describe('loadSave', () => {
       { ...valid, playerXp: 1e300 },
     ]) {
       expect(loadSave(memory(JSON.stringify(bad)))).toEqual(defaultSave());
+    }
+  });
+  it('starts with level 0 unlocked', () => {
+    expect(defaultSave().highestUnlockedLevel).toBe(0);
+  });
+  it('accepts 0 and the last level index, rejects others', () => {
+    for (const ok of [0, LEVEL_COUNT - 1]) {
+      const s = { ...valid, highestUnlockedLevel: ok };
+      expect(loadSave(memory(JSON.stringify(s)))).toEqual(s);
+    }
+    for (const bad of [-1, LEVEL_COUNT, 1.5, '3']) {
+      const s = { ...valid, highestUnlockedLevel: bad };
+      expect(loadSave(memory(JSON.stringify(s)))).toEqual(defaultSave());
     }
   });
   it('returns default if getItem throws', () => {

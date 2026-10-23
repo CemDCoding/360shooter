@@ -32,7 +32,7 @@ export function applyRoundResult(
   xp: number,
   rules: ProgressionRules,
 ): SaveGame {
-  const gained = Number.isFinite(xp) ? Math.max(0, xp) : 0;
+  const gained = Number.isFinite(xp) ? Math.floor(Math.max(0, xp)) : 0;
   const playerXp = Math.min(MAX_XP, save.playerXp + gained);
   let highestUnlockedLevel = save.highestUnlockedLevel;
   if (result === 'won') {

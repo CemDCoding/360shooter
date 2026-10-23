@@ -60,6 +60,12 @@ describe('applyRoundResult', () => {
     expect(next.highestUnlockedLevel).toBe(LEVEL_COUNT - 1);
   });
 
+  it('floors fractional xp and ignores invalid values', () => {
+    expect(applyRoundResult(base, 0, 'won', 12.7, PROGRESSION).playerXp).toBe(12);
+    expect(applyRoundResult(base, 0, 'won', -5, PROGRESSION).playerXp).toBe(0);
+    expect(applyRoundResult(base, 0, 'won', NaN, PROGRESSION).playerXp).toBe(0);
+  });
+
   it('caps xp and does not mutate the input', () => {
     const s = { ...base, playerXp: 1e9 - 1 };
     const copy = { ...s };
