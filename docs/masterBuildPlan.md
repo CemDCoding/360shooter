@@ -60,21 +60,21 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | fertig | – | G1 |
-| 2 | Umfang | in Klärung | Q-09, Q-10, Q-11 (Q-04 nur für Boss-Meilenstein) | G1 |
+| 2 | Umfang | angenommen | Q-10 bestätigen (Q-04 nur für Boss-Meilenstein) | G1 |
 | 3 | Tech-Stack | angenommen | – | G1 |
-| 4 | Architektur, Datenmodell, Verträge | angenommen | Bestätigung PE-21 | G1 |
-| 5 | Sicherheit, Datenschutz, Recht, Limits | angenommen | Bestätigung PE-22 | G1 |
+| 4 | Architektur, Datenmodell, Verträge | fertig | – | G1 |
+| 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | Q-12 (W) | G1 |
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
-| 8 | Lanes und Dateieigentum | leer | – | G2 |
-| 9 | Meilensteine und Wellen | leer | – | G2 |
-| 10 | Statusübersicht | leer | – | G2 |
-| 11 | Abhängigkeitsgraph | leer | – | G2 |
-| 12 | Arbeitspakete | leer | – | G2 (je Meilenstein) |
-| 13 | Menschliche Schritte | leer | – | G2 |
+| 8 | Lanes und Dateieigentum | fertig | – | G2 |
+| 9 | Meilensteine und Wellen | in Klärung | Bestätigung M0 | G2 |
+| 10 | Statusübersicht | in Klärung | – | G2 |
+| 11 | Abhängigkeitsgraph | fertig | – | G2 |
+| 12 | Arbeitspakete | in Klärung | M0 detailliert, M1/M2 folgen, M3 wartet auf Q-04 | G2 (je Meilenstein) |
+| 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | leer | – | G2 |
 | 15 | Risiken | leer | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-04, Q-09–Q-11 | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-04, Q-10, Q-12 | laufend |
 | 17 | Abdeckungsmatrix | leer | – | G2 |
 | 18 | Änderungsprotokoll | leer | – | laufend |
 
@@ -140,6 +140,9 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | F-09 | Hauptmenü und Level-Freischaltung | Start, Anzeige des Spielerlevels, Level-Auswahl 0–20. Ein Level wird frei, wenn das vorherige geschafft ist (PE-13). | ja |
 | F-10 | iPhone über PWA | Das Spiel läuft auf dem iPhone in Safari, als Homescreen-App im Vollbild, vom PC über das lokale WLAN bereitgestellt (PE-14). | ja |
 | F-11 | Lebenspunkte und Niederlage | Die Astronautin hat 100 HP mit Lebensleiste. Bei 0 HP ist die Runde verloren, ein Teil der Erfahrung geht trotzdem ans Spielerlevel. Heilung gibt es nur als seltenes Item (PE-17). | ja |
+| F-12 | Platzhalter-Grafik austauschbar | Alle Sprites sind Platzhalter mit fester Sprite-Liste. Ein Designer ersetzt eine PNG-Datei, ohne Code anzufassen. Anleitung `docs/guides/grafik-austauschen.md` (PE-23). | nein |
+| F-13 | Platzhalter-Sounds austauschbar | Einfache Platzhalter-Effekte (Laser, Treffer, Item, Niederlage, Sieg), Stummschalt-Taste, Austausch per Datei. Anleitung `docs/guides/sound-austauschen.md` (PE-24). | nein |
+| F-14 | Querformat | Das Spiel ist für Querformat ausgelegt, auf dem iPhone gibt es im Hochformat einen Hinweis „bitte drehen“ (PE-25, angenommen). | nein |
 
 ### Optional
 
@@ -383,22 +386,29 @@ flowchart TD
 
 | Lane | Zuständigkeit | Ordner und Dateien |
 |---|---|---|
-| **{{SH}}** – Verträge | {{…}} | `{{…}}` |
-| **{{API}}** – Backend | {{…}} | `{{…}}` |
-| **{{WEB}}** – Frontend | {{…}} | `{{…}}` |
-| **{{OPS}}** – Infrastruktur und Doku | {{…}} | `{{…}}` (ohne `.github/workflows`, das macht der Nutzer) |
-| **HUM** – Mensch | Konten, Secrets, Deployments, Smoke-Tests | – |
+| **SH** – Verträge und Daten | Typen, Spielwerte, Level-Tabelle | `src/contracts/`, `src/config/` |
+| **LOG** – Spiellogik | reine Logik ohne Phaser, mit Unit-Tests | `src/logic/`, `tests/logic/` |
+| **GAME** – Spiel | Phaser-Szenen, Entities, Plattform-Adapter | `src/scenes/`, `src/entities/`, `src/platform/`, `src/main.ts` |
+| **ASSET** – Grafik, Sound, Anleitungen | Platzhalter, Generator, Designer-Anleitungen | `public/assets/`, `scripts/`, `docs/guides/` |
+| **OPS** – Gerüst, PWA, Doku | Werkzeuge, Build, PWA, README | Root-Konfiguration, `index.html`, `public/manifest.webmanifest`, `public/icons/`, `README.md` (ohne `.github/workflows`, das macht der Nutzer) |
+| **HUM** – Mensch | Tests auf PC und iPhone, Merges nach stage/master, eigene Grafiken und Sounds | – |
 
 **Grundregeln:**
 
 1. Innerhalb einer Welle gehört jede Datei höchstens einem Paket.
 2. Verträge entstehen mindestens eine Welle vor ihren Nutzern.
 3. Gemeinsame Dateien legt ein Gerüst-Paket in Welle 1 eines Meilensteins an.
-4. Konflikte im Lockfile sind erwartet. Der Lead löst sie beim Merge mit `{{npm install}}`.
+4. Konflikte im Lockfile sind erwartet. Der Lead löst sie beim Merge mit `npm install`.
+5. Tests liegen gespiegelt unter `tests/` (z. B. `src/logic/rotation.ts` → `tests/logic/rotation.test.ts`) und gehören dem Paket, dem die Quelldatei gehört.
 
 | Gemeinsame Datei | Wer ändert sie | Wann |
 |---|---|---|
-| `{{…}}` | {{…}} | {{…}} |
+| `package.json`, `package-lock.json` | AP-01 (anlegen), AP-02 (Skript `assets:placeholders`); danach nur der Lead beim Merge | M0 W1, M0 W2 |
+| `src/main.ts` (Szenen-Registrierung) | AP-01 registriert alle sechs Szenen als Stubs; danach unverändert | M0 W1 |
+| `src/contracts/*` | AP-01; spätere Erweiterung nur in einem eigenen Vertragspaket eine Welle vorher | M0 W1 |
+| `index.html` | AP-01, später AP-13 (PWA-Meta-Tags) | M0 W1, M2 W1 |
+| `README.md` | AP-01, später AP-13 (Abschnitt iPhone) | M0 W1, M2 W1 |
+| `src/scenes/GameScene.ts` | AP-10, später AP-14 (Sound-Hooks) | M1 W3, M2 W2 |
 
 ---
 
@@ -411,7 +421,10 @@ flowchart TD
 
 | # | Meilenstein | Inhalt | Live-Zustand |
 |---|---|---|---|
-| M0 | {{Fundament}} | {{…}} | {{…}} |
+| M0 | Fundament | Werkzeuge, Verträge, Spieldaten 0–20, Platzhalter-Assets, Eingabe und Speicher | `npm run dev` zeigt die Preload-Szene mit allen Platzhalter-Sprites; alle Checks grün |
+| M1 | Kernspiel | Drehen und Auto-Schuss, 4 Gegnertypen, Items durch Anschießen, HP, Timer, Sieg/Niederlage, HUD; Designer-Anleitungen | Level 0 (und per Debug-Parameter jedes Level 0–20) am PC spielbar |
+| M2 | Inhalte, Menü, iPhone | Hauptmenü mit Level-Auswahl und Spielerlevel, Maps je Batch, PWA + Querformat, Platzhalter-Sounds mit Stummschalten, Balancing 0–20 | Level 0–20 nacheinander freispielbar, am PC und auf dem iPhone |
+| M3 | Bosse | Boss-Rahmen und Bosse je Level (PE-18). G2 erst nach Q-04 | jedes Level endet mit Boss |
 
 ### 9.1 Ablauf einer Welle
 
@@ -422,39 +435,112 @@ flowchart TD
 | 2 Delegieren | Coder im Hintergrund starten, je eigener Worktree | Lead |
 | 3 Umsetzen | Code, Tests, Commits auf `agent/AP-<nr>-c<n>`, Bericht | Coder |
 | 4 Review | Urteil; bei „nicht bestanden“ Nachbesserung durch denselben Coder, max. 2 Runden | Reviewer, Lead, Coder |
-| 5 Mergen | `merge --no-ff` in `dev`, Reihenfolge {{SH → API → WEB → OPS}} | Lead |
+| 5 Mergen | `merge --no-ff` in `dev`, Reihenfolge SH → LOG → GAME → ASSET → OPS | Lead |
 | 6 Integrationspunkt | Install, Checks, Handtest-Checkliste; rot → Fix-Paket | Lead (+ Nutzer für Handtest) |
 | 7 Abschluss | `push origin dev`, Worktrees und Branches aufräumen, Plan pflegen | Lead, Planner |
 
 ### 9.2 Meilensteine im Detail
 
-#### M{{x}} – {{Name}}
+#### M0 – Fundament
 
 | Welle | Pakete (parallel) |
 |---|---|
-| W1 | {{Gerüst- und Vertragspakete}} |
-| W{{n}} | M{{x}}-DEP [Mensch] |
+| W1 | AP-01 Gerüst und Verträge |
+| W2 | AP-02 Asset-Pipeline, AP-03 Spieldaten, AP-04 Plattform |
+| W3 | M0-DEP [Mensch] |
 
-**Integration:** {{was nach welcher Welle von Hand geprüft wird}}
+**Integration:** nach W2: `npm install`, alle Checks, `npm run dev` zeigt die Preload-Szene mit allen Platzhaltern.
 
-##### M{{x}}-DEP – Deployment [Mensch]
+##### M0-DEP – Abnahme [Mensch]
 
-- Pull Request `dev` → `stage`, mergen, Smoke-Test auf stage
-- Pull Request `stage` → `master`, mergen, Smoke-Test in Produktion
+- Pull Request `dev` → `stage`, mergen, `npm run dev` am PC
+- Pull Request `stage` → `master`, mergen
 - **Smoke-Test:**
-  - [ ] {{prüfbarer Punkt}}
+  - [ ] `npm install` und `npm test` laufen ohne Fehler
+  - [ ] Browser zeigt die Preload-Szene mit allen Platzhalter-Sprites (Astronautin, 4 Gegner, Items)
+
+#### M1 – Kernspiel
+
+| Welle | Pakete (parallel) |
+|---|---|
+| W1 | AP-05 Kampf-Logik, AP-06 Runden- und Fortschrittslogik, AP-07 Designer-Anleitungen |
+| W2 | AP-08 Astronautin, Laser, Items (Entities), AP-09 Gegner (Entities) |
+| W3 | AP-10 Spielszene, HUD, Ergebnis |
+| W4 | M1-DEP [Mensch] |
+
+**Integration:** nach W3 Handtest am PC: drehen, schießen, Items anschießen, verlieren, gewinnen.
+
+##### M1-DEP – Abnahme [Mensch]
+
+- Pull Requests `dev` → `stage` → `master`, Test am PC
+- **Smoke-Test:**
+  - [ ] Die Astronautin dreht sich sichtbar mit Verzögerung zum Mauszeiger, in beide Richtungen
+  - [ ] Der Laser feuert automatisch in Blickrichtung
+  - [ ] Level 0: Bäume kommen von allen Seiten, der Timer läuft 3:00 ab, danach erscheint „Gewonnen“
+  - [ ] Ein angeschossenes Item verändert die Waffe sichtbar
+  - [ ] Bei 0 HP erscheint „Verloren“
+  - [ ] `?level=12` startet Level 12 mit allen vier Gegnertypen
+  - [ ] Die beiden Anleitungen in `docs/guides/` sind für Nicht-Programmierer verständlich
+
+#### M2 – Inhalte, Menü, iPhone
+
+| Welle | Pakete (parallel) |
+|---|---|
+| W1 | AP-11 Hauptmenü und Fortschritt, AP-12 Maps je Batch, AP-13 PWA und Querformat |
+| W2 | AP-14 Sound-Anbindung und Stummschalten, AP-15 Balancing Level 0–20 |
+| W3 | M2-DEP [Mensch] |
+
+##### M2-DEP – Abnahme [Mensch]
+
+- Pull Requests `dev` → `stage` → `master`, Test am PC und auf dem iPhone (H-03)
+- **Smoke-Test:**
+  - [ ] Menü zeigt Spielerlevel und Level 0–20, nur freigespielte sind wählbar
+  - [ ] Wald, Wald bei Nacht und Elfenwald sehen unterschiedlich aus
+  - [ ] iPhone: Homescreen-App startet im Vollbild, Steuerung per Finger, Hochformat zeigt „bitte drehen“
+  - [ ] Sounds hörbar, Stummschalten wirkt und bleibt gespeichert
+  - [ ] Fortschritt bleibt nach Neuladen erhalten, „Zurücksetzen“ löscht ihn
+
+#### M3 – Bosse (grob, G2 erst nach Q-04)
+
+| Welle | Pakete (parallel) |
+|---|---|
+| W1 | AP-16 Boss-Rahmen (Vertrag, Logik, Basis-Entity, HUD-Leiste) |
+| W2 | AP-17 Bosse Wald, AP-18 Bosse Wald bei Nacht, AP-19 Bosse Elfenwald |
+| W3 | M3-DEP [Mensch] |
 
 ---
 
 ## 10. Statusübersicht
 
-Gepflegt von ma-planner (im Auftrag des Leads). Aufwand: S ≈ {{0,75}} h · M ≈ {{1,5}} h · L ≈ {{2,5}} h Agent-Zeit, H = Mensch.
+Gepflegt von ma-planner (im Auftrag des Leads). Aufwand: S ≈ 0,75 h · M ≈ 1,5 h · L ≈ 2,5 h Agent-Zeit, H = Mensch.
 
 Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in dev) · `blockiert`
 
 | ID | Titel | M | Lane | Welle | Abhängigkeiten | Aufwand | Modell | Coder / Branch | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| AP-01 | {{…}} | M0 | {{SH}} | W1 | – | {{S}} | {{haiku}} | – | offen |
+| AP-01 | Gerüst und Verträge | M0 | OPS/SH | W1 | H-01 | M | sonnet (high) | – | bereit |
+| AP-02 | Asset-Pipeline und Platzhalter | M0 | ASSET | W2 | AP-01 | M | sonnet (medium) | – | offen |
+| AP-03 | Spieldaten Level 0–20 | M0 | SH | W2 | AP-01 | S | sonnet (medium) | – | offen |
+| AP-04 | Plattform: Eingabe und Speicher | M0 | GAME | W2 | AP-01 | S | sonnet (medium) | – | offen |
+| M0-DEP | Abnahme M0 | M0 | HUM | W3 | AP-02–04 | H | – | – | offen |
+| AP-05 | Kampf-Logik | M1 | LOG | W1 | M0 | M | sonnet (high) | – | offen |
+| AP-06 | Runden- und Fortschrittslogik | M1 | LOG | W1 | M0 | M | sonnet (high) | – | offen |
+| AP-07 | Designer-Anleitungen Grafik und Sound | M1 | ASSET | W1 | AP-02 | S | sonnet (medium) | – | offen |
+| AP-08 | Astronautin, Laser, Items (Entities) | M1 | GAME | W2 | AP-05 | M | sonnet (medium) | – | offen |
+| AP-09 | Gegner (Entities) | M1 | GAME | W2 | AP-05, AP-06 | M | sonnet (medium) | – | offen |
+| AP-10 | Spielszene, HUD, Ergebnis | M1 | GAME | W3 | AP-08, AP-09 | L | opus (high) | – | offen |
+| M1-DEP | Abnahme M1 | M1 | HUM | W4 | AP-10 | H | – | – | offen |
+| AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
+| AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
+| AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | – | offen |
+| AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11 | S | sonnet (medium) | – | offen |
+| AP-15 | Balancing Level 0–20 | M2 | SH | W2 | AP-12 | M | sonnet (medium) | – | offen |
+| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | offen |
+| AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2, Q-04 | L | opus (high) | – | blockiert (Q-04) |
+| AP-17 | Bosse Wald (0–4) | M3 | GAME | W2 | AP-16 | M | sonnet | – | blockiert (Q-04) |
+| AP-18 | Bosse Wald bei Nacht (5–9) | M3 | GAME | W2 | AP-16 | M | sonnet | – | blockiert (Q-04) |
+| AP-19 | Bosse Elfenwald (10–20) | M3 | GAME | W2 | AP-16 | L | sonnet | – | blockiert (Q-04) |
+| M3-DEP | Abnahme M3 | M3 | HUM | W3 | AP-17–19 | H | – | – | offen |
 
 ---
 
@@ -462,12 +548,30 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 
 ```mermaid
 flowchart LR
-  subgraph M0["M0 {{Name}}"]
-    AP01["AP-01"] --> AP02["AP-02"]
+  subgraph M0["M0 Fundament"]
+    AP01["AP-01"] --> AP02["AP-02"] & AP03["AP-03"] & AP04["AP-04"]
   end
+  subgraph M1["M1 Kernspiel"]
+    AP05["AP-05"] --> AP08["AP-08"] & AP09["AP-09"]
+    AP06["AP-06"] --> AP09
+    AP08 & AP09 --> AP10["AP-10"]
+    AP07["AP-07"]
+  end
+  subgraph M2["M2 Inhalte, Menü, iPhone"]
+    AP11["AP-11"] --> AP14["AP-14"]
+    AP12["AP-12"] --> AP15["AP-15"]
+    AP13["AP-13"]
+  end
+  subgraph M3["M3 Bosse"]
+    AP16["AP-16"] --> AP17["AP-17"] & AP18["AP-18"] & AP19["AP-19"]
+  end
+  AP02 & AP03 & AP04 --> AP05 & AP06
+  AP02 --> AP07
+  AP10 --> AP11 & AP12 & AP13
+  AP14 & AP15 --> AP16
 ```
 
-**Kritischer Pfad:** {{…}}
+**Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11 → AP-14 → (M3) AP-16 → AP-19
 
 ---
 
@@ -480,28 +584,216 @@ flowchart LR
 - IDs fortlaufend über alle Meilensteine: AP-01, AP-02 …
 -->
 
-#### AP-{{nn}} – {{Titel}}
+### M0 – Fundament
 
-- **Meilenstein, Lane, Welle:** M{{x}} · {{LANE}} · W{{n}}
-- **Ziel:** {{ein bis zwei Sätze}}
-- **Pflichtlektüre:** {{Datei und Abschnitt, PE-xx}}
-- **Abhängigkeiten:** {{AP-IDs, H-xx}}
-- **Parallel möglich mit:** {{AP-IDs}}
-- **Dateien (Eigentum):** {{Pfade}}
-- **Nicht anfassen:** {{Dateien paralleler Pakete}}
-- **Freigegebene Abhängigkeiten:** {{Pakete oder „keine“}}
+#### AP-01 – Gerüst und Verträge
+
+- **Meilenstein, Lane, Welle:** M0 · OPS/SH · W1
+- **Ziel:** Lauffähiges Phaser-3-Projekt mit TypeScript, Vite, Vitest, ESLint und Prettier, sechs Szenen-Stubs und allen gemeinsamen Typen. Alle späteren Pakete bauen darauf auf.
+- **Pflichtlektüre:** §3, §4, §8 dieses Plans; PE-11, PE-21, PE-25
+- **Abhängigkeiten:** H-01
+- **Parallel möglich mit:** –
+- **Dateien (Eigentum):** `package.json`, `package-lock.json`, `tsconfig.json`, `vite.config.ts`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `.gitignore`, `index.html`, `README.md`, `src/main.ts`, `src/scenes/{Boot,Preload,Menu,Game,Hud,Result}Scene.ts`, `src/contracts/*.ts`, `tests/contracts/contracts.test.ts`
+- **Nicht anfassen:** `docs/`, `idee.txt`, `.claude/`, `.env*`
+- **Freigegebene Abhängigkeiten:** `phaser` (3.x), `typescript`, `vite`, `vitest`, `eslint`, `@eslint/js`, `typescript-eslint`, `prettier`, `eslint-config-prettier`
 - **Umsetzung:**
-  1. {{…}}
-- **Schnittstellen:** {{genutzte oder bereitgestellte Verträge}}
+  1. Lege das Projekt mit npm an und installiere die Abhängigkeiten. Diese Skripte gehören in `package.json`:
+     - `dev`, `build` (`tsc --noEmit && vite build`), `preview`
+     - `test` (`vitest run`), `lint`, `typecheck` (`tsc --noEmit`), `format`
+  2. `tsconfig.json`: strict, ES2022, `moduleResolution: bundler`. Vitest-Konfiguration in `vite.config.ts`, Tests unter `tests/**/*.test.ts`.
+  3. `.gitignore`: `node_modules/`, `dist/` ergänzen. Bestehende Einträge bleiben.
+  4. `index.html`: viewport ohne Zoom, `touch-action: none`, kein Scrollen, Vollfläche für den Canvas.
+  5. `src/main.ts`: Phaser-Konfiguration:
+     - logische Auflösung 640×360, `pixelArt: true`
+     - `Scale.FIT` mit `CENTER_BOTH`, dunkler Hintergrund
+     - alle sechs Szenen registrieren. Die Stubs zeigen nur ihren Namen. Boot startet Preload, Preload startet Menu.
+  6. `src/contracts/`, je Datei ein Thema, Export gesammelt über `index.ts`:
+     - `level.ts`:
+       - `BatchId` (`forest` | `forestNight` | `elfForest`)
+       - `LevelDef` mit den Feldern `id`, `batch`, `durationSec`, `enemyPool` (Liste aus `{ enemyId, weight }`), `spawnIntervalMs`, `maxEnemies` und optional `bossId`
+     - `enemy.ts`:
+       - `EnemyId` (`cursedTree` | `forestWitch` | `zombieSquirrel` | `forestSpirit`)
+       - `EnemyBehavior` (`chase` | `shooter` | `aura`)
+       - `EnemyDef` mit den Feldern `id`, `hp`, `speed` (px/s), `contactDamage`, `behavior`, `xp`, `spriteKey`
+       - optional `projectile` mit `damage`, `speed`, `intervalMs`, `keepDistance`
+       - optional `aura` mit `radius`, `dps`
+     - `item.ts`:
+       - `ItemEffect` (`fireRate` | `damage` | `size` | `heal`)
+       - `ItemDef` mit `id`, `effect`, `perStack`, `maxStacks`, `dropWeight`, `spriteKey`
+       - `ItemRules` mit `dropChance`, `lifetimeMs`
+     - `weapon.ts`:
+       - `WeaponStats` mit `fireRatePerSec`, `damage`, `projectileScale`, `projectileSpeed`, `range`
+       - `WeaponStacks` mit `fireRate`, `damage`, `size`
+     - `player.ts`: `PlayerDef` mit `maxHp`, `turnSpeedDegPerSec`
+     - `progression.ts`: `ProgressionRules` mit `xpCurveBase`, `xpCurveExponent`, `lossXpFactor`
+     - `save.ts`: `SaveGame` mit `version: 1`, `playerXp`, `playerLevel`, `highestUnlockedLevel`, `muted`
+     - `events.ts`: Konstanten für Event-Namen und eine Payload-Map. Events: `hp-changed`, `timer-tick`, `weapon-changed`, `round-ended` (`won` | `lost`, `xpGained`), `mute-changed`
+     - `assets.ts`:
+       - `AssetKind` (`spritesheet` | `image` | `audio`)
+       - `AssetDef` mit `key`, `kind`, `path`, optional `frameWidth`, `frameHeight` und `frames`, dazu `description` (Text für Designer)
+  7. README: Voraussetzungen (Node 24), Befehle, Ordnerstruktur nach §4, Regel „Spielwerte nur in `src/config`“.
+- **Schnittstellen:** stellt alle Verträge aus §4 bereit
 - **Akzeptanzkriterien:**
-  - {{prüfbar formuliert}}
-- **Tests:** {{welche Tests das Paket schreibt}}
-- **Review-Schwerpunkte:** {{z. B. Autorisierung, DSGVO, Impressum, Eingabevalidierung}}
-- **Doku-Pflichten:** {{z. B. .env.example, README}}
-- **Aufwand:** {{S / M / L}} · **Modell:** {{haiku / sonnet / opus}} · **Effort:** {{low / medium / high}}
-- **Opus-Grund:** {{Sicherheit | Kern | groß | –}} (Pflicht, wenn das Modell `opus` ist und der Aufwand nicht `L`)
-- **Kürzbar bei Budgetnot:** {{ja / nein, mit Begründung}}
-- **Commit-Typ:** `{{feat|fix|…}}(AP-{{nn}}): {{what}}`
+  - `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` sind grün
+  - `npm run dev` zeigt im Browser den Text der Menu-Szene, Fenster skaliert ohne Verzerrung
+  - Kein Import von `phaser` in `src/contracts`
+- **Tests:** `tests/contracts/contracts.test.ts`: Typ-Smoke-Test (Beispielobjekte je Vertrag kompilieren und sind gültig)
+- **Review-Schwerpunkte:** Vollständigkeit der Verträge gegenüber §4, keine unnötigen Abhängigkeiten, `npm audit` ohne hohe Befunde
+- **Doku-Pflichten:** README
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Fundament)
+- **Commit-Typ:** `chore(AP-01): scaffold project and contracts`
+
+#### AP-02 – Asset-Pipeline und Platzhalter
+
+- **Meilenstein, Lane, Welle:** M0 · ASSET · W2
+- **Ziel:** Eine feste Asset-Liste (Manifest), ein Generator für Platzhalter-PNGs und -WAVs ohne fremde Pakete und eine Preload-Szene, die alles lädt. Designer ersetzen später nur Dateien (PE-23, PE-24).
+- **Pflichtlektüre:** PE-23, PE-24, PE-26, §5 (Asset-Lizenzen), `src/contracts/assets.ts`
+- **Abhängigkeiten:** AP-01
+- **Parallel möglich mit:** AP-03, AP-04
+- **Dateien (Eigentum):** `src/config/assets.ts`, `scripts/generate-placeholders.mjs`, `public/assets/sprites/*`, `public/assets/sounds/*`, `public/assets/LICENSES.md`, `src/scenes/PreloadScene.ts`, `package.json` (nur Skript `assets:placeholders`), `tests/config/assets.test.ts`
+- **Nicht anfassen:** übrige `src/config/*`, `src/platform/*`, andere Szenen
+- **Freigegebene Abhängigkeiten:** keine (nur Node-Bordmittel `node:fs`, `node:zlib`, `node:path`)
+- **Umsetzung:**
+  1. `src/config/assets.ts`: Manifest nach `AssetDef`. Jeder Eintrag bekommt eine deutsche `description` für Designer. Alle Sprites sind PNG mit Transparenz, Blickrichtung **nach rechts**, Frames waagerecht nebeneinander. Sprites (Breite×Höhe je Frame, Anzahl Frames):
+     - Figuren:
+       - `astronaut` 32×32 ×4 (2 Idle, 2 Schuss)
+       - `boss-placeholder` 64×64 ×2
+     - Waffe und Geschosse:
+       - `laser` 16×4 ×1
+       - `witch-bolt` 8×8 ×2
+     - Gegner:
+       - `enemy-cursed-tree` 32×32 ×4
+       - `enemy-forest-witch` 32×32 ×4
+       - `enemy-zombie-squirrel` 24×24 ×4
+       - `enemy-forest-spirit` 32×32 ×4
+     - Items:
+       - `item-fire-rate` 16×16 ×2
+       - `item-damage` 16×16 ×2
+       - `item-size` 16×16 ×2
+       - `item-heal` 16×16 ×2
+     - Maps:
+       - `tiles-forest` 32×32 ×4
+       - `tiles-forest-night` 32×32 ×4
+       - `tiles-elf-forest` 32×32 ×4
+     - Oberfläche: `ui-icons` 16×16 ×3 (Herz, Ton an, Ton aus)
+
+     Sounds (WAV, 16 Bit, mono, 44,1 kHz): `laser`, `hit`, `enemy-death`, `item-pickup`, `player-hurt`, `round-won`, `round-lost`.
+  2. `scripts/generate-placeholders.mjs`:
+     - erzeugt pro Manifest-Eintrag eine Datei: einfache, gut unterscheidbare Pixel-Formen in eigener Farbe, Frames leicht verschieden
+     - schreibt nur fehlende Dateien. Mit `--force` überschreibt es nur Dateien, die es selbst erzeugt hat (Markierung über eine Liste in `public/assets/.placeholders.json`)
+     - Echte Designer-Dateien werden nie überschrieben.
+  3. Skript `assets:placeholders` in `package.json`. Generator ausführen, Ergebnisse committen.
+  4. `PreloadScene`:
+     - lädt alles aus dem Manifest, mit Fortschrittsbalken
+     - Fehlt eine Datei, gibt es eine Warnung in der Konsole, kein Absturz
+     - Nach dem Laden zeigt eine Debug-Ansicht (`?assets=1`) alle Sprites und spielt die Animationen. Ohne Parameter startet die Menu-Szene.
+  5. `public/assets/LICENSES.md`: Tabelle Datei | Herkunft | Lizenz. Platzhalter: „selbst erzeugt“.
+- **Schnittstellen:** nutzt `AssetDef`; stellt `ASSETS` (Manifest) und Asset-Keys für AP-07 bis AP-14 bereit
+- **Akzeptanzkriterien:**
+  - `npm run assets:placeholders` erzeugt alle Dateien, ein zweiter Lauf ändert nichts
+  - Eine von Hand ersetzte PNG bleibt bei einem neuen Lauf erhalten
+  - `?assets=1` zeigt alle Sprites mit Animation
+  - Checks grün
+- **Tests:** `tests/config/assets.test.ts`: eindeutige Keys, jede Datei im Manifest existiert, Frame-Größen passen zur Bildgröße (PNG-Header lesen)
+- **Review-Schwerpunkte:** keine fremden Pakete, Generator überschreibt keine Designer-Dateien, Lizenzliste vorhanden
+- **Doku-Pflichten:** `public/assets/LICENSES.md`
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Grundlage für Austausch durch Designer)
+- **Commit-Typ:** `feat(AP-02): add asset manifest, placeholder generator and preload`
+
+#### AP-03 – Spieldaten Level 0–20
+
+- **Meilenstein, Lane, Welle:** M0 · SH · W2
+- **Ziel:** Alle Spielwerte als Daten: Level 0–20, Gegner, Items, Waffe, Spielerin, Fortschritt. Startwerte, das Feintuning macht AP-15.
+- **Pflichtlektüre:** §2 (F-03 bis F-11), PE-04, PE-05, PE-09, PE-10, PE-16, PE-17, `idee.txt` (Gegner), `src/contracts/*`
+- **Abhängigkeiten:** AP-01
+- **Parallel möglich mit:** AP-02, AP-04
+- **Dateien (Eigentum):** `src/config/{levels,enemies,items,weapon,player,progression,index}.ts`, `tests/config/{levels,enemies,items}.test.ts`
+- **Nicht anfassen:** `src/config/assets.ts` (AP-02)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `levels.ts`: `LEVELS` mit 21 Einträgen, `getLevel(id)`, `LEVEL_COUNT`.
+     - Batches: `forest` 0–4, `forestNight` 5–9, `elfForest` 10–20.
+     - Dauer 180 s oder 300 s pro Batch, erste Hälfte aufgerundet: 0–2, 5–7 und 10–15 haben 180 s, der Rest 300 s.
+     - Gegnerpool:
+       - `cursedTree` ab Level 0
+       - `forestWitch` und `zombieSquirrel` ab Level 5
+       - `forestSpirit` ab Level 10
+     - `spawnIntervalMs` sinkt von Level zu Level, `maxEnemies` höchstens 150. `bossId` bleibt leer bis M3.
+  2. `enemies.ts`, Startwerte:
+     - `cursedTree`: hp 30, speed 30, dmg 10, chase
+     - `forestWitch`: hp 20, speed 40, shooter, alle 2000 ms ein Geschoss mit dmg 8, speed 120, hält 140 px Abstand
+     - `zombieSquirrel`: hp 8, speed 110, dmg 5, chase
+     - `forestSpirit`: hp 10, speed 60, aura mit Radius 48 und 12 dps
+     - `xp` passend zur Gefahr
+  3. `items.ts`:
+     - `fireRate` +20 % je Stufe, `damage` +25 %, `size` +25 %, jeweils `maxStacks` 5
+     - `heal` +25 HP
+     - Gewichte 30/30/30/10
+     - `ITEM_RULES` mit `dropChance` 0.08 und `lifetimeMs` 10000
+  4. `weapon.ts`: Grundwerte 2 Schuss/s, Schaden 10, Skalierung 1, Geschwindigkeit 400, Reichweite 360.
+  5. `player.ts`: `maxHp` 100, `turnSpeedDegPerSec` 270.
+  6. `progression.ts`: Kurve `xpCurveBase` 100, `xpCurveExponent` 1.5, `lossXpFactor` 0.5.
+  7. Kommentar am Dateikopf: „Startwerte, Feintuning in AP-15, nur hier ändern“.
+- **Schnittstellen:** nutzt Verträge aus AP-01; stellt Konfiguration für alle Logik- und Spielpakete bereit
+- **Akzeptanzkriterien:**
+  - Tests belegen Batch-Grenzen, Dauern und Gegner-Verfügbarkeit genau nach PE-05, PE-09, PE-10 und `idee.txt`
+  - Checks grün
+- **Tests:** Tabellen-Tests für alle 21 Level; Gegner- und Item-Werte sind positiv; Gewichte > 0
+- **Review-Schwerpunkte:** Übereinstimmung mit `idee.txt` und PE-05/09/10, keine Logik in Config
+- **Doku-Pflichten:** –
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-03): add game data for levels 0-20`
+
+#### AP-04 – Plattform: Eingabe und Speicher
+
+- **Meilenstein, Lane, Welle:** M0 · GAME · W2
+- **Ziel:** Einheitliche Zielrichtung aus Maus und Touch und ein robuster lokaler Spielstand (PE-03, PE-13, §5).
+- **Pflichtlektüre:** PE-03, PE-08, §5 (robustes Laden), `src/contracts/save.ts`
+- **Abhängigkeiten:** AP-01
+- **Parallel möglich mit:** AP-02, AP-03
+- **Dateien (Eigentum):** `src/platform/{input,storage,angle}.ts`, `tests/platform/{storage,angle}.test.ts`
+- **Nicht anfassen:** `src/scenes/*`, `src/config/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `angle.ts` (ohne Phaser): `angleFromCenter(px, py, cx, cy)` in Radiant und `normalizeAngle`.
+  2. `input.ts`: Klasse `AimInput` für eine Phaser-Szene.
+     - Maus: Das Ziel folgt dem Zeiger, auch ohne Klick.
+     - Touch: Das Ziel ist der letzte Berührungspunkt und bleibt nach dem Loslassen erhalten.
+     - Liefert `targetAngle`.
+     - Unterdrückt das Kontextmenü und das Scrollen.
+  3. `storage.ts`:
+     - `loadSave()`, `writeSave()`, `resetSave()`, Schlüssel `360shooter.save.v1`
+     - Fehlt der Stand, ist er kaputt oder hat er falsche Typen oder Werte außerhalb des Bereichs, gibt es den Standard ohne Absturz
+     - Storage ist injizierbar für Tests. Fehler beim Schreiben (privater Modus) werden abgefangen.
+- **Schnittstellen:** nutzt `SaveGame`; stellt `AimInput`, `angleFromCenter`, Storage-API für AP-10/AP-11 bereit
+- **Akzeptanzkriterien:**
+  - Kaputter oder manipulierter Spielstand führt zum Standard, kein Absturz
+  - Checks grün
+- **Tests:** Winkel in allen vier Quadranten; Storage: leer, gültig, kaputtes JSON, falsche Typen, negative Werte, Schreibfehler
+- **Review-Schwerpunkte:** Validierung des Spielstands (§5), keine weiteren Daten gespeichert (R2)
+- **Doku-Pflichten:** –
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-04): add aim input and save storage`
+
+### M1 – Kernspiel
+
+⟦Detailbeschreibung folgt nach Bestätigung von M0, siehe §10 für Zuschnitt⟧
+
+### M2 – Inhalte, Menü, iPhone
+
+⟦Detailbeschreibung folgt nach Bestätigung von M1⟧
+
+### M3 – Bosse
+
+⟦offen: Q-04⟧
 
 ---
 
@@ -509,7 +801,12 @@ flowchart LR
 
 | ID | Schritt | Ab wann nötig | Blockiert | Erledigt |
 |---|---|---|---|---|
-| H-01 | {{z. B. .env aus .env.example anlegen und füllen}} | {{sofort}} | {{…}} | ☐ |
+| H-01 | Node.js 24 und npm vorhanden (geprüft: Node v24.21.0, npm 11.19.0) | sofort | AP-01 | ☑ |
+| H-02 | Lizenzfrage für öffentliches Repo entscheiden (Q-12) | vor M2-DEP | – | ☐ |
+| H-03 | iPhone im selben WLAN; Windows-Firewall erlaubt Node im privaten Netz (Abfrage beim ersten `npm run preview -- --host` mit „Zulassen“ bestätigen) | M2-DEP | M2-DEP | ☐ |
+| H-04 | Bosse beschreiben (Q-04) | vor M3 | AP-16–AP-19 | ☐ |
+| H-05 | Optional: eigene Grafiken und Sounds nach den Anleitungen aus AP-07 austauschen | ab M1 | – | ☐ |
+| H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☐ |
 
 ---
 
@@ -568,8 +865,12 @@ flowchart LR
 | PE-18 | Boss erscheint in der letzten Minute, die Runde endet erst mit seinem Sieg. Boss-Pakete bilden einen eigenen, späteren Meilenstein | Antwort 3a | Nutzer am 2026-10-23 |
 | PE-19 | Kein Termin | Antwort 4a | Nutzer am 2026-10-23 |
 | PE-20 | GitHub-Remote `origin` vorhanden, `stage` = Teststand auf PC und iPhone, `master` = abgenommener Stand | Antwort 4b, 4c | Nutzer am 2026-10-23 |
-| PE-21 | Architektur §4: Daten in `src/config`, reine Logik in `src/logic` ohne Phaser, Verträge in `src/contracts` | Entwurf | angenommen vom Planner |
-| PE-22 | Sicherheit §5: keine personenbezogenen Daten, kein Tracking, keine öffentliche Seite → R3 erst vor einer Veröffentlichung | Entwurf | angenommen vom Planner |
+| PE-21 | Architektur §4: Daten in `src/config`, reine Logik in `src/logic` ohne Phaser, Verträge in `src/contracts` | Entwurf, bestätigt | Nutzer am 2026-10-23 |
+| PE-22 | Sicherheit §5: keine personenbezogenen Daten, kein Tracking, keine öffentliche Seite → R3 erst vor einer Veröffentlichung | Entwurf, bestätigt | Nutzer am 2026-10-23 |
+| PE-23 | Grafik: Agents bauen Platzhalter-Sprites und eine Sprite-Liste. Dazu kommt eine Anleitung `docs/guides/grafik-austauschen.md` für Grafikdesigner ohne Programmierkenntnisse: Schritt für Schritt, Dateiformat, Größen, Frames, Dateinamen | Antwort 1a + Wunsch Anleitung | Nutzer am 2026-10-23 |
+| PE-24 | Sound: nur Platzhalter-Effekte, keine Musik. Der Nutzer ersetzt die Sounds selbst; Anleitung `docs/guides/sound-austauschen.md` wie bei der Grafik. Stummschalt-Taste | Antwort 3 | Nutzer am 2026-10-23 |
+| PE-25 | Querformat (angenommen, Frage 2 nicht beantwortet) | Empfehlung | angenommen vom Planner |
+| PE-26 | Repository ist öffentlich. Folge: niemals Secrets, keine fremden Assets ohne Lizenz, Plan und Idee sind öffentlich lesbar | Antwort 4 | Nutzer am 2026-10-23 |
 
 ### Offene Fragen
 
@@ -583,15 +884,16 @@ flowchart LR
 | Q-06 | Wie gibt es Upgrades in der Runde, was bringt das Spielerlevel im ersten Stich (Rüstungen, Power-ups?), wie werden Level freigeschaltet? | K | F-07–F-09 | Erfahrungskristalle sammeln → Auswahl aus 3 Upgrades; Level nacheinander freischalten | geklärt (PE-12, PE-13) |
 | Q-07 | iOS: Der Mac ist sehr alt, das iPhone hat das neueste iOS. Wie kommt das Spiel aufs iPhone? Welches Mac-Modell und welche macOS-Version? | K | §3, §6 | Stich 1: iPhone spielt per Safari/PWA über das lokale WLAN vom PC. Native iOS-App erst später | geklärt (PE-14) |
 | Q-08 | Item-Drops: Wie kommt das Item zur Astronautin (sie läuft nicht)? Wie lange wirkt es, stapelt es sich, wie oft droppt es? | K | F-07 | Item fliegt nach 1 s von selbst zu ihr; wirkt bis Rundenende; stapelt bis Stufe 5 je Eigenschaft; Drop-Chance ca. 8 % | geklärt (PE-16) |
-| Q-09 | Grafik: Woher kommen die Pixel-Sprites (Astronautin, 4 Gegner, 3 Maps, Items, Bosse)? | K | F-04–F-06, §5 Lizenzen | siehe Interview Runde 5 | offen |
-| Q-10 | Bildschirm: Hochformat, Querformat oder beides? | W | §4, Szenen | Querformat | offen |
-| Q-11 | Sound und Musik im ersten Stich? | W | Umfang | nur einfache Effekte | offen |
+| Q-09 | Grafik: Woher kommen die Pixel-Sprites (Astronautin, 4 Gegner, 3 Maps, Items, Bosse)? | K | F-04–F-06, §5 Lizenzen | Platzhalter + Sprite-Liste + Anleitung | geklärt (PE-23) |
+| Q-10 | Bildschirm: Hochformat, Querformat oder beides? | W | §4, Szenen | Querformat | angenommen (PE-25), Bestätigung offen |
+| Q-11 | Sound und Musik im ersten Stich? | W | Umfang | nur einfache Effekte | geklärt (PE-24) |
+| Q-12 | Lizenz des öffentlichen Repos: Soll eine `LICENSE` festlegen, dass Code und Grafiken nicht frei genutzt werden dürfen? | W | §5, Kommerzialisierung | ohne Lizenzdatei gilt „alle Rechte vorbehalten“; zusätzlich kurzer Hinweis im README | offen |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
 | Was | Änderung | Grund | Vorgeschlagen von |
 |---|---|---|---|
-| `idee.txt` | ins Repo committen (oder nach `docs/idee.md` verschieben) | Ist die einzige Projektdoku, liegt aber unversioniert vor | Planner |
+| `idee.txt` | ~~ins Repo committen~~ erledigt durch den Nutzer (556fab7) | – | Planner |
 
 ---
 
@@ -614,3 +916,4 @@ flowchart LR
 | 2026-10-23 | PE-08–PE-11: Bewegung, Rundendauer pro Batch, Batch-Grenzen, Tech-Stack. §3 befüllt, Q-07 (iOS) neu | Interview Runde 2 | – | Nutzer |
 | 2026-10-23 | PE-12–PE-15: Item-Drops, Spielerlevel, iPhone per PWA, 3 Coder mit Freigabe pro Meilenstein. F-10 neu, Q-08 neu | Interview Runde 3 | – | Nutzer |
 | 2026-10-23 | PE-16–PE-22: Items anschießen, HP, Boss-Ablauf, kein Termin, Remote. §4–§6 als Entwurf befüllt, Q-09–Q-11 neu | Interview Runde 4 | – | Nutzer / Entwurf Planner |
+| 2026-10-23 | PE-23–PE-26 (Grafik, Sound, Querformat angenommen, öffentliches Repo), §4/§5 bestätigt, G1 erfüllt. §8–§11, §13 und M0-Pakete AP-01–AP-04 geschnitten, M1–M3 grob | Interview Runde 5, Paketierung | AP-01–AP-19 | Nutzer / Planner |
