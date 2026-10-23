@@ -21,12 +21,12 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-23 · Wellenabschluss M0 W2, M0 gebaut (Abnahme offen), M1 W1 bereit
-- **Fertig:** AP-01 (2fdf9c4), AP-02 (eb025c8), AP-03 (1763ba4), AP-04 (248c4d6), alle in dev · **Bereit:** AP-05, AP-06, AP-07 (M1 W1) · **Offen:** AP-08–AP-20 `offen`; M0-DEP bis M3-DEP `offen`
+- **Stand:** 2026-10-23 · Wellenabschluss M1 W1 · M0 gebaut (Abnahme offen), M1 W1 gemergt
+- **Fertig:** AP-01–AP-04 (M0), AP-05 (a619aec), AP-06 (9358ef9), AP-07 (79b2246), alle in dev · **Bereit:** AP-08, AP-09, AP-21 (M1 W2) · **Offen:** AP-10 (wartet auf AP-08, AP-09, AP-21), AP-11–AP-20; M0-DEP bis M3-DEP `offen`
 - **Unterbrochen oder laufend:** nichts
-- **Erkenntnisse:** Phaser ist auf 3.90.0 fixiert, Pakete ändern `phaser` nicht. Sound-Keys tragen Präfix `sfx-`, Animationen `animKey()`. Konfiguration über `src/config` (ohne `assets.ts`). Details §18.
-- **Nächster Schritt:** M1 W1 mit AP-05, AP-06, AP-07 parallel (Lead, Modelle laut §10). Autonomie bis M2 vom Nutzer freigegeben (PE-15).
-- **Offene Fragen an den Nutzer:** M0-DEP-Abnahme steht aus (Nutzer-Schritt, [Mensch]). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen. Abnahmen M1-DEP bis M3-DEP sind ebenfalls Nutzer-Schritte.
+- **Erkenntnisse:** Phaser ist auf 3.90.0 fixiert. `highestUnlockedLevel` ist ein Index (PE-35), Fix in AP-21 (Standard 0). Drehwinkel in Grad, `angle.ts` in Radiant (AP-08 rechnet um). Testabdeckung AP-05 nur manuell belegt (§16). Details §18.
+- **Nächster Schritt:** M1 W2 mit AP-08, AP-09, AP-21 parallel (Lead, Modelle laut §10). Danach W3 mit AP-10. Autonomie bis M2 vom Nutzer freigegeben (PE-15).
+- **Offene Fragen an den Nutzer:** M0-DEP-Abnahme steht aus (Nutzer-Schritt, [Mensch]). M1-DEP nach W3 (Nutzer-Schritt). Coverage-Werkzeug freigeben? (§16 Vorschläge). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen.
 
 <!-- Ende Lagebericht -->
 
@@ -425,6 +425,7 @@ flowchart TD
 | `src/contracts/*` | AP-01; spätere Erweiterung nur in einem eigenen Vertragspaket eine Welle vorher (M3: AP-16) | M0 W1 |
 | `index.html`, `vite.config.ts` | AP-01, später AP-13 | M0 W1, M2 W1 |
 | `README.md` | AP-01, später AP-13 | M0 W1, M2 W1 |
+| `src/platform/storage.ts`, `src/logic/progression.ts` (samt Tests) | AP-04 / AP-06 → AP-21 (Fix Index-Semantik) | M0 W2, M1 W1, M1 W2 |
 | `src/scenes/GameScene.ts` | AP-10 → AP-12 (Hintergrund) → AP-14 (Sound) | M1 W3, M2 W1, M2 W2 |
 | `src/scenes/{MenuScene,HudScene,ResultScene}.ts` | AP-10 (Hud, Result), AP-11 (Menu) → AP-14 (Sound, Stumm-Taste) | M1 W3, M2 W1, M2 W2 |
 | `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M3 W1 |
@@ -486,7 +487,7 @@ flowchart TD
 | Welle | Pakete (parallel) |
 |---|---|
 | W1 | AP-05 Kampf-Logik, AP-06 Runden- und Fortschrittslogik, AP-07 Designer-Anleitungen |
-| W2 | AP-08 Astronautin, Laser, Items (Entities), AP-09 Gegner (Entities) |
+| W2 | AP-08 Astronautin, Laser, Items (Entities), AP-09 Gegner (Entities), AP-21 Fix Freischaltstand als Index |
 | W3 | AP-10 Spielszene, HUD, Ergebnis |
 | W4 | M1-DEP [Mensch] |
 
@@ -555,13 +556,14 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-03 | Spieldaten Level 0–20 | M0 | SH | W2 | AP-01 | S | sonnet (medium) | c3 / agent/AP-03-c3 | fertig |
 | AP-04 | Plattform: Eingabe und Speicher | M0 | GAME | W2 | AP-01 | S | sonnet (medium) | c4 / agent/AP-04-c4 | fertig |
 | M0-DEP | Abnahme M0 | M0 | HUM | W3 | AP-02–04 | H | – | – | offen |
-| AP-05 | Kampf-Logik | M1 | LOG | W1 | M0 | M | sonnet (high) | – | bereit |
-| AP-06 | Runden- und Fortschrittslogik | M1 | LOG | W1 | M0 | M | sonnet (high) | – | bereit |
-| AP-07 | Designer-Anleitungen Grafik und Sound | M1 | ASSET | W1 | AP-02 | S | sonnet (medium) | – | bereit |
-| AP-08 | Astronautin, Laser, Items (Entities) | M1 | GAME | W2 | AP-05 | M | sonnet (medium) | – | offen |
-| AP-09 | Gegner (Entities) | M1 | GAME | W2 | AP-05, AP-06 | M | sonnet (medium) | – | offen |
-| AP-10 | Spielszene, HUD, Ergebnis | M1 | GAME | W3 | AP-08, AP-09 | L | opus (high) | – | offen |
-| M1-DEP | Abnahme M1 | M1 | HUM | W4 | AP-10 | H | – | – | offen |
+| AP-05 | Kampf-Logik | M1 | LOG | W1 | M0 | M | sonnet (high) | c5 / agent/AP-05-c5 | fertig |
+| AP-06 | Runden- und Fortschrittslogik | M1 | LOG | W1 | M0 | M | sonnet (high) | c6 / agent/AP-06-c6 | fertig |
+| AP-07 | Designer-Anleitungen Grafik und Sound | M1 | ASSET | W1 | AP-02 | S | sonnet (medium) | c7 / agent/AP-07-c7 | fertig |
+| AP-08 | Astronautin, Laser, Items (Entities) | M1 | GAME | W2 | AP-05 | M | sonnet (medium) | – | bereit |
+| AP-09 | Gegner (Entities) | M1 | GAME | W2 | AP-05, AP-06 | M | sonnet (medium) | – | bereit |
+| AP-21 | Fix: Freischaltstand als Index | M1 | LOG/GAME | W2 | AP-04, AP-06 | S | sonnet (medium) | – | bereit |
+| AP-10 | Spielszene, HUD, Ergebnis | M1 | GAME | W3 | AP-08, AP-09, AP-21 | L | opus (high) | – | offen |
+| M1-DEP | Abnahme M1 | M1 | HUM | W4 | AP-10, AP-21 | H | – | – | offen |
 | AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
 | AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
 | AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | – | offen |
@@ -587,8 +589,9 @@ flowchart LR
   subgraph M1["M1 Kernspiel"]
     AP05["AP-05"] --> AP08["AP-08"] & AP09["AP-09"]
     AP06["AP-06"] --> AP09
-    AP08 & AP09 --> AP10["AP-10"]
+    AP08 & AP09 & AP21 --> AP10["AP-10"]
     AP07["AP-07"]
+    AP21["AP-21"]
   end
   subgraph M2["M2 Inhalte, Menü, iPhone"]
     AP11["AP-11"] --> AP14["AP-14"]
@@ -602,6 +605,7 @@ flowchart LR
   end
   AP02 & AP03 & AP04 --> AP05 & AP06
   AP02 --> AP07
+  AP04 & AP06 --> AP21
   AP10 --> AP11 & AP12 & AP13 & AP15
   AP14 & AP15 --> AP16
 ```
@@ -1005,12 +1009,50 @@ flowchart LR
 - **Kürzbar bei Budgetnot:** nein
 - **Commit-Typ:** `feat(AP-09): add enemy entities`
 
+#### AP-21 – Fix: Freischaltstand als Index
+
+- **Meilenstein, Lane, Welle:** M1 · LOG/GAME · W2
+- **Ziel:** `highestUnlockedLevel` ist eindeutig der Index des höchsten freigeschalteten Levels (PE-35). Ein neuer Spielstand schaltet nur Level 0 frei, und XP werden nie gebrochen gespeichert.
+- **Pflichtlektüre:** PE-13, PE-35, §5 (robustes Laden), `src/contracts/save.ts`, `src/config/levels.ts` (`LEVEL_COUNT`), Ist-Code von AP-04 (`storage.ts`) und AP-06 (`progression.ts`)
+- **Abhängigkeiten:** AP-04, AP-06
+- **Parallel möglich mit:** AP-08, AP-09
+- **Dateien (Eigentum):** `src/platform/storage.ts`, `tests/platform/storage.test.ts`, `src/logic/progression.ts`, `tests/logic/progression.test.ts`
+- **Nicht anfassen:** `src/contracts/*`, `src/config/*`, `src/scenes/*`, `src/entities/*`, übrige `src/logic/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `storage.ts`:
+     - `defaultSave()` setzt `highestUnlockedLevel` auf 0.
+     - `parseSave` akzeptiert nur ganze Zahlen von 0 bis `LEVEL_COUNT - 1`. Die Obergrenze kommt aus `src/config/levels.ts` (importieren, nicht hartkodieren, `src/config` bleibt unverändert).
+     - Ein Wert außerhalb des Bereichs führt wie bisher zum Standard, ohne Absturz.
+     - `playerLevel` bleibt 1..1000.
+  2. `progression.ts`:
+     - `applyRoundResult` rundet die XP mit `Math.floor` ab, bevor sie addiert werden. Negative und ungültige Werte bleiben auf 0.
+     - Freischaltung bei Sieg in Level n: `max(bisher, min(LEVEL_COUNT - 1, n + 1))`. Niederlage ändert die Freischaltung nicht.
+  3. Tests:
+     - Standard-Spielstand hat 0.
+     - 0 und 20 sind gültig. -1, 21, 1,5 und Zeichenketten werden verworfen.
+     - Sieg in Level 0 schaltet 1 frei, Sieg in Level 20 deckelt bei 20, Niederlage ändert nichts.
+     - XP 12,7 wird als 12 gespeichert.
+     - Testfixturen in den Progression-Tests nutzen Index-Semantik.
+- **Schnittstellen:** nutzt `SaveGame` (Vertrag unverändert); stellt die korrigierte Speicher- und Fortschrittslogik für AP-10 und AP-11 bereit. Der Kommentar in `src/contracts/save.ts` ist nicht Teil dieses Pakets (Vertrag, AP-01). Die Bedeutung steht in PE-35.
+- **Akzeptanzkriterien:**
+  - Ein neuer Spielstand startet mit Level 0 frei
+  - Ungültige Werte für `highestUnlockedLevel` führen zum Standard, kein Absturz
+  - Checks grün
+- **Tests:** siehe Umsetzung 3
+- **Review-Schwerpunkte:** Bereich 0..20 an allen Stellen gleich, Konstante statt Zahl, keine Migration nötig (nichts ausgeliefert, PE-35)
+- **Doku-Pflichten:** –
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `fix(AP-21): define highest unlocked level as index`
+
 #### AP-10 – Spielszene, HUD, Ergebnis
 
 - **Meilenstein, Lane, Welle:** M1 · GAME · W3
 - **Ziel:** Alles zu einer spielbaren Runde verbinden: Spawns, Kollisionen, Items, Timer, Sieg/Niederlage, Fortschritt speichern, HUD und Ergebnisbildschirm.
-- **Pflichtlektüre:** §2 (F-01–F-11), PE-03–PE-18, `src/contracts/events.ts`, alle Dateien aus AP-04–AP-09 (Schnittstellen)
-- **Abhängigkeiten:** AP-08, AP-09
+- **Pflichtlektüre:** §2 (F-01–F-11), PE-03–PE-18, PE-35, `src/contracts/events.ts`, alle Dateien aus AP-04–AP-09 und AP-21 (Schnittstellen)
+- **Abhängigkeiten:** AP-08, AP-09, AP-21
 - **Parallel möglich mit:** –
 - **Dateien (Eigentum):** `src/scenes/{GameScene,HudScene,ResultScene}.ts`, `src/scenes/debug.ts`
 - **Nicht anfassen:** `src/main.ts`, `src/entities/*`, `src/logic/*`, `src/config/*`
@@ -1424,10 +1466,10 @@ flowchart LR
 | Meilenstein | Pakete | Agent-Aufwand | Geschätzte 5-h-Fenster bei 30 % Team-Budget |
 |---|---|---|---|
 | M0 | 4 | ≈ 4,5 h (+ Review ≈ 6 h) | ≈ 2–3 |
-| M1 | 6 | ≈ 9,25 h (+ Review ≈ 12 h) | ≈ 4–5 |
+| M1 | 7 | ≈ 10 h (+ Review ≈ 13 h) | ≈ 4–5 |
 | M2 | 5 | ≈ 6,75 h (+ Review ≈ 9 h) | ≈ 3–4 |
 | M3 | 5 | ≈ 8,5 h (+ Review ≈ 11 h) | ≈ 4–5 |
-| **Gesamt** | **20** | **≈ 29 h (+ Review ≈ 38 h)** | **≈ 14–17** |
+| **Gesamt** | **21** | **≈ 30 h (+ Review ≈ 39 h)** | **≈ 14–17** |
 
 Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18).
 
@@ -1506,6 +1548,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-30 | Zuschnitt M1 (AP-05–AP-10) bestätigt | Antwort 1 | Nutzer am 2026-10-23 |
 | PE-31 | Treffer-Feedback: nur sanftes, angenehmes Aufblinken; kein Bildschirmwackeln, keine Schadenszahlen | Antwort 3 | Nutzer am 2026-10-23 |
 | PE-26 | Repository ist öffentlich. Folge: niemals Secrets, keine fremden Assets ohne Lizenz, Plan und Idee sind öffentlich lesbar | Antwort 4 | Nutzer am 2026-10-23 |
+| PE-35 | `highestUnlockedLevel` ist der Index des höchsten freigeschalteten Levels. Startwert 0 (nur Level 0 frei), Bereich 0..20 (`LEVEL_COUNT - 1`). Sieg in Level n schaltet `min(20, n+1)` frei. Der Fehler aus AP-04 (Standard 1, Bereich 1..1000) wird in AP-21 behoben. Kein Migrationsbedarf, da nichts ausgeliefert ist | Detailfrage ohne Auswirkung auf Sicherheit oder Umfang, Entscheidung des Leads (Wellenabschluss M1 W1) | Lead am 2026-10-23 |
 
 ### Offene Fragen
 
@@ -1530,6 +1573,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 |---|---|---|---|
 | `idee.txt` | ~~ins Repo committen~~ erledigt durch den Nutzer (556fab7) | – | Planner |
 | AP-01 `Dateien (Eigentum)` | `.gitignore` aus dem Coder-Eigentum nehmen. `node_modules/` und `dist/` sind bereits auf dev (c53f075, Lead). Nur für künftige Pakete gedacht, AP-01 bleibt unverändert | Coder-role-guard blockt `.gitignore`, Wellenabschluss M0 W1 | Lead (Wellenabschluss) |
+| §4 Datenmodell, Zeile `SaveGame` | `highestUnlockedLevel` um die Bedeutung ergänzen: Index des höchsten freigeschalteten Levels, Startwert 0, Bereich 0..20 (PE-35) | Begriff war im Plan nicht festgelegt, AP-04 hatte Standard 1 | Planner (Pflege, Lead-Auftrag) |
+| Testabdeckung AP-05 (≥ 90 %) | Ein Coverage-Werkzeug (z. B. Vitest-Coverage) freigeben, damit das Akzeptanzkriterium belegt werden kann. Bisher nur manuell geprüft | Nachweis fehlt, neues Paket braucht Freigabe (Regel Abhängigkeiten) | Lead (Erkenntnis AP-05) |
 
 ---
 
@@ -1545,7 +1590,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | F-06 Level und Maps 0–20 | AP-03, AP-12 |
 | F-07 Waffen-Items | AP-03, AP-05, AP-08, AP-10 |
 | F-08 Spielerlevel | AP-06, AP-10, AP-11 |
-| F-09 Hauptmenü und Freischaltung | AP-06, AP-11 |
+| F-09 Hauptmenü und Freischaltung | AP-06, AP-11, AP-21 |
 | F-10 iPhone über PWA | AP-13, M2-DEP |
 | F-11 HP und Niederlage | AP-05, AP-10 |
 | F-12 Grafik austauschbar + Anleitung | AP-02, AP-07 |
@@ -1553,7 +1598,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | F-14 Querformat | AP-01, AP-13 |
 | PE-29 Pause | AP-10 |
 | PE-31 sanftes Treffer-Feedback | AP-08, AP-09, AP-10 |
-| §5 Robustes Laden des Spielstands | AP-04 |
+| §5 Robustes Laden des Spielstands | AP-04, AP-21 |
 | §5 Dev-Server nur im Heimnetz | AP-13 |
 | R1 Recht (Asset-Lizenzen, Lizenzhinweis PE-27) | AP-01, AP-02, AP-07 |
 | R2 DSGVO (keine personenbezogenen Daten, kein Tracking) | AP-04, Review aller Pakete |
@@ -1586,3 +1631,10 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-23 | Startwerte aus AP-03 für Balancing (AP-15), Ausgangspunkt, kein Balancing-Ergebnis: Pool-Gewichte cursedTree 10, forestWitch 5, zombieSquirrel 8, forestSpirit 4. spawnIntervalMs = 1500−50·id. maxEnemies = min(150, 30+6·id). xp 5/10/4/8. Witch contactDamage 5, Spirit 0. heal maxStacks 1 | Wellenabschluss M0 W2 | AP-09, AP-15 | Lead (Pflege) |
 | 2026-10-23 | Erkenntnis AP-04: `new AimInput(scene, cx, cy)` mit `targetAngle` und `destroy()`. Storage-API: `loadSave`, `writeSave` (gibt boolean zurück, schreibt nur validierte Felder), `resetSave`, `parseSave`, `defaultSave`, `SAVE_KEY`. Wertebereiche: playerXp 0..1e9 (`MAX_XP`), Level 1..1000 (`MAX_LEVEL`) | Wellenabschluss M0 W2 | AP-10, AP-11 | Lead (Pflege) |
 | 2026-10-23 | Erkenntnis Tooling M0 W2: Kein `@types/node` im Projekt. Der Asset-Test lädt `node:fs` per Variablen-Import. Der Generator nutzt Node-24-Type-Stripping; Mindestversion Node 24 laut Lead in README/engines dokumentiert, noch nicht geprüft. Coder brauchen im Worktree `npm ci`. Keine `.gitattributes` (CRLF-Warnungen unter Windows, harmlos) | Wellenabschluss M0 W2 | AP-05–AP-20 (Tooling) | Lead (Pflege) |
+| 2026-10-23 | Wellenabschluss M1 W1: AP-05 (a619aec), AP-06 (9358ef9), AP-07 (79b2246, mit Doku-Nachbesserung 38c9bfe) gemergt. Reviews in Runde 1 bestanden. Checks auf dev grün: lint, typecheck, 114/114 Tests in 17 Dateien, build, `assets:check`, `npm audit` 0. AP-05–AP-07 `fertig`, AP-08 und AP-09 `bereit`, AP-10 `offen` | Wellenabschluss M1 W1 | AP-05–AP-10 | Lead (Pflege) |
+| 2026-10-23 | Neues Fix-Paket AP-21 (M1, W2): `highestUnlockedLevel` als Index, Standard 0, Bereich 0..20 (PE-35). AP-04 hatte Standard 1 und Bereich 1..1000 geprüft. AP-10 und M1-DEP hängen jetzt zusätzlich von AP-21 ab | Entscheidung Lead, Wellenabschluss M1 W1 | AP-04, AP-06, AP-10, AP-21 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis AP-05: Drehwinkel in `rotation.ts` sind Grad, normalisiert auf (-180, 180]. `angle.ts` und `pointOnRing` nutzen Radiant, AP-08 rechnet um. Item-Wirkung relativ: Basis × (1 + perStack × Stacks). Zuordnung: fireRate → fireRatePerSec, damage → damage, size → projectileScale. `applyItem` gibt `{stacks, heal}` zurück (`heal` = perStack bei Typ heal). `rollDrop` zieht erst dropChance, dann gewichtet. `FireTimer.reset()` und `emptyStacks()` in `weapon.ts`, `createRng(seed)` (mulberry32) in `rng.ts` | Wellenabschluss M1 W1 | AP-08, AP-09, AP-10 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis AP-05: Testabdeckung ≥ 90 % ist nur manuell belegt, es gibt kein freigegebenes Coverage-Werkzeug. Vorschlag in §16 | Wellenabschluss M1 W1 | AP-05 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis AP-06: `xpForLevel(n, rules)` = kumulative Schwelle round(base·(n−1)^exp), Level 1 = 0. `levelForXp(xp, rules)`. `roundXp` und `applyRoundResult` nehmen `rules` als letzten Parameter. `SpawnDirector(level, rng, spawnRadius)`, `rng` braucht nur `next()`. `RoundState`: `status`, `remainingMs`, `elapsed`, `isFinalMinute`, `requiresBossDefeat` (fest `false`, M3/AP-16 macht es pro Level setzbar), `bossDefeated()`. Niederlage hat nur Vorrang, wenn `playerDied()` vor `tick()` im selben Frame aufgerufen wird. AP-10 muss diese Reihenfolge einhalten | Wellenabschluss M1 W1 | AP-10, AP-16 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis AP-07: `check-assets.mjs` liest das Manifest per direktem TS-Import (Node 24). Verweise für AP-13 im README: `docs/guides/grafik-austauschen.md`, `docs/guides/sound-austauschen.md`, `npm run assets:check`, `npm run assets:placeholders`, `?assets=1`. Die Guides nennen `http://localhost:5173/`, bei Port-Änderung anpassen | Wellenabschluss M1 W1 | AP-13 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis Wächter: Commit-Nachrichten dürfen kein `>` enthalten, role-guard lehnt Umleitungszeichen ab | Wellenabschluss M1 W1 | alle Coder, Lead, Planner | Lead (Pflege) |
