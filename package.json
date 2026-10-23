@@ -13,7 +13,9 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "assets:placeholders": "node scripts/generate-placeholders.mjs",
-    "assets:check": "node scripts/check-assets.mjs"
+    "assets:check": "node scripts/check-assets.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "preview:lan": "npm run build && vite preview --host"
   },
   "type": "module",
   "dependencies": {
