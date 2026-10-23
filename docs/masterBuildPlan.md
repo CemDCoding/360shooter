@@ -21,12 +21,12 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-23 · Wellenabschluss M1 W2 · M0 gebaut (Abnahme offen), M1 W1 und W2 gemergt in dev
-- **Fertig:** AP-01–AP-09 und AP-21 (alle in dev; AP-08 a061f1a, AP-09 843ded5, AP-21 11fee13). **Bereit:** AP-10 (opus, L, Welle 3). **Offen:** AP-11–AP-20; M0-DEP bis M3-DEP `offen`
+- **Stand:** 2026-10-24 · Wellenabschluss M1 W3 · M0 und M1 technisch komplett in dev, M0-DEP und M1-DEP offen
+- **Fertig:** AP-01–AP-10 und AP-21 (alle in dev; AP-10 f1000c0). **Bereit:** M1-DEP ([Mensch], Abnahme M1), AP-11, AP-12, AP-13 (M2 W1). **Offen:** AP-14–AP-20; M0-DEP, M2-DEP, M3-DEP `offen`
 - **Unterbrochen oder laufend:** nichts
-- **Erkenntnisse:** Phaser ist auf 3.90.0 fixiert. `highestUnlockedLevel` ist ein Index (PE-35, AP-21 umgesetzt). Gegner-Fabrik `createEnemy` wählt die Klasse über `behavior`, nicht über die Id. Pool-Gegner sind inaktiv, bis `spawn()`. AP-10 ruft `playerDied()` vor `tick()` auf. Details §18.
-- **Nächster Schritt:** M1 W3 mit AP-10 (Lead, opus, Opus-Grund: Kern). Danach M1-DEP (Nutzer-Schritt, [Mensch]). Autonomie bis M2 vom Nutzer freigegeben (PE-15).
-- **Offene Fragen an den Nutzer:** M0-DEP-Abnahme steht aus ([Mensch]). M1-DEP nach W3 ([Mensch]). Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen.
+- **Erkenntnisse:** Checks auf dev grün (129/129 Tests). AP-10 ist nicht im Browser getestet, erste Laufzeitprüfung ist M1-DEP. Debug-Parameter `?level=n` und `?fps=1`. Pause hat kein Vertrags-Event. MenuScene enthält einen temporären Start von GameScene, den AP-11 ersetzt. Details §18.
+- **Nächster Schritt:** Nutzer: PR `dev` nach `stage`, Smoke-Test M1-DEP (§9.2), PR `stage` nach `master`; M0-DEP ebenfalls offen. Danach M2 W1 mit AP-11, AP-12, AP-13 (Lead, max. 3 parallel). Autonomie bis M2 vom Nutzer freigegeben (PE-15).
+- **Offene Fragen an den Nutzer:** M0-DEP-Abnahme steht aus ([Mensch]). M1-DEP nach Smoke-Test ([Mensch]). Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen.
 
 <!-- Ende Lagebericht -->
 
@@ -562,11 +562,11 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-08 | Astronautin, Laser, Items (Entities) | M1 | GAME | W2 | AP-05 | M | sonnet (medium) | c8 / agent/AP-08-c8 | fertig |
 | AP-09 | Gegner (Entities) | M1 | GAME | W2 | AP-05, AP-06 | M | sonnet (medium) | c9 / agent/AP-09-c9 | fertig |
 | AP-21 | Fix: Freischaltstand als Index | M1 | LOG/GAME | W2 | AP-04, AP-06 | S | sonnet (medium) | c21 / agent/AP-21-c21 | fertig |
-| AP-10 | Spielszene, HUD, Ergebnis | M1 | GAME | W3 | AP-08, AP-09, AP-21 | L | opus (high) | – | bereit |
-| M1-DEP | Abnahme M1 | M1 | HUM | W4 | AP-10, AP-21 | H | – | – | offen |
-| AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
-| AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | offen |
-| AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | – | offen |
+| AP-10 | Spielszene, HUD, Ergebnis | M1 | GAME | W3 | AP-08, AP-09, AP-21 | L | opus (high) | c10 / agent/AP-10-c10 | fertig |
+| M1-DEP | Abnahme M1 | M1 | HUM | W4 | AP-10, AP-21 | H | – | – | bereit |
+| AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | bereit |
+| AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | bereit |
+| AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | – | bereit |
 | AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | – | offen |
 | AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | – | offen |
 | M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | offen |
@@ -1124,6 +1124,9 @@ flowchart LR
   3. `Button`: Tasten groß genug für Finger (mindestens 32×32 logische Pixel), Hover am PC, sanftes Feedback.
   4. „Fortschritt zurücksetzen“ mit `ConfirmDialog` („Wirklich löschen?“) → `resetSave()`.
   5. Auswahl startet `GameScene` mit `{ levelId }`.
+- **Hinweise aus M1 W3:**
+  - `src/scenes/MenuScene.ts` enthält einen temporären Einstieg (`this.scene.start('GameScene')`, vom Lead im Review von AP-10 erlaubt). Dieser Stub wird durch das echte Menü ersetzt. Bis dahin startet die Menü-Taste der ResultScene sofort ein neues Level.
+  - Aus `src/scenes/debug.ts` nutzbar (nur importieren, nicht ändern): `resolveLevelId`, `isValidLevelId`, `MAX_LEVEL_ID`.
 - **Akzeptanzkriterien:**
   - Nur freigespielte Level startbar
   - Nach Sieg in Level n ist n+1 beim Zurückkehren frei
@@ -1655,3 +1658,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-23 | Erkenntnis AP-09 (Ist-API): `new EnemyPool(scene, { boltPool, onDeath(x,y,xp) })` mit `spawn(id,x,y)`, `update(time,delta)` pro Frame, `clear()`, `enemies`. `createEnemy(scene,id,ctx)` wählt per `ENEMIES[id].behavior`. Enemy: `takeDamage(n)` (true bei Tod), `contactDamageFor(dtMs)`, `auraDamageAt(px,py,dtMs)`, `def`, `hp`, `active`. `new WitchBoltPool(scene)` mit `bolts`, `update()`, `clear()`. Spielerin-gegen-Bolt-Overlap und `bolt.despawn()` macht AP-10. Pool-Gegner sind inaktiv, bis `spawn()`. Dateiliste in §12 angeglichen: `EnemyPool` liegt in `createEnemy.ts`, Klassen je Verhalten (`ChaseEnemy`, `AuraEnemy`) statt je Gegnertyp | Wellenabschluss M1 W2 | AP-10 | Lead (Pflege) |
 | 2026-10-23 | Review-Lehre AP-09: Fabriken per Daten auf Erweiterbarkeit prüfen. Review Runde 1 fand eine Auswahl per Id-switch. Fix d488b63 wählt die Klasse über `behavior`, damit Level 21+ nur Daten und höchstens ein neues Verhalten brauchen | Review-Befund AP-09 | AP-09, künftige Gegnerpakete | Lead (Pflege) |
 | 2026-10-23 | AP-10 ergänzt um Schnittstellen-Hinweise (Ist-API aus AP-08/AP-09) und die Reihenfolge `playerDied()` vor `tick()` je Frame. Ziele und Umfang unverändert. Arena-Konstante als Vorschlag in §16 | Wellenabschluss M1 W2 | AP-10 | Lead (Pflege) |
+| 2026-10-24 | Wellenabschluss M1 W3: AP-10 (f1000c0, Coder c10, Review Runde 2 bestanden) gemergt. Checks auf dev grün: lint, typecheck, 129/129 Tests in 19 Dateien, build, `npm audit` 0. AP-10 `fertig`, M1-DEP `bereit`, AP-11, AP-12, AP-13 `bereit` (M2 W1) | Wellenabschluss M1 W3 | AP-10, M1-DEP, AP-11–AP-13 | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-10 (Ist-API): `GameScene` exportiert `emitGameEvent`, `HudInitData`, `ResultSceneData`. `debug.ts` exportiert `resolveLevelId`, `isValidLevelId`, `MAX_LEVEL_ID` (AP-11 nutzt sie für die Levelauswahl). Debug-Parameter: `?level=n` (nicht ganzzahlig → 0, sonst auf 0..20 begrenzt; eine gültige `levelId` in den Szenendaten hat Vorrang), `?fps=1` (FPS unten rechts im HUD) | Wellenabschluss M1 W3 | AP-11, AP-13 (README), AP-14 | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-10: Pause hat kein Vertrags-Event. Das HUD hört auf die Phaser-Events PAUSE und RESUME der GameScene. Kontakt- und Aura-Schaden per `physics.overlap` je Frame, dt-skaliert, dt auf 100 ms begrenzt. Laser- und Hexen-Geschoss über Collider. Drops werden gesammelt und im Update gespawnt. Lokale Konstante `SPAWN_MARGIN_PX` = 24 und HUD-Layoutwerte (Kandidaten für Config, AP-15) | Wellenabschluss M1 W3 | AP-14, AP-15 | Lead (Pflege) |
+| 2026-10-24 | Ausnahmen aus dem Review AP-10, vom Lead erlaubt: (a) `MenuScene.ts` enthält die Zeile `this.scene.start('GameScene')` als temporären Einstieg. AP-11 muss sie durch das echte Menü ersetzen; bis dahin startet die Menü-Taste der ResultScene sofort ein neues Level. (b) `ItemPickup.ts` bekam einen optionalen 6. Konstruktorparameter `spawnedAtMs`. GameScene führt eine pausierbare `playTimeMs`, damit Items in Pause nicht ablaufen (PE-29) | Wellenabschluss M1 W3 | AP-11, AP-08 (Datei) | Lead (Pflege) |
+| 2026-10-24 | Review-Lehre AP-10: Zeitbasierte Entities über pausierbare Spielzeit statt Rohzeit prüfen. Gilt für künftige Pakete mit Zeitlogik (z. B. AP-16–AP-19) | Review-Befund AP-10 | AP-16–AP-19 | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-10: Nicht im Browser geprüft. Erste Laufzeitprüfung ist M1-DEP. Handtest-Liste des Leads: Drehung verzögert, Auto-Feuer, Level 0 Bäume von allen Seiten, Timer 3:00 bis Gewonnen, Item erhöht Stack im HUD, 0 HP = Verloren, `?level=12` mit vier Gegnertypen, Pause per Taste, Esc, P oder Tab, Nochmal ohne doppelte Events, Nächstes Level nur nach Sieg, Fortschritt bleibt nach Reload, `?fps=1`. Abweichung: §10 nennt Esc und P, die Liste nennt zusätzlich Tab | Wellenabschluss M1 W3 | M1-DEP, AP-11 | Lead (Pflege) |
