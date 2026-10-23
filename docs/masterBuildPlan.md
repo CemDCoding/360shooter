@@ -60,8 +60,8 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | in Klärung | Q-02 | G1 |
-| 2 | Umfang | in Klärung | Q-01, Q-03–Q-06 | G1 |
-| 3 | Tech-Stack | leer | – | G1 |
+| 2 | Umfang | in Klärung | Q-04, Q-06 | G1 |
+| 3 | Tech-Stack | in Klärung | Q-07 | G1 |
 | 4 | Architektur, Datenmodell, Verträge | leer | – | G1 |
 | 5 | Sicherheit, Datenschutz, Recht, Limits | leer | – | G1 |
 | 6 | Umgebungen, Branches, Deployment | leer | – | G1 |
@@ -74,7 +74,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 13 | Menschliche Schritte | leer | – | G2 |
 | 14 | Budget und Kürzungen | leer | – | G2 |
 | 15 | Risiken | leer | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-01–Q-06 | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-02, Q-04, Q-06, Q-07 | laufend |
 | 17 | Abdeckungsmatrix | leer | – | G2 |
 | 18 | Änderungsprotokoll | leer | – | laufend |
 
@@ -129,12 +129,12 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | ID | Funktion | Beschreibung aus Nutzersicht | Kernfluss |
 |---|---|---|---|
-| F-01 | Steuerung | Die Astronautin steht fest in der Bildschirmmitte. Der Spieler zeigt mit Maus oder Finger (Touch) auf eine Stelle, die Figur dreht sich dorthin, in beide Richtungen auf dem kürzeren Weg. Die Drehung ist **nicht sofort**, sondern mit begrenzter Drehgeschwindigkeit (PE-03, PE-04). | ja |
+| F-01 | Steuerung | Die Astronautin steht fest in der Bildschirmmitte und läuft nicht (PE-08). Der Spieler zeigt mit Maus oder Finger (Touch) auf eine Stelle, die Figur dreht sich dorthin, in beide Richtungen auf dem kürzeren Weg. Die Drehung ist **nicht sofort**, sondern mit begrenzter Drehgeschwindigkeit (PE-03, PE-04). | ja |
 | F-02 | Automatischer Schuss | Die Laserpistole feuert automatisch, immer in die aktuelle Blickrichtung (PE-03). | ja |
-| F-03 | Runde mit Timer | Eine Runde ist gewonnen, wenn der Timer abläuft und die Astronautin noch lebt. Dauer: erste Hälfte 3 min, zweite Hälfte 5 min, die Hälfte wird aufgerundet (PE-05, Bezug ⟦offen: Q-03⟧). | ja |
+| F-03 | Runde mit Timer | Eine Runde ist gewonnen, wenn der Timer abläuft und die Astronautin noch lebt. Dauer: erste Hälfte 3 min, zweite Hälfte 5 min, die erste Hälfte wird aufgerundet, bezogen auf die Level eines Batches (PE-05, PE-09). Ergebnis: Wald 0–2 = 3 min, 3–4 = 5 min · Nacht 5–7 = 3 min, 8–9 = 5 min · Elfenwald 10–15 = 3 min, 16–20 = 5 min. | ja |
 | F-04 | Gegner | Verfluchter Baum (Level 0–20, langsam, etwas mehr HP, läuft auf Spieler zu), Wald-Hexe (5–20, schießt Projektile, normale Werte), Zombie-Eichhörnchen (5–20, schnell, wenig HP, läuft), Böser Wald-Spirit (10–20, Dauerschaden in Nähe, wenig HP). Quelle: `idee.txt`. | ja |
 | F-05 | Boss je Level | Jedes Level hat einen Boss. Aussehen und Verhalten beschreibt der Nutzer noch (⟦offen: Q-04⟧). | nein |
-| F-06 | Level und Maps 0–20 | Batches Wald, Wald bei Nacht, Elfenwald mit je einer einfachen Map mit Charme (Grenzen ⟦offen: Q-05⟧). | ja |
+| F-06 | Level und Maps 0–20 | Batches Wald, Wald bei Nacht, Elfenwald mit je einer einfachen Map mit Charme. Grenzen: Wald 0–4, Wald bei Nacht 5–9, Elfenwald 10–20 (PE-10). | ja |
 | F-07 | Waffen-Upgrades in der Runde | Die Laserpistole wird in der Runde schneller, stärker, größer. Upgrades starten jede Runde bei 0 (Ablauf ⟦offen: Q-06⟧). | ja |
 | F-08 | Spielerlevel | Ein Spielerlevel, das über alle Runden lokal gespeichert bleibt. | nein |
 | F-09 | Hauptmenü | Start, Level-Auswahl ⟦offen: Q-06⟧ | ja |
@@ -167,18 +167,20 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | Bereich | Technologie | Begründung |
 |---|---|---|
-| Sprache | {{…}} | {{…}} |
-| Frontend | {{…}} | {{…}} |
-| Backend | {{…}} | {{…}} |
-| Datenbank / ORM | {{…}} | {{…}} |
-| Auth | {{…}} | {{…}} |
-| Tests | {{…}} | {{…}} |
-| Code-Qualität | {{…}} | {{…}} |
-| Hosting | {{…}} | {{…}} |
+| Sprache | TypeScript (strict) | Typsicherheit, gut für parallele Agent-Arbeit (PE-11) |
+| Frontend / Engine | Phaser 3 (aktuelle 3.x), Build mit Vite | 2D, Pixel-Art, Maus und Touch, läuft im Browser (PE-11) |
+| Backend | keins | alles lokal (PE-02) |
+| Datenbank / ORM | keine. Spielstand (Spielerlevel) lokal im Gerät (`localStorage`) (angenommen) | PE-02 |
+| Auth | keine | PE-02 |
+| Handy | Capacitor (Android/iOS), iOS-Weg ⟦offen: Q-07⟧ | PE-11 |
+| Tests | Vitest für Spiellogik (ohne Phaser-Rendering) (angenommen) | Logik testbar, schnell |
+| Code-Qualität | ESLint + typescript-eslint, Prettier, `tsc --noEmit` (angenommen) | Standard |
+| Paketmanager | npm, ein Repository (angenommen) | einfach |
+| Hosting | keins. PC: lokal im Browser (`npm run dev` / `npm run preview`) | PE-02 |
 
-**Checks, die jedes Paket bestehen muss:** `{{z. B. npm run lint}}`, `{{npm run typecheck}}`, `{{npm test}}`
+**Checks, die jedes Paket bestehen muss:** `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` (angenommen)
 
-**Freigegebene Abhängigkeiten (PE-xx):** {{Liste. Coder installieren nur diese, und nur wenn ihnen die betroffene package.json gehört. Alles andere geht über Lead und Nutzer.}}
+**Freigegebene Abhängigkeiten (PE-11, angenommen):** `phaser`, `typescript`, `vite`, `vitest`, `eslint`, `typescript-eslint`, `@eslint/js`, `prettier`, `eslint-config-prettier`. Capacitor-Pakete erst nach Klärung von Q-07. Coder installieren nur diese, und nur wenn ihnen die `package.json` gehört. Alles andere geht über Lead und Nutzer.
 
 ---
 
@@ -502,17 +504,22 @@ flowchart LR
 | PE-05 | Rundendauer: erste Hälfte 3 min, zweite Hälfte 5 min, bei ungerader Anzahl wird die erste Hälfte aufgerundet | Antwort 2 | Nutzer am 2026-10-23 |
 | PE-06 | Im ersten Stich nur die Startwaffe Laserpistole, keine Waffenauswahl | Antwort 3 | Nutzer am 2026-10-23 |
 | PE-07 | Jedes Level hat einen Boss | Antwort 4 | Nutzer am 2026-10-23 |
+| PE-08 | Die Astronautin läuft nicht, sie steht fest in der Mitte und dreht sich nur | Q-01, Antwort 1a | Nutzer am 2026-10-23 |
+| PE-09 | „Erste Hälfte“ bezieht sich auf die Level eines Batches | Q-03, Antwort 2a | Nutzer am 2026-10-23 |
+| PE-10 | Batch-Grenzen: Wald 0–4, Wald bei Nacht 5–9, Elfenwald 10–20 | Q-05, Antwort 3a | Nutzer am 2026-10-23 |
+| PE-11 | Tech-Stack: Phaser 3 + TypeScript + Vite, Handy über Capacitor | Antwort 4a | Nutzer am 2026-10-23 |
 
 ### Offene Fragen
 
 | ID | Frage | Priorität | Betrifft | Empfehlung | Status |
 |---|---|---|---|---|---|
-| Q-01 | Bewegt sich die Astronautin auch über die Map, oder steht sie fest und dreht sich nur? | K | F-01, §4 | fest in der Mitte, nur Drehen (wie `idee.txt`) | offen |
+| Q-01 | Bewegt sich die Astronautin auch über die Map, oder steht sie fest und dreht sich nur? | K | F-01, §4 | fest in der Mitte, nur Drehen (wie `idee.txt`) | geklärt (PE-08) |
 | Q-02 | Gibt es einen Termin für den ersten Stich? | K | §1, §14 | keiner | offen |
-| Q-03 | „Erste Hälfte“ bezogen auf was: die Level eines Batches oder die Level 0–20 insgesamt? | K | F-03 | pro Batch | offen |
+| Q-03 | „Erste Hälfte“ bezogen auf was: die Level eines Batches oder die Level 0–20 insgesamt? | K | F-03 | pro Batch | geklärt (PE-09) |
 | Q-04 | Boss je Level: Aussehen, Verhalten, wann erscheint er (bei Timer-Ende, zur Halbzeit)? Muss er besiegt werden? | K (für Boss-Pakete) | F-05 | Boss erscheint in der letzten Minute; Runde gewonnen, wenn Timer abgelaufen und Boss besiegt | offen |
-| Q-05 | Batch-Grenzen überlappen (Wald 0–5, Nacht 5–10, Elfenwald 10–20). Zu welchem Batch gehören Level 5 und 10? | W | F-06 | 0–4 Wald, 5–9 Nacht, 10–20 Elfenwald | offen |
+| Q-05 | Batch-Grenzen überlappen (Wald 0–5, Nacht 5–10, Elfenwald 10–20). Zu welchem Batch gehören Level 5 und 10? | W | F-06 | 0–4 Wald, 5–9 Nacht, 10–20 Elfenwald | geklärt (PE-10) |
 | Q-06 | Wie gibt es Upgrades in der Runde, was bringt das Spielerlevel im ersten Stich (Rüstungen, Power-ups?), wie werden Level freigeschaltet? | K | F-07–F-09 | Erfahrungskristalle sammeln → Auswahl aus 3 Upgrades; Level nacheinander freischalten | offen |
+| Q-07 | iOS: Der Mac ist sehr alt, das iPhone hat das neueste iOS. Wie kommt das Spiel aufs iPhone? Welches Mac-Modell und welche macOS-Version? | K | §3, §6 | Stich 1: iPhone spielt per Safari/PWA über das lokale WLAN vom PC. Native iOS-App erst später | offen |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -538,3 +545,4 @@ flowchart LR
 | Datum | Änderung | Grund | Betroffene Pakete | Freigabe |
 |---|---|---|---|---|
 | 2026-10-23 | Planversion 1: §1 und §2 aus `idee.txt` und den ersten Antworten befüllt, PE-01–PE-07, Q-01–Q-06 | Interview-Start | – | Nutzer |
+| 2026-10-23 | PE-08–PE-11: Bewegung, Rundendauer pro Batch, Batch-Grenzen, Tech-Stack. §3 befüllt, Q-07 (iOS) neu | Interview Runde 2 | – | Nutzer |
