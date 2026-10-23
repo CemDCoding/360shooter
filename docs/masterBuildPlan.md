@@ -21,11 +21,12 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-24 · Wellenabschluss M1 W3 · M0 und M1 technisch komplett in dev, M0-DEP und M1-DEP offen
-- **Fertig:** AP-01–AP-10 und AP-21 (alle in dev; AP-10 f1000c0). **Bereit:** M1-DEP ([Mensch], Abnahme M1), AP-11, AP-12, AP-13 (M2 W1). **Offen:** AP-14–AP-20; M0-DEP, M2-DEP, M3-DEP `offen`
+- **Stand:** 2026-10-24 · Wellenabschluss M2 W1 · M0, M1 und M2 W1 technisch komplett in dev, M0-DEP und M1-DEP offen
+- **Fertig:** AP-01–AP-13 und AP-21 (alle in dev). **Bereit:** M1-DEP ([Mensch], Abnahme M1), AP-14 und AP-15 (M2 W2). **Offen:** AP-16–AP-20; M0-DEP, M2-DEP, M3-DEP `offen`
+- **Budget:** Team-Budget ca. 29 % (Zielwert 30 %). M2 W2 erst nach Prüfung des Budgets (§14) starten.
 - **Unterbrochen oder laufend:** nichts
-- **Erkenntnisse:** Checks auf dev grün (129/129 Tests). AP-10 ist nicht im Browser getestet, erste Laufzeitprüfung ist M1-DEP. Debug-Parameter `?level=n` und `?fps=1`. Pause hat kein Vertrags-Event. MenuScene enthält einen temporären Start von GameScene, den AP-11 ersetzt. Details §18.
-- **Nächster Schritt:** Nutzer: PR `dev` nach `stage`, Smoke-Test M1-DEP (§9.2), PR `stage` nach `master`; M0-DEP ebenfalls offen. Danach M2 W1 mit AP-11, AP-12, AP-13 (Lead, max. 3 parallel). Autonomie bis M2 vom Nutzer freigegeben (PE-15).
+- **Erkenntnisse:** Checks auf dev grün (136/136 Tests in 21 Dateien). Nicht im Browser getestet: Optik und iPhone-Verhalten (Teil von M1-DEP und M2-DEP, Handtest H-03). Details §18.
+- **Nächster Schritt:** Nutzer: PR `dev` nach `stage`, Smoke-Test M1-DEP (§9.2), PR `stage` nach `master`; M0-DEP ebenfalls offen. Danach Budgetprüfung, dann Lead startet M2 W2. Autonomie bis M2 vom Nutzer freigegeben (PE-15).
 - **Offene Fragen an den Nutzer:** M0-DEP-Abnahme steht aus ([Mensch]). M1-DEP nach Smoke-Test ([Mensch]). Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen.
 
 <!-- Ende Lagebericht -->
@@ -503,6 +504,11 @@ flowchart TD
   - [ ] Ein angeschossenes Item verändert die Waffe sichtbar
   - [ ] Bei 0 HP erscheint „Verloren“
   - [ ] `?level=12` startet Level 12 mit allen vier Gegnertypen
+  - [ ] Pause: Taste im HUD oder `Esc`/`P` pausiert und setzt fort; Browser-Tab wechseln und zurückkehren pausiert automatisch, ohne Tastendruck
+  - [ ] „Nochmal“ startet die Runde ohne doppelte Events (Timer, Treffer, Items)
+  - [ ] „Nächstes Level“ ist nur nach einem Sieg wählbar
+  - [ ] Fortschritt bleibt nach Neuladen erhalten
+  - [ ] `?fps=1` zeigt die FPS unten rechts im HUD
   - [ ] Die beiden Anleitungen in `docs/guides/` sind für Nicht-Programmierer verständlich
 
 #### M2 – Inhalte, Menü, iPhone
@@ -564,11 +570,11 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-21 | Fix: Freischaltstand als Index | M1 | LOG/GAME | W2 | AP-04, AP-06 | S | sonnet (medium) | c21 / agent/AP-21-c21 | fertig |
 | AP-10 | Spielszene, HUD, Ergebnis | M1 | GAME | W3 | AP-08, AP-09, AP-21 | L | opus (high) | c10 / agent/AP-10-c10 | fertig |
 | M1-DEP | Abnahme M1 | M1 | HUM | W4 | AP-10, AP-21 | H | – | – | bereit |
-| AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | bereit |
-| AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | – | bereit |
-| AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | – | bereit |
-| AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | – | offen |
-| AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | – | offen |
+| AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | c11 / agent/AP-11-c11 | fertig |
+| AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | c12 / agent/AP-12-c12 | fertig |
+| AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | c13 / agent/AP-13-c13 | fertig |
+| AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | – | bereit |
+| AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | – | bereit |
 | M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | offen |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2 | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -1074,7 +1080,7 @@ flowchart LR
      - HP-Leiste
      - Waffenstufen (drei kleine Icons mit Zahl 0–5)
      - Pause-Taste
-  4. Pause: Taste im HUD, `Esc`/`P` am PC. Automatische Pause, wenn die Seite in den Hintergrund geht (`visibilitychange`) (PE-29). Kein Bildschirmwackeln, keine Schadenszahlen (PE-31).
+  4. Pause: Taste im HUD, `Esc`/`P` am PC. Automatische Pause, wenn die Seite in den Hintergrund geht (Browser-Tab wechseln, `visibilitychange`), ohne Tastendruck (PE-29). Kein Bildschirmwackeln, keine Schadenszahlen (PE-31).
   5. Rundenende:
      - `applyRoundResult` mit `writeSave`
      - `ResultScene` zeigt „Gewonnen“ oder „Verloren“, XP und Spielerlevel
@@ -1112,7 +1118,7 @@ flowchart LR
 - **Pflichtlektüre:** F-08, F-09, PE-13, `src/platform/storage.ts`, `src/logic/progression.ts`, `src/config/levels.ts`
 - **Abhängigkeiten:** M1
 - **Parallel möglich mit:** AP-12, AP-13
-- **Dateien (Eigentum):** `src/scenes/MenuScene.ts`, `src/scenes/menu/{LevelGrid,ConfirmDialog,Button}.ts`
+- **Dateien (Eigentum):** `src/scenes/MenuScene.ts`, `src/scenes/menu/{LevelGrid,ConfirmDialog,Button,levelGroups}.ts`, `tests/scenes/levelGroups.test.ts`
 - **Nicht anfassen:** `src/scenes/{GameScene,HudScene,ResultScene}.ts`, `index.html`, `src/config/*`
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
@@ -1664,3 +1670,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-24 | Ausnahmen aus dem Review AP-10, vom Lead erlaubt: (a) `MenuScene.ts` enthält die Zeile `this.scene.start('GameScene')` als temporären Einstieg. AP-11 muss sie durch das echte Menü ersetzen; bis dahin startet die Menü-Taste der ResultScene sofort ein neues Level. (b) `ItemPickup.ts` bekam einen optionalen 6. Konstruktorparameter `spawnedAtMs`. GameScene führt eine pausierbare `playTimeMs`, damit Items in Pause nicht ablaufen (PE-29) | Wellenabschluss M1 W3 | AP-11, AP-08 (Datei) | Lead (Pflege) |
 | 2026-10-24 | Review-Lehre AP-10: Zeitbasierte Entities über pausierbare Spielzeit statt Rohzeit prüfen. Gilt für künftige Pakete mit Zeitlogik (z. B. AP-16–AP-19) | Review-Befund AP-10 | AP-16–AP-19 | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis AP-10: Nicht im Browser geprüft. Erste Laufzeitprüfung ist M1-DEP. Handtest-Liste des Leads: Drehung verzögert, Auto-Feuer, Level 0 Bäume von allen Seiten, Timer 3:00 bis Gewonnen, Item erhöht Stack im HUD, 0 HP = Verloren, `?level=12` mit vier Gegnertypen, Pause per Taste, Esc, P oder Tab, Nochmal ohne doppelte Events, Nächstes Level nur nach Sieg, Fortschritt bleibt nach Reload, `?fps=1`. Abweichung: §10 nennt Esc und P, die Liste nennt zusätzlich Tab | Wellenabschluss M1 W3 | M1-DEP, AP-11 | Lead (Pflege) |
+| 2026-10-24 | Wellenabschluss M2 W1: AP-11 (260c646, Coder c11), AP-12 (e382bd6, c12), AP-13 (df1c19e, c13) gemergt. Review in Runde 1 bestanden. Checks auf dev grün: lint, typecheck, 136/136 Tests in 21 Dateien, build, `npm audit` 0. AP-11–AP-13 `fertig`, AP-14 und AP-15 `bereit` | Wellenabschluss M2 W1 | AP-11–AP-15 | Lead (Pflege) |
+| 2026-10-24 | Vom Lead freigegebene Detailkorrekturen ohne Scope- oder Security-Wirkung: §9.2 M1-DEP-Smoke-Test um Pause, „Nochmal“, Level-Freischaltung, Fortschritt und `?fps=1` ergänzt. AP-11 Dateieigentum um `levelGroups.ts` und Test erweitert. AP-10 präzisiert: Browser-Tab-Wechsel pausiert über `visibilitychange`, ohne Taste | Wellenabschluss M2 W1 | M1-DEP, AP-10, AP-11 | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-11: Das Menü liest bei jedem `create()` `loadSave()`. Die Idle-Animation `astronaut-idle` (Frames 0–1) wird in `MenuScene` angelegt. Reset läuft über `resetSave()` und `scene.restart()`. `Button` erzwingt mindestens 32 px, Level-Zellen sind 40×40 | Wellenabschluss M2 W1 | AP-14, AP-15 | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-11, niedrig: Der Hover bleibt nach einem Touch-Tap bis `pointerout` stehen. `Button` löst `pointerup` auch ohne vorheriges `pointerdown` aus | Wellenabschluss M2 W1 | AP-14 (Stumm-Taste im Menü), künftige Button-Nutzung | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-12: Tileset-Frame 0 ist Boden, Frames 1..n sind Deko (das Manifest nennt 4 Frames je Tileset). `TILE_PX` = 32 ist im Code fest eingetragen, Designer-Sheets mit anderer Frame-Größe hinterlassen Lücken. Seed je Level `levelId*7919+1`, Tiefe -100. Partikel höchstens 30 (Nacht 24, Elfenwald 30). Vignette als gecachte Canvas-Textur. Platzhalter-Kacheln sind deckend mit Hash-Farben, Gegner-Lesbarkeit mit Platzhaltern per Handy-Smoke-Test prüfen | Wellenabschluss M2 W1 | M2-DEP, AP-15 (Konstanten), künftige Tilesets | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-13: Kein Service Worker, kein Offline-Betrieb (steht im README). `preview:lan` = `build` und danach `vite preview --host`, die IP steht unter „Network:“. Das Inline-Script blockiert `gesturestart`, `gesturechange` und `contextmenu`; bei einer späteren CSP ist ein Hash nötig. Das Overlay „Bitte drehen“ erscheint auch in schmalen Desktop-Fenstern, das Spiel pausiert dabei nicht (Kandidat für ein späteres Paket). Bei neuem Icon das Symbol vom Homescreen löschen und neu hinzufügen. Safe-Area-Padding auf `#game` mit `Scale.FIT` ist nur am iPhone mit Notch prüfbar (H-03) | Wellenabschluss M2 W1 | M2-DEP, künftige CSP | Lead (Pflege) |
