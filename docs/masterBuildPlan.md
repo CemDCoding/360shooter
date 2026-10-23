@@ -7,11 +7,11 @@ Er ist der einzige Agent, der diese Datei ändert. Der Lead (ma-lead) steuert de
 Grundlage der Regeln: MultiAgent/entscheidungen.md
 -->
 
-# Master-Build-Plan {{PROJEKTNAME}}
+# Master-Build-Plan 360shooter
 
-**Stand:** {{JJJJ-MM-TT}} · **Planversion:** {{n}} · **Gepflegt von:** ma-planner · **Gesteuert von:** ma-lead · **Nutzer:** {{NAME}}
+**Stand:** 2026-10-23 · **Planversion:** 1 · **Gepflegt von:** ma-planner · **Gesteuert von:** ma-lead · **Nutzer:** Cem Dogan
 
-{{KURZÜBERBLICK: höchstens zehn Zeilen. Was baut das Projekt, für wen? Wie viele Meilensteine und Pakete hat der Plan?}}
+360shooter ist ein 2D-Pixel-Survival-Shooter im Metroid-Stil für Handy und PC. Eine Astronautin steht in der Bildschirmmitte, dreht sich um 360° und schießt automatisch mit einer Laserpistole in Blickrichtung. Sie muss in jeder Runde überleben, bis der Timer abläuft. Monster greifen von allen Seiten an. Der erste Stich umfasst die Level 0–20 (Batches Wald, Wald bei Nacht, Elfenwald) und läuft nur lokal. Grundlage ist die Idee in `idee.txt`. Meilensteine und Pakete folgen nach G1.
 
 ---
 
@@ -59,8 +59,8 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
-| 1 | Projektkontext und Ziel | leer | – | G1 |
-| 2 | Umfang | leer | – | G1 |
+| 1 | Projektkontext und Ziel | in Klärung | Q-02 | G1 |
+| 2 | Umfang | in Klärung | Q-01, Q-03–Q-06 | G1 |
 | 3 | Tech-Stack | leer | – | G1 |
 | 4 | Architektur, Datenmodell, Verträge | leer | – | G1 |
 | 5 | Sicherheit, Datenschutz, Recht, Limits | leer | – | G1 |
@@ -74,7 +74,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 13 | Menschliche Schritte | leer | – | G2 |
 | 14 | Budget und Kürzungen | leer | – | G2 |
 | 15 | Risiken | leer | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | leer | – | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | in Klärung | Q-01–Q-06 | laufend |
 | 17 | Abdeckungsmatrix | leer | – | G2 |
 | 18 | Änderungsprotokoll | leer | – | laufend |
 
@@ -98,19 +98,21 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | Feld | Wert |
 |---|---|
-| Einzeiler | {{…}} |
-| Zielgruppe | {{…}} |
-| Lieferumfang | {{…}} |
-| Termin | {{JJJJ-MM-TT oder „keiner“}} |
-| Kommerzialisierung | {{nein / später möglich / geplant}} |
-| Projektdokumentation | {{Verweis oder „keine“}} |
+| Einzeiler | Rundenbasierter 360°-Survival-Shooter im Pixel-Stil: Die Astronautin in der Bildschirmmitte dreht sich, schießt automatisch und überlebt Monsterwellen, bis der Timer abläuft. |
+| Zielgruppe | Gelegenheitsspieler auf Handy und PC. Im ersten Stich nur der Nutzer selbst (lokal). |
+| Lieferumfang | Stich 1: lokal lauffähiges Spiel mit Level 0–20 auf PC und Handy. Keine Veröffentlichung. Später App Store (Ausblick). |
+| Termin | ⟦offen: Q-02⟧ |
+| Kommerzialisierung | später möglich (App Store), PE-01 |
+| Projektdokumentation | `idee.txt` (Spielidee, Gegner, Batches; noch nicht committet, siehe §16 Vorschläge) |
 
 **Leitprinzipien (in Rangfolge):**
 
 1. Sicherheit und Datenschutz werden nie gekürzt.
-2. {{…}}
+2. Alles läuft lokal. Veröffentlichung, Anmeldung, Downloads und Server-Datenbank sind im ersten Stich unwichtig (PE-02).
+3. Spielgefühl (Steuerung, Treffer, Lesbarkeit) vor Inhaltsmenge.
+4. Level 21–100 sind nur Ausblick. Der Code soll sie später ohne Umbau aufnehmen können (datengetriebene Level und Gegner).
 
-**Abnahmekriterien (G3):** {{prüfbare Liste}}
+**Abnahmekriterien (G3):** ⟦offen: wird nach §2 und §9 konkretisiert⟧
 
 ---
 
@@ -127,7 +129,15 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | ID | Funktion | Beschreibung aus Nutzersicht | Kernfluss |
 |---|---|---|---|
-| F-01 | {{…}} | {{…}} | {{ja/nein}} |
+| F-01 | Steuerung | Die Astronautin steht fest in der Bildschirmmitte. Der Spieler zeigt mit Maus oder Finger (Touch) auf eine Stelle, die Figur dreht sich dorthin, in beide Richtungen auf dem kürzeren Weg. Die Drehung ist **nicht sofort**, sondern mit begrenzter Drehgeschwindigkeit (PE-03, PE-04). | ja |
+| F-02 | Automatischer Schuss | Die Laserpistole feuert automatisch, immer in die aktuelle Blickrichtung (PE-03). | ja |
+| F-03 | Runde mit Timer | Eine Runde ist gewonnen, wenn der Timer abläuft und die Astronautin noch lebt. Dauer: erste Hälfte 3 min, zweite Hälfte 5 min, die Hälfte wird aufgerundet (PE-05, Bezug ⟦offen: Q-03⟧). | ja |
+| F-04 | Gegner | Verfluchter Baum (Level 0–20, langsam, etwas mehr HP, läuft auf Spieler zu), Wald-Hexe (5–20, schießt Projektile, normale Werte), Zombie-Eichhörnchen (5–20, schnell, wenig HP, läuft), Böser Wald-Spirit (10–20, Dauerschaden in Nähe, wenig HP). Quelle: `idee.txt`. | ja |
+| F-05 | Boss je Level | Jedes Level hat einen Boss. Aussehen und Verhalten beschreibt der Nutzer noch (⟦offen: Q-04⟧). | nein |
+| F-06 | Level und Maps 0–20 | Batches Wald, Wald bei Nacht, Elfenwald mit je einer einfachen Map mit Charme (Grenzen ⟦offen: Q-05⟧). | ja |
+| F-07 | Waffen-Upgrades in der Runde | Die Laserpistole wird in der Runde schneller, stärker, größer. Upgrades starten jede Runde bei 0 (Ablauf ⟦offen: Q-06⟧). | ja |
+| F-08 | Spielerlevel | Ein Spielerlevel, das über alle Runden lokal gespeichert bleibt. | nein |
+| F-09 | Hauptmenü | Start, Level-Auswahl ⟦offen: Q-06⟧ | ja |
 
 ### Optional
 
@@ -139,7 +149,9 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | Ausgeschlossen | Begründung |
 |---|---|
-| {{…}} | {{…}} |
+| Level 21–100 (Bauernhof bis Büro) | Ausblick, nicht im ersten Stich (`idee.txt`) |
+| Weitere Startwaffen | Im ersten Stich gibt es nur die Laserpistole (PE-06) |
+| Veröffentlichung, App-Store-Einreichung, Anmeldung, Online-Spielerdatenbank, Downloads | PE-02 |
 
 ---
 
@@ -483,19 +495,30 @@ flowchart LR
 
 | ID | Entscheidung | Begründung | Quelle |
 |---|---|---|---|
-| PE-01 | {{…}} | {{…}} | {{Nutzer am JJJJ-MM-TT / angenommen vom Planner}} |
+| PE-01 | Kommerzialisierung später möglich (App Store), nicht im ersten Stich | Wunsch „im besten Fall App Store“ | Nutzer (`idee.txt`), 2026-10-23 |
+| PE-02 | Erster Stich nur lokal: keine Veröffentlichung, kein Login, keine Server-DB | „Fokus ist erstmal, dass alles lokal geht“ | Nutzer (`idee.txt`), 2026-10-23 |
+| PE-03 | Steuerung per Maus und Touch: Zeigen gibt die Zielrichtung vor, die Pistole schießt immer in Blickrichtung | Antwort 1 | Nutzer am 2026-10-23 |
+| PE-04 | Drehung in beide Richtungen, aber mit begrenzter Drehgeschwindigkeit (kein sofortiger Sprung). Startwert 270°/s (angenommen), als Konstante einstellbar | Antwort 1, Wert vom Planner | Nutzer am 2026-10-23 / Wert angenommen vom Planner |
+| PE-05 | Rundendauer: erste Hälfte 3 min, zweite Hälfte 5 min, bei ungerader Anzahl wird die erste Hälfte aufgerundet | Antwort 2 | Nutzer am 2026-10-23 |
+| PE-06 | Im ersten Stich nur die Startwaffe Laserpistole, keine Waffenauswahl | Antwort 3 | Nutzer am 2026-10-23 |
+| PE-07 | Jedes Level hat einen Boss | Antwort 4 | Nutzer am 2026-10-23 |
 
 ### Offene Fragen
 
 | ID | Frage | Priorität | Betrifft | Empfehlung | Status |
 |---|---|---|---|---|---|
-| Q-01 | {{…}} | {{K/W/O}} | {{…}} | {{…}} | offen |
+| Q-01 | Bewegt sich die Astronautin auch über die Map, oder steht sie fest und dreht sich nur? | K | F-01, §4 | fest in der Mitte, nur Drehen (wie `idee.txt`) | offen |
+| Q-02 | Gibt es einen Termin für den ersten Stich? | K | §1, §14 | keiner | offen |
+| Q-03 | „Erste Hälfte“ bezogen auf was: die Level eines Batches oder die Level 0–20 insgesamt? | K | F-03 | pro Batch | offen |
+| Q-04 | Boss je Level: Aussehen, Verhalten, wann erscheint er (bei Timer-Ende, zur Halbzeit)? Muss er besiegt werden? | K (für Boss-Pakete) | F-05 | Boss erscheint in der letzten Minute; Runde gewonnen, wenn Timer abgelaufen und Boss besiegt | offen |
+| Q-05 | Batch-Grenzen überlappen (Wald 0–5, Nacht 5–10, Elfenwald 10–20). Zu welchem Batch gehören Level 5 und 10? | W | F-06 | 0–4 Wald, 5–9 Nacht, 10–20 Elfenwald | offen |
+| Q-06 | Wie gibt es Upgrades in der Runde, was bringt das Spielerlevel im ersten Stich (Rüstungen, Power-ups?), wie werden Level freigeschaltet? | K | F-07–F-09 | Erfahrungskristalle sammeln → Auswahl aus 3 Upgrades; Level nacheinander freischalten | offen |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
 | Was | Änderung | Grund | Vorgeschlagen von |
 |---|---|---|---|
-| {{…}} | {{…}} | {{…}} | {{Lead / Reviewer / Planner}} |
+| `idee.txt` | ins Repo committen (oder nach `docs/idee.md` verschieben) | Ist die einzige Projektdoku, liegt aber unversioniert vor | Planner |
 
 ---
 
@@ -514,4 +537,4 @@ flowchart LR
 
 | Datum | Änderung | Grund | Betroffene Pakete | Freigabe |
 |---|---|---|---|---|
-| {{JJJJ-MM-TT}} | {{…}} | {{…}} | {{…}} | {{Nutzer / Lead + Planner}} |
+| 2026-10-23 | Planversion 1: §1 und §2 aus `idee.txt` und den ersten Antworten befüllt, PE-01–PE-07, Q-01–Q-06 | Interview-Start | – | Nutzer |
