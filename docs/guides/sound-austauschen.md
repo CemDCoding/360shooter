@@ -7,7 +7,15 @@ Diese Anleitung zeigt dir, wie du einen Sound im Spiel ersetzt. Du brauchst daf�
 - **Audacity**: kostenloses Programm zum Aufnehmen und Bearbeiten von Ton.
 - **jsfxr** oder **ChipTone**: kostenlose Programme im Browser. Sie erzeugen Retro-Effekte per Knopfdruck.
 - Den Projektordner `360shooter` auf deinem Rechner.
-- Ein Terminal (Eingabeaufforderung), um zwei Befehle einzutippen. Wie das geht, steht unten.
+- **Node.js 24**: ein kostenloses Hilfsprogramm von nodejs.org. Es führt die Prüf-Befehle aus. Einmal installieren genügt.
+- Ein Terminal (Eingabeaufforderung), um Befehle einzutippen. Wie das geht, steht unten.
+- Einmalig im Projektordner im Terminal diesen Befehl tippen und Enter drücken:
+
+  ```
+  npm install
+  ```
+
+  Er lädt alle Teile herunter, die das Projekt braucht. Das dauert ein paar Minuten und ist nur beim ersten Mal nötig.
 
 ## Die Regeln
 
@@ -70,10 +78,10 @@ Das Repository ist **öffentlich**. Jeder kann deine Dateien sehen. Darum gilt:
 
 | Meldung oder Problem                  | Ursache                                   | Lösung                                                                  |
 | ------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- |
-| "Die WAV hat 2 Kanäle"                | Stereo exportiert                         | In Audacity zu Mono mischen und neu exportieren                         |
+| "Die WAV hat 2 Kanaele"                | Stereo exportiert                         | In Audacity zu Mono mischen und neu exportieren                         |
 | "Falsche Abtastrate"                  | Projektrate war nicht 44100 Hz            | Projektrate auf 44100 Hz stellen und neu exportieren                    |
 | "Falsche Bittiefe"                    | Export mit 24 oder 32 Bit                 | Beim Export "Signed 16-bit PCM" wählen                                  |
-| "keine gültige WAV-Datei"             | Datei nur umbenannt, zum Beispiel eine MP3 | Wirklich als WAV exportieren                                            |
+| "keine gueltige WAV-Datei"             | Datei nur umbenannt, zum Beispiel eine MP3 | Wirklich als WAV exportieren                                            |
 | "Datei fehlt"                         | Name falsch oder falscher Ordner          | Name genau wie in der Tabelle schreiben, Ordner `public/assets/sounds/` |
 | Sound kommt zu spät                   | Stille am Anfang                          | Leere Stelle vorne abschneiden                                          |
 | Sound knackt oder klingt verzerrt     | Zu laut ausgesteuert                      | Lautstärke senken, Spitze bei etwa minus 3 dB                           |

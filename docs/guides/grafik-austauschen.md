@@ -9,7 +9,15 @@ Diese Anleitung zeigt dir, wie du eine Grafik im Spiel ersetzt. Du brauchst daf�
   - **Piskel** (läuft im Browser, nichts zu installieren)
 - **Aseprite** ist eine kostenpflichtige Alternative. Es kann das Gleiche.
 - Den Projektordner `360shooter` auf deinem Rechner.
-- Ein Terminal (Eingabeaufforderung), um zwei Befehle einzutippen. Wie das geht, steht unten.
+- **Node.js 24**: ein kostenloses Hilfsprogramm von nodejs.org. Es führt die Prüf-Befehle aus. Einmal installieren genügt.
+- Ein Terminal (Eingabeaufforderung), um Befehle einzutippen. Wie das geht, steht unten.
+- Einmalig im Projektordner im Terminal diesen Befehl tippen und Enter drücken:
+
+  ```
+  npm install
+  ```
+
+  Er lädt alle Teile herunter, die das Projekt braucht. Das dauert ein paar Minuten und ist nur beim ersten Mal nötig.
 
 ## Die Regeln
 
@@ -50,7 +58,9 @@ Tipp: Öffne zuerst die vorhandene Platzhalter-Datei. So siehst du, wie die Fram
 ## Schritt für Schritt
 
 1. **Datei öffnen.** Öffne die Platzhalter-Datei aus dem Ordner `public/assets/sprites/` in deinem Zeichenprogramm. Zum Beispiel `astronaut.png`.
-2. **Zeichnen.** Male die Frames nebeneinander. Halte dich an die Regeln oben. Ändere die Leinwandgröße nicht.
+2. **Zeichnen.** Male die Frames nebeneinander. Halte dich an die Regeln oben. Die Leinwand muss genau die Gesamtgröße aus der Tabelle haben. Die Breite ist Frame-Breite mal Anzahl der Frames, die Höhe ist die Frame-Höhe. Beispiel `astronaut.png`: 32 mal 4 = 128 Pixel breit, 32 Pixel hoch.
+   - **LibreSprite:** Öffnest du die Platzhalter-Datei, stimmt die Größe schon. Bei einer neuen Datei wählst du `Datei > Neu` und trägst Breite und Höhe ein. Später änderst du sie unter `Sprite > Leinwandgröße`.
+   - **Piskel:** Beim Start oder unter dem Werkzeug "Größe ändern" Breite und Höhe eintragen. Entferne den Haken bei "Seitenverhältnis beibehalten", sonst ändert sich die Höhe mit. Beim Export (PNG) wähle Skalierung 1x.
 3. **Speichern.** Speichere als **PNG** mit **demselben Namen** im **selben Ordner** `public/assets/sprites/`. Die alte Datei wird dabei ersetzt.
 4. **Terminal öffnen.** Öffne den Projektordner im Datei-Explorer. Klicke oben in die Adresszeile, tippe `powershell` und drücke Enter. Es öffnet sich ein Fenster, in dem du Befehle eintippst.
 5. **Dateien prüfen.** Tippe diesen Befehl und drücke Enter:
@@ -83,10 +93,10 @@ Das Repository ist **öffentlich**. Jeder kann deine Dateien sehen. Darum gilt:
 
 | Meldung oder Problem                    | Ursache                                         | Lösung                                                                                  |
 | --------------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------- |
-| "Falsche Größe: ... Erwartet: ..."      | Die Leinwand hat nicht die Gesamtgröße          | Leinwandgröße in der Tabelle nachsehen und im Programm anpassen                         |
+| "Falsche Groesse: ... Erwartet: ..."      | Die Leinwand hat nicht die Gesamtgröße          | Leinwandgröße in der Tabelle nachsehen und im Programm anpassen                         |
 | "Datei fehlt"                           | Name falsch oder falscher Ordner                | Name genau wie in der Tabelle schreiben, Ordner `public/assets/sprites/`                |
-| "keine gültige PNG-Datei"               | Datei nur umbenannt, zum Beispiel aus einer JPG | Im Programm wirklich als PNG exportieren                                                |
-| Hinweis "kein transparenter Hintergrund" | Hintergrund ist weiß oder farbig                | Hintergrund löschen, sodass er durchsichtig ist                                         |
+| "keine gueltige PNG-Datei"               | Datei nur umbenannt, zum Beispiel aus einer JPG | Im Programm wirklich als PNG exportieren                                                |
+| Hinweis "keinen transparenten Hintergrund" | Hintergrund ist weiß oder farbig                | Hintergrund löschen, sodass er durchsichtig ist                                         |
 | Bild wirkt verschwommen                 | Kantenglättung war an                           | Antialiasing ausschalten, neu zeichnen oder ohne Skalierung speichern                   |
 | Figur läuft rückwärts                   | Figur schaut nach links                         | Figur spiegeln, sodass sie nach rechts schaut                                           |
 | Animation springt                       | Frames in falscher Reihenfolge                  | Frames von links nach rechts in der Reihenfolge der Tabelle anordnen                    |
