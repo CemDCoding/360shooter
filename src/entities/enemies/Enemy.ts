@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { animKey } from '../../config/assets';
 import { ENEMIES } from '../../config/enemies';
 import type { EnemyDef, EnemyId } from '../../contracts';
+import { distance } from '../../logic/geometry';
 import { applyDamage, auraDamage, isDead } from '../../logic/health';
 
 export const ARENA_CENTER = { x: 320, y: 180 } as const;
@@ -87,7 +88,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   auraDamageAt(tx: number, ty: number, dtMs: number): number {
     const aura = this.def.aura;
     if (!aura || !this.active) return 0;
-    if (Math.hypot(tx - this.x, ty - this.y) > aura.radius) return 0;
+    if (distance(this.x, this.y, tx, ty) > aura.radius) return 0;
     return auraDamage(aura.dps, dtMs);
   }
 
@@ -114,7 +115,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected moveToCenter(): number {
     const dx = this.center.x - this.x;
     const dy = this.center.y - this.y;
-    const dist = Math.hypot(dx, dy);
+    const dist = distance(this.x, this.y, this.center.x, this.center.y);
     if (dist < 1) {
       this.setVelocity(0, 0);
     } else {

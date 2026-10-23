@@ -1,29 +1,27 @@
 import type Phaser from 'phaser';
 import type { EnemyId } from '../../contracts';
-import { CursedTree } from './CursedTree';
+import { ENEMIES } from '../../config/enemies';
+import { AuraEnemy } from './AuraEnemy';
+import { ChaseEnemy } from './ChaseEnemy';
 import type { Enemy, EnemyContext } from './Enemy';
-import { ForestSpirit } from './ForestSpirit';
 import { ForestWitch } from './ForestWitch';
 import type { WitchBoltPool } from './WitchBoltPool';
-import { ZombieSquirrel } from './ZombieSquirrel';
 
 export interface CreateEnemyContext extends EnemyContext {
   /** Required for shooter enemies. */
   boltPool?: WitchBoltPool;
 }
 
-/** Factory: picks the class per id. New enemies need config data and at most one new class. */
+/** Factory: picks the behavior class via EnemyDef.behavior. A new enemy with a known behavior needs only a config entry. */
 export function createEnemy(scene: Phaser.Scene, id: EnemyId, ctx: CreateEnemyContext = {}): Enemy {
-  switch (id) {
-    case 'cursedTree':
-      return new CursedTree(scene, ctx);
-    case 'zombieSquirrel':
-      return new ZombieSquirrel(scene, ctx);
-    case 'forestSpirit':
-      return new ForestSpirit(scene, ctx);
-    case 'forestWitch':
-      if (!ctx.boltPool) throw new Error('forestWitch needs a boltPool');
-      return new ForestWitch(scene, { ...ctx, boltPool: ctx.boltPool });
+  switch (ENEMIES[id].behavior) {
+    case 'chase':
+      return new ChaseEnemy(scene, id, ctx);
+    case 'aura':
+      return new AuraEnemy(scene, id, ctx);
+    case 'shooter':
+      if (!ctx.boltPool) throw new Error(`${id} needs a boltPool`);
+      return new ForestWitch(scene, id, { ...ctx, boltPool: ctx.boltPool });
   }
 }
 
