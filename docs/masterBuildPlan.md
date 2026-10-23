@@ -67,10 +67,10 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | fertig | – | G2 |
-| 9 | Meilensteine und Wellen | in Klärung | Bestätigung M0 | G2 |
+| 9 | Meilensteine und Wellen | in Klärung | Bestätigung M1 | G2 |
 | 10 | Statusübersicht | in Klärung | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | in Klärung | M0 detailliert, M1/M2 folgen, M3 wartet auf Q-04 | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | in Klärung | M0 bestätigt, M1 detailliert (Bestätigung offen), M2 folgt, M3 wartet auf Q-04 | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | leer | – | G2 |
 | 15 | Risiken | leer | – | G2 |
@@ -142,7 +142,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | F-11 | Lebenspunkte und Niederlage | Die Astronautin hat 100 HP mit Lebensleiste. Bei 0 HP ist die Runde verloren, ein Teil der Erfahrung geht trotzdem ans Spielerlevel. Heilung gibt es nur als seltenes Item (PE-17). | ja |
 | F-12 | Platzhalter-Grafik austauschbar | Alle Sprites sind Platzhalter mit fester Sprite-Liste. Ein Designer ersetzt eine PNG-Datei, ohne Code anzufassen. Anleitung `docs/guides/grafik-austauschen.md` (PE-23). | nein |
 | F-13 | Platzhalter-Sounds austauschbar | Einfache Platzhalter-Effekte (Laser, Treffer, Item, Niederlage, Sieg), Stummschalt-Taste, Austausch per Datei. Anleitung `docs/guides/sound-austauschen.md` (PE-24). | nein |
-| F-14 | Querformat | Das Spiel ist für Querformat ausgelegt, auf dem iPhone gibt es im Hochformat einen Hinweis „bitte drehen“ (PE-25, angenommen). | nein |
+| F-14 | Querformat | Das Spiel ist für Querformat ausgelegt, auf dem iPhone gibt es im Hochformat einen Hinweis „bitte drehen“ (PE-25). | nein |
 
 ### Optional
 
@@ -631,7 +631,8 @@ flowchart LR
      - `assets.ts`:
        - `AssetKind` (`spritesheet` | `image` | `audio`)
        - `AssetDef` mit `key`, `kind`, `path`, optional `frameWidth`, `frameHeight` und `frames`, dazu `description` (Text für Designer)
-  7. README: Voraussetzungen (Node 24), Befehle, Ordnerstruktur nach §4, Regel „Spielwerte nur in `src/config`“.
+  7. README: Voraussetzungen (Node 24), Befehle, Ordnerstruktur nach §4, Regel „Spielwerte nur in `src/config`“. Am Ende der Hinweis „© Cem Dogan. Alle Rechte vorbehalten. Code, Grafiken und Sounds dürfen ohne Erlaubnis nicht verwendet werden.“ Keine `LICENSE`-Datei (PE-27).
+  8. In `src/main.ts` Arcade Physics aktivieren (ohne Schwerkraft), damit M1 Kollisionen nutzen kann.
 - **Schnittstellen:** stellt alle Verträge aus §4 bereit
 - **Akzeptanzkriterien:**
   - `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` sind grün
@@ -785,7 +786,235 @@ flowchart LR
 
 ### M1 – Kernspiel
 
-⟦Detailbeschreibung folgt nach Bestätigung von M0, siehe §10 für Zuschnitt⟧
+#### AP-05 – Kampf-Logik
+
+- **Meilenstein, Lane, Welle:** M1 · LOG · W1
+- **Ziel:** Reine, getestete Funktionen für Drehung, Waffe, Items, HP und Zufall, ohne Phaser.
+- **Pflichtlektüre:** §4 (Grundregeln), PE-03, PE-04, PE-12, PE-16, PE-17, `src/contracts/*`, `src/config/{weapon,items,player}.ts`
+- **Abhängigkeiten:** M0 (AP-01–AP-04)
+- **Parallel möglich mit:** AP-06, AP-07
+- **Dateien (Eigentum):** `src/logic/{rotation,weapon,items,health,rng,geometry}.ts`, `tests/logic/{rotation,weapon,items,health,rng,geometry}.test.ts`
+- **Nicht anfassen:** `src/logic/{round,spawn,progression}.ts` (AP-06), `src/config/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `rotation.ts`: `stepRotation(current, target, maxDegPerSec, dtMs)` dreht auf dem kürzeren Weg, maximal `maxDegPerSec × dt`. Kein Überschießen, Ergebnis normalisiert.
+  2. `weapon.ts`:
+     - `computeWeaponStats(base, stacks, itemDefs)` → `WeaponStats`
+     - `FireTimer`: `tick(dtMs, fireRatePerSec)` → Anzahl der Schüsse in diesem Schritt (Akkumulator, unabhängig von der Bildrate)
+  3. `items.ts`:
+     - `rollDrop(rng, rules, defs)` → `ItemDef | null`, gewichtet
+     - `applyItem(stacks, def)` → neue Stacks, gedeckelt bei `maxStacks`. `heal` ändert die Stacks nicht und gibt die Heilmenge zurück.
+     - `isExpired(spawnedAtMs, nowMs, lifetimeMs)`
+  4. `health.ts`: `applyDamage`, `applyHeal` (gedeckelt bei `maxHp`), `isDead`, `auraDamage(dps, dtMs)`.
+  5. `rng.ts`: deterministischer Zufall mit Seed (z. B. mulberry32), Schnittstelle `next(): number`.
+  6. `geometry.ts`: `circlesOverlap`, `pointOnRing(angle, radius, cx, cy)`, `distance`.
+- **Schnittstellen:** nutzt Verträge; stellt Logik für AP-08, AP-09, AP-10 bereit
+- **Akzeptanzkriterien:**
+  - Kein Import von `phaser` in `src/logic`
+  - Testabdeckung der Logikdateien ≥ 90 % der Zeilen
+  - Checks grün
+- **Tests:** Drehung über die 0°/360°-Grenze in beide Richtungen; FireTimer bei 30 und 144 fps gleich viele Schüsse pro Sekunde; Stack-Deckel; Drop-Verteilung mit festem Seed; HP-Grenzen
+- **Review-Schwerpunkte:** Bildraten-Unabhängigkeit, keine hartkodierten Spielwerte
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-05): add combat logic`
+
+#### AP-06 – Runden- und Fortschrittslogik
+
+- **Meilenstein, Lane, Welle:** M1 · LOG · W1
+- **Ziel:** Reine, getestete Logik für Rundenablauf, Spawns und Spielerlevel.
+- **Pflichtlektüre:** PE-05, PE-09, PE-13, PE-17, PE-18 (Boss nur als Erweiterungspunkt), `src/contracts/*`, `src/config/{levels,progression}.ts`
+- **Abhängigkeiten:** M0
+- **Parallel möglich mit:** AP-05, AP-07
+- **Dateien (Eigentum):** `src/logic/{round,spawn,progression}.ts`, `tests/logic/{round,spawn,progression}.test.ts`
+- **Nicht anfassen:** Dateien von AP-05, `src/config/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `round.ts`: `RoundState`.
+     - Erzeugen aus `LevelDef`, `tick(dtMs)`, `playerDied()`
+     - Zustände `running`, `won`, `lost`, dazu `remainingMs` und `isFinalMinute`
+     - Gewonnen, wenn die Zeit abgelaufen ist und die Spielerin lebt.
+     - Erweiterungspunkt `requiresBossDefeat` (in M1 immer `false`), damit M3 nur ergänzt.
+  2. `spawn.ts`: `SpawnDirector(level, rng)`.
+     - `tick(dtMs, aliveCount)` → Liste von `{ enemyId, angle, radius }`
+     - Gegner erscheinen auf einem Ring knapp außerhalb des Sichtfelds (Radius aus Konstruktor-Parameter), aus allen Richtungen und gewichtet nach `enemyPool`.
+     - Das Intervall sinkt im Rundenverlauf (Startwert × 1,0 → × 0,6), `maxEnemies` wird beachtet.
+  3. `progression.ts`:
+     - `xpForLevel(n)` aus `ProgressionRules`
+     - `roundXp(killXp, result)`: bei `lost` mit `lossXpFactor`
+     - `applyRoundResult(save, levelId, result, xp)` → neuer `SaveGame` mit XP und Spielerlevel. Bei `won` wird das nächste Level freigeschaltet, höchstens bis `LEVEL_COUNT - 1`.
+- **Schnittstellen:** nutzt `LevelDef`, `SaveGame`, `ProgressionRules`; stellt Logik für AP-09, AP-10, AP-11 bereit
+- **Akzeptanzkriterien:**
+  - Rundendauer stimmt für 180 s und 300 s
+  - Niederlage hat Vorrang vor gleichzeitigem Timer-Ende
+  - Spawns respektieren `maxEnemies` und den Gegnerpool des Levels
+  - Kein `phaser`-Import, Checks grün
+- **Tests:** Zustandswechsel; Spawn-Pool je Batch (Level 0 nur Bäume, Level 12 alle vier); gleichmäßige Winkelverteilung mit Seed; XP-Kurve, mehrere Level-ups auf einmal, Freischaltung nur bei Sieg, kein Überlauf über Level 20
+- **Review-Schwerpunkte:** Regeln aus PE-05/09/13/17 korrekt, Erweiterungspunkt Boss sauber
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-06): add round, spawn and progression logic`
+
+#### AP-07 – Designer-Anleitungen Grafik und Sound
+
+- **Meilenstein, Lane, Welle:** M1 · ASSET · W1
+- **Ziel:** Zwei Anleitungen, mit denen Grafikdesigner und der Nutzer ohne Programmierkenntnisse Sprites und Sounds ersetzen können, plus ein Prüfbefehl, der falsche Dateien meldet (PE-23, PE-24).
+- **Pflichtlektüre:** PE-23, PE-24, PE-26, `src/config/assets.ts`, `public/assets/LICENSES.md`, README
+- **Abhängigkeiten:** AP-02
+- **Parallel möglich mit:** AP-05, AP-06
+- **Dateien (Eigentum):** `docs/guides/grafik-austauschen.md`, `docs/guides/sound-austauschen.md`, `scripts/check-assets.mjs`, `package.json` (nur Skript `assets:check`), `tests/scripts/check-assets.test.ts`
+- **Nicht anfassen:** `docs/masterBuildPlan.md`, `src/**`, `public/assets/*` (nur lesen)
+- **Freigegebene Abhängigkeiten:** keine (nur Node-Bordmittel)
+- **Umsetzung:**
+  1. `grafik-austauschen.md`, einfache Sprache, kurze Sätze, Du-Form. Abschnitte:
+     - Was du brauchst: kostenlose Programme wie LibreSprite oder Piskel; Aseprite als kostenpflichtige Alternative.
+     - Die Regeln:
+       - PNG mit transparentem Hintergrund, exakt die angegebene Größe
+       - Frames waagerecht nebeneinander, Figur schaut nach rechts
+       - harte Pixel ohne Kantenglättung, Dateiname unverändert
+     - Tabelle aller Sprites: Dateiname, Frame-Größe, Anzahl Frames, Gesamtgröße der Datei, was darauf zu sehen ist, welcher Frame wofür. Die Werte kommen aus dem Manifest.
+     - Schritt für Schritt: Datei öffnen, zeichnen, unter gleichem Namen in `public/assets/sprites/` speichern, `npm run assets:check`, Spiel mit `?assets=1` ansehen. Jeder Befehl wird erklärt: was er tut und wo man ihn eintippt.
+     - Häufige Fehler und ihre Lösung.
+     - Pflicht: Eintrag in `public/assets/LICENSES.md`, nur eigene oder ausdrücklich erlaubte Grafiken (Repo ist öffentlich).
+  2. `sound-austauschen.md`, gleich aufgebaut:
+     - Programme: Audacity; jsfxr oder ChipTone für Retro-Effekte.
+     - Format: WAV, 16 Bit, mono, 44,1 kHz. Empfohlene Länge je Sound, keine Stille am Anfang, Lautstärke angleichen.
+     - Tabelle aller Sounds mit Anlass im Spiel.
+  3. `scripts/check-assets.mjs`:
+     - prüft jede Datei aus dem Manifest: vorhanden, PNG-Größe passt zu Frames × Frame-Größe, WAV-Format laut Header
+     - verständliche deutsche Meldungen, Exit-Code ≠ 0 bei Fehlern
+     - Das Manifest wird gelesen, nicht dupliziert. Bei Bedarf als JSON-Export aus `src/config/assets.ts` über ein kleines TS-freies Hilfsmodul; der Weg wird im Bericht begründet.
+- **Schnittstellen:** nutzt das Asset-Manifest aus AP-02
+- **Akzeptanzkriterien:**
+  - Jedes Asset aus dem Manifest steht in genau einer Tabelle
+  - Eine absichtlich falsch große PNG führt zu einer klaren Fehlermeldung
+  - Ein Nicht-Programmierer kann jeden Schritt ohne Vorwissen ausführen (Review liest mit dieser Brille)
+- **Tests:** `check-assets` mit gültigen und fehlerhaften Testdateien (temporäres Verzeichnis)
+- **Review-Schwerpunkte:** Verständlichkeit, Vollständigkeit gegenüber dem Manifest, Lizenzhinweis
+- **Doku-Pflichten:** Verweis auf beide Anleitungen im README ist **nicht** Teil dieses Pakets (README gehört AP-13 in M2), stattdessen Liste im Bericht
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerwunsch)
+- **Commit-Typ:** `docs(AP-07): add asset replacement guides and asset check`
+
+#### AP-08 – Astronautin, Laser, Items (Entities)
+
+- **Meilenstein, Lane, Welle:** M1 · GAME · W2
+- **Ziel:** Phaser-Objekte für die Spielerin (fest in der Mitte, verzögerte Drehung, Auto-Schuss), Laser-Projektile und Items, die man anschießen kann.
+- **Pflichtlektüre:** PE-03, PE-04, PE-08, PE-12, PE-16, PE-17, `src/logic/{rotation,weapon,items,health}.ts`, `src/platform/input.ts`, `src/config/assets.ts`
+- **Abhängigkeiten:** AP-05
+- **Parallel möglich mit:** AP-09
+- **Dateien (Eigentum):** `src/entities/{Player,Laser,LaserPool,ItemPickup}.ts`
+- **Nicht anfassen:** `src/entities/enemies/*` (AP-09), `src/scenes/*`, `src/logic/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `Player`:
+     - Sprite `astronaut` in der Mitte, Arcade-Body als Kreis
+     - `update(dt, targetAngle)` dreht mit `stepRotation` und `turnSpeedDegPerSec`
+     - feuert mit `FireTimer` über `LaserPool` in die aktuelle Blickrichtung
+     - hält HP und Waffen-Stacks, `takeDamage`, `heal`, `applyItem`
+     - sendet Änderungen über Callbacks (keine Szenen-Imports)
+     - Animationen idle/shoot, kurzes Aufblinken bei Treffer
+  2. `LaserPool`: Objekt-Pool mit Arcade-Gruppe. Skalierung und Schaden nach aktuellen `WeaponStats`, Löschen ab `range`.
+  3. `ItemPickup`:
+     - erscheint an einer Gegnerposition
+     - blinkt in den letzten 3 s und verschwindet nach `lifetimeMs`
+     - `collect()` wird ausgelöst, wenn ein Laser es trifft. Der Laser wird dabei verbraucht.
+- **Schnittstellen:** nutzt Logik aus AP-05 und `AimInput` aus AP-04; stellt Entities für AP-10 bereit
+- **Akzeptanzkriterien:**
+  - Spielwerte nur aus `src/config`
+  - Logik nur über `src/logic`
+  - Checks grün
+  - Handtest über eine temporäre Debug-Szene ist **nicht** nötig, die Integration prüft AP-10
+- **Tests:** keine Phaser-Tests; neue Hilfsfunktionen gehören nach `src/logic`, aber nicht in dieses Paket. Fehlt dort etwas, meldet der Coder das.
+- **Review-Schwerpunkte:** keine Spiellogik dupliziert, Pooling, keine Speicherlecks (Listener abmelden)
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-08): add player, laser and item entities`
+
+#### AP-09 – Gegner (Entities)
+
+- **Meilenstein, Lane, Welle:** M1 · GAME · W2
+- **Ziel:** Die vier Gegnertypen aus `idee.txt` mit ihrem Verhalten, dazu das Hexen-Geschoss.
+- **Pflichtlektüre:** `idee.txt` (Gegner), F-04, `src/config/enemies.ts`, `src/logic/{health,geometry}.ts`, `src/contracts/enemy.ts`
+- **Abhängigkeiten:** AP-05, AP-06
+- **Parallel möglich mit:** AP-08
+- **Dateien (Eigentum):** `src/entities/enemies/{Enemy,CursedTree,ForestWitch,ZombieSquirrel,ForestSpirit,WitchBolt,WitchBoltPool,createEnemy}.ts`
+- **Nicht anfassen:** Dateien von AP-08, `src/scenes/*`, `src/logic/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `Enemy` (Basis):
+     - Sprite und Animation aus `spriteKey`, HP aus `EnemyDef`, `takeDamage` mit Aufblinken
+     - Tod → Callback `onDeath(x, y, xp)`
+     - Ausrichtung zur Mitte, Pooling-fähig (`spawn`/`despawn`)
+  2. `chase` (`CursedTree`, `ZombieSquirrel`): läuft direkt zur Mitte. Kontaktschaden je Sekunde Kontakt.
+  3. `shooter` (`ForestWitch`): nähert sich bis `keepDistance`, bleibt stehen, feuert im Intervall `WitchBolt` auf die Mitte.
+  4. `aura` (`ForestSpirit`): läuft zur Mitte. Innerhalb von `aura.radius` meldet er Dauerschaden mit `auraDamage`, die Aura ist sichtbar als halbtransparenter Kreis.
+  5. `createEnemy(scene, id)`: Fabrik aus `EnemyDef`, damit neue Gegner (Level 21+) nur Daten und höchstens ein neues Verhalten brauchen.
+- **Schnittstellen:** nutzt Config und Logik; stellt Fabrik, Gruppen und Callbacks für AP-10 bereit
+- **Akzeptanzkriterien:**
+  - Alle vier Typen verhalten sich wie in F-04 beschrieben
+  - Werte nur aus Config
+  - Checks grün
+- **Tests:** wie AP-08, keine Phaser-Tests
+- **Review-Schwerpunkte:** Verhalten laut `idee.txt`, Erweiterbarkeit, Pooling
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-09): add enemy entities`
+
+#### AP-10 – Spielszene, HUD, Ergebnis
+
+- **Meilenstein, Lane, Welle:** M1 · GAME · W3
+- **Ziel:** Alles zu einer spielbaren Runde verbinden: Spawns, Kollisionen, Items, Timer, Sieg/Niederlage, Fortschritt speichern, HUD und Ergebnisbildschirm.
+- **Pflichtlektüre:** §2 (F-01–F-11), PE-03–PE-18, `src/contracts/events.ts`, alle Dateien aus AP-04–AP-09 (Schnittstellen)
+- **Abhängigkeiten:** AP-08, AP-09
+- **Parallel möglich mit:** –
+- **Dateien (Eigentum):** `src/scenes/{GameScene,HudScene,ResultScene}.ts`, `src/scenes/debug.ts`
+- **Nicht anfassen:** `src/main.ts`, `src/entities/*`, `src/logic/*`, `src/config/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `GameScene` startet mit `{ levelId }`. Der Debug-Parameter `?level=n` (0–20, ungültig → 0) startet ein Level direkt, `debug.ts` liest und begrenzt ihn.
+  2. Ablauf:
+     - `AimInput` → `Player`
+     - `SpawnDirector` → `createEnemy` auf dem Ring
+     - `RoundState` tickt
+     - Kollisionen:
+       - Laser ↔ Gegner: Schaden, beim Tod Drop-Wurf mit `rollDrop` → `ItemPickup`
+       - Laser ↔ Item: einsammeln
+       - Gegner ↔ Spielerin: Kontaktschaden
+       - Hexen-Geschoss ↔ Spielerin
+       - Aura des Spirits
+  3. Events an `HudScene` laut Vertrag. HUD zeigt:
+     - Timer `m:ss`
+     - HP-Leiste
+     - Waffenstufen (drei kleine Icons mit Zahl 0–5)
+     - Pause-Taste
+  4. Pause: Taste im HUD, `Esc`/`P` am PC. Automatische Pause, wenn die Seite in den Hintergrund geht (`visibilitychange`) (angenommen, PE-29).
+  5. Rundenende:
+     - `applyRoundResult` mit `writeSave`
+     - `ResultScene` zeigt „Gewonnen“ oder „Verloren“, XP und Spielerlevel
+     - Tasten „Nochmal“, „Nächstes Level“ (nur nach Sieg, Level < 20) und „Menü“
+  6. Leistung: Pools nutzen. Bei 150 Gegnern am PC flüssig, Debug-FPS-Anzeige mit `?fps=1`.
+- **Schnittstellen:** nutzt alles aus M0 und M1
+- **Akzeptanzkriterien:**
+  - Alle Smoke-Test-Punkte von M1-DEP sind erfüllt
+  - Kein Spielwert in Szenen hartkodiert
+  - Checks grün
+- **Tests:** `tests/scenes/debug.test.ts` für das Parsen der Parameter; Integration als Handtest-Checkliste im Bericht
+- **Review-Schwerpunkte:** Kollisionen korrekt, Speicherung über Storage-API, Aufräumen beim Szenenwechsel (keine doppelten Listener nach „Nochmal“)
+- **Doku-Pflichten:** Debug-Parameter im Bericht auflisten (README-Eintrag macht AP-13)
+- **Aufwand:** L · **Modell:** opus · **Effort:** high
+- **Opus-Grund:** Kern
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-10): wire game, hud and result scenes`
 
 ### M2 – Inhalte, Menü, iPhone
 
@@ -802,7 +1031,7 @@ flowchart LR
 | ID | Schritt | Ab wann nötig | Blockiert | Erledigt |
 |---|---|---|---|---|
 | H-01 | Node.js 24 und npm vorhanden (geprüft: Node v24.21.0, npm 11.19.0) | sofort | AP-01 | ☑ |
-| H-02 | Lizenzfrage für öffentliches Repo entscheiden (Q-12) | vor M2-DEP | – | ☐ |
+| H-02 | Lizenzfrage für öffentliches Repo entscheiden (Q-12) | vor M2-DEP | – | ☑ (PE-27) |
 | H-03 | iPhone im selben WLAN; Windows-Firewall erlaubt Node im privaten Netz (Abfrage beim ersten `npm run preview -- --host` mit „Zulassen“ bestätigen) | M2-DEP | M2-DEP | ☐ |
 | H-04 | Bosse beschreiben (Q-04) | vor M3 | AP-16–AP-19 | ☐ |
 | H-05 | Optional: eigene Grafiken und Sounds nach den Anleitungen aus AP-07 austauschen | ab M1 | – | ☐ |
@@ -869,7 +1098,10 @@ flowchart LR
 | PE-22 | Sicherheit §5: keine personenbezogenen Daten, kein Tracking, keine öffentliche Seite → R3 erst vor einer Veröffentlichung | Entwurf, bestätigt | Nutzer am 2026-10-23 |
 | PE-23 | Grafik: Agents bauen Platzhalter-Sprites und eine Sprite-Liste. Dazu kommt eine Anleitung `docs/guides/grafik-austauschen.md` für Grafikdesigner ohne Programmierkenntnisse: Schritt für Schritt, Dateiformat, Größen, Frames, Dateinamen | Antwort 1a + Wunsch Anleitung | Nutzer am 2026-10-23 |
 | PE-24 | Sound: nur Platzhalter-Effekte, keine Musik. Der Nutzer ersetzt die Sounds selbst; Anleitung `docs/guides/sound-austauschen.md` wie bei der Grafik. Stummschalt-Taste | Antwort 3 | Nutzer am 2026-10-23 |
-| PE-25 | Querformat (angenommen, Frage 2 nicht beantwortet) | Empfehlung | angenommen vom Planner |
+| PE-25 | Querformat, im Hochformat Hinweis „bitte drehen“ | Q-10, Antwort 2 | Nutzer am 2026-10-23 |
+| PE-27 | Keine Open-Source-Lizenz: keine `LICENSE`-Datei, README-Hinweis „© Cem Dogan, alle Rechte vorbehalten“ (in AP-01) | Q-12, Antwort 3a | Nutzer am 2026-10-23 |
+| PE-28 | Zuschnitt M0 (AP-01–AP-04) bestätigt | Antwort 1 | Nutzer am 2026-10-23 |
+| PE-29 | Pause-Taste und automatische Pause, wenn die App in den Hintergrund geht | wichtig auf dem Handy | angenommen vom Planner |
 | PE-26 | Repository ist öffentlich. Folge: niemals Secrets, keine fremden Assets ohne Lizenz, Plan und Idee sind öffentlich lesbar | Antwort 4 | Nutzer am 2026-10-23 |
 
 ### Offene Fragen
@@ -885,9 +1117,9 @@ flowchart LR
 | Q-07 | iOS: Der Mac ist sehr alt, das iPhone hat das neueste iOS. Wie kommt das Spiel aufs iPhone? Welches Mac-Modell und welche macOS-Version? | K | §3, §6 | Stich 1: iPhone spielt per Safari/PWA über das lokale WLAN vom PC. Native iOS-App erst später | geklärt (PE-14) |
 | Q-08 | Item-Drops: Wie kommt das Item zur Astronautin (sie läuft nicht)? Wie lange wirkt es, stapelt es sich, wie oft droppt es? | K | F-07 | Item fliegt nach 1 s von selbst zu ihr; wirkt bis Rundenende; stapelt bis Stufe 5 je Eigenschaft; Drop-Chance ca. 8 % | geklärt (PE-16) |
 | Q-09 | Grafik: Woher kommen die Pixel-Sprites (Astronautin, 4 Gegner, 3 Maps, Items, Bosse)? | K | F-04–F-06, §5 Lizenzen | Platzhalter + Sprite-Liste + Anleitung | geklärt (PE-23) |
-| Q-10 | Bildschirm: Hochformat, Querformat oder beides? | W | §4, Szenen | Querformat | angenommen (PE-25), Bestätigung offen |
+| Q-10 | Bildschirm: Hochformat, Querformat oder beides? | W | §4, Szenen | Querformat | geklärt (PE-25) |
 | Q-11 | Sound und Musik im ersten Stich? | W | Umfang | nur einfache Effekte | geklärt (PE-24) |
-| Q-12 | Lizenz des öffentlichen Repos: Soll eine `LICENSE` festlegen, dass Code und Grafiken nicht frei genutzt werden dürfen? | W | §5, Kommerzialisierung | ohne Lizenzdatei gilt „alle Rechte vorbehalten“; zusätzlich kurzer Hinweis im README | offen |
+| Q-12 | Lizenz des öffentlichen Repos: Soll eine `LICENSE` festlegen, dass Code und Grafiken nicht frei genutzt werden dürfen? | W | §5, Kommerzialisierung | ohne Lizenzdatei gilt „alle Rechte vorbehalten“; zusätzlich kurzer Hinweis im README | geklärt (PE-27) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -917,3 +1149,4 @@ flowchart LR
 | 2026-10-23 | PE-12–PE-15: Item-Drops, Spielerlevel, iPhone per PWA, 3 Coder mit Freigabe pro Meilenstein. F-10 neu, Q-08 neu | Interview Runde 3 | – | Nutzer |
 | 2026-10-23 | PE-16–PE-22: Items anschießen, HP, Boss-Ablauf, kein Termin, Remote. §4–§6 als Entwurf befüllt, Q-09–Q-11 neu | Interview Runde 4 | – | Nutzer / Entwurf Planner |
 | 2026-10-23 | PE-23–PE-26 (Grafik, Sound, Querformat angenommen, öffentliches Repo), §4/§5 bestätigt, G1 erfüllt. §8–§11, §13 und M0-Pakete AP-01–AP-04 geschnitten, M1–M3 grob | Interview Runde 5, Paketierung | AP-01–AP-19 | Nutzer / Planner |
+| 2026-10-23 | M0 bestätigt (PE-28), Querformat (PE-25), Lizenzhinweis (PE-27), M1-Pakete AP-05–AP-10 detailliert, PE-29 Pause angenommen | Interview Runde 6 | AP-01, AP-05–AP-10 | Nutzer / Planner |
