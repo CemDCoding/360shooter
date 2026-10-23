@@ -21,12 +21,12 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-23 · Planung abgeschlossen, Bau noch nicht begonnen
-- **Fertig:** – · **Offen:** AP-01 `bereit`; AP-02–AP-20 `offen`
+- **Stand:** 2026-10-23 · Wellenabschluss M0 W1, Bau läuft
+- **Fertig:** AP-01 (gemergt in dev, 2fdf9c4) · **Offen:** AP-02–AP-04 `bereit`; AP-05–AP-20 `offen`; M0-DEP bis M3-DEP `offen`
 - **Unterbrochen oder laufend:** nichts
-- **Erkenntnisse:** –
-- **Nächster Schritt:** Nutzer gibt den Meilenstein frei, bis zu dem autonom gearbeitet wird (PE-15) → M0 W1 starten: AP-01
-- **Offene Fragen an den Nutzer:** Boss-Verhalten PE-34 vor M3-Freigabe bestätigen
+- **Erkenntnisse:** Phaser ist auf 3.90.0 fixiert, Pakete ändern `phaser` nicht. `.gitignore` ist kein Coder-Eigentum (role-guard blockt). Details §18.
+- **Nächster Schritt:** M0 W2 mit AP-02, AP-03, AP-04 parallel (Lead). Autonomie bis M2 vom Nutzer freigegeben (PE-15).
+- **Offene Fragen an den Nutzer:** Boss-Verhalten PE-34 vor M3-Freigabe bestätigen. Abnahmen (M0-DEP, M1-DEP, M2-DEP, M3-DEP) sind Nutzer-Schritte.
 
 <!-- Ende Lagebericht -->
 
@@ -550,10 +550,10 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 
 | ID | Titel | M | Lane | Welle | Abhängigkeiten | Aufwand | Modell | Coder / Branch | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| AP-01 | Gerüst und Verträge | M0 | OPS/SH | W1 | H-01 | M | sonnet (high) | – | bereit |
-| AP-02 | Asset-Pipeline und Platzhalter | M0 | ASSET | W2 | AP-01 | M | sonnet (medium) | – | offen |
-| AP-03 | Spieldaten Level 0–20 | M0 | SH | W2 | AP-01 | S | sonnet (medium) | – | offen |
-| AP-04 | Plattform: Eingabe und Speicher | M0 | GAME | W2 | AP-01 | S | sonnet (medium) | – | offen |
+| AP-01 | Gerüst und Verträge | M0 | OPS/SH | W1 | H-01 | M | sonnet (high) | c1 / agent/AP-01-c1 | fertig |
+| AP-02 | Asset-Pipeline und Platzhalter | M0 | ASSET | W2 | AP-01 | M | sonnet (medium) | – | bereit |
+| AP-03 | Spieldaten Level 0–20 | M0 | SH | W2 | AP-01 | S | sonnet (medium) | – | bereit |
+| AP-04 | Plattform: Eingabe und Speicher | M0 | GAME | W2 | AP-01 | S | sonnet (medium) | – | bereit |
 | M0-DEP | Abnahme M0 | M0 | HUM | W3 | AP-02–04 | H | – | – | offen |
 | AP-05 | Kampf-Logik | M1 | LOG | W1 | M0 | M | sonnet (high) | – | offen |
 | AP-06 | Runden- und Fortschrittslogik | M1 | LOG | W1 | M0 | M | sonnet (high) | – | offen |
@@ -1529,6 +1529,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Was | Änderung | Grund | Vorgeschlagen von |
 |---|---|---|---|
 | `idee.txt` | ~~ins Repo committen~~ erledigt durch den Nutzer (556fab7) | – | Planner |
+| AP-01 `Dateien (Eigentum)` | `.gitignore` aus dem Coder-Eigentum nehmen. `node_modules/` und `dist/` sind bereits auf dev (c53f075, Lead). Nur für künftige Pakete gedacht, AP-01 bleibt unverändert | Coder-role-guard blockt `.gitignore`, Wellenabschluss M0 W1 | Lead (Wellenabschluss) |
 
 ---
 
@@ -1575,3 +1576,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-23 | M0 bestätigt (PE-28), Querformat (PE-25), Lizenzhinweis (PE-27), M1-Pakete AP-05–AP-10 detailliert, PE-29 Pause angenommen | Interview Runde 6 | AP-01, AP-05–AP-10 | Nutzer / Planner |
 | 2026-10-23 | M1 bestätigt (PE-30), Pause bestätigt, PE-31 sanftes Feedback. M2-Pakete AP-11–AP-15 detailliert, §1 Abnahme, §14 Budget, §15 Risiken, §17 Matrix, Lagebericht | Interview Runde 7 | AP-08–AP-15 | Nutzer / Planner |
 | 2026-10-23 | M2 bestätigt (PE-32), Bosse je Batch (PE-33), Boss-Verhalten angenommen (PE-34), M3 neu geschnitten: AP-16–AP-20 | Interview Runde 8 | AP-16–AP-20 | Nutzer / Planner |
+| 2026-10-23 | Wellenabschluss M0 W1: AP-01 gemergt (2fdf9c4, Review Runde 2 bestanden, lint/typecheck/test/build grün, `npm audit` 0). AP-01 `fertig`, AP-02–AP-04 `bereit` | Wellenabschluss | AP-01–AP-04 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis: Review Runde 1 fand Phaser 4.2.1 statt 3.x. Coder hat auf exakt 3.90.0 fixiert. Pakete mit `npm install` dürfen `phaser` nicht ändern | Review-Befund AP-01 | AP-02–AP-20 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis: Coder-role-guard blockiert `.gitignore`. Lead hat `node_modules/` und `dist/` auf dev ergänzt (c53f075). Vorschlag in §16 | Wellenabschluss M0 W1 | AP-01 | Lead (Pflege) |
+| 2026-10-23 | Erkenntnis: Entscheidungen aus AP-01 (Ist-Stand): `bossId` und `ItemDef.id` sind `string`, `LevelDef.id` ist `number`. Event-Payloads: hp-changed `{hp, maxHp}`, timer-tick `{remainingSec}`, weapon-changed `{stacks}`, round-ended `{result, xpGained}`, mute-changed `{muted}`. Prettier: singleQuote, printWidth 100. vite `server.host: true`. Hilfstypen `EnemyPoolEntry`, `EnemyProjectileDef`, `EnemyAuraDef`. Vitest-Config aus `vitest/config` | Wellenabschluss M0 W1 | AP-02–AP-20 (Verträge und Konfiguration) | Lead (Pflege) |
