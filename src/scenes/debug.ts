@@ -12,8 +12,8 @@ export function isValidLevelId(value: unknown): value is number {
 
 /**
  * Reads the debug parameter `?level=n` from a query string.
- * Returns null if the parameter is missing. Non-numeric values give 0,
- * numbers are truncated and clamped to 0..MAX_LEVEL_ID.
+ * Returns null if the parameter is missing. Anything that is not a plain integer
+ * (text, decimals like 1.5, exponents, hex) gives 0; integers are clamped to 0..MAX_LEVEL_ID.
  */
 export function parseDebugLevel(search: string): number | null {
   const raw = new URLSearchParams(search).get('level');

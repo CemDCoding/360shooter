@@ -15,11 +15,23 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
   /** Called once when collected by a laser. */
   onCollected?: (def: ItemDef) => void;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, def: ItemDef, rules: ItemRules) {
+  /**
+   * @param spawnedAtMs Spawn time on the clock later passed to update(). Pass a clock that
+   *   stops while the game is paused (e.g. accumulated round time) so the lifetime does not
+   *   run out during a pause. Defaults to scene.time.now.
+   */
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    def: ItemDef,
+    rules: ItemRules,
+    spawnedAtMs: number = scene.time.now,
+  ) {
     super(scene, x, y, def.spriteKey);
     this.def = def;
     this.lifetimeMs = rules.lifetimeMs;
-    this.spawnedAt = scene.time.now;
+    this.spawnedAt = spawnedAtMs;
     scene.add.existing(this);
     scene.physics.add.existing(this);
     (this.body as Phaser.Physics.Arcade.Body).setCircle(8);
@@ -27,7 +39,7 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
     if (scene.anims.exists(key)) this.play(key);
   }
 
-  /** Call every frame with scene time (ms). Returns false once expired/destroyed. */
+  /** Call every frame with the same clock as spawnedAtMs (ms). Returns false once expired/destroyed. */
   update(nowMs: number): boolean {
     if (this.collected || !this.active) return false;
     if (isExpired(this.spawnedAt, nowMs, this.lifetimeMs)) {

@@ -82,6 +82,8 @@ export class GameScene extends Phaser.Scene {
   private items: ItemPickup[] = [];
   private pendingDrops: { x: number; y: number }[] = [];
   private killXp = 0;
+  /** Play clock (ms): sum of running frame times, stands still while paused (PE-29). */
+  private playTimeMs = 0;
   private lastTimerSec = -1;
   private ended = false;
   private center = { x: 0, y: 0 };
@@ -96,6 +98,7 @@ export class GameScene extends Phaser.Scene {
     this.items = [];
     this.pendingDrops = [];
     this.killXp = 0;
+    this.playTimeMs = 0;
     this.lastTimerSec = -1;
     this.ended = false;
   }
@@ -178,6 +181,7 @@ export class GameScene extends Phaser.Scene {
   update(time: number, delta: number): void {
     if (this.ended) return;
     const dt = Math.min(MAX_FRAME_MS, Math.max(0, delta));
+    this.playTimeMs += dt;
 
     this.player.update(dt, this.aim.targetAngle);
     this.lasers.update();
@@ -186,7 +190,7 @@ export class GameScene extends Phaser.Scene {
     this.spawnEnemies(dt);
     this.applyAreaDamage(dt);
     this.spawnDrops();
-    this.updateItems(time);
+    this.updateItems(this.playTimeMs);
 
     // Order matters (AP-06): death before the timer, so a loss wins over a simultaneous timeout.
     if (this.player.isDead) this.round.playerDied();
@@ -228,7 +232,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnItem(x: number, y: number, def: ItemDef): void {
-    const item = new ItemPickup(this, x, y, def, ITEM_RULES);
+    const item = new ItemPickup(this, x, y, def, ITEM_RULES, this.playTimeMs);
     item.setDepth(5);
     item.onCollected = (collected) => this.player.applyItem(collected);
     this.items.push(item);
