@@ -9,6 +9,13 @@ describe('enemies', () => {
     expect(e.contactDamage).toBeGreaterThanOrEqual(0);
   });
 
+  it('coin values match PE-39..43 for all four enemies', () => {
+    expect(ENEMIES.cursedTree.coinValue).toBe(2);
+    expect(ENEMIES.zombieSquirrel.coinValue).toBe(2);
+    expect(ENEMIES.forestWitch.coinValue).toBe(5);
+    expect(ENEMIES.forestSpirit.coinValue).toBe(8);
+  });
+
   it('zombie squirrel is slowed down (AP-23)', () => {
     expect(ENEMIES.zombieSquirrel.speed).toBeLessThanOrEqual(80);
   });
