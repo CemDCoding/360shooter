@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { ASSETS, animKey } from '../config/assets';
+import { resolveStartTarget } from './debug';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -56,7 +57,11 @@ export class PreloadScene extends Phaser.Scene {
 
     const debug = new URLSearchParams(window.location.search).get('assets') === '1';
     if (debug) this.showDebugView();
-    else this.scene.start('MenuScene');
+    else {
+      const target = resolveStartTarget(window.location.search);
+      if (target.scene === 'GameScene') this.scene.start('GameScene', { levelId: target.levelId });
+      else this.scene.start('MenuScene');
+    }
   }
 
   /** Debug-Ansicht (?assets=1): alle Sprites mit Animation. */

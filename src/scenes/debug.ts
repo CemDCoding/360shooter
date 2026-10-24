@@ -25,6 +25,14 @@ export function parseDebugLevel(search: string): number | null {
   return Math.min(MAX_LEVEL_ID, Math.max(0, n));
 }
 
+export type StartTarget = { scene: 'GameScene'; levelId: number } | { scene: 'MenuScene' };
+
+/** Scene to start after preload: direct GameScene with `?level=n`, otherwise the menu. */
+export function resolveStartTarget(search: string): StartTarget {
+  const levelId = parseDebugLevel(search);
+  return levelId === null ? { scene: 'MenuScene' } : { scene: 'GameScene', levelId };
+}
+
 /** True if the debug FPS display is requested via `?fps=1`. */
 export function parseDebugFps(search: string): boolean {
   return new URLSearchParams(search).get('fps') === '1';
