@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="360shooter" />
+    <meta name="theme-color" content="#0b0b14" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icons/icon-180.png" />
+    <title>360shooter</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0b0b14;
+        touch-action: none;
+        overscroll-behavior: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        position: fixed;
+      }
+      #game {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+          env(safe-area-inset-left);
+      }
+      canvas {
+        display: block;
+        touch-action: none;
+        -webkit-touch-callout: none;
+      }
+      #rotate-hint {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+        background: #0b0b14;
+        color: #ffd64a;
+        font-family: monospace;
+        font-size: 24px;
+        text-align: center;
+      }
+      #rotate-hint span {
+        font-size: 56px;
+      }
+      @media (orientation: portrait) {
+        #rotate-hint {
+          display: flex;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game"></div>
+    <div id="rotate-hint" role="alert">
+      <span aria-hidden="true">&#x21BB;</span>
+      Bitte drehen
+    </div>
+    <script>
+      // iOS ignores user-scalable=no: block pinch gestures and the context menu.
+      for (const t of ['gesturestart', 'gesturechange', 'contextmenu']) {
+        document.addEventListener(t, (e) => e.preventDefault());
+      }
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

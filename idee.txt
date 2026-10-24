@@ -1,0 +1,21 @@
+###ziel plattform: handy und auf pc soll später im app store sein im besten fall und im pc kein öffentliches game sein also kann nur lokal laufen wie auch immer es am besten zu handy entwicklung passt
+fokus ist erstmal das alles lokal geht also veröffentlichung und anmeldung downloads spieler db ist nicht so wichtig
+
+der spieler steuert ein character der immer in der mitte des bildschirms ist er kann von allen seiten angegriffen werden und sich um 360 grad um sich selbst drehen. 
+eine schüsse sind automatisert. das spiel ist runden basiert der spieler muss so lange überleben bis ein timer abgelaufen ist. der spieler hat ein allgemeines spielerlevel was sich über alle runden hinweg durch trägt.
+dieses level ermöglicht ihn andere startwaffen im hauptmenü auszuwählen, sowie andere rüstungen auszuwählen und power ups. die waffen und upgrades dieser starten immer bei 0 und können nur in runden verbessert werden und resetten sich danach.
+es gibt verschiedene spiel level der design der maps ist in batches aufgeteilt.
+
+wichtig: im ersten stich machen wir nur die level 0-20 der rest ist nur für den ausblick für erweiterungen und spielprinzip
+
+##design orientierung: metroid pixelig design
+##der character: astronautin die hammer süß aussieht
+##charcter waffe: laserpistole die laster schießt die waffe kann in den level schneller stärker größer schiepen
+##die gegner: Abhänig vom spielevel batch 
+Der verflcuhte Baum (erscheint bei 0-20): kann nur auf den spieler zu laufen ist langsam aber hat bisschen mehr hp 
+Die Wald Hexe(erscheint bei 5-20): schießt projektile normale werte
+Zombie Eichhörnchen(erscheint bei 5-20): kann nur lkaufen schnell aber wenig hp
+Böser Wald Spirit(erscheint bei 10-20):wenn nah genug an spieler macht er kontiniuerlich schaden hat aber wenig hp
+##die umgebung: astraunautin ist auf einem fremden planeten gelandet und kämpft gegen die monster die da leben
+##spiellevel und batches: Wald:0-5 Wald bei Nacht:5-10 Elfenwald:10-20 Bauernhof:20-30 Bauenhof massaker:30-40 Autobahn:40-50 Raststääte:50-65 Resturant:65-80 Büro:80-100
+##maps abhängig von spiellevel batch sehr basic gehalten vom design aber mit charme
