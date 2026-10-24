@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PROGRESSION } from '../config';
 import { levelForXp, xpForLevel } from '../logic/progression';
+import { addMuteButton, getSoundService } from '../platform/audio';
 import { loadSave, resetSave } from '../platform/storage';
 import { isValidLevelId } from './debug';
 import { Button } from './menu/Button';
@@ -21,6 +22,7 @@ export class MenuScene extends Phaser.Scene {
   create(): void {
     this.dialog = null;
     this.starting = false;
+    getSoundService(this.game).reload();
     const save = loadSave();
     const { width, height } = this.scale;
 
@@ -60,6 +62,8 @@ export class MenuScene extends Phaser.Scene {
       fill: 0x5a2d2d,
       hoverFill: 0x8a3d3d,
     });
+
+    addMuteButton(this, width - 24, 24);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.tweens.killAll();

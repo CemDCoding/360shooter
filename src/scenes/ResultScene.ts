@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getSoundService } from '../platform/audio';
 import { isValidLevelId, MAX_LEVEL_ID } from './debug';
 import type { ResultSceneData } from './GameScene';
 
@@ -22,6 +23,7 @@ export class ResultScene extends Phaser.Scene {
     const leveledUp =
       Number.isFinite(data?.previousPlayerLevel) && playerLevel > data.previousPlayerLevel;
     const cx = width / 2;
+    getSoundService(this.game).play(won ? 'sfx-round-won' : 'sfx-round-lost');
 
     this.add
       .text(cx, 56, won ? 'Gewonnen' : 'Verloren', {
