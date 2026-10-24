@@ -1,11 +1,48 @@
-import type { ItemDef, WeaponStacks, WeaponStats } from '../contracts';
+import type { ActivePowers, ItemDef, WeaponStacks, WeaponStats } from '../contracts';
+import { clampStage, effectiveFireRate, isRapidFireActive, shotPattern } from './powers';
+
+/** Upgrade factors, passed in by the caller (see upgradeFactors in AP-29). */
+export interface WeaponFactors {
+  weaponFireRateMult: number;
+  weaponDamageMult: number;
+}
 
 export function emptyStacks(): WeaponStacks {
   return { fireRate: 0, damage: 0, size: 0 };
 }
 
-/** Each stack adds `perStack` (relative) to the base value; heal items have no weapon effect. */
 export function computeWeaponStats(
+  base: WeaponStats,
+  factors: WeaponFactors,
+  state: ActivePowers,
+): WeaponStats;
+/** @deprecated legacy stack-based variant, removed in AP-36 */
+export function computeWeaponStats(
+  base: WeaponStats,
+  stacks: WeaponStacks,
+  itemDefs: readonly ItemDef[],
+): WeaponStats;
+export function computeWeaponStats(
+  base: WeaponStats,
+  second: WeaponFactors | WeaponStacks,
+  third: ActivePowers | readonly ItemDef[],
+): WeaponStats {
+  if (Array.isArray(third)) return legacyStats(base, second as WeaponStacks, third);
+  const factors = second as WeaponFactors;
+  const state = third as ActivePowers;
+  return {
+    ...base,
+    fireRatePerSec: effectiveFireRate(
+      base.fireRatePerSec * factors.weaponFireRateMult,
+      isRapidFireActive(state),
+    ),
+    damage: base.damage * factors.weaponDamageMult,
+    shotCount: shotPattern(clampStage(state.doubleShotStage)).length,
+  };
+}
+
+/** Each stack adds `perStack` (relative) to the base value; heal items have no weapon effect. */
+function legacyStats(
   base: WeaponStats,
   stacks: WeaponStacks,
   itemDefs: readonly ItemDef[],

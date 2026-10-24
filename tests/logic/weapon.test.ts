@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ITEMS, WEAPON_BASE } from '../../src/config';
+import { ITEMS, RAPID_FIRE_MAX_PER_SEC, WEAPON_BASE } from '../../src/config';
+import { emptyPowers } from '../../src/logic/powers';
 import { FireTimer, computeWeaponStats, emptyStacks } from '../../src/logic/weapon';
 
 const per = (effect: string): number => ITEMS.find((i) => i.effect === effect)?.perStack ?? 0;
@@ -46,5 +47,41 @@ describe('FireTimer', () => {
     t.reset();
     expect(t.tick(300, 2)).toBe(0);
     expect(t.tick(200, 2)).toBe(1);
+  });
+});
+
+describe('computeWeaponStats (powers)', () => {
+  const one = { weaponFireRateMult: 1, weaponDamageMult: 1 };
+  const shots = (n: number): number | undefined =>
+    computeWeaponStats(WEAPON_BASE, one, { ...emptyPowers(), doubleShotStage: n }).shotCount;
+  it('neutral factors, no powers: base values, one shot', () => {
+    const s = computeWeaponStats(WEAPON_BASE, one, emptyPowers());
+    expect(s.fireRatePerSec).toBe(WEAPON_BASE.fireRatePerSec);
+    expect(s.damage).toBe(WEAPON_BASE.damage);
+    expect(s.shotCount).toBe(1);
+  });
+  it('upgrade factors act multiplicatively', () => {
+    const f = { weaponFireRateMult: 1.5, weaponDamageMult: 2 };
+    const s = computeWeaponStats(WEAPON_BASE, f, emptyPowers());
+    expect(s.fireRatePerSec).toBeCloseTo(WEAPON_BASE.fireRatePerSec * 1.5);
+    expect(s.damage).toBeCloseTo(WEAPON_BASE.damage * 2);
+  });
+  it('shotCount follows the stage (1 to 3, clamped)', () => {
+    expect([shots(0), shots(1), shots(2), shots(9)]).toEqual([1, 2, 3, 3]);
+  });
+  it('rapid fire applies the cap on the upgraded rate', () => {
+    const f = { weaponFireRateMult: 2, weaponDamageMult: 1 };
+    const s = computeWeaponStats(WEAPON_BASE, f, { ...emptyPowers(), rapidFireMsLeft: 10 });
+    expect(s.fireRatePerSec).toBe(Math.max(WEAPON_BASE.fireRatePerSec * 2, RAPID_FIRE_MAX_PER_SEC));
+  });
+  it('rapid fire rate gives equal shots at 30 and 144 fps', () => {
+    const run = (fps: number): number => {
+      const t = new FireTimer();
+      let n = 0;
+      for (let i = 0; i < fps * 5; i++) n += t.tick(1000 / fps, RAPID_FIRE_MAX_PER_SEC);
+      return n;
+    };
+    expect(run(30)).toBe(100);
+    expect(run(144)).toBe(100);
   });
 });
