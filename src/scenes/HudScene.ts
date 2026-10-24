@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { ITEMS } from '../config';
 import { GameEvents, type GameEventPayloads, type WeaponStacks } from '../contracts';
 import { addMuteButton } from '../platform/audio';
+import { BASE_HUD_FONT, hudScale } from '../platform/layout';
 import { parseDebugFps } from './debug';
 import type { HudInitData } from './GameScene';
 
@@ -48,12 +49,26 @@ export class HudScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setStroke('#000000', 3);
 
-    // Weapon stacks: one small icon per weapon item from config, with a number 0..maxStacks.
-    ITEMS.filter((d) => d.effect !== 'heal').forEach((def, i) => {
-      const x = 14 + i * 36;
-      this.add.image(x, 36, def.spriteKey, 0);
+    // Weapon stacks: one icon per weapon item from config, with a number 0..maxStacks.
+    // On small screens (k > 1) icons/text grow and sit on a dark panel; desktop (k = 1) is unchanged.
+    const k = hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight);
+    const weapons = ITEMS.filter((d) => d.effect !== 'heal');
+    const step = 36 * k;
+    if (k > 1) {
+      this.add
+        .rectangle(6, 26, 8 + weapons.length * step, 22 * k, 0x000000, 0.55)
+        .setOrigin(0, 0);
+    }
+    weapons.forEach((def, i) => {
+      const x = 14 + i * step + (k > 1 ? 4 : 0);
+      const y = k > 1 ? 26 + 11 * k : 36;
+      this.add.image(x, y, def.spriteKey, 0).setScale(k);
       const t = this.add
-        .text(x + 10, 36, '0', { fontFamily: FONT, fontSize: '10px', color: '#ffffff' })
+        .text(x + 10 * k, y, '0', {
+          fontFamily: FONT,
+          fontSize: `${Math.round(BASE_HUD_FONT * k)}px`,
+          color: '#ffffff',
+        })
         .setOrigin(0, 0.5)
         .setStroke('#000000', 2);
       this.stackTexts.set(def.effect as keyof WeaponStacks, t);

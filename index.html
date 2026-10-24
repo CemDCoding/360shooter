@@ -32,14 +32,27 @@
         -webkit-tap-highlight-color: transparent;
         position: fixed;
       }
-      #game {
+      /* Safe-area probe: only its padding is read (layout.ts); the canvas is never padded. */
+      #safe {
         position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
         width: 100%;
-        height: 100%;
+        height: 100vh;
+        height: 100dvh;
         box-sizing: border-box;
+        pointer-events: none;
         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
           env(safe-area-inset-left);
+      }
+      /* Size and position are set by src/main.ts via fitArena(); fallback fills the safe area. */
+      #game {
+        position: fixed;
+        top: env(safe-area-inset-top);
+        left: env(safe-area-inset-left);
+        right: env(safe-area-inset-right);
+        bottom: env(safe-area-inset-bottom);
+        pointer-events: auto;
       }
       canvas {
         display: block;
@@ -72,6 +85,7 @@
     </style>
   </head>
   <body>
+    <div id="safe"></div>
     <div id="game"></div>
     <div id="rotate-hint" role="alert">
       <span aria-hidden="true">&#x21BB;</span>
