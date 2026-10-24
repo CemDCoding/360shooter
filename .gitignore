@@ -4,3 +4,7 @@
 .env.*
 !.env.example
 .claude/
+
+# Abhaengigkeiten und Build-Ausgabe
+node_modules/
+dist/
