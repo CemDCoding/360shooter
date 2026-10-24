@@ -38,6 +38,8 @@ Alle Dateien liegen in `public/assets/sounds/`. Die Namen stammen aus der Asset-
 | player-hurt.wav | Die Spielerin wird getroffen         | 0,2 bis 0,5 s    |
 | round-won.wav   | Die Runde ist gewonnen               | 0,5 bis 2 s      |
 | round-lost.wav  | Die Runde ist verloren               | 0,5 bis 2 s      |
+| coin.wav        | Die Spielerin sammelt eine Münze ein | 0,1 bis 0,3 s    |
+| shield-break.wav | Das Schutzschild geht kaputt         | 0,2 bis 0,5 s    |
 
 Der Laser-Sound spielt sehr oft. Mach ihn deshalb besonders kurz und nicht zu laut.
 

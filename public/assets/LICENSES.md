@@ -18,6 +18,11 @@ Platzhalter werden von `npm run assets:placeholders` erzeugt (`scripts/generate-
 | sprites/item-damage.png           | selbst erzeugt | selbst erzeugt |
 | sprites/item-size.png             | selbst erzeugt | selbst erzeugt |
 | sprites/item-heal.png             | selbst erzeugt | selbst erzeugt |
+| sprites/item-double-shot.png      | selbst erzeugt | selbst erzeugt |
+| sprites/item-shield.png           | selbst erzeugt | selbst erzeugt |
+| sprites/item-rapid-fire.png       | selbst erzeugt | selbst erzeugt |
+| sprites/coin-small.png            | selbst erzeugt | selbst erzeugt |
+| sprites/coin-big.png              | selbst erzeugt | selbst erzeugt |
 | sprites/tiles-forest.png          | selbst erzeugt | selbst erzeugt |
 | sprites/tiles-forest-night.png    | selbst erzeugt | selbst erzeugt |
 | sprites/tiles-elf-forest.png      | selbst erzeugt | selbst erzeugt |
@@ -29,3 +34,5 @@ Platzhalter werden von `npm run assets:placeholders` erzeugt (`scripts/generate-
 | sounds/player-hurt.wav            | selbst erzeugt | selbst erzeugt |
 | sounds/round-won.wav              | selbst erzeugt | selbst erzeugt |
 | sounds/round-lost.wav             | selbst erzeugt | selbst erzeugt |
+| sounds/coin.wav                   | selbst erzeugt | selbst erzeugt |
+| sounds/shield-break.wav           | selbst erzeugt | selbst erzeugt |
