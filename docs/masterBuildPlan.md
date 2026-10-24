@@ -22,11 +22,11 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
 - **Stand:** 2026-10-24 · Wellenabschluss M2 W2 · M2 (AP-11–AP-15) technisch komplett in dev, Abnahmen M0-DEP, M1-DEP und M2-DEP offen
-- **Fertig:** AP-01–AP-15 und AP-21 (alle in dev). **Bereit:** M1-DEP und M2-DEP ([Mensch]). **Offen:** AP-16–AP-20, M0-DEP `offen`, M3-DEP `offen`
+- **Fertig:** AP-01–AP-15 und AP-21 (alle in dev). **Bereit:** M1-DEP ([Mensch]) und AP-22 (Fix Debug-Parameter `?level=n`, M2 W3). **Offen:** AP-16–AP-20, M0-DEP `offen`, M2-DEP `offen` (wartet auf AP-22), M3-DEP `offen`
 - **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach W2 nicht neu gemessen.
 - **Unterbrochen oder laufend:** nichts
 - **Erkenntnisse:** Checks auf dev grün (151/151 Tests in 23 Dateien; lint, typecheck, build, assets:check, `npm audit` 0). Nicht im Browser oder auf dem iPhone getestet: Optik, Ton, Safe-Area, Balancing (Teil von M1-DEP und M2-DEP, Handtest H-03). Details §18.
-- **Nächster Schritt:** Nutzer: Abnahmen M1-DEP und M2-DEP (PR `dev` nach `stage`, Smoke-Test PC und iPhone, PR `stage` nach `master`); M0-DEP ebenfalls offen. Die Autonomie des Leads bis M2 (PE-15) ist erfüllt. M3 (AP-16 ff.) startet erst nach Rückmeldung des Nutzers.
+- **Nächster Schritt:** Nutzer: Abnahme M1-DEP (PR `dev` nach `stage`, Smoke-Test PC, PR `stage` nach `master`); M0-DEP ebenfalls offen. M2-DEP folgt erst auf AP-22 (M2 W3). Die Autonomie des Leads bis M2 (PE-15) ist erfüllt. M3 (AP-16 ff.) startet erst nach Rückmeldung des Nutzers.
 - **Offene Fragen an den Nutzer:** Abnahmen M0-DEP, M1-DEP und M2-DEP ([Mensch]). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen. Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Balancing nach dem Handtest nachjustieren?
 
 <!-- Ende Lagebericht -->
@@ -428,6 +428,7 @@ flowchart TD
 | `README.md` | AP-01, später AP-13 | M0 W1, M2 W1 |
 | `src/platform/storage.ts`, `src/logic/progression.ts` (samt Tests) | AP-04 / AP-06 → AP-21 (Fix Index-Semantik) | M0 W2, M1 W1, M1 W2 |
 | `src/scenes/GameScene.ts` | AP-10 → AP-12 (Hintergrund) → AP-14 (Sound) | M1 W3, M2 W1, M2 W2 |
+| `src/scenes/debug.ts`, `src/scenes/PreloadScene.ts` (samt `tests/scenes/debug.test.ts`) | AP-10 (`debug.ts`) → AP-22 (Direktstart `?level=n`) | M1 W3, M2 W3 |
 | `src/scenes/{MenuScene,HudScene,ResultScene}.ts` | AP-10 (Hud, Result), AP-11 (Menu) → AP-14 (Sound, Stumm-Taste) | M1 W3, M2 W1, M2 W2 |
 | `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M3 W1 |
 | `src/config/assets.ts`, `docs/guides/*` | AP-02 / AP-07 → AP-16 (Boss-Assets) | M0 W2, M1 W1, M3 W1 |
@@ -501,9 +502,9 @@ flowchart TD
   - [ ] Die Astronautin dreht sich sichtbar mit Verzögerung zum Mauszeiger, in beide Richtungen
   - [ ] Der Laser feuert automatisch in Blickrichtung
   - [ ] Level 0: Bäume kommen von allen Seiten, der Timer läuft 3:00 ab, danach erscheint „Gewonnen“
-  - [ ] Ein angeschossenes Item verändert die Waffe sichtbar
+  - [ ] Ein angeschossenes Item erhöht den Stack im HUD
   - [ ] Bei 0 HP erscheint „Verloren“
-  - [ ] `?level=12` startet Level 12 mit allen vier Gegnertypen
+  - [ ] `?level=12` startet Level 12 mit allen vier Gegnertypen (erst nach AP-22 erfüllbar, siehe M2-DEP)
   - [ ] Pause: Taste im HUD oder `Esc`/`P` pausiert und setzt fort; Browser-Tab wechseln und zurückkehren pausiert automatisch, ohne Tastendruck
   - [ ] „Nochmal“ startet die Runde ohne doppelte Events (Timer, Treffer, Items)
   - [ ] „Nächstes Level“ ist nur nach einem Sieg wählbar
@@ -517,7 +518,8 @@ flowchart TD
 |---|---|
 | W1 | AP-11 Hauptmenü und Fortschritt, AP-12 Maps je Batch, AP-13 PWA und Querformat |
 | W2 | AP-14 Sound-Anbindung und Stummschalten, AP-15 Balancing Level 0–20 |
-| W3 | M2-DEP [Mensch] |
+| W3 | AP-22 Fix Debug-Parameter `?level=n` im Menü-Flow |
+| W4 | M2-DEP [Mensch] |
 
 ##### M2-DEP – Abnahme [Mensch]
 
@@ -534,6 +536,7 @@ flowchart TD
   - [ ] Stumm-Taste bleibt nach Neuladen erhalten
   - [ ] Ton auf dem iPhone ist nach dem ersten Antippen hörbar
   - [ ] Balancing-Handtest: Level 0 gut schaffbar, Level 20 nur mit Items. Bei Abweichung nachjustieren laut `docs/balancing.md`
+  - [ ] Debug: `?level=12` startet Elfenwald direkt, auch ohne Freischaltung (AP-22)
 
 #### M3 – Bosse
 
@@ -581,7 +584,8 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | c13 / agent/AP-13-c13 | fertig |
 | AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | c14 / agent/AP-14-c14 | fertig |
 | AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | c15 / agent/AP-15-c15 | fertig |
-| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | bereit |
+| AP-22 | Debug-Parameter `?level=n` im Menü-Flow | M2 | GAME | W3 | keine (AP-10, AP-11 fertig) | S | sonnet (medium) | – | bereit |
+| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W4 | AP-14, AP-15, AP-22 | H | – | – | offen |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2 | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -620,6 +624,7 @@ flowchart LR
   AP04 & AP06 --> AP21
   AP10 --> AP11 & AP12 & AP13 & AP15
   AP14 & AP15 --> AP16
+  AP10 & AP11 --> AP22["AP-22"]
 ```
 
 **Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11/AP-12 → AP-14 → (M3) AP-16 → AP-17–AP-19 → AP-20
@@ -1294,6 +1299,38 @@ flowchart LR
 - **Kürzbar bei Budgetnot:** ja (K1: nur Kennzahlen-Tabelle, keine Monotonie-Tests)
 - **Commit-Typ:** `feat(AP-15): balance levels 0-20`
 
+#### AP-22 – Fix: Debug-Parameter `?level=n` im Menü-Flow
+
+- **Meilenstein, Lane, Welle:** M2 · GAME · W3
+- **Ziel:** `?level=n` startet nach dem Preload direkt `GameScene` mit Level n (0–20). Ungültige Werte und Zahlen außerhalb werden wie bisher in `parseDebugLevel` behandelt (nicht ganzzahlig → 0, sonst auf 0..20 begrenzt). Der Direktstart gilt unabhängig vom Freischaltstand. Ohne Parameter bleibt es beim Hauptmenü. Der Start verändert den Spielstand nicht (PE-36).
+- **Ursache (Befund Nutzer-Handtest):** Seit AP-11 startet `PreloadScene` immer `MenuScene`. `GameScene` liest `?level` nur, wenn keine Level-Daten übergeben werden. Der Parameter greift deshalb nie.
+- **Pflichtlektüre:** PE-36, PE-13, §9.2 M1-DEP und M2-DEP (Smoke-Test), `src/scenes/debug.ts`, `src/scenes/PreloadScene.ts`, `src/scenes/GameScene.ts` (nur lesen: `resolveLevelId`, Szenendaten `{ levelId }`), `tests/scenes/debug.test.ts`
+- **Abhängigkeiten:** keine offenen (AP-10, AP-11 fertig)
+- **Parallel möglich mit:** – (W3 enthält nur dieses Paket)
+- **Dateien (Eigentum):** `src/scenes/PreloadScene.ts`, `src/scenes/debug.ts`, `tests/scenes/debug.test.ts`
+- **Nicht anfassen:** `src/scenes/{GameScene,MenuScene,ResultScene,HudScene}.ts`, `src/platform/*`, `src/logic/*`, `src/config/*`, `src/main.ts`, `index.html`, `README.md`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `debug.ts`: neue reine Funktion `resolveStartTarget(search: string)`. Sie liefert `{ scene: 'GameScene', levelId }`, wenn `?level` vorhanden ist (Wert über `parseDebugLevel`), sonst `{ scene: 'MenuScene' }`. Sie liest nur die Query-Zeichenkette und keinen Spielstand.
+  2. `PreloadScene.create()`: `?assets=1` (Debug-Ansicht) bleibt vorrangig. Danach startet die Szene das Ziel aus `resolveStartTarget(window.location.search)`. Bei `GameScene` werden `{ levelId }` übergeben, bei `MenuScene` wie bisher keine Daten. Die Szene enthält keine eigene Parse-Logik.
+  3. Der Start schreibt keinen Spielstand (kein `writeSave` in den geänderten Dateien).
+  4. Runden mit Debug-Level werden am Rundenende wie jede Runde gespeichert (PE-36, `GameScene` bleibt unverändert).
+  5. Tests in `tests/scenes/debug.test.ts`: ohne Parameter → `MenuScene`; `?level=12` → `GameScene` mit 12; `?level=20` → 20; `?level=99` → 20; `?level=-3` → 0; `?level=abc` und `?level=1.5` → 0; `?level=5&fps=1` → 5; `?fps=1` allein → `MenuScene`.
+- **Schnittstellen:** nutzt `parseDebugLevel`, `resolveLevelId`, `MAX_LEVEL_ID` aus `debug.ts` und die Szenendaten `{ levelId }` von `GameScene` (unverändert).
+- **Akzeptanzkriterien:**
+  - `?level=n` startet direkt in `GameScene` mit Level n (0–20), auch wenn Level n gesperrt ist
+  - Ohne Parameter startet das Menü wie bisher
+  - Der Start schreibt keinen Spielstand
+  - Checks grün (`lint`, `typecheck`, `test`, `build`)
+  - Handtest durch den Nutzer: `?level=12` startet Elfenwald, alle vier Gegnertypen (Verfluchter Baum, Wald-Hexe, Zombie-Eichhörnchen, Böser Wald-Spirit) sind im Spiel zu sehen
+- **Tests:** Vitest für `resolveStartTarget` (Umsetzung 5). Die Phaser-Szene selbst wird nicht getestet. Der Handtest steht in der Checkliste des Berichts.
+- **Review-Schwerpunkte:** `PreloadScene` ruft nur die reine Funktion, Clamping identisch zu `parseDebugLevel`, `?assets=1` nicht gebrochen, kein Schreibzugriff auf den Spielstand beim Start.
+- **Doku-Pflichten:** Der Bericht beschreibt das Verhalten (Direktstart, Spielstand beim Start unverändert, Runden wie PE-36). README nicht anfassen (`Q-13` entscheidet über eine Änderung der Runden-Speicherung).
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (M2-DEP hängt daran)
+- **Commit-Typ:** `fix(AP-22): start debug level directly from preload`
+
 ### M3 – Bosse
 
 #### AP-16 – Boss-Rahmen
@@ -1574,6 +1611,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-31 | Treffer-Feedback: nur sanftes, angenehmes Aufblinken; kein Bildschirmwackeln, keine Schadenszahlen | Antwort 3 | Nutzer am 2026-10-23 |
 | PE-26 | Repository ist öffentlich. Folge: niemals Secrets, keine fremden Assets ohne Lizenz, Plan und Idee sind öffentlich lesbar | Antwort 4 | Nutzer am 2026-10-23 |
 | PE-35 | `highestUnlockedLevel` ist der Index des höchsten freigeschalteten Levels. Startwert 0 (nur Level 0 frei), Bereich 0..20 (`LEVEL_COUNT - 1`). Sieg in Level n schaltet `min(20, n+1)` frei. Der Fehler aus AP-04 (Standard 1, Bereich 1..1000) wird in AP-21 behoben. Kein Migrationsbedarf, da nichts ausgeliefert ist | Detailfrage ohne Auswirkung auf Sicherheit oder Umfang, Entscheidung des Leads (Wellenabschluss M1 W1) | Lead am 2026-10-23 |
+| PE-36 | Debug-Direktstart `?level=n` (AP-22): Der Start führt direkt in `GameScene` mit dem Level und schreibt den Spielstand nicht. Der Freischaltstand spielt dabei keine Rolle. Runden mit Debug-Level werden wie jede Runde gespeichert (Erfahrung, Freischaltung nur steigend). Ein Debug-Sieg kann höhere Level freischalten. Das ist akzeptiert, weil `GameScene` unverändert bleibt. Eine Sperre für Debug-Runden braucht `GameScene` im Paket, siehe Q-13 | Befund Nutzer-Handtest (M1-DEP); Umgang mit dem Spielstand vom Planner angenommen | Lead am 2026-10-24 (Pflege), Detail angenommen vom Planner |
 
 ### Offene Fragen
 
@@ -1591,6 +1629,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-10 | Bildschirm: Hochformat, Querformat oder beides? | W | §4, Szenen | Querformat | geklärt (PE-25) |
 | Q-11 | Sound und Musik im ersten Stich? | W | Umfang | nur einfache Effekte | geklärt (PE-24) |
 | Q-12 | Lizenz des öffentlichen Repos: Soll eine `LICENSE` festlegen, dass Code und Grafiken nicht frei genutzt werden dürfen? | W | §5, Kommerzialisierung | ohne Lizenzdatei gilt „alle Rechte vorbehalten“; zusätzlich kurzer Hinweis im README | geklärt (PE-27) |
+| Q-13 | Sollen Debug-Runden (`?level=n`) den Spielstand gar nicht verändern, also weder Erfahrung noch Freischaltung schreiben? | W | AP-22, AP-10 (`GameScene`) | Ja: Folgepaket mit `GameScene` (Debug-Kennzeichen in den Szenendaten, Speichern überspringen). Bis dahin gilt PE-36 | offen |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -1616,7 +1655,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | F-06 Level und Maps 0–20 | AP-03, AP-12 |
 | F-07 Waffen-Items | AP-03, AP-05, AP-08, AP-10 |
 | F-08 Spielerlevel | AP-06, AP-10, AP-11 |
-| F-09 Hauptmenü und Freischaltung | AP-06, AP-11, AP-21 |
+| F-09 Hauptmenü und Freischaltung | AP-06, AP-11, AP-21, AP-22 (Direktstart `?level=n` am Menü vorbei) |
 | F-10 iPhone über PWA | AP-13, M2-DEP |
 | F-11 HP und Niederlage | AP-05, AP-10 |
 | F-12 Grafik austauschbar + Anleitung | AP-02, AP-07 |
@@ -1684,3 +1723,6 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-24 | Erkenntnis AP-13: Kein Service Worker, kein Offline-Betrieb (steht im README). `preview:lan` = `build` und danach `vite preview --host`, die IP steht unter „Network:“. Das Inline-Script blockiert `gesturestart`, `gesturechange` und `contextmenu`; bei einer späteren CSP ist ein Hash nötig. Das Overlay „Bitte drehen“ erscheint auch in schmalen Desktop-Fenstern, das Spiel pausiert dabei nicht (Kandidat für ein späteres Paket). Bei neuem Icon das Symbol vom Homescreen löschen und neu hinzufügen. Safe-Area-Padding auf `#game` mit `Scale.FIT` ist nur am iPhone mit Notch prüfbar (H-03) | Wellenabschluss M2 W1 | M2-DEP, künftige CSP | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis AP-14: `getSoundService(game)` liefert einen Service pro Game. Das Event `mute-changed` läuft über `game.events`. `addMuteButton(scene,x,y)` in `audio.ts` (32×32, `ui-icons` Frame 1 Ton an, 2 Ton aus). MenuScene ruft `reload()` nach dem Reset. Laser-Drosselung 80 ms, BASE_VOLUME 0,5. Lokal in GameScene `HURT_SOUND_GAP_MS` = 250 (Kandidat für Config). Eine Scene darf kein privates Feld `sound` nennen (kollidiert mit `Phaser.Scene.sound`), das Feld heißt `sfx`. Sound-Keys in Szenen sind String-Literale. `setMuted` überschreibt einen korrupten Save mit dem defaultSave (Randfall) | Wellenabschluss M2 W2 | AP-15 (Config-Kandidat), M2-DEP (Ton-Test am iPhone) | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis AP-15: Kennzahl „Druck“ = Gegner-HP/s geteilt durch Basis-DPS 30. Werte: Level 0 0,36; Level 4 0,58; Level 5 0,71 (+22 %); Level 10 1,12 (+17 %); Level 20 1,59. Volle Items ca. 4,5× DPS (135). Spawn-Intervall und Max-Gegner jetzt als Tabellen pro Level (21 Einträge) in `levels.ts`. `WEAPON_BASE.fireRatePerSec` von 2 auf 3. Die Kennzahlentabelle in `docs/balancing.md` ist handkopiert und kann beim Nachjustieren veralten. Die Obergrenze `maxEnemies` (kein Nachholen) fließt nicht in die Kennzahlen ein, beim Handtest beobachten | Wellenabschluss M2 W2 | M2-DEP (Handtest), `docs/balancing.md` | Lead (Pflege) |
+| 2026-10-24 | Befund Nutzer-Handtest (Dev-Server am PC): `?level=12` wirkungslos seit AP-11. Ursache: `PreloadScene` startet immer `MenuScene`, `GameScene` liest `?level` nur ohne Level-Daten. Folge: Level 5–20 ohne Freispielen nicht testbar. Fix als AP-22 (M2 W3, Eigentum `PreloadScene.ts`, `debug.ts`, Test). M1-DEP-Punkt `?level=12` erst nach AP-22 erfüllbar. M2-DEP wandert nach W4, wartet auf AP-22 und ist `offen`. Umgang mit dem Spielstand: PE-36, offene Frage Q-13 | Befund Nutzer-Handtest | AP-22, M1-DEP, M2-DEP | Lead (Pflege) |
+| 2026-10-24 | Befund Nutzer-Handtest: Smoke-Test M1-DEP präzisiert. Statt „verändert die Waffe sichtbar“ jetzt „erhöht den Stack im HUD“, weil es keine Waffengrafik gibt. Sichtbar ist nur der Item-Stack im HUD. M2-DEP enthält diesen Punkt nicht, dort kam ein `?level=12`-Punkt hinzu | Befund Nutzer-Handtest | M1-DEP, M2-DEP | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis Handtest: `localhost:5173` war nach Reload auf dem PC des Nutzers nicht erreichbar, `127.0.0.1:5173` ging. Kein Spielfehler, vermutlich IPv6-/IPv4-Auflösung. Für Handtests `127.0.0.1` verwenden. Die Guides und die Doku nennen weiterhin `localhost`, bei Bedarf anpassen | Befund Nutzer-Handtest | M1-DEP, M2-DEP (Handtest), Doku-Hinweise | Lead (Pflege) |
