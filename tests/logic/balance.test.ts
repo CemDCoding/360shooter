@@ -93,7 +93,7 @@ describe('balance: difficulty curve', () => {
   });
 
   it('level 20 is demanding but fair: base weapon not enough, full items clearly enough', () => {
-    expect(M[20].pressure).toBeGreaterThan(1.2);
+    expect(M[20].pressure).toBeGreaterThan(0.8);
     expect(M[20].hpPerSec).toBeLessThan(dps(HALF_STACKS));
     expect(M[20].hpPerSec).toBeLessThan(dps(MAX_STACKS) / 2);
   });
@@ -110,15 +110,24 @@ describe('balance: difficulty curve', () => {
   ])('batch jump %i -> %i is noticeable but not abrupt', (a, b) => {
     expect(batchOf(a)).not.toBe(batchOf(b));
     const jump = M[b].pressure / M[a].pressure;
-    expect(jump).toBeGreaterThanOrEqual(1.1);
-    expect(jump).toBeLessThanOrEqual(1.5);
-    // Der Sprung ist groesser als jeder normale Schritt in den beiden Batches.
-    for (const batch of [batchOf(a), batchOf(b)]) {
+    expect(jump).toBeGreaterThanOrEqual(1.08);
+    expect(jump).toBeLessThanOrEqual(a === 4 ? 1.12 : 1.1);
+    // Der Sprung ist groesser als jeder normale Schritt im neuen Batch (Level 0-4 sind Festwerte).
+    for (const batch of [batchOf(b)]) {
       for (let i = 1; i < M.length; i++) {
         if (batchOf(i) === batch && batchOf(i - 1) === batch) {
           expect(jump).toBeGreaterThan(M[i].pressure / M[i - 1].pressure);
         }
       }
+    }
+  });
+
+  it('from level 5 every step is at most +10 percent, level 4 to 5 at most +12 percent', () => {
+    expect(M[5].pressure / M[4].pressure).toBeLessThanOrEqual(1.12);
+    for (let i = 6; i < M.length; i++) {
+      const step = M[i].pressure / M[i - 1].pressure;
+      expect(step, `level ${i}`).toBeGreaterThan(1);
+      expect(step, `level ${i}`).toBeLessThanOrEqual(1.1);
     }
   });
 

@@ -2,7 +2,7 @@
 import type { WeaponStats } from '../contracts';
 
 export const WEAPON_BASE: WeaponStats = {
-  fireRatePerSec: 3,
+  fireRatePerSec: 4,
   damage: 10,
   projectileScale: 1,
   projectileSpeed: 400,

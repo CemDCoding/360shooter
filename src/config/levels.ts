@@ -1,4 +1,4 @@
-// Balancing (AP-15): alle Level-Werte stehen hier, Erklaerung in docs/balancing.md.
+// Balancing (AP-15, Level 5-20 neu in AP-23): alle Level-Werte stehen hier, Erklaerung in docs/balancing.md.
 import type { BatchId, EnemyPoolEntry, LevelDef } from '../contracts';
 
 export const LEVEL_COUNT = 21;
@@ -17,13 +17,13 @@ const SHORT_LEVELS: readonly number[] = [0, 1, 2, 5, 6, 7, 10, 11, 12, 13, 14, 1
  * Kleiner = mehr Gegner. Index = Level-ID.
  */
 const SPAWN_INTERVAL_MS: readonly number[] = [
-  3570, 3130, 2780, 2450, 2190, 1200, 1120, 1050, 970, 890, 710, 680, 660, 640, 620, 600, 580, 560,
-  540, 520, 500,
+  3570, 3130, 2780, 2450, 2190, 1330, 1270, 1210, 1160, 1100, 930, 900, 860, 830, 800, 770, 740, 710,
+  680, 650, 620,
 ];
 
 /** Maximal gleichzeitig lebende Gegner pro Level (Obergrenze 150). Index = Level-ID. */
 const MAX_ENEMIES: readonly number[] = [
-  25, 28, 31, 34, 37, 45, 49, 53, 57, 61, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125,
+  25, 28, 31, 34, 37, 40, 42, 44, 46, 48, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100,
 ];
 
 function poolOf(id: number): EnemyPoolEntry[] {

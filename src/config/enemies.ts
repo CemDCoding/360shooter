@@ -24,7 +24,7 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
   zombieSquirrel: {
     id: 'zombieSquirrel',
     hp: 8,
-    speed: 110,
+    speed: 80,
     contactDamage: 5,
     behavior: 'chase',
     xp: 4,
