@@ -28,9 +28,9 @@ Schwierigkeit nicht mehr stetig steigt.
 - **Spawns/Min**: neue Gegner pro Minute im Durchschnitt der Runde.
 - **Gegner-HP/Min**: Summe der Lebenspunkte aller neuen Gegner pro Minute.
 - **Druck**: Gegner-HP pro Sekunde geteilt durch den Schaden pro Sekunde der Laserpistole ohne Items
-  (jetzt 3 Schuesse/s mal 10 Schaden = 30 pro Sekunde). Unter 1 reicht die Grundwaffe rechnerisch,
-  ueber 1 braucht man Items. Mit allen Items auf Stufe 5 ist der Schaden rund 4,5-mal so hoch (135 pro Sekunde).
-  In der Praxis trifft man nicht immer, deshalb ist Level 0 mit 0,36 bewusst weit unter 1.
+  (jetzt 4 Schuesse/s mal 10 Schaden = 40 pro Sekunde). Unter 1 reicht die Grundwaffe rechnerisch,
+  ueber 1 braucht man Items. Mit allen Items auf Stufe 5 ist der Schaden rund 4,5-mal so hoch (180 pro Sekunde).
+  In der Praxis trifft man nicht immer, deshalb ist Level 0 mit 0,27 bewusst weit unter 1.
 - **Schaden ohne Abschuss/Min**: Schaden pro Minute an der Astronautin, wenn sie gar nichts trifft und
   alle Gegner ungestoert ankommen. Sie ist nur zum Vergleichen der Level gedacht (die Zahl waechst mit
   der Rundendauer, daher sind 5-Minuten-Level hoeher). Annahme: Gegner starten 380 px vom Zentrum.
@@ -39,36 +39,49 @@ Schwierigkeit nicht mehr stetig steigt.
 
 | Level | Batch | Minuten | Spawn-Abstand (ms) | Max. Gegner | Spawns/Min | Gegner-HP/Min | Druck | Schaden ohne Abschuss/Min |
 |---|---|---|---|---|---|---|---|---|
-| 0 | forest | 3 | 3570 | 25 | 21 | 640 | 0,36 | 10312 |
-| 1 | forest | 3 | 3130 | 28 | 24 | 730 | 0,41 | 11635 |
-| 2 | forest | 3 | 2780 | 31 | 27 | 820 | 0,46 | 12967 |
-| 3 | forest | 5 | 2450 | 34 | 31 | 936 | 0,52 | 16725 |
-| 4 | forest | 5 | 2190 | 37 | 35 | 1044 | 0,58 | 18289 |
-| 5 | forestNight | 3 | 1200 | 45 | 64 | 1284 | 0,71 | 14972 |
-| 6 | forestNight | 3 | 1120 | 49 | 68 | 1372 | 0,76 | 16261 |
-| 7 | forestNight | 3 | 1050 | 53 | 73 | 1466 | 0,81 | 17549 |
-| 8 | forestNight | 5 | 970 | 57 | 79 | 1590 | 0,88 | 20823 |
-| 9 | forestNight | 5 | 890 | 61 | 86 | 1735 | 0,96 | 22328 |
-| 10 | elfForest | 3 | 710 | 75 | 108 | 2010 | 1,12 | 27909 |
-| 11 | elfForest | 3 | 680 | 80 | 112 | 2097 | 1,16 | 29663 |
-| 12 | elfForest | 3 | 660 | 85 | 116 | 2165 | 1,20 | 31349 |
-| 13 | elfForest | 3 | 640 | 90 | 119 | 2228 | 1,24 | 33035 |
-| 14 | elfForest | 3 | 620 | 95 | 123 | 2302 | 1,28 | 34728 |
-| 15 | elfForest | 3 | 600 | 100 | 127 | 2377 | 1,32 | 36429 |
-| 16 | elfForest | 5 | 580 | 105 | 132 | 2464 | 1,37 | 42214 |
-| 17 | elfForest | 5 | 560 | 110 | 137 | 2550 | 1,42 | 44170 |
-| 18 | elfForest | 5 | 540 | 115 | 142 | 2647 | 1,47 | 46137 |
-| 19 | elfForest | 5 | 520 | 120 | 147 | 2748 | 1,53 | 48119 |
-| 20 | elfForest | 5 | 500 | 125 | 153 | 2856 | 1,59 | 50117 |
+| 0 | forest | 3 | 3570 | 25 | 21 | 640 | 0,27 | 10312 |
+| 1 | forest | 3 | 3130 | 28 | 24 | 730 | 0,30 | 11635 |
+| 2 | forest | 3 | 2780 | 31 | 27 | 820 | 0,34 | 12967 |
+| 3 | forest | 5 | 2450 | 34 | 31 | 936 | 0,39 | 16725 |
+| 4 | forest | 5 | 2190 | 37 | 35 | 1044 | 0,43 | 18289 |
+| 5 | forestNight | 3 | 1330 | 40 | 57 | 1157 | 0,48 | 13307 |
+| 6 | forestNight | 3 | 1270 | 42 | 60 | 1210 | 0,50 | 13969 |
+| 7 | forestNight | 3 | 1210 | 44 | 63 | 1271 | 0,53 | 14642 |
+| 8 | forestNight | 5 | 1160 | 46 | 66 | 1331 | 0,55 | 16836 |
+| 9 | forestNight | 5 | 1100 | 48 | 70 | 1404 | 0,59 | 17588 |
+| 10 | elfForest | 3 | 930 | 60 | 82 | 1531 | 0,64 | 22091 |
+| 11 | elfForest | 3 | 900 | 64 | 85 | 1587 | 0,66 | 23430 |
+| 12 | elfForest | 3 | 860 | 68 | 89 | 1661 | 0,69 | 24827 |
+| 13 | elfForest | 3 | 830 | 72 | 92 | 1717 | 0,72 | 26182 |
+| 14 | elfForest | 3 | 800 | 76 | 96 | 1786 | 0,74 | 27546 |
+| 15 | elfForest | 3 | 770 | 80 | 99 | 1854 | 0,77 | 28924 |
+| 16 | elfForest | 5 | 740 | 84 | 103 | 1930 | 0,80 | 33651 |
+| 17 | elfForest | 5 | 710 | 88 | 108 | 2012 | 0,84 | 35235 |
+| 18 | elfForest | 5 | 680 | 92 | 113 | 2102 | 0,88 | 36834 |
+| 19 | elfForest | 5 | 650 | 96 | 118 | 2199 | 0,92 | 38449 |
+| 20 | elfForest | 5 | 620 | 100 | 123 | 2303 | 0,96 | 40082 |
 
 ## Was die Tests sichern
 
 - Der Druck steigt mit jedem Level, auch ueber Batch-Grenzen (Spawns/Min ebenso).
-- Die Spruenge 4 zu 5 und 9 zu 10 sind spuerbar (mindestens 10 % mehr Druck), aber hoechstens 50 %,
-  und groesser als jeder normale Schritt im Batch.
+- Die Spruenge 4 zu 5 (hoechstens +12 %) und 9 zu 10 (hoechstens +10 %) sind spuerbar (mindestens 8 %)
+  und groesser als jeder normale Schritt im neuen Batch.
+- Ab Level 5 waechst der Druck je Level um hoechstens 10 %.
 - 5-Minuten-Level sind in ihrem Batch fordernder als die 3-Minuten-Level.
-- Level 0 hat Druck von hoechstens 0,4. Level 20 liegt ueber 1,2 (Grundwaffe reicht nicht) und
+- Level 0 hat Druck von hoechstens 0,4. Level 20 liegt ueber 0,8 und
   bleibt mit einem Teil der Items schaffbar.
+
+## Aenderung nach dem Handtest (AP-23)
+
+Im Handtest kippte das Spiel ab Level 5, Level 12 war zu schwer. Deshalb:
+
+- Die Laserpistole schiesst jetzt 4 statt 3 Mal pro Sekunde. Das gilt in allen Level, also sind auch Level 0-4 etwas leichter.
+- Das Zombie-Eichhoernchen laeuft langsamer (Tempo 80 statt 110). Es kommt erst ab Level 5 vor.
+- Der Verfluchte Baum bleibt unveraendert.
+- Level 0-4 behalten ihre Spawn-Werte (Abstand und Max. Gegner).
+- Level 5-20 haben weniger und gleichmaessiger wachsende Gegnermengen: Sprung von Level 4 auf 5 etwa +11 %,
+  danach hoechstens +10 % je Level. Alt: Abstand Level 5 = 1200 ms, Level 12 = 660 ms, Level 20 = 500 ms. Neu: 1330, 860, 620 ms.
+- Die Druck-Werte sind nicht mit den Werten aus AP-15 vergleichbar, weil die Grundwaffe jetzt 40 statt 30 Schaden pro Sekunde macht.
 
 ## Nachjustieren: Beispiele
 

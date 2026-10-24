@@ -9,6 +9,10 @@ describe('enemies', () => {
     expect(e.contactDamage).toBeGreaterThanOrEqual(0);
   });
 
+  it('zombie squirrel is slowed down (AP-23)', () => {
+    expect(ENEMIES.zombieSquirrel.speed).toBeLessThanOrEqual(80);
+  });
+
   it('behaviors carry their definitions', () => {
     expect(ENEMIES.forestWitch.projectile).toEqual({
       damage: 8,
