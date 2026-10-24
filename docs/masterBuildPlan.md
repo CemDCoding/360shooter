@@ -9,7 +9,7 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 # Master-Build-Plan 360shooter
 
-**Stand:** 2026-10-23 · **Planversion:** 1 · **Gepflegt von:** ma-planner · **Gesteuert von:** ma-lead · **Nutzer:** Cem Dogan
+**Stand:** 2026-10-24 · **Planversion:** 1 · **Gepflegt von:** ma-planner · **Gesteuert von:** ma-lead · **Nutzer:** Cem Dogan
 
 360shooter ist ein 2D-Pixel-Survival-Shooter im Metroid-Stil für Handy und PC. Eine Astronautin steht in der Bildschirmmitte, dreht sich um 360° und schießt automatisch mit einer Laserpistole in Blickrichtung. Sie muss in jeder Runde überleben, bis der Timer abläuft. Monster greifen von allen Seiten an. Der erste Stich umfasst die Level 0–20 (Batches Wald, Wald bei Nacht, Elfenwald) und läuft nur lokal. Grundlage ist die Idee in `idee.txt`. Meilensteine und Pakete folgen nach G1.
 
@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-24 · Wellenabschluss M2 W3 · AP-22 in dev, M2 technisch komplett, Abnahmen M0-DEP, M1-DEP und M2-DEP offen
-- **Fertig:** AP-01–AP-15, AP-21 und AP-22 (alle in dev). **Bereit:** M1-DEP und M2-DEP ([Mensch]). **Offen:** AP-16–AP-20, M0-DEP `offen`, M3-DEP `offen`
+- **Stand:** 2026-10-24 · Wellenabschluss M2 W3 · AP-22 in dev · Fix-Pakete AP-23 (Balancing) und AP-24 (Projektile abschießbar) in M2 W4 angelegt, Freigabe Nutzer 2026-10-24
+- **Fertig:** AP-01–AP-15, AP-21 und AP-22 (alle in dev). **Bereit:** AP-23, AP-24 (M2 W4). **Offen:** M2-DEP (W5, wartet auf AP-23/24), AP-16–AP-20, M0-DEP, M1-DEP, M3-DEP ([Mensch])
 - **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach W3 nicht neu gemessen.
 - **Unterbrochen oder laufend:** nichts
 - **Erkenntnisse:** Checks auf dev grün (153/153 Tests in 23 Dateien; lint, typecheck, build, assets:check, `npm audit` 0). Der Nutzer testet gerade M0/M1/M2-DEP gemeinsam. Bisher ok: Teile A–C (Menü, Ton, Reset, `?fps=1`, Anleitungen). Neu zu testen: `?level=12` (Elfenwald, vier Gegnertypen). Nicht getestet: iPhone (H-03), Balancing. Details §18.
-- **Nächster Schritt:** Nutzer: Handtest M0/M1/M2-DEP mit `?level=12`, iPhone-Test (H-03), PRs `dev` nach `stage` und `stage` nach `master`, Balancing-Handtest. Die Autonomie des Leads bis M2 (PE-15) ist erfüllt. M3 (AP-16 ff.) startet erst nach Rückmeldung des Nutzers.
-- **Offene Fragen an den Nutzer:** Abnahmen M0-DEP, M1-DEP und M2-DEP ([Mensch]). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen. Q-13: Sollen Debug-Runden den Spielstand gar nicht verändern? Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Balancing nach dem Handtest nachjustieren?
+- **Nächster Schritt:** Lead startet W4 (AP-23 und AP-24 parallel, keine gemeinsamen Dateien). Danach M2-DEP (W5) durch den Nutzer. Vorher Handtest-Befunde (Level 5 kippt, Level 12 zu schwer) durch AP-23 abarbeiten. M3 (AP-16 ff.) startet erst nach M2-DEP und Rückmeldung des Nutzers.
+- **Offene Fragen an den Nutzer:** Abnahmen M0-DEP, M1-DEP und M2-DEP ([Mensch]). Q-14: Dauerhafte Gold-Münz-Upgrades (Umfang, nicht angelegt). Vorschlag §16: Verfluchter Baum spawnt ab Level 0, Tempo-Senkung nur ab Level 5 braucht Freigabe. Boss-Verhalten PE-34, Q-13 (Debug-Runden speichern?).
 
 <!-- Ende Lagebericht -->
 
@@ -74,11 +74,11 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 9 | Meilensteine und Wellen | fertig | – | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 bestätigt; M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 bestätigt; AP-23/AP-24 (M2 W4) angelegt, Richtwerte angenommen (PE-37, PE-38); M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34 bestätigen | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; Q-14 offen (Umfang) | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
@@ -427,10 +427,10 @@ flowchart TD
 | `index.html`, `vite.config.ts` | AP-01, später AP-13 | M0 W1, M2 W1 |
 | `README.md` | AP-01, später AP-13 | M0 W1, M2 W1 |
 | `src/platform/storage.ts`, `src/logic/progression.ts` (samt Tests) | AP-04 / AP-06 → AP-21 (Fix Index-Semantik) | M0 W2, M1 W1, M1 W2 |
-| `src/scenes/GameScene.ts` | AP-10 → AP-12 (Hintergrund) → AP-14 (Sound) | M1 W3, M2 W1, M2 W2 |
+| `src/scenes/GameScene.ts` | AP-10 → AP-12 (Hintergrund) → AP-14 (Sound) → AP-24 (Laser vs. Geschoss) | M1 W3, M2 W1, M2 W2, M2 W4 |
 | `src/scenes/debug.ts`, `src/scenes/PreloadScene.ts` (samt `tests/scenes/debug.test.ts`) | AP-10 (`debug.ts`) → AP-22 (Direktstart `?level=n`) | M1 W3, M2 W3 |
 | `src/scenes/{MenuScene,HudScene,ResultScene}.ts` | AP-10 (Hud, Result), AP-11 (Menu) → AP-14 (Sound, Stumm-Taste) | M1 W3, M2 W1, M2 W2 |
-| `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M3 W1 |
+| `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-23 (`levels`, `enemies`, `weapon`) → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M2 W4, M3 W1 |
 | `src/config/assets.ts`, `docs/guides/*` | AP-02 / AP-07 → AP-16 (Boss-Assets) | M0 W2, M1 W1, M3 W1 |
 | `src/logic/{round,spawn}.ts`, `src/contracts/{events,index}.ts` | AP-06 / AP-01 → AP-16 | M1 W1, M0 W1, M3 W1 |
 | `src/scenes/{GameScene,HudScene,ResultScene}.ts` in M3 | AP-20 | M3 W3 |
@@ -519,7 +519,8 @@ flowchart TD
 | W1 | AP-11 Hauptmenü und Fortschritt, AP-12 Maps je Batch, AP-13 PWA und Querformat |
 | W2 | AP-14 Sound-Anbindung und Stummschalten, AP-15 Balancing Level 0–20 |
 | W3 | AP-22 Fix Debug-Parameter `?level=n` im Menü-Flow |
-| W4 | M2-DEP [Mensch] |
+| W4 | AP-23 Balancing-Nachbesserung Level 5–20, AP-24 Gegnerische Projektile abschießbar |
+| W5 | M2-DEP [Mensch] |
 
 ##### M2-DEP – Abnahme [Mensch]
 
@@ -537,6 +538,8 @@ flowchart TD
   - [ ] Ton auf dem iPhone ist nach dem ersten Antippen hörbar
   - [ ] Balancing-Handtest: Level 0 gut schaffbar, Level 20 nur mit Items. Bei Abweichung nachjustieren laut `docs/balancing.md`
   - [ ] Debug: `?level=12` startet Elfenwald direkt, auch ohne Freischaltung (AP-22)
+  - [ ] Balancing nach Handtest: Ab Level 5 kippt das Spiel nicht mehr, Level 12 ist mit der Startwaffe fair zu schaffen (AP-23)
+  - [ ] Die Laserpistole zerstört Geschosse der Wald-Hexe, der Laser verschwindet dabei (AP-24)
 
 #### M3 – Bosse
 
@@ -585,7 +588,9 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | c14 / agent/AP-14-c14 | fertig |
 | AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | c15 / agent/AP-15-c15 | fertig |
 | AP-22 | Debug-Parameter `?level=n` im Menü-Flow | M2 | GAME | W3 | keine (AP-10, AP-11 fertig) | S | sonnet (medium) | c22 / agent/AP-22-c22 | fertig |
-| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W4 | AP-14, AP-15, AP-22 | H | – | – | bereit |
+| AP-23 | Balancing-Nachbesserung Level 5–20 | M2 | SH | W4 | keine (AP-15 fertig) | S | sonnet (medium) | – | bereit |
+| AP-24 | Gegnerische Projektile abschießbar | M2 | GAME/LOG | W4 | keine (AP-09, AP-10 fertig) | S | sonnet (medium) | – | bereit |
+| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W5 | AP-14, AP-15, AP-22, AP-23, AP-24 | H | – | – | offen |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2 | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -613,7 +618,8 @@ flowchart LR
     AP11["AP-11"] --> AP14["AP-14"]
     AP12["AP-12"] --> AP14
     AP13["AP-13"]
-    AP15["AP-15"]
+    AP15["AP-15"] --> AP23["AP-23"]
+    AP24["AP-24"]
   end
   subgraph M3["M3 Bosse"]
     AP16["AP-16"] --> AP17["AP-17"] & AP18["AP-18"] & AP19["AP-19"]
@@ -625,7 +631,11 @@ flowchart LR
   AP10 --> AP11 & AP12 & AP13 & AP15
   AP14 & AP15 --> AP16
   AP10 & AP11 --> AP22["AP-22"]
+  AP09 & AP10 --> AP24
+  AP14 & AP15 & AP22 & AP23 & AP24 --> M2DEP["M2-DEP"]
 ```
+
+**M2 W4:** AP-23 (nur `src/config/*`, `tests/config/*`, `tests/logic/balance.test.ts`, `docs/balancing.md`) und AP-24 (`src/scenes/GameScene.ts`, `src/logic/projectiles.ts`, Test) teilen keine Datei und laufen parallel.
 
 **Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11/AP-12 → AP-14 → (M3) AP-16 → AP-17–AP-19 → AP-20
 
@@ -1331,6 +1341,76 @@ flowchart LR
 - **Kürzbar bei Budgetnot:** nein (M2-DEP hängt daran)
 - **Commit-Typ:** `fix(AP-22): start debug level directly from preload`
 
+#### AP-23 – Balancing-Nachbesserung Level 5–20
+
+- **Meilenstein, Lane, Welle:** M2 · SH · W4
+- **Ziel:** Nach dem Nutzer-Handtest kippt das Spiel ab Level 5, Level 12 ist zu schwer. Gegner ab Level 5 werden langsamer, die Startwaffe (Laserpistole) feuert schneller, und die Schwierigkeit steigt von Level 5 bis 20 gleichmäßig. Level 0–4 bleiben in ihren Spawn-Werten unverändert (PE-38).
+- **Pflichtlektüre:** PE-38, PE-05, PE-16, PE-17, Umsetzung und Erkenntnisse von AP-15 (Druck-Kennzahl, §18), `src/config/{levels,enemies,weapon}.ts`, `src/logic/spawn.ts` (nur lesen), `docs/balancing.md`
+- **Abhängigkeiten:** keine (AP-15 fertig)
+- **Parallel möglich mit:** AP-24 (keine gemeinsamen Dateien)
+- **Dateien (Eigentum):** `src/config/{levels,enemies,weapon}.ts`, `tests/config/{levels,enemies}.test.ts`, `tests/config/weapon.test.ts` (neu), `tests/logic/balance.test.ts`, `docs/balancing.md`
+- **Nicht anfassen:** `src/config/{assets,maps,items,player,progression,index}.ts`, `src/entities/*`, `src/logic/*`, `src/scenes/*`, `src/contracts/*`. Keine Logikänderung: die Werte wirken über die bestehende Konfiguration.
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `weapon.ts`: `fireRatePerSec` von 3 auf 4 (Richtwert, angenommen). Die Feuerrate wirkt auf alle Level, also werden Level 0–4 dadurch ebenfalls leichter. Das im Bericht nennen.
+  2. `enemies.ts`: Zombie-Eichhörnchen (`zombieSquirrel`) `speed` von 110 auf 80 (Richtwert, angenommen). Es erscheint erst ab Level 5, Level 0–4 sind nicht betroffen.
+  3. Verfluchter Baum (`cursedTree`) bleibt in diesem Paket unverändert, er erscheint schon ab Level 0. Eine Tempo-Senkung nur ab Level 5 braucht eine Änderung außerhalb der Daten, siehe §16 „Vorgeschlagene Änderungen“. Ohne Freigabe dieses Vorschlags bleibt der Baum unverändert.
+  4. `levels.ts`: `spawnIntervalMs` und `maxEnemies` für Level 5–20 neu abstimmen:
+     - Die Werte für Level 0–4 bleiben gleich wie vor AP-23 (Festwerte im Test).
+     - Die Druck-Kennzahl (Gegner-HP/s geteilt durch Basis-DPS, wie in AP-15) steigt ab Level 5 von Level zu Level.
+     - Der Sprung von Level 4 auf Level 5 ist höchstens +12 % (vorher +22 %).
+     - Jeder weitere Schritt bis Level 20 ist höchstens +10 %.
+     - Die Richtwerte sind Vorschläge. Der Coder darf sie anpassen, wenn er die Bedingungen einhält und die Änderung im Bericht nennt.
+     - Die Basis-DPS steigt mit der Feuerrate. Die Druck-Werte aller Level sinken dadurch, deshalb die Kurve nach Schritt 1 neu rechnen.
+  5. Tests:
+     - `tests/config/weapon.test.ts` (neu): `fireRatePerSec` ist mindestens 4.
+     - `tests/config/enemies.test.ts`: `zombieSquirrel.speed` höchstens 80, alle Gegner-Geschwindigkeiten größer 0.
+     - `tests/config/levels.test.ts`: Festwerte für Level 0–4 (`spawnIntervalMs`, `maxEnemies`).
+     - `tests/logic/balance.test.ts`: Druck-Bedingungen aus Umsetzung 4 (Schritt 4→5 höchstens +12 %, danach höchstens +10 % je Level, monoton). Bestehende Batch-Bedingungen bleiben grün.
+  6. `docs/balancing.md`: Kennzahlen-Tabelle neu erzeugen (sie ist handkopiert), Abschnitt „Änderung nach dem Handtest (AP-23)“ in einfacher Sprache. Die Druck-Werte sind gegenüber AP-15 nicht vergleichbar.
+- **Schnittstellen:** keine Vertragsänderung. `src/logic/spawn.ts` und die Entities lesen die Werte weiterhin über `src/config`.
+- **Akzeptanzkriterien:**
+  - Tests aus Umsetzung 5 grün, Level 0–4 Spawn-Werte unverändert
+  - Checks grün (`lint`, `typecheck`, `test`, `build`, `assets:check`)
+  - Handtest durch den Nutzer in M2-DEP (`?level=5`, `?level=12`): Level 5 kippt nicht, Level 12 ist mit der Startwaffe fair zu schaffen
+- **Tests:** wie Umsetzung 5
+- **Review-Schwerpunkte:** nur Daten geändert, keine Logik in `src/config`, keine Spielwerte in Szenen, Level 0–4 Festwerte, Zahlen in `docs/balancing.md` stimmen mit `src/config` überein
+- **Doku-Pflichten:** `docs/balancing.md`
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Befund des Nutzers)
+- **Commit-Typ:** `fix(AP-23): rebalance levels 5-20 and start weapon fire rate`
+
+#### AP-24 – Gegnerische Projektile abschießbar
+
+- **Meilenstein, Lane, Welle:** M2 · GAME/LOG · W4 (vor M3, weil Bosse Geschosse schießen)
+- **Ziel:** Die Laserpistole des Spielers zerstört gegnerische Geschosse, zum Beispiel das Hexen-Geschoss der Wald-Hexe. Ein Treffer entfernt Laser und Geschoss. Kein Durchschlag: Ein Laser trifft genau ein Ziel (Gegner, Item oder Geschoss). Angenommen, siehe PE-37.
+- **Pflichtlektüre:** PE-37, PE-16, PE-31, §12 AP-09 und AP-10 (Hinweise Ist-API), §18 Erkenntnisse AP-08, AP-09 und AP-10, `src/scenes/GameScene.ts` (Block `addColliders`), `src/entities/enemies/WitchBolt.ts`, `src/entities/enemies/WitchBoltPool.ts`, `src/entities/LaserPool.ts`, `src/logic/geometry.ts`
+- **Abhängigkeiten:** keine offenen (AP-09 und AP-10 fertig)
+- **Parallel möglich mit:** AP-23 (keine gemeinsamen Dateien)
+- **Dateien (Eigentum):** `src/logic/projectiles.ts` (neu), `tests/logic/projectiles.test.ts` (neu), `src/scenes/GameScene.ts`
+- **Nicht anfassen:** `src/entities/*`, `src/config/*`, `src/contracts/*`, übrige `src/logic/*`, `src/scenes/{HudScene,ResultScene,MenuScene,PreloadScene,debug}.ts`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `src/logic/projectiles.ts`: reine Funktion `canLaserDestroyBolt(laser, bolt)`. Sie liefert `true`, wenn beide aktiv sind und sich die Kreise überschneiden (`circlesOverlap` aus `geometry.ts`). Eingabe ist `{ active, x, y, radius }`, ohne Phaser-Typen.
+  2. `GameScene.addColliders()`: neuer Overlap von `this.boltPool.bolts` mit `this.lasers.group`, nach dem Muster Laser gegen Gegner. Im Callback: `active` und `this.ended` prüfen, `this.lasers.release(laser)`, `bolt.despawn()`. Optional kurzer Treffer-Ton `sfx-hit`, bestehende Drosselung nutzen. Radien aus den Körpern der Entities, keine Zahlen im Code.
+  3. Doppeltreffer vermeiden: Der Laser ist nach dem ersten Treffer inaktiv, das Geschoss wird nur einmal entfernt.
+  4. Tests in `tests/logic/projectiles.test.ts`: Treffer bei Überlappung, kein Treffer ohne Überlappung, kein Treffer bei inaktivem Laser oder Geschoss, Berührung zählt als Treffer.
+- **Schnittstellen:** nutzt `LaserPool.release`, `WitchBolt.despawn`, `boltPool.bolts`, `circlesOverlap`. Verträge und Pools bleiben unverändert. Die Logik ist für Boss-Geschosse (M3) wiederverwendbar.
+- **Akzeptanzkriterien:**
+  - Ein Laser zerstört ein Hexen-Geschoss, danach sind Laser und Geschoss weg
+  - Ein Laser trifft nie zwei Ziele
+  - Treffer auf Gegner und Items funktionieren wie bisher
+  - Checks grün (`lint`, `typecheck`, `test`, `build`)
+  - Handtest durch den Nutzer (M2-DEP): ab Level 5, Wald-Hexe schießt, Laser trifft Geschoss
+- **Tests:** Vitest für `projectiles.ts`. Die Szene wird nicht getestet, der Handtest steht im Bericht.
+- **Review-Schwerpunkte:** Pool-Rückgabe genau einmal, `ended`-Guard, keine Änderung an `src/entities`, keine Spielwerte in der Szene
+- **Doku-Pflichten:** – (der Bericht beschreibt das Verhalten)
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (vor M3 nötig)
+- **Commit-Typ:** `feat(AP-24): let player lasers destroy enemy projectiles`
+
 ### M3 – Bosse
 
 #### AP-16 – Boss-Rahmen
@@ -1611,6 +1691,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-31 | Treffer-Feedback: nur sanftes, angenehmes Aufblinken; kein Bildschirmwackeln, keine Schadenszahlen | Antwort 3 | Nutzer am 2026-10-23 |
 | PE-26 | Repository ist öffentlich. Folge: niemals Secrets, keine fremden Assets ohne Lizenz, Plan und Idee sind öffentlich lesbar | Antwort 4 | Nutzer am 2026-10-23 |
 | PE-35 | `highestUnlockedLevel` ist der Index des höchsten freigeschalteten Levels. Startwert 0 (nur Level 0 frei), Bereich 0..20 (`LEVEL_COUNT - 1`). Sieg in Level n schaltet `min(20, n+1)` frei. Der Fehler aus AP-04 (Standard 1, Bereich 1..1000) wird in AP-21 behoben. Kein Migrationsbedarf, da nichts ausgeliefert ist | Detailfrage ohne Auswirkung auf Sicherheit oder Umfang, Entscheidung des Leads (Wellenabschluss M1 W1) | Lead am 2026-10-23 |
+| PE-37 | Spieler-Laser zerstören gegnerische Geschosse (Wald-Hexe, später Boss-Geschosse). Der Laser verschwindet dabei ebenfalls, kein Durchschlag: ein Laser trifft genau ein Ziel (AP-24) | Auftrag Lead, Umfang aus Nutzer-Freigabe; Regel „Laser verschwindet, kein Durchschlag“ angenommen | Nutzer am 2026-10-24 (Paket), Regel (angenommen) |
+| PE-38 | Balancing-Nachbesserung nach Nutzer-Handtest (AP-23): Ab Level 5 kippt das Spiel, Level 12 ist zu schwer. Gegner ab Level 5 langsamer (Zombie-Eichhörnchen, Verfluchter Baum), Feuerrate der Startwaffe erhöhen, Kurve 5–20 glätten. Level 0–4 bleiben in den Spawn-Werten. Richtwerte Feuerrate 3 → 4/s und Zombie-Eichhörnchen 110 → 80 px/s (angenommen). Verfluchter Baum ab Level 5: offen, siehe §16 Vorschläge | Befund Nutzer-Handtest am 2026-10-24, Richtwerte angenommen vom Planner | Nutzer am 2026-10-24 (Befund und Freigabe), Werte (angenommen) |
 | PE-36 | Debug-Direktstart `?level=n` (AP-22): Der Start führt direkt in `GameScene` mit dem Level und schreibt den Spielstand nicht. Der Freischaltstand spielt dabei keine Rolle. Runden mit Debug-Level werden wie jede Runde gespeichert (Erfahrung, Freischaltung nur steigend). Ein Debug-Sieg kann höhere Level freischalten. Das ist akzeptiert, weil `GameScene` unverändert bleibt. Eine Sperre für Debug-Runden braucht `GameScene` im Paket, siehe Q-13 | Befund Nutzer-Handtest (M1-DEP); Umgang mit dem Spielstand vom Planner angenommen | Lead am 2026-10-24 (Pflege), Detail angenommen vom Planner |
 
 ### Offene Fragen
@@ -1630,6 +1712,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-11 | Sound und Musik im ersten Stich? | W | Umfang | nur einfache Effekte | geklärt (PE-24) |
 | Q-12 | Lizenz des öffentlichen Repos: Soll eine `LICENSE` festlegen, dass Code und Grafiken nicht frei genutzt werden dürfen? | W | §5, Kommerzialisierung | ohne Lizenzdatei gilt „alle Rechte vorbehalten“; zusätzlich kurzer Hinweis im README | geklärt (PE-27) |
 | Q-13 | Sollen Debug-Runden (`?level=n`) den Spielstand gar nicht verändern, also weder Erfahrung noch Freischaltung schreiben? | W | AP-22, AP-10 (`GameScene`) | Ja: Folgepaket mit `GameScene` (Debug-Kennzeichen in den Szenendaten, Speichern überspringen). Bis dahin gilt PE-36 | offen |
+| Q-14 | Dauerhafte Waffen- und Charakter-Upgrades mit Gold-Münzen. Stand: Gold-Münzen als Währung, zufällig von Gegnern gedroppt, fliegen automatisch zur Spielerin. Offen: was ist upgradebar, Shop-Ort, Preise, Spielstand-Schema, Verhältnis zu F-07 und PE-12 (Items pro Runde bleiben?), Neu-Balancing | K | §2 (Umfang), F-07, PE-12, PE-13, §4 (`SaveGame`), §8 | keine Empfehlung, Umfangsänderung gegenüber F-07/PE-06. Erst klären, dann Paket anlegen | offen |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -1640,6 +1723,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | §4 Datenmodell, Zeile `SaveGame` | `highestUnlockedLevel` um die Bedeutung ergänzen: Index des höchsten freigeschalteten Levels, Startwert 0, Bereich 0..20 (PE-35) | Begriff war im Plan nicht festgelegt, AP-04 hatte Standard 1 | Planner (Pflege, Lead-Auftrag) |
 | Testabdeckung AP-05 (≥ 90 %) | Ein Coverage-Werkzeug (z. B. Vitest-Coverage) freigeben, damit das Akzeptanzkriterium belegt werden kann. Bisher nur manuell geprüft | Nachweis fehlt, neues Paket braucht Freigabe (Regel Abhängigkeiten) | Lead (Erkenntnis AP-05) |
 | Arena-Auflösung als Konstante `GAME_SIZE` (640×360) | `ARENA_CENTER` (320,180) steht lokal in `Enemy.ts` und ist nur per `ctx.center` überschreibbar. Die Zahl steckt damit an zwei Stellen. Vorschlag: Konstante in `src/config` anlegen und von Gegnern, Spielszene und Kamera nutzen. Eigentum: AP-15 (`src/config`), AP-10 nutzt sie nur. Alternativ AP-10 übernimmt es, bräuchte aber Config-Freigabe | Erkenntnis AP-09, Hinweis aus Review | Lead (Wellenabschluss M1 W2) |
+| Verfluchter Baum ab Level 5 langsamer (AP-23, Befund Handtest) | `cursedTree` erscheint ab Level 0, eine Tempo-Senkung nur für Level 5+ geht mit reinen Daten nicht. Optionen: (a) Tempo-Faktor je Level in `levels.ts`, dazu eine kleine Änderung in `createEnemy.ts`/`Enemy.ts` und GameScene (Umfang über reine Datenänderung hinaus, eigenes Paket nach AP-24 in M2 W5 oder M3). (b) Baum-Tempo global senken, dann ändert sich auch Level 0–4 (widerspricht „Level 0–4 darf bleiben“). (c) Baum vorerst unverändert, nur Zombie-Eichhörnchen wird langsamer. Empfehlung: (a) | Befund Nutzer-Handtest, Konflikt Datenänderung gegen Auftrag | Lead (Auftrag AP-23), Planner |
 
 ---
 
@@ -1648,9 +1732,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Anforderung oder Regel | Pakete |
 |---|---|
 | F-01 Steuerung (Drehen, Maus/Touch) | AP-04, AP-05, AP-08, AP-10 |
-| F-02 Automatischer Schuss | AP-05, AP-08 |
+| F-02 Automatischer Schuss | AP-05, AP-08, AP-23 (Feuerrate) |
 | F-03 Runde mit Timer | AP-03, AP-06, AP-10 |
-| F-04 Gegner | AP-03, AP-09, AP-15 |
+| F-04 Gegner | AP-03, AP-09, AP-15, AP-23 (Tempo, Kurve 5–20), AP-24 (Geschosse abschießbar) |
 | F-05 Boss je Level | AP-16–AP-20 |
 | F-06 Level und Maps 0–20 | AP-03, AP-12 |
 | F-07 Waffen-Items | AP-03, AP-05, AP-08, AP-10 |
@@ -1728,3 +1812,5 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-24 | Erkenntnis Handtest: `localhost:5173` war nach Reload auf dem PC des Nutzers nicht erreichbar, `127.0.0.1:5173` ging. Kein Spielfehler, vermutlich IPv6-/IPv4-Auflösung. Für Handtests `127.0.0.1` verwenden. Die Guides und die Doku nennen weiterhin `localhost`, bei Bedarf anpassen | Befund Nutzer-Handtest | M1-DEP, M2-DEP (Handtest), Doku-Hinweise | Lead (Pflege) |
 | 2026-10-24 | Wellenabschluss M2 W3: AP-22 (96bdfc9, Coder c22, Merge 9f8a2f8) gemergt. Review in Runde 1 bestanden. Checks auf dev grün: lint, typecheck, 153/153 Tests in 23 Dateien, build, assets:check, `npm audit` 0. AP-22 `fertig`, M2-DEP `bereit` (AP-14, AP-15, AP-22 fertig) | Wellenabschluss M2 W3 | AP-22, M2-DEP | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis AP-22: `resolveStartTarget(search)` in `debug.ts` ist rein und liest nur die Query-Zeichenkette. `PreloadScene` priorisiert `?assets=1`, danach `resolveStartTarget`. Der Direktstart umgeht die Freischaltung und schreibt keinen Spielstand. Runden mit Debug-Level werden normal gespeichert (PE-36, Q-13 offen). Im Coder-Worktree fehlte `node_modules`, der Coder führte `npm ci` aus. Handtest `?level=12` (Elfenwald, vier Gegnertypen) steht beim Nutzer aus | Wellenabschluss M2 W3 | M1-DEP, M2-DEP, Q-13 | Lead (Pflege) |
+| 2026-10-24 | Fix-Pakete aus dem Nutzer-Handtest (Freigabe im Chat): AP-23 Balancing-Nachbesserung Level 5–20 (PE-38) und AP-24 gegnerische Geschosse abschießbar (PE-37, Regel angenommen) in M2 W4 angelegt, beide `bereit`. M2-DEP wandert von W4 auf W5 und hängt an AP-23 und AP-24 (`offen`). Q-14 (Gold-Münz-Upgrades) eingetragen, nicht als Paket angelegt. Vorschlag §16 zum Verfluchten Baum (Tempo nur ab Level 5). Die höhere Feuerrate macht Level 0–4 ebenfalls leichter, das prüft der Nutzer im Handtest | Befund Nutzer-Handtest | AP-23, AP-24, M2-DEP, §8–§11, §16, §17 | Nutzer (Chat) / Lead (Pflege) |
+| 2026-10-24 | Erkenntnis Planung (Ist-Code): `Enemy` liest das Tempo aus `ENEMIES[id].speed` ohne Level-Kontext. Ein levelabhängiges Tempo braucht deshalb eine Änderung in Entities und Szene, nicht nur in `src/config`. Wald-Hexe-Geschosse sind `WitchBoltPool.bolts` (Array für Physics-Overlap), Kreisprüfung in `logic/geometry.ts` (`circlesOverlap`). Die Druck-Kennzahl nutzt `WEAPON_BASE` und ändert sich mit der Feuerrate | Planung AP-23/AP-24 | AP-23, AP-24, künftige Gegnerpakete | Planner (Pflege) |
