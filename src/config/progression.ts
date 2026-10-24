@@ -1,4 +1,4 @@
-// Startwerte, Feintuning in AP-15, nur hier ändern.
+// Balancing (AP-15), Erklaerung in docs/balancing.md.
 import type { ProgressionRules } from '../contracts';
 
 export const PROGRESSION: ProgressionRules = {

@@ -1,4 +1,4 @@
-// Startwerte, Feintuning in AP-15, nur hier ändern.
+// Balancing (AP-15), Erklaerung in docs/balancing.md.
 import type { ItemDef, ItemRules } from '../contracts';
 
 export const ITEMS: readonly ItemDef[] = [
