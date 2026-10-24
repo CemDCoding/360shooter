@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-24 · Wellenabschluss M2 W2 · M2 (AP-11–AP-15) technisch komplett in dev, Abnahmen M0-DEP, M1-DEP und M2-DEP offen
-- **Fertig:** AP-01–AP-15 und AP-21 (alle in dev). **Bereit:** M1-DEP ([Mensch]) und AP-22 (Fix Debug-Parameter `?level=n`, M2 W3). **Offen:** AP-16–AP-20, M0-DEP `offen`, M2-DEP `offen` (wartet auf AP-22), M3-DEP `offen`
-- **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach W2 nicht neu gemessen.
+- **Stand:** 2026-10-24 · Wellenabschluss M2 W3 · AP-22 in dev, M2 technisch komplett, Abnahmen M0-DEP, M1-DEP und M2-DEP offen
+- **Fertig:** AP-01–AP-15, AP-21 und AP-22 (alle in dev). **Bereit:** M1-DEP und M2-DEP ([Mensch]). **Offen:** AP-16–AP-20, M0-DEP `offen`, M3-DEP `offen`
+- **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach W3 nicht neu gemessen.
 - **Unterbrochen oder laufend:** nichts
-- **Erkenntnisse:** Checks auf dev grün (151/151 Tests in 23 Dateien; lint, typecheck, build, assets:check, `npm audit` 0). Nicht im Browser oder auf dem iPhone getestet: Optik, Ton, Safe-Area, Balancing (Teil von M1-DEP und M2-DEP, Handtest H-03). Details §18.
-- **Nächster Schritt:** Nutzer: Abnahme M1-DEP (PR `dev` nach `stage`, Smoke-Test PC, PR `stage` nach `master`); M0-DEP ebenfalls offen. M2-DEP folgt erst auf AP-22 (M2 W3). Die Autonomie des Leads bis M2 (PE-15) ist erfüllt. M3 (AP-16 ff.) startet erst nach Rückmeldung des Nutzers.
-- **Offene Fragen an den Nutzer:** Abnahmen M0-DEP, M1-DEP und M2-DEP ([Mensch]). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen. Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Balancing nach dem Handtest nachjustieren?
+- **Erkenntnisse:** Checks auf dev grün (153/153 Tests in 23 Dateien; lint, typecheck, build, assets:check, `npm audit` 0). Der Nutzer testet gerade M0/M1/M2-DEP gemeinsam. Bisher ok: Teile A–C (Menü, Ton, Reset, `?fps=1`, Anleitungen). Neu zu testen: `?level=12` (Elfenwald, vier Gegnertypen). Nicht getestet: iPhone (H-03), Balancing. Details §18.
+- **Nächster Schritt:** Nutzer: Handtest M0/M1/M2-DEP mit `?level=12`, iPhone-Test (H-03), PRs `dev` nach `stage` und `stage` nach `master`, Balancing-Handtest. Die Autonomie des Leads bis M2 (PE-15) ist erfüllt. M3 (AP-16 ff.) startet erst nach Rückmeldung des Nutzers.
+- **Offene Fragen an den Nutzer:** Abnahmen M0-DEP, M1-DEP und M2-DEP ([Mensch]). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen. Q-13: Sollen Debug-Runden den Spielstand gar nicht verändern? Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Balancing nach dem Handtest nachjustieren?
 
 <!-- Ende Lagebericht -->
 
@@ -584,8 +584,8 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | c13 / agent/AP-13-c13 | fertig |
 | AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | c14 / agent/AP-14-c14 | fertig |
 | AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | c15 / agent/AP-15-c15 | fertig |
-| AP-22 | Debug-Parameter `?level=n` im Menü-Flow | M2 | GAME | W3 | keine (AP-10, AP-11 fertig) | S | sonnet (medium) | – | bereit |
-| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W4 | AP-14, AP-15, AP-22 | H | – | – | offen |
+| AP-22 | Debug-Parameter `?level=n` im Menü-Flow | M2 | GAME | W3 | keine (AP-10, AP-11 fertig) | S | sonnet (medium) | c22 / agent/AP-22-c22 | fertig |
+| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W4 | AP-14, AP-15, AP-22 | H | – | – | bereit |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2 | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -1726,3 +1726,5 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-24 | Befund Nutzer-Handtest (Dev-Server am PC): `?level=12` wirkungslos seit AP-11. Ursache: `PreloadScene` startet immer `MenuScene`, `GameScene` liest `?level` nur ohne Level-Daten. Folge: Level 5–20 ohne Freispielen nicht testbar. Fix als AP-22 (M2 W3, Eigentum `PreloadScene.ts`, `debug.ts`, Test). M1-DEP-Punkt `?level=12` erst nach AP-22 erfüllbar. M2-DEP wandert nach W4, wartet auf AP-22 und ist `offen`. Umgang mit dem Spielstand: PE-36, offene Frage Q-13 | Befund Nutzer-Handtest | AP-22, M1-DEP, M2-DEP | Lead (Pflege) |
 | 2026-10-24 | Befund Nutzer-Handtest: Smoke-Test M1-DEP präzisiert. Statt „verändert die Waffe sichtbar“ jetzt „erhöht den Stack im HUD“, weil es keine Waffengrafik gibt. Sichtbar ist nur der Item-Stack im HUD. M2-DEP enthält diesen Punkt nicht, dort kam ein `?level=12`-Punkt hinzu | Befund Nutzer-Handtest | M1-DEP, M2-DEP | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis Handtest: `localhost:5173` war nach Reload auf dem PC des Nutzers nicht erreichbar, `127.0.0.1:5173` ging. Kein Spielfehler, vermutlich IPv6-/IPv4-Auflösung. Für Handtests `127.0.0.1` verwenden. Die Guides und die Doku nennen weiterhin `localhost`, bei Bedarf anpassen | Befund Nutzer-Handtest | M1-DEP, M2-DEP (Handtest), Doku-Hinweise | Lead (Pflege) |
+| 2026-10-24 | Wellenabschluss M2 W3: AP-22 (96bdfc9, Coder c22, Merge 9f8a2f8) gemergt. Review in Runde 1 bestanden. Checks auf dev grün: lint, typecheck, 153/153 Tests in 23 Dateien, build, assets:check, `npm audit` 0. AP-22 `fertig`, M2-DEP `bereit` (AP-14, AP-15, AP-22 fertig) | Wellenabschluss M2 W3 | AP-22, M2-DEP | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-22: `resolveStartTarget(search)` in `debug.ts` ist rein und liest nur die Query-Zeichenkette. `PreloadScene` priorisiert `?assets=1`, danach `resolveStartTarget`. Der Direktstart umgeht die Freischaltung und schreibt keinen Spielstand. Runden mit Debug-Level werden normal gespeichert (PE-36, Q-13 offen). Im Coder-Worktree fehlte `node_modules`, der Coder führte `npm ci` aus. Handtest `?level=12` (Elfenwald, vier Gegnertypen) steht beim Nutzer aus | Wellenabschluss M2 W3 | M1-DEP, M2-DEP, Q-13 | Lead (Pflege) |
