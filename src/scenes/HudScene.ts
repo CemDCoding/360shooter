@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../config';
 import { GameEvents, type GameEventPayloads, type WeaponStacks } from '../contracts';
+import { addMuteButton } from '../platform/audio';
 import { parseDebugFps } from './debug';
 import type { HudInitData } from './GameScene';
 
@@ -59,6 +60,7 @@ export class HudScene extends Phaser.Scene {
     });
 
     this.createPauseButton(width);
+    addMuteButton(this, width - BUTTON_SIZE * 1.5 - 8, BUTTON_SIZE / 2 + 4);
     this.pauseOverlay = this.createPauseOverlay(width, height);
 
     if (parseDebugFps(window.location.search)) {

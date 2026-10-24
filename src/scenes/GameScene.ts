@@ -23,6 +23,7 @@ import { applyRoundResult, roundXp, type RoundResult } from '../logic/progressio
 import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
 import { SpawnDirector } from '../logic/spawn';
+import { getSoundService, type SoundService } from '../platform/audio';
 import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
 import { resolveLevelId } from './debug';
@@ -31,6 +32,8 @@ import { resolveLevelId } from './debug';
 const SPAWN_MARGIN_PX = 24;
 /** Upper bound for one frame step, avoids huge jumps after a stall (ms). */
 const MAX_FRAME_MS = 100;
+/** Contact damage hits every frame: play the hurt sound at most this often (ms). */
+const HURT_SOUND_GAP_MS = 250;
 
 export interface GameSceneData {
   levelId?: number;
@@ -88,6 +91,8 @@ export class GameScene extends Phaser.Scene {
   private playTimeMs = 0;
   private lastTimerSec = -1;
   private ended = false;
+  private sfx!: SoundService;
+  private lastHurtSoundMs = Number.NEGATIVE_INFINITY;
   private center = { x: 0, y: 0 };
 
   constructor() {
@@ -103,11 +108,13 @@ export class GameScene extends Phaser.Scene {
     this.playTimeMs = 0;
     this.lastTimerSec = -1;
     this.ended = false;
+    this.lastHurtSoundMs = Number.NEGATIVE_INFINITY;
   }
 
   create(): void {
     const { width, height } = this.scale;
     this.center = { x: width / 2, y: height / 2 };
+    this.sfx = getSoundService(this.game);
     this.rng = createRng(Date.now() >>> 0);
     // endRound() pauses the world; make sure a restarted round ("Nochmal") runs again.
     this.physics.resume();
@@ -121,6 +128,7 @@ export class GameScene extends Phaser.Scene {
       boltPool: this.boltPool,
       center: this.center,
       onDeath: (x, y, xp) => {
+        this.sfx.play('sfx-enemy-death');
         this.killXp += xp;
         this.pendingDrops.push({ x, y });
       },
@@ -153,6 +161,12 @@ export class GameScene extends Phaser.Scene {
   private bindPlayerCallbacks(): void {
     this.player.callbacks.onHpChange = (hp, maxHp) =>
       emitGameEvent(this.events, GameEvents.HpChanged, { hp, maxHp });
+    this.player.callbacks.onShoot = () => this.sfx.play('sfx-laser');
+    this.player.callbacks.onHurt = () => {
+      if (this.playTimeMs - this.lastHurtSoundMs < HURT_SOUND_GAP_MS) return;
+      this.lastHurtSoundMs = this.playTimeMs;
+      this.sfx.play('sfx-player-hurt');
+    };
     this.player.callbacks.onStatsChange = (_stats, stacks) =>
       emitGameEvent(this.events, GameEvents.WeaponChanged, { stacks: { ...stacks } });
   }
@@ -164,7 +178,7 @@ export class GameScene extends Phaser.Scene {
       const laser = pick(a, b, Laser);
       if (!enemy || !laser || !enemy.active || !laser.active || this.ended) return;
       this.lasers.release(laser);
-      enemy.takeDamage(laser.damage);
+      if (!enemy.takeDamage(laser.damage)) this.sfx.play('sfx-hit');
     });
     // Laser vs item: shooting an item collects it (PE-16).
     this.physics.add.overlap(this.items, this.lasers.group, (a, b) => {
@@ -239,7 +253,10 @@ export class GameScene extends Phaser.Scene {
   private spawnItem(x: number, y: number, def: ItemDef): void {
     const item = new ItemPickup(this, x, y, def, ITEM_RULES, this.playTimeMs);
     item.setDepth(5);
-    item.onCollected = (collected) => this.player.applyItem(collected);
+    item.onCollected = (collected) => {
+      this.sfx.play('sfx-item-pickup');
+      this.player.applyItem(collected);
+    };
     this.items.push(item);
   }
 
@@ -291,6 +308,8 @@ export class GameScene extends Phaser.Scene {
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
     this.player.callbacks.onHpChange = undefined;
     this.player.callbacks.onStatsChange = undefined;
+    this.player.callbacks.onShoot = undefined;
+    this.player.callbacks.onHurt = undefined;
     for (const item of this.items) item.onCollected = undefined;
     this.items = [];
     this.pendingDrops = [];
