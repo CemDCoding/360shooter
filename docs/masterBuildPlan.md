@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-25 · M0, M1, M2 abgenommen (M0-DEP, M1-DEP, M2-DEP am PC und iPhone) · laufender Meilenstein M2b, Welle W2 abgeschlossen, nächste Welle W3 · Rüstung Feuerring in M2b eingeplant (PE-58)
-- **Fertig:** AP-01–AP-15, AP-21–AP-28, AP-38, AP-39, M0-DEP, M1-DEP, M2-DEP (alle in dev). **Bereit:** AP-29, AP-30, AP-37a (W3). **Offen:** AP-31, AP-34, AP-37c (W4), AP-32, AP-33, AP-35 (W5), AP-36 (W6), M2b-DEP (W7), AP-16–AP-20, M3-DEP.
-- **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach M2b W1 und W2 nicht neu gemessen, der Lead hat keinen Wert gemeldet. Vor W1 war M2b auf ca. 11–12 Fenster geschätzt (§14).
-- **Unterbrochen oder laufend:** Keine laufende Arbeit, keine Unterbrechung gemeldet. Hauptcheckout steht auf `dev`, Plan-Commits nur auf `dev` (siehe §18). Der Lead pusht `dev` nach dem Plan-Commit von M2b W2 (Merges AP-27, AP-28, AP-39).
-- **Erkenntnisse:** AP-30 muss doubleShot, shield, rapidFire echt umsetzen (AP-25 hat `applyItem` nur minimal angepasst). AP-35 setzt die zwei `it.skip`-Tests aus AP-27 neu auf. AP-29 braucht eine gemeinsame Preisfunktion. `MAX_GOLD` liegt in `storage.ts`, Ortsfrage in §16. AP-39: `AimInput` mit 4. Parameter `StickSource`, `targetAngle` jeden Frame lesen. AP-39 brauchte Review Runde 2 (Stick nach Pause „gehalten“). Details §18.
-- **Nächster Schritt:** Lead startet W3 (AP-29 Logik Wirtschaft und Upgrades, AP-30 Logik Items, Schild, Dauerfeuer, AP-37a Rüstung Logik). Eigentum geprüft: keine gemeinsame Datei. Nach W3 Typecheck und Tests (§9.2). Handtest iPhone für AP-38 und AP-39 in M2b-DEP, inkl. Pause mit gehaltenem Stick.
-- **Offene Fragen an den Nutzer:** Q-23 (Feuerring: Drop-Chance 2 % je Gegner, Bosse ab M3). Zu bestätigen (angenommen): Boss-Verhalten PE-34 vor M3, Zahlen PE-41, Richtwerte PE-43, PE-44, PE-45, Feuerring-Regeln PE-57. Keine `[K]`-Frage offen. Zwei Vorschläge in §16 brauchen eine Entscheidung: Ort von `MAX_GOLD` (vor W3), Eigentum der Legacy-Tests (vor W6).
+- **Stand:** 2026-10-25 · M0, M1, M2 abgenommen (M0-DEP, M1-DEP, M2-DEP am PC und iPhone) · laufender Meilenstein M2b, Welle W3 abgeschlossen, nächste Welle W4 · Rüstung Feuerring in M2b eingeplant (PE-58)
+- **Fertig:** AP-01–AP-15, AP-21–AP-30, AP-37a, AP-38, AP-39, M0-DEP, M1-DEP, M2-DEP (alle in dev). **Bereit:** AP-31, AP-34, AP-37c (W4). **Offen:** AP-32, AP-33, AP-35 (W5), AP-36 (W6), M2b-DEP (W7), AP-16–AP-20, M3-DEP.
+- **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach M2b W1 bis W3 nicht neu gemessen, der Lead hat keinen Wert gemeldet. Vor W1 war M2b auf ca. 11–12 Fenster geschätzt (§14).
+- **Unterbrochen oder laufend:** Keine laufende Arbeit, keine Unterbrechung gemeldet. Hauptcheckout steht auf `dev`, Plan-Commits nur auf `dev` (siehe §18). Der Lead pusht `dev` nach dem Plan-Commit (Merges AP-29, AP-30, AP-37a).
+- **Erkenntnisse:** AP-37a: Das Lead-Skript akzeptiert nur `AP-<nr>`, Branch und Commit heißen `AP-37` (Werkzeug-Mangel, Vorschlag §16). AP-29: `MAX_GOLD` liegt in `logic/economy.ts` (Entscheidung Lead). AP-30: `computeWeaponStats` ist überladen, AP-31 stellt um, AP-36 räumt auf (Eigentum jetzt in §8 und §12). AP-39: `AimInput` mit 4. Parameter `StickSource`, `targetAngle` jeden Frame lesen. AP-39 brauchte Review Runde 2 (Stick nach Pause „gehalten“). Details §18.
+- **Nächster Schritt:** Lead startet W4 (AP-31 Entities Spielerin, Laser, Münzen; AP-34 HUD Münzen und Power-Anzeige; AP-37c Feuerring-Entity und Pickup-Sprite). Eigentum W4 geprüft, keine gemeinsame Datei. Nach W4 Typecheck und Tests (§9.2). Handtest iPhone für AP-38 und AP-39 in M2b-DEP, inkl. Pause mit gehaltenem Stick.
+- **Offene Fragen an den Nutzer:** Q-23 (Feuerring: Drop-Chance 2 % je Gegner, Bosse ab M3). Zu bestätigen (angenommen): Boss-Verhalten PE-34 vor M3, Zahlen PE-41, Richtwerte PE-43, PE-44, PE-45, Feuerring-Regeln PE-57. Keine `[K]`-Frage offen. Vorschlag §16: Lead-Skript für Buchstaben-IDs (Werkzeug, Entscheidung Nutzer).
 
 <!-- Ende Lagebericht -->
 
@@ -82,7 +82,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 (AP-29, AP-30, AP-37a) `bereit`.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) `bereit`.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -469,7 +469,7 @@ flowchart TD
 | W5 | AP-32 | `src/scenes/MenuScene.ts`, `src/scenes/menu/{UpgradePanel,ConfirmDialog}.ts` (von W4 hierher verschoben, damit W4 drei Pakete hat) |
 | W5 | AP-33 | `src/scenes/{GameScene,ResultScene}.ts` (inkl. Rüstungs-Einbindung in `GameScene`) |
 | W5 | AP-35 | `src/config/{levels,enemies,weapon,items,coins,upgrades}.ts`, `tests/config/*` (ohne `assets`, `maps`, `player`), `tests/logic/balance.test.ts`, `docs/balancing.md` |
-| W6 | AP-36 | `src/contracts/{item,weapon}.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, alte Item-Platzhalter, `docs/guides/*`, `public/assets/LICENSES.md` |
+| W6 | AP-36 | `src/contracts/{item,weapon}.ts`, `src/logic/{items,weapon}.ts`, `tests/logic/{items,weapon,balance,powers}.test.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, alte Item-Platzhalter, `docs/guides/*`, `public/assets/LICENSES.md` |
 
 ---
 
@@ -678,16 +678,16 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-26 | Assets Münzen und neue Items | M2b | ASSET | W1 | M2-DEP (fertig) | M | sonnet (medium) | c26 / agent/AP-26-c26 | fertig |
 | AP-27 | Config Münzen, Upgrades, Items | M2b | SH | W2 | AP-25 | M | sonnet (medium) | c27 / agent/AP-27-c27 | fertig |
 | AP-28 | Spielstand v2 (Gold, Upgrades) | M2b | GAME | W2 | AP-25 | S | sonnet (medium) | c28 / agent/AP-28-c28 | fertig |
-| AP-29 | Logik Wirtschaft und Upgrades | M2b | LOG | W3 | AP-25, AP-27 | M | sonnet (high) | – | bereit |
-| AP-30 | Logik Items, Schild, Dauerfeuer | M2b | LOG | W3 | AP-25, AP-27 | M | sonnet (high) | – | bereit |
-| AP-31 | Entities Spielerin, Laser, Münzen | M2b | GAME | W4 | AP-26, AP-27, AP-29, AP-30 | M | sonnet (medium) | – | offen |
+| AP-29 | Logik Wirtschaft und Upgrades | M2b | LOG | W3 | AP-25, AP-27 | M | sonnet (high) | c29 / agent/AP-29-c29 | fertig |
+| AP-30 | Logik Items, Schild, Dauerfeuer | M2b | LOG | W3 | AP-25, AP-27 | M | sonnet (high) | c30 / agent/AP-30-c30 | fertig |
+| AP-31 | Entities Spielerin, Laser, Münzen | M2b | GAME | W4 | AP-26, AP-27, AP-29, AP-30 | M | sonnet (medium) | – | bereit |
 | AP-32 | Hauptmenü Upgrade-Overlay | M2b | GAME | W5 | AP-27, AP-28, AP-29 | M | sonnet (medium) | – | offen |
-| AP-34 | HUD Münzen, Power- und Rüstungs-Anzeige | M2b | GAME | W4 | AP-25, AP-30, AP-37a, AP-38 | M | sonnet (medium) | – | offen |
+| AP-34 | HUD Münzen, Power- und Rüstungs-Anzeige | M2b | GAME | W4 | AP-25, AP-30, AP-37a, AP-38 | M | sonnet (medium) | – | bereit |
 | AP-33 | Spielszene, Ergebnis mit Gold, Rüstungs-Einbindung | M2b | GAME | W5 | AP-29, AP-30, AP-31, AP-37a, AP-37c, AP-38, AP-39 | L | opus (high) | – | offen |
 | AP-35 | Neu-Balancing M2b | M2b | SH | W5 | AP-27, AP-29, AP-30 | M | sonnet (high) | – | offen |
 | AP-36 | Aufräumen alter Waffen-Items | M2b | SH/ASSET | W6 | AP-26, AP-33, AP-35 | S | sonnet (medium) | – | offen |
-| AP-37a | Rüstung Vertrag, Config und Logik (Feuerring, PE-52, PE-57) | M2b | SH/LOG | W3 | AP-25 | M | sonnet (high) | – | bereit |
-| AP-37c | Rüstung Feuerring-Entity und Pickup-Sprite (PE-52, PE-57) | M2b | GAME/ASSET | W4 | AP-26, AP-37a | M | sonnet (medium) | – | offen |
+| AP-37a | Rüstung Vertrag, Config und Logik (Feuerring, PE-52, PE-57) | M2b | SH/LOG | W3 | AP-25 | M | sonnet (high) | c37 / agent/AP-37-c37 | fertig |
+| AP-37c | Rüstung Feuerring-Entity und Pickup-Sprite (PE-52, PE-57) | M2b | GAME/ASSET | W4 | AP-26, AP-37a | M | sonnet (medium) | – | bereit |
 | AP-38 | Fix iPhone-Darstellung, Mitte und HUD-Lesbarkeit (PE-54) | M2b | GAME/OPS | W1 | keine (M2 abgenommen) | M | sonnet (medium) | c38 / agent/AP-38-c38 | fertig |
 | AP-39 | Virtueller Stick für Touch-Geräten (PE-55) | M2b | GAME | W2 | AP-38 (Datei GameScene, Reihenfolge) | M | sonnet (high) | c39 / agent/AP-39-c39 | fertig |
 | M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36, AP-37a, AP-37c, AP-38, AP-39 | H | – | – | offen |
@@ -1580,7 +1580,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
   3. `src/entities/ArmourPickup.ts`: Muster wie `ItemPickup`, Sprite `item-fire-ring`, Verfall nach `ITEM_RULES.lifetimeMs` (wie Items), `collect()` ruft `onCollected(def)` auf. Eingesammelt wird durch Anschießen (PE-57). Die Zeit kommt von der Szene (pausierbar).
   4. `src/entities/ArmourRing.ts`: Kreis mit dem Radius aus `ArmourDef`, Transparenz 50 %, Tiefe über dem Spielfeld. `show(def)`, `hide()`, `setCenter(x, y)` pro Frame, `destroy()`. Der Ring zeigt nur an. Schaden und Zeit liegen in AP-37a.
   5. Keine Pooling-Pflicht, es gibt höchstens ein Pickup und einen Ring. Listener abmelden, Objekte beim Szenenwechsel zerstören.
-- **Schnittstellen:** Entities für AP-33. Keine Vertragsänderung.
+- **Schnittstellen:** Entities für AP-33. Keine Vertragsänderung. `ARMOURS` nur aus `src/config/armour` importieren, nicht über `src/config/index.ts`. Branch `agent/AP-37-c<n>` und Commit-Betreff `feat(AP-37): …` (Lead-Skript, §18).
 - **Akzeptanzkriterien:**
   - `npm run assets:check` grün, zweiter Generatorlauf ändert nichts
   - Keine Spielwerte und keine Logik in den Entities, nur Anzeige und Aufrufe
@@ -1591,7 +1591,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 - **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
 - **Opus-Grund:** –
 - **Kürzbar bei Budgetnot:** ja (Ring ohne Pulsieren, nur statische Linie; K8)
-- **Commit-Typ:** `feat(AP-37c): add fire ring entity and pickup sprite`
+- **Commit-Typ:** `feat(AP-37): add fire ring entity and pickup sprite` (Lead-Skript, §18)
 
 #### AP-25 – Verträge Gold, Upgrades, Waffen-Items
 
@@ -1779,11 +1779,11 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 - **Nicht anfassen:** `src/entities/{enemies,bosses,ItemPickup}/*`, `src/scenes/*`, `src/logic/*`, `src/config/*`
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
-  1. `Player`: Der Konstruktor bekommt die Upgrade-Werte (`maxHp`, `turnSpeedDegPerSec`, Multiplikatoren) als Parameter, nicht aus der Szene. `takeDamage(n)` läuft zuerst durch `absorbDamage`, der Restwert des Schilds geht über einen Callback. Der Schild zeigt einen halbtransparenten Ring. Treffer lösen nur das sanfte Aufblinken aus (PE-31). `applyItem(def)` ruft `applyPowerItem` auf. Die Feuerrate kommt aus `effectiveFireRate`.
-  2. `LaserPool.fire`: erzeugt je nach `shotPattern` mehrere Laser mit Versatz und Winkel. Jeder Laser hat eigenen Schaden und wird ab `range` entfernt. Ein Laser trifft weiterhin genau ein Ziel (AP-24).
+  1. `Player`: Der Konstruktor bekommt die Upgrade-Werte (`maxHp`, `turnSpeedDegPerSec`, Multiplikatoren) als Parameter, nicht aus der Szene. `takeDamage(n)` läuft zuerst durch `absorbDamage`, der Restwert des Schilds geht über einen Callback. Der Schild zeigt einen halbtransparenten Ring. Treffer lösen nur das sanfte Aufblinken aus (PE-31). `applyItem(def)` ruft `applyPowerItem` auf. Die Feuerrate kommt aus `effectiveFireRate`. `tickPowers(state, dtMs)` pro Frame mit der pausierbaren Spielzeit. Nach jeder Änderung des Power-Zustands `computeWeaponStats(base, factors, powers)` neu rechnen. Alte Aufrufe entfernen: `applyItem` aus `logic/items`, `emptyStacks` und die alte Signatur von `computeWeaponStats` (Rest in `Player.ts`).
+  2. `LaserPool.fire`: erzeugt je nach `shotPattern(stage)` (AP-30) mehrere Laser: `offsetPx` seitlich zur Zielrichtung, `angleDeg` relativ dazu. Jeder Laser hat eigenen Schaden und wird ab `range` entfernt. Ein Laser trifft weiterhin genau ein Ziel (AP-24).
   3. `Coin` und `CoinPool`: Münze an der Gegnerposition, Größe nach `coinSizeFor`, Drehanimation. `update(dtMs, player)` nutzt `coinMagnetStep`. `collect` ruft `onCollected(value)` auf. Keine Lebensdauer (Q-17, bestätigt). Laser gehen durch Münzen.
   4. Pooling wie bei den Gegnern, Listener abmelden.
-- **Schnittstellen:** nutzt AP-29 und AP-30. Stellt `Player`, `LaserPool` und `CoinPool` für AP-33 bereit.
+- **Schnittstellen:** nutzt AP-29 und AP-30. Stellt `Player`, `LaserPool` und `CoinPool` für AP-33 bereit. Ist-API: siehe §18 (Erkenntnisse AP-29, AP-30). `takeDamage` läuft über `absorbDamage`, bevor die HP abgerechnet werden.
 - **Akzeptanzkriterien:**
   - Spielwerte nur aus Config, keine Logik in den Entities außer Aufrufen
   - Schild-Reihenfolge wie in AP-30, Checks grün
@@ -1842,7 +1842,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
   3. Layout respektiert die Safe-Area (AP-13). Keine Schadenszahlen (PE-31).
   4. Pause-Taste bleibt. Layout-Werte als lokale Konstanten, mit Kennzeichnung als Kandidaten für die Config.
   5. Listener beim Szenenwechsel abmelden.
-- **Schnittstellen:** nutzt die Events aus AP-25, die Typen aus AP-30 und AP-37a (`ActiveArmour`, `armour-changed`). Keine Vertragsänderung.
+- **Schnittstellen:** nutzt die Events aus AP-25, die Typen aus AP-30 und AP-37a (`ActiveArmour`, `armour-changed`). Keine Vertragsänderung. Ist-API: `ActivePowers` hat kein Schild-Stufenfeld. Die Stufe ergibt sich aus `shieldLeft` und `perStack`, `shieldLeft` ist auf `maxStacks × perStack` gedeckelt. `ActiveArmour` hat `activeMsLeft` und `cooldownMsLeft` (§18).
 - **Akzeptanzkriterien:**
   - Zahlen und Anzeigen aktualisieren sich live, Schildbalken leert sich, Dauerfeuer-Anzeige verschwindet nach Ablauf
   - Feuerring-Anzeige zeigt Aktivzeit, danach Abklingzeit, und verschwindet nach der Abklingzeit
@@ -1875,7 +1875,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
   7. `ResultScene` zeigt die gesammelten Münzen, den Anteil (100 % oder 50 %) und das Gold gesamt.
   8. Rüstung (PE-52, PE-57): Beim Tod eines Gegners zusätzlich `rollArmourDrop` aus AP-37a. Bei Erfolg erscheint ein `ArmourPickup` (AP-37c). Eingesammelt wird es durch einen Treffer wie bei Items. Die Aufnahme ruft `activateArmour` auf und sendet `armour-changed`. Während aktiver Rüstung oder Abklingzeit hat sie keine Wirkung.
   9. Jeder Frame: `tickArmour` mit dem Delta der pausierbaren Spielzeit (`playTimeMs`). `ArmourRing.setCenter` folgt der Spielerin. Ringschaden über `ringDamageFor` an Gegner im Radius, der Tod läuft über den bestehenden Todespfad. Bosse nehmen in M2b keinen Ringschaden (Q-23). Beim Rundenstart und Rundenende `resetArmour()`.
-- **Schnittstellen:** nutzt AP-29, AP-30, AP-31, AP-37a, AP-37c. Keine Vertragsänderung.
+- **Schnittstellen:** nutzt AP-29, AP-30, AP-31, AP-37a, AP-37c. Keine Vertragsänderung. Ist-API (§18): `tickArmour(state, dtMs, def)` mit `def` als drittem Parameter, `isInRing(def, cx, cy, tx, ty, tr)`, `ARMOURS` nur aus `src/config/armour`. `computeWeaponStats(base, factors, powers)`, `tickPowers` pro Frame, `absorbDamage` vor der HP-Abrechnung.
 - **Akzeptanzkriterien:**
   - Gold erscheint im Ergebnis, Niederlage zahlt 50 %
   - Feuerring-Handtest (M2b-DEP): Pickup aktiviert 5 s, Ring tötet Gegner im Radius, Pause friert die Zeit ein, Rundenende setzt zurück
@@ -1906,6 +1906,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
   3. `docs/balancing.md`: Abschnitt „Gold und Upgrades“ und eine neue Kennzahl-Tabelle, in einfacher Sprache.
   4. Im Bericht nennen: alle vier Upgrades auf Stufe 10 kosten zusammen etwa 2 800 Gold (Q-15).
   5. `tests/logic/balance.test.ts`: Schwelle für Level 20 (`pressure` > 0,8) auf mindestens 0,9 anheben (Review AP-23, Ist-Wert 0,96). Die zwei `it.skip`-Fälle aus AP-27 (`items raise dps step by step`, `level 20 is demanding but fair`) setzt AP-35 neu auf, auf die Werte nach dem Neu-Balancing. Nicht löschen (Auftrag Lead, 2026-10-25). `tests/config/items.test.ts` (prüft `WEAPON_BASE.fireRatePerSec`) gehört bereits zu AP-27 und AP-35. Bei Änderungen an `weapon.ts` dort mit anpassen.
+  6. `src/config/upgrades.ts`: Kommentar „Effekt je Stufe: multiplikativ (Faktor je Stufe) oder additiv“ auf „Zuwachs je Stufe, additiv aufsummiert“ klarstellen, Werte unverändert (Befund Lead, Wellenabschluss M2b W3). Die Logik rechnet `1 + perLevel × Stufe`.
 - **Schnittstellen:** nur Config, keine Vertragsänderung.
 - **Akzeptanzkriterien:**
   - Tests grün, Zahlen in der Doku stimmen mit der Config überein
@@ -1922,16 +1923,17 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 
 - **Meilenstein, Lane, Welle:** M2b · SH/ASSET · W6
 - **Ziel:** Die alten Item-Typen (Feuerrate, Schaden, Größe) und ihre Platzhalter-Sprites entfernen. Verträge und Doku bereinigen.
-- **Pflichtlektüre:** PE-42, `src/contracts/{item,weapon}.ts`, `src/config/assets.ts`, `docs/guides/*`
+- **Pflichtlektüre:** PE-42, `src/contracts/{item,weapon}.ts`, `src/logic/{items,weapon,powers}.ts` (Ist-Stand), `src/config/assets.ts`, `docs/guides/*`
 - **Abhängigkeiten:** AP-26, AP-33, AP-35 (alle Nutzer sind umgestellt)
 - **Parallel möglich mit:** – (W6 enthält nur dieses Paket)
-- **Dateien (Eigentum):** `src/contracts/{item,weapon}.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, `public/assets/sprites/item-{fire-rate,damage,size}-*.png` (nur Platzhalter), `public/assets/LICENSES.md`, `docs/guides/*` (nur Tabellen)
+- **Dateien (Eigentum):** `src/contracts/{item,weapon}.ts`, `src/logic/{items,weapon}.ts`, `tests/logic/{items,weapon,balance,powers}.test.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, `public/assets/sprites/item-{fire-rate,damage,size}-*.png` (nur Platzhalter), `public/assets/LICENSES.md`, `docs/guides/*` (nur Tabellen)
 - **Nicht anfassen:** übrige Dateien. Designer-Dateien werden nie gelöscht.
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
-  1. `ItemEffect` nur noch `doubleShot` | `shield` | `rapidFire` | `heal`. Alte Felder in `WeaponStacks` entfernen, soweit ungenutzt (Suche im Repo vor dem Entfernen).
+  1. `ItemEffect` nur noch `doubleShot` | `shield` | `rapidFire` | `heal`. Alte Felder in `WeaponStacks` entfernen, soweit ungenutzt (Suche im Repo vor dem Entfernen). Legacy-Pfade entfernen: `applyItem` (alt, für `fireRate`, `damage`, `size`) in `logic/items`, `emptyStacks`, `legacyStats` und die alte Signatur in `computeWeaponStats`, die `legacy()`-Fälle in den Tests. Nutzt `tests/logic/balance.test.ts` oder `tests/logic/weapon.test.ts` noch die alte Signatur, stellt AP-36 sie um (Planner-Ergänzung, §18).
   2. Manifest: Einträge `item-fire-rate`, `item-damage`, `item-size` entfernen. Platzhalter-Dateien nur löschen, wenn sie in `.placeholders.json` stehen. Geänderte Designer-Dateien bleiben liegen und werden im Bericht genannt.
   3. Die Tabellen in beiden Anleitungen anpassen.
+  4. Optional (Review AP-30, niedrig): In `src/logic/items.ts` die Zahl 2 in `Math.min(def.maxStacks, 2, …)` durch `MAX_DOUBLE_SHOT_STAGE` aus `src/logic/powers.ts` ersetzen. Im Dauerfeuer-Test in `tests/logic/powers.test.ts` das Literal 5000 durch eine benannte Größe ersetzen.
 - **Schnittstellen:** keine neue Schnittstelle.
 - **Akzeptanzkriterien:**
   - Keine Verweise auf die alten Namen mehr (Suche im Repo)
@@ -2366,9 +2368,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Arena-Auflösung als Konstante `GAME_SIZE` (640×360) | `ARENA_CENTER` (320,180) steht lokal in `Enemy.ts` und ist nur per `ctx.center` überschreibbar. Die Zahl steckt damit an zwei Stellen. Vorschlag: Konstante in `src/config` anlegen und von Gegnern, Spielszene und Kamera nutzen. Eigentum: AP-15 (`src/config`), AP-10 nutzt sie nur. Alternativ AP-10 übernimmt es, bräuchte aber Config-Freigabe | Erkenntnis AP-09, Hinweis aus Review | Lead (Wellenabschluss M1 W2) |
 | Prüfung LICENSES.md (Vorschlag) | Ein Prüfpunkt oder Test, der `public/assets/LICENSES.md` auf Vollständigkeit gegen das Asset-Manifest prüft (jeder Eintrag einmal, Datei nicht leer). Heute prüft `assets:check` die Datei nicht. Vorschlag: eigenes kleines Paket nach M2b oder Erweiterung von `tests/config/assets.test.ts` in einem späteren Asset-Paket. Entscheidung Nutzer | Review-Befund AP-26 (Datei durch Prettier-Pipe geleert) | Lead (Wellenabschluss M2b W1) |
 | `ActivePowers.doubleShotStage` (Typ-Schärfung) | AP-25 spezifiziert `0–2`, Ist-Typ ist `number`. Vorschlag: auf `0 \| 1 \| 2` schärfen. Eigentum: `src/contracts/weapon.ts` (AP-25-Datei), nur mit Freigabe und vor AP-30 | Review-Hinweis AP-38, niedrig | Lead (Wellenabschluss M2b W1) |
-| `MAX_GOLD` Ort (vor W3) | `MAX_GOLD` (1e9) steht in `src/platform/storage.ts`, nicht in `src/config`. AP-29 (`src/logic/economy.ts`) braucht den Wert. Ein Import aus `platform` in `logic` sollte vermieden werden (Schichtung §4, PE-21). Optionen: (a) AP-29 importiert aus `storage.ts`, keine Änderung an fertigen Dateien; (b) Konstante nach `src/contracts/save.ts` verschieben (wie `MAX_UPGRADE_LEVEL` in `contracts/upgrade.ts`), dann berühren `storage.ts` und `save.ts` fertige Dateien. Empfehlung des Planners: (a), falls der Test der Logik ohne Browser-API läuft, sonst (b) | Erkenntnis AP-28 (Ist-Stand) | Planner (Pflege, Wellenabschluss M2b W2) |
-| AP-36 `Dateien (Eigentum)` (vor W6) | `tests/logic/items.test.ts` ergänzen oder die Legacy-Hilfe (fireRate, damage, size, AP-27) von AP-30 streichen lassen. AP-36 besitzt die Datei nicht, und die Hilfe hängt an den Effekten, die AP-36 entfernt. Empfehlung des Planners: AP-30 streicht die Hilfe, weil es die Datei in W3 ohnehin besitzt und die alte Logik ersetzt | Erkenntnis AP-27, Eigentumslücke | Planner (Pflege, Wellenabschluss M2b W2) |
 | §11 Abhängigkeitsgraph | Kanten AP-29 → AP-35 und AP-30 → AP-35 ergänzen. §10 nennt beide Abhängigkeiten, der Graph zeigt nur AP-27 → AP-35. Keine Auswirkung auf die Wellen, AP-35 ist W5 | Prüfung Eigentum und Wellen W3 | Planner (Pflege, Wellenabschluss M2b W2) |
+| Lead-Skript: Paket-IDs mit Buchstabe (Werkzeug) | Das Skript akzeptiert im Branch und im Commit-Betreff nur `AP-<nr>`. AP-37a und AP-37c werden deshalb als `AP-37` geführt (`agent/AP-37-c<n>`, `feat(AP-37): ...`). Vorschlag: das Skript auf `AP-<nr>[a-z]?` erweitern, danach gelten Branch und Commit-Betreff wie im Paket (`feat(AP-37c): ...`). Bis zur Entscheidung bleibt das Workaround-Schema. Nicht geändert, Werkzeug-Mangel für den Nutzer | Befund Wellenabschluss M2b W3 (AP-37a) | Lead (Wellenabschluss M2b W3) |
 
 #### Verbesserungsplan Wellenkonzept (Entwurf, nicht freigegeben)
 
@@ -2555,3 +2556,10 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-25 | Erkenntnis AP-28: `parseSave` liefert immer `version` 2, auch für v1-Stände (sie werden beim Lesen gehoben). `SAVE_KEY` bleibt `360shooter.save.v1`. `MAX_GOLD` ist in `src/platform/storage.ts` definiert und exportiert, nicht in `src/config` (AP-27 hat es dort nicht angelegt). `SaveGame.gold` und `SaveGame.upgrades` sind im Typ optional, nach `loadSave` und `defaultSave` immer gesetzt | Wellenabschluss M2b W2 | AP-29 (MAX_GOLD), AP-32, AP-33 | Lead (Pflege) |
 | 2026-10-25 | Erkenntnis AP-39 (Ist-Code): `AimInput` bekommt als 4. Parameter `StickSource`. `targetAngle` ist ein Getter mit Seiteneffekt (er berechnet `resolveAim` neu) und muss jeden Frame gelesen werden. Tippen innerhalb der Stick-Basis zielt nie. Der Stick nutzt `input.addPointer(2)`. Review Runde 1 nicht bestanden: Der Stick blieb nach einer Pause „gehalten“, und das Ziel sprang nach dem Loslassen auf den alten Tipp-Winkel. Fix b30d435 setzt den Stick bei Pause zurück und hält den Winkel nach dem Loslassen. Runde 2 bestanden. PAUSE- und RESUME-Verdrahtung hat keinen Unit-Test, der Handtest in M2b-DEP prüft sie (inkl. Pause mit gehaltenem Stick) | Wellenabschluss M2b W2 | AP-33 (AimInput-Schnittstelle, Stick), M2b-DEP | Lead (Pflege) |
 | 2026-10-25 | Lead-Auftrag: §9 M2b-DEP um einen Handtest-Punkt ergänzt (Pause mit gehaltenem Stick). §12 AP-29: eine Preisfunktion (`upgradeCost`), keine zweite Formel (Hinweis Review AP-27); MAX_GOLD-Ort offen (§16). §12 AP-35: die zwei `it.skip`-Tests aus AP-27 werden neu aufgesetzt. Keine Änderung an §2, §4, §5 | Lead-Auftrag Wellenabschluss M2b W2 | AP-29, AP-35, M2b-DEP | Planner (Pflege) |
+| 2026-10-25 | Wellenabschluss M2b W3: AP-29 (merge 7a3faa0, Coder c29), AP-30 (merge bf40477, Coder c30) und AP-37a (merge 08be401, Coder c37) gemergt. Review Runde 1 bestanden bei allen drei. Checks auf dev grün: 246 Tests bestanden, 2 übersprungen (AP-35), 36 Dateien, lint, typecheck, build, assets:check. AP-29, AP-30, AP-37a `fertig`. AP-31, AP-34, AP-37c `bereit` (W4). Eigentum W4 geprüft (§8, §12): keine gemeinsame Datei, alle Abhängigkeiten `fertig`, keine Kante innerhalb W4, drei Pakete je Welle (PE-15) | Wellenabschluss M2b W3 | AP-29, AP-30, AP-31, AP-34, AP-37a, AP-37c | Lead (Pflege) |
+| 2026-10-25 | Erkenntnis AP-37a (Werkzeug): Das Lead-Skript akzeptiert nur `AP-<nr>` im Branch und Commit-Betreff. Paket-IDs mit Buchstaben (AP-37a, AP-37c) werden als `AP-37` geführt. Für AP-37c gilt dasselbe: Branch `agent/AP-37-c<n>` mit eindeutiger Coder-Nr. (z. B. c371), Commit-Betreff `feat(AP-37): ...`. §12 AP-37c (Schnittstellen, Commit-Typ) entsprechend ergänzt. Werkzeug-Mangel für den Nutzer, Vorschlag §16, nicht geändert | Wellenabschluss M2b W3 | AP-37c, Lead-Skript | Lead (Pflege) |
+| 2026-10-25 | Erkenntnis AP-37a (Ist-API): `tickArmour(state, dtMs, def)` hat `def` als dritten Parameter, weil `ActiveArmour` keine Cooldown-Dauer hält. Überschuss-dt nach Ablauf der Aktivzeit zählt auf die Abklingzeit. `isInRing(def, cx, cy, tx, ty, tr)`. `rollArmourDrop(rng, rules)` ist `rng.next() < dropChance`. Event `GameEvents.ArmourChanged` (Payload `ActiveArmour`). `ARMOURS` und `ARMOUR_RULES` sind nicht in `src/config/index.ts` re-exportiert (nicht im Eigentum), direkter Import aus `src/config/armour`. AP-33, AP-34, AP-37c müssen das beachten (Hinweise in §12 ergänzt) | Wellenabschluss M2b W3 | AP-33, AP-34, AP-37c | Lead (Pflege) |
+| 2026-10-25 | Erkenntnis AP-29 (Ist-API): `MAX_GOLD` (1_000_000_000) liegt in `src/logic/economy.ts`. Entscheidung Lead: Logik importiert nie aus `platform`, dafür ein Gleichheitstest gegen `src/platform/storage.ts`. Der Vorschlag dazu in §16 ist damit erledigt. `upgradeFactors` rechnet multiplikativ als `1 + perLevel × Stufe` (Stufe 10 = 2,0, vom Reviewer bestätigt, PE-41). Der Kommentar „Faktor je Stufe“ in `src/config/upgrades.ts` ist mehrdeutig, Klarstellung „Zuwachs je Stufe, additiv aufsummiert“ in AP-35 (Schritt 6). `upgradeCost(_track, level)` ignoriert die Spur. `coinMagnetStep(coin, player, dtMs, rules)` gibt `{x, y, collected}`, außerhalb des Magnetradius bleibt die Münze unverändert. Exporte: `Point`, `MagnetResult`, `UpgradeFactors`. `gold` und `upgrades` im SaveGame sind optional, die Funktionen behandeln fehlende Werte als 0 | Wellenabschluss M2b W3 | AP-31, AP-32, AP-33, AP-35 | Lead (Pflege) |
+| 2026-10-25 | Erkenntnis AP-30 (Ist-API): `computeWeaponStats` ist überladen. Neu `(base, WeaponFactors, ActivePowers)`, alt `(base, stacks, itemDefs)` wird per `Array.isArray` erkannt (`@deprecated`). AP-31 entfernt die Nutzung der alten Signatur in `Player.ts`. AP-36 entfernt sie samt `legacyStats`, `applyItem` (alt), `emptyStacks` und den `legacy()`-Fällen. Die alte Signatur wird noch genutzt in `tests/logic/balance.test.ts` (AP-35 stellt um) und in `tests/logic/weapon.test.ts` (Planner-Prüfung, nicht im Auftrag genannt, AP-36 ergänzt). `ActivePowers` hat kein Schild-Stufenfeld, die Stufe kommt aus `shieldLeft` und `perStack`, `shieldLeft` ist auf `maxStacks × perStack` gedeckelt. `doubleShotStage` wird in der Logik auf 0..2 geklemmt, der Vertragstyp bleibt `number`. Der vorgeschlagene Typ `0 \| 1 \| 2` (§16) bleibt offen. AP-36 besitzt `src/contracts/weapon.ts`, es wäre dort möglich. Neue Exporte: `emptyPowers`, `absorbDamage`, `tickPowers`, `shotPattern`, `effectiveFireRate`, `isRapidFireActive`, `clampStage`, `applyPowerItem`, `WeaponFactors`. AP-31 muss `tickPowers` mit dtMs der pausierbaren Spielzeit aufrufen, `absorbDamage` vor der HP-Abrechnung, `shotPattern(stage)` nutzen (`offsetPx` seitlich zur Zielrichtung, `angleDeg` relativ) und `computeWeaponStats` bei Änderung des Power-Zustands neu berechnen | Wellenabschluss M2b W3 | AP-31, AP-35, AP-36 | Lead (Pflege) |
+| 2026-10-25 | Lead-Auftrag: Eigentum AP-36 in §8 und §12 eingetragen: `src/logic/{items,weapon}.ts`, `tests/logic/items.test.ts`, `tests/logic/balance.test.ts`. Planner-Ergänzung: `tests/logic/weapon.test.ts` (alte Signatur und `emptyStacks`) und `tests/logic/powers.test.ts` (Dauerfeuer-Test mit Literal 5000). W6 enthält nur AP-36, daher keine Konflikte. Optional aus Review AP-30 (niedrig): `Math.min(def.maxStacks, 2, …)` in `items.ts` durch `MAX_DOUBLE_SHOT_STAGE` ersetzen, Literal 5000 ersetzen (§12 AP-36, Schritt 4). Der Vorschlag „AP-36 Dateien (Eigentum)“ in §16 ist damit erledigt und entfernt | Lead-Auftrag Wellenabschluss M2b W3, Review AP-30 | AP-36, §8, §12, §16 | Lead (Pflege) |
+| 2026-10-25 | Lead-Auftrag: AP-35 um Schritt 6 ergänzt (Klarstellung „Faktor je Stufe“ in `src/config/upgrades.ts`). Ist-API-Hinweise in §12 bei AP-31, AP-33, AP-34, AP-37c (Schnittstellen). Commit-Typ AP-37c auf `feat(AP-37)` (Lead-Schema). Der Vorschlag zu `MAX_GOLD` (§16) ist entschieden und entfernt | Lead-Auftrag Wellenabschluss M2b W3 | AP-31, AP-33, AP-34, AP-35, AP-36, AP-37c | Lead (Pflege) |
