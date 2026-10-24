@@ -18,6 +18,7 @@ import { Enemy } from '../entities/enemies/Enemy';
 import { WitchBolt } from '../entities/enemies/WitchBolt';
 import { WitchBoltPool } from '../entities/enemies/WitchBoltPool';
 import { pointOnRing } from '../logic/geometry';
+import { canLaserDestroyBolt } from '../logic/projectiles';
 import { rollDrop } from '../logic/items';
 import { applyRoundResult, roundXp, type RoundResult } from '../logic/progression';
 import { createRng, type Rng } from '../logic/rng';
@@ -187,6 +188,22 @@ export class GameScene extends Phaser.Scene {
       if (!item || !laser || !item.active || !laser.active || this.ended) return;
       this.lasers.release(laser);
       item.collect();
+    });
+    // Laser vs enemy projectile: both are removed, one laser hits one target (PE-37).
+    this.physics.add.overlap(this.boltPool.bolts, this.lasers.group, (a, b) => {
+      const bolt = pick(a, b, WitchBolt);
+      const laser = pick(a, b, Laser);
+      if (!bolt || !laser || !bolt.active || !laser.active || this.ended) return;
+      const lb = laser.body as Phaser.Physics.Arcade.Body;
+      const bb = bolt.body as Phaser.Physics.Arcade.Body;
+      const hit = canLaserDestroyBolt(
+        { active: laser.active, x: lb.center.x, y: lb.center.y, radius: lb.halfWidth },
+        { active: bolt.active, x: bb.center.x, y: bb.center.y, radius: bb.halfWidth },
+      );
+      if (!hit) return;
+      this.lasers.release(laser);
+      bolt.despawn();
+      this.sfx.play('sfx-hit');
     });
     // Witch bolt vs player.
     this.physics.add.overlap(this.player, this.boltPool.bolts, (a, b) => {
