@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-24 · Wellenabschluss M2 W1 · M0, M1 und M2 W1 technisch komplett in dev, M0-DEP und M1-DEP offen
-- **Fertig:** AP-01–AP-13 und AP-21 (alle in dev). **Bereit:** M1-DEP ([Mensch], Abnahme M1), AP-14 und AP-15 (M2 W2). **Offen:** AP-16–AP-20; M0-DEP, M2-DEP, M3-DEP `offen`
-- **Budget:** Team-Budget ca. 29 % (Zielwert 30 %). M2 W2 erst nach Prüfung des Budgets (§14) starten.
+- **Stand:** 2026-10-24 · Wellenabschluss M2 W2 · M2 (AP-11–AP-15) technisch komplett in dev, Abnahmen M0-DEP, M1-DEP und M2-DEP offen
+- **Fertig:** AP-01–AP-15 und AP-21 (alle in dev). **Bereit:** M1-DEP und M2-DEP ([Mensch]). **Offen:** AP-16–AP-20, M0-DEP `offen`, M3-DEP `offen`
+- **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach W2 nicht neu gemessen.
 - **Unterbrochen oder laufend:** nichts
-- **Erkenntnisse:** Checks auf dev grün (136/136 Tests in 21 Dateien). Nicht im Browser getestet: Optik und iPhone-Verhalten (Teil von M1-DEP und M2-DEP, Handtest H-03). Details §18.
-- **Nächster Schritt:** Nutzer: PR `dev` nach `stage`, Smoke-Test M1-DEP (§9.2), PR `stage` nach `master`; M0-DEP ebenfalls offen. Danach Budgetprüfung, dann Lead startet M2 W2. Autonomie bis M2 vom Nutzer freigegeben (PE-15).
-- **Offene Fragen an den Nutzer:** M0-DEP-Abnahme steht aus ([Mensch]). M1-DEP nach Smoke-Test ([Mensch]). Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen.
+- **Erkenntnisse:** Checks auf dev grün (151/151 Tests in 23 Dateien; lint, typecheck, build, assets:check, `npm audit` 0). Nicht im Browser oder auf dem iPhone getestet: Optik, Ton, Safe-Area, Balancing (Teil von M1-DEP und M2-DEP, Handtest H-03). Details §18.
+- **Nächster Schritt:** Nutzer: Abnahmen M1-DEP und M2-DEP (PR `dev` nach `stage`, Smoke-Test PC und iPhone, PR `stage` nach `master`); M0-DEP ebenfalls offen. Die Autonomie des Leads bis M2 (PE-15) ist erfüllt. M3 (AP-16 ff.) startet erst nach Rückmeldung des Nutzers.
+- **Offene Fragen an den Nutzer:** Abnahmen M0-DEP, M1-DEP und M2-DEP ([Mensch]). Boss-Verhalten PE-34 vor M3-Freigabe bestätigen. Coverage-Werkzeug freigeben? Arena-Konstante `GAME_SIZE` anlegen? (§16 Vorschläge). Balancing nach dem Handtest nachjustieren?
 
 <!-- Ende Lagebericht -->
 
@@ -528,6 +528,12 @@ flowchart TD
   - [ ] iPhone: Homescreen-App startet im Vollbild, Steuerung per Finger, Hochformat zeigt „bitte drehen“
   - [ ] Sounds hörbar, Stummschalten wirkt und bleibt gespeichert
   - [ ] Fortschritt bleibt nach Neuladen erhalten, „Zurücksetzen“ löscht ihn
+  - [ ] Gegner auf den Platzhalter-Kacheln sind auf dem Handy in allen drei Batches gut lesbar
+  - [ ] Overlay „Bitte drehen“ erscheint im Hochformat, im Querformat spielt es sich normal
+  - [ ] iPhone mit Notch: Safe-Area stimmt, nichts liegt unter der Notch
+  - [ ] Stumm-Taste bleibt nach Neuladen erhalten
+  - [ ] Ton auf dem iPhone ist nach dem ersten Antippen hörbar
+  - [ ] Balancing-Handtest: Level 0 gut schaffbar, Level 20 nur mit Items. Bei Abweichung nachjustieren laut `docs/balancing.md`
 
 #### M3 – Bosse
 
@@ -573,9 +579,9 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-11 | Hauptmenü und Fortschritt | M2 | GAME | W1 | M1 | M | sonnet (medium) | c11 / agent/AP-11-c11 | fertig |
 | AP-12 | Maps je Batch | M2 | GAME | W1 | M1 | M | sonnet (medium) | c12 / agent/AP-12-c12 | fertig |
 | AP-13 | PWA und Querformat | M2 | OPS | W1 | M1 | M | sonnet (medium) | c13 / agent/AP-13-c13 | fertig |
-| AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | – | bereit |
-| AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | – | bereit |
-| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | offen |
+| AP-14 | Sound-Anbindung und Stummschalten | M2 | GAME | W2 | AP-11, AP-12 | S | sonnet (medium) | c14 / agent/AP-14-c14 | fertig |
+| AP-15 | Balancing Level 0–20 | M2 | SH | W2 | M1 | M | sonnet (high) | c15 / agent/AP-15-c15 | fertig |
+| M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W3 | AP-14, AP-15 | H | – | – | bereit |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2 | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -1676,3 +1682,5 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-24 | Erkenntnis AP-11, niedrig: Der Hover bleibt nach einem Touch-Tap bis `pointerout` stehen. `Button` löst `pointerup` auch ohne vorheriges `pointerdown` aus | Wellenabschluss M2 W1 | AP-14 (Stumm-Taste im Menü), künftige Button-Nutzung | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis AP-12: Tileset-Frame 0 ist Boden, Frames 1..n sind Deko (das Manifest nennt 4 Frames je Tileset). `TILE_PX` = 32 ist im Code fest eingetragen, Designer-Sheets mit anderer Frame-Größe hinterlassen Lücken. Seed je Level `levelId*7919+1`, Tiefe -100. Partikel höchstens 30 (Nacht 24, Elfenwald 30). Vignette als gecachte Canvas-Textur. Platzhalter-Kacheln sind deckend mit Hash-Farben, Gegner-Lesbarkeit mit Platzhaltern per Handy-Smoke-Test prüfen | Wellenabschluss M2 W1 | M2-DEP, AP-15 (Konstanten), künftige Tilesets | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis AP-13: Kein Service Worker, kein Offline-Betrieb (steht im README). `preview:lan` = `build` und danach `vite preview --host`, die IP steht unter „Network:“. Das Inline-Script blockiert `gesturestart`, `gesturechange` und `contextmenu`; bei einer späteren CSP ist ein Hash nötig. Das Overlay „Bitte drehen“ erscheint auch in schmalen Desktop-Fenstern, das Spiel pausiert dabei nicht (Kandidat für ein späteres Paket). Bei neuem Icon das Symbol vom Homescreen löschen und neu hinzufügen. Safe-Area-Padding auf `#game` mit `Scale.FIT` ist nur am iPhone mit Notch prüfbar (H-03) | Wellenabschluss M2 W1 | M2-DEP, künftige CSP | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-14: `getSoundService(game)` liefert einen Service pro Game. Das Event `mute-changed` läuft über `game.events`. `addMuteButton(scene,x,y)` in `audio.ts` (32×32, `ui-icons` Frame 1 Ton an, 2 Ton aus). MenuScene ruft `reload()` nach dem Reset. Laser-Drosselung 80 ms, BASE_VOLUME 0,5. Lokal in GameScene `HURT_SOUND_GAP_MS` = 250 (Kandidat für Config). Eine Scene darf kein privates Feld `sound` nennen (kollidiert mit `Phaser.Scene.sound`), das Feld heißt `sfx`. Sound-Keys in Szenen sind String-Literale. `setMuted` überschreibt einen korrupten Save mit dem defaultSave (Randfall) | Wellenabschluss M2 W2 | AP-15 (Config-Kandidat), M2-DEP (Ton-Test am iPhone) | Lead (Pflege) |
+| 2026-10-24 | Erkenntnis AP-15: Kennzahl „Druck“ = Gegner-HP/s geteilt durch Basis-DPS 30. Werte: Level 0 0,36; Level 4 0,58; Level 5 0,71 (+22 %); Level 10 1,12 (+17 %); Level 20 1,59. Volle Items ca. 4,5× DPS (135). Spawn-Intervall und Max-Gegner jetzt als Tabellen pro Level (21 Einträge) in `levels.ts`. `WEAPON_BASE.fireRatePerSec` von 2 auf 3. Die Kennzahlentabelle in `docs/balancing.md` ist handkopiert und kann beim Nachjustieren veralten. Die Obergrenze `maxEnemies` (kein Nachholen) fließt nicht in die Kennzahlen ein, beim Handtest beobachten | Wellenabschluss M2 W2 | M2-DEP (Handtest), `docs/balancing.md` | Lead (Pflege) |
