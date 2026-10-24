@@ -23,8 +23,13 @@ export interface ApplyItemResult {
 /** Returns new stacks (capped at maxStacks); heal leaves stacks unchanged. */
 export function applyItem(stacks: WeaponStacks, def: ItemDef): ApplyItemResult {
   if (def.effect === 'heal') return { stacks: { ...stacks }, heal: def.perStack };
+  const effect = def.effect;
+  // New effects (doubleShot, shield, rapidFire) do not touch WeaponStacks yet (AP-30).
+  if (effect !== 'fireRate' && effect !== 'damage' && effect !== 'size') {
+    return { stacks: { ...stacks }, heal: 0 };
+  }
   const next = { ...stacks };
-  next[def.effect] = Math.min(def.maxStacks, stacks[def.effect] + 1);
+  next[effect] = Math.min(def.maxStacks, stacks[effect] + 1);
   return { stacks: next, heal: 0 };
 }
 
