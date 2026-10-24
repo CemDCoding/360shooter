@@ -7,3 +7,5 @@ export * from './progression';
 export * from './save';
 export * from './events';
 export * from './assets';
+export * from './coin';
+export * from './upgrade';

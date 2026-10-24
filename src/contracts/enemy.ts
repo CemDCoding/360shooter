@@ -22,6 +22,8 @@ export interface EnemyDef {
   contactDamage: number;
   behavior: EnemyBehavior;
   xp: number;
+  /** Muenzwert bei Drop (optional, Standard: Config-Wert) */
+  coinValue?: number;
   spriteKey: string;
   projectile?: EnemyProjectileDef;
   aura?: EnemyAuraDef;

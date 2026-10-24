@@ -1,4 +1,4 @@
-import type { WeaponStacks } from './weapon';
+import type { ActivePowers, WeaponStacks } from './weapon';
 
 export const GameEvents = {
   HpChanged: 'hp-changed',
@@ -6,6 +6,8 @@ export const GameEvents = {
   WeaponChanged: 'weapon-changed',
   RoundEnded: 'round-ended',
   MuteChanged: 'mute-changed',
+  CoinsChanged: 'coins-changed',
+  PowersChanged: 'powers-changed',
 } as const;
 
 export type GameEventName = (typeof GameEvents)[keyof typeof GameEvents];
@@ -16,4 +18,6 @@ export interface GameEventPayloads {
   'weapon-changed': { stacks: WeaponStacks };
   'round-ended': { result: 'won' | 'lost'; xpGained: number };
   'mute-changed': { muted: boolean };
+  'coins-changed': { roundCoins: number };
+  'powers-changed': ActivePowers;
 }
