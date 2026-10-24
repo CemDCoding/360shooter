@@ -1,4 +1,4 @@
-import type { ItemDef, ItemRules, WeaponStacks } from '../contracts';
+import type { ActivePowers, ItemDef, ItemRules, WeaponStacks } from '../contracts';
 import type { Rng } from './rng';
 
 /** Weighted drop: first checks dropChance, then picks a def by dropWeight. */
@@ -31,6 +31,27 @@ export function applyItem(stacks: WeaponStacks, def: ItemDef): ApplyItemResult {
   const next = { ...stacks };
   next[effect] = Math.min(def.maxStacks, stacks[effect] + 1);
   return { stacks: next, heal: 0 };
+}
+
+/** Returns the new power state; unknown/legacy effects and heal leave it unchanged. */
+export function applyPowerItem(state: ActivePowers, def: ItemDef): ActivePowers {
+  switch (def.effect) {
+    case 'doubleShot':
+      return {
+        ...state,
+        doubleShotStage: Math.min(def.maxStacks, 2, Math.max(0, state.doubleShotStage) + 1),
+      };
+    case 'shield':
+      // No stage field in ActivePowers: stage = ceil(shieldLeft / perStack), capped via maxStacks.
+      return {
+        ...state,
+        shieldLeft: Math.min(def.maxStacks * def.perStack, state.shieldLeft + def.perStack),
+      };
+    case 'rapidFire':
+      return { ...state, rapidFireMsLeft: def.durationMs ?? 0 };
+    default:
+      return { ...state };
+  }
 }
 
 export function isExpired(spawnedAtMs: number, nowMs: number, lifetimeMs: number): boolean {
