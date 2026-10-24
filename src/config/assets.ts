@@ -44,6 +44,11 @@ export const ASSETS: readonly AssetDef[] = [
   sprite('item-damage', 16, 16, 2, 'Item: Schaden erhoehen.'),
   sprite('item-size', 16, 16, 2, 'Item: Schussgroesse erhoehen.'),
   sprite('item-heal', 16, 16, 2, 'Item: Heilung.'),
+  sprite('item-double-shot', 16, 16, 2, 'Item: Doppelschuss.'),
+  sprite('item-shield', 16, 16, 2, 'Item: Schutzschild.'),
+  sprite('item-rapid-fire', 16, 16, 2, 'Item: Schnellfeuer.'),
+  sprite('coin-small', 8, 8, 4, 'Kleine Muenze, Drehung in 4 Frames.'),
+  sprite('coin-big', 16, 16, 4, 'Grosse Muenze, Drehung in 4 Frames.'),
   sprite('tiles-forest', 32, 32, 4, 'Map-Kacheln: Wald.'),
   sprite('tiles-forest-night', 32, 32, 4, 'Map-Kacheln: Wald bei Nacht.'),
   sprite('tiles-elf-forest', 32, 32, 4, 'Map-Kacheln: Elfenwald.'),
@@ -55,6 +60,8 @@ export const ASSETS: readonly AssetDef[] = [
   sound('player-hurt', 'Spielerin wird getroffen.'),
   sound('round-won', 'Runde gewonnen.'),
   sound('round-lost', 'Runde verloren.'),
+  sound('coin', 'Muenze eingesammelt.'),
+  sound('shield-break', 'Schutzschild geht kaputt.'),
 ];
 
 /** Animations-Key fuer ein Spritesheet (von PreloadScene angelegt, wenn frames > 1). */

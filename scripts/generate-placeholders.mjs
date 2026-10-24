@@ -114,6 +114,8 @@ const SOUNDS = {
   'sfx-player-hurt': { f0: 200, f1: 100, dur: 0.2, wave: 'saw' },
   'sfx-round-won': { f0: 500, f1: 1000, dur: 0.5, wave: 'sine' },
   'sfx-round-lost': { f0: 400, f1: 100, dur: 0.6, wave: 'sine' },
+  'sfx-coin': { f0: 900, f1: 1500, dur: 0.1, wave: 'square' },
+  'sfx-shield-break': { f0: 700, f1: 150, dur: 0.3, wave: 'saw' },
 };
 function makeWav(spec) {
   const rate = 44100;
