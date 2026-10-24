@@ -25,3 +25,14 @@ export function resolveAim(state: AimState): AimResult {
   }
   return { angleRad: state.lastAngleRad, source: 'hold' };
 }
+
+/**
+ * Pointer angle to keep this frame: a held stick discards the stored tap/mouse angle, so after
+ * release the aim stays at the last stick angle instead of jumping back to an old tap.
+ */
+export function pointerAngleWhileStick(
+  stickHeld: boolean,
+  pointerAngle: number | null,
+): number | null {
+  return stickHeld ? null : pointerAngle;
+}

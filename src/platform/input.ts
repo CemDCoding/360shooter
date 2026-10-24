@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { resolveAim } from '../logic/aimSource';
+import { pointerAngleWhileStick, resolveAim } from '../logic/aimSource';
 import { angleFromCenter } from './angle';
 
 /** What AimInput needs from the virtual stick. */
@@ -39,6 +39,7 @@ export class AimInput {
 
   /** Aim angle in radians; the priority rule lives in resolveAim (stick beats tap and mouse). */
   get targetAngle(): number {
+    this.pointerAngle = pointerAngleWhileStick(this.stick?.held ?? false, this.pointerAngle);
     const r = resolveAim({
       stickHeld: this.stick?.held ?? false,
       stickAngleRad: this.stick?.angleRad ?? null,

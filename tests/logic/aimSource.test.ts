@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveAim } from '../../src/logic/aimSource';
+import { pointerAngleWhileStick, resolveAim } from '../../src/logic/aimSource';
 
 describe('resolveAim', () => {
   it('stick held beats tap and mouse', () => {
@@ -44,5 +44,29 @@ describe('resolveAim', () => {
     expect(
       resolveAim({ stickHeld: false, stickAngleRad: null, pointerAngleRad: null, lastAngleRad: 3 }),
     ).toEqual({ angleRad: 3, source: 'hold' });
+  });
+});
+
+describe('tap A, stick B, release', () => {
+  it('keeps the last stick angle instead of jumping back to A', () => {
+    let pointer: number | null = 2; // tap A
+    let last = 0;
+    // stick held at B
+    pointer = pointerAngleWhileStick(true, pointer);
+    last = resolveAim({
+      stickHeld: true,
+      stickAngleRad: 1,
+      pointerAngleRad: pointer,
+      lastAngleRad: last,
+    }).angleRad;
+    // released
+    pointer = pointerAngleWhileStick(false, pointer);
+    const r = resolveAim({
+      stickHeld: false,
+      stickAngleRad: null,
+      pointerAngleRad: pointer,
+      lastAngleRad: last,
+    });
+    expect(r).toEqual({ angleRad: 1, source: 'hold' });
   });
 });

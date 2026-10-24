@@ -52,6 +52,9 @@ export class VirtualStick {
     scene.input.on('pointermove', this.onMove, this);
     scene.input.on('pointerup', this.onUp, this);
     scene.input.on('pointerupoutside', this.onUp, this);
+    // A paused scene gets no pointerup: release the stick on pause and resume.
+    scene.events.on(Phaser.Scenes.Events.PAUSE, this.reset, this);
+    scene.events.on(Phaser.Scenes.Events.RESUME, this.reset, this);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
   }
 
@@ -85,7 +88,10 @@ export class VirtualStick {
   }
 
   private onUp(pointer: Phaser.Input.Pointer): void {
-    if (pointer.id !== this.ownerId) return;
+    if (pointer.id === this.ownerId) this.reset();
+  }
+
+  private reset(): void {
     this.ownerId = null;
     this.angle = null;
     this.knob.setPosition(this.cx, this.cy);
@@ -105,6 +111,8 @@ export class VirtualStick {
       this.scene.input.off('pointermove', this.onMove, this);
       this.scene.input.off('pointerup', this.onUp, this);
       this.scene.input.off('pointerupoutside', this.onUp, this);
+      this.scene.events.off(Phaser.Scenes.Events.PAUSE, this.reset, this);
+      this.scene.events.off(Phaser.Scenes.Events.RESUME, this.reset, this);
     }
     this.ownerId = null;
     this.angle = null;
