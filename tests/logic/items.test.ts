@@ -74,6 +74,14 @@ describe('applyItem', () => {
     expect(r.stacks).toEqual(s);
     expect(r.heal).toBe(def('heal').perStack);
   });
+  it('new effects leave stacks unchanged', () => {
+    const s = { fireRate: 2, damage: 1, size: 0 };
+    for (const effect of ['doubleShot', 'shield', 'rapidFire'] as const) {
+      const r = applyItem(s, { ...def('damage'), effect });
+      expect(r.stacks).toEqual(s);
+      expect(r.heal).toBe(0);
+    }
+  });
 });
 
 describe('isExpired', () => {
