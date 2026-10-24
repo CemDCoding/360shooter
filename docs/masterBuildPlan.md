@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-24 · Wellenabschluss M2 W4 (AP-23, AP-24 gemergt) · M2-DEP bereit (W5, [Mensch])
-- **Fertig:** AP-01–AP-15, AP-21–AP-24 (alle in dev). **Bereit:** M2-DEP (W5), M1-DEP ([Mensch]). **Offen:** M2b AP-25–AP-36 und M2b-DEP (Vorschlag, wartet auf H-07 und M2-DEP), AP-37 (Platzhalter), AP-16–AP-20, M0-DEP, M3-DEP ([Mensch]). Keine Coder-Pakete bereit.
+- **Stand:** 2026-10-24 · Wellenabschluss M2 W4 (AP-23, AP-24 gemergt) · M2-DEP bereit (W5, [Mensch]) · H-07 freigegeben (V-01–V-04 übernommen, PE-49–PE-53)
+- **Fertig:** AP-01–AP-15, AP-21–AP-24 (alle in dev). **Bereit:** M2-DEP (W5), M1-DEP ([Mensch]). **Offen:** M2b AP-25–AP-36 und M2b-DEP (freigegeben, startet nach M2-DEP), AP-37 (Platzhalter, Rüstungs-Katalog offen), AP-16–AP-20, M0-DEP, M3-DEP ([Mensch]). Keine Coder-Pakete bereit.
 - **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach M2 W4 nicht neu gemessen. M2b schätzt ca. 8–9 Fenster (§14).
 - **Unterbrochen oder laufend:** nichts, keine Wellen laufen
 - **Erkenntnisse:** AP-23 und AP-24 gemergt, Review Runde 1 bestanden, 162/162 Tests in 25 Dateien. Verfluchter Baum bleibt unverändert (PE-48), Vorschlag geschlossen. Coder c23 musste `tests/config/items.test.ts` anfassen (Dateieigentum AP-27/AP-35 prüfen). `npm ci` scheitert bei laufendem Dev-Server: vorher stoppen. Details §18.
-- **Nächster Schritt:** Nutzer entscheidet H-07 (V-01 bis V-04) und beantwortet Q-15, Q-16, Q-19 bis Q-21. Abnahmen M0-DEP, M1-DEP, M2-DEP, mit Handtest `?level=5` und `?level=12` am PC und iPhone (`127.0.0.1` nutzen). M2b startet erst nach M2-DEP und H-07 (AP-25, AP-26). M3 erst nach M2b-DEP.
-- **Offene Fragen an den Nutzer:** H-07 (V-01 bis V-04). Q-15 (Stufe 10 nach 15–20 Leveln: Spiel-Level oder Spielerlevel?), Q-16 (Dauerfeuer als Obergrenze 20 Schuss/s). Q-19 bis Q-21 (Rüstungen, vor AP-37). Q-13 (Debug-Runden speichern?). Boss-Verhalten PE-34 vor M3. Q-17 und Q-18 sind angenommen.
+- **Nächster Schritt:** Abnahmen M0-DEP, M1-DEP, M2-DEP, mit Handtest `?level=5` und `?level=12` am PC und iPhone (`127.0.0.1` nutzen). M2b startet erst nach M2-DEP (AP-25, AP-26). M3 erst nach M2b-DEP.
+- **Offene Fragen an den Nutzer:** Keine `[K]`-Frage offen. Zu bestätigen: Boss-Verhalten PE-34 vor M3, PE-37, PE-38, Zahlen PE-41, Richtwerte PE-43, PE-44, PE-45 (noch angenommen). Rüstungs-Katalog weiterer Rüstungen ist spätere Planung.
 
 <!-- Ende Lagebericht -->
 
@@ -64,25 +64,25 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | fertig | – | G1 |
-| 2 | Umfang | angenommen | Q-04 nur für M3; V-01/V-02 (F-07, F-15, F-16, Backlog) Freigabe offen | G1 |
+| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) vor M3; F-07, F-15 bis F-17 und Backlog freigegeben (H-07) | G1 |
 | 3 | Tech-Stack | angenommen | Werkzeuge (Vitest, ESLint, Prettier) angenommen | G1 |
 | 4 | Architektur, Datenmodell, Verträge | fertig | – | G1 |
 | 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | – | G1 |
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | fertig | – | G2 |
-| 9 | Meilensteine und Wellen | angenommen | M2b und Reihenfolge (V-04) Freigabe offen | G2 |
+| 9 | Meilensteine und Wellen | fertig | – (M2b und Reihenfolge M2b vor M3 freigegeben, H-07) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 bestätigt; AP-23/AP-24 fertig (M2 W4); M2b AP-25–AP-36 als Vorschlag (offen bis Freigabe V-01–V-04), AP-37 Platzhalter (Rüstungen, Q-19–Q-21); M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 bestätigt; AP-23/AP-24 fertig (M2 W4); M2b AP-25–AP-36 freigegeben (H-07), AP-37 Platzhalter (Rüstungen: Pilot PE-52, Katalog offen); M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; Q-13, Q-15–Q-16, Q-19–Q-21 offen; Q-17/Q-18 angenommen; V-01–V-04 freigeben | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen) | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b) offen: wartet auf V-01 bis V-04 und M2-DEP.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), Start erst nach M2-DEP.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -153,7 +153,10 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 Verhalten siehe PE-34. Eigener Meilenstein M3. | nein |
 | F-06 | Level und Maps 0–20 | Batches Wald, Wald bei Nacht, Elfenwald mit je einer einfachen Map mit Charme. Grenzen: Wald 0–4, Wald bei Nacht 5–9, Elfenwald 10–20 (PE-10). | ja |
-| F-07 | Waffen-Items in der Runde | Besiegte Gegner lassen zufällig Items fallen, die die Laserpistole verändern (schneller, stärker, größer). Die Waffe startet jede Runde bei 0. Ein Item wird eingesammelt, indem die Astronautin es **anschießt**. Es wirkt bis Rundenende und stapelt bis Stufe 5 je Eigenschaft. Die Drop-Chance liegt bei ca. 8 %, ein liegendes Item verschwindet nach 10 s (PE-12, PE-16). | ja |
+| F-07 | Waffen-Items in der Runde | Besiegte Gegner lassen mit ca. 8 % zufällig Items fallen: Doppelschuss, Schild, Dauerfeuer und selten Heilung. Ein Item wird eingesammelt, indem die Astronautin es **anschießt**. Doppelschuss (Stufe 1–2) und Schild (Schadens-Puffer, max. 3 Stufen) wirken bis Rundenende, Dauerfeuer 5 s. Ein liegendes Item verschwindet nach 10 s. Die Waffe startet jede Runde neu (PE-12, PE-16, PE-42, PE-43). | ja |
+| F-15 | Gold-Münzen | Gegner lassen mit 5 % Chance eine Gold-Münze fallen, stärkere Gegner geben mehr Gold, ab Wert 5 erscheint eine größere Münze. Münzen fliegen automatisch zur Astronautin. Gold aus einer Runde: Sieg 100 %, Niederlage 50 %, Gutschrift am Rundenende (PE-39, PE-40). | nein |
+| F-16 | Dauerhafte Upgrades | Im Hauptmenü kauft die Spielerin mit Gold Upgrades auf zwei Spuren: Waffe (Feuerrate, Schaden) und Spielerin (max. HP, Drehgeschwindigkeit), je 10 Stufen. Der Preis steigt mit jeder Stufe. Reset löscht Gold und Upgrades (PE-41, PE-45). | nein |
+| F-17 | Rüstungen mit passiven Effekten | Rüstungen wirken passiv, zeitlich begrenzt und nur in der Runde. Pilot ist der Feuerring: 5 s um die Spielerin, Radius 72 px, 20 Schaden je Sekunde an Gegnern im Ring, Aktivierung durch Einsammeln, 20 s Abklingzeit nach Ende (PE-47, PE-52). Weitere Rüstungen sind spätere Planung. | nein |
 | F-08 | Spielerlevel | Das Spielerlevel steigt durch Erfahrung aus Runden, wird lokal gespeichert und angezeigt. Im ersten Stich schaltet es nichts frei (PE-13). | nein |
 | F-09 | Hauptmenü und Level-Freischaltung | Start, Anzeige des Spielerlevels, Level-Auswahl 0–20. Ein Level wird frei, wenn das vorherige geschafft ist (PE-13). | ja |
 | F-10 | iPhone über PWA | Das Spiel läuft auf dem iPhone in Safari, als Homescreen-App im Vollbild, vom PC über das lokale WLAN bereitgestellt (PE-14). | ja |
@@ -161,8 +164,6 @@ Verhalten siehe PE-34. Eigener Meilenstein M3. | nein |
 | F-12 | Platzhalter-Grafik austauschbar | Alle Sprites sind Platzhalter mit fester Sprite-Liste. Ein Designer ersetzt eine PNG-Datei, ohne Code anzufassen. Anleitung `docs/guides/grafik-austauschen.md` (PE-23). | nein |
 | F-13 | Platzhalter-Sounds austauschbar | Einfache Platzhalter-Effekte (Laser, Treffer, Item, Niederlage, Sieg), Stummschalt-Taste, Austausch per Datei. Anleitung `docs/guides/sound-austauschen.md` (PE-24). | nein |
 | F-14 | Querformat | Das Spiel ist für Querformat ausgelegt, auf dem iPhone gibt es im Hochformat einen Hinweis „bitte drehen“ (PE-25). | nein |
-
-> **Vorschlag offen (Q-14, PE-39–PE-42, PE-47):** F-07 wird geändert, F-15 Gold-Münzen und F-16 Dauerhafte Upgrades kommen dazu, Backlog „Später“ (neue Waffen, Akimbo-Modus). Vorschlag F-17 Rüstungen mit passiven, zeitlich begrenzten Effekten (Details offen, Q-19 bis Q-21). Wortlaut in §16 (V-01, V-02). Bis zur Freigabe des Nutzers gilt diese Tabelle unverändert.
 
 ### Optional
 
@@ -177,6 +178,13 @@ Verhalten siehe PE-34. Eigener Meilenstein M3. | nein |
 | Level 21–100 (Bauernhof bis Büro) | Ausblick, nicht im ersten Stich (`idee.txt`) |
 | Weitere Startwaffen | Im ersten Stich gibt es nur die Laserpistole (PE-06) |
 | Veröffentlichung, App-Store-Einreichung, Anmeldung, Online-Spielerdatenbank, Downloads | PE-02 |
+
+### Später (Backlog, nicht geplant)
+
+| Idee | Begründung |
+|---|---|
+| Neue Waffen | Backlog aus Q-14 (PE-42), nicht geplant |
+| Akimbo-Modus (zwei Waffen gleichzeitig) | Backlog aus Q-14, nicht geplant |
 
 ---
 
@@ -253,13 +261,16 @@ flowchart TD
 
 | Entität | Wichtige Felder | Gehört zu | Löschverhalten |
 |---|---|---|---|
-| SaveGame | `version`, `playerXp`, `playerLevel`, `highestUnlockedLevel` | Gerät (lokal) | „Fortschritt zurücksetzen“ im Menü löscht ihn (angenommen) |
+| SaveGame | `version` (1 oder 2), `playerXp`, `playerLevel`, `highestUnlockedLevel` (Index des höchsten freigeschalteten Levels, Startwert 0, Bereich 0..20, PE-35), `muted`, `gold` und `upgrades` (ab Version 2, PE-44) | Gerät (lokal) | „Fortschritt zurücksetzen“ im Menü löscht alles, auch Gold und Upgrades (PE-41) |
 | LevelDef | `id`, `batch`, `durationSec`, `enemyPool`, `spawnRate`, `bossId?` | Konfiguration | – |
-| EnemyDef | `id`, `hp`, `speed`, `damage`, `behavior` (chase, shooter, aura) | Konfiguration | – |
-| ItemDef | `id`, `effect` (fireRate, damage, size, heal), `maxStacks`, `dropWeight` | Konfiguration | – |
-| WeaponStats | `fireRate`, `damage`, `projectileSize`, `projectileSpeed` | Runde (flüchtig) | Reset bei Rundenende |
+| EnemyDef | `id`, `hp`, `speed`, `damage`, `behavior` (chase, shooter, aura), `coinValue` (ab M2b) | Konfiguration | – |
+| ItemDef | `id`, `effect` (doubleShot, shield, rapidFire, heal; alt fireRate, damage, size bis AP-36), `maxStacks`, `dropWeight`, `durationMs?` (nur Dauerfeuer) | Konfiguration | – |
+| WeaponStats | `fireRate`, `damage`, `projectileSize`, `projectileSpeed`, `shotCount` (Standard 1) | Runde (flüchtig) | Reset bei Rundenende |
+| ActivePowers (M2b) | `doubleShotStage` (0–2), `shieldLeft` (Schadenspunkte), `rapidFireMsLeft` | Runde (flüchtig) | Reset bei Rundenende |
+| CoinRules (M2b, `coin.ts`) | `dropChance`, `magnetRadiusPx`, `collectRadiusPx`, `magnetSpeedPxPerSec` | Konfiguration | – |
+| UpgradeLevels (M2b, `upgrade.ts`) | je Spur 0–10: `weaponFireRate`, `weaponDamage`, `playerMaxHp`, `playerTurnSpeed` | Gerät (im SaveGame) | Reset mit SaveGame |
 
-**Verträge:** TypeScript-Typen in `src/contracts/`. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern.
+**Verträge:** TypeScript-Typen in `src/contracts/`. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern. M2b (AP-25) ergänzt Typen additiv und die Events `coins-changed` (`{ roundCoins }`) und `powers-changed` (`ActivePowers`). Rüstungen (PE-47) kommen in §4 erst mit AP-37.
 
 ---
 
@@ -438,7 +449,7 @@ flowchart TD
 | `src/scenes/{GameScene,HudScene,ResultScene}.ts` in M3 | AP-20 | M3 W3 |
 | `src/scenes/GameScene.ts` in M2b | AP-33 (Ergebnis und Gold, Upgrades beim Start) | M2b W5 |
 
-**M2b (Vorschlag, Eigentum je Welle, Freigabe V-01–V-04):** Innerhalb einer Welle höchstens ein Paket je Datei. Vertragsänderungen in W1 sind additiv, Aufräumen in W6.
+**M2b (Eigentum je Welle, freigegeben am 2026-10-24, H-07):** Innerhalb einer Welle höchstens ein Paket je Datei. Vertragsänderungen in W1 sind additiv, Aufräumen in W6.
 
 | Welle | Paket | Dateien |
 |---|---|---|
@@ -469,7 +480,7 @@ flowchart TD
 | M0 | Fundament | Werkzeuge, Verträge, Spieldaten 0–20, Platzhalter-Assets, Eingabe und Speicher | `npm run dev` zeigt die Preload-Szene mit allen Platzhalter-Sprites; alle Checks grün |
 | M1 | Kernspiel | Drehen und Auto-Schuss, 4 Gegnertypen, Items durch Anschießen, HP, Timer, Sieg/Niederlage, HUD; Designer-Anleitungen | Level 0 (und per Debug-Parameter jedes Level 0–20) am PC spielbar |
 | M2 | Inhalte, Menü, iPhone | Hauptmenü mit Level-Auswahl und Spielerlevel, Maps je Batch, PWA + Querformat, Platzhalter-Sounds mit Stummschalten, Balancing 0–20 | Level 0–20 nacheinander freispielbar, am PC und auf dem iPhone |
-| M2b | Gold und Waffen-Items (Vorschlag, Freigabe offen) | Gold-Münzen aus Gegnern, Upgrade-Overlay im Hauptmenü (Waffe: Feuerrate, Schaden; Spielerin: max. HP, Drehgeschwindigkeit; je 10 Stufen), Waffen-Items neu (Doppelschuss, Schild, Dauerfeuer), Neu-Balancing | Upgrades kaufbar, Gold bleibt nach Neuladen, Reset löscht Gold und Upgrades |
+| M2b | Gold und Waffen-Items (freigegeben, H-07) | Gold-Münzen aus Gegnern, Upgrade-Overlay im Hauptmenü (Waffe: Feuerrate, Schaden; Spielerin: max. HP, Drehgeschwindigkeit; je 10 Stufen), Waffen-Items neu (Doppelschuss, Schild, Dauerfeuer), Neu-Balancing | Upgrades kaufbar, Gold bleibt nach Neuladen, Reset löscht Gold und Upgrades |
 | M3 | Bosse | Boss-Rahmen, drei Bosse mit Varianten je Level, Einbindung (PE-18, PE-33, PE-34) | jedes Level endet mit seinem Boss |
 
 ### 9.1 Ablauf einer Welle
@@ -562,11 +573,11 @@ flowchart TD
   - [ ] Balancing nach Handtest: Ab Level 5 kippt das Spiel nicht mehr, Level 12 ist mit der Startwaffe fair zu schaffen (AP-23)
   - [ ] Die Laserpistole zerstört Geschosse der Wald-Hexe, der Laser verschwindet dabei (AP-24)
 
-#### M2b – Gold und Waffen-Items (Vorschlag, Status offen)
+#### M2b – Gold und Waffen-Items (freigegeben, noch nicht begonnen)
 
-**Einordnung (PE-46):** eigener Meilenstein zwischen M2-DEP und M3. Grund: Schild und Münzen müssen alle Schadens- und Einsammelpfade kennen, bevor die Bosse (M3) sie nutzen. Start erst nach M2-DEP und nach Freigabe V-01 bis V-04 (H-07).
+**Einordnung (PE-46, PE-53):** eigener Meilenstein zwischen M2-DEP und M3. Grund: Schild und Münzen müssen alle Schadens- und Einsammelpfade kennen, bevor die Bosse (M3) sie nutzen. Start erst nach M2-DEP (Freigabe H-07 erledigt).
 
-**Rüstungen (PE-47, Vorschlag):** passive, zeitlich begrenzte Effekte, eigene Kategorie neben den Waffen-Items. Erster Effekt ist der Feuerring um die Spielerin (5 s, Richtwerte). Noch ohne Paket, weil Katalog, Auslöser und Werte offen sind (Q-19 bis Q-21). Nach deren Klärung wird ein Paket AP-37 detailliert (Platzhalter in §10). Einordnung dann: Logik nach W3, Entity und Szene nach W4 und W5.
+**Rüstungen (PE-47, PE-52):** passive, zeitlich begrenzte Effekte, eigene Kategorie neben den Waffen-Items. Pilot ist der Feuerring um die Spielerin (5 s, Radius 72 px, 20 Schaden je Sekunde, nur in der Runde). Der Katalog weiterer Rüstungen ist spätere Planung. Deshalb noch kein Paket: AP-37 bleibt Platzhalter in §10. Einordnung, wenn AP-37 kommt: Logik nach W3, Entity und Szene nach W4 und W5.
 
 | Welle | Pakete (parallel) |
 |---|---|
@@ -647,8 +658,8 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-23 | Balancing-Nachbesserung Level 5–20 | M2 | SH | W4 | keine (AP-15 fertig) | S | sonnet (medium) | c23 / agent/AP-23-c23 | fertig |
 | AP-24 | Gegnerische Projektile abschießbar | M2 | GAME/LOG | W4 | keine (AP-09, AP-10 fertig) | S | sonnet (medium) | c24 / agent/AP-24-c24 | fertig |
 | M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W5 | AP-14, AP-15, AP-22, AP-23, AP-24 | H | – | – | bereit |
-| AP-25 | Verträge Gold, Upgrades, Waffen-Items | M2b | SH | W1 | H-07, M2-DEP | S | sonnet (medium) | – | offen |
-| AP-26 | Assets Münzen und neue Items | M2b | ASSET | W1 | H-07, M2-DEP | M | sonnet (medium) | – | offen |
+| AP-25 | Verträge Gold, Upgrades, Waffen-Items | M2b | SH | W1 | M2-DEP | S | sonnet (medium) | – | offen |
+| AP-26 | Assets Münzen und neue Items | M2b | ASSET | W1 | M2-DEP | M | sonnet (medium) | – | offen |
 | AP-27 | Config Münzen, Upgrades, Items | M2b | SH | W2 | AP-25 | M | sonnet (medium) | – | offen |
 | AP-28 | Spielstand v2 (Gold, Upgrades) | M2b | GAME | W2 | AP-25 | S | sonnet (medium) | – | offen |
 | AP-29 | Logik Wirtschaft und Upgrades | M2b | LOG | W3 | AP-25, AP-27 | M | sonnet (high) | – | offen |
@@ -659,7 +670,7 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-33 | Spielszene und Ergebnis mit Gold | M2b | GAME | W5 | AP-29, AP-30, AP-31 | L | opus (high) | – | offen |
 | AP-35 | Neu-Balancing M2b | M2b | SH | W5 | AP-27, AP-29, AP-30 | M | sonnet (high) | – | offen |
 | AP-36 | Aufräumen alter Waffen-Items | M2b | SH/ASSET | W6 | AP-26, AP-33, AP-35 | S | sonnet (medium) | – | offen |
-| AP-37 | Platzhalter: Rüstung Feuerring (PE-47), nicht umsetzbar | M2b | LOG/GAME | tbd | Q-19, Q-20, Q-21 | tbd | tbd | – | offen |
+| AP-37 | Platzhalter: Rüstungen, Pilot Feuerring (PE-47, PE-52), nicht umsetzbar | M2b | LOG/GAME | tbd | Katalog weiterer Rüstungen (spätere Planung) | tbd | tbd | – | Platzhalter |
 | M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36 | H | – | – | offen |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2b-DEP | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -691,7 +702,7 @@ flowchart LR
     AP15["AP-15"] --> AP23["AP-23"]
     AP24["AP-24"]
   end
-  subgraph M2b["M2b Gold und Waffen-Items (Vorschlag)"]
+  subgraph M2b["M2b Gold und Waffen-Items"]
     AP25["AP-25"] --> AP27["AP-27"] & AP28["AP-28"] & AP34["AP-34"]
     AP26["AP-26"]
     AP27 --> AP29["AP-29"] & AP30["AP-30"] & AP35["AP-35"] & AP31["AP-31"] & AP32["AP-32"]
@@ -718,7 +729,7 @@ flowchart LR
   AP14 & AP15 & AP22 & AP23 & AP24 --> M2DEP["M2-DEP"]
 ```
 
-**M2b (Vorschlag):** W1 und W2 sind je ein Paket pro Datei. W5 läuft mit AP-33 (GameScene) und AP-35 (Config) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt.
+**M2b:** Die Kante M2-DEP → AP-25/AP-26 ist eine Reihenfolgekante (PE-46, Abnahme vor Start), keine Code-Abhängigkeit. Sie bleibt bis zur Entscheidung des Nutzers. W1 und W2 sind je ein Paket pro Datei. W5 läuft mit AP-33 (GameScene) und AP-35 (Config) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt.
 
 **M2 W4:** AP-23 (nur `src/config/*`, `tests/config/*`, `tests/logic/balance.test.ts`, `docs/balancing.md`) und AP-24 (`src/scenes/GameScene.ts`, `src/logic/projectiles.ts`, Test) teilen keine Datei und laufen parallel.
 
@@ -1496,18 +1507,18 @@ flowchart LR
 - **Kürzbar bei Budgetnot:** nein (vor M3 nötig)
 - **Commit-Typ:** `feat(AP-24): let player lasers destroy enemy projectiles`
 
-### M2b – Gold und Waffen-Items (Vorschlag, Status offen)
+### M2b – Gold und Waffen-Items (freigegeben, noch nicht begonnen)
 
-Die Pakete hängen an den Entscheidungen PE-39 bis PE-46 und an den Vorschlägen V-01 bis V-04 (§16). Sie gelten erst nach Freigabe durch den Nutzer (H-07). Alle Verträge sind in W1 additiv. Jedes Paket nutzt nur Verträge und Config aus früheren Wellen.
+Die Pakete hängen an den Entscheidungen PE-39 bis PE-53 (§16). Der Nutzer hat Umfang, Verträge und Reihenfolge am 2026-10-24 freigegeben (H-07, V-01 bis V-04 in §2, §4, §9 übernommen). Alle Verträge sind in W1 additiv. Jedes Paket nutzt nur Verträge und Config aus früheren Wellen.
 
-Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald Q-19 bis Q-21 beantwortet sind. Bis dahin ist AP-37 nur ein Platzhalter in §10 und kein umsetzbares Paket.
+Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstungen ist spätere Planung. AP-37 bleibt deshalb ein Platzhalter in §10 und kein umsetzbares Paket.
 
 #### AP-25 – Verträge Gold, Upgrades, Waffen-Items
 
 - **Meilenstein, Lane, Welle:** M2b · SH · W1
 - **Ziel:** Alle neuen Typen und Events als Verträge. Die Änderungen sind additiv, bestehende Namen bleiben bis AP-36.
-- **Pflichtlektüre:** PE-39 bis PE-44, V-01 bis V-03 (§16), §4 (Verträge), `src/contracts/*`
-- **Abhängigkeiten:** H-07 (Freigabe), M2-DEP
+- **Pflichtlektüre:** PE-39 bis PE-44, §2 (F-07, F-15, F-16), §4 (Verträge), `src/contracts/*`
+- **Abhängigkeiten:** M2-DEP
 - **Parallel möglich mit:** AP-26
 - **Dateien (Eigentum):** `src/contracts/{coin,upgrade,item,weapon,enemy,save,events,index}.ts` (neu: `coin.ts`, `upgrade.ts`), `tests/contracts/contracts.test.ts`
 - **Nicht anfassen:** `src/config/*`, `src/logic/*`, `src/entities/*`, `src/scenes/*`, `src/platform/*`
@@ -1538,7 +1549,7 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
 - **Meilenstein, Lane, Welle:** M2b · ASSET · W1
 - **Ziel:** Platzhalter-Sprites und -Sounds für Münzen und die neuen Items. Designer ersetzen sie wie bisher nur durch Dateien (PE-23, PE-24).
 - **Pflichtlektüre:** PE-23, PE-24, PE-26, `src/config/assets.ts`, `docs/guides/*`, `public/assets/LICENSES.md`
-- **Abhängigkeiten:** H-07 (Freigabe), M2-DEP
+- **Abhängigkeiten:** M2-DEP
 - **Parallel möglich mit:** AP-25
 - **Dateien (Eigentum):** `src/config/assets.ts`, `public/assets/sprites/{item-double-shot,item-shield,item-rapid-fire,coin-small,coin-big}.png`, `public/assets/sounds/{sfx-coin,sfx-shield-break}.wav`, `public/assets/.placeholders.json`, `public/assets/LICENSES.md`, `docs/guides/{grafik,sound}-austauschen.md`, `tests/config/assets.test.ts`
 - **Nicht anfassen:** übrige `src/config/*`, `src/contracts/*`. Die alten Item-Einträge bleiben bis AP-36.
@@ -1690,7 +1701,7 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
 - **Umsetzung:**
   1. `Player`: Der Konstruktor bekommt die Upgrade-Werte (`maxHp`, `turnSpeedDegPerSec`, Multiplikatoren) als Parameter, nicht aus der Szene. `takeDamage(n)` läuft zuerst durch `absorbDamage`, der Restwert des Schilds geht über einen Callback. Der Schild zeigt einen halbtransparenten Ring. Treffer lösen nur das sanfte Aufblinken aus (PE-31). `applyItem(def)` ruft `applyPowerItem` auf. Die Feuerrate kommt aus `effectiveFireRate`.
   2. `LaserPool.fire`: erzeugt je nach `shotPattern` mehrere Laser mit Versatz und Winkel. Jeder Laser hat eigenen Schaden und wird ab `range` entfernt. Ein Laser trifft weiterhin genau ein Ziel (AP-24).
-  3. `Coin` und `CoinPool`: Münze an der Gegnerposition, Größe nach `coinSizeFor`, Drehanimation. `update(dtMs, player)` nutzt `coinMagnetStep`. `collect` ruft `onCollected(value)` auf. Keine Lebensdauer (Q-17, angenommen). Laser gehen durch Münzen.
+  3. `Coin` und `CoinPool`: Münze an der Gegnerposition, Größe nach `coinSizeFor`, Drehanimation. `update(dtMs, player)` nutzt `coinMagnetStep`. `collect` ruft `onCollected(value)` auf. Keine Lebensdauer (Q-17, bestätigt). Laser gehen durch Münzen.
   4. Pooling wie bei den Gegnern, Listener abmelden.
 - **Schnittstellen:** nutzt AP-29 und AP-30. Stellt `Player`, `LaserPool` und `CoinPool` für AP-33 bereit.
 - **Akzeptanzkriterien:**
@@ -1708,7 +1719,7 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
 
 - **Meilenstein, Lane, Welle:** M2b · GAME · W4
 - **Ziel:** Gold ist sichtbar, Upgrades sind im Hauptmenü kaufbar. Der Reset-Dialog nennt Gold und Upgrades (PE-41, PE-45).
-- **Pflichtlektüre:** PE-41, PE-45, F-09, F-16 (Vorschlag V-02), `src/scenes/MenuScene.ts` (Ist-Stand), `src/scenes/menu/*`, `src/logic/upgrades.ts` (AP-29), `src/platform/storage.ts` (AP-28)
+- **Pflichtlektüre:** PE-41, PE-45, F-09, F-16, `src/scenes/MenuScene.ts` (Ist-Stand), `src/scenes/menu/*`, `src/logic/upgrades.ts` (AP-29), `src/platform/storage.ts` (AP-28)
 - **Abhängigkeiten:** AP-27, AP-28, AP-29
 - **Parallel möglich mit:** AP-31, AP-34
 - **Dateien (Eigentum):** `src/scenes/MenuScene.ts`, `src/scenes/menu/UpgradePanel.ts` (neu), `src/scenes/menu/ConfirmDialog.ts` (nur der Text)
@@ -1766,7 +1777,7 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
 
 - **Meilenstein, Lane, Welle:** M2b · GAME · W5
 - **Ziel:** Verbindet alles in der Runde: Upgrades beim Start, Münzen und neue Items im Kampf, Gold am Rundenende.
-- **Pflichtlektüre:** PE-29, PE-36, PE-39 bis PE-43, §18 Lehre AP-10 (Pause, `playTimeMs`, Reihenfolge `playerDied()` vor `tick()`), Schnittstellen aus AP-31, `src/scenes/{GameScene,ResultScene}.ts` (Ist-Stand)
+- **Pflichtlektüre:** PE-29, PE-49, PE-39 bis PE-43, §18 Lehre AP-10 (Pause, `playTimeMs`, Reihenfolge `playerDied()` vor `tick()`), Schnittstellen aus AP-31, `src/scenes/{GameScene,ResultScene}.ts` (Ist-Stand)
 - **Abhängigkeiten:** AP-29, AP-30, AP-31
 - **Parallel möglich mit:** AP-35
 - **Dateien (Eigentum):** `src/scenes/{GameScene,ResultScene}.ts`
@@ -1778,11 +1789,12 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
   3. Items: `rollDrop` wie bisher, neue Wirkung über `applyPowerItem`. Dauerfeuer und Münz-Verzögerung laufen über `playTimeMs` (pausierbar).
   4. Alle Schadenspfade (Kontakt, Aura, Geschoss) gehen über `Player.takeDamage`, damit der Schild zuerst wirkt.
   5. Event `powers-changed` bei jeder Änderung von Schild, Doppelschuss und Dauerfeuer. Das alte Event `weapon-changed` entfällt.
-  6. Rundenende: `applyRoundGold(save, roundCoins, result)` und `applyRoundResult` werden kombiniert, danach ein einziger `writeSave`. Debug-Runden zahlen Gold wie jede Runde (PE-36, Q-13 offen).
+  6. Rundenende: `applyRoundGold(save, roundCoins, result)` und `applyRoundResult` werden kombiniert, danach ein einziger `writeSave`. Debug-Runden (`?level=n`) schreiben keinen Spielstand: kein `writeSave`, also keine Erfahrung, keine Freischaltung und kein Gold (PE-49, Q-13; Gold eingeschlossen als Folge, angenommen). Die Umsetzung steht hier statt in einem eigenen Folgepaket.
   7. `ResultScene` zeigt die gesammelten Münzen, den Anteil (100 % oder 50 %) und das Gold gesamt.
 - **Schnittstellen:** nutzt AP-29, AP-30, AP-31. Keine Vertragsänderung.
 - **Akzeptanzkriterien:**
   - Gold erscheint im Ergebnis, Niederlage zahlt 50 %
+  - Debug-Runde (`?level=n`) verändert den Spielstand nicht (Handtest, PE-49)
   - Keine doppelten Listener nach „Nochmal“, keine Spielwerte in der Szene
   - Alle Smoke-Test-Punkte der M2b-DEP für Runde und Ergebnis erfüllt, Checks grün
 - **Tests:** keine Phaser-Tests, Handtest-Checkliste im Bericht
@@ -1796,7 +1808,7 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
 #### AP-35 – Neu-Balancing M2b
 
 - **Meilenstein, Lane, Welle:** M2b · SH · W5
-- **Ziel:** Gold-Kurve, Upgrades und neue Items passen zusammen. Richtwerte: im Mittel etwa 45 Gold je gewonnenem Level, Stufe 10 eines Upgrades nach etwa 15–20 Leveln (Q-15). Doppelschuss, Schild und Dauerfeuer sind spürbar, aber nicht dominant. Level 20 bleibt mit Items fordernd (wie AP-15).
+- **Ziel:** Gold-Kurve, Upgrades und neue Items passen zusammen. Richtwerte: im Mittel etwa 45 Gold je gewonnenem Level, Stufe 10 eines Upgrades nach etwa 15–20 Spiel-Leveln (Q-15, PE-50). Doppelschuss, Schild und Dauerfeuer sind spürbar, aber nicht dominant. Level 20 bleibt mit Items fordernd (wie AP-15).
 - **Pflichtlektüre:** PE-39 bis PE-43, `docs/balancing.md`, `tests/logic/balance.test.ts`, AP-23-Bedingungen, `src/config/*`, `src/logic/{economy,upgrades,coins,weapon,powers}.ts` (nur lesen)
 - **Abhängigkeiten:** AP-27, AP-29, AP-30
 - **Parallel möglich mit:** AP-33
@@ -1808,6 +1820,7 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
   2. Werte anpassen: Gold-Mittel etwa 45 je gewonnenem Level, Schild-Limit, Dauerfeuer-Dauer und Doppelschuss-Stufen nur in der Config. Die Bedingungen aus AP-23 (Druck-Kurve Level 5–20 monoton, Sprünge begrenzt) bleiben grün, die Spawn-Werte von Level 0–4 bleiben gleich.
   3. `docs/balancing.md`: Abschnitt „Gold und Upgrades“ und eine neue Kennzahl-Tabelle, in einfacher Sprache.
   4. Im Bericht nennen: alle vier Upgrades auf Stufe 10 kosten zusammen etwa 2 800 Gold (Q-15).
+  5. `tests/logic/balance.test.ts`: Schwelle für Level 20 (`pressure` > 0,8) auf mindestens 0,9 anheben (Review AP-23, Ist-Wert 0,96). `tests/config/items.test.ts` (prüft `WEAPON_BASE.fireRatePerSec`) gehört bereits zu AP-27 und AP-35. Bei Änderungen an `weapon.ts` dort mit anpassen.
 - **Schnittstellen:** nur Config, keine Vertragsänderung.
 - **Akzeptanzkriterien:**
   - Tests grün, Zahlen in der Doku stimmen mit der Config überein
@@ -2035,9 +2048,9 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
 | H-04 | Bosse beschreiben (Q-04); angenommenes Verhalten PE-34 vor M3-Freigabe prüfen | vor M3 | AP-16–AP-20 | ☑ Namen / ☐ PE-34 prüfen |
 | H-05 | Optional: eigene Grafiken und Sounds nach den Anleitungen aus AP-07 austauschen | ab M1 | – | ☐ |
 | H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☐ |
-| H-07 | Freigabe Umfang, Verträge und Reihenfolge M2b: V-01 bis V-04 in §16 bestätigen (oder Änderungswünsche nennen) | vor M2b | AP-25, AP-26 | ☐ |
+| H-07 | Freigabe Umfang, Verträge und Reihenfolge M2b: V-01 bis V-04 (in §16, inzwischen übernommen) | vor M2b | AP-25, AP-26 | ☑ (2026-10-24) |
 | H-08 | Abnahme M2b: Smoke-Test am PC und auf dem iPhone (M2b-DEP) | nach M2b | M3 (AP-16 ff.) | ☐ |
-| H-09 | Rüstungen klären: Q-19 (Katalog), Q-20 (Auslöser, Abklingzeit), Q-21 (Feuerring-Werte) beantworten | vor AP-37 | AP-37 (Platzhalter) | ☐ |
+| H-09 | Rüstungen klären: Q-19 (Katalog), Q-20 (Auslöser, Abklingzeit), Q-21 (Feuerring-Werte) beantworten | vor AP-37 | AP-37 (Platzhalter) | ☑ (Pilot PE-52, Katalog spätere Planung) |
 
 ---
 
@@ -2048,11 +2061,11 @@ Rüstungen (PE-47) haben noch kein Paket. Sie werden als AP-37 angelegt, sobald 
 | M0 | 4 | ≈ 4,5 h (+ Review ≈ 6 h) | ≈ 2–3 |
 | M1 | 7 | ≈ 10 h (+ Review ≈ 13 h) | ≈ 4–5 |
 | M2 | 5 | ≈ 6,75 h (+ Review ≈ 9 h) | ≈ 3–4 |
-| M2b (Vorschlag) | 12 | ≈ 16,75 h (+ Review ≈ 21 h) | ≈ 8–9 |
+| M2b | 12 | ≈ 16,75 h (+ Review ≈ 21 h) | ≈ 8–9 |
 | M3 | 5 | ≈ 8,5 h (+ Review ≈ 11 h) | ≈ 4–5 |
 | **Gesamt** | **33** | **≈ 47 h (+ Review ≈ 60 h)** | **≈ 21–26** |
 
-Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 21–26 Fenster. Rüstungen (AP-37) sind nicht enthalten, ihr Aufwand wird nach Q-19 bis Q-21 geschätzt.
+Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 21–26 Fenster. Rüstungen (AP-37) sind nicht enthalten, ihr Aufwand wird nach Klärung des Rüstungs-Katalogs geschätzt.
 
 **Zeit des Nutzers:** Abnahmen und Smoke-Tests ≈ 0,5–1 h je Meilenstein, Freigaben pro Meilenstein, Boss-Beschreibung (Q-04), optional Grafik und Sound. Zusammen ≈ 4–6 h ohne Grafik.
 
@@ -2091,7 +2104,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | RI-11 | Gemeinsame Szenendateien werden in mehreren Wellen geändert | Eigentum je Welle in §8 festgelegt, Merge-Reihenfolge | AP-10, AP-12, AP-14 |
 | RI-12 | Schild und Dauerfeuer greifen in Schadens- und Feuerpfad, Fehler wirken in allen Szenen | Schaden läuft nur über `Player.takeDamage` und `absorbDamage`, Zeiten über `playTimeMs`; Handtest mit Boss-Vorbereitung, Tests in AP-30 | AP-30, AP-31, AP-33 |
 | RI-13 | Gold-Kurve trifft das Ziel nicht (zu viel oder zu wenig Gold, Upgrades zu schnell oder zu langsam) | Kennzahl-Tabelle und Zielwert-Test in AP-35, nur Config; Nutzer prüft nach M2b-DEP | AP-35 |
-| RI-14 | Rüstungen (PE-47) erweitern den Umfang, bevor der Katalog feststeht (Scope Creep) | Kein Paket vor Q-19 bis Q-21, AP-37 nur Platzhalter, Aufwand erst nach Klärung | AP-37 |
+| RI-14 | Rüstungen (PE-47) erweitern den Umfang, bevor der Katalog feststeht (Scope Creep) | Pilot Feuerring fest (PE-52), Katalog weiterer Rüstungen offen. AP-37 nur Platzhalter, Aufwand erst nach Katalog-Klärung | AP-37 |
 
 ---
 
@@ -2138,17 +2151,22 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-35 | `highestUnlockedLevel` ist der Index des höchsten freigeschalteten Levels. Startwert 0 (nur Level 0 frei), Bereich 0..20 (`LEVEL_COUNT - 1`). Sieg in Level n schaltet `min(20, n+1)` frei. Der Fehler aus AP-04 (Standard 1, Bereich 1..1000) wird in AP-21 behoben. Kein Migrationsbedarf, da nichts ausgeliefert ist | Detailfrage ohne Auswirkung auf Sicherheit oder Umfang, Entscheidung des Leads (Wellenabschluss M1 W1) | Lead am 2026-10-23 |
 | PE-37 | Spieler-Laser zerstören gegnerische Geschosse (Wald-Hexe, später Boss-Geschosse). Der Laser verschwindet dabei ebenfalls, kein Durchschlag: ein Laser trifft genau ein Ziel (AP-24) | Auftrag Lead, Umfang aus Nutzer-Freigabe; Regel „Laser verschwindet, kein Durchschlag“ angenommen | Nutzer am 2026-10-24 (Paket), Regel (angenommen) |
 | PE-38 | Balancing-Nachbesserung nach Nutzer-Handtest (AP-23): Ab Level 5 kippt das Spiel, Level 12 ist zu schwer. Gegner ab Level 5 langsamer (Zombie-Eichhörnchen, Verfluchter Baum), Feuerrate der Startwaffe erhöhen, Kurve 5–20 glätten. Level 0–4 bleiben in den Spawn-Werten. Richtwerte Feuerrate 3 → 4/s und Zombie-Eichhörnchen 110 → 80 px/s (angenommen). Verfluchter Baum ab Level 5: offen, siehe §16 Vorschläge | Befund Nutzer-Handtest am 2026-10-24, Richtwerte angenommen vom Planner | Nutzer am 2026-10-24 (Befund und Freigabe), Werte (angenommen) |
-| PE-36 | Debug-Direktstart `?level=n` (AP-22): Der Start führt direkt in `GameScene` mit dem Level und schreibt den Spielstand nicht. Der Freischaltstand spielt dabei keine Rolle. Runden mit Debug-Level werden wie jede Runde gespeichert (Erfahrung, Freischaltung nur steigend). Ein Debug-Sieg kann höhere Level freischalten. Das ist akzeptiert, weil `GameScene` unverändert bleibt. Eine Sperre für Debug-Runden braucht `GameScene` im Paket, siehe Q-13 | Befund Nutzer-Handtest (M1-DEP); Umgang mit dem Spielstand vom Planner angenommen | Lead am 2026-10-24 (Pflege), Detail angenommen vom Planner |
-| PE-39 | Währung sind Gold-Münzen. Jeder Gegner lässt mit 5 % Chance eine Münze fallen (`COIN_RULES`). Stärkere Gegner geben mehr Gold (Münzwert je Gegner), ab Wert 5 erscheint eine größere Münze. Münzen fliegen automatisch zur Astronautin, ohne Lebensdauer, Laser gehen durch Münzen | Antwort Nutzer zu Gold-Münzen; Magnet-Reichweite über das Spielfeld, keine Lebensdauer und Durchgang der Laser angenommen (Q-17) | Nutzer am 2026-10-24, Details (angenommen) |
-| PE-40 | Gold aus einer Runde: Sieg behält 100 %, Niederlage 50 % (abgerundet). Die Gutschrift erfolgt am Rundenende in demselben Speichervorgang wie das Rundenergebnis | Vorschlag Planner zu 50 % vom Nutzer bestätigt („dein Vorschlag ist gut“); 100 % bei Sieg angenommen (Q-18) | Nutzer am 2026-10-24, Sieg-Wert (angenommen) |
-| PE-41 | Dauerhafte Upgrades auf zwei Spuren: Waffe (Feuerrate, Schaden) und Spielerin (max. HP, Drehgeschwindigkeit), je 10 Stufen, Preis steigt mit jeder Stufe. Richtwerte: Feuerrate und Schaden je +10 % pro Stufe, max. HP +10 pro Stufe, Drehgeschwindigkeit +15 °/s pro Stufe. Preis Stufe k → k+1 = round(10 × 1,4^k), Summe je Spur 698, alle vier zusammen ca. 2 800 Gold. Ziel: Stufe 10 nach ca. 15–20 Leveln (Q-15). Kauf im Hauptmenü über „Upgrade“. Reset löscht Gold und Upgrades | Antworten Nutzer zu Spuren, Stufen, Preisanstieg, Ziel und Reset; Zahlenwerte und Preisformel angenommen | Nutzer am 2026-10-24, Zahlen (angenommen) |
-| PE-42 | Items wirken weiter nur in der Runde (F-07, PE-12, PE-16). Die bisherigen Waffen-Items (Feuerrate, Schaden, Größe) werden ersetzt durch Doppelschuss, Schild (Schadens-Puffer) und Dauerfeuer (Feuerrate für einige Sekunden). Heilung bleibt als seltenes Item. Die Änderung an F-07 braucht Freigabe (V-01) | Antwort Nutzer zu Items in der Runde; Heilung bleibt angenommen (Q-18) | Nutzer am 2026-10-24, Heilung (angenommen) |
-| PE-43 | Richtwerte Items (angenommen): Doppelschuss 2 Stufen (Stufe 1 zwei Laser versetzt um ±4 px, Stufe 2 drei Laser im Fächer ±8°). Schild 60 Schadenspunkte je Stufe, max. 3 Stufen (180), ist der Puffer aufgebraucht, ist er kaputt. Dauerfeuer 5 s, neue Aufnahme setzt die Zeit neu. Feuerrate im Dauerfeuer auf 20 Schuss/s begrenzt (technische Obergrenze statt „unendlich“, Q-16). Drop-Gewichte 30/30/30/10 (Doppelschuss, Schild, Dauerfeuer, Heilung) | Planner-Vorschlag | Planner (angenommen) |
+| PE-36 | Überholt durch PE-49 (Q-13). Debug-Direktstart `?level=n` (AP-22): Der Start führt direkt in `GameScene` mit dem Level und schreibt den Spielstand nicht. Der Freischaltstand spielt dabei keine Rolle. Runden mit Debug-Level werden wie jede Runde gespeichert (Erfahrung, Freischaltung nur steigend). Ein Debug-Sieg kann höhere Level freischalten. Das ist akzeptiert, weil `GameScene` unverändert bleibt. Eine Sperre für Debug-Runden braucht `GameScene` im Paket, siehe Q-13 | Befund Nutzer-Handtest (M1-DEP); Umgang mit dem Spielstand vom Planner angenommen | Lead am 2026-10-24 (Pflege), Detail angenommen vom Planner |
+| PE-39 | Währung sind Gold-Münzen. Jeder Gegner lässt mit 5 % Chance eine Münze fallen (`COIN_RULES`). Stärkere Gegner geben mehr Gold (Münzwert je Gegner), ab Wert 5 erscheint eine größere Münze. Münzen fliegen automatisch zur Astronautin, ohne Lebensdauer, Laser gehen durch Münzen | Antwort Nutzer zu Gold-Münzen; Magnet-Reichweite über das Spielfeld, keine Lebensdauer und Durchgang der Laser bestätigt (Q-17) | Nutzer am 2026-10-24 (Q-17 bestätigt) |
+| PE-40 | Gold aus einer Runde: Sieg behält 100 %, Niederlage 50 % (abgerundet). Die Gutschrift erfolgt am Rundenende in demselben Speichervorgang wie das Rundenergebnis | Vorschlag Planner zu 50 % vom Nutzer bestätigt („dein Vorschlag ist gut“); 100 % bei Sieg bestätigt (Q-18) | Nutzer am 2026-10-24 (Q-18 bestätigt) |
+| PE-41 | Dauerhafte Upgrades auf zwei Spuren: Waffe (Feuerrate, Schaden) und Spielerin (max. HP, Drehgeschwindigkeit), je 10 Stufen, Preis steigt mit jeder Stufe. Richtwerte: Feuerrate und Schaden je +10 % pro Stufe, max. HP +10 pro Stufe, Drehgeschwindigkeit +15 °/s pro Stufe. Preis Stufe k → k+1 = round(10 × 1,4^k), Summe je Spur 698, alle vier zusammen ca. 2 800 Gold. Ziel: Stufe 10 nach ca. 15–20 Spiel-Leveln (Q-15 bestätigt). Kauf im Hauptmenü über „Upgrade“. Reset löscht Gold und Upgrades | Antworten Nutzer zu Spuren, Stufen, Preisanstieg, Ziel und Reset; Zahlenwerte und Preisformel angenommen | Nutzer am 2026-10-24, Zahlen (angenommen) |
+| PE-42 | Items wirken weiter nur in der Runde (F-07, PE-12, PE-16). Die bisherigen Waffen-Items (Feuerrate, Schaden, Größe) werden ersetzt durch Doppelschuss, Schild (Schadens-Puffer) und Dauerfeuer (Feuerrate für einige Sekunden). Heilung bleibt als seltenes Item. Die Änderung an F-07 ist freigegeben (H-07, 2026-10-24) | Antwort Nutzer zu Items in der Runde; Heilung bleibt bestätigt (Q-18) | Nutzer am 2026-10-24 (Q-18 bestätigt) |
+| PE-43 | Richtwerte Items (angenommen): Doppelschuss 2 Stufen (Stufe 1 zwei Laser versetzt um ±4 px, Stufe 2 drei Laser im Fächer ±8°). Schild 60 Schadenspunkte je Stufe, max. 3 Stufen (180), ist der Puffer aufgebraucht, ist er kaputt. Dauerfeuer 5 s, neue Aufnahme setzt die Zeit neu. Feuerrate im Dauerfeuer auf 20 Schuss/s begrenzt (technische Obergrenze statt „unendlich“, Q-16 bestätigt). Drop-Gewichte 30/30/30/10 (Doppelschuss, Schild, Dauerfeuer, Heilung) | Planner-Vorschlag | Planner (angenommen) |
 | PE-44 | Spielstand Version 2 mit `gold` und `upgrades`. Version 1 bleibt ohne Verlust lesbar (Gold 0, Stufen 0). Ungültige Gold- oder Stufenwerte werden nur auf 0 gesetzt, der übrige Fortschritt bleibt. Keine neuen personenbezogenen Daten (R2) | Robustes Laden nach §5, Ergänzung zu PE-35 | Planner (angenommen, §5) |
 | PE-45 | Upgrade-Auswahl als Overlay im Hauptmenü, keine neue Szene, keine Änderung an `src/main.ts` | Vermeidet Änderungen am Startpfad, Planner-Vorschlag | Planner (angenommen) |
-| PE-46 | M2b liegt zwischen M2-DEP und M3. M3 startet erst nach M2b-DEP, weil Schild und Münzen alle Schadens- und Einsammelpfade betreffen, bevor die Bosse sie nutzen. Folge: M3 verschiebt sich um ca. 8–9 Fenster | Abhängigkeit der Schadens- und Einsammelpfade, Planner-Vorschlag, Freigabe offen (V-04) | Planner (Vorschlag), Freigabe ausstehend |
-| PE-47 | Rüstungen als eigene Kategorie mit passiven, zeitlich begrenzten Effekten, z. B. ein Feuerring um die Spielerin für 5 s. Auslöser (angenommen): Aktivierung durch Einsammeln, Wirkung beginnt sofort. Abklingzeit (angenommen): 20 s nach Ende. Richtwerte: Feuerring Radius 72 px, Schaden 20 je Sekunde an Gegnern im Ring, Dauer 5 s. Welche Rüstungen es gibt, bleibt offen. Kein Paket vor Klärung (AP-37 als Platzhalter) | Ergänzung Nutzer zu Q-14; Auslöser, Abklingzeit und Werte angenommen vom Planner | Nutzer am 2026-10-24 (Idee), Details (angenommen), Q-19 bis Q-21 |
+| PE-46 | M2b liegt zwischen M2-DEP und M3. M3 startet erst nach M2b-DEP, weil Schild und Münzen alle Schadens- und Einsammelpfade betreffen, bevor die Bosse sie nutzen. Folge: M3 verschiebt sich um ca. 8–9 Fenster | Abhängigkeit der Schadens- und Einsammelpfade, Planner-Vorschlag, freigegeben (V-04) | Planner (Vorschlag), Nutzer am 2026-10-24 freigegeben (H-07) |
+| PE-47 | Rüstungen als eigene Kategorie mit passiven, zeitlich begrenzten Effekten, z. B. ein Feuerring um die Spielerin für 5 s. Auslöser: Aktivierung durch Einsammeln, Wirkung beginnt sofort. Abklingzeit: 20 s nach Ende. Werte Feuerring: Radius 72 px, Schaden 20 je Sekunde an Gegnern im Ring, Dauer 5 s, nur in der Runde (Q-21). Pilot ist der Feuerring, weitere Rüstungen sind spätere Planung (Q-19). AP-37 bleibt Platzhalter | Ergänzung Nutzer zu Q-14; Auslöser, Abklingzeit und Werte bestätigt (Q-19 bis Q-21) | Nutzer am 2026-10-24 (Idee und Antworten Q-19 bis Q-21) |
 | PE-48 | Verfluchter Baum (`cursedTree`) bleibt unverändert, auch ab Level 5 (Option c aus den Vorschlägen). Die Tempo-Senkung ab Level 5 trifft nur das Zombie-Eichhörnchen, das erst ab Level 5 erscheint (F-04). Eine Tempo-Senkung nur für den Baum bräuchte eine Änderung in Entities und Szene und ist nicht umgesetzt | Entscheidung zum Vorschlag Baum-Tempo (AP-23-Befund, PE-38) | Nutzer am 2026-10-24 |
+| PE-49 | Debug-Runden (`?level=n`) schreiben keinen Spielstand: keine Erfahrung, keine Freischaltung, kein Gold. Der Direktstart bleibt ohne Speichern. Umsetzung in AP-33 (Rundenende, Debug-Kennzeichen in den Szenendaten), statt eines eigenen Folgepakets. Ersetzt PE-36. Gold-Einschluss ist die Folge der Empfehlung (angenommen) | Empfehlung Q-13 („Ja“, Folgepaket mit GameScene) | Nutzer am 2026-10-24 (Q-13 „alles wie vorgeschlagen“) |
+| PE-50 | Stufe 10 der Upgrades bezieht sich auf das Spiel-Level (0–20), nicht auf das Spielerlevel. Richtwert: Stufe 10 nach etwa 15–20 Spiel-Leveln | Empfehlung Q-15 | Nutzer am 2026-10-24 |
+| PE-51 | Dauerfeuer ist auf 20 Schuss/s begrenzt (`RAPID_FIRE_MAX_PER_SEC`), statt „unendlich“ | Empfehlung Q-16 | Nutzer am 2026-10-24 |
+| PE-52 | Rüstungs-Pilot ist nur der Feuerring: 5 s, Radius 72 px, 20 Schaden je Sekunde, Aktivierung durch Einsammeln, 20 s Abklingzeit nach Ende, nur in der Runde, nicht im Menü. Der Katalog weiterer Rüstungen ist spätere Planung, AP-37 bleibt Platzhalter | Q-19 bis Q-21 | Nutzer am 2026-10-24 |
+| PE-53 | Freigabe M2b: F-07 neu, F-15 bis F-17 und Backlog „Später“ in §2, Datenmodell in §4, M2b vor M3 (PE-46). V-01 bis V-04 sind übernommen und aus §16 entfernt | H-07 | Nutzer am 2026-10-24 |
 
 ### Offene Fragen
 
@@ -2166,30 +2184,23 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-10 | Bildschirm: Hochformat, Querformat oder beides? | W | §4, Szenen | Querformat | geklärt (PE-25) |
 | Q-11 | Sound und Musik im ersten Stich? | W | Umfang | nur einfache Effekte | geklärt (PE-24) |
 | Q-12 | Lizenz des öffentlichen Repos: Soll eine `LICENSE` festlegen, dass Code und Grafiken nicht frei genutzt werden dürfen? | W | §5, Kommerzialisierung | ohne Lizenzdatei gilt „alle Rechte vorbehalten“; zusätzlich kurzer Hinweis im README | geklärt (PE-27) |
-| Q-13 | Sollen Debug-Runden (`?level=n`) den Spielstand gar nicht verändern, also weder Erfahrung noch Freischaltung schreiben? | W | AP-22, AP-10 (`GameScene`) | Ja: Folgepaket mit `GameScene` (Debug-Kennzeichen in den Szenendaten, Speichern überspringen). Bis dahin gilt PE-36 | offen |
-| Q-14 | Dauerhafte Waffen- und Charakter-Upgrades mit Gold-Münzen. Stand: Gold-Münzen als Währung, zufällig von Gegnern gedroppt, fliegen automatisch zur Spielerin. Offen: was ist upgradebar, Shop-Ort, Preise, Spielstand-Schema, Verhältnis zu F-07 und PE-12 (Items pro Runde bleiben?), Neu-Balancing | K | §2 (Umfang), F-07, PE-12, PE-13, §4 (`SaveGame`), §8 | keine Empfehlung, Umfangsänderung gegenüber F-07/PE-06. Erst klären, dann Paket anlegen | geklärt (PE-39–PE-45, PE-47), Umfang Freigabe offen (V-01, V-02); Rüstungen offen (Q-19–Q-21) |
-| Q-15 | Stufe 10 nach „15–20 Leveln“: zählt das Spiel-Level (0–20) oder das Spielerlevel? Alle vier Upgrades auf Stufe 10 kosten zusammen ca. 2 800 Gold. | W | PE-41, AP-35 | Spiel-Level, eine Spur pro Runde spürbar | offen |
-| Q-16 | Dauerfeuer „unendlich“ als Obergrenze 20 Schuss/s akzeptieren? | W | PE-43, AP-30 | Ja | offen |
-| Q-17 | Münzen: Magnet über das ganze Spielfeld, keine Lebensdauer, Laser gehen durch Münzen | O | PE-39, AP-31 | so, wie angenommen | angenommen (PE-39), Bestätigung offen |
-| Q-18 | Heilung bleibt seltenes Item, bei Sieg 100 % Gold, bei Niederlage 50 % | O | PE-40, PE-42 | so, wie angenommen | angenommen (PE-40, PE-42), Bestätigung offen |
-| Q-19 | Rüstungen (PE-47): Welche Rüstungen soll es geben (Anzahl, Namen, Effekte)? Ist der Feuerring der erste Eintrag? | K | PE-47, AP-37, §2 (F-17 Vorschlag) | Nur Feuerring als Pilot, weitere später | offen |
-| Q-20 | Rüstungen: Auslöser und Abklingzeit. Vorschlag: Aktivierung durch Einsammeln, Wirkung sofort, Abklingzeit 20 s nach Ende | K | PE-47, AP-37 | so, wie angenommen | offen |
-| Q-21 | Rüstungen: Richtwerte Feuerring (Radius 72 px, Schaden 20/s, Dauer 5 s). Gelten die Richtwerte oder soll der Nutzer sie festlegen? Gilt die Rüstung nur in der Runde, nicht im Menü? | K | PE-47, AP-37 | Richtwerte gelten, nur in der Runde | offen |
+| Q-13 | Sollen Debug-Runden (`?level=n`) den Spielstand gar nicht verändern, also weder Erfahrung noch Freischaltung schreiben? | W | AP-22, AP-10 (`GameScene`) | Ja: Folgepaket mit `GameScene` (Debug-Kennzeichen in den Szenendaten, Speichern überspringen). Bis zur Umsetzung in AP-33 gilt PE-36 | geklärt (PE-49), Umsetzung in AP-33 |
+| Q-14 | Dauerhafte Waffen- und Charakter-Upgrades mit Gold-Münzen. Stand: Gold-Münzen als Währung, zufällig von Gegnern gedroppt, fliegen automatisch zur Spielerin. Offen: was ist upgradebar, Shop-Ort, Preise, Spielstand-Schema, Verhältnis zu F-07 und PE-12 (Items pro Runde bleiben?), Neu-Balancing | K | §2 (Umfang), F-07, PE-12, PE-13, §4 (`SaveGame`), §8 | keine Empfehlung, Umfangsänderung gegenüber F-07/PE-06. Erst klären, dann Paket anlegen | geklärt (PE-39–PE-47, PE-52), Umfang freigegeben (H-07) |
+| Q-15 | Stufe 10 nach „15–20 Leveln“: zählt das Spiel-Level (0–20) oder das Spielerlevel? Alle vier Upgrades auf Stufe 10 kosten zusammen ca. 2 800 Gold. | W | PE-41, AP-35 | Spiel-Level, eine Spur pro Runde spürbar | geklärt (PE-50) |
+| Q-16 | Dauerfeuer „unendlich“ als Obergrenze 20 Schuss/s akzeptieren? | W | PE-43, AP-30 | Ja | geklärt (PE-51) |
+| Q-17 | Münzen: Magnet über das ganze Spielfeld, keine Lebensdauer, Laser gehen durch Münzen | O | PE-39, AP-31 | so, wie angenommen | bestätigt (PE-39) |
+| Q-18 | Heilung bleibt seltenes Item, bei Sieg 100 % Gold, bei Niederlage 50 % | O | PE-40, PE-42 | so, wie angenommen | bestätigt (PE-40, PE-42) |
+| Q-19 | Rüstungen (PE-47): Welche Rüstungen soll es geben (Anzahl, Namen, Effekte)? Ist der Feuerring der erste Eintrag? | K | PE-47, AP-37, §2 (F-17) | Nur Feuerring als Pilot, weitere später | geklärt (PE-52) |
+| Q-20 | Rüstungen: Auslöser und Abklingzeit. Vorschlag: Aktivierung durch Einsammeln, Wirkung sofort, Abklingzeit 20 s nach Ende | K | PE-47, AP-37 | so, wie angenommen | geklärt (PE-52) |
+| Q-21 | Rüstungen: Richtwerte Feuerring (Radius 72 px, Schaden 20/s, Dauer 5 s). Gelten die Richtwerte oder soll der Nutzer sie festlegen? Gilt die Rüstung nur in der Runde, nicht im Menü? | K | PE-47, AP-37 | Richtwerte gelten, nur in der Runde | geklärt (PE-52) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
 | Was | Änderung | Grund | Vorgeschlagen von |
 |---|---|---|---|
-| `idee.txt` | ~~ins Repo committen~~ erledigt durch den Nutzer (556fab7) | – | Planner |
 | AP-01 `Dateien (Eigentum)` | `.gitignore` aus dem Coder-Eigentum nehmen. `node_modules/` und `dist/` sind bereits auf dev (c53f075, Lead). Nur für künftige Pakete gedacht, AP-01 bleibt unverändert | Coder-role-guard blockt `.gitignore`, Wellenabschluss M0 W1 | Lead (Wellenabschluss) |
-| §4 Datenmodell, Zeile `SaveGame` | `highestUnlockedLevel` um die Bedeutung ergänzen: Index des höchsten freigeschalteten Levels, Startwert 0, Bereich 0..20 (PE-35) | Begriff war im Plan nicht festgelegt, AP-04 hatte Standard 1 | Planner (Pflege, Lead-Auftrag) |
 | Testabdeckung AP-05 (≥ 90 %) | Ein Coverage-Werkzeug (z. B. Vitest-Coverage) freigeben, damit das Akzeptanzkriterium belegt werden kann. Bisher nur manuell geprüft | Nachweis fehlt, neues Paket braucht Freigabe (Regel Abhängigkeiten) | Lead (Erkenntnis AP-05) |
 | Arena-Auflösung als Konstante `GAME_SIZE` (640×360) | `ARENA_CENTER` (320,180) steht lokal in `Enemy.ts` und ist nur per `ctx.center` überschreibbar. Die Zahl steckt damit an zwei Stellen. Vorschlag: Konstante in `src/config` anlegen und von Gegnern, Spielszene und Kamera nutzen. Eigentum: AP-15 (`src/config`), AP-10 nutzt sie nur. Alternativ AP-10 übernimmt es, bräuchte aber Config-Freigabe | Erkenntnis AP-09, Hinweis aus Review | Lead (Wellenabschluss M1 W2) |
-| ~~Verfluchter Baum ab Level 5 langsamer (AP-23, Befund Handtest)~~ erledigt: Option (c), Entscheidung Nutzer 2026-10-24, PE-48 | `cursedTree` erscheint ab Level 0, eine Tempo-Senkung nur für Level 5+ geht mit reinen Daten nicht. Optionen: (a) Tempo-Faktor je Level in `levels.ts`, dazu eine kleine Änderung in `createEnemy.ts`/`Enemy.ts` und GameScene (Umfang über reine Datenänderung hinaus, eigenes Paket nach AP-24 in M2 W5 oder M3). (b) Baum-Tempo global senken, dann ändert sich auch Level 0–4 (widerspricht „Level 0–4 darf bleiben“). (c) Baum vorerst unverändert, nur Zombie-Eichhörnchen wird langsamer. Empfehlung: (a) | Befund Nutzer-Handtest, Konflikt Datenänderung gegen Auftrag | Lead (Auftrag AP-23), Planner |
-| V-01 §2 F-07 Waffen-Items (neuer Wortlaut) | Neuer Wortlaut: „Besiegte Gegner lassen mit ca. 8 % zufällig Items fallen: Doppelschuss, Schild, Dauerfeuer und selten Heilung. Ein Item wird eingesammelt, indem die Astronautin es anschießt. Doppelschuss (Stufe 1–2) und Schild (Schadens-Puffer, max. 3 Stufen) wirken bis Rundenende, Dauerfeuer 5 s. Ein liegendes Item verschwindet nach 10 s. Die Waffe startet jede Runde neu.“ Ersetzt die Wirkung „schneller, stärker, größer“. Betroffen: AP-03, AP-05, AP-08, AP-10 (ersetzt durch AP-25 bis AP-36). | Q-14, PE-42, PE-43 | Planner (Pflege), Freigabe Nutzer ausstehend (H-07) |
-| V-02 §2 neue Zeilen F-15, F-16, F-17, Backlog „Später (nicht geplant)“ | F-15 Gold-Münzen (PE-39, PE-40). F-16 Dauerhafte Upgrades (PE-41, PE-45). F-17 Rüstungen mit passiven, zeitlich begrenzten Effekten, erster Effekt Feuerring 5 s (PE-47, Details offen Q-19 bis Q-21). Backlog „Später (nicht geplant)“: neue Waffen, Akimbo-Modus | Q-14, PE-39–PE-47 | Planner (Pflege), Freigabe Nutzer ausstehend (H-07). §2 wird erst nach Freigabe des Nutzers geändert |
-| V-03 §4 Verträge und Datenmodell | `SaveGame` version 1 oder 2 mit `gold` und `upgrades` (PE-44). `ItemEffect` um `doubleShot`, `shield`, `rapidFire` (PE-42). Neue Verträge `coin.ts`, `upgrade.ts`. `ActivePowers`. Events `coins-changed` und `powers-changed`. Bausteine `logic/{economy,upgrades,coins,powers}`, Entities `Coin` und `CoinPool`, `scenes/hud/*`, `scenes/menu/UpgradePanel.ts`. Rüstungen (PE-47) kommen in §4 erst mit AP-37 | AP-25–AP-36 | Planner (Pflege), Freigabe Nutzer ausstehend (H-07) |
-| V-04 Reihenfolge: M2b vor M3 | M2b zwischen M2-DEP und M3 (PE-46). M3 verschiebt sich um ca. 8–9 Fenster. Alternative: M3 zuerst, dann Nachziehen der Schild- und Münzpfade in den Bossen (mehr Nacharbeit, höheres Risiko) | PE-46, §7.3 (Vorgehensänderung) | Planner (Vorschlag), Freigabe Nutzer ausstehend (H-07) |
 
 ---
 
@@ -2203,7 +2214,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | F-04 Gegner | AP-03, AP-09, AP-15, AP-23 (Tempo, Kurve 5–20), AP-24 (Geschosse abschießbar) |
 | F-05 Boss je Level | AP-16–AP-20 |
 | F-06 Level und Maps 0–20 | AP-03, AP-12 |
-| F-07 Waffen-Items (geändert, V-01) | AP-03, AP-05, AP-08, AP-10 (alt, ersetzt in M2b); neu: AP-25, AP-27, AP-30, AP-31, AP-33, AP-34, AP-36 |
+| F-07 Waffen-Items (geändert, PE-42, H-07) | AP-03, AP-05, AP-08, AP-10 (alt, ersetzt in M2b); neu: AP-25, AP-27, AP-30, AP-31, AP-33, AP-34, AP-36 |
 | F-08 Spielerlevel | AP-06, AP-10, AP-11 |
 | F-09 Hauptmenü und Freischaltung | AP-06, AP-11, AP-21, AP-22 (Direktstart `?level=n` am Menü vorbei) |
 | F-10 iPhone über PWA | AP-13, M2-DEP |
@@ -2211,9 +2222,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | F-12 Grafik austauschbar + Anleitung | AP-02, AP-07 |
 | F-13 Sounds austauschbar + Anleitung | AP-02, AP-07, AP-14 |
 | F-14 Querformat | AP-01, AP-13 |
-| F-15 Gold-Münzen (Vorschlag, V-02) | AP-25, AP-26, AP-27, AP-29, AP-31, AP-33, AP-35 |
-| F-16 Dauerhafte Upgrades (Vorschlag, V-02) | AP-27, AP-28, AP-29, AP-32, AP-33, AP-35 |
-| F-17 Rüstungen mit passiven Effekten (Vorschlag, V-02) | AP-37 (Platzhalter, Q-19 bis Q-21 offen) |
+| F-15 Gold-Münzen (PE-39, PE-40) | AP-25, AP-26, AP-27, AP-29, AP-31, AP-33, AP-35 |
+| F-16 Dauerhafte Upgrades (PE-41, PE-45) | AP-27, AP-28, AP-29, AP-32, AP-33, AP-35 |
+| F-17 Rüstungen mit passiven Effekten (PE-47, PE-52) | AP-37 (Platzhalter, Pilot Feuerring fest, Katalog offen) |
 | Schild gilt für alle Schadensquellen (PE-42, PE-43) | AP-30, AP-31, AP-33 |
 | §5 Spielstand v2, robustes Laden (PE-44) | AP-28 |
 | R1 Asset-Lizenzen M2b | AP-26, AP-36 |
@@ -2297,3 +2308,5 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-24 | Erkenntnis Tooling M2 W4: Im Coder-Worktree fehlte `node_modules` (wie bei AP-22), der Coder führte `npm ci` aus. `npm ci` im Hauptcheckout scheitert, solange ein Dev-Server läuft (rolldown-Binding gesperrt), und lässt `node_modules` halb abgebaut zurück. Vor dem Integrationspunkt Dev-Server stoppen | Wellenabschluss M2 W4 | alle Integrationen | Lead (Pflege) |
 | 2026-10-24 | Erkenntnis AP-24 (Ist-API): `canLaserDestroyBolt` in `src/logic/projectiles.ts` nimmt `{active, x, y, radius}` und ist für Boss-Geschosse wiederverwendbar. Overlap in `GameScene.addColliders`, Treffer-Ton `sfx-hit`. Kreisprüfung ist enger als die Rechteck-Überlappung (PE-37). Keine Szenentests, Handtest in M2-DEP | Wellenabschluss M2 W4 | M2-DEP, AP-16–AP-20 (Boss-Geschosse) | Lead (Pflege) |
 | 2026-10-24 | Review-Hinweis AP-23, niedrig: Die Schwelle für Level 20 im Balance-Test (> 0,8, Ist 0,96) ist lockerer als nötig. Anhebung auf 0,9 soll in AP-35 mit erledigt werden, im Paket-Text noch nicht vermerkt | Review-Befund AP-23 | AP-35 | Lead (Pflege) |
+| 2026-10-24 | Freigabe Nutzer („alles wie vorgeschlagen“): V-01 bis V-04 in §2, §4, §8, §9, §11, §12 übernommen und aus §16 entfernt, Backlog „Später“ in §2. Q-13, Q-15, Q-16, Q-19 bis Q-21 entschieden (PE-49 bis PE-52), Q-17/Q-18 bestätigt, PE-53. AP-33 um Debug-Verhalten (PE-49) ergänzt, AP-35 um Level-20-Schwelle 0,9 und Hinweis `items.test.ts`. H-07 und H-09 erledigt. Erledigte Zeilen aus „Vorgeschlagene Änderungen“ (idee.txt, verfluchter Baum, SaveGame-Bedeutung) entfernt | Pflegeauftrag Lead, Freigabe Nutzer 2026-10-24 | §2, §4, §8–§12, §13, §16, §17, AP-33, AP-35 | Planner (Pflege) |
+| 2026-10-24 | Prüfung Reihenfolge M2-DEP → AP-25/AP-26: keine Code-Abhängigkeit. Beide Pakete berühren keine Datei, die in M2 noch offen ist (M2 hat kein offenes Code-Paket, M3 ist nicht begonnen). Die Kante bleibt als Reihenfolgekante, bis der Nutzer entscheidet. `src/entities/Laser.ts` hat in M2b kein Eigentum, AP-31 könnte es für Schaden je Laser brauchen. Zu klären vor AP-31 | Pflegeauftrag Lead | §11, AP-31 (offen) | Planner (Pflege) |
