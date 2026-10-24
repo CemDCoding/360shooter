@@ -27,6 +27,7 @@ import { SpawnDirector } from '../logic/spawn';
 import { getSoundService, type SoundService } from '../platform/audio';
 import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
+import { VirtualStick } from './controls/VirtualStick';
 import { resolveLevelId } from './debug';
 
 /** Layout only: distance of the spawn ring beyond the visible corners (pixels). */
@@ -83,6 +84,7 @@ export class GameScene extends Phaser.Scene {
   private enemyPool!: EnemyPool;
   private player!: Player;
   private aim!: AimInput;
+  private stick?: VirtualStick;
   private round!: RoundState;
   private spawner!: SpawnDirector;
   private items: ItemPickup[] = [];
@@ -136,7 +138,8 @@ export class GameScene extends Phaser.Scene {
     });
     this.player = new Player(this, this.center.x, this.center.y, this.lasers);
     this.player.setDepth(10);
-    this.aim = new AimInput(this, this.center.x, this.center.y);
+    this.stick = new VirtualStick(this);
+    this.aim = new AimInput(this, this.center.x, this.center.y, this.stick);
 
     this.round = new RoundState(this.level);
     const spawnRadius = Math.hypot(width, height) / 2 + SPAWN_MARGIN_PX;
@@ -332,6 +335,8 @@ export class GameScene extends Phaser.Scene {
     this.pendingDrops = [];
     this.background?.destroy();
     this.background = undefined;
+    this.stick?.destroy();
+    this.stick = undefined;
     // AimInput removes its own listeners on SHUTDOWN; game objects, colliders and timers
     // are destroyed by Phaser's scene shutdown.
     if (this.scene.isActive('HudScene') || this.scene.isPaused('HudScene')) {
