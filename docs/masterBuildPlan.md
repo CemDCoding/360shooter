@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-25 · M0, M1, M2 abgenommen (M0-DEP, M1-DEP, M2-DEP am PC und iPhone, H-03 und H-06 für M0–M2 erledigt, PRs dev→stage→master durch Nutzer) · nächster Meilenstein M2b
-- **Fertig:** AP-01–AP-15, AP-21–AP-24, M0-DEP, M1-DEP, M2-DEP (alle in dev). **Bereit:** AP-25, AP-26, AP-38 (M2b W1). **Offen:** AP-39 (wartet auf Freigabe V-05 und auf AP-38), AP-27–AP-36, M2b-DEP, AP-16–AP-20, M3-DEP. AP-37 Platzhalter. Keine Coder-Pakete laufen.
-- **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach M2 W4 nicht neu gemessen. M2b jetzt ca. 9–10 Fenster, gesamt ca. 22–27 (§14).
-- **Unterbrochen oder laufend:** nichts, keine Wellen laufen. Hinweis: Hauptcheckout steht auf `stage`, Plan-Commits nur auf `dev` (siehe §18).
-- **Erkenntnisse:** M2-Abnahme bestanden. iPhone-Befunde: Spielfeld größer als der Bildschirm, Astronautin nicht mittig, HUD-Stacks zu klein (AP-38, PE-54). Touch-Stick als Umfangserweiterung vorgeschlagen (V-05, PE-55). F-17 Rüstungen nach „Optional“ vorgeschlagen (V-06, PE-56). Offen: Notch-Punkt M2-DEP wird über AP-38 nachgeprüft. Details §18.
-- **Nächster Schritt:** Nutzer entscheidet V-05 und V-06. Danach Wellenplan M2b W1 (AP-25, AP-26, AP-38) durch den Lead. AP-39 folgt in W2 nach Merge AP-38.
-- **Offene Fragen an den Nutzer:** Freigabe V-05 (Stick, §2 F-01) und V-06 (F-17 nach „Optional“). Keine `[K]`-Frage offen. Zu bestätigen: Boss-Verhalten PE-34 vor M3, Zahlen PE-41, Richtwerte PE-43, PE-44, PE-45 (noch angenommen).
+- **Stand:** 2026-10-25 · M0, M1, M2 abgenommen (M0-DEP, M1-DEP, M2-DEP am PC und iPhone) · laufender Meilenstein M2b, Welle W1 · Rüstung Feuerring in M2b eingeplant (PE-58)
+- **Fertig:** AP-01–AP-15, AP-21–AP-24, M0-DEP, M1-DEP, M2-DEP (alle in dev). **Laufend (M2b W1):** AP-25, AP-26, AP-38. **Offen:** AP-27, AP-28, AP-39 (W2), AP-29, AP-30, AP-37a (W3), AP-31, AP-34, AP-37c (W4), AP-32, AP-33, AP-35 (W5), AP-36 (W6), M2b-DEP (W7), AP-16–AP-20, M3-DEP.
+- **Budget:** Vor M2 W2 ca. 29 % (Zielwert 30 %). Nach M2 W4 nicht neu gemessen. M2b jetzt ca. 11–12 Fenster, gesamt ca. 24–29 (§14).
+- **Unterbrochen oder laufend:** M2b W1 läuft (AP-25, AP-26, AP-38), keine Unterbrechung gemeldet. Hauptcheckout steht auf `dev`, Plan-Commits nur auf `dev` (siehe §18).
+- **Erkenntnisse:** Stick übernommen (V-05, §2 F-01), AP-39 wartet nur noch auf AP-38. F-17 Rüstungen bleibt Pflicht (V-06 abgelehnt, PE-56), zeitnah Priorität (PE-58): AP-37a (W3), AP-37c (W4), HUD in AP-34 (W4), Einbindung in AP-33 (W5), AP-32 nach W5. Offen: Notch-Punkt M2-DEP wird über AP-38 und M2b-DEP nachgeprüft. Details §18.
+- **Nächster Schritt:** Wellenabschluss M2b W1 durch den Lead, danach W2 (AP-27, AP-28, AP-39).
+- **Offene Fragen an den Nutzer:** Q-23 (Feuerring: Drop-Chance 2 % je Gegner, Bosse ab M3). Zu bestätigen (angenommen): Boss-Verhalten PE-34 vor M3, Zahlen PE-41, Richtwerte PE-43, PE-44, PE-45, Feuerring-Regeln PE-57. Keine `[K]`-Frage offen.
 
 <!-- Ende Lagebericht -->
 
@@ -64,25 +64,25 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | fertig | – | G1 |
-| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) vor M3; F-07, F-15 bis F-17 und Backlog freigegeben (H-07); V-05 (Stick, F-01) und V-06 (F-17 nach „Optional“) Freigabe ausstehend (H-10) | G1 |
+| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) vor M3; F-07, F-15 bis F-17 und Backlog freigegeben (H-07); F-01 mit Stick übernommen (V-05, 2026-10-25); F-17 bleibt Pflicht (V-06 abgelehnt, PE-56) | G1 |
 | 3 | Tech-Stack | angenommen | Werkzeuge (Vitest, ESLint, Prettier) angenommen | G1 |
 | 4 | Architektur, Datenmodell, Verträge | fertig | – | G1 |
 | 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | – | G1 |
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | fertig | – | G2 |
-| 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; um AP-38 und AP-39 erweitert am 2026-10-25) | G2 |
+| 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 neu (bereit), AP-39 neu (offen bis V-05); AP-37 Platzhalter (Rüstungen: Pilot PE-52, Katalog offen); M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-54 bis PE-56 neu, V-05/V-06 freigeben, Q-22 geklärt (PE-55) | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 (Feuerring-Regeln) bestätigen, Q-23 klären; PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38 (bereit) und AP-39 (offen bis Freigabe V-05). W1 (AP-25, AP-26, AP-38) darf starten.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) läuft.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -142,7 +142,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 
 | ID | Funktion | Beschreibung aus Nutzersicht | Kernfluss |
 |---|---|---|---|
-| F-01 | Steuerung | Die Astronautin steht fest in der Bildschirmmitte und läuft nicht (PE-08). Der Spieler zeigt mit Maus oder Finger (Touch) auf eine Stelle, die Figur dreht sich dorthin, in beide Richtungen auf dem kürzeren Weg. Die Drehung ist **nicht sofort**, sondern mit begrenzter Drehgeschwindigkeit (PE-03, PE-04). | ja |
+| F-01 | Steuerung | Die Astronautin steht fest in der Bildschirmmitte und läuft nicht (PE-08). Der Spieler zeigt mit Maus oder Finger (Touch) auf eine Stelle, die Figur dreht sich dorthin, in beide Richtungen auf dem kürzeren Weg. Die Drehung ist **nicht sofort**, sondern mit begrenzter Drehgeschwindigkeit (PE-03, PE-04). Auf Touch-Geräten im Querformat zusätzlich ein virtueller Stick unten rechts: Die Stick-Richtung ist die Zielrichtung (360°). Tippen auf das Spielfeld bleibt erhalten, der Stick hat Vorrang (PE-55). | ja |
 | F-02 | Automatischer Schuss | Die Laserpistole feuert automatisch, immer in die aktuelle Blickrichtung (PE-03). | ja |
 | F-03 | Runde mit Timer | Eine Runde ist gewonnen, wenn der Timer abläuft und die Astronautin noch lebt. Dauer: erste Hälfte 3 min, zweite Hälfte 5 min, die erste Hälfte wird aufgerundet, bezogen auf die Level eines Batches (PE-05, PE-09). Ergebnis: Wald 0–2 = 3 min, 3–4 = 5 min · Nacht 5–7 = 3 min, 8–9 = 5 min · Elfenwald 10–15 = 3 min, 16–20 = 5 min. | ja |
 | F-04 | Gegner | Verfluchter Baum (Level 0–20, langsam, etwas mehr HP, läuft auf Spieler zu), Wald-Hexe (5–20, schießt Projektile, normale Werte), Zombie-Eichhörnchen (5–20, schnell, wenig HP, läuft), Böser Wald-Spirit (10–20, Dauerschaden in Nähe, wenig HP). Quelle: `idee.txt`. | ja |
@@ -270,7 +270,7 @@ flowchart TD
 | CoinRules (M2b, `coin.ts`) | `dropChance`, `magnetRadiusPx`, `collectRadiusPx`, `magnetSpeedPxPerSec` | Konfiguration | – |
 | UpgradeLevels (M2b, `upgrade.ts`) | je Spur 0–10: `weaponFireRate`, `weaponDamage`, `playerMaxHp`, `playerTurnSpeed` | Gerät (im SaveGame) | Reset mit SaveGame |
 
-**Verträge:** TypeScript-Typen in `src/contracts/`. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern. M2b (AP-25) ergänzt Typen additiv und die Events `coins-changed` (`{ roundCoins }`) und `powers-changed` (`ActivePowers`). Rüstungen (PE-47) kommen in §4 erst mit AP-37.
+**Verträge:** TypeScript-Typen in `src/contracts/`. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern. M2b (AP-25) ergänzt Typen additiv und die Events `coins-changed` (`{ roundCoins }`) und `powers-changed` (`ActivePowers`). Rüstungen (PE-47) kommen in §4 erst mit AP-37a (Vorschlag für das Datenmodell in §16).
 
 ---
 
@@ -436,7 +436,7 @@ flowchart TD
 |---|---|---|
 | `package.json`, `package-lock.json` | AP-01 (anlegen), AP-02 (`assets:placeholders`), AP-07 (`assets:check`), AP-13 (`preview:lan`, `icons`); sonst nur der Lead beim Merge | M0 W1, M0 W2, M1 W1, M2 W1 |
 | `src/main.ts` (Szenen-Registrierung) | AP-01 registriert alle sechs Szenen als Stubs; danach unverändert | M0 W1 |
-| `src/contracts/*` | AP-01; spätere Erweiterung nur in einem eigenen Vertragspaket eine Welle vorher (M3: AP-16) | M0 W1 |
+| `src/contracts/*` | AP-01; spätere Erweiterung nur in einem eigenen Vertragspaket eine Welle vorher (M2b: AP-25, AP-37a; M3: AP-16) | M0 W1, M2b W1, M2b W3, M3 W1 |
 | `index.html`, `vite.config.ts` | AP-01, später AP-13, AP-38 (M2b, nur `index.html`) | M0 W1, M2 W1, M2b W1 |
 | `README.md` | AP-01, später AP-13 | M0 W1, M2 W1 |
 | `src/platform/storage.ts`, `src/logic/progression.ts` (samt Tests) | AP-04 / AP-06 → AP-21 (Fix Index-Semantik) | M0 W2, M1 W1, M1 W2 |
@@ -444,13 +444,13 @@ flowchart TD
 | `src/scenes/debug.ts`, `src/scenes/PreloadScene.ts` (samt `tests/scenes/debug.test.ts`) | AP-10 (`debug.ts`) → AP-22 (Direktstart `?level=n`) | M1 W3, M2 W3 |
 | `src/scenes/{MenuScene,HudScene,ResultScene}.ts` | AP-10 (Hud, Result), AP-11 (Menu) → AP-14 (Sound, Stumm-Taste) | M1 W3, M2 W1, M2 W2 |
 | `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-23 (`levels`, `enemies`, `weapon`) → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M2 W4, M3 W1 |
-| `src/config/assets.ts`, `docs/guides/*` | AP-02 / AP-07 → AP-16 (Boss-Assets) | M0 W2, M1 W1, M3 W1 |
-| `src/logic/{round,spawn}.ts`, `src/contracts/{events,index}.ts` | AP-06 / AP-01 → AP-16 | M1 W1, M0 W1, M3 W1 |
+| `src/config/assets.ts`, `docs/guides/*` | AP-02 / AP-07 → AP-16 (Boss-Assets), M2b: AP-26 → AP-37c → AP-36 | M0 W2, M1 W1, M3 W1, M2b W1, W4, W6 |
+| `src/logic/{round,spawn}.ts`, `src/contracts/{events,index}.ts` | AP-06 / AP-01 → AP-16; M2b: AP-25 → AP-37a | M1 W1, M0 W1, M3 W1, M2b W1, W3 |
 | `src/scenes/{GameScene,HudScene,ResultScene}.ts` in M3 | AP-20 | M3 W3 |
-| `src/scenes/GameScene.ts` in M2b | AP-38 (Mitte, Vollbild), AP-39 (Stick-Einbindung), AP-33 (Ergebnis und Gold, Upgrades beim Start) | M2b W1, W2, W5 |
+| `src/scenes/GameScene.ts` in M2b | AP-38 (Mitte, Vollbild), AP-39 (Stick-Einbindung), AP-33 (Ergebnis und Gold, Upgrades beim Start, Rüstungs-Einbindung) | M2b W1, W2, W5 |
 | `src/main.ts` in M2b | AP-38 (Scale-Einstellung, nur falls nötig) | M2b W1 |
 
-**M2b (Eigentum je Welle, freigegeben am 2026-10-24, H-07; ergänzt am 2026-10-25 um AP-38 und AP-39):** Innerhalb einer Welle höchstens ein Paket je Datei. Vertragsänderungen in W1 sind additiv, Aufräumen in W6. AP-38 und AP-39 teilen `GameScene.ts`, daher liegen sie in zwei Wellen nacheinander (AP-38 zuerst).
+**M2b (Eigentum je Welle, freigegeben am 2026-10-24, H-07; ergänzt am 2026-10-25 um AP-38, AP-39 und die Rüstungspakete AP-37a und AP-37c, PE-58):** Innerhalb einer Welle höchstens ein Paket je Datei. Vertragsänderungen in W1 sind additiv, Aufräumen in W6. AP-38 und AP-39 teilen `GameScene.ts`, daher liegen sie in zwei Wellen nacheinander (AP-38 zuerst). AP-33 teilt `GameScene.ts` mit keinem anderen Paket, deshalb trägt es in W5 die Rüstungs-Einbindung. Höchstens drei Pakete je Welle (PE-15).
 
 | Welle | Paket | Dateien |
 |---|---|---|
@@ -462,10 +462,12 @@ flowchart TD
 | W2 | AP-39 | `src/platform/stick.ts` (neu), `tests/platform/stick.test.ts` (neu), `src/logic/aimSource.ts` (neu), `tests/logic/aimSource.test.ts` (neu), `src/platform/input.ts` (einziger Input-Code), `src/scenes/controls/VirtualStick.ts` (neu), `src/scenes/GameScene.ts` (nur Einbindung) |
 | W3 | AP-29 | `src/logic/{economy,upgrades,coins}.ts`, `tests/logic/{economy,upgrades,coins}.test.ts` |
 | W3 | AP-30 | `src/logic/{items,weapon,powers}.ts`, `tests/logic/{items,weapon,powers}.test.ts` |
+| W3 | AP-37a | `src/contracts/{armour,events,index}.ts` (neu `armour.ts`, `events.ts` nur `armour-changed`), `src/config/armour.ts` (neu), `src/logic/armour.ts` (neu), `tests/config/armour.test.ts` (neu), `tests/logic/armour.test.ts` (neu) |
 | W4 | AP-31 | `src/entities/{Player,LaserPool,Coin,CoinPool}.ts` |
-| W4 | AP-32 | `src/scenes/MenuScene.ts`, `src/scenes/menu/{UpgradePanel,ConfirmDialog}.ts` |
 | W4 | AP-34 | `src/scenes/HudScene.ts`, `src/scenes/hud/*` (neu), ggf. `tests/scenes/hud.test.ts` |
-| W5 | AP-33 | `src/scenes/{GameScene,ResultScene}.ts` |
+| W4 | AP-37c | `src/entities/{ArmourRing,ArmourPickup}.ts` (neu), `src/config/assets.ts`, `public/assets/sprites/item-fire-ring.png` (neu), `public/assets/.placeholders.json`, `public/assets/LICENSES.md`, `docs/guides/grafik-austauschen.md`, `tests/config/assets.test.ts` |
+| W5 | AP-32 | `src/scenes/MenuScene.ts`, `src/scenes/menu/{UpgradePanel,ConfirmDialog}.ts` (von W4 hierher verschoben, damit W4 drei Pakete hat) |
+| W5 | AP-33 | `src/scenes/{GameScene,ResultScene}.ts` (inkl. Rüstungs-Einbindung in `GameScene`) |
 | W5 | AP-35 | `src/config/{levels,enemies,weapon,items,coins,upgrades}.ts`, `tests/config/*` (ohne `assets`, `maps`, `player`), `tests/logic/balance.test.ts`, `docs/balancing.md` |
 | W6 | AP-36 | `src/contracts/{item,weapon}.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, alte Item-Platzhalter, `docs/guides/*`, `public/assets/LICENSES.md` |
 
@@ -483,7 +485,7 @@ flowchart TD
 | M0 | Fundament | Werkzeuge, Verträge, Spieldaten 0–20, Platzhalter-Assets, Eingabe und Speicher | `npm run dev` zeigt die Preload-Szene mit allen Platzhalter-Sprites; alle Checks grün |
 | M1 | Kernspiel | Drehen und Auto-Schuss, 4 Gegnertypen, Items durch Anschießen, HP, Timer, Sieg/Niederlage, HUD; Designer-Anleitungen | Level 0 (und per Debug-Parameter jedes Level 0–20) am PC spielbar |
 | M2 | Inhalte, Menü, iPhone | Hauptmenü mit Level-Auswahl und Spielerlevel, Maps je Batch, PWA + Querformat, Platzhalter-Sounds mit Stummschalten, Balancing 0–20 | Level 0–20 nacheinander freispielbar, am PC und auf dem iPhone |
-| M2b | Gold und Waffen-Items (freigegeben, H-07) | Gold-Münzen aus Gegnern, Upgrade-Overlay im Hauptmenü (Waffe: Feuerrate, Schaden; Spielerin: max. HP, Drehgeschwindigkeit; je 10 Stufen), Waffen-Items neu (Doppelschuss, Schild, Dauerfeuer), Neu-Balancing, Fix iPhone-Darstellung (AP-38), virtueller Stick auf Touch-Geräten (AP-39, nach Freigabe V-05) | Upgrades kaufbar, Gold bleibt nach Neuladen, Reset löscht Gold und Upgrades; iPhone: Spielfeld passt ins Bild, Stick steuert die Zielrichtung |
+| M2b | Gold und Waffen-Items (freigegeben, H-07) | Gold-Münzen aus Gegnern, Upgrade-Overlay im Hauptmenü (Waffe: Feuerrate, Schaden; Spielerin: max. HP, Drehgeschwindigkeit; je 10 Stufen), Waffen-Items neu (Doppelschuss, Schild, Dauerfeuer), Neu-Balancing, Fix iPhone-Darstellung (AP-38), virtueller Stick auf Touch-Geräten (AP-39), Rüstung Feuerring (AP-37a, AP-37c, Einbindung AP-33, Anzeige AP-34) | Upgrades kaufbar, Gold bleibt nach Neuladen, Reset löscht Gold und Upgrades; iPhone: Spielfeld passt ins Bild, Stick steuert die Zielrichtung; Feuerring wirkt 5 s, danach 20 s Abklingzeit |
 | M3 | Bosse | Boss-Rahmen, drei Bosse mit Varianten je Level, Einbindung (PE-18, PE-33, PE-34) | jedes Level endet mit seinem Boss |
 
 ### 9.1 Ablauf einer Welle
@@ -580,19 +582,19 @@ flowchart TD
 
 **Einordnung (PE-46, PE-53):** eigener Meilenstein zwischen M2-DEP und M3. Grund: Schild und Münzen müssen alle Schadens- und Einsammelpfade kennen, bevor die Bosse (M3) sie nutzen. Start nach M2-DEP (abgenommen 2026-10-25). Am 2026-10-25 kamen zwei Befunde aus dem iPhone-Test dazu (PE-54, PE-55): AP-38 und AP-39.
 
-**Rüstungen (PE-47, PE-52):** passive, zeitlich begrenzte Effekte, eigene Kategorie neben den Waffen-Items. Pilot ist der Feuerring um die Spielerin (5 s, Radius 72 px, 20 Schaden je Sekunde, nur in der Runde). Der Katalog weiterer Rüstungen ist spätere Planung. Deshalb noch kein Paket: AP-37 bleibt Platzhalter in §10. Einordnung, wenn AP-37 kommt: Logik nach W3, Entity und Szene nach W4 und W5.
+**Rüstungen (PE-47, PE-52, PE-58):** passive, zeitlich begrenzte Effekte, eigene Kategorie neben den Waffen-Items. Pilot ist der Feuerring um die Spielerin (5 s, Radius 72 px, 20 Schaden je Sekunde, nur in der Runde, Regeln in PE-57). Die Umsetzung läuft in vier Teilen: Vertrag, Config und Logik in AP-37a (W3), Entity und Pickup-Sprite in AP-37c (W4), Anzeige im HUD in AP-34 (W4), Einbindung in die Spielszene in AP-33 (W5). Der Katalog weiterer Rüstungen ist spätere Planung. Die Definition liegt als Daten in `src/config/armour.ts`, damit weitere Rüstungen ohne Umbau kommen. Gleiche Welle heißt keine Abhängigkeit: AP-37a und AP-37c haben deshalb keine Kante zu AP-29, AP-30 oder AP-31 (eigener Zustand `ActiveArmour`, Position kommt von der Szene).
 
 | Welle | Pakete (parallel) |
 |---|---|
 | W1 | AP-25 Verträge Gold, Upgrades, Waffen-Items (SH), AP-26 Assets Münzen und neue Items (ASSET), AP-38 Fix iPhone-Darstellung, Mitte und HUD-Lesbarkeit (GAME/OPS) |
-| W2 | AP-27 Config Münzen, Upgrades, Items, Gegner-Münzwerte (SH), AP-28 Spielstand v2 (GAME/Plattform), AP-39 Virtueller Stick für Touch-Geräte (GAME, nach Freigabe V-05) |
-| W3 | AP-29 Logik Wirtschaft und Upgrades (LOG), AP-30 Logik Items, Schild, Dauerfeuer (LOG) |
-| W4 | AP-31 Entities Spielerin, Laser, Münzen (GAME), AP-32 Hauptmenü Upgrade-Overlay (GAME), AP-34 HUD Münzen und Power-Anzeige (GAME) |
-| W5 | AP-33 Spielszene und Ergebnis mit Gold (GAME, opus), AP-35 Neu-Balancing (SH) |
+| W2 | AP-27 Config Münzen, Upgrades, Items, Gegner-Münzwerte (SH), AP-28 Spielstand v2 (GAME/Plattform), AP-39 Virtueller Stick für Touch-Geräte (GAME, nach AP-38) |
+| W3 | AP-29 Logik Wirtschaft und Upgrades (LOG), AP-30 Logik Items, Schild, Dauerfeuer (LOG), AP-37a Rüstung Vertrag, Config und Logik Feuerring (SH/LOG) |
+| W4 | AP-31 Entities Spielerin, Laser, Münzen (GAME), AP-34 HUD Münzen, Power- und Rüstungs-Anzeige (GAME), AP-37c Rüstung Feuerring-Entity und Pickup-Sprite (GAME/ASSET) |
+| W5 | AP-32 Hauptmenü Upgrade-Overlay (GAME), AP-33 Spielszene und Ergebnis mit Gold, Rüstungs-Einbindung (GAME, opus), AP-35 Neu-Balancing (SH) |
 | W6 | AP-36 Aufräumen alter Waffen-Items (SH/ASSET) |
 | W7 | M2b-DEP [Mensch] |
 
-**Integration:** nach W2 und nach W5 `npm install`, alle Checks, `npm run dev`. Nach W1 bleibt der Typecheck grün, weil alle Vertragsänderungen additiv sind.
+**Integration:** nach W2 und nach W5 `npm install`, alle Checks, `npm run dev`. Nach W1 bleibt der Typecheck grün, weil alle Vertragsänderungen additiv sind. Nach W3 und W4 Typecheck und Tests. AP-32 wechselt von W4 nach W5, weil W4 sonst vier Pakete hätte (Limit drei, PE-15).
 
 ##### M2b-DEP – Abnahme [Mensch]
 
@@ -616,6 +618,10 @@ flowchart TD
   - [ ] iPhone: Virtueller Stick unten rechts erscheint nur auf Touch-Geräten im Querformat, 360°-Zielen über die Stick-Richtung, Auto-Schuss läuft, Drehung bleibt verzögert (AP-39, PE-55)
   - [ ] Tippen auf das Spielfeld zielt weiterhin. Solange der Stick gehalten wird, wirkt Tippen nicht, ein zweiter Finger auf dem Feld wird ignoriert, nach dem Loslassen gilt Tippen wieder. Die Pause-Taste funktioniert parallel (AP-39, PE-55)
   - [ ] PC: kein Stick sichtbar, die Maus zielt wie bisher (AP-39, PE-55)
+  - [ ] Feuerring: Pickup fällt selten, Anschießen aktiviert es, der Ring um die Astronautin wirkt 5 s und fügt Gegnern im Ring Schaden zu (AP-37a, AP-37c, AP-33, PE-52)
+  - [ ] Feuerring: danach 20 s Abklingzeit, ein Pickup in dieser Zeit oder während aktiver Rüstung wirkt nicht (PE-57)
+  - [ ] Feuerring: Pause hält Ring und Abklingzeit an, eine neue Runde startet ohne Ring (PE-29, PE-57)
+  - [ ] HUD zeigt Restzeit und Abklingzeit des Feuerrings (AP-34); im Hauptmenü gibt es keine Rüstung (PE-52)
 
 #### M3 – Bosse
 
@@ -667,22 +673,23 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-23 | Balancing-Nachbesserung Level 5–20 | M2 | SH | W4 | keine (AP-15 fertig) | S | sonnet (medium) | c23 / agent/AP-23-c23 | fertig |
 | AP-24 | Gegnerische Projektile abschießbar | M2 | GAME/LOG | W4 | keine (AP-09, AP-10 fertig) | S | sonnet (medium) | c24 / agent/AP-24-c24 | fertig |
 | M2-DEP | Abnahme M2 (PC + iPhone) | M2 | HUM | W5 | AP-14, AP-15, AP-22, AP-23, AP-24 | H | – | – | fertig |
-| AP-25 | Verträge Gold, Upgrades, Waffen-Items | M2b | SH | W1 | M2-DEP (fertig) | S | sonnet (medium) | – | bereit |
-| AP-26 | Assets Münzen und neue Items | M2b | ASSET | W1 | M2-DEP (fertig) | M | sonnet (medium) | – | bereit |
+| AP-25 | Verträge Gold, Upgrades, Waffen-Items | M2b | SH | W1 | M2-DEP (fertig) | S | sonnet (medium) | – | in Arbeit |
+| AP-26 | Assets Münzen und neue Items | M2b | ASSET | W1 | M2-DEP (fertig) | M | sonnet (medium) | – | in Arbeit |
 | AP-27 | Config Münzen, Upgrades, Items | M2b | SH | W2 | AP-25 | M | sonnet (medium) | – | offen |
 | AP-28 | Spielstand v2 (Gold, Upgrades) | M2b | GAME | W2 | AP-25 | S | sonnet (medium) | – | offen |
 | AP-29 | Logik Wirtschaft und Upgrades | M2b | LOG | W3 | AP-25, AP-27 | M | sonnet (high) | – | offen |
 | AP-30 | Logik Items, Schild, Dauerfeuer | M2b | LOG | W3 | AP-25, AP-27 | M | sonnet (high) | – | offen |
 | AP-31 | Entities Spielerin, Laser, Münzen | M2b | GAME | W4 | AP-26, AP-27, AP-29, AP-30 | M | sonnet (medium) | – | offen |
-| AP-32 | Hauptmenü Upgrade-Overlay | M2b | GAME | W4 | AP-27, AP-28, AP-29 | M | sonnet (medium) | – | offen |
-| AP-34 | HUD Münzen und Power-Anzeige | M2b | GAME | W4 | AP-25, AP-30, AP-38 | M | sonnet (medium) | – | offen |
-| AP-33 | Spielszene und Ergebnis mit Gold | M2b | GAME | W5 | AP-29, AP-30, AP-31, AP-38, AP-39 | L | opus (high) | – | offen |
+| AP-32 | Hauptmenü Upgrade-Overlay | M2b | GAME | W5 | AP-27, AP-28, AP-29 | M | sonnet (medium) | – | offen |
+| AP-34 | HUD Münzen, Power- und Rüstungs-Anzeige | M2b | GAME | W4 | AP-25, AP-30, AP-37a, AP-38 | M | sonnet (medium) | – | offen |
+| AP-33 | Spielszene, Ergebnis mit Gold, Rüstungs-Einbindung | M2b | GAME | W5 | AP-29, AP-30, AP-31, AP-37a, AP-37c, AP-38, AP-39 | L | opus (high) | – | offen |
 | AP-35 | Neu-Balancing M2b | M2b | SH | W5 | AP-27, AP-29, AP-30 | M | sonnet (high) | – | offen |
 | AP-36 | Aufräumen alter Waffen-Items | M2b | SH/ASSET | W6 | AP-26, AP-33, AP-35 | S | sonnet (medium) | – | offen |
-| AP-37 | Platzhalter: Rüstungen, Pilot Feuerring (PE-47, PE-52), nicht umsetzbar | M2b | LOG/GAME | tbd | Katalog weiterer Rüstungen (spätere Planung) | tbd | tbd | – | Platzhalter |
-| AP-38 | Fix iPhone-Darstellung, Mitte und HUD-Lesbarkeit (PE-54) | M2b | GAME/OPS | W1 | keine (M2 abgenommen) | M | sonnet (medium) | – | bereit |
-| AP-39 | Virtueller Stick für Touch-Geräten (PE-55) | M2b | GAME | W2 | AP-38 (Datei GameScene), Freigabe V-05 | M | sonnet (high) | – | offen |
-| M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36, AP-38, AP-39 | H | – | – | offen |
+| AP-37a | Rüstung Vertrag, Config und Logik (Feuerring, PE-52, PE-57) | M2b | SH/LOG | W3 | AP-25 | M | sonnet (high) | – | offen |
+| AP-37c | Rüstung Feuerring-Entity und Pickup-Sprite (PE-52, PE-57) | M2b | GAME/ASSET | W4 | AP-26, AP-37a | M | sonnet (medium) | – | offen |
+| AP-38 | Fix iPhone-Darstellung, Mitte und HUD-Lesbarkeit (PE-54) | M2b | GAME/OPS | W1 | keine (M2 abgenommen) | M | sonnet (medium) | – | in Arbeit |
+| AP-39 | Virtueller Stick für Touch-Geräten (PE-55) | M2b | GAME | W2 | AP-38 (Datei GameScene, Reihenfolge) | M | sonnet (high) | – | offen |
+| M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36, AP-37a, AP-37c, AP-38, AP-39 | H | – | – | offen |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2b-DEP | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -714,10 +721,12 @@ flowchart LR
     AP24["AP-24"]
   end
   subgraph M2b["M2b Gold und Waffen-Items"]
-    AP25["AP-25"] --> AP27["AP-27"] & AP28["AP-28"] & AP34["AP-34"]
-    AP26["AP-26"]
+    AP25["AP-25"] --> AP27["AP-27"] & AP28["AP-28"] & AP34["AP-34"] & AP37a["AP-37a"]
+    AP26["AP-26"] --> AP37c["AP-37c"]
     AP38["AP-38"] --> AP39["AP-39"] & AP34["AP-34"]
     AP39 --> AP33["AP-33"]
+    AP37a["AP-37a"] --> AP34 & AP37c & AP33
+    AP37c --> AP33
     AP27 --> AP29["AP-29"] & AP30["AP-30"] & AP35["AP-35"] & AP31["AP-31"] & AP32["AP-32"]
     AP28 --> AP32
     AP29 --> AP31 & AP32 & AP33["AP-33"]
@@ -725,7 +734,7 @@ flowchart LR
     AP26 --> AP31
     AP31 --> AP33
     AP33 & AP35 --> AP36["AP-36"]
-    AP31 & AP32 & AP33 & AP34 & AP35 & AP36 & AP38 & AP39 --> M2bDEP["M2b-DEP"]
+    AP31 & AP32 & AP33 & AP34 & AP35 & AP36 & AP37a & AP37c & AP38 & AP39 --> M2bDEP["M2b-DEP"]
   end
   subgraph M3["M3 Bosse"]
     AP16["AP-16"] --> AP17["AP-17"] & AP18["AP-18"] & AP19["AP-19"]
@@ -741,7 +750,7 @@ flowchart LR
   AP14 & AP15 & AP22 & AP23 & AP24 --> M2DEP["M2-DEP"]
 ```
 
-**M2b:** Die Reihenfolgekante M2-DEP → AP-25/AP-26 (PE-46) ist mit der Abnahme vom 2026-10-25 erfüllt und entfernt. W1 und W2 sind je ein Paket pro Datei. AP-38 (W1) und AP-39 (W2) teilen `GameScene.ts`, daher nacheinander. AP-34 (HUD, W4) und AP-33 (GameScene, W5) starten erst nach AP-38 bzw. AP-39. W5 läuft mit AP-35 (Config) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt.
+**M2b:** Die Reihenfolgekante M2-DEP → AP-25/AP-26 (PE-46) ist mit der Abnahme vom 2026-10-25 erfüllt und entfernt. W1 und W2 sind je ein Paket pro Datei. AP-38 (W1) und AP-39 (W2) teilen `GameScene.ts`, daher nacheinander. AP-34 (HUD, W4) und AP-33 (GameScene, W5) starten erst nach AP-38 bzw. AP-39. W5 läuft mit AP-35 (Config) und AP-32 (Menü) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt. Rüstungen (PE-58): AP-37a (W3) liefert Vertrag und Logik, AP-37c (W4) Entity und Sprite, AP-34 (W4) die Anzeige, AP-33 (W5) die Einbindung in `GameScene`. Die Einbindung steckt in AP-33, weil `GameScene.ts` in W5 schon AP-33 gehört. Ein eigenes Einbindungspaket wäre erst in W6 möglich und verletzte „spätestens W5“ (PE-58).
 
 **M2 W4:** AP-23 (nur `src/config/*`, `tests/config/*`, `tests/logic/balance.test.ts`, `docs/balancing.md`) und AP-24 (`src/scenes/GameScene.ts`, `src/logic/projectiles.ts`, Test) teilen keine Datei und laufen parallel.
 
@@ -1521,9 +1530,67 @@ flowchart LR
 
 ### M2b – Gold und Waffen-Items (freigegeben, noch nicht begonnen)
 
-Die Pakete hängen an den Entscheidungen PE-39 bis PE-53 (§16). Der Nutzer hat Umfang, Verträge und Reihenfolge am 2026-10-24 freigegeben (H-07, V-01 bis V-04 in §2, §4, §9 übernommen). Am 2026-10-25 kamen AP-38 (Fix iPhone, W1) und AP-39 (Stick, W2) aus dem iPhone-Test dazu. AP-39 wartet auf die Freigabe von V-05 (§16). Alle Verträge sind in W1 additiv. Jedes Paket nutzt nur Verträge und Config aus früheren Wellen.
+Die Pakete hängen an den Entscheidungen PE-39 bis PE-53 (§16). Der Nutzer hat Umfang, Verträge und Reihenfolge am 2026-10-24 freigegeben (H-07, V-01 bis V-04 in §2, §4, §9 übernommen). Am 2026-10-25 kamen AP-38 (Fix iPhone, W1) und AP-39 (Stick, W2) aus dem iPhone-Test dazu. Der Stick ist mit V-05 freigegeben (2026-10-25), AP-39 wartet nur noch auf AP-38. Alle Verträge sind in W1 additiv. Jedes Paket nutzt nur Verträge und Config aus früheren Wellen.
 
-Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstungen ist spätere Planung. AP-37 bleibt deshalb ein Platzhalter in §10 und kein umsetzbares Paket.
+Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer Rüstungen ist spätere Planung, die Definition liegt als Daten vor. Die Rüstung ist Pflicht (F-17, V-06 abgelehnt) und hat Priorität. Die Pakete AP-37a (W3, Vertrag, Config, Logik), AP-37c (W4, Entity und Pickup-Sprite) und die Einbindung in AP-33 (W5) sowie die Anzeige in AP-34 (W4) stehen in M2b.
+
+#### AP-37a – Rüstung: Vertrag, Config und Logik (Feuerring)
+
+- **Meilenstein, Lane, Welle:** M2b · SH/LOG · W3
+- **Ziel:** Der Feuerring (PE-52) als Daten und reine Logik: Vertrag `ArmourDef`, Zustand `ActiveArmour`, Aktivierung, Zeitablauf, Ring-Schaden, Drop-Wurf. Weitere Rüstungen kommen später nur als Daten (PE-58).
+- **Pflichtlektüre:** PE-47, PE-52, PE-57, PE-58, F-17, `src/contracts/{events,index}.ts` (Ist-Stand nach AP-25), `src/logic/geometry.ts` und `src/logic/rng.ts` (nur lesen)
+- **Abhängigkeiten:** AP-25 (`events.ts`, `index.ts` aus W1). Keine Kante zu AP-29 oder AP-30 (gleiche Welle), die Rüstung hat einen eigenen Zustand
+- **Parallel möglich mit:** AP-29, AP-30 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/contracts/{armour,events,index}.ts` (neu: `armour.ts`; `events.ts` nur die Konstante und Payload für `armour-changed`), `src/config/armour.ts` (neu), `src/logic/armour.ts` (neu), `tests/config/armour.test.ts` (neu), `tests/logic/armour.test.ts` (neu)
+- **Nicht anfassen:** `src/logic/{items,weapon,powers,economy,upgrades,coins}.ts`, `src/config/{items,assets,enemies,index}.ts`, `src/entities/*`, `src/scenes/*`, `src/platform/*`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `src/contracts/armour.ts`: Typ `ArmourDef` mit `id`, `label` (deutsch), `durationMs`, `cooldownMs`, `radiusPx`, `damagePerSec`. Typ `ArmourRules` mit `dropChance`. Typ `ActiveArmour` mit `id` (oder null), `activeMsLeft`, `cooldownMsLeft`. Nur Typen, kein Phaser.
+  2. `events.ts`: Konstante `armour-changed` mit Payload `ActiveArmour`. Bestehende Events bleiben. `index.ts` exportiert `armour`.
+  3. `src/config/armour.ts`: Liste `ARMOURS` mit dem Feuerring (`durationMs` 5000, `cooldownMs` 20000, `radiusPx` 72, `damagePerSec` 20, PE-52). `ARMOUR_RULES.dropChance` 0,02 (Richtwert, angenommen, Q-23). Keine Logik in der Config.
+  4. `src/logic/armour.ts` (ohne Phaser): `createArmourState()`. `activateArmour(state, def)` wirkt nur ohne aktive Rüstung und ohne Abklingzeit, sonst gibt sie den Zustand unverändert zurück (PE-57). `tickArmour(state, dtMs)` zählt die aktive Zeit herunter, danach startet die Abklingzeit. `ringDamageFor(def, dtMs)` gibt `damagePerSec` × dt in Sekunden zurück. `isInRing(...)` prüft über `circlesOverlap` aus `logic/geometry.ts`. `rollArmourDrop(rng, rules)` wie `rollCoinDrop`. `resetArmour()` für das Rundenende.
+  5. Die Zeit kommt immer als `dtMs` der pausierbaren Spielzeit (PE-29), die Logik kennt keine Rohzeit.
+- **Schnittstellen:** Vertrag für AP-33, AP-34 und AP-37c. Keine Vertragsänderung nach W3.
+- **Akzeptanzkriterien:**
+  - Ring-Schaden 20 je Sekunde bei 1000 ms, außerhalb von 72 px kein Schaden
+  - Aktivierung wirkt nur ohne aktive Rüstung und Abklingzeit, Aktivzeit 5 s, danach 20 s Abklingzeit
+  - Keine Phaser-Importe, Checks grün
+- **Tests:** `tests/config/armour.test.ts`: Werte des Feuerrings, Drop-Chance zwischen 0 und 1, `ARMOURS` enthält den Feuerring mit eindeutiger ID. `tests/logic/armour.test.ts`: Aktivierung, Blockade während aktiv und Abklingzeit, Ende nach 5 s, Abklingzeit 20 s, Schaden je Schritt (dt-Skalierung), Radius-Grenze innen und außen, Drop-Rate mit festem Seed (ca. 2 %), Reset
+- **Review-Schwerpunkte:** Werte nur aus Config, Zeit nur über `dtMs`, keine Phaser-Importe, Vertrag additiv, Regeln aus PE-57 umgesetzt
+- **Doku-Pflichten:** –
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (F-17 ist Pflicht)
+- **Commit-Typ:** `feat(AP-37a): add armour contract, config and fire ring logic`
+
+#### AP-37c – Rüstung: Feuerring-Entity und Pickup-Sprite
+
+- **Meilenstein, Lane, Welle:** M2b · GAME/ASSET · W4
+- **Ziel:** Ein sichtbarer Feuerring um die Spielerin, ein Pickup, das wie ein Item eingesammelt wird, und das Platzhalter-Sprite über die bestehende Pipeline (PE-23, F-12).
+- **Pflichtlektüre:** PE-23, PE-47, PE-52, PE-57, `src/config/assets.ts` und `docs/guides/grafik-austauschen.md` (Ist-Stand), `src/entities/ItemPickup.ts` (Ist-Stand, als Muster), `src/contracts/armour.ts` und `src/config/armour.ts` (AP-37a)
+- **Abhängigkeiten:** AP-26 (Asset-Muster, `assets.ts`), AP-37a (Vertrag und Config)
+- **Parallel möglich mit:** AP-31, AP-34 (keine gemeinsame Datei). Die Position der Spielerin übergibt die Szene, `Player.ts` bleibt unberührt
+- **Dateien (Eigentum):** `src/entities/{ArmourRing,ArmourPickup}.ts` (neu), `src/config/assets.ts`, `public/assets/sprites/item-fire-ring.png` (neu), `public/assets/.placeholders.json`, `public/assets/LICENSES.md`, `docs/guides/grafik-austauschen.md`, `tests/config/assets.test.ts`
+- **Nicht anfassen:** `src/entities/{Player,LaserPool,Coin,CoinPool}.ts` (AP-31), `src/scenes/*` (Einbindung in AP-33), `src/logic/*`, `src/config/{armour,items,...}.ts` (nur lesen)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Manifest additiv: `item-fire-ring` 16×16 ×2 Frames, deutsche `description`. `npm run assets:placeholders`, danach `npm run assets:check`. Der Generator darf keine Designer-Dateien überschreiben.
+  2. `docs/guides/grafik-austauschen.md`: eine Zeile für `item-fire-ring`. `LICENSES.md`: „selbst erzeugt“.
+  3. `src/entities/ArmourPickup.ts`: Muster wie `ItemPickup`, Sprite `item-fire-ring`, Verfall nach `ITEM_RULES.lifetimeMs` (wie Items), `collect()` ruft `onCollected(def)` auf. Eingesammelt wird durch Anschießen (PE-57). Die Zeit kommt von der Szene (pausierbar).
+  4. `src/entities/ArmourRing.ts`: Kreis mit dem Radius aus `ArmourDef`, Transparenz 50 %, Tiefe über dem Spielfeld. `show(def)`, `hide()`, `setCenter(x, y)` pro Frame, `destroy()`. Der Ring zeigt nur an. Schaden und Zeit liegen in AP-37a.
+  5. Keine Pooling-Pflicht, es gibt höchstens ein Pickup und einen Ring. Listener abmelden, Objekte beim Szenenwechsel zerstören.
+- **Schnittstellen:** Entities für AP-33. Keine Vertragsänderung.
+- **Akzeptanzkriterien:**
+  - `npm run assets:check` grün, zweiter Generatorlauf ändert nichts
+  - Keine Spielwerte und keine Logik in den Entities, nur Anzeige und Aufrufe
+  - Checks grün
+- **Tests:** `tests/config/assets.test.ts` um `item-fire-ring` erweitert (eindeutig, Datei vorhanden, Frame-Größe passt). Phaser-Entities nur im Handtest (M2b-DEP)
+- **Review-Schwerpunkte:** Generator überschreibt keine Designer-Dateien, Lizenzliste, Ring ohne Logik, Listener aufräumen
+- **Doku-Pflichten:** `docs/guides/grafik-austauschen.md`, `public/assets/LICENSES.md`
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja (Ring ohne Pulsieren, nur statische Linie; K8)
+- **Commit-Typ:** `feat(AP-37c): add fire ring entity and pickup sprite`
 
 #### AP-25 – Verträge Gold, Upgrades, Waffen-Items
 
@@ -1646,7 +1713,7 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 - **Ziel:** Reine Logik für Goldauszahlung, Upgrade-Kauf und Münzen (Drop, Magnet).
 - **Pflichtlektüre:** PE-39 bis PE-41, `src/config/{coins,upgrades}.ts`, `src/contracts/{coin,upgrade,save}.ts`, `src/logic/progression.ts` (nur lesen)
 - **Abhängigkeiten:** AP-25, AP-27
-- **Parallel möglich mit:** AP-30
+- **Parallel möglich mit:** AP-30, AP-37a (keine gemeinsamen Dateien)
 - **Dateien (Eigentum):** `src/logic/{economy,upgrades,coins}.ts`, `tests/logic/{economy,upgrades,coins}.test.ts`
 - **Nicht anfassen:** `src/logic/{progression,round,spawn,items,weapon,powers}.ts`, `src/platform/*`, `src/config/*`
 - **Freigegebene Abhängigkeiten:** keine
@@ -1674,7 +1741,7 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 - **Ziel:** Die drei neuen Waffen-Items als reine Logik: Stapel, Schildpuffer, Dauerfeuer-Timer, Schussmuster. Die alte Item-Logik (Feuerrate, Schaden, Größe) wird ersetzt.
 - **Pflichtlektüre:** PE-16, PE-31, PE-42, PE-43, §18 Lehre AP-10 (pausierbare Spielzeit), `src/config/items.ts`, `src/logic/{items,weapon}.ts` (Ist-Stand), `src/contracts/{item,weapon}.ts`
 - **Abhängigkeiten:** AP-25, AP-27
-- **Parallel möglich mit:** AP-29 (keine gemeinsamen Dateien). Die Upgrade-Faktoren kommen als Parameter, es gibt keinen Import aus `upgrades.ts`.
+- **Parallel möglich mit:** AP-29, AP-37a (keine gemeinsamen Dateien). Die Upgrade-Faktoren kommen als Parameter, es gibt keinen Import aus `upgrades.ts`.
 - **Dateien (Eigentum):** `src/logic/{items,weapon,powers}.ts`, `tests/logic/{items,weapon,powers}.test.ts`
 - **Nicht anfassen:** `src/logic/{economy,upgrades,coins,round,spawn,health,geometry,rotation,rng,progression}.ts`, `src/config/*`, `src/entities/*`
 - **Freigegebene Abhängigkeiten:** keine
@@ -1706,7 +1773,7 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 - **Ziel:** Spielerin mit Upgrade-Werten und Schild, Laser als Mehrfachschuss, Münzen mit Magnet.
 - **Pflichtlektüre:** PE-31, PE-39, PE-41 bis PE-43, `src/entities/{Player,LaserPool,ItemPickup}.ts` (Ist-Stand), `src/logic/{powers,weapon,coins}.ts`, `src/config/{coins,player,items}.ts`
 - **Abhängigkeiten:** AP-26, AP-27, AP-29, AP-30
-- **Parallel möglich mit:** AP-32, AP-34
+- **Parallel möglich mit:** AP-34, AP-37c (keine gemeinsamen Dateien)
 - **Dateien (Eigentum):** `src/entities/{Player,LaserPool,Coin,CoinPool}.ts` (`Coin` und `CoinPool` neu)
 - **Nicht anfassen:** `src/entities/{enemies,bosses,ItemPickup}/*`, `src/scenes/*`, `src/logic/*`, `src/config/*`
 - **Freigegebene Abhängigkeiten:** keine
@@ -1729,11 +1796,11 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 
 #### AP-32 – Hauptmenü: Gold und Upgrade-Overlay
 
-- **Meilenstein, Lane, Welle:** M2b · GAME · W4
+- **Meilenstein, Lane, Welle:** M2b · GAME · W5
 - **Ziel:** Gold ist sichtbar, Upgrades sind im Hauptmenü kaufbar. Der Reset-Dialog nennt Gold und Upgrades (PE-41, PE-45).
 - **Pflichtlektüre:** PE-41, PE-45, F-09, F-16, `src/scenes/MenuScene.ts` (Ist-Stand), `src/scenes/menu/*`, `src/logic/upgrades.ts` (AP-29), `src/platform/storage.ts` (AP-28)
 - **Abhängigkeiten:** AP-27, AP-28, AP-29
-- **Parallel möglich mit:** AP-31, AP-34
+- **Parallel möglich mit:** AP-33, AP-35 (keine gemeinsamen Dateien, Menü-Szene getrennt von der Spielszene)
 - **Dateien (Eigentum):** `src/scenes/MenuScene.ts`, `src/scenes/menu/UpgradePanel.ts` (neu), `src/scenes/menu/ConfirmDialog.ts` (nur der Text)
 - **Nicht anfassen:** `src/scenes/{GameScene,HudScene,ResultScene,PreloadScene,debug}.ts`, `src/main.ts` (keine neue Szene, PE-45), `src/logic/*`, `src/config/*`
 - **Freigegebene Abhängigkeiten:** keine
@@ -1761,21 +1828,23 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 
 - **Meilenstein, Lane, Welle:** M2b · GAME · W4
 - **Ziel:** Im HUD sichtbar: Münzen der Runde, Doppelschuss-Stufe, Schildpunkte und Dauerfeuer-Restzeit. Die drei alten Waffenstufen-Symbole entfallen.
-- **Pflichtlektüre:** PE-31, PE-42, PE-43, `src/contracts/events.ts`, `src/scenes/HudScene.ts` (Ist-Stand), `src/scenes/hud/*` (neu)
-- **Abhängigkeiten:** AP-25, AP-30, AP-38
-- **Parallel möglich mit:** AP-31, AP-32
-- **Dateien (Eigentum):** `src/scenes/HudScene.ts`, `src/scenes/hud/{CoinCounter,PowerIndicators}.ts` (neu), ggf. `tests/scenes/hud.test.ts`
+- **Pflichtlektüre:** PE-31, PE-42, PE-43, PE-47, PE-52, `src/contracts/{events,armour}.ts` (AP-25, AP-37a), `src/scenes/HudScene.ts` (Ist-Stand), `src/scenes/hud/*` (neu)
+- **Abhängigkeiten:** AP-25, AP-30, AP-37a, AP-38
+- **Parallel möglich mit:** AP-31, AP-37c (keine gemeinsamen Dateien)
+- **Dateien (Eigentum):** `src/scenes/HudScene.ts`, `src/scenes/hud/{CoinCounter,PowerIndicators,ArmourIndicator}.ts` (neu), ggf. `tests/scenes/hud.test.ts`
 - **Nicht anfassen:** `src/scenes/{GameScene,ResultScene,MenuScene}.ts`, `src/contracts/*`, `src/logic/*`
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
   1. `CoinCounter`: Münzsymbol mit Zahl, hört auf `coins-changed`.
   2. `PowerIndicators`: Doppelschuss als Stufenanzeige 0/1/2, Schild als Balken mit Restpunkten, Dauerfeuer mit Restsekunden. Hört auf `powers-changed`. Icons aus den Item-Sprites (AP-26).
+  2a. `ArmourIndicator` (PE-52): zeigt beim Feuerring die aktive Restzeit, danach die Abklingzeit, und ist ohne Rüstung unsichtbar. Hört auf `armour-changed` (AP-37a). Das Symbol ist eine Grafikform (Kreis), nicht der Sprite `item-fire-ring` aus AP-37c, weil AP-37c in derselben Welle liegt.
   3. Layout respektiert die Safe-Area (AP-13). Keine Schadenszahlen (PE-31).
   4. Pause-Taste bleibt. Layout-Werte als lokale Konstanten, mit Kennzeichnung als Kandidaten für die Config.
   5. Listener beim Szenenwechsel abmelden.
-- **Schnittstellen:** nutzt die Events aus AP-25, die Typen aus AP-30. Keine Vertragsänderung.
+- **Schnittstellen:** nutzt die Events aus AP-25, die Typen aus AP-30 und AP-37a (`ActiveArmour`, `armour-changed`). Keine Vertragsänderung.
 - **Akzeptanzkriterien:**
   - Zahlen und Anzeigen aktualisieren sich live, Schildbalken leert sich, Dauerfeuer-Anzeige verschwindet nach Ablauf
+  - Feuerring-Anzeige zeigt Aktivzeit, danach Abklingzeit, und verschwindet nach der Abklingzeit
   - Checks grün
 - **Tests:** falls Hilfslogik nötig (z. B. Balkenbreite), als reine Funktion mit Test in `tests/scenes/hud.test.ts`
 - **Review-Schwerpunkte:** Listener aufräumen, Lesbarkeit auf dem Handy
@@ -1789,9 +1858,9 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 
 - **Meilenstein, Lane, Welle:** M2b · GAME · W5
 - **Ziel:** Verbindet alles in der Runde: Upgrades beim Start, Münzen und neue Items im Kampf, Gold am Rundenende.
-- **Pflichtlektüre:** PE-29, PE-49, PE-39 bis PE-43, §18 Lehre AP-10 (Pause, `playTimeMs`, Reihenfolge `playerDied()` vor `tick()`), Schnittstellen aus AP-31, Ist-Stand aus AP-38 und AP-39, `src/scenes/{GameScene,ResultScene}.ts` (Ist-Stand)
-- **Abhängigkeiten:** AP-29, AP-30, AP-31, AP-38, AP-39
-- **Parallel möglich mit:** AP-35
+- **Pflichtlektüre:** PE-29, PE-47, PE-49, PE-52, PE-57, PE-39 bis PE-43, §18 Lehre AP-10 (Pause, `playTimeMs`, Reihenfolge `playerDied()` vor `tick()`), Schnittstellen aus AP-31, Ist-Stand aus AP-38 und AP-39, `src/scenes/{GameScene,ResultScene}.ts` (Ist-Stand)
+- **Abhängigkeiten:** AP-29, AP-30, AP-31, AP-37a, AP-37c, AP-38, AP-39
+- **Parallel möglich mit:** AP-32, AP-35
 - **Dateien (Eigentum):** `src/scenes/{GameScene,ResultScene}.ts`
 - **Nicht anfassen:** `src/scenes/{HudScene,MenuScene}.ts`, `src/entities/*`, `src/logic/*`, `src/config/*`, `src/contracts/*`
 - **Freigegebene Abhängigkeiten:** keine
@@ -1803,9 +1872,12 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
   5. Event `powers-changed` bei jeder Änderung von Schild, Doppelschuss und Dauerfeuer. Das alte Event `weapon-changed` entfällt.
   6. Rundenende: `applyRoundGold(save, roundCoins, result)` und `applyRoundResult` werden kombiniert, danach ein einziger `writeSave`. Debug-Runden (`?level=n`) schreiben keinen Spielstand: kein `writeSave`, also keine Erfahrung, keine Freischaltung und kein Gold (PE-49, Q-13; Gold eingeschlossen als Folge, angenommen). Die Umsetzung steht hier statt in einem eigenen Folgepaket.
   7. `ResultScene` zeigt die gesammelten Münzen, den Anteil (100 % oder 50 %) und das Gold gesamt.
-- **Schnittstellen:** nutzt AP-29, AP-30, AP-31. Keine Vertragsänderung.
+  8. Rüstung (PE-52, PE-57): Beim Tod eines Gegners zusätzlich `rollArmourDrop` aus AP-37a. Bei Erfolg erscheint ein `ArmourPickup` (AP-37c). Eingesammelt wird es durch einen Treffer wie bei Items. Die Aufnahme ruft `activateArmour` auf und sendet `armour-changed`. Während aktiver Rüstung oder Abklingzeit hat sie keine Wirkung.
+  9. Jeder Frame: `tickArmour` mit dem Delta der pausierbaren Spielzeit (`playTimeMs`). `ArmourRing.setCenter` folgt der Spielerin. Ringschaden über `ringDamageFor` an Gegner im Radius, der Tod läuft über den bestehenden Todespfad. Bosse nehmen in M2b keinen Ringschaden (Q-23). Beim Rundenstart und Rundenende `resetArmour()`.
+- **Schnittstellen:** nutzt AP-29, AP-30, AP-31, AP-37a, AP-37c. Keine Vertragsänderung.
 - **Akzeptanzkriterien:**
   - Gold erscheint im Ergebnis, Niederlage zahlt 50 %
+  - Feuerring-Handtest (M2b-DEP): Pickup aktiviert 5 s, Ring tötet Gegner im Radius, Pause friert die Zeit ein, Rundenende setzt zurück
   - Debug-Runde (`?level=n`) verändert den Spielstand nicht (Handtest, PE-49)
   - Keine doppelten Listener nach „Nochmal“, keine Spielwerte in der Szene
   - Alle Smoke-Test-Punkte der M2b-DEP für Runde und Ergebnis erfüllt, Checks grün
@@ -1823,7 +1895,7 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 - **Ziel:** Gold-Kurve, Upgrades und neue Items passen zusammen. Richtwerte: im Mittel etwa 45 Gold je gewonnenem Level, Stufe 10 eines Upgrades nach etwa 15–20 Spiel-Leveln (Q-15, PE-50). Doppelschuss, Schild und Dauerfeuer sind spürbar, aber nicht dominant. Level 20 bleibt mit Items fordernd (wie AP-15).
 - **Pflichtlektüre:** PE-39 bis PE-43, `docs/balancing.md`, `tests/logic/balance.test.ts`, AP-23-Bedingungen, `src/config/*`, `src/logic/{economy,upgrades,coins,weapon,powers}.ts` (nur lesen)
 - **Abhängigkeiten:** AP-27, AP-29, AP-30
-- **Parallel möglich mit:** AP-33
+- **Parallel möglich mit:** AP-32, AP-33
 - **Dateien (Eigentum):** `src/config/{levels,enemies,weapon,items,coins,upgrades}.ts`, `tests/config/{levels,enemies,weapon,items,coins,upgrades}.test.ts`, `tests/logic/balance.test.ts`, `docs/balancing.md`
 - **Nicht anfassen:** `src/config/{assets,maps,player}.ts`, `src/logic/*` (nur lesen), Szenen, Entities
 - **Freigegebene Abhängigkeiten:** keine
@@ -1908,7 +1980,7 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 - **Meilenstein, Lane, Welle:** M2b · GAME · W2
 - **Ziel:** Auf Touch-Geräten im Querformat ein virtueller Stick unten rechts. Die Stick-Richtung ist die Zielrichtung (360°). Tippen auf das Spielfeld bleibt zusätzlich erhalten. Stick vor Tippen und Maus: solange der Stick gehalten wird, sind Tippen und Mauszielen gesperrt. Verzögerte Drehung und Auto-Schuss bleiben. Am PC erscheint kein Stick (PE-55).
 - **Pflichtlektüre:** PE-03, PE-04, PE-55, `src/platform/{input,angle}.ts` (Ist-Stand), `src/logic/rotation.ts` (nur lesen), `src/scenes/GameScene.ts` (Ist-Stand nach AP-38)
-- **Abhängigkeiten:** AP-38 (gleiche Datei GameScene, Reihenfolge), Freigabe V-05 (§16)
+- **Abhängigkeiten:** AP-38 (gleiche Datei GameScene, Reihenfolge). Der Stick ist mit V-05 freigegeben (2026-10-25, PE-55, §2 F-01)
 - **Parallel möglich mit:** AP-27, AP-28 (keine gemeinsame Datei)
 - **Dateien (Eigentum):** `src/platform/stick.ts` (neu), `tests/platform/stick.test.ts` (neu), `src/logic/aimSource.ts` (neu), `tests/logic/aimSource.test.ts` (neu), `src/platform/input.ts` (der einzige Input-Code; Maus und Touch laufen dort über die Zeiger-Eingabe), `src/scenes/controls/VirtualStick.ts` (neu), `src/scenes/GameScene.ts` (nur Einbindung)
 - **Nicht anfassen:** `src/logic/*` außer `aimSource.ts`, `src/entities/*`, `src/config/*`, `src/scenes/{HudScene,MenuScene,ResultScene}.ts`, `index.html`
@@ -1916,7 +1988,7 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 - **Umsetzung:**
   1. `src/platform/stick.ts` (ohne Phaser): `stickVector(dxPx, dyPx, radiusPx, deadZoneRatio)` begrenzt den Ausschlag auf den Radius und gibt `{ x, y, active }`. In der Totzone ist `active` false. `stickAngleRad(vector)` gibt den Winkel in Radiant, im selben Format wie `AimInput.targetAngle`.
   2. `src/scenes/controls/VirtualStick.ts`: Basis-Kreis unten rechts, Abstand zum Rand plus Safe-Area. Startwerte (angenommen): Durchmesser 140 px, Knopf 56 px, Rand 24 px, Totzone 15 % des Radius. Eigener Pointer (per `pointer.id`), damit Stick und Pause-Taste sich nicht stören. `setScrollFactor(0)`, Transparenz 50 %, Tiefe über dem Spielfeld.
-  3. Sichtbar nur bei Touch über `this.sys.game.device.input.touch`. Am PC unsichtbar. Touch-Laptops zeigen den Stick ebenfalls (angenommen).
+  3. Sichtbar nur bei Touch über `this.sys.game.device.input.touch`. Am PC unsichtbar. Touch-Laptops zeigen den Stick ebenfalls (bestätigt Nutzer 2026-10-25).
   4. `src/logic/aimSource.ts` (ohne Phaser): reine Funktion `resolveAim(state)`. Eingabe: `stickHeld`, `stickAngleRad` (oder null in der Totzone), `pointerAngleRad` (Tippen oder Maus, oder null), `lastAngleRad`. Ausgabe: `{ angleRad, source }` mit `source` ∈ `stick` | `pointer` | `hold`. Regeln: (a) Stick gehalten: Winkel des Sticks, in der Totzone der letzte Stick-Winkel, Quelle `stick`. Tippen und Maus werden dabei ignoriert. (b) Stick nicht gehalten und Tippen oder Maus liefern einen Winkel: Quelle `pointer`. (c) sonst letzter Winkel, Quelle `hold`.
   5. `src/platform/input.ts` (AimInput): Der Zeiger des Sticks wird über seine `pointer.id` erkannt. Tippt während des Haltens ein zweiter Zeiger auf das Feld, meldet er keinen Winkel an `resolveAim`. Das Ergebnis von `resolveAim` ist `targetAngle`. Nach dem Loslassen gilt wieder Tippen bzw. Maus.
   6. `GameScene`: Stick erzeugen, beim Szenenwechsel zerstören, Listener abmelden.
@@ -2128,8 +2200,8 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 | H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☑ M0–M2 (2026-10-25) / ☐ M2b, M3 |
 | H-07 | Freigabe Umfang, Verträge und Reihenfolge M2b: V-01 bis V-04 (in §16, inzwischen übernommen) | vor M2b | AP-25, AP-26 | ☑ (2026-10-24) |
 | H-08 | Abnahme M2b: Smoke-Test am PC und auf dem iPhone (M2b-DEP) | nach M2b | M3 (AP-16 ff.) | ☐ |
-| H-09 | Rüstungen klären: Q-19 (Katalog), Q-20 (Auslöser, Abklingzeit), Q-21 (Feuerring-Werte) beantworten | vor AP-37 | AP-37 (Platzhalter) | ☑ (Pilot PE-52, Katalog spätere Planung) |
-| H-10 | Freigabe Umfang: V-05 (Stick, §2 F-01) und V-06 (F-17 nach „Optional“, §2) entscheiden. Erst danach trägt der Planner die §2-Änderungen ein | vor AP-39 bzw. §2 | AP-39 | ☐ |
+| H-09 | Rüstungen klären: Q-19 (Katalog), Q-20 (Auslöser, Abklingzeit), Q-21 (Feuerring-Werte) beantworten | vor AP-37a | AP-37a, AP-37c | ☑ (Pilot PE-52, Katalog spätere Planung; Umsetzung PE-58) |
+| H-10 | Freigabe Umfang: V-05 (Stick, §2 F-01) und V-06 (F-17 nach „Optional“, §2) entscheiden. Erst danach trägt der Planner die §2-Änderungen ein | vor AP-39 bzw. §2 | AP-39 | ☑ V-05 übernommen (2026-10-25), V-06 abgelehnt, F-17 bleibt Pflicht (PE-56) |
 
 ---
 
@@ -2140,11 +2212,11 @@ Rüstungen (PE-47): Pilot ist der Feuerring (PE-52). Der Katalog weiterer Rüstu
 | M0 | 4 | ≈ 4,5 h (+ Review ≈ 6 h) | ≈ 2–3 |
 | M1 | 7 | ≈ 10 h (+ Review ≈ 13 h) | ≈ 4–5 |
 | M2 | 5 | ≈ 6,75 h (+ Review ≈ 9 h) | ≈ 3–4 |
-| M2b | 14 | ≈ 19,75 h (+ Review ≈ 25 h) | ≈ 9–10 |
+| M2b | 16 | ≈ 23,75 h (+ Review ≈ 30 h) | ≈ 11–12 |
 | M3 | 5 | ≈ 8,5 h (+ Review ≈ 11 h) | ≈ 4–5 |
-| **Gesamt** | **35** | **≈ 50 h (+ Review ≈ 64 h)** | **≈ 22–27** |
+| **Gesamt** | **37** | **≈ 54 h (+ Review ≈ 69 h)** | **≈ 24–29** |
 
-Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 22–27 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen). AP-37 und die Rüstungs-Pakete sind nicht enthalten. Rüstungen (AP-37) sind nicht enthalten, ihr Aufwand wird nach Klärung des Rüstungs-Katalogs geschätzt.
+Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h.
 
 **Zeit des Nutzers:** Abnahmen und Smoke-Tests ≈ 0,5–1 h je Meilenstein, Freigaben pro Meilenstein, Boss-Beschreibung (Q-04), optional Grafik und Sound. Zusammen ≈ 4–6 h ohne Grafik.
 
@@ -2162,6 +2234,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | K5 | Doppelschuss nur Stufe 1 (zwei Laser), keine Fächer-Stufe 2 | ≈ 0,3 h | AP-30, AP-31 |
 | K6 | Dauerfeuer weglassen (dann entfällt auch die Obergrenze 20 Schuss/s, Q-16) | ≈ 0,5 h | AP-27, AP-30, AP-34 |
 | K7 | Neu-Balancing nur als Kennzahltabelle, ohne Zielwert-Tests | ≈ 0,5 h | AP-35 |
+| K8 | Feuerring ohne Pulsieren, nur statische Linie (Rüstung bleibt Pflicht, F-17) | ≈ 0,3 h | AP-37c |
 | nie | Sicherheit, Datenschutz, robustes Laden, Asset-Lizenzen, Designer-Anleitungen | – | – |
 
 ---
@@ -2183,8 +2256,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | RI-11 | Gemeinsame Szenendateien werden in mehreren Wellen geändert | Eigentum je Welle in §8 festgelegt, Merge-Reihenfolge | AP-10, AP-12, AP-14 |
 | RI-12 | Schild und Dauerfeuer greifen in Schadens- und Feuerpfad, Fehler wirken in allen Szenen | Schaden läuft nur über `Player.takeDamage` und `absorbDamage`, Zeiten über `playTimeMs`; Handtest mit Boss-Vorbereitung, Tests in AP-30 | AP-30, AP-31, AP-33 |
 | RI-13 | Gold-Kurve trifft das Ziel nicht (zu viel oder zu wenig Gold, Upgrades zu schnell oder zu langsam) | Kennzahl-Tabelle und Zielwert-Test in AP-35, nur Config; Nutzer prüft nach M2b-DEP | AP-35 |
-| RI-14 | Rüstungen (PE-47) erweitern den Umfang, bevor der Katalog feststeht (Scope Creep) | Pilot Feuerring fest (PE-52), Katalog weiterer Rüstungen offen. AP-37 nur Platzhalter, Aufwand erst nach Katalog-Klärung | AP-37 |
+| RI-14 | Rüstungen (PE-47) erweitern den Umfang, bevor der Katalog feststeht (Scope Creep) | Pilot Feuerring fest (PE-52), Katalog weiterer Rüstungen offen. Nur Daten (`ArmourDef` in Config, PE-58), kein Katalog in M2b. Weitere Rüstungen erst nach Klärung in der Planung | AP-37a, AP-37c |
 | RI-15 | Touch-Stick: Multi-Touch-Konflikte mit der Pause-Taste, Fehlklicks am Bildschirmrand, Safari-Vollbild ändert die Höhe beim Drehen | Eigener Pointer je Stick, Winkelfunktion als reine Funktion getestet, Handtest auf dem iPhone in M2b-DEP | AP-38, AP-39 |
+| RI-16 | AP-33 wird groß (opus, L): Spielszene, Drop, Pickup und Ringschaden in einem Paket, dazu das Rundenende. Ein Fehler in der Szene trifft alle Runden | Feuerring-Logik ist in AP-37a getestet, AP-33 verdrahtet nur. Review-Punkt Rundenende-Reihenfolge. Falls AP-33 zu groß wird, ist eine Aufteilung nur mit Freigabe des Nutzers möglich, weil PE-58 die Einbindung spätestens in W5 verlangt | AP-33, AP-37a, AP-37c |
 
 ---
 
@@ -2245,11 +2319,13 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-49 | Debug-Runden (`?level=n`) schreiben keinen Spielstand: keine Erfahrung, keine Freischaltung, kein Gold. Der Direktstart bleibt ohne Speichern. Umsetzung in AP-33 (Rundenende, Debug-Kennzeichen in den Szenendaten), statt eines eigenen Folgepakets. Ersetzt PE-36. Gold-Einschluss ist die Folge der Empfehlung (angenommen) | Empfehlung Q-13 („Ja“, Folgepaket mit GameScene) | Nutzer am 2026-10-24 (Q-13 „alles wie vorgeschlagen“) |
 | PE-50 | Stufe 10 der Upgrades bezieht sich auf das Spiel-Level (0–20), nicht auf das Spielerlevel. Richtwert: Stufe 10 nach etwa 15–20 Spiel-Leveln | Empfehlung Q-15 | Nutzer am 2026-10-24 |
 | PE-51 | Dauerfeuer ist auf 20 Schuss/s begrenzt (`RAPID_FIRE_MAX_PER_SEC`), statt „unendlich“ | Empfehlung Q-16 | Nutzer am 2026-10-24 |
-| PE-52 | Rüstungs-Pilot ist nur der Feuerring: 5 s, Radius 72 px, 20 Schaden je Sekunde, Aktivierung durch Einsammeln, 20 s Abklingzeit nach Ende, nur in der Runde, nicht im Menü. Der Katalog weiterer Rüstungen ist spätere Planung, AP-37 bleibt Platzhalter | Q-19 bis Q-21 | Nutzer am 2026-10-24 |
+| PE-52 | Rüstungs-Pilot ist nur der Feuerring: 5 s, Radius 72 px, 20 Schaden je Sekunde, Aktivierung durch Einsammeln, 20 s Abklingzeit nach Ende, nur in der Runde, nicht im Menü. Der Katalog weiterer Rüstungen ist spätere Planung. Umsetzung in AP-37a und AP-37c (PE-58) | Q-19 bis Q-21 | Nutzer am 2026-10-24 |
 | PE-53 | Freigabe M2b: F-07 neu, F-15 bis F-17 und Backlog „Später“ in §2, Datenmodell in §4, M2b vor M3 (PE-46). V-01 bis V-04 sind übernommen und aus §16 entfernt | H-07 | Nutzer am 2026-10-24 |
 | PE-54 | Befunde iPhone-Test (M2, 2026-10-25): Spielfeld größer als der sichtbare Bereich, Astronautin nicht mittig, HUD-Item-Stacks zu klein. Fix als AP-38 in M2b W1. Keine Umfangsänderung, es ist eine Fehlerbehebung zu F-10 und F-14 | Befund Nutzer-Test am iPhone, über Lead | Nutzer am 2026-10-25 |
-| PE-55 | Virtueller Stick auf Touch-Geräten im Querformat unten rechts für 360°-Zielen (Stick-Richtung ist die Zielrichtung). Erscheint nur bei Touch, nicht am PC. Verzögerte Drehung und Auto-Schuss bleiben. Die bestehende Touch-Steuerung (Tippen auf das Spielfeld, Astronautin dreht dorthin) bleibt zusätzlich erhalten. Priorität: Stick vor Tippen und Maus. Solange der Stick gehalten wird, ist Tippen und Mauszielen gesperrt (die Maus-Zielrichtung wird ignoriert). Tippt während des Haltens ein zweiter Finger auf das Feld, wird der Tipp ignoriert. Nach dem Loslassen gilt wieder Touch bzw. Maus. Startwerte: Durchmesser 140 px, Knopf 56 px, Rand 24 px, Totzone 15 %. Umfangsänderung als V-05, Freigabe ausstehend, AP-39 bis dahin `offen` | Befund Nutzer-Test (Stick-Wunsch), Präzisierung Nutzer (Priorität) | Nutzer am 2026-10-25 (Befund und Präzisierung); Startwerte (angenommen) |
-| PE-56 | F-17 Rüstungen (Pilot Feuerring) von „Pflicht“ nach „Optional“. Der Katalog weiterer Rüstungen ist spätere Planung, der Pilot bleibt wie in PE-52. Umfangsänderung als V-06, Freigabe ausstehend | Lead-Auftrag 2026-10-25, Nutzer hat nicht widersprochen | Planner (angenommen) |
+| PE-55 | Virtueller Stick auf Touch-Geräten im Querformat unten rechts für 360°-Zielen (Stick-Richtung ist die Zielrichtung). Erscheint nur bei Touch, nicht am PC. Verzögerte Drehung und Auto-Schuss bleiben. Die bestehende Touch-Steuerung (Tippen auf das Spielfeld, Astronautin dreht dorthin) bleibt zusätzlich erhalten. Priorität: Stick vor Tippen und Maus. Solange der Stick gehalten wird, ist Tippen und Mauszielen gesperrt (die Maus-Zielrichtung wird ignoriert). Tippt während des Haltens ein zweiter Finger auf das Feld, wird der Tipp ignoriert. Nach dem Loslassen gilt wieder Touch bzw. Maus. Startwerte: Durchmesser 140 px, Knopf 56 px, Rand 24 px, Totzone 15 %. Umfang in §2 F-01 übernommen (V-05 freigegeben 2026-10-25), AP-39 wartet nur noch auf AP-38 | Befund Nutzer-Test (Stick-Wunsch), Präzisierung Nutzer (Priorität) | Nutzer am 2026-10-25 (Befund, Präzisierung und Freigabe V-05); Startwerte (angenommen) |
+| PE-56 | F-17 Rüstungen (Pilot Feuerring) bleiben Pflicht. Der Vorschlag, F-17 nach „Optional“ zu verschieben (V-06), ist abgelehnt. Der Katalog weiterer Rüstungen ist spätere Planung, der Pilot bleibt wie in PE-52 | Lead-Auftrag 2026-10-25 (V-06) | Nutzer am 2026-10-25 (V-06 abgelehnt) |
+| PE-57 | Feuerring-Regeln (angenommen, Bestätigung durch den Nutzer offen, Q-23): Drop-Chance 2 % je besiegtem Gegner (Richtwert). Eingesammelt wird das Pickup durch Anschießen wie ein Item. Es verfällt nach `ITEM_RULES.lifetimeMs`. Aufnahme während aktiver Rüstung oder Abklingzeit wirkt nicht. Die Zeit ist die pausierbare Spielzeit (PE-29). Der Ring fügt Gegnern im Radius Schaden über den bestehenden Todespfad zu. Eigener Zustand `ActiveArmour`, getrennt von `ActivePowers`. Bosse nehmen in M2b keinen Ringschaden | Umsetzung der Regeln aus PE-47 und PE-52, Planer-Vorschlag | Planner (angenommen), Q-23 |
+| PE-58 | Rüstungs-Priorität: Der Feuerring kommt zeitnah in M2b. AP-37a (W3, Vertrag, Config, Logik), AP-37c (W4, Entity, Pickup-Sprite), Anzeige in AP-34 (W4), Einbindung in AP-33 (W5). AP-32 wird dafür nach W5 verschoben. Weitere Rüstungen sind später reine Daten in `src/config/armour.ts` | Nutzer-Auftrag Priorität, Konflikt Wellenlimit (max. drei Pakete je Welle, PE-15) | Nutzer am 2026-10-25 |
 
 ### Offene Fragen
 
@@ -2273,10 +2349,11 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-16 | Dauerfeuer „unendlich“ als Obergrenze 20 Schuss/s akzeptieren? | W | PE-43, AP-30 | Ja | geklärt (PE-51) |
 | Q-17 | Münzen: Magnet über das ganze Spielfeld, keine Lebensdauer, Laser gehen durch Münzen | O | PE-39, AP-31 | so, wie angenommen | bestätigt (PE-39) |
 | Q-18 | Heilung bleibt seltenes Item, bei Sieg 100 % Gold, bei Niederlage 50 % | O | PE-40, PE-42 | so, wie angenommen | bestätigt (PE-40, PE-42) |
-| Q-19 | Rüstungen (PE-47): Welche Rüstungen soll es geben (Anzahl, Namen, Effekte)? Ist der Feuerring der erste Eintrag? | K | PE-47, AP-37, §2 (F-17) | Nur Feuerring als Pilot, weitere später | geklärt (PE-52) |
-| Q-20 | Rüstungen: Auslöser und Abklingzeit. Vorschlag: Aktivierung durch Einsammeln, Wirkung sofort, Abklingzeit 20 s nach Ende | K | PE-47, AP-37 | so, wie angenommen | geklärt (PE-52) |
-| Q-21 | Rüstungen: Richtwerte Feuerring (Radius 72 px, Schaden 20/s, Dauer 5 s). Gelten die Richtwerte oder soll der Nutzer sie festlegen? Gilt die Rüstung nur in der Runde, nicht im Menü? | K | PE-47, AP-37 | Richtwerte gelten, nur in der Runde | geklärt (PE-52) |
+| Q-19 | Rüstungen (PE-47): Welche Rüstungen soll es geben (Anzahl, Namen, Effekte)? Ist der Feuerring der erste Eintrag? | K | PE-47, AP-37a, AP-37c, §2 (F-17) | Nur Feuerring als Pilot, weitere später | geklärt (PE-52) |
+| Q-20 | Rüstungen: Auslöser und Abklingzeit. Vorschlag: Aktivierung durch Einsammeln, Wirkung sofort, Abklingzeit 20 s nach Ende | K | PE-47, AP-37a, AP-37c | so, wie angenommen | geklärt (PE-52) |
+| Q-21 | Rüstungen: Richtwerte Feuerring (Radius 72 px, Schaden 20/s, Dauer 5 s). Gelten die Richtwerte oder soll der Nutzer sie festlegen? Gilt die Rüstung nur in der Runde, nicht im Menü? | K | PE-47, AP-37a, AP-37c | Richtwerte gelten, nur in der Runde | geklärt (PE-52) |
 | Q-22 | Auf Touch-Geräten: Bleibt das Tippen auf das Spielfeld als Zielen erhalten, wenn der Stick dazukommt? | W | PE-03, PE-55, AP-39 | Ja, der Stick hat Vorrang vor Tippen und Maus | geklärt (PE-55, Nutzer am 2026-10-25) |
+| Q-23 | Feuerring: Drop-Chance je Gegner (Richtwert 2 %, angenommen) und trifft der Ring ab M3 auch Bosse? In M2b trifft er keine Bosse | W | PE-57, AP-37a, AP-33, M3 (AP-16 ff.) | 2 % je Gegner, Bosse ab M3 nur nach Entscheidung mit PE-34 | offen, angenommen (PE-57) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -2284,8 +2361,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 |---|---|---|---|
 | AP-01 `Dateien (Eigentum)` | `.gitignore` aus dem Coder-Eigentum nehmen. `node_modules/` und `dist/` sind bereits auf dev (c53f075, Lead). Nur für künftige Pakete gedacht, AP-01 bleibt unverändert | Coder-role-guard blockt `.gitignore`, Wellenabschluss M0 W1 | Lead (Wellenabschluss) |
 | Testabdeckung AP-05 (≥ 90 %) | Ein Coverage-Werkzeug (z. B. Vitest-Coverage) freigeben, damit das Akzeptanzkriterium belegt werden kann. Bisher nur manuell geprüft | Nachweis fehlt, neues Paket braucht Freigabe (Regel Abhängigkeiten) | Lead (Erkenntnis AP-05) |
-| §2 F-01 (V-05) | F-01 um diesen Satz ergänzen: „Auf Touch-Geräten im Querformat zusätzlich ein virtueller Stick unten rechts, die Stick-Richtung ist die Zielrichtung (360°). Tippen auf das Spielfeld bleibt zusätzlich erhalten, der Stick hat Vorrang (PE-55).“ AP-39 wartet auf diese Freigabe | Befund iPhone-Test (PE-55). §2 ist Umfang, deshalb nur nach Freigabe des Nutzers eintragen (H-10) | Planner (Pflege, Lead-Auftrag 2026-10-25) |
-| §2 F-17 (V-06) | F-17 aus „Pflicht“ in „Optional“ verschieben, den Platzhalter O-01 in der Optional-Tabelle durch F-17 ersetzen, Text unverändert. Status (angenommen): Nutzer hat nicht widersprochen, Freigabe nach §2-Regel ausstehend | Katalog weiterer Rüstungen ist spätere Planung (PE-56) | Planner (Pflege, Lead-Auftrag 2026-10-25) |
+| §4 Datenmodell Rüstungen (Vorschlag) | In die Datenmodell-Tabelle von §4 aufnehmen: `ArmourDef` (Config, Vertrag) mit `id`, `label`, `durationMs`, `cooldownMs`, `radiusPx`, `damagePerSec`; `ArmourRules` mit `dropChance`; `ActiveArmour` mit `id`, `activeMsLeft`, `cooldownMsLeft`, flüchtig und nicht gespeichert. Ereignis `armour-changed`. Die Angaben stehen so in AP-37a, §4 bleibt bis zur Freigabe unverändert | PE-47, PE-58, AP-37a (Datenmodell für Rüstungen fehlt in §4) | Planner (Pflege, Lead-Auftrag 2026-10-25) |
 | Arena-Auflösung als Konstante `GAME_SIZE` (640×360) | `ARENA_CENTER` (320,180) steht lokal in `Enemy.ts` und ist nur per `ctx.center` überschreibbar. Die Zahl steckt damit an zwei Stellen. Vorschlag: Konstante in `src/config` anlegen und von Gegnern, Spielszene und Kamera nutzen. Eigentum: AP-15 (`src/config`), AP-10 nutzt sie nur. Alternativ AP-10 übernimmt es, bräuchte aber Config-Freigabe | Erkenntnis AP-09, Hinweis aus Review | Lead (Wellenabschluss M1 W2) |
 
 ---
@@ -2294,7 +2370,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 
 | Anforderung oder Regel | Pakete |
 |---|---|
-| F-01 Steuerung (Drehen, Maus/Touch) | AP-04, AP-05, AP-08, AP-10; Stick auf Touch (PE-55, V-05): AP-39 |
+| F-01 Steuerung (Drehen, Maus/Touch) | AP-04, AP-05, AP-08, AP-10; Stick auf Touch (PE-55, §2 F-01): AP-39 |
 | F-02 Automatischer Schuss | AP-05, AP-08, AP-23 (Feuerrate) |
 | F-03 Runde mit Timer | AP-03, AP-06, AP-10 |
 | F-04 Gegner | AP-03, AP-09, AP-15, AP-23 (Tempo, Kurve 5–20), AP-24 (Geschosse abschießbar) |
@@ -2310,9 +2386,10 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | F-14 Querformat | AP-01, AP-13, AP-38 (Darstellung im Querformat) |
 | F-15 Gold-Münzen (PE-39, PE-40) | AP-25, AP-26, AP-27, AP-29, AP-31, AP-33, AP-35 |
 | F-16 Dauerhafte Upgrades (PE-41, PE-45) | AP-27, AP-28, AP-29, AP-32, AP-33, AP-35 |
-| F-17 Rüstungen mit passiven Effekten (PE-47, PE-52, PE-56; Umstufung auf Optional als V-06 vorgeschlagen) | AP-37 (Platzhalter, Pilot Feuerring fest, Katalog offen) |
+| F-17 Rüstungen mit passiven Effekten (PE-47, PE-52, PE-56, PE-58; Pflicht, V-06 abgelehnt) | AP-37a, AP-37c, AP-34, AP-33, M2b-DEP (Pilot Feuerring fest, Katalog offen) |
+| Rüstung Feuerring: Drop, Aktivierung, Ring-Schaden, Abklingzeit, Pause (PE-52, PE-57) | AP-37a (Logik), AP-37c (Entity, Pickup), AP-33 (Verdrahtung), M2b-DEP (Handtest) |
 | iPhone-Befunde M2: Vollbild im Querformat, Astronautin mittig, HUD lesbar (PE-54) | AP-38, M2b-DEP (Handtest) |
-| Virtueller Stick auf Touch-Geräten, 360°-Zielen, Stick vor Tippen und Maus (PE-55, V-05) | AP-39 (`logic/aimSource`), M2b-DEP (Handtest) |
+| Virtueller Stick auf Touch-Geräten, 360°-Zielen, Stick vor Tippen und Maus (PE-55, §2 F-01) | AP-39 (`logic/aimSource`), M2b-DEP (Handtest) |
 | Schild gilt für alle Schadensquellen (PE-42, PE-43) | AP-30, AP-31, AP-33 |
 | §5 Spielstand v2, robustes Laden (PE-44) | AP-28 |
 | R1 Asset-Lizenzen M2b | AP-26, AP-36 |
@@ -2402,3 +2479,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | 2026-10-25 | Befunde Nutzer-Handtest iPhone: Spielfeld zu groß, HUD-Stapel zu klein, Astronautin nicht mittig. Neues Paket AP-38 (M2b W1, GAME/OPS, sonnet medium, `bereit`) mit Vollbild, Safe-Area, Viewport, HUD und Zentrierung. Neues Paket AP-39 (M2b W2, GAME, sonnet high, `offen` bis V-05 freigegeben ist und AP-38 gemergt ist): virtueller Stick unten rechts im Querformat, nur auf Touch-Geräten. Eigentum W1: AP-38 besitzt `index.html`, `src/main.ts`, `src/platform/layout.ts` (neu), `src/scenes/{GameScene,HudScene}.ts`, `src/entities/Player.ts` nur zum Zentrieren. Eigentum W2: AP-39 besitzt `src/platform/stick.ts`, `src/logic/aimSource.ts`, `src/platform/input.ts` (einziger Input-Code), `src/scenes/controls/VirtualStick.ts`, `GameScene.ts` nur zur Einbindung. Keine Datei doppelt in einer Welle. AP-38 und AP-39 teilen `GameScene.ts`, daher AP-38 zuerst. AP-25 und AP-26 laufen parallel zu AP-38 in W1 (keine gemeinsamen Dateien), AP-39 nicht parallel in W1. Vorschlag Wellen: W1 AP-25, AP-26, AP-38; W2 AP-27, AP-28, AP-39. Präzisierung Nutzer zu AP-39 (PE-55): Tippen bleibt zusätzlich erhalten, Stick hat Vorrang, zweiter Finger ignoriert, Priorität in reiner Funktion `resolveAim` (`src/logic/aimSource.ts`), eigene Tests. M2b-DEP-Handtest um sechs Zeilen erweitert | Befund Nutzer-Handtest, PE-54, PE-55 | §2 (V-05), §8, §9, §10, §11, §12, §14, §16, §17, AP-38, AP-39 | Planner (Pflege) |
 | 2026-10-25 | Umfang-Vorschläge nur in §16 (V-05 Stick in F-01, V-06 F-17 nach Optional), §2 unverändert, Freigabe Nutzer offen. F-17 (Rüstungen) als Optional, `(angenommen)`, PE-56. Budget M2b rechnerisch ca. 9–10 Fenster, Gesamtplan ca. 22–27 Fenster bei 2,5 h je Fenster (30 % Team-Budget, Annahme). RI-15 ergänzt (Multitouch am Stick, Vollbild in Safari) | Planner (Pflege) | §2 (Vorschlag), §14, §15, §16 | Planner (Pflege) |
 | 2026-10-25 | Hinweis Git: Der Hauptcheckout steht auf `stage`, nicht auf `dev`. Die Planänderung ist deshalb unkommittiert im Arbeitsbaum (Inhalt von `stage` und `dev` für diese Datei identisch). Der Lead wechselt auf `dev` und committet mit `plan: ...`. Der Planner hat nicht selbst gewechselt | Pflegeauftrag Lead | Git | Planner (Pflege) |
+| 2026-10-25 | Nutzer-Freigabe V-05 übernommen (Stick in §2 F-01; Touch-Laptops zählen als Touch-Geräte, bestätigt). V-06 abgelehnt: F-17 bleibt Pflicht. Rüstungs-Priorität: AP-37a (W3), AP-37c (W4), Anzeige in AP-34 (W4), Einbindung in AP-33 (W5), AP-32 nach W5 | Lead-Auftrag und Nutzer-Entscheidung 2026-10-25 | §2, §9, §10, §11, §12, §16 | Planner (Pflege) |
+| 2026-10-25 | Wellen und Pakete: AP-37 (Platzhalter) entfällt, ersetzt durch AP-37a und AP-37c. AP-32 von W4 nach W5. M2b jetzt 16 Pakete, ca. 23,75 h Agent-Zeit, ca. 11–12 Fenster. Gesamt 37 Pakete, ca. 24–29 Fenster | Planung Rüstungs-Priorität | §9, §10, §14 | Planner (Pflege) |
+| 2026-10-25 | Erkenntnis Planung: Regel „keine Abhängigkeit auf einen Vertrag aus derselben Welle“ und Wellenlimit (drei Pakete, eine Datei je Welle). AP-37a (W3) braucht nur AP-25, deshalb keine Kante zu AP-29 und AP-30. AP-34 zeigt den Feuerring als Kreis-Grafik, nicht als Sprite aus AP-37c (gleiche Welle). Einbindung in AP-33 (W5), weil GameScene dort frei ist. Folge: AP-33 wird groß (RI-16) | Planung Rüstungs-Priorität | AP-33, AP-34, AP-37a, AP-37c | Planner (Pflege) |
+| 2026-10-25 | Status: AP-25, AP-26, AP-38 auf `in Arbeit` (W1 läuft), AP-39 `offen` bis AP-38 gemergt. H-09 erledigt (PE-52), H-10 erledigt (V-05 übernommen, V-06 abgelehnt). Feuerring-Regeln PE-57 angenommen, Q-23 offen | Lead-Auftrag 2026-10-25 | §10, §13, §16 | Planner (Pflege) |
