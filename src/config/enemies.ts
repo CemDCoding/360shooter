@@ -1,4 +1,4 @@
-// Startwerte, Feintuning in AP-15, nur hier ändern.
+// Balancing (AP-15), Erklaerung in docs/balancing.md.
 import type { EnemyDef, EnemyId } from '../contracts';
 
 export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {

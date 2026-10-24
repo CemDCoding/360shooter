@@ -14,7 +14,7 @@ describe('items and base values', () => {
   });
 
   it('weapon, player, progression', () => {
-    expect(WEAPON_BASE.fireRatePerSec).toBe(2);
+    expect(WEAPON_BASE.fireRatePerSec).toBe(3);
     expect(PLAYER).toEqual({ maxHp: 100, turnSpeedDegPerSec: 270 });
     expect(PROGRESSION.lossXpFactor).toBe(0.5);
   });
