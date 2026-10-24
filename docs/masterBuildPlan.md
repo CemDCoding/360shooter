@@ -2366,6 +2366,60 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Prüfung LICENSES.md (Vorschlag) | Ein Prüfpunkt oder Test, der `public/assets/LICENSES.md` auf Vollständigkeit gegen das Asset-Manifest prüft (jeder Eintrag einmal, Datei nicht leer). Heute prüft `assets:check` die Datei nicht. Vorschlag: eigenes kleines Paket nach M2b oder Erweiterung von `tests/config/assets.test.ts` in einem späteren Asset-Paket. Entscheidung Nutzer | Review-Befund AP-26 (Datei durch Prettier-Pipe geleert) | Lead (Wellenabschluss M2b W1) |
 | `ActivePowers.doubleShotStage` (Typ-Schärfung) | AP-25 spezifiziert `0–2`, Ist-Typ ist `number`. Vorschlag: auf `0 \| 1 \| 2` schärfen. Eigentum: `src/contracts/weapon.ts` (AP-25-Datei), nur mit Freigabe und vor AP-30 | Review-Hinweis AP-38, niedrig | Lead (Wellenabschluss M2b W1) |
 
+#### Verbesserungsplan Wellenkonzept (Entwurf, nicht freigegeben)
+
+Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine Statusänderung. Umsetzung erst nach Freigabe und Aufnahme in §9/§10/§12.
+
+**Kurzfazit.** Der Nutzerbefund (ab Level 5 kippt das Spiel) hat zwei Ursachen: In Level 5 steigen gleichzeitig die Spawn-Rate (+63 %, 35 auf 57 Spawns/Min) und die Zahl der Typen (Hexe, Eichhörnchen). Danach bleibt der Mix von Level 10 bis 20 gleich, nur Menge und Obergrenze wachsen. Die Referenzspiele steuern Druck über Phasen (Aufbau, Spitze, Ruhe), Ereignisse zu festen Zeitpunkten, Elite-Varianten und Budgets, nicht über ein linear sinkendes Intervall. Der `SpawnDirector` ist deterministisch testbar und kann um Phasen und Budget erweitert werden.
+
+**Belegte Erkenntnisse (Quellen sind Spielwikis, Entwicklerdokus und Presse; GDC-Folien selbst wurden nicht gefunden).**
+
+| # | Erkenntnis (eigene Worte) | Quelle |
+|---|---|---|
+| E1 | Left 4 Dead: Der Director wechselt zwischen Aufbau, Spitze und Ruhe. Mobs entstehen nur in der Aufbauphase, Spitze und Ruhe haben einstellbare Zeiten | https://developer.valvesoftware.com/wiki/L4D2_Director_Scripts |
+| E2 | Booth: Ruhige Phasen löst der Director durch Angriffe ab, zu lange Intensität durch eine Pause. Reines Skripting wird vermieden, weil Spieler Abläufe auswendig lernen | https://www.shacknews.com/article/46443/left-4-dead-interview ; https://gamesradar.com/making-left-4-dead |
+| E3 | L4D hält nur etwa 30 Zombies gleichzeitig in der Welt und tauscht sie außerhalb der Sicht aus (Obergrenze statt Masse) | https://gamesradar.com/making-left-4-dead |
+| E4 | Vampire Survivors (Fan-Wiki): Wellen etwa minütlich mit Mindestanzahl und Intervall, bei Unterschreitung wird aufgefüllt; ab 300 Gegnern stoppt das Spawnen; Map-Events (Schwarm, Umzingelung) kommen zu festen Sekunden und sind erwartbar | https://vampire-survivors.fandom.com/wiki/Enemies |
+| E5 | Brotato (Fan-Wiki): Gegner-HP wächst je Welle, Elite-/Horde-Welle um Welle 11/12 (ein Elite aus drei möglichen), Boss in Welle 20, höchstens 100 Gegner gleichzeitig; Spieler berichten von fehlenden großen Sprüngen zwischen Wellen | https://brotato.wiki.spellsandguns.com/Elite_Wave ; https://brotato.wiki.spellsandguns.com/Waves |
+| E6 | Risk of Rain 2: Ein Director erhält Credits, jeder Gegner kostet Credits, hat Gewicht und frühestes Level (Spawn Card). Das ist ein Budget-System mit gestaffelter Einführung | https://riskofrain2.wiki.gg/wiki/Directors |
+| E7 | Risk of Rain (1): Der Director wählt eine Karte und spawnt sie je nach Budget normal oder als Elite | https://riskofrain.wiki.gg/wiki/Enemies |
+| E8 | Tower-Defense-Leitfäden: Neue Gegnertypen sollen bestehende Strategien herausfordern (Variation statt nur Menge); schnelle schwache, langsame gepanzerte, fliegende Gegner als Mix; Vorschau der nächsten Welle | https://bugnet.io/blog/how-to-design-a-tower-defense-game ; https://abratabia.com/game-genres/tower-defense.php |
+| E9 | PaceMaker (Forschung): Intensität wird aus Schaden und Zustand der Spieler geschätzt, Ziel sind Spitzen und Täler | https://arxiv.org/pdf/2408.15001 |
+
+**Unbelegt (nicht gefunden, nur Gedächtnis oder Annahme):** konkrete Wellenmuster von Halls of Torment, 20 Minutes Till Dawn, Nuclear Throne und Enter the Gungeon; GDC-Folien zu L4D; Telegraphing-Dauern; Lesbarkeit auf kleinen Bildschirmen (nur Spielerkommentare zu Kontrast gefunden, nicht belastbar); Richtwerte für die Länge von Ruhephasen. Diese Zahlen unten sind Startwerte und per Handtest zu prüfen.
+
+**Priorisierte Maßnahmen (Paketvorschläge, Kurzform).**
+
+| ID | Prio | Ziel | Dateien | Abhängigkeiten | Aufwand | Modell | Wirkung |
+|---|---|---|---|---|---|---|---|
+| AP-40 | hoch | SpawnDirector um Phasen erweitern: Aufbau, Spitze, Ruhe (Startwerte z. B. 40 s, 10 s, 6 s, unbelegt) mit Spawn-Rate-Faktor je Phase, deterministisch über SpawnRng. Wahlweise Spawns/Min als Test-Metrik | `src/logic/spawn.ts`, `src/config/waves.ts` (neu), `tests/logic/spawn.test.ts` | AP-35 nicht nötig, aber vor AP-16 (Eigentum `spawn.ts` M3 W1) | M, medium | sonnet | Hoch: bricht den Dauerstrom, entschärft Level 5 |
+| AP-41 | hoch | Typen gestaffelt einführen: Hexe Level 5, Eichhörnchen Level 6 oder 7 (Gewicht der Neuen im Einführungslevel niedrig, steigend). Ab Level 10 Typmix nach Level variieren statt nur Menge | `src/config/levels.ts`, `tests/config/levels.test.ts`, `docs/balancing.md` | nach AP-35 (Eigentum `levels.ts` W5), vor AP-16; braucht Freigabe zu Q-24 | S, medium | sonnet | Hoch: entkoppelt die zwei Hebel in Level 5 |
+| AP-42 | hoch | Druck-Kennzahl um Schwarm-Faktor (Spawns/Min und Anzahl schneller Gegner) ergänzen, Test: Sprung Level 4 auf 5 und je Level begrenzt | `tests/logic/balance.test.ts`, `docs/balancing.md` | AP-40, AP-41 | S, low | haiku | Mittel: verhindert Rückfall, macht Befund messbar |
+| AP-43 | mittel | Budget-System: jeder Typ hat Kosten, der Director erhält Credits je Phase (RoR2-Prinzip) statt gewichtetem Zufall; Obergrenze bleibt `maxEnemies` | `src/logic/spawn.ts`, `src/config/{waves,enemies}.ts`, Tests | AP-40, AP-35 | M, high | sonnet | Mittel: faire Mischung, gut testbar |
+| AP-44 | mittel | Spawn-Muster: Ring (Umzingelung), Schwarm von einer Seite, Cluster, Flanken; zeitlich fest in der Spitzenphase | `src/logic/spawn.ts`, `src/config/waves.ts`, Tests | AP-40 | M, medium | sonnet | Mittel: Abwechslung statt Menge |
+| AP-45 | mittel | Elite-Varianten bestehender Gegner (mehr HP, größer, getönt, keine neuen Assets), 1 Elite in der Spitzenphase ab Level ca. 8 | `src/config/{enemies,waves}.ts`, `src/contracts/enemy.ts` (nur Feld `variant`, eigenes Vertragspaket eine Welle vorher), `src/entities/Enemy.ts` | AP-40, AP-33 (Szene), Q-26 | M, medium | sonnet | Mittel: Abwechslung ohne neue Typen |
+| AP-46 | mittel | Telegraph-Marker für Muster (kurz blinkender Rand-Marker, ca. 0,6 s, unbelegt) | `src/entities/SpawnMarker.ts` (neu), `src/scenes/GameScene.ts` | AP-44, nach AP-33 (Szene), vor AP-20 | S, medium | sonnet | Mittel: Fairness, iPhone-Lesbarkeit |
+| AP-47 | niedrig | Sanfte Pro-Level-HP-/Tempo-Skalierung ab Level 10 (Brotato-Prinzip), Eichhörnchen-Tempo bleibt gedeckelt | `src/config/{levels,enemies}.ts`, Tests | AP-41 | S, low | haiku | Niedrig bis mittel: ersetzt Menge durch Stärke |
+| AP-48 | niedrig | Pre-Boss-Ruhe (ca. 8 s ohne Spawns, bestehende Gegner abräumen) und Boss-Zustandsautomat im SpawnDirector, F-05 bleibt (Runde läuft bis der Boss tot ist) | `src/logic/{spawn,round}.ts`, Tests | AP-40, in AP-16 integrieren, nicht danach | S, medium | sonnet | Niedrig: Dramaturgie |
+| AP-49 | niedrig | Obergrenze gleichzeitiger Gegner auf iPhone prüfen und ggf. senken (L4D-Prinzip, Q-27) | `src/config/levels.ts` | AP-41, Messung | S, low | haiku | Niedrig: Lesbarkeit |
+
+**Einordnung und Konflikte.**
+- AP-27 (M2b W2) besitzt `src/config/enemies.ts`: AP-43/AP-45/AP-47 laufen erst danach. Kein Konflikt für AP-40 (`spawn.ts` ist in M2b frei).
+- AP-35 (M2b W5) besitzt `levels.ts` und `balance.test.ts` und verlangt dort „Spawn-Werte von Level 0–4 bleiben gleich“. AP-41/AP-42 und AP-47 gehören deshalb nach AP-35 (neue Welle W6, nach Freigabe) oder werden in AP-35 aufgenommen. Beides ändert das Balancing, daher Freigabe des Nutzers nötig. AP-35 Schritt 5 (Schwelle `pressure` > 0,9 für Level 20) muss mit AP-42 abgestimmt werden.
+- AP-16 (M3 W1) besitzt `spawn.ts`, `round.ts`, `levels.ts`. Alle hohen und mittleren Pakete müssen vor M3 W1 gemergt sein, sonst muss AP-16 sie auf eine neue Grundlage stellen. Empfehlung: AP-40 bis AP-42 in M2b nach AP-35, AP-43 bis AP-46 optional als M2c oder zwischen M2b und M3; AP-48 in AP-16 einarbeiten (Planänderung dort).
+- AP-33 (M2b W5) und AP-20 (M3 W3) besitzen `GameScene.ts`: AP-46 liegt dazwischen. AP-37a/AP-37c (Feuerring) berühren nur Rüstung, kein Konflikt. AP-39 (Stick) berührt keine Spawn-Dateien.
+- `docs/balancing.md` und PE-05 schützen „Gegner-Ab-Level aus `idee.txt`, nicht ändern“ und Rundendauer. AP-41 ändert die Ab-Level und braucht deshalb eine ausdrückliche Entscheidung (Q-24).
+- Aufwand gesamt hoch+mittel etwa 6 mittelgroße Pakete; Budget gegen §14 prüfen, falls freigegeben.
+
+**Offene Fragen an den Nutzer (Entwurf, noch ohne Q-Nummer in der Tabelle oben).**
+1. (Q-24) Dürfen die Einführungslevel der Gegner gestaffelt werden (z. B. Hexe Level 5, Eichhörnchen Level 7), obwohl `docs/balancing.md` „nicht ändern“ sagt und die Werte aus `idee.txt` stammen?
+2. (Q-25) Sind Ruhephasen (einige Sekunden ohne neue Spawns) gewünscht, oder soll das Spiel durchgehend dicht bleiben?
+3. (Q-26) Sind Elite-Varianten bestehender Gegner (größer, getönt, mehr HP, ohne neue Assets) gewünscht?
+4. (Q-27) Gegnerzahl auf dem iPhone: Soll `maxEnemies` dort niedriger sein als auf dem Desktop?
+5. (Q-28) Telegraph-Marker: Soll ein kurzer Warn-Marker am Rand vor Ring- und Schwarmspawns erscheinen?
+6. (Q-29) Boss-Verhalten: Pre-Boss-Ruhe und Spawn-Stopp, bis der Boss tot ist, oder laufen normale Spawns weiter (F-05 sagt nur, dass die Runde bis zum Tod des Bosses läuft)?
+7. (Q-30) Soll der Entwurf vor M3 (als M2c) umgesetzt werden, oder erst nach M3 mit Boss-Daten?
+
 ---
 
 ## 17. Abdeckungsmatrix
