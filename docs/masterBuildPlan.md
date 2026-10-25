@@ -22,12 +22,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
 - **Stand:** 2026-10-25 · M0, M1, M2, M2b abgenommen (M2b-DEP am 2026-10-25, PC und iPhone) · M2c W1 gemergt (`dev` auf df95a1a), M2c W2 gemergt (`dev` auf 58eef9b), M2c W3 gemergt (`dev` auf 905850a, gepusht) · **Design übernommen** (PE-59, PE-60): M2c (AP-50–AP-55, M2c-DEP) liegt nach M2b-DEP und vor M3. Handtest-Befunde: PE-61 (AP-56 erledigt, AP-53 umgesetzt, Prüfung in M2c-DEP). Schriftumfang: PE-63, PE-64
-- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50 (gemergt 28906d1), AP-51 (gemergt df95a1a), AP-52 (gemergt 2d94bdb), AP-53 (gemergt 58eef9b), AP-54 (gemergt 9f0091a), AP-55 (gemergt 905850a), AP-56 (gemergt cfcdde7), AP-57 (gemergt d25bc66), M0-DEP, M1-DEP, M2-DEP, M2b-DEP (alle in dev, Reviews bestanden). Checks auf dev grün (nach W3): lint, typecheck, 315/315 Tests, assets:check (31 Dateien), build. `theme:build` und `fonts:build` reproduzierbar. **Bereit:** M2c-DEP (W4, [Mensch]). Gate M2c-DEP erfüllt (AP-50–AP-55 fertig). **Offen:** AP-16–AP-20 (warten auf M2c-DEP), M3-DEP.
+- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50 (gemergt 28906d1), AP-51 (gemergt df95a1a), AP-52 (gemergt 2d94bdb), AP-53 (gemergt 58eef9b), AP-54 (gemergt 9f0091a), AP-55 (gemergt 905850a), AP-56 (gemergt cfcdde7), AP-57 (gemergt d25bc66), M0-DEP, M1-DEP, M2-DEP, M2b-DEP (alle in dev, Reviews bestanden). Checks auf dev grün (nach W3): lint, typecheck, 315/315 Tests, assets:check (31 Dateien), build. `theme:build` und `fonts:build` reproduzierbar. **Bereit:** AP-58, AP-60, AP-61 (N1), danach AP-59, AP-62 (N2). M2c-DEP (W4, [Mensch]) läuft nach N2 erneut (erster Handtest hat Befunde ergeben). **Offen:** AP-16–AP-20 (warten auf M2c-DEP), M3-DEP.
 - **Budget:** Nicht im Wellenauftrag gemeldet. Stand in `.claude/ma-usage.json` prüfen, bevor M3 startet (W4 ist ein Handtest des Nutzers ohne Agent-Budget).
 - **Unterbrochen oder laufend:** Keine laufende Arbeit. Wellenabschluss M2c W3 erledigt (§18, 2026-10-25).
 - **Erkenntnisse:** Review-Befund AP-55 (Runde 1, mittel) behoben: README-Abschnitt war in Windows-1252 statt UTF-8 gespeichert (Python `open()` ohne `encoding` unter Windows). Textdateien immer als UTF-8 schreiben und mit `TextDecoder` (fatal) prüfen. Lint-Regel (§18) erfasst `#rgb` bis `#rrggbbaa`, `0xRRGGBB` und `monospace` in `src/scenes/**` und `src/entities/**`. Einzige Ausnahme: `Enemy.ts` Zeile 40 (Aura, Token `game.aura` fehlt, §16). Sichtprüfung weiter nur im Handtest M2c-DEP (§18).
-- **Nächster Schritt:** Nutzer führt M2c-DEP [Mensch] aus (W4): Handtest auf PC und iPhone mit den Prüfpunkten aus §9.2 inklusive Vormerkungen. Danach Lead startet M3 (AP-16). Erst nach M2c-DEP startet AP-16.
-- **Offene Fragen an den Nutzer:** Q-32 Stick-Größe (AP-53 nimmt Token 88 px, Fangbereich 126 px, angenommen). Zu bestätigen (angenommen): PE-34, PE-41, PE-43 bis PE-45, Baum-HP 50 und Radiusfaktor 0,65 (AP-56). App-Icon-Pixel (§18): Designer oder Nutzer in M2c-DEP. Design-Lücken für das Designer-Interview: §16.
+- **Handtest M2c-DEP (2026-10-25, PC und iPhone), erste Runde, Befunde PE-65:** iPhone-Spiel zu groß, Stick am PC weg, Waffe teleportiert und dreht zu langsam, Schüsse links nicht aus der Mündung, Bäume bleiben im Spieler stehen, Gold soll weicher fliegen, Power-ups sollen manuell aktivierbar sein. **Fix-Pakete M2c-Nachtrag:** N1 = AP-58 (Mündung), AP-60 (Baum-Despawn), AP-61 (iPhone-Darstellung); N2 = AP-59 (Waffendrehung, nach AP-58) und AP-62 (Stick auch am PC, PE-68). N1 `bereit`, N2 `offen` (AP-62 sofort `bereit`, AP-59 nach AP-58). M2c-DEP bleibt offen und wird nach N2 wiederholt. Power-up-Aktivierung und Gold-Magnet: nur Vorschlag (§16).
+- **Nächster Schritt:** Lead startet N1 (AP-58, AP-60, AP-61), danach N2 (AP-59, AP-62), dann Nutzer wiederholt M2c-DEP [Mensch] (W4). Erst danach startet AP-16. Hinweis: Der PR `dev` → `stage` hat Merge-Konflikte (stage enthält nur den Squash-Commit „init stage (#1)“ 32a050c, §18). Der Lead gibt dem Nutzer eine manuelle Anleitung.
+- **Offene Fragen an den Nutzer:** Q-34 manuelle Power-up-Aktivierung (Optionen §16), Q-35 iPhone-Details, Q-36 Gold-Magnet weicher. Q-32 Stick-Größe (AP-53 nimmt Token 88 px, Fangbereich 126 px, angenommen). Zu bestätigen (angenommen): PE-34, PE-41, PE-43 bis PE-45, Baum-HP 50 und Radiusfaktor 0,65 (AP-56). App-Icon-Pixel (§18): Designer oder Nutzer in M2c-DEP. Design-Lücken für das Designer-Interview: §16.
 
 <!-- Ende Lagebericht -->
 
@@ -78,7 +79,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; V-07 (§2 F-01 Stick am PC) und V-08 (manuelle Power-up-Aktivierung) als Vorschläge; Q-34 bis Q-36 offen | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
@@ -485,6 +486,16 @@ flowchart TD
 | W2 | AP-54 | `src/entities/{Player,Laser,LaserPool,ArmourRing,ItemPickup,ArmourPickup}.ts`, `src/entities/enemies/Enemy.ts` (nur Treffer-Blitz und Aura-Farbe), `src/scenes/GameScene.ts` (nur Übergabe der Waffen-Ausbaustufe), `tests/entities/ItemPickup.test.ts` |
 | W3 | AP-55 | `eslint.config.js` (nach AP-57, dessen `docs/design/**`-Eintrag bleibt), `README.md`, Restfunde in `src/scenes/**` und `src/entities/**` (nur Farb-Literale), `docs/guides/*` (Verweise) |
 
+**M2c-Nachtrag (Handtest M2c-DEP, PE-65):** Kleine Fix-Pakete in zwei Wellen vor der Wiederholung von M2c-DEP. Pakete, die `Player.ts` und `weaponMount` berühren, liegen in zwei Wellen nacheinander (AP-58, dann AP-59). Höchstens drei Pakete je Welle (PE-15). Die Funktion `weaponPose` aus AP-58 ist der Vertrag für AP-59 (eine Welle vorher).
+
+| Welle | Paket | Dateien |
+|---|---|---|
+| N1 | AP-58 | `src/entities/Player.ts`, `src/logic/weaponMount.ts`, `src/config/weaponMount.ts` (nur falls die Ursache dort liegt), `tests/logic/weaponMount.test.ts` |
+| N1 | AP-60 | `src/entities/enemies/Enemy.ts`, `src/config/enemies.ts`, `src/logic/contactBudget.ts` (neu), `tests/logic/contactBudget.test.ts` (neu), `tests/config/enemies.test.ts` |
+| N1 | AP-61 | `index.html`, `src/main.ts`, `src/platform/layout.ts`, `tests/platform/layout.test.ts`, `src/scenes/HudScene.ts` und `src/scenes/hud/hudMath.ts` (nur falls die Ursache dort liegt), `tests/scenes/hud.test.ts` |
+| N2 | AP-59 | `src/entities/Player.ts`, `src/logic/weaponMount.ts`, `tests/logic/weaponMount.test.ts`, `src/config/weaponMount.ts`, `src/config/player.ts`, `tests/config/items.test.ts` (nur die Zeile mit `PLAYER`), `tests/logic/upgrades.test.ts` (nur die Zeilen mit der Drehgeschwindigkeit), `docs/balancing.md` |
+| N2 | AP-62 | `src/scenes/controls/VirtualStick.ts`, `src/platform/stick.ts`, `tests/platform/stick.test.ts`, `src/platform/input.ts` (nur falls nötig). Keine Überschneidung mit AP-59 |
+
 ---
 
 ## 9. Meilensteine und Wellen
@@ -658,7 +669,9 @@ flowchart TD
 | W1 | AP-50 Theme, Waffen-Geometrie und Farben der Hülle (OPS/SH/LOG), AP-51 Schriften, Icons und Asset-Pipeline (ASSET) |
 | W2 | AP-52 Menü, Level-Auswahl, Upgrade-Panel, Laden, Hochformat-Hinweis (GAME), AP-53 Runde: HUD, Pause, Stick, Ergebnis, Maps (GAME), AP-54 Waffe als eigenes Sprite, Spielerin, Laser (GAME/LOG) |
 | W3 | AP-55 Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README (OPS) |
-| W4 | M2c-DEP [Mensch] |
+| N1 (Nachtrag, PE-65) | AP-58 Mündung bei gespiegelter Figur (GAME/LOG), AP-60 Baum-Despawn nach Kontaktschaden (GAME/SH), AP-61 iPhone-Darstellung zu groß (GAME/OPS) |
+| N2 (Nachtrag, PE-65) | AP-59 Waffendrehung weich und schneller (GAME/LOG/SH), baut auf AP-58 auf (gleiche Dateien), AP-62 Stick auch am PC (GAME, PE-68) |
+| W4 | M2c-DEP [Mensch] (erste Runde mit Befunden am 2026-10-25, Wiederholung nach N2) |
 
 **Integration:** nach W1 `npm install`, alle Checks, `npm run fonts:build` und `npm run theme:build` erzeugen unveränderte Dateien (kein Diff). Nach W2 alle Checks. Eine Sichtprüfung im Browser ist in der Agent-Umgebung nicht möglich (kein Browser, localhost per Proxy blockiert); die Sichtprüfung der Szenen (Menü, Level 0, Pause, Ergebnis) erfolgt im Handtest M2c-DEP. **Design-Review** (`ma-designer`, Modus Review) für AP-52, AP-53 und AP-54 zusätzlich zum normalen Review; Prüfgrundlage: Grundsätze im Brief, `docs/design/tokens.json`, `docs/design/screenshots/`. W1 und W2 werden direkt hintereinander gemergt und nicht einzeln im Browser abgenommen: In W1 ändert sich die Frame-Belegung von `ui-icons` und die Schrift wird geladen, aber noch nicht genutzt.
 
@@ -683,6 +696,12 @@ flowchart TD
   - [ ] Vormerkung: Kachel-Tints Nacht (Level 7) und Elfenwald (Level 16) mit Kontrast von Laser, Gegnern und Items am Boden
   - [ ] Vormerkung: Stick-Fangbereich mit dem Daumen treffen (126 px), Stick-Mittelpunkt 7 px weiter innen
   - [ ] Vormerkung: Menü-Kacheln ohne Hover-Zustand (Hover für Phaser nicht umgesetzt) vollständig lesbar und bedienbar
+  - [ ] **Wiederholung nach M2c-Nachtrag (PE-65):** iPhone: Spielfeld passt in den Sicherheitsbereich, nichts abgeschnitten, auch in der Homescreen-App (AP-61)
+  - [ ] Schüsse beginnen bei Zielen nach links und rechts an der Waffenmündung, in allen acht Richtungen (AP-58)
+  - [ ] Waffe wechselt beim Überqueren von oben und unten (±90°) weich die Seite, kein Springen, Drehung im Basis-Level flüssig (AP-59)
+  - [ ] Verfluchter Baum verschwindet von selbst nach 30 Schaden am Spieler, ohne Münze, Item oder Erfahrung (AP-60, Schwelle angenommen)
+  - [ ] PC: Der Stick ist unten rechts sichtbar und mit der Maus ziehbar, solange er gehalten wird, wirkt die Mausposition nicht (AP-62, PE-68). Dieser Punkt ersetzt „PC: kein Stick sichtbar“ aus M2b-DEP
+  - [ ] Offen für die Entscheidung des Nutzers, nicht Teil des Nachtrags: manuelle Aktivierung von Power-ups (Q-34), weicherer Gold-Magnet (Q-36), Tastatur-Steuerung (§16)
   - [ ] Balancing nach AP-56 (Handtest-Prüfpunkte): Level 10–20 gezielt spielen. Der Druck liegt ab Level 10 über 1, Level 12 = 1,09 (früher als zu schwer bewertet), Level 20 = 1,22. Eröffnungsgegner erscheinen horizontal im Bild, vertikal knapp außerhalb. Baum-HP 50 und Radiusfaktor 0,65 sind angenommen, bis der Nutzer sie bestätigt oder ändert
 
 #### M3 – Bosse
@@ -761,7 +780,12 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-53 | Runde: HUD, Pause, Stick, Ergebnis, Maps (Design, Design-Review; Befunde PE-61: Stick kleiner, kein grauer Kasten) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – (gemergt 58eef9b) | fertig (gemergt, Review-Befund Runde 1 behoben, §18) |
 | AP-54 | Waffe als eigenes Sprite, Spielerin spiegelt, Laser, Treffer-Blitz (Design, Design-Review) | M2c | GAME/LOG | W2 | AP-50, AP-51 | M | sonnet (high) | – (gemergt 9f0091a) | fertig (gemergt, Checks grün) |
 | AP-55 | Design-Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README | M2c | OPS | W3 | AP-52, AP-53, AP-54, AP-57 (Datei `eslint.config.js`, Reihenfolge) | S | sonnet (medium) | – (gemergt 905850a) | fertig (gemergt, Review Runde 1 mittel behoben, Checks grün) |
-| M2c-DEP | Abnahme M2c (PC + iPhone) | M2c | HUM | W4 | AP-50–AP-55 | H | – | – | bereit |
+| AP-58 | Fix: Schuss startet an der Waffenmündung, auch bei gespiegelter Figur (PE-65, Befund 4) | M2c-Nachtrag | GAME/LOG | N1 | AP-55 (fertig) | S | sonnet (medium) | – | bereit |
+| AP-60 | Fix: Verfluchter Baum verschwindet nach Kontaktschaden (PE-65, PE-66, Befund 6) | M2c-Nachtrag | GAME/SH | N1 | AP-55 (fertig) | S | sonnet (medium) | – | bereit |
+| AP-61 | Fix: Spielfeld auf dem iPhone zu groß (PE-65, Befund 1) | M2c-Nachtrag | GAME/OPS | N1 | AP-55 (fertig) | M | sonnet (high) | – | bereit |
+| AP-59 | Fix: Waffe wechselt weich die Seite, Drehung schneller (PE-65, PE-67, Befund 3) | M2c-Nachtrag | GAME/LOG/SH | N2 | AP-58 (gleiche Dateien, `weaponPose`) | M | sonnet (medium) | – | offen (bereit nach AP-58) |
+| AP-62 | Fix: Virtueller Stick auch am PC sichtbar, mit der Maus bedienbar (PE-65, PE-68, Befund 2) | M2c-Nachtrag | GAME | N2 | AP-55 (fertig) | S | sonnet (medium) | – | bereit |
+| M2c-DEP | Abnahme M2c (PC + iPhone), Wiederholung nach dem Nachtrag | M2c | HUM | W4 | AP-50–AP-55, AP-58–AP-62 | H | – | – | erster Handtest 2026-10-25 mit Befunden (PE-65), offen bis N2 |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2c-DEP | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -813,6 +837,9 @@ flowchart LR
     AP51["AP-51"] --> AP52 & AP53 & AP54
     AP52 & AP53 & AP54 --> AP55["AP-55"]
     AP50 & AP51 & AP52 & AP53 & AP54 & AP55 --> M2cDEP["M2c-DEP"]
+    AP55 --> AP58["AP-58"] & AP60["AP-60"] & AP61["AP-61"] & AP62["AP-62"]
+    AP58 --> AP59["AP-59"]
+    AP58 & AP59 & AP60 & AP61 & AP62 --> M2cDEP
   end
   subgraph M3["M3 Bosse"]
     AP16["AP-16"] --> AP17["AP-17"] & AP18["AP-18"] & AP19["AP-19"]
@@ -833,6 +860,8 @@ flowchart LR
 **M2b:** Die Reihenfolgekante M2-DEP → AP-25/AP-26 (PE-46) ist mit der Abnahme vom 2026-10-25 erfüllt und entfernt. W1 und W2 sind je ein Paket pro Datei. AP-38 (W1) und AP-39 (W2) teilen `GameScene.ts`, daher nacheinander. AP-34 (HUD, W4) und AP-33 (GameScene, W5) starten erst nach AP-38 bzw. AP-39. W5 läuft mit AP-35 (Config) und AP-32 (Menü) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt. Rüstungen (PE-58): AP-37a (W3) liefert Vertrag und Logik, AP-37c (W4) Entity und Sprite, AP-34 (W4) die Anzeige, AP-33 (W5) die Einbindung in `GameScene`. Die Einbindung steckt in AP-33, weil `GameScene.ts` in W5 schon AP-33 gehört. Ein eigenes Einbindungspaket wäre erst in W6 möglich und verletzte „spätestens W5“ (PE-58).
 
 **M2c (PE-59, PE-60):** M2c startet nach M2b-DEP (Reihenfolgekante, keine Code-Abhängigkeit, wie bei M2b nach M2-DEP) und endet vor M3. AP-16 hängt von M2c-DEP ab, weil AP-51 `config/assets.ts` besitzt (wie AP-16) und AP-53 `HudScene`/`ResultScene` (wie AP-20). W2 hängt von W1 ab, weil `theme.ts` und die Schrift Verträge für die UI-Pakete sind. AP-52, AP-53 und AP-54 teilen keine Datei und nutzen keine Funktion aus derselben Welle: Die Ton-Taste ruft AP-53 mit der von AP-50 vorbereiteten Signatur `addMuteButton(scene, x, y, world)` auf, und die Funk-Buttons des Ergebnisses kommen aus `scenes/hud/` (AP-53), nicht aus `menu/Button.ts` (AP-52).
+
+**M2c-Nachtrag (PE-65):** AP-58, AP-60 und AP-61 (N1) teilen keine Datei und laufen parallel. AP-62 (Stick am PC) hat keine gemeinsame Datei mit den anderen, liegt aber in N2, weil N1 schon drei Pakete hat (PE-15), und läuft dort parallel zu AP-59. AP-59 (N2) teilt `Player.ts`, `weaponMount.ts` und dessen Test mit AP-58 und nutzt dessen Funktion `weaponPose`, daher eine Welle später. M2c-DEP wird nach N2 wiederholt, AP-16 bleibt von M2c-DEP abhängig.
 
 **M2 W4:** AP-23 (nur `src/config/*`, `tests/config/*`, `tests/logic/balance.test.ts`, `docs/balancing.md`) und AP-24 (`src/scenes/GameScene.ts`, `src/logic/projectiles.ts`, Test) teilen keine Datei und laufen parallel.
 
@@ -2361,6 +2390,177 @@ Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Absc
 - **Kürzbar bei Budgetnot:** ja (nur Restfunde ohne Regel; die Regel kann später folgen)
 - **Commit-Typ:** `chore(AP-55): enforce theme tokens with a lint rule`
 
+### M2c-Nachtrag – Fix-Pakete aus dem Handtest M2c-DEP (PE-65)
+
+Erster Handtest M2c-DEP am 2026-10-25 (PC und iPhone). Fünf der sieben Befunde werden hier als kleine Fix-Pakete behoben (Befunde 1, 2, 3, 4, 6 als AP-61, AP-62, AP-59, AP-58, AP-60; Befund 2 ist laut Nutzer ein Wunsch: Stick auch am PC, PE-68). Befund 5 (Power-ups manuell aktivieren) ist eine Frage an den Nutzer, Befund 7 ein Backlog-Hinweis, siehe §16. Gemeinsame Regeln: keine neuen Abhängigkeiten, keine Farb-Literale (Tokens), Spiellogik außerhalb der genannten Dateien unverändert, `prettier --write` nur auf die eigenen Dateien, Textdateien als UTF-8. Die Agent-Umgebung hat keinen Browser (§18): Die Wirkung auf dem Gerät prüft der Nutzer in der Wiederholung von M2c-DEP, die Pakete belegen ihre Ursache und Wirkung rechnerisch über reine Funktionen und Tests.
+
+#### AP-58 – Fix: Schuss startet an der Waffenmündung, auch bei gespiegelter Figur
+
+- **Meilenstein, Lane, Welle:** M2c-Nachtrag · GAME/LOG · N1
+- **Ziel:** Befund 4: Steht die Waffe links von der Spielerin (Figur gespiegelt), starten die Schüsse im Sprite der Astronautin statt an der Waffenmündung. Der Laser (alle Laser einer Salve, auch Doppelschuss) startet in allen Zielrichtungen sichtbar an der Mündung der Pistole. Waffen-Sprite und Laser-Start nutzen eine gemeinsame Quelle.
+- **Ist-Stand (Planner hat den Code gelesen):** `Player.update` berechnet `hand = handPoint(...)` und `muzzle = muzzlePoint(hand.x, hand.y, facingDeg, left)`, das Waffen-Sprite wird getrennt in `updateWeapon` positioniert, gedreht und per `flipY` gespiegelt. `muzzlePoint` negiert beim Spiegeln nur `muzzle.y`. Die Formel ist laut `tests/logic/weaponMount.test.ts` für 0° und 180° konsistent und spiegelsymmetrisch (links 180° = (−25 | +4), rechts 0° = (+25 | +4) gegenüber der Mitte). Die Ursache liegt daher vermutlich **nicht in der Rechnung, sondern in der Darstellung**: (a) Die Annahme, wie Phaser `flipY` bei gleichzeitiger Rotation um den Origin zeichnet, ist nie gegen die Formel geprüft; Sprite und Laser-Start haben zwei getrennte Quellen. (b) `WEAPON_MOUNT.muzzle` (15 | −5) und `grip` (7 | 12) gelten für den Frame von Ausbaustufe 0 (aus dem Mockup); Stufe 1 und 2 sowie der Schussframe können eine andere Mündung haben. (c) Hand- oder Mündungspunkt passt nicht zur gespiegelten Figur-Art. Der Coder belegt zuerst, welche Ursache gilt.
+- **Pflichtlektüre:** PE-65, `src/logic/weaponMount.ts`, `src/config/weaponMount.ts`, `src/entities/Player.ts`, `src/entities/LaserPool.ts` (nur lesen), `tests/logic/weaponMount.test.ts`, `docs/design/mockups/{sprites,schrift-und-waffe}.html` (Ankerpunkte Griff und Mündung je Stufe, nur lesen), `public/assets/sprites/weapon-raygun.png` und `.placeholders.json` (Pixel der Mündung je Frame), §18 (Erkenntnisse AP-50, AP-54)
+- **Abhängigkeiten:** AP-55 (fertig). Keine weiteren
+- **Parallel möglich mit:** AP-60, AP-61 (keine gemeinsame Datei). **Nicht** parallel mit AP-59 (gleiche Dateien, AP-59 baut auf `weaponPose` auf)
+- **Dateien (Eigentum):** `src/entities/Player.ts`, `src/logic/weaponMount.ts`, `src/config/weaponMount.ts` (nur falls die Ursache in den Konstanten liegt), `tests/logic/weaponMount.test.ts`
+- **Nicht anfassen:** `src/entities/{Laser,LaserPool}.ts`, `src/scenes/**`, `src/logic/{weapon,powers,rotation}.ts`, `src/config/player.ts`, `public/assets/**` (Sprites nicht ändern: stimmt die Konstante nicht, wird die Konstante angepasst), `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **Ursache belegen (im Bericht):** Mündungs- und Griffpixel je Frame (Stufen 0–2, Ruhe und Schuss) aus `weapon-raygun.png` bestimmen (einmaliges Wegwerf-Skript außerhalb des Repos oder Lesen der Pixel, nicht einchecken) und mit `WEAPON_MOUNT.grip` und `.muzzle` vergleichen. Dazu die Gegenprobe aus Schritt 3.
+  2. **Eine Quelle:** Neue reine Funktion `weaponPose(centerX, centerY, facingDeg, mirror)` in `src/logic/weaponMount.ts`. `mirror` ist `+1` (Figur schaut nach rechts) oder `−1` (gespiegelt); die Funktion ist so geschrieben, dass sie auch Zwischenwerte in [−1, 1] versteht (AP-59 macht den Wert stetig; AP-58 übergibt nur ±1). Rückgabe: `{ hand, rotationDeg, flipY, behind, muzzle }`, mit `hand.x = centerX + WEAPON_MOUNT.hand.x * mirror`, Mündungs-Versatz `(muzzle.x, muzzle.y * mirror)` um den Griff gedreht. `faceLeft`, `handPoint`, `muzzlePoint`, `weaponBehindFigure` bleiben exportiert (bestehende Tests grün).
+  3. **Gegenprobe im Test, unabhängig von der Formel:** Eine kleine Test-Hilfsfunktion rechnet Griff und Mündung des Frames über eine explizite Matrix (Verschiebung zum Handpunkt · Drehung um `facingDeg` · Skalierung (1, mirror) · Verschiebung um −Griff) aus den Frame-Pixeln (`grip`, Mündungspixel des Frames) und vergleicht sie mit `weaponPose` für rechts und links.
+  4. **`Player`:** Waffen-Sprite (Position, Rotation, `flipY`, Tiefe) und Laser-Start (`lasers.fire`) lesen beide aus demselben `weaponPose`-Ergebnis des Frames. Die zweite Berechnung in `update` und `updateWeapon` entfällt. Doppelschuss-Versätze (senkrecht zur Richtung) bleiben, sie beziehen sich auf die Mündung.
+  5. **Stimmt die Konstante nicht** (z. B. Mündung der Stufen 1 und 2 weicht ab), wird `WEAPON_MOUNT.muzzle` je Stufe geführt (`muzzle` als Liste je Stufe, nur wenn belegt) und `weaponPose` bekommt `stage`. Stimmt weder Formel noch Konstante, prüft der Coder, ob die Darstellung von der Formel abweicht (z. B. `flipY` gegen negatives `scaleY` am Sprite) und meldet das Ergebnis dem Lead, statt Konstanten zu raten.
+- **Schnittstellen:** neu exportiert `weaponPose` und der Typ des Ergebnisses. `PlayerConfig`, `facingDeg` und Callbacks unverändert. AP-59 nutzt `weaponPose` mit stetigem `mirror`.
+- **Akzeptanzkriterien:**
+  - Für die Zielwinkel 0°, ±45°, ±90°, ±135°, 180° liegt die Mündung bei konstantem Abstand √(15² + 5²) (Toleranz 1e-6) vor dem Griff, und ihre Projektion auf die Zielrichtung liegt mindestens 15 px vor der Hand
+  - **Spiegelsymmetrie (Mündung links/rechts):** Die Mündung bei Zielwinkel 180° − θ (links) ist die Spiegelung der Mündung bei θ (rechts) an der Mittelachse der Spielerin (x → 2·Mitte − x), für θ = 0°, ±45°, ±90° (Toleranz 1e-6)
+  - Bei Zielwinkel 180° liegt die Mündung mindestens 24 px links von der Mitte (außerhalb der halben Figurbreite von 16 px), bei 0° mindestens 24 px rechts
+  - Gegenprobe über die Frame-Pixel stimmt für rechts und links mit `weaponPose` überein (Toleranz 0,5 px)
+  - `Player` nutzt `weaponPose` für Sprite und Laser (kein zweiter Rechenweg); Doppelschuss, Feuerrate, Schaden, Tiefe und Spiegeln der Figur unverändert
+  - Bericht nennt die belegte Ursache (a, b oder c) mit Zahlen. Handtest (Nutzer, M2c-DEP-Wiederholung): Schüsse beginnen links und rechts an der Mündung, auch bei schrägen Winkeln
+  - Checks grün
+- **Tests:** `tests/logic/weaponMount.test.ts`: `weaponPose` (Abstand, Spiegelsymmetrie, 180° und 0°, Zwischenwert `mirror = 0`: Hand in der Mitte), Gegenprobe über die Matrix, bestehende Tests unverändert. `Player` braucht Phaser und wird nicht getestet.
+- **Review-Schwerpunkte:** eine Quelle für Sprite und Laser, keine Farb-Literale, Waffe wird weiter beim Tod und bei „Nochmal“ aufgeräumt, Konstanten nicht geraten, Tests nicht nur selbstbestätigend (die Gegenprobe rechnet unabhängig)
+- **Doku-Pflichten:** – (Kommentar in `weaponMount.ts`, welche Annahme über `flipY` gilt)
+- **Design-Review:** nein (Geometriefehler, Sichtprüfung im Handtest)
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerbefund)
+- **Commit-Typ:** `fix(AP-58): start lasers at the weapon muzzle when the figure is mirrored`
+
+#### AP-60 – Fix: Verfluchter Baum verschwindet nach Kontaktschaden
+
+- **Meilenstein, Lane, Welle:** M2c-Nachtrag · GAME/SH · N1
+- **Ziel:** Befund 6: Ein Verfluchter Baum, der die Spielerin erreicht hat, bleibt unendlich lange stehen und schädigt sie dauerhaft. Hat ein Baum der Spielerin ein einstellbares Maß an Kontaktschaden zugefügt, verschwindet er von selbst (Despawn). Er lässt dabei weder Münze, Item noch Rüstung fallen und gibt keine Erfahrung.
+- **Ist-Stand (Planner hat den Code gelesen):** `GameScene.applyAreaDamage` ruft pro Überlappung `enemy.contactDamageFor(dt)` auf. `Enemy.contactDamageFor` rechnet nur `auraDamage(def.contactDamage, dtMs)` und merkt sich nichts. `cursedTree.contactDamage` ist 10 je Sekunde. Der Baum bewegt sich zum Zentrum (`ChaseEnemy`) und bleibt dort stehen.
+- **Pflichtlektüre:** PE-65, PE-66, `src/entities/enemies/Enemy.ts`, `src/entities/enemies/ChaseEnemy.ts`, `src/config/enemies.ts`, `src/logic/health.ts` (`auraDamage`), `src/scenes/GameScene.ts` (nur lesen: `applyAreaDamage`, Todespfad), `tests/config/enemies.test.ts`
+- **Abhängigkeiten:** AP-55 (fertig)
+- **Parallel möglich mit:** AP-58, AP-61 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/entities/enemies/Enemy.ts`, `src/config/enemies.ts`, `src/logic/contactBudget.ts` (neu), `tests/logic/contactBudget.test.ts` (neu), `tests/config/enemies.test.ts`
+- **Nicht anfassen:** `src/scenes/GameScene.ts` (der Despawn läuft in `Enemy.update`, die Szene bleibt unverändert), `src/contracts/**` (kein Vertragsfeld: die Schwelle steht als Konstante in `enemies.ts`), `src/entities/enemies/{ChaseEnemy,AuraEnemy,ForestWitch}.ts`, `src/logic/health.ts`, `tests/logic/balance.test.ts`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `src/logic/contactBudget.ts` (ohne Phaser): `addContact(dealt, amount)` gibt die neue Summe (Eingabe nicht endlich oder negativ zählt als 0), `isContactSpent(dealt, limit)` gibt `true`, wenn `limit` gesetzt (endlich, größer 0) und `dealt >= limit` ist; ohne `limit` immer `false`.
+  2. `src/config/enemies.ts`: neue exportierte Konstante `CONTACT_DESPAWN_DAMAGE: Partial<Record<EnemyId, number>> = { cursedTree: 30 }` mit Kommentar „Balancing, Startwert angenommen (PE-66): 3 s Kontakt bei 10 Schaden je Sekunde, ein Drittel der HP der Spielerin“. Andere Gegner haben keinen Eintrag, ihr Verhalten bleibt.
+  3. `Enemy.ts`: Feld `contactDealt` (bei `spawn()` auf 0). `contactDamageFor(dtMs)` berechnet wie bisher den Schaden, addiert ihn zu `contactDealt` (der **berechnete** Schaden zählt, auch wenn ein Schild ihn abfängt) und merkt sich `contactSpent`, sobald `isContactSpent(contactDealt, CONTACT_DESPAWN_DAMAGE[def.id])` gilt. Der Schaden dieses Frames wird noch zurückgegeben.
+  4. `Enemy.update`: Ist `contactSpent`, wird der Gegner im nächsten Frame mit `despawn()` entfernt (nicht innerhalb des Physik-Callbacks, damit `overlap` nicht stört). Es wird `ctx.onDeath` **nicht** aufgerufen: kein Gold, kein Item, keine Erfahrung, kein Kill-Zähler. Die Spawn-Zahl (`alive`) sinkt, der `SpawnDirector` füllt im Regelbetrieb nach.
+  5. Keine Animation und kein Blinken nötig (Grundsatz 7). Optional ein sofortiges Ausblenden (Alpha 0), wenn es ohne Tween geht.
+- **Schnittstellen:** neu `CONTACT_DESPAWN_DAMAGE` (Config) und `addContact`/`isContactSpent` (Logik). Keine Vertragsänderung, `GameScene` unverändert. Bosse (M3, AP-16) haben keinen Eintrag und sind nicht betroffen.
+- **Akzeptanzkriterien:**
+  - `isContactSpent`: ohne Grenze `false`, unter der Grenze `false`, bei Gleichstand und darüber `true`; `addContact` ignoriert nicht endliche und negative Werte
+  - `CONTACT_DESPAWN_DAMAGE.cursedTree` ist eine endliche Zahl größer 0 und höchstens halbe `PLAYER.maxHp`; kein Eintrag für `forestWitch`, `zombieSquirrel`, `forestSpirit`
+  - Ein Baum, der drei Sekunden lang Kontakt hatte (30 Schaden), ist weg, ohne Münze, Item oder Erfahrung. Bäume ohne Kontakt, Hexe, Eichhörnchen und Geist verhalten sich wie bisher (Handtest, M2c-DEP-Wiederholung)
+  - Der Wert ist die einzige Stellschraube (Konfig), kein Zahlenwert in `Enemy.ts`
+  - Checks grün
+- **Tests:** `tests/logic/contactBudget.test.ts` (Grenzen, ungültige Eingaben), `tests/config/enemies.test.ts` (Konstante, nur Baum). `Enemy` braucht Phaser und wird nicht getestet.
+- **Review-Schwerpunkte:** Despawn nicht im Physik-Callback, kein Aufruf von `onDeath`, `contactDealt` wird bei jedem `spawn()` zurückgesetzt (Pool!), Schild-Fall zählt mit, Bosse nicht betroffen
+- **Doku-Pflichten:** `docs/balancing.md` nur um einen Satz ergänzen, falls der Coder die Datei ohnehin anfasst; sonst Vermerk im Bericht (Datei gehört AP-60 nicht)
+- **Design-Review:** nein
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerbefund)
+- **Commit-Typ:** `fix(AP-60): despawn cursed trees after dealing contact damage`
+
+#### AP-61 – Fix: Spielfeld auf dem iPhone zu groß
+
+- **Meilenstein, Lane, Welle:** M2c-Nachtrag · GAME/OPS · N1
+- **Ziel:** Befund 1: Auf dem iPhone im Querformat war das Spiel zu groß für den Bildschirm. Ursache finden und beheben, sodass Spielfeld und alle Elemente (HUD, Menü, Ergebnis) vollständig im Sicherheitsbereich liegen, im Safari-Tab und in der Homescreen-App.
+- **Ist-Stand (Planner hat den Code gelesen):** Der Platz wird zweistufig bestimmt: `src/main.ts` `layoutArena()` setzt `#game` per `fitArena` (aus `layout.ts`, Sicherheitsbereich über die Sonde `#safe` mit `env(safe-area-inset-*)`), zusätzlich passt Phaser (`Scale.FIT`, `autoCenter`) das Canvas ins Elternelement an. Neuberechnung nur bei `resize` und `orientationchange` (200 ms Verzögerung). `#safe` hat `height: 100dvh` mit Fallback `100vh`. AP-38 war im M2b-DEP abgenommen (2026-10-25); seitdem haben M2c-Pakete `index.html` (AP-50, AP-52), HUD und Layout (AP-53) verändert. **Kandidaten** (der Coder belegt, welcher gilt): (1) HUD-, Menü- oder Ergebnis-Elemente ragen durch größeres HUD (`hudScale`, `funkScale`) über den Rand der 640 × 360 Arena; das Spielfeld selbst passt; (2) Adressleiste und Werkzeugleiste von Safari ändern die sichtbare Höhe, ohne dass `resize` zuverlässig ausgelöst wird (`window.visualViewport` wird nicht beachtet); (3) Homescreen-App mit `black-translucent`: `100dvh` und `env(safe-area-inset-*)` weichen von Safari ab; (4) doppelte Skalierung (`fitArena` und `FIT`) mit Rundung (`Math.floor`).
+- **Pflichtlektüre:** PE-65, PE-54, Q-35, AP-38 (diese Datei oben, Umsetzung und Erkenntnisse in §18), AP-53 (Teil HUD-Größe, `funkScale`), `index.html`, `src/main.ts`, `src/platform/layout.ts`, `tests/platform/layout.test.ts`, `src/scenes/HudScene.ts` und `src/scenes/hud/hudMath.ts` (Layout der Elemente), `public/manifest.webmanifest` (nur lesen)
+- **Abhängigkeiten:** AP-55 (fertig). Der Nutzer liefert die Antworten zu Q-35 (Safari-Tab oder Homescreen, was war zu groß, Gerät). Liegen sie nicht vor, arbeitet der Coder mit allen vier Kandidaten
+- **Parallel möglich mit:** AP-58, AP-60 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `index.html`, `src/main.ts`, `src/platform/layout.ts`, `tests/platform/layout.test.ts`, `src/scenes/HudScene.ts` und `src/scenes/hud/hudMath.ts` (nur falls die Ursache dort liegt), `tests/scenes/hud.test.ts` (nur dann)
+- **Nicht anfassen:** `src/scenes/{GameScene,MenuScene,ResultScene}.ts`, `src/scenes/menu/*`, `src/entities/**`, `src/logic/**`, `src/config/**`, `public/manifest.webmanifest`, `docs/design/**`. Liegt die Ursache in einer dieser Dateien, meldet der Coder das dem Lead (kein Eingriff)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **Ursache zuerst (im Bericht):** Rechnerisch für typische iPhone-Querformate (844 × 390 mit Notch links 47 px, 932 × 430, 667 × 375, jeweils mit und ohne Adressleiste und Home-Balken) die Größe von `#game`, das Canvas, die HUD-Skalierung (`hudScale`, `funkScale`) und die Rechtecke der HUD-Elemente gegen die 640 × 360 Arena prüfen. Aussage, welcher Kandidat zutrifft, mit Zahlen.
+  2. **Zu Kandidat 1 (HUD ragt hinaus):** Layout-Rechenwege der Elemente als reine Funktion mit Rechtecken testbar machen (in `hudMath.ts`), Skalierung begrenzen, sodass kein Element die Arena verlässt. Aussehen unverändert, wo es passt.
+  3. **Zu Kandidat 2 und 3 (Viewport):** `layoutArena` beachtet `window.visualViewport` (Breite, Höhe, `resize`-Ereignis) und ruft sich bei `visualViewport.resize` sowie nach Drehung erneut auf; die Höhe kommt aus `visualViewport.height`, nicht nur aus `100dvh`. Die Sonde bleibt für die Safe-Area-Insets. In der Homescreen-App (`display-mode: standalone`) werden die Insets wie im Tab behandelt.
+  4. **Zu Kandidat 4 (Rundung):** Doppelte Skalierung vermeiden: entweder Phaser `Scale.NONE`/`RESIZE` mit `layoutArena` als einzigem Rechenweg oder `FIT` allein, aber nicht beides mit gegensätzlichen Rundungen. Nur ändern, wenn die Rechnung eine Abweichung von mehr als 1 CSS-px zeigt.
+  5. PC-Darstellung darf sich nicht ändern (Vergleich im Bericht: Beispiel 1280 × 720 und 1920 × 1080).
+- **Schnittstellen:** `fitArena` und `hudScale` behalten ihre Signaturen (additive Hilfsfunktionen sind erlaubt). Keine Vertragsänderung.
+- **Akzeptanzkriterien:**
+  - Für 844 × 390 (Notch links 47), 932 × 430 und 667 × 375 liegt die Arena ganz im Sicherheitsbereich, Arenamitte gleich Mitte des Bereichs (Abweichung höchstens 1 px), jeweils mit der Höhe ohne und mit Adressleiste (z. B. 390 und 340)
+  - Alle HUD-Elemente (Energie, Timer, Münzen, Chips, Stick-Bereich, Pause- und Ton-Taste) liegen bei den genannten Größen innerhalb der Arena-Grenzen (reine Funktion, Test); `hudScale` unterschreitet die Untergrenze (14 CSS-px) weiterhin nicht
+  - PC bei 1280 × 720 und 1920 × 1080 unverändert (gleiche `fitArena`-Werte wie vorher)
+  - Bericht nennt die belegte Ursache. Handtest iPhone (Nutzer, M2c-DEP-Wiederholung): Spielfeld, HUD, Menü und Ergebnis passen, im Safari-Tab und in der Homescreen-App
+  - Checks grün
+- **Tests:** `tests/platform/layout.test.ts` (iPhone-Größen mit und ohne Adressleiste, Hochformat ohne Absturz, Mitte), `tests/scenes/hud.test.ts` nur bei Befund 1 (Rechtecke innerhalb der Arena)
+- **Review-Schwerpunkte:** Ursache mit Zahlen belegt statt geraten, keine Änderung am Spielverhalten, `visualViewport`-Listener werden nicht doppelt angemeldet, PC unverändert, keine Phaser-Importe in `layout.ts`
+- **Doku-Pflichten:** – (README nur, falls sich die Startanleitung ändert)
+- **Design-Review:** nein (Passform, keine Gestaltung). Ändert sich die Größe von HUD-Elementen sichtbar, meldet der Coder es dem Lead
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerbefund)
+- **Commit-Typ:** `fix(AP-61): keep arena and hud inside the iphone safe area`
+
+#### AP-59 – Fix: Waffe wechselt weich die Seite, Drehung im Basis-Level schneller
+
+- **Meilenstein, Lane, Welle:** M2c-Nachtrag · GAME/LOG/SH · N2
+- **Ziel:** Befund 3: Die Waffe „teleportiert“ bei Richtungswechsel, und die Drehung ist im Basis-Level zu langsam. Beim Überqueren von ±90° wechselt die Waffe über wenige Zehntel Sekunden weich die Seite statt in einem Frame zu springen, und die Basis-Drehgeschwindigkeit steigt.
+- **Ist-Stand (Planner hat den Code gelesen):** `faceLeft` schaltet bei |Winkel| > 90° sofort um: Der Handpunkt springt in einem Frame von x = +10 auf −10 (20 px) und `flipY` wechselt gleichzeitig. Das ist das „Teleportieren“, unabhängig von der Drehgeschwindigkeit. Die Drehung selbst folgt `stepRotation` mit `PLAYER.turnSpeedDegPerSec` = 270 °/s (PE-04, Planner-Startwert), Upgrade +15 °/s je Stufe (Stufe 10: 420).
+- **Pflichtlektüre:** PE-65, PE-67, PE-04, AP-58 (diese Datei, Ergebnis `weaponPose`), `src/logic/weaponMount.ts`, `src/config/weaponMount.ts`, `src/entities/Player.ts`, `src/platform/motion.ts` (`prefersReducedMotion`), `src/config/player.ts`, `tests/logic/upgrades.test.ts`, `tests/config/items.test.ts`
+- **Abhängigkeiten:** AP-58 (gleiche Dateien; `weaponPose` mit `mirror`)
+- **Parallel möglich mit:** AP-60, AP-61, falls diese noch laufen (keine gemeinsame Datei). Nicht mit AP-58
+- **Dateien (Eigentum):** `src/entities/Player.ts`, `src/logic/weaponMount.ts`, `src/config/weaponMount.ts`, `tests/logic/weaponMount.test.ts`, `src/config/player.ts`, `tests/config/items.test.ts` (nur die Zeile mit `PLAYER`), `tests/logic/upgrades.test.ts` (nur die Zeilen 77 und 89), `docs/balancing.md` (nur ein Satz zur Basis-Drehgeschwindigkeit, falls dort erwähnt)
+- **Nicht anfassen:** `src/entities/{Laser,LaserPool}.ts`, `src/scenes/**`, `src/logic/{rotation,upgrades}.ts`, `src/config/upgrades.ts` (Upgrade-Stufe +15 °/s bleibt), `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `weaponMount.ts`: reine Funktion `stepMirror(current, target, dtMs, durationMs)`: bewegt den Wert linear von `current` zu `target` (±1) in `durationMs` für den gesamten Weg von −1 nach +1, ohne Überschwingen, `durationMs <= 0` springt sofort. `WEAPON_MOUNT.mirrorMs = 120` (Startwert, angenommen, PE-67).
+  2. `Player`: Feld `mirror` (Start +1 bzw. −1 je nach Anfangswinkel). Jeden Frame `mirror = stepMirror(mirror, faceLeft(facingDeg) ? −1 : 1, dt, prefersReducedMotion() ? 0 : mirrorMs)`. `weaponPose(..., mirror)` liefert Hand, Mündung und Rotation. Das Waffen-Sprite nutzt `scaleY = mirror` (statt `flipY`; Darstellung durch 0 beim Kippen) und `x` aus der Pose. Die Figur spiegelt (`flipX`) weiter sofort, die Waffe gleitet in `mirrorMs` zur anderen Hand. Mit `prefers-reduced-motion` springt sie wie bisher (Grundsatz 7).
+  3. Der Laser startet aus `pose.muzzle` des Frames (AP-58), folgt also dem Sprite auch während des Wechsels. Tiefe (`behind`) wie bisher.
+  4. `PLAYER.turnSpeedDegPerSec` von 270 auf **360** (Startwert, angenommen, PE-67). Upgrade +15 °/s je Stufe bleibt, Stufe 10 ergibt 510. Tests nachziehen: `items.test.ts` (`PLAYER`), `upgrades.test.ts` Zeile 77 (360) und 89 (510). Hinweis im Bericht: Das Upgrade bringt jetzt relativ weniger (4,2 % statt 5,6 % je Stufe).
+- **Schnittstellen:** `weaponPose` (aus AP-58) bekommt stetige `mirror`-Werte, Signatur unverändert. Neu `stepMirror`, `WEAPON_MOUNT.mirrorMs`. `PlayerConfig` und `facingDeg` unverändert. `PLAYER` behält die Form.
+- **Akzeptanzkriterien:**
+  - `stepMirror`: erreicht ±1 nach `durationMs` (bei Weg von −1 nach +1), ist monoton, überschreitet nie ±1, `durationMs = 0` springt sofort, `dtMs <= 0` ändert nichts
+  - Simulation in Frames von 16,7 ms beim Überqueren von 90° (Winkel steigt von 80° bis 100°): Die Hand bewegt sich pro Frame höchstens 20 · 16,7 / 120 + 0,5 ≈ 3,3 px (vorher 20 px); Handpunkt bei `mirror = 0` liegt in der Mitte
+  - Die Mündung folgt dem Sprite (Test mit `weaponPose` und Zwischenwerten des Spiegelwerts, Abstand zum Griff bleibt konstant)
+  - `PLAYER.turnSpeedDegPerSec` = 360, Stufe 10 = 510, alle übrigen Tests grün
+  - Handtest (Nutzer, M2c-DEP-Wiederholung): Beim Überqueren von oben und unten springt die Waffe nicht, die Drehung im Basis-Level ist flüssig genug; Schüsse starten weiter an der Mündung (AP-58)
+  - Checks grün
+- **Tests:** `tests/logic/weaponMount.test.ts` (`stepMirror`, Frame-Simulation, Pose mit Zwischenwerten), `tests/config/items.test.ts`, `tests/logic/upgrades.test.ts`
+- **Review-Schwerpunkte:** `prefers-reduced-motion` springt sofort, Laser-Start folgt der Pose, `scaleY` wird beim Tod und bei „Nochmal“ nicht verschleppt (Waffe neu erzeugt), Tiefe beim Wechsel ohne Flackern, Zahlen nur in Config (`mirrorMs`, `turnSpeed`)
+- **Doku-Pflichten:** `docs/balancing.md` (ein Satz, falls die Drehgeschwindigkeit dort steht)
+- **Design-Review:** nein (Bewegungsfeinschliff, Sichtprüfung im Handtest). Wirkt die Kippbewegung gestalterisch unpassend, entscheidet der Nutzer im Handtest
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerbefund)
+- **Commit-Typ:** `fix(AP-59): swap the weapon side smoothly and raise base turn speed`
+
+#### AP-62 – Fix: Virtueller Stick auch am PC sichtbar und mit der Maus bedienbar
+
+- **Meilenstein, Lane, Welle:** M2c-Nachtrag · GAME · N2
+- **Ziel:** Befund 2 und Antwort des Nutzers (PE-68): Der virtuelle Stick ist auch am PC sichtbar und lässt sich mit der Maus ziehen. Die Prioritätsregel aus AP-39 bleibt: Solange der Stick gehalten wird, ist Mauszielen gesperrt. Ohne Stick zielt die Maus wie bisher. Dieses Paket ersetzt die Regel „kein Stick am PC“ aus PE-55 und AP-39.
+- **Ursache (Planner hat den Code gelesen):** Kein Fehler, sondern Absicht aus PE-55: `VirtualStick` setzt `enabled = !!scene.sys.game.device.input.touch`. Ohne Touch-Gerät sind Basis, Ring und Knopf unsichtbar (`setVisible(false)`), und die Zeiger-Listener werden gar nicht angemeldet. Am PC ohne Touchscreen erscheint der Stick deshalb nicht. Der M2b-DEP-Prüfpunkt „PC: kein Stick sichtbar“ prüfte genau dieses Verhalten. Das Verhalten ist also kein Regress durch M2c.
+- **Pflichtlektüre:** PE-55, PE-68, AP-39 (diese Datei oben), `src/scenes/controls/VirtualStick.ts`, `src/platform/{stick,input}.ts`, `src/logic/aimSource.ts`, `tests/platform/stick.test.ts`, `tests/logic/aimSource.test.ts`
+- **Abhängigkeiten:** AP-55 (fertig). Keine weiteren
+- **Parallel möglich mit:** AP-59 (keine gemeinsame Datei). AP-58, AP-60 und AP-61 laufen in N1 (höchstens drei Pakete je Welle, PE-15)
+- **Dateien (Eigentum):** `src/scenes/controls/VirtualStick.ts`, `src/platform/stick.ts`, `tests/platform/stick.test.ts`, `src/platform/input.ts` (nur falls die Maus-Bedienung es verlangt)
+- **Nicht anfassen:** `src/scenes/GameScene.ts` (die Szene erzeugt den Stick schon immer, `enabled` ist intern), `src/logic/aimSource.ts` (Prioritätsregel bleibt), `src/scenes/hud/**`, `src/config/**`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `stick.ts` (ohne Phaser): Konstante `STICK_ON_DESKTOP = true` (Schalter, falls der Nutzer es wieder ändern will) und reine Funktion `stickVisible(hasTouch, onDesktop)`: gibt `hasTouch || onDesktop` zurück.
+  2. `VirtualStick`: `enabled = stickVisible(!!scene.sys.game.device.input.touch, STICK_ON_DESKTOP)`. Aussehen, Größe (Tokens), Lage unten rechts und Fangbereich unverändert (kein neues Design). Mausbedienung läuft über dieselben Listener: Klick im Fangbereich startet den Stick, Ziehen mit gedrückter Maustaste bewegt ihn, Loslassen (auch außerhalb des Canvas, `pointerupoutside`) gibt ihn frei.
+  3. Maus-Eigenheiten prüfen und beheben: (a) `pointer.id` der Maus ist 0, der Eigentümer-Vergleich muss mit der Id 0 funktionieren (`ownerId !== null`, nicht „falsy“); (b) Mausbewegung ohne gedrückte Taste darf den Stick nicht bewegen; (c) Wird die Maus bei gedrückter Taste aus dem Fenster gezogen und losgelassen, bleibt der Stick nicht hängen (`pointerupoutside`, zusätzlich Fenster-`blur`); (d) die Hover-Position über dem Stick zielt nicht (bleibt wie in `AimInput.update`, `contains`); (e) Rechtsklick startet den Stick nicht.
+  4. `AimInput` in `input.ts` nur ändern, wenn (a) bis (e) es verlangen.
+  5. **Tastatur:** Der Code enthält keine Tastatur-Zielsteuerung (PE-03: Maus und Touch). Dieses Paket baut keine. Der Nutzer erwähnte „zusätzlich zur Tastatur“. Falls eine Tastatur-Steuerung (z. B. A/D oder Pfeiltasten zum Drehen) gewünscht ist, ist das ein eigener Wunsch (Backlog-Hinweis in §16), nicht Teil von AP-62.
+- **Schnittstellen:** `VirtualStick`-API (`held`, `angleRad`, `pointerId`, `contains`) und `StickSource` unverändert. Neu `stickVisible` und `STICK_ON_DESKTOP` in `stick.ts`.
+- **Akzeptanzkriterien:**
+  - `stickVisible`: Touch und Desktop-Schalter an/aus ergeben die vier Fälle richtig (ohne Touch und Schalter an: sichtbar; ohne Touch und Schalter aus: unsichtbar; mit Touch immer sichtbar)
+  - PC ohne Touch: Stick unten rechts sichtbar. Klick im Fangbereich und Ziehen lenkt die Zielrichtung (360°), Loslassen gibt den Stick frei, danach zielt die Maus wieder; solange der Stick gehalten wird, wirkt die Mausposition nicht (`resolveAim`, unverändert)
+  - Pause und Wiederaufnahme geben den Stick frei (wie bisher), Szenenende meldet Listener ab (kein doppeltes Anmelden bei „Nochmal“)
+  - iPhone und Touch-Laptops verhalten sich wie vorher
+  - Checks grün
+- **Tests:** `tests/platform/stick.test.ts` (`stickVisible`, bestehende Tests grün). Maus-Zeiger und Szene nur im Handtest.
+- **Review-Schwerpunkte:** Maus-Id 0, hängender Stick nach Loslassen außerhalb, Listener-Aufräumen, Prioritätsregel nur in `aimSource.ts`, kein Eingriff in `GameScene`
+- **Doku-Pflichten:** – (README-Bedienung nur auf Nutzerwunsch)
+- **Design-Review:** nein (kein neues Aussehen, nur Sichtbarkeit). Wirkt der Stick am PC gestalterisch störend, entscheidet der Nutzer im Handtest
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerwunsch)
+- **Commit-Typ:** `fix(AP-62): show the virtual stick on desktop and drive it with the mouse`
+
 ### M3 – Bosse
 
 #### AP-16 – Boss-Rahmen
@@ -2570,6 +2770,7 @@ Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Absc
 | M2 | 5 | ≈ 6,75 h (+ Review ≈ 9 h) | ≈ 3–4 |
 | M2b | 16 | ≈ 23,75 h (+ Review ≈ 30 h) | ≈ 11–12 |
 | M2c | 6 | ≈ 11,25 h (+ Review inkl. 3 Design-Reviews ≈ 15 h) | ≈ 5–6 (bei 45 % Zielwert ≈ 4) |
+| M2c-Nachtrag | 5 (AP-58 bis AP-62) | ≈ 5,25 h (3 × S, 2 × M; + Review ≈ 7 h) | ≈ 2–3 (bei 30 % Team-Budget je Fenster etwa 2 bis 3 Pakete mit Review) |
 | M3 | 5 | ≈ 8,5 h (+ Review ≈ 11 h) | ≈ 4–5 |
 | **Gesamt** | **43** | **≈ 65 h (+ Review ≈ 84 h)** | **≈ 29–35** |
 
@@ -2691,6 +2892,10 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-62 | Lint-Fix auf dev: `npm run lint` (`eslint .`) ist seit dem Design-Commit 5e58bf2 rot, 18 Fehler `no-undef` (`document`, `window`) nur in `docs/design/assets/{fonts,pixel}.js`, Browser-Skripte des Designers. Umsetzung AP-57 (M2b-Nachtrag W8, vor M2c W1): `docs/design/**` in `eslint.config.js` ignorieren, Designer-Dateien bleiben unverändert. Keine Globals-Erweiterung und keine Regel gelockert, `src/` bleibt voll geprüft. AP-55 (W3) ändert `eslint.config.js` danach, die Ignore-Zeile bleibt | Lead-Auftrag „Fix-Paket“ am 2026-10-25 (Pflege, kein Umfang, keine Architektur- oder Sicherheitsänderung) | Lead (Auftrag 2026-10-25), Planner-Vorschlag Paket und Reihenfolge |
 | PE-63 | Schriftumfang: Das Glyph `ß` fehlt in Astro Kapsel und Astro Funk. Im Menü wird „Schließen“ als „SCHLIESSEN“ ausgeschrieben (`UpgradePanel.ts`, Zeile 92, AP-52). Hinweis in AP-52, AP-53, AP-54 | Befund Schriften-Erkenntnis AP-51 (Lead, Wellenabschluss M2c W1) | Nutzer am 2026-10-25 |
 | PE-64 | Zeichensatz der Bitmap-Schriften (AP-51): nur Großbuchstaben A–Z, Ä Ö Ü, 0–9 und `/ % : ! . - × ( ) ?`. Astro Funk zusätzlich kleines `s` (Sekunden), kein kleines `x`, nur `X` und `×`. Texte vor der Übergabe mit `toUpperCase()` (außer das `s` in Funk). Hinweise in AP-52 bis AP-54. Nachtrag 2026-10-25: auch `–`, `…` und `·` fehlen in beiden Schriften (§18) | Erkenntnis AP-51, Lead-Auftrag Wellenabschluss M2c W1 | Lead (Pflege), 2026-10-25 |
+| PE-65 | Erster Handtest M2c-DEP (2026-10-25, PC und iPhone), sieben Befunde: (1) iPhone: Spiel zu groß, (2) PC: Stick weg, (3) Waffe „teleportiert“ und dreht im Basis-Level zu langsam, (4) Schüsse links nicht aus der Mündung, (5) zeitlich begrenzte Power-ups sollen manuell aktiviert werden, (6) Bäume bleiben im Spieler stehen, (7) Gold soll weicher einfliegen. Umsetzung als **M2c-Nachtrag** (kleine Fix-Pakete vor der Wiederholung von M2c-DEP): AP-61 (1), AP-62 (2), AP-59 (3), AP-58 (4), AP-60 (6). Wellen N1 (AP-58, AP-60, AP-61) und N2 (AP-59, AP-62). (5) als Vorschlag V-08 und Frage Q-34, (7) als Backlog-Hinweis Q-36, beide ohne Paket. M2c-DEP bleibt offen. Umfang §2 unverändert bis V-07 | Handtest-Befunde, Wortlaut Nutzer über Lead | Nutzer am 2026-10-25 (Befunde) |
+| PE-66 | Verfluchter Baum verschwindet nach 30 Schaden, den er der Spielerin zugefügt hat (`CONTACT_DESPAWN_DAMAGE.cursedTree`, 3 s Kontakt bei 10 Schaden je Sekunde). Der berechnete Schaden zählt, auch wenn ein Schild ihn abfängt. Der Baum despawnt ohne Münze, Item, Rüstung und Erfahrung. Schwelle ist Balancing-Konfig in `src/config/enemies.ts` (AP-60) | Befund 6, Wert vom Planner | Nutzer am 2026-10-25 (Befund); Schwelle 30 (angenommen) |
+| PE-67 | Waffenbewegung: Die Waffe wechselt beim Überqueren von ±90° über `mirrorMs` = 120 ms weich die Seite (statt in einem Frame), mit `prefers-reduced-motion` sofort. Basis-Drehgeschwindigkeit 270 → 360 °/s, das Upgrade bleibt bei +15 °/s je Stufe (Stufe 10: 510). Die Ursache des „Teleportierens“ ist der sofortige Sprung des Handpunkts um 20 px und von `flipY`. Beide Werte sind Startwerte (AP-59) | Befund 3, Werte vom Planner | Nutzer am 2026-10-25 (Befund); Werte 120 ms und 360 °/s (angenommen) |
+| PE-68 | Der virtuelle Stick ist auch am PC sichtbar und mit der Maus bedienbar (Schalter `STICK_ON_DESKTOP`). Priorität unverändert: Stick vor Tippen und Maus. Ersetzt in PE-55 und AP-39 den Satz „kein Stick am PC“. Eine Tastatur-Steuerung ist damit nicht eingeführt (siehe Backlog-Hinweis). Der Planner trägt die Änderung in §2 F-01 nicht selbst ein, sondern schlägt sie als V-07 vor | Antwort Nutzer zu Befund 2, vom Lead gemeldet | Nutzer am 2026-10-25 (laut Lead) |
 
 ### Offene Fragen
 
@@ -2720,6 +2925,10 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-22 | Auf Touch-Geräten: Bleibt das Tippen auf das Spielfeld als Zielen erhalten, wenn der Stick dazukommt? | W | PE-03, PE-55, AP-39 | Ja, der Stick hat Vorrang vor Tippen und Maus | geklärt (PE-55, Nutzer am 2026-10-25) |
 | Q-23 | Feuerring: Drop-Chance je Gegner (Richtwert 2 %, angenommen) und trifft der Ring ab M3 auch Bosse? In M2b trifft er keine Bosse | W | PE-57, AP-37a, AP-33, M3 (AP-16 ff.) | 2 % je Gegner, Bosse ab M3 nur nach Entscheidung mit PE-34 | geklärt (PE-57), Nutzer am 2026-10-25 |
 | Q-31 | Timer-Label nach Ablauf bei lebendem Boss: „BOSS!“ (Design-Brief, Grundsatz 4) oder „Boss besiegen!“ (bisheriger Text in AP-20)? | O | AP-20, AP-53 (Zustand `setOvertime`) | „BOSS!“ laut Design, weil es zum Funk-HUD und zu den Mockups passt | geklärt: „BOSS!“ (Nutzer am 2026-10-25), AP-20 trägt „BOSS!“ |
+| Q-33 | Stick am PC: War „PC: kein Stick sichtbar“ (PE-55) gewollt, oder soll er auch am PC erscheinen? | W | PE-55, AP-39, AP-62 | Nutzer wünscht den Stick am PC, mit der Maus bedienbar | geklärt (PE-68, AP-62), Nutzer am 2026-10-25 laut Lead |
+| Q-34 | Manuelle Aktivierung zeitlich begrenzter Power-ups statt Start beim Aufheben (Befund 5). Siehe Vorschlag V-08 in „Vorgeschlagene Änderungen“. Der Nutzer nannte „Hammer“ und „schnelle Feuerrate“: Im Plan gibt es keinen Hammer; zeitlich begrenzt sind nur Dauerfeuer (5 s) und die Rüstung Feuerring (5 s, 20 s Abklingzeit). Welche Kräfte gemeint sind, Anzahl der Plätze, Aktivierung per Tippen oder Taste | K | §2 F-07, F-17, PE-42, PE-47, PE-57, AP-30, AP-33, AP-34, HUD | Optionen und Empfehlung in V-08, kein Paket bis zur Antwort | offen |
+| Q-35 | iPhone zu groß (Befund 1): Safari-Tab oder Homescreen-App? Was war zu groß (Spielfeld, HUD, Menü)? Gerät und iOS-Version? Hilft dem Coder von AP-61 bei der Ursache; ohne Antwort prüft er alle vier Kandidaten | O | AP-61 | Antwort mit Gerät, Modus und kurzer Beschreibung | offen |
+| Q-36 | Gold weicher einsaugen (Befund 7): siehe Backlog-Hinweis in „Vorgeschlagene Änderungen“. Der Magnet existiert schon (AP-29, AP-31), er fliegt mit konstant 320 px/s; „weicher“ wäre Beschleunigung (Easing) | O | AP-29, AP-31, `coinMagnetStep` | Als kleines Paket nach M2c-DEP, falls gewünscht | offen |
 | Q-32 | Stick-Größe auf dem Handy: Befund „10 % zu groß“ (140 px, also etwa 126 px) oder Designvorgabe `size.stick` 88 px und `size.stick-knob` 28 px (-37 %)? 88 px ist als Zielfläche für den Daumen klein | W | PE-61, AP-53 | AP-53 nimmt die Token-Größe 88/28 (Vorgabe des Leads: Design vor Befund), Fangbereich zum Starten des Sticks bleibt bei 126 px (Durchmesser), damit der Daumen ihn trifft. Der Nutzer prüft in M2c-DEP; ist 88 px zu klein, wird nur der Token-Wert geändert (eine Zeile in `docs/design/tokens.json` durch den Designer plus `theme:build`) | offen (AP-53 mit Empfehlung eingetragen, angenommen) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
@@ -2741,6 +2950,10 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Design: Lücken im Design-System (nur Hinweis, für das Designer-Interview) | Tokens fehlen für Kachel-Tints Nacht (`biome.night`) und Elfenwald (`biome.elf`), neutrales Weiß für Partikel, Ausnahme für die 3×-Astronautin im Ergebnis, HUD-Mindestgröße für 1×-Labels, `game.aura` (Ausnahme in `src/entities/enemies/Enemy.ts` Zeile 40, eslint-disable mit Begründung, entfällt nach Ergänzung des Tokens, Review AP-55), `menu.planet` und `menu.planet-hi`. `game.pickup-outline`, `size.ring-stroke` und `size.ring-dash` sind keine Lücken (AP-55: kein Treffer, nicht nötig). Offen sind außerdem Text auf gesperrtem Grund (ZU TEUER, 3,79:1), Knopfhöhe 24 (Mockup) gegen 32 (Brief) und der Hover-Zustand für Phaser. Die Designdateien bleiben unverändert (Eigentum des Designers) | Lead, Wellenabschluss M2c W2 | Lead (Pflege) |
 | Später (optional): Überlebenszeit bei Niederlage im Ergebnis | Mögliches späteres Paket: Datenfeld aus `GameScene` an `ResultScene` übergeben. Nicht in M2c, kein Paket geplant | Lead, Wellenabschluss M2c W2 | Lead (Pflege) |
 | `vm`-Auswertung in `scripts/build-fonts.mjs` härten (optional) | `vm.runInNewContext` ist keine echte Sicherheitsgrenze. Die Quelle `docs/design/assets/fonts.js` ist eine freigegebene Designer-Datei, das Risiko ist daher gering. Optional: Eingabe nur als Daten einlesen (Regex-Parser oder JSON-Export durch den Designer). Entscheidung Nutzer | Review-Befund M2c W1 (§18), R6 | Lead (Wellenabschluss M2c W1) |
+| **V-07** §2 F-01 und PE-55 | Stick auch am PC: In §2 F-01 den Satz „erscheint nur bei Touch, nicht am PC“ streichen und ersetzen durch „der Stick ist auf allen Geräten sichtbar und mit Maus oder Finger bedienbar“. Der Nutzer hat das laut Lead beantwortet (PE-68). AP-62 setzt es um; die Planänderung in §2 bleibt dem Nutzer zur Bestätigung vorbehalten (Planner trägt §2 nicht selbst ein) | Befund 2, Handtest M2c-DEP | Planner (Pflege) |
+| **V-08** Zeitlich begrenzte Power-ups manuell aktivieren (Befund 5) — Änderung von Umfang und Bedienung, **kein Paket bis zur Freigabe**, **Design-Review: ja** (der Designer legt Symbol, Platz und Zustände im HUD fest) | **Ist-Stand:** Dauerfeuer (5 s, PE-43) startet beim Anschießen des Items; die Rüstung Feuerring (5 s, 20 s Abklingzeit, PE-52, PE-57) startet beim Einsammeln. Im Plan gibt es keinen „Hammer“; was der Nutzer so nennt, ist zu klären (Q-34). Doppelschuss und Schild wirken bis Rundenende bzw. bis verbraucht und sind nicht zeitlich begrenzt. **Vorschlag:** Aufgenommene zeitlich begrenzte Kräfte kommen in einen Lagerplatz im HUD unter den Waffen-Power-up-Anzeigen. Aktiviert wird per Tippen auf das Symbol oder per Taste. **Optionen:** (A, Empfehlung) ein Lagerplatz je Art (Dauerfeuer, Feuerring), Stapel bis 1, Antippen startet, Aufnehmen bei vollem Platz setzt die Zeit nicht zurück; (B) ein gemeinsamer Platz (nur die zuletzt aufgenommene Kraft), einfacher, aber Verlust bei Doppelaufnahme; (C) zwei bis drei allgemeine Plätze, jeder Platz hält eine beliebige Kraft, flexibel, aber mehr HUD-Fläche. **Aktivierung:** Tippen auf das Symbol (Touch, Maus), Taste am PC (Vorschlag Q, E oder 1, 2; Tastatur existiert im Spiel noch nicht, siehe Hinweis Tastatur). Berührt §2 F-07 und F-17, PE-42, PE-47, PE-57, `ActivePowers`/`ActiveArmour` (§4), AP-30, AP-33 (Szene), AP-34 (HUD), M3 (Boss-Einbindung). Aufwand grob: Vertrag und Logik M, HUD-Platz mit Designer M, Szene S. Der Nutzer entscheidet Option, Plätze, Aktivierung und welche Kräfte betroffen sind (Q-34). Designer-Interview für den HUD-Platz nötig | Befund 5, Handtest M2c-DEP | Planner (Pflege) |
+| Backlog-Hinweis Gold-Magnet weicher (Befund 7, Q-36) | Der Magnet existiert (AP-29 `coinMagnetStep`, AP-31 `Coin.update`), konstante Geschwindigkeit 320 px/s innerhalb 400 px. Ein Paket für „weicher“ ist nicht geplant. Vorschlag für ein kleines Paket nach M2c-DEP: Beschleunigung (Ease-in) statt konstanter Geschwindigkeit in `coinMagnetStep` (reine Funktion, mit Test), optional Einsaug-Effekt (leichtes Schrumpfen kurz vor dem Einsammeln, mit `prefers-reduced-motion` aus). Dateien `src/logic/coins.ts`, `src/entities/Coin.ts`, `src/config/coins.ts`, Tests; keine Überschneidung mit anderen Paketen. Product-Owner-Kandidat für `docs/backlog.md` | Befund 7 | Planner (Pflege) |
+| Backlog-Hinweis Tastatur-Steuerung (Zusatz zu Befund 2) | Der Nutzer erwähnte den Stick „zusätzlich zur Tastatur“. Der Code kennt keine Tastatursteuerung (PE-03: Maus und Touch). Falls gewünscht (A/D oder Pfeiltasten drehen die Waffe, Tasten für V-08), ist das eine neue Anforderung für den Product Owner und `docs/backlog.md`, nicht Teil von AP-62. Der Planner schreibt das Backlog nicht | Antwort Nutzer zu Befund 2 | Planner (Pflege) |
 
 #### Verbesserungsplan Wellenkonzept (Entwurf, nicht freigegeben)
 
@@ -2847,6 +3060,12 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | Design-Grundsatz 7 „Bewegung abschaltbar“ (`prefers-reduced-motion`) | AP-50 (`motion.ts`), AP-52, AP-53, AP-54, M2c-DEP |
 | Design-Grundsatz 8 „Keine Zahlen über Gegnern“ (Treffer-Blitz 120 ms) | AP-54 (PE-31 gilt schon) |
 | R1 Asset-Lizenzen M2c (eigene Schriften, Icons, Sprites) | AP-51 (`LICENSES.md`) |
+| Handtest-Befunde M2c-DEP (PE-65): iPhone zu groß (F-10, F-14) | AP-61, Q-35, M2c-DEP-Wiederholung |
+| Handtest-Befunde M2c-DEP (PE-65, PE-68): Stick auch am PC (F-01, V-07) | AP-62, M2c-DEP-Wiederholung |
+| Handtest-Befunde M2c-DEP (PE-65, PE-67): Waffe weich und Drehung (F-01, F-02) | AP-59, M2c-DEP-Wiederholung |
+| Handtest-Befunde M2c-DEP (PE-65): Schuss an der Mündung (F-02, F-12) | AP-58, M2c-DEP-Wiederholung |
+| Handtest-Befunde M2c-DEP (PE-65, PE-66): Baum despawnt nach Kontaktschaden (F-04) | AP-60, M2c-DEP-Wiederholung |
+| Handtest-Befunde M2c-DEP (PE-65): Power-ups manuell aktivieren (F-07, F-17), Gold weicher (F-15) | kein Paket: V-08/Q-34 und Q-36 warten auf den Nutzer |
 | Design für M3: Boss-Lebensleiste, Timer-Label, Telegraph-Farben | AP-16, AP-20 (Q-31), AP-17–AP-19 (Tokens) |
 
 ---
@@ -2988,3 +3207,7 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-25 | Wellenabschluss M2c W3: AP-55 (merge 905850a, Review Runde 1 mittel, behoben) gemergt. Checks auf dev grün: lint, typecheck, 315/315 Tests, assets:check (31 Dateien), build. `dev` auf 905850a, gepusht. AP-55 `fertig`, M2c-DEP `bereit` (W4, Mensch). Gate M2c-DEP erfüllt (AP-50–AP-55 fertig) | Wellenabschluss M2c W3 | §0, §10, §16, §18, M2c-DEP | Lead (Pflege) |
 | 2026-10-25 | Review-Befund AP-55 (Runde 1, mittel): README-Abschnitt war in Windows-1252 statt UTF-8 gespeichert (Python `open()` ohne `encoding` schreibt unter Windows cp1252). Behoben, Lead hat Dekodierbarkeit geprüft. Regel für alle Textdateien: immer als UTF-8 schreiben und mit `TextDecoder` (fatal) prüfen | Review-Befund AP-55 | alle Coder, Reviewer, Dokumentationspakete | Lead (Pflege) |
 | 2026-10-25 | Erkenntnis AP-55 (Lint-Regel `no-restricted-syntax`): erfasst `#rgb` bis `#rrggbbaa`, Zahlen genau `0xRRGGBB` (6 Hexstellen) und `monospace`, nur in `src/scenes/**` und `src/entities/**`; `src/config/theme.ts` ist ausgenommen. Einzige Ausnahme: `Enemy.ts` Zeile 40 (Aura 0x9b59b6), begründeter eslint-disable, weil Token `game.aura` fehlt (§16). Wird das Token ergänzt, entfällt die Ausnahme. Sechsstellige Nicht-Farb-Hexkonstanten werden gemeldet, Ausweg ist ein eslint-disable mit Begründung | Erkenntnis AP-55, Hinweise Review | Coder und Reviewer bei neuen Konstanten, Designer (Token `game.aura`) | Lead (Pflege) |
+| 2026-10-25 | Handtest M2c-DEP (erste Runde, PC und iPhone): sieben Befunde (PE-65). Neuer Nachtrag **M2c-Nachtrag** mit AP-58 (Mündung), AP-60 (Baum-Despawn), AP-61 (iPhone-Größe) in N1 und AP-59 (Waffendrehung), AP-62 (Stick am PC) in N2. Schwellen und Werte als Startwerte (angenommen): Baum-Despawn 30 Schaden (PE-66), Spiegelzeit 120 ms und Drehgeschwindigkeit 360 °/s (PE-67). M2c-DEP bleibt offen, Wiederholung nach N2. §8, §9, §10, §11, §12, §14, §16, §17 ergänzt | Handtest M2c-DEP | AP-58–AP-62, M2c-DEP | Lead (Pflege), Nutzer (Befunde) |
+| 2026-10-25 | Ursachenanalyse (Planner, Code gelesen): Befund 2 ist kein Fehler, `VirtualStick` blendet sich ohne Touch-Gerät absichtlich aus (PE-55). Der Nutzer wünscht den Stick am PC (PE-68, AP-62, §2-Änderung als V-07). Befund 3: Der Handpunkt springt beim Spiegeln um 20 px und `flipY` wechselt in einem Frame (AP-59). Befund 4: Die Formel in `weaponMount.ts` ist rechnerisch spiegelsymmetrisch, die Ursache liegt vermutlich in der Darstellung oder in den Konstanten der Ausbaustufen, AP-58 belegt sie und vereinheitlicht die Quelle (`weaponPose`). Befund 6: Der Kontaktschaden wird nur summiert, nicht begrenzt (AP-60). Befund 1: vier Kandidaten, Antwort des Nutzers (Q-35) hilft AP-61 | Handtest M2c-DEP | AP-58–AP-62 | Lead (Pflege) |
+| 2026-10-25 | Hinweis Git: Der Pull Request `dev` → `stage` hat Merge-Konflikte, weil `stage` nur den Squash-Commit „init stage (#1)“ (32a050c) eines frühen `dev`-Stands enthält, der nicht in der `dev`-Historie liegt. Kein Paket. Der Lead gibt dem Nutzer eine manuelle Anleitung (kein Eingriff durch Agents, `stage` und `master` sind für sie nur lesbar). Der Nutzer führt die Zusammenführung aus | Handtest M2c-DEP, PR-Konflikt | M2c-DEP, H-12 | Lead (Pflege) |
+| 2026-10-25 | Befunde ohne Paket: Befund 5 (manuelle Aktivierung zeitlich begrenzter Power-ups) als Vorschlag V-08 mit Optionen und Frage Q-34, Design-Review ja, der Begriff „Hammer“ kommt im Plan nicht vor. Befund 7 (Gold weicher) als Backlog-Hinweis Q-36, der Magnet existiert (AP-29, AP-31), konstante Geschwindigkeit. Tastatursteuerung als Backlog-Hinweis (nicht im Code, nicht im Plan) | Handtest M2c-DEP | – | Lead (Pflege) |
