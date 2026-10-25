@@ -8,7 +8,12 @@ const BUTTON_W = 150;
 /** Touch target: at least 32 logical pixels high. */
 const BUTTON_H = 34;
 
-/** Round result: won/lost, XP, player level and the follow-up buttons. */
+/** Finite, non-negative number from scene data, else 0. */
+function nonNegative(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+/** Round result: won/lost, XP, player level, gold and the follow-up buttons. */
 export class ResultScene extends Phaser.Scene {
   constructor() {
     super('ResultScene');
@@ -34,18 +39,27 @@ export class ResultScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setStroke('#000000', 4);
 
+    const debugRound = data?.debugRound === true;
+    const coins = nonNegative(data?.roundCoins);
+    const sharePct = Math.round(Math.min(1, nonNegative(data?.goldShare)) * 100);
+    const goldGained = nonNegative(data?.goldGained);
+    const goldTotal = nonNegative(data?.goldTotal);
+
     const lines = [`Level ${levelId}`, `+${xp} XP`, `Spielerlevel ${playerLevel}`];
-    if (leveledUp) lines.push('Levelaufstieg!');
-    if (data?.saved === false) lines.push('Fortschritt konnte nicht gespeichert werden.');
+    if (leveledUp && !debugRound) lines.push('Levelaufstieg!');
+    lines.push(`Münzen ${coins} · Anteil ${sharePct} % · +${goldGained} Gold`);
+    lines.push(`Gold gesamt ${goldTotal}`);
+    if (debugRound) lines.push('Debug-Runde: Spielstand wird nicht gespeichert.');
+    else if (data?.saved === false) lines.push('Fortschritt konnte nicht gespeichert werden.');
     this.add
-      .text(cx, 130, lines.join('\n'), {
+      .text(cx, 92, lines.join('\n'), {
         fontFamily: FONT,
         fontSize: '14px',
         color: '#ffffff',
         align: 'center',
-        lineSpacing: 6,
+        lineSpacing: 4,
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5, 0);
 
     const buttons: { label: string; action: () => void }[] = [
       { label: 'Nochmal', action: () => this.scene.start('GameScene', { levelId }) },
