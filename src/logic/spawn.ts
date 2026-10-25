@@ -1,3 +1,4 @@
+import { BOSS_SPAWN_RATE_FACTOR } from '../config/bosses';
 import type { EnemyId, LevelDef } from '../contracts';
 
 /** Minimale RNG-Schnittstelle: Zahl in [0, 1). */
@@ -49,7 +50,8 @@ export class SpawnDirector {
     return this.level.spawnIntervalMs * (1 - (1 - MIN_INTERVAL_FACTOR) * progress);
   }
 
-  tick(dtMs: number, aliveCount: number): SpawnRequest[] {
+  /** @param bossActive true while the boss lives: normal spawns come at half the rate (PE-18). */
+  tick(dtMs: number, aliveCount: number, bossActive = false): SpawnRequest[] {
     const out: SpawnRequest[] = [];
     if (!Number.isFinite(dtMs) || dtMs <= 0 || this.totalWeight <= 0) return out;
     this.elapsedMs += dtMs;
@@ -77,7 +79,9 @@ export class SpawnDirector {
         this.cooldownMs = 0;
         break;
       }
-      this.cooldownMs += this.currentIntervalMs;
+      this.cooldownMs += bossActive
+        ? this.currentIntervalMs / BOSS_SPAWN_RATE_FACTOR
+        : this.currentIntervalMs;
       out.push({
         enemyId: this.pickEnemy(),
         angle: this.rng.next() * Math.PI * 2,

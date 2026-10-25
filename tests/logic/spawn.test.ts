@@ -136,4 +136,19 @@ describe('SpawnDirector', () => {
     const empty = new SpawnDirector({ ...lvl(0), enemyPool: [] }, testRng(1), 600);
     expect(empty.tick(10_000, 0)).toEqual([]);
   });
+
+  it('halves the normal spawn rate while the boss is active (PE-18)', () => {
+    const level = lvl(12);
+    const count = (boss: boolean): number => {
+      const d = new SpawnDirector(level, testRng(5), 600);
+      d.tick(1, 0); // opening wave
+      let n = 0;
+      for (let t = 0; t < 120_000; t += 100) n += d.tick(100, 0, boss).length;
+      return n;
+    };
+    const normal = count(false);
+    const withBoss = count(true);
+    expect(withBoss / normal).toBeGreaterThan(0.45);
+    expect(withBoss / normal).toBeLessThan(0.55);
+  });
 });

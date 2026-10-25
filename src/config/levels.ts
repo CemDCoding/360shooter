@@ -1,5 +1,5 @@
 // Balancing (AP-15, Level 5-20 neu in AP-23, alle Level neu eingestellt in AP-56): alle Level-Werte stehen hier, Erklaerung in docs/balancing.md.
-import type { BatchId, EnemyPoolEntry, LevelDef } from '../contracts';
+import type { BatchId, BossId, EnemyPoolEntry, LevelDef } from '../contracts';
 
 export const LEVEL_COUNT = 21;
 
@@ -8,6 +8,13 @@ function batchOf(id: number): BatchId {
   if (id <= 9) return 'forestNight';
   return 'elfForest';
 }
+
+/** One boss per batch, the other levels use it as variants (PE-33, AP-16). */
+const BOSS_OF_BATCH: Readonly<Record<BatchId, BossId>> = {
+  forest: 'rootMonster',
+  forestNight: 'forestGhost',
+  elfForest: 'giantStone',
+};
 
 /** Erste Batch-Haelfte (aufgerundet) = 180 s, Rest 300 s (PE-05, PE-09, PE-10). */
 const SHORT_LEVELS: readonly number[] = [0, 1, 2, 5, 6, 7, 10, 11, 12, 13, 14, 15];
@@ -42,7 +49,7 @@ export const LEVELS: readonly LevelDef[] = Array.from({ length: LEVEL_COUNT }, (
   enemyPool: poolOf(id),
   spawnIntervalMs: SPAWN_INTERVAL_MS[id],
   maxEnemies: MAX_ENEMIES[id],
-  bossId: '',
+  bossId: BOSS_OF_BATCH[batchOf(id)],
 }));
 
 export function getLevel(id: number): LevelDef | undefined {
