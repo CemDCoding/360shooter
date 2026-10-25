@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   BASE_HUD_FONT,
+  clampedArea,
   fitArena,
   hudScale,
   MIN_HUD_FONT_CSS,
+  RELAYOUT_DELAYS_MS,
   visibleArea,
 } from '../../src/platform/layout';
 
@@ -121,5 +123,72 @@ describe('visibleArea + fitArena on iPhone landscape sizes', () => {
         fitArena(w, h, none, 640, 360),
       );
     }
+  });
+});
+
+describe('clampedArea (AP-63, stale start values)', () => {
+  // Insets are assumptions (not measured): left/right 47 (59 for iPhone 15), bottom 21.
+  const cases = [
+    {
+      name: '844x390',
+      win: [844, 390],
+      stale: [932, 430],
+      ins: { top: 0, right: 47, bottom: 21, left: 47 },
+    },
+    {
+      name: '667x375',
+      win: [667, 375],
+      stale: [736, 414],
+      ins: { top: 0, right: 44, bottom: 21, left: 44 },
+    },
+    {
+      name: '852x393 iPhone 15',
+      win: [852, 393],
+      stale: [932, 430],
+      ins: { top: 0, right: 59, bottom: 21, left: 59 },
+    },
+  ];
+  for (const c of cases) {
+    it(`${c.name}: arena inside safe area and centred despite a stale probe`, () => {
+      const [ww, wh] = c.win as [number, number];
+      const a = clampedArea(c.stale[0]!, c.stale[1]!, c.ins, null, { width: ww, height: wh });
+      const f = fitArena(a.width, a.height, a.insets, 640, 360);
+      const x = a.x + f.offsetX;
+      const y = a.y + f.offsetY;
+      expect(x).toBeGreaterThanOrEqual(c.ins.left - 0.001);
+      expect(x + f.width).toBeLessThanOrEqual(ww - c.ins.right + 0.001);
+      expect(y).toBeGreaterThanOrEqual(c.ins.top - 0.001);
+      expect(y + f.height).toBeLessThanOrEqual(wh - c.ins.bottom + 0.001);
+      const cx = c.ins.left + (ww - c.ins.left - c.ins.right) / 2;
+      const cy = c.ins.top + (wh - c.ins.top - c.ins.bottom) / 2;
+      expect(Math.abs(x + f.width / 2 - cx)).toBeLessThanOrEqual(1);
+      expect(Math.abs(y + f.height / 2 - cy)).toBeLessThanOrEqual(1);
+    });
+  }
+  it('ignores missing or invalid window sizes', () => {
+    const a = clampedArea(844, 390, none, null, { width: NaN, height: 0 });
+    expect(a).toMatchObject({ width: 844, height: 390 });
+    expect(clampedArea(844, 390, none, null, null)).toMatchObject({ width: 844, height: 390 });
+  });
+  it('desktop is unchanged when window equals probe', () => {
+    for (const [w, h] of [
+      [1280, 720],
+      [1920, 1080],
+    ] as const) {
+      const a = clampedArea(w, h, none, null, { width: w, height: h });
+      expect(fitArena(a.width, a.height, a.insets, 640, 360)).toEqual(
+        fitArena(w, h, none, 640, 360),
+      );
+    }
+  });
+});
+
+describe('RELAYOUT_DELAYS_MS', () => {
+  it('is finite, positive and strictly ascending', () => {
+    expect(RELAYOUT_DELAYS_MS.length).toBeGreaterThan(0);
+    RELAYOUT_DELAYS_MS.forEach((d, i) => {
+      expect(Number.isFinite(d) && d > 0).toBe(true);
+      if (i > 0) expect(d).toBeGreaterThan(RELAYOUT_DELAYS_MS[i - 1]!);
+    });
   });
 });

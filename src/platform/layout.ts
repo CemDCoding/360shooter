@@ -117,3 +117,35 @@ export function visibleArea(
     },
   };
 }
+
+/** The window size as reported by `window.innerWidth/innerHeight`. */
+export interface WindowBox {
+  width: number;
+  height: number;
+}
+
+/**
+ * Like `visibleArea`, then caps the area by the window size (only when finite and > 0). The probe
+ * (100dvh) can be stale or too large right after a start from the iOS home screen; the smallest
+ * trustworthy measurement wins. Insets are kept as measured, so the arena can only get smaller.
+ */
+export function clampedArea(
+  probeW: number,
+  probeH: number,
+  insets: Insets,
+  vv: VisualBox | null | undefined,
+  win: WindowBox | null | undefined,
+): VisibleArea {
+  const a = visibleArea(probeW, probeH, insets, vv);
+  if (!win) return a;
+  const ww = safe(win.width);
+  const wh = safe(win.height);
+  return {
+    ...a,
+    width: ww > 0 ? Math.min(a.width, Math.max(0, ww - a.x)) : a.width,
+    height: wh > 0 ? Math.min(a.height, Math.max(0, wh - a.y)) : a.height,
+  };
+}
+
+/** Delays (ms) after which the layout is measured again once the page has started. */
+export const RELAYOUT_DELAYS_MS: readonly number[] = [100, 300, 1000];
