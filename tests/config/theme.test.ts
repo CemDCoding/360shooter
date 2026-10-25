@@ -10,7 +10,7 @@ interface Fs {
 const fsName = 'node:fs';
 const fs = (await import(/* @vite-ignore */ fsName)) as Fs;
 const read = (rel: string): string =>
-  fs.readFileSync(new URL(`../../${rel}`, import.meta.url), 'utf8');
+  fs.readFileSync(new URL(`../../${rel}`, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 
 const json: unknown = JSON.parse(read('docs/design/export/tokens.resolved.json'));
 
