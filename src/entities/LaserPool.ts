@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { WeaponStats } from '../contracts';
+import { shotPattern } from '../logic/powers';
 import { Laser } from './Laser';
 
 /** Object pool of lasers backed by an Arcade group. Use `group` for overlap checks. */
@@ -14,23 +15,32 @@ export class LaserPool {
     });
   }
 
-  /** Fires one laser from (x, y) in direction angleRad using the current weapon stats. */
-  fire(x: number, y: number, angleRad: number, stats: WeaponStats): Laser {
-    let laser = this.group.getFirstDead(false) as Laser | null;
-    if (!laser) {
-      laser = new Laser(this.scene, x, y);
-      this.group.add(laser, true);
+  /**
+   * Fires one volley from (x, y) in direction angleRad. The pattern for the given double-shot
+   * stage decides how many lasers are created (sideways offset, relative angle).
+   */
+  fire(x: number, y: number, angleRad: number, stats: WeaponStats, doubleShotStage = 0): Laser[] {
+    const fired: Laser[] = [];
+    const perpX = -Math.sin(angleRad);
+    const perpY = Math.cos(angleRad);
+    for (const spec of shotPattern(doubleShotStage)) {
+      let laser = this.group.getFirstDead(false) as Laser | null;
+      if (!laser) {
+        laser = new Laser(this.scene, x, y);
+        this.group.add(laser, true);
+      }
+      laser.fire(
+        x + perpX * spec.offsetPx,
+        y + perpY * spec.offsetPx,
+        angleRad + Phaser.Math.DegToRad(spec.angleDeg),
+        stats.projectileSpeed,
+        stats.projectileScale,
+        stats.damage,
+        stats.range,
+      );
+      fired.push(laser);
     }
-    laser.fire(
-      x,
-      y,
-      angleRad,
-      stats.projectileSpeed,
-      stats.projectileScale,
-      stats.damage,
-      stats.range,
-    );
-    return laser;
+    return fired;
   }
 
   /** Returns a laser to the pool (e.g. after it hit something). */
