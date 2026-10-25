@@ -26,6 +26,11 @@ describe('boss config (PE-75)', () => {
     expect(fade?.telegraphMs).toBe(1000);
   });
 
+  it('announces rootThrust at least MIN_REACTION_MS', () => {
+    const a = BOSSES.rootMonster.attacks.find((x) => x.id === 'rootThrust');
+    expect(a?.telegraphMs).toBeGreaterThanOrEqual(MIN_REACTION_MS);
+  });
+
   it('lets lasers hit the bud from every aim direction', () => {
     const m = WEAPON_MOUNT;
     const hand = Math.hypot(m.hand.x, m.hand.y);

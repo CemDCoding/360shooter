@@ -9,7 +9,6 @@ export const ROOT_SPIKE_TEXTURE = 'boss-root-spike';
 const SPIKE_DEPTH = 2;
 const FLASH_MS = 120;
 const FLASH_TINT = THEME.colors['game.hit-flash'].num;
-const SPROUT_START_SCALE = 0.4;
 const SPROUT_START_ALPHA = 0.5;
 
 /** sprout: harmless bud (rootThrust announcement), up: the root hurts once, creep: ring root moving in. */
@@ -66,7 +65,7 @@ export class RootSpike extends Phaser.Physics.Arcade.Sprite {
     if (scene.anims.exists(anim)) this.play(anim, true);
     this.applyBody();
     if (this.phase === 'sprout' && !this.reduced) {
-      this.setScale(SPROUT_START_SCALE).setAlpha(SPROUT_START_ALPHA);
+      this.setAlpha(SPROUT_START_ALPHA);
     }
   }
 
@@ -132,13 +131,12 @@ export class RootSpike extends Phaser.Physics.Arcade.Sprite {
       if (this.sproutLeftMs <= 0) {
         // The bud turns into a root; its damage was fixed by the laser hits.
         this.phase = 'up';
-        this.setScale(1).setAlpha(1);
+        this.setAlpha(1);
         this.applyBody();
         return this.hitsLeft <= 0;
       }
       if (!this.reduced) {
         const p = 1 - this.sproutLeftMs / this.sproutTotalMs;
-        this.setScale(SPROUT_START_SCALE + (1 - SPROUT_START_SCALE) * p);
         this.setAlpha(SPROUT_START_ALPHA + (1 - SPROUT_START_ALPHA) * p);
       }
       return false;
