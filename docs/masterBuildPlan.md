@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-25 · M0, M1, M2 abgenommen · laufender Meilenstein M2b: W1–W6 abgeschlossen, `dev` auf 44b27c3 (Push nach origin ausstehend, Lead) · nächste Welle W7 M2b-DEP (Handtest PC und iPhone). **Design übernommen** (Brief vom 2026-10-25, PE-59): neuer Meilenstein M2c (AP-50–AP-55, M2c-DEP) zwischen M2b-DEP und M3 (PE-60, angenommen)
-- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, M0-DEP, M1-DEP, M2-DEP (alle in dev). Checks auf dev grün: Install, lint, typecheck, 249/249 Tests, assets:check, build. **Bereit:** M2b-DEP (W7, Mensch). Keine Coder-Pakete bereit. **Offen:** AP-50–AP-55 (M2c, warten auf M2b-DEP), AP-16–AP-20 (warten auf M2c-DEP), M2c-DEP, M3-DEP.
+- **Stand:** 2026-10-25 · M0, M1, M2, M2b abgenommen (M2b-DEP am 2026-10-25, PC und iPhone) · `dev` auf 44b27c3 plus Plan-Commits (Push nach origin ausstehend, Lead) · **Design übernommen** (PE-59): M2c (AP-50–AP-55, M2c-DEP) liegt nach M2b-DEP und vor M3, Reihenfolge vom Nutzer bestätigt (PE-60, H-11). Handtest-Befunde: PE-61
+- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, M0-DEP, M1-DEP, M2-DEP, M2b-DEP (alle in dev). Checks auf dev grün: Install, lint, typecheck, 249/249 Tests, assets:check, build. **Bereit:** AP-56 (M2b-Nachtrag W8: Rundenstart mit Eröffnungswelle, Baum-HP 30 auf 50, Balancing der ersten Level; sonnet, M; vor M2c W1). **Danach:** M2c W1 (AP-50, AP-51). **Offen:** AP-52–AP-55 (M2c), AP-16–AP-20 (warten auf M2c-DEP), M2c-DEP, M3-DEP.
 - **Budget:** `.claude/ma-usage.json`: team 0 % (Reset erfolgt, `resets_at` 2026-10-25 16:50 UTC), Zielwert 45 %, Obergrenze 54 % (§7.2). Das Budget ist für die nächste Welle frei.
 - **Unterbrochen oder laufend:** Keine laufende Arbeit. Keine Agent-Branches und keine Worktrees offen (geprüft). Push `dev` nach origin ausstehend (Lead, §9.1 Schritt 7).
 - **Erkenntnisse:** AP-36 gemergt: alte Waffen-Items, Event `weapon-changed` und 3 Platzhalter-PNGs entfernt. Außerhalb des Eigentums geändert: `tests/entities/ItemPickup.test.ts` und `public/assets/.placeholders.json` (§18). AP-31 war kurz vor AP-33 in dev rot (Lehre §18). Feuerring trifft Bosse ab M3 nur nach Entscheidung mit PE-34 (Q-23, §18).
-- **Nächster Schritt:** Nutzer macht M2b-DEP (W7, Mensch) nach §9.2 auf PC und iPhone (Optik ist Platzhalter, geprüft werden Funktion und Passform). Danach startet der Lead M2c W1 (AP-50, AP-51), dann W2 (AP-52 bis AP-54, je mit Design-Review), W3 (AP-55), M2c-DEP. Erst nach M2c-DEP startet AP-16 (M3).
-- **Offene Fragen an den Nutzer:** Reihenfolge Design nach M2b-DEP und vor M3 bestätigen (PE-60, angenommen). Q-31 Timer-Text „BOSS!“ (Design) oder „Boss besiegen!“ (AP-20). Stumm-Taste im Debug-Modus (§18, offen). Zu bestätigen (angenommen): PE-34, PE-41, PE-43 bis PE-45. Vorschlag §16: Lead-Skript für Buchstaben-IDs (Werkzeug, Entscheidung Nutzer).
+- **Nächster Schritt:** Lead startet AP-56 (W8, ein Coder, normales Review), danach M2c W1 (AP-50, AP-51), dann W2 (AP-52 bis AP-54, je mit Design-Review; AP-53 trägt die Handtest-Befunde Stick-Größe und grauer Kasten), W3 (AP-55), M2c-DEP. Erst nach M2c-DEP startet AP-16 (M3).
+- **Offene Fragen an den Nutzer:** Q-32 Stick-Größe (Befund 10 % kleiner = 126 px oder Design-Token 88 px, AP-53 nimmt Token 88 mit Fangbereich 126 px, angenommen). Stumm-Taste im Debug-Modus (§18, offen). Zu bestätigen (angenommen): PE-34, PE-41, PE-43 bis PE-45, Startwerte in AP-56. Vorschlag §16: Lead-Skript für Buchstaben-IDs (Werkzeug, Entscheidung Nutzer). Geklärt am 2026-10-25: H-11 (Reihenfolge), Q-31 (Timer-Text „BOSS!“).
 
 <!-- Ende Lagebericht -->
 
@@ -71,18 +71,18 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | fertig | – | G2 |
-| 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 angenommen) | G2 |
+| 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 bestätigt 2026-10-25; M2b-Nachtrag AP-56 neu) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 angenommen; M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-DEP | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-DEP | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, angenommen), Q-31 neu | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) `bereit`, wartet auf den Nutzer. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 mit Annahme PE-60 (Bestätigung durch den Nutzer vor dem Start von M2c).
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). M2c W1 startet nach AP-56.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -443,9 +443,9 @@ flowchart TD
 | `src/scenes/GameScene.ts` | AP-10 → AP-12 (Hintergrund) → AP-14 (Sound) → AP-24 (Laser vs. Geschoss) | M1 W3, M2 W1, M2 W2, M2 W4 |
 | `src/scenes/debug.ts`, `src/scenes/PreloadScene.ts` (samt `tests/scenes/debug.test.ts`) | AP-10 (`debug.ts`) → AP-22 (Direktstart `?level=n`) | M1 W3, M2 W3 |
 | `src/scenes/{MenuScene,HudScene,ResultScene}.ts` | AP-10 (Hud, Result), AP-11 (Menu) → AP-14 (Sound, Stumm-Taste) | M1 W3, M2 W1, M2 W2 |
-| `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-23 (`levels`, `enemies`, `weapon`) → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M2 W4, M3 W1 |
+| `src/config/{levels,enemies,items,weapon,player,progression}.ts` | AP-03 → AP-15 → AP-23 (`levels`, `enemies`, `weapon`) → AP-35 → AP-56 (`levels`, `enemies`, M2b W8) → AP-16 (nur `levels.ts`) | M0 W2, M2 W2, M2 W4, M2b W5, M2b W8, M3 W1 |
 | `src/config/assets.ts`, `docs/guides/*` | AP-02 / AP-07 → AP-16 (Boss-Assets), M2b: AP-26 → AP-37c → AP-36 | M0 W2, M1 W1, M3 W1, M2b W1, W4, W6 |
-| `src/logic/{round,spawn}.ts`, `src/contracts/{events,index}.ts` | AP-06 / AP-01 → AP-16; M2b: AP-25 → AP-37a | M1 W1, M0 W1, M3 W1, M2b W1, W3 |
+| `src/logic/{round,spawn}.ts`, `src/contracts/{events,index}.ts` | AP-06 / AP-01 → AP-16; M2b: AP-25 → AP-37a; `spawn.ts` zusätzlich AP-56 (Eröffnungswelle, M2b W8) vor AP-16 | M1 W1, M0 W1, M3 W1, M2b W1, W3, W8 |
 | `src/scenes/{GameScene,HudScene,ResultScene}.ts` in M3 | AP-20 | M3 W3 |
 | `src/scenes/GameScene.ts` in M2b | AP-38 (Mitte, Vollbild), AP-39 (Stick-Einbindung), AP-33 (Ergebnis und Gold, Upgrades beim Start, Rüstungs-Einbindung) | M2b W1, W2, W5 |
 | `src/main.ts` in M2b | AP-38 (Scale-Einstellung, nur falls nötig) | M2b W1 |
@@ -471,6 +471,7 @@ flowchart TD
 | W5 | AP-33 | `src/scenes/{GameScene,ResultScene}.ts` (inkl. Rüstungs-Einbindung in `GameScene`) |
 | W5 | AP-35 | `src/config/{levels,enemies,weapon,items,coins,upgrades}.ts`, `tests/config/*` (ohne `assets`, `maps`, `player`), `tests/logic/balance.test.ts`, `docs/balancing.md` |
 | W6 | AP-36 | `src/contracts/{item,weapon}.ts`, `src/contracts/events.ts` (nur Event `weapon-changed`), `src/logic/{items,weapon}.ts`, `tests/logic/{items,weapon,balance,powers}.test.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, alte Item-Platzhalter, `docs/guides/*`, `public/assets/LICENSES.md` |
+| W8 (Nachtrag, PE-61) | AP-56 | `src/logic/spawn.ts`, `tests/logic/spawn.test.ts`, `src/config/{levels,enemies}.ts`, `src/config/coins.ts` (nur `dropChance`), `tests/config/{levels,enemies,coins}.test.ts`, `tests/logic/balance.test.ts`, `docs/balancing.md` (keine Überschneidung mit M2c W1: AP-50 und AP-51 besitzen diese Dateien nicht) |
 
 **M2c (Design-Umsetzung, Eigentum je Welle, Design-Brief vom 2026-10-25, PE-59, PE-60):** Die Spiellogik ändert sich nicht. `docs/design/` gehört dem Designer und ist für alle Coder nur lesbar. Höchstens drei Pakete je Welle (PE-15). Die drei UI-Pakete der W2 hängen nur von W1 ab und teilen keine Datei. Gemeinsame Hilfen der Welt „Funk“ (Panel, Button) liegen in `src/scenes/hud/` und gehören AP-53. Die Resultat-Buttons nutzen sie von dort, nicht aus `menu/Button.ts`.
 
@@ -605,11 +606,14 @@ flowchart TD
 | W4 | AP-31 Entities Spielerin, Laser, Münzen (GAME), AP-34 HUD Münzen, Power- und Rüstungs-Anzeige (GAME), AP-37c Rüstung Feuerring-Entity und Pickup-Sprite (GAME/ASSET) |
 | W5 | AP-32 Hauptmenü Upgrade-Overlay (GAME), AP-33 Spielszene und Ergebnis mit Gold, Rüstungs-Einbindung (GAME, opus), AP-35 Neu-Balancing (SH) |
 | W6 | AP-36 Aufräumen alter Waffen-Items (SH/ASSET) |
-| W7 | M2b-DEP [Mensch] |
+| W7 | M2b-DEP [Mensch] (abgenommen 2026-10-25) |
+| W8 (Nachtrag, PE-61) | AP-56 Rundenstart, Baum-Leben, Balancing der ersten Level (SH/LOG); danach M2c W1 |
 
 **Integration:** nach W2 und nach W5 `npm install`, alle Checks, `npm run dev`. Nach W1 bleibt der Typecheck grün, weil alle Vertragsänderungen additiv sind. Nach W3 und W4 Typecheck und Tests. AP-32 wechselt von W4 nach W5, weil W4 sonst vier Pakete hätte (Limit drei, PE-15).
 
-##### M2b-DEP – Abnahme [Mensch]
+##### M2b-DEP – Abnahme [Mensch] (abgenommen 2026-10-25, PC und iPhone)
+
+**Befunde aus dem Handtest (PE-61):** Stick auf dem Handy 10 % zu groß und grauer Kasten hinter den Power-ups gehen als Akzeptanzkriterien in AP-53 (M2c W2). Zu einfache erste Level, Rundenstart mit leerem Feld und Baum mit einem Laser tot gehen in das Nachtragspaket AP-56 (W8, vor M2c W1).
 
 - Pull Requests `dev` → `stage` → `master`, Test am PC und auf dem iPhone (H-03)
 - **Hinweis (PE-59, PE-60):** Die Optik ist Platzhalter und wird in M2c durch das freigegebene Design ersetzt. Diese Abnahme prüft Funktion und Passform, nicht Aussehen. Die Punkte „Lesbarkeit im HUD“ und „Abstand Gold-Anzeige und Upgrade-Button“ gelten nur grob (nichts ist abgeschnitten oder überlappt unbenutzbar). Die genaue Lesbarkeit und das Layout prüft M2c-DEP. Fehler aus dieser Abnahme werden noch in der alten Optik behoben, bevor M2c startet.
@@ -668,7 +672,8 @@ flowchart TD
   - [ ] Pause-Overlay im Funk-Stil mit Level, Biom und Restzeit; Ergebnis im Funk-Stil mit Biom-Farbband, GEWONNEN/VERLOREN, Fakten, Hauptaktion mit Fokus
   - [ ] Waffe: Die Astronautin dreht sich nicht mehr, sie spiegelt sich; die Pistole kreist um die Hand, der Laser startet an der Mündung; Ausbaustufe wechselt bei Waffen-Upgrade 7 und 14 (zum Prüfen Spielstand mit Stufen oder Debug)
   - [ ] Hochformat-Hinweis im Kassetten-Stil, App-Icon auf dem Homescreen (Helm mit Visier)
-  - [ ] Stick, Schild-Ring und Feuerring in den neuen Farben; Feuerring gestrichelt
+  - [ ] Stick, Schild-Ring und Feuerring in den neuen Farben; Feuerring gestrichelt; Stick kleiner als vorher und mit dem Daumen gut zu treffen (Q-32, ist 88 px zu klein, Token anpassen)
+  - [ ] Kein grauer Kasten hinter den Power-up-Anzeigen im HUD (Befund M2b-DEP)
   - [ ] **iPhone-Lesbarkeit (Brief, Handtest):** Funk 1× (Labels im HUD) und Kapsel 1× (Legende, Hinweis) ohne Zoomen lesbar. Wenn nicht, die Labels auf 2× anheben (kleines Fix-Paket, Platz im Layout ist vorhanden)
   - [ ] Kein Blinken bei `prefers-reduced-motion` (iPhone: Einstellungen, Bedienungshilfen, Bewegung, Bewegung reduzieren), keine Bildschirm-Erschütterung
   - [ ] Funktion unverändert: Level 0 spielbar, Gold und Upgrades, Items, Schild, Feuerring, Pause, Stick, Fortschritt bleibt nach Neuladen
@@ -691,7 +696,7 @@ flowchart TD
   - [ ] Der Timer läuft ab, die Runde endet aber erst mit dem Sieg über den Boss
   - [ ] `?level=0`, `?level=3`, `?level=7`, `?level=18`: Boss passt zum Batch, spätere Level haben stärkere Varianten mit Zusatzangriff
   - [ ] Jeder Angriff wird vorher sichtbar angekündigt (fair)
-  - [ ] Design: Boss-Lebensleiste und Timer-Label im Funk-Stil (Brief `runde.html` 3, Q-31), Warnanzeigen in Warnrot, keine Farb-Literale in den Boss-Dateien (Design-Review AP-20)
+  - [ ] Design: Boss-Lebensleiste und Timer-Label im Funk-Stil (Brief `runde.html` 3, Text „BOSS!“ laut Q-31), Warnanzeigen in Warnrot, keine Farb-Literale in den Boss-Dateien (Design-Review AP-20)
 
 ---
 
@@ -741,11 +746,12 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-37c | Rüstung Feuerring-Entity und Pickup-Sprite (PE-52, PE-57) | M2b | GAME/ASSET | W4 | AP-26, AP-37a | M | sonnet (medium) | c40 / agent/AP-37-c40 | fertig |
 | AP-38 | Fix iPhone-Darstellung, Mitte und HUD-Lesbarkeit (PE-54) | M2b | GAME/OPS | W1 | keine (M2 abgenommen) | M | sonnet (medium) | c38 / agent/AP-38-c38 | fertig |
 | AP-39 | Virtueller Stick für Touch-Geräten (PE-55) | M2b | GAME | W2 | AP-38 (Datei GameScene, Reihenfolge) | M | sonnet (high) | c39 / agent/AP-39-c39 | fertig |
-| M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36, AP-37a, AP-37c, AP-38, AP-39 | H | – | – | bereit |
+| M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36, AP-37a, AP-37c, AP-38, AP-39 | H | – | – | fertig (abgenommen 2026-10-25) |
+| AP-56 | Nachtrag Handtest M2b-DEP: Rundenstart, Baum-Leben, Balancing der ersten Level (PE-61) | M2b-Nachtrag | SH/LOG | W8 | M2b-DEP (fertig); vor M2c W1 (Vorgabe Lead) | M | sonnet (high) | – | bereit |
 | AP-50 | Theme, Waffen-Geometrie und Farben der Hülle (Design) | M2c | OPS/SH/LOG | W1 | M2b-DEP | M | sonnet (high) | – | offen |
 | AP-51 | Schriften, Icons und Asset-Pipeline (Design) | M2c | ASSET | W1 | M2b-DEP | L | sonnet (high) | – | offen |
 | AP-52 | Menü, Level-Auswahl, Upgrade-Panel, Laden, Hochformat-Hinweis (Design, Design-Review) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – | offen |
-| AP-53 | Runde: HUD, Pause, Stick, Ergebnis, Maps (Design, Design-Review) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – | offen |
+| AP-53 | Runde: HUD, Pause, Stick, Ergebnis, Maps (Design, Design-Review; Befunde PE-61: Stick kleiner, kein grauer Kasten) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – | offen |
 | AP-54 | Waffe als eigenes Sprite, Spielerin spiegelt, Laser, Treffer-Blitz (Design, Design-Review) | M2c | GAME/LOG | W2 | AP-50, AP-51 | M | sonnet (high) | – | offen |
 | AP-55 | Design-Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README | M2c | OPS | W3 | AP-52, AP-53, AP-54 | S | sonnet (medium) | – | offen |
 | M2c-DEP | Abnahme M2c (PC + iPhone) | M2c | HUM | W4 | AP-50–AP-55 | H | – | – | offen |
@@ -809,7 +815,7 @@ flowchart LR
   AP02 --> AP07
   AP04 & AP06 --> AP21
   AP10 --> AP11 & AP12 & AP13 & AP15
-  M2bDEP --> AP50 & AP51
+  M2bDEP --> AP56["AP-56 Nachtrag"] & AP50 & AP51
   M2cDEP --> AP16
   AP10 & AP11 --> AP22["AP-22"]
   AP09 & AP10 --> AP24
@@ -822,7 +828,7 @@ flowchart LR
 
 **M2 W4:** AP-23 (nur `src/config/*`, `tests/config/*`, `tests/logic/balance.test.ts`, `docs/balancing.md`) und AP-24 (`src/scenes/GameScene.ts`, `src/logic/projectiles.ts`, Test) teilen keine Datei und laufen parallel.
 
-**Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11/AP-12 → AP-14 → (M2b) AP-25 → AP-27 → AP-29/AP-30 → AP-31 → AP-33 → AP-36 → M2b-DEP → (M2c) AP-50/AP-51 → AP-52–AP-54 → AP-55 → M2c-DEP → (M3) AP-16 → AP-17–AP-19 → AP-20
+**Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11/AP-12 → AP-14 → (M2b) AP-25 → AP-27 → AP-29/AP-30 → AP-31 → AP-33 → AP-36 → M2b-DEP → AP-56 (Nachtrag, Reihenfolge Lead) → (M2c) AP-50/AP-51 → AP-52–AP-54 → AP-55 → M2c-DEP → (M3) AP-16 → AP-17–AP-19 → AP-20
 
 ---
 
@@ -2080,6 +2086,39 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 - **Kürzbar bei Budgetnot:** ja (Größe und Totzone fest, keine Anpassung je Gerät)
 - **Commit-Typ:** `feat(AP-39): add virtual stick for touch aiming`
 
+#### AP-56 – Nachtrag Handtest M2b-DEP: Rundenstart, Baum-Leben, Balancing der ersten Level
+
+- **Meilenstein, Lane, Welle:** M2b-Nachtrag · SH/LOG · W8 (nach M2b-DEP, vor M2c W1; PE-61)
+- **Ziel:** Drei Befunde des Handtests vom 2026-10-25 beheben, nur in Config, Logik und Tests: (c) die ersten Level sind zu einfach, (d) jede Runde beginnt mit spawnenden Gegnern statt mit leerem Feld, (e) der Verfluchte Baum stirbt mit einem Laser. Keine Szene, keine Entity, kein Vertrag ändert sich.
+- **Ist-Stand (Planner hat den Code gelesen):** (d) `SpawnDirector` setzt `cooldownMs = level.spawnIntervalMs`, der erste Gegner erscheint also erst nach einem vollen Intervall (Level 0: 3,57 s) und startet auf dem Ring 391 px vom Zentrum (Tempo 30 px/s, etwa 12 s Laufweg). (e) `cursedTree.hp` ist 30, die Grundwaffe macht 10 je Schuss; Doppelschuss Stufe 2 (drei Laser, Fächer) und Schaden-Upgrades (+10 % je Stufe) töten ihn mit einer Salve. (c) Druck (Gegner-HP je Sekunde geteilt durch Basis-DPS) liegt in Level 0 bei 0,27 und in Level 4 bei 0,43 (`docs/balancing.md`).
+- **Pflichtlektüre:** PE-61, `src/logic/spawn.ts`, `src/config/{levels,enemies,coins}.ts`, `tests/logic/{spawn,balance}.test.ts`, `tests/config/{levels,enemies,coins}.test.ts`, `docs/balancing.md`, §18 (Erkenntnisse AP-15, AP-23, AP-35: Kennzahl-Tabelle, Gold-Test), Draft „Verbesserungsplan Wellenkonzept“ in §16 (nur Hintergrund, nicht Teil dieses Pakets)
+- **Abhängigkeiten:** M2b-DEP (abgenommen). Keine Dateiüberschneidung mit AP-50/AP-51, deshalb technisch auch parallel zu M2c W1 möglich. Vorgabe des Leads: vor M2c W1 mergen
+- **Parallel möglich mit:** AP-50, AP-51 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/logic/spawn.ts`, `tests/logic/spawn.test.ts`, `src/config/{levels,enemies}.ts`, `src/config/coins.ts` (nur `dropChance`, falls der Gold-Test es verlangt), `tests/config/{levels,enemies,coins}.test.ts`, `tests/logic/balance.test.ts`, `docs/balancing.md`
+- **Nicht anfassen:** `src/contracts/**` (`LevelDef` bleibt), `src/scenes/**` (auch `GameScene.ts`: die Anfrage trägt den Radius schon, `pointOnRing` setzt ihn um), `src/entities/**`, `src/logic/round.ts`, `docs/design/**`, alle Dateien aus AP-50/AP-51
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **Rundenstart (d), `spawn.ts`:** Beim ersten `tick` mit gültigem `dtMs` erzeugt der Director sofort eine **Eröffnungswelle** von `openingCount = clamp(round(level.maxEnemies * 0.15), 3, 8)` Gegnern (Level 0: 4, Level 20: 8), begrenzt durch `maxEnemies - aliveCount`. Die Winkel sind gleichmäßig verteilt (zufälliger Startwinkel aus `SpawnRng`, dann `+ i * 2π / n`), der Typ kommt aus `pickEnemy()`. Der Radius der Eröffnungswelle ist `spawnRadius * OPENING_RADIUS_FACTOR` mit exportierter Konstante `OPENING_RADIUS_FACTOR = 0.65` (Startwert, angenommen; die Gegner erscheinen am Bildrand statt weit außerhalb und sind in unter 10 s bei der Astronautin). Danach läuft der Regelbetrieb wie bisher (erster Regel-Spawn nach einem vollen Intervall, Intervall sinkt auf 60 %). Eröffnungsgegner zählen zu `alive`, `maxEnemies` bleibt Obergrenze. Genau einmal je Director (eine neue Runde oder „Nochmal“ legt einen neuen Director an, die Pause ruft `tick` nicht auf). `GameScene.ts` bleibt unverändert.
+  2. **Baum-Leben (e), `enemies.ts`:** `cursedTree.hp` von 30 auf 50 (Startwert, angenommen). Die Grundwaffe braucht dann 5 Treffer. Zusatz: Doppelschuss Stufe 2 bei Schaden-Upgrade Stufe 5 (drei Laser je 15) macht 45 und tötet den Baum nicht mit einer Salve. Mit Schaden-Upgrade Stufe 10 kann eine volle Salve ihn töten, das ist gewollt. Die Werte der anderen Gegner bleiben.
+  3. **Balancing der ersten Level (c), `levels.ts`:** Die höheren Baum-HP heben den Druck von selbst (Level 0 etwa 0,44, Level 4 etwa 0,73). Der Coder stellt die Kurve mit der Kennzahl aus `balance.test.ts` neu ein (nur Zahlen in `SPAWN_INTERVAL_MS`, `MAX_ENEMIES`), Zielwerte (Startwerte, angenommen): **Level 0 Druck 0,45 bis 0,55** (Startwert Abstand etwa 3300 ms statt 3570), **Level 4 Druck 0,72 bis 0,80**, Level 4 auf 5 Sprung 1,08 bis 1,12, Level 9 auf 10 Sprung 1,08 bis 1,10, ab Level 5 höchstens +10 % je Stufe, **Level 20 Druck 0,95 bis 1,25** (heute 0,96; ohne Anpassung stiege es durch die Baum-HP auf etwa 1,34, das ist zu viel, Nutzer bewertete die späten Level nicht als zu leicht). Level 5 bis 9 brauchen dafür mehr Spawns (Abstand etwa 1150 ms statt 1330 für Level 5), Level 11 bis 20 etwas weniger. Der Abstand sinkt weiter streng mit jedem Level. Obergrenze `maxEnemies` höchstens 150, Startwerte der Liste nur erhöhen, wenn die Wirkung der zäheren Bäume es verlangt.
+  4. **Folgen ausgleichen:** Mehr oder weniger Spawns verändern das Gold. `COIN_RULES.dropChance` (derzeit 0,048) wird nur dann angepasst, wenn der Gold-Test (Mittel 43 bis 47 je gewonnenem Level, Stufe 10 nach 15 bis 20 Leveln, Summe aller Upgrades 2700 bis 2900) sonst rot würde. Die Eröffnungswelle zählt in den Spawn-Zahlen des Tests mit (`spawnCount`). Ein geänderter `dropChance` wird in `tests/config/coins.test.ts` und `docs/balancing.md` nachgezogen.
+  5. **Tests anpassen:** `levels.test.ts`: der Test „levels 0-4 keep their fixed spawn values (AP-23)“ wird auf die neuen Werte umgestellt oder durch Bereiche ersetzt (Abstand und Maximum steigen je Level). `balance.test.ts`: „level 0 is easy“ von höchstens 0,4 auf 0,45 bis 0,55 als Bereich, Level 20 mit der neuen Obergrenze, `metrics` und `spawnCount` rechnen die Eröffnungswelle mit. `spawn.test.ts`: „uses the configured radius“ trennt Eröffnungs- und Regel-Spawns (Regel-Spawns auf dem vollen Radius 600, Eröffnungs-Spawns auf `0.65 * 600`).
+  6. `docs/balancing.md`: Kennzahl-Tabelle neu, Abschnitt „Änderung nach dem Handtest M2b-DEP (AP-56)“ mit Befund, Ursache und neuen Werten, den Hinweis auf die Eröffnungswelle und `OPENING_RADIUS_FACTOR` im Abschnitt „Nachjustieren“.
+- **Schnittstellen:** `SpawnDirector`-API bleibt (`tick`, `currentIntervalMs`), neu exportiert sind `OPENING_RADIUS_FACTOR` und `openingCount(level)`. Keine Vertragsänderung.
+- **Akzeptanzkriterien:**
+  - (d) Der erste `tick` einer Runde liefert Spawns (mindestens 3), alle auf dem Eröffnungsradius, vor Ablauf des ersten Intervalls. Mit `aliveCount >= maxEnemies` liefert er keine. Gleicher Seed, gleiche Ausgabe (deterministisch). Handtest: Wenige Sekunden nach dem Start sind Gegner am Bildrand sichtbar, kein leeres Feld mit Wartezeit
+  - (e) `cursedTree.hp >= 5 * WEAPON_BASE.damage`. Test: Doppelschuss Stufe 2 mit Schaden-Upgrade Stufe 5 (Faktor 1,5, drei Laser) tötet den Baum nicht mit einer Salve. Handtest: ein Laser tötet den Baum nicht
+  - (c) Druck-Kennzahlen innerhalb der Zielwerte aus Umsetzung 3, alle bestehenden Kurven-Tests (steigender Druck, steigende Dichte, Sprünge, 5-Minuten-Level härter) bleiben grün, bei geänderten Zielwerten ist die Begründung in `docs/balancing.md` und im Bericht
+  - Gold-Mittel bleibt zwischen 43 und 47, Checks grün (lint, typecheck, test, assets:check, build)
+- **Tests:** `spawn.test.ts` (Eröffnungswelle: Anzahl, Radius, Winkelverteilung, `maxEnemies`, einmalig, deterministisch), `enemies.test.ts` (Baum-HP, Treffer bis zum Tod), `levels.test.ts`, `balance.test.ts`, `coins.test.ts` (nur bei Änderung)
+- **Review-Schwerpunkte:** Eröffnungswelle nur einmal je Director und nicht in der Pause, keine Änderung an `GameScene`/Vertrag, Kurven-Tests sind nicht nur gelockert (Bereiche begründet), Gold-Kette stimmt, `docs/balancing.md` passt zu den Zahlen, keine Konflikte mit dem Draft AP-40 ff. (Hinweis in §18)
+- **Doku-Pflichten:** `docs/balancing.md`
+- **Design-Review:** nein
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerbefund)
+- **Commit-Typ:** `fix(AP-56): open rounds with a spawn wave and toughen trees`
+
 ### M2c – Design-Umsetzung
 
 Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Abschnitte „Gewählte Richtung“, „Grundsätze“, „Übergabe an den Planner“), PE-59, PE-60. `docs/design/` ist für Coder nur lesbar (Eigentum des Designers). Neue Abhängigkeiten gibt es nicht (Brief, „Neue Abhängigkeiten: keine“). Die Spiellogik und alle Werte in `src/config/` (außer den neuen Design-Dateien) bleiben unverändert.
@@ -2197,10 +2236,10 @@ Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Absc
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
   1. `FunkPanel` (dunkles Glas `hud.glass`, 1-px-Linien, gepunktete Trenner, Logbuch-Kopf, angeschliffene Ecke oben links) und `FunkButton` (Zustände, Fokus-Ring `hud.focus`, mindestens 32×32) als wiederverwendbare Bausteine. Ergebnis und Pause nutzen sie, nicht `menu/Button.ts`.
-  2. `HudScene` nach `runde.html` 1 bis 4: Energie-Panel (Zahl 3× und 10 Segmente, Warnzustand ab 25 % oder weniger mit Label „ENERGIE!“), Timer-Panel (Warnung unter 10 s; Zustand „BOSS!“ als schaltbarer Zustand `setOvertime(on)`, in diesem Meilenstein noch nie aktiv, die Verdrahtung macht AP-20), Chips nur für aktive Kräfte mit Zahl oder Sekunden (kleines „s“, z. B. „4s“), Münz-Anzeige, Feuerring aktiv (Akzentrahmen) bzw. lädt (gepunktet). Größeres HUD (Brief, 5b), Layout mit `hudScale` und Safe-Area. Pause- und Ton-Taste als Funk-Icon-Buttons (`ui-icons` Frame 2 und `addMuteButton(..., 'hud')`). Das Herz-Symbol entfällt (Frame 0 hat jetzt eine andere Bedeutung).
+  2. `HudScene` nach `runde.html` 1 bis 4: Energie-Panel (Zahl 3× und 10 Segmente, Warnzustand ab 25 % oder weniger mit Label „ENERGIE!“), Timer-Panel (Warnung unter 10 s; Zustand „BOSS!“ als schaltbarer Zustand `setOvertime(on)`, in diesem Meilenstein noch nie aktiv, die Verdrahtung macht AP-20), Chips nur für aktive Kräfte mit Zahl oder Sekunden (kleines „s“, z. B. „4s“), Münz-Anzeige, Feuerring aktiv (Akzentrahmen) bzw. lädt (gepunktet). Größeres HUD (Brief, 5b), Layout mit `hudScale` und Safe-Area. Pause- und Ton-Taste als Funk-Icon-Buttons (`ui-icons` Frame 2 und `addMuteButton(..., 'hud')`). Das Herz-Symbol entfällt (Frame 0 hat jetzt eine andere Bedeutung). **Kein grauer Kasten (Handtest-Befund M2b-DEP, PE-61):** Das halbtransparente schwarze Rechteck `ROW_PANEL_W` (290 px mal `k`, Alpha 0,55) hinter der Power-up-Zeile in `HudScene.ts` entfällt. Die Chips haben nur ihren eigenen Rahmen laut `runde.html`, hinter einer inaktiven Zeile oder zwischen den Chips liegt keine Fläche. Der Schild-Balken in `PowerIndicators.ts` hat einen eigenen schmalen Hintergrund (Rahmen des Balkens), keine breite Fläche.
   3. Pause-Overlay im Funk-Stil mit Level, Biom und Restzeit. Fehlen Biom oder Level in den Szenendaten, leitet der Coder sie aus der Level-ID über `src/config` ab (keine Änderung an `GameScene`, sonst Rückfrage an den Lead).
   4. `ResultScene` nach `ergebnis.html` 1 bis 2: Biom-Farbband oben, Logbuch-Kopf, GEWONNEN/VERLOREN in Astro Funk 4×, Faktenliste (Dauer, Erfahrung, Gold wie bisher), Buttons rechts unten, der Fokus liegt auf der Hauptaktion („NÄCHSTES LEVEL“ oder „NOCHMAL“, Akzentrahmen). Die Regeln aus AP-33 und AP-10 (z. B. „Nächstes Level“ nur nach Sieg) bleiben.
-  5. `VirtualStick`: gepunkteter Phosphor-Ring, Knopf mit Phosphor-Rand, aktiv heller. Maße und Verhalten aus AP-39 bleiben unverändert.
+  5. `VirtualStick`: gepunkteter Phosphor-Ring, Knopf mit Phosphor-Rand, aktiv heller. Verhalten aus AP-39 bleibt unverändert. **Größe (Handtest-Befund M2b-DEP „Stick auf dem Handy 10 % zu groß“, PE-61, Q-32):** Durchmesser und Knopf kommen aus den Design-Tokens `size.stick` (88 px) und `size.stick-knob` (28 px) über `THEME`, die Konstanten `BASE_DIAMETER = 140` und `KNOB_DIAMETER = 56` entfallen. Der Fangbereich, in dem ein Finger den Stick startet, ist unabhängig von der gezeichneten Größe und hat mindestens 126 px Durchmesser (10 % unter dem Ist-Stand 140), damit er mit dem Daumen sicher getroffen wird. Hat das Design-Token (theme.ts) die Größe nicht, gilt 126 px für Ring und 50 px für den Knopf (je 10 % weniger) und der Coder meldet es dem Lead.
   6. `maps.ts`: `baseColor` aus `biome.*-ground`, Partikel mit `game.firefly` und `game.spore`. `MapBackground.ts` ohne Farb-Literale.
   7. Reine Hilfsfunktionen (Segmentzahl, Warnschwelle, Sekundentext) in `hudMath.ts` mit Tests. `prefersReducedMotion()`: kein Blinken von Energie und Timer, die Information bleibt über Text und Umriss erhalten.
   8. Listener beim Szenenende abmelden (wie bisher). Keine Zahlen über Gegnern (Grundsatz 8).
@@ -2208,6 +2247,8 @@ Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Absc
 - **Akzeptanzkriterien:**
   - HUD, Pause und Ergebnis entsprechen den Mockups, Warnzustände haben ein zweites Merkmal (Text, Umriss)
   - Alle Funktionen der HUD- und Ergebnis-Szenen wie vorher (Pause, Weiterspielen, „Nochmal“, „Nächstes Level“, Menü)
+  - Stick (Befund PE-61): gezeichneter Durchmesser aus `size.stick` (88 px, Knopf 28 px) und damit deutlich kleiner als vorher (140 px), Fangbereich mindestens 126 px, Stick startet auf dem iPhone mit dem Daumen sicher, Verhalten (Vorrang vor Tippen, zweiter Finger, Pause) unverändert
+  - HUD (Befund PE-61): hinter den Power-up-Anzeigen liegt kein grauer Kasten und keine breite Fläche (weder bei aktiven noch bei inaktiven Kräften), Sichtprüfung am PC und im iPhone-Querformat
   - Keine Farb-Literale und keine `monospace`-Angabe in den eigenen Dateien
   - Checks grün
 - **Tests:** `hudMath` (Segmente bei 0, 25, 100 %, Sekundentext mit „s“), `maps.test.ts` an die Tokens angepasst
@@ -2442,7 +2483,7 @@ Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Absc
        - Boss-Angriffe ↔ Spielerin
        - Spawn-Callbacks (Baummonster)
      - `bossDefeated` an `RoundState`, dazu der Sound `boss-defeated`.
-  3. `HudScene`: Boss-HP-Leiste oben mit Namen (deutsch: „Verwurzeltes Baummonster“, „Waldgeist“, „Riesen-Stein“) im Funk-Stil nach `runde.html` 3 (Vorschlag des Designers für M3), mit `FunkPanel` aus AP-53, Farben nur aus `theme.ts`. Das Timer-Panel hat seit AP-53 den Zustand `setOvertime(on)` mit dem Label „BOSS!“. AP-20 schaltet ihn ein, sobald der Timer abgelaufen ist und der Boss lebt. Der Text des Labels ist „BOSS!“ laut Design (statt „Boss besiegen!“), Bestätigung offen (Q-31).
+  3. `HudScene`: Boss-HP-Leiste oben mit Namen (deutsch: „Verwurzeltes Baummonster“, „Waldgeist“, „Riesen-Stein“) im Funk-Stil nach `runde.html` 3 (Vorschlag des Designers für M3), mit `FunkPanel` aus AP-53, Farben nur aus `theme.ts`. Das Timer-Panel hat seit AP-53 den Zustand `setOvertime(on)` mit dem Label „BOSS!“. AP-20 schaltet ihn ein, sobald der Timer abgelaufen ist und der Boss lebt. Der Text des Labels ist „BOSS!“ laut Design (statt „Boss besiegen!“), vom Nutzer bestätigt am 2026-10-25 (Q-31).
   4. `ResultScene`: zeigt „Boss besiegt“.
 - **Akzeptanzkriterien:**
   - Alle Smoke-Test-Punkte von M3-DEP
@@ -2467,12 +2508,12 @@ Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Absc
 | H-03 | iPhone im selben WLAN; Windows-Firewall erlaubt Node im privaten Netz (Abfrage beim ersten `npm run preview -- --host` mit „Zulassen“ bestätigen) | M2-DEP | M2-DEP | ☑ (PC und iPhone, 2026-10-25) |
 | H-04 | Bosse beschreiben (Q-04); angenommenes Verhalten PE-34 vor M3-Freigabe prüfen | vor M3 | AP-16–AP-20 | ☑ Namen / ☐ PE-34 prüfen |
 | H-05 | Optional: eigene Grafiken und Sounds nach den Anleitungen aus AP-07 austauschen | ab M1 | – | ☐ |
-| H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☑ M0–M2 (2026-10-25) / ☐ M2b, M2c, M3 |
+| H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☑ M0–M2b (2026-10-25) / ☐ M2c, M3 |
 | H-07 | Freigabe Umfang, Verträge und Reihenfolge M2b: V-01 bis V-04 (in §16, inzwischen übernommen) | vor M2b | AP-25, AP-26 | ☑ (2026-10-24) |
-| H-08 | Abnahme M2b: Smoke-Test am PC und auf dem iPhone (M2b-DEP) | nach M2b | M2c (AP-50, AP-51), danach M3 | ☐ |
+| H-08 | Abnahme M2b: Smoke-Test am PC und auf dem iPhone (M2b-DEP) | nach M2b | M2c (AP-50, AP-51), danach M3 | ☑ (2026-10-25, PC und iPhone; Befunde in PE-61) |
 | H-09 | Rüstungen klären: Q-19 (Katalog), Q-20 (Auslöser, Abklingzeit), Q-21 (Feuerring-Werte) beantworten | vor AP-37a | AP-37a, AP-37c | ☑ (Pilot PE-52, Katalog spätere Planung; Umsetzung PE-58) |
 | H-10 | Freigabe Umfang: V-05 (Stick, §2 F-01) und V-06 (F-17 nach „Optional“, §2) entscheiden. Erst danach trägt der Planner die §2-Änderungen ein | vor AP-39 bzw. §2 | AP-39 | ☑ V-05 übernommen (2026-10-25), V-06 abgelehnt, F-17 bleibt Pflicht (PE-56) |
-| H-11 | Reihenfolge bestätigen: Design-Umsetzung (M2c) nach M2b-DEP und vor M3 (PE-60, angenommen). Antwort „ja“ oder „Design zuerst, vor M2b-DEP“ | vor M2c W1 | AP-50, AP-51 | ☐ |
+| H-11 | Reihenfolge bestätigen: Design-Umsetzung (M2c) nach M2b-DEP und vor M3 (PE-60) | vor M2c W1 | AP-50, AP-51 | ☑ (bestätigt 2026-10-25) |
 | H-12 | Abnahme M2c: Smoke-Test am PC und auf dem iPhone (M2c-DEP), inklusive Lesbarkeit von Funk 1× und Kapsel 1× im Querformat | nach M2c | M3 (AP-16 ff.) | ☐ |
 | H-13 | Optional: die 30 Platzhalter-Sprites (Astronautin, Gegner, Items, Bosse) nach `docs/design/mockups/sprites.html` und der Anleitung `docs/guides/grafik-austauschen.md` neu zeichnen. Reiner Dateiaustausch ohne Code. Kein Paket geplant (Brief, Reihenfolge-Empfehlung 5) | jederzeit nach M2c W1 | – | ☐ |
 
@@ -2603,7 +2644,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-57 | Feuerring-Regeln: Drop-Chance 2 % je besiegtem Gegner (Richtwert). Eingesammelt wird das Pickup durch Anschießen wie ein Item. Es verfällt nach `ITEM_RULES.lifetimeMs`. Aufnahme während aktiver Rüstung oder Abklingzeit wirkt nicht. Die Zeit ist die pausierbare Spielzeit (PE-29). Der Ring fügt Gegnern im Radius Schaden über den bestehenden Todespfad zu. Eigener Zustand `ActiveArmour`, getrennt von `ActivePowers`. Bosse nehmen in M2b keinen Ringschaden. Bosse ab M3 nur nach Entscheidung mit PE-34 (Q-23) | Umsetzung der Regeln aus PE-47 und PE-52, Planer-Vorschlag, bestätigt (Q-23) | Nutzer am 2026-10-25 (Q-23) |
 | PE-58 | Rüstungs-Priorität: Der Feuerring kommt zeitnah in M2b. AP-37a (W3, Vertrag, Config, Logik), AP-37c (W4, Entity, Pickup-Sprite), Anzeige in AP-34 (W4), Einbindung in AP-33 (W5). AP-32 wird dafür nach W5 verschoben. Weitere Rüstungen sind später reine Daten in `src/config/armour.ts` | Nutzer-Auftrag Priorität, Konflikt Wellenlimit (max. drei Pakete je Welle, PE-15) | Nutzer am 2026-10-25 |
 | PE-59 | Design übernommen (Brief vom 2026-10-25, Status `freigegeben`, Richtung „Außen die Spielkassette, innen das Funkgerät im Anzug“). Umsetzung als Meilenstein M2c mit AP-50 bis AP-55: Tokens als `src/config/theme.ts` (erzeugt aus `tokens.resolved.json`), eigene Bitmap-Schriften Astro Kapsel und Astro Funk, Menü im Kassetten-Stil, Runde im Funk-Stil, Waffe als eigenes kreisendes Sprite mit drei Ausbaustufen, Lint-Regel „nur Tokens“. Keine neuen Abhängigkeiten, Spiellogik unverändert. Angenommen im Brief: Laserfarbe Korallenrosa, „s“ bei Sekunden, Logo-Schriftzug, kein Fließtext-Font. Kein Impressum nötig (R3 erst bei Veröffentlichung, Brief) | Lead-Auftrag „Design übernehmen“, Übergabe im Brief | Nutzer (Design freigegeben am 2026-10-25), Paketschnitt Planner |
-| PE-60 | Reihenfolge: M2c (Design) läuft nach M2b-DEP und vor M3. Gründe: M2b-DEP prüft Funktion und Passform, nicht Optik, und findet Fehler noch in der alten Optik. Die Design-Pakete besitzen `HudScene`, `ResultScene`, `config/assets.ts` und `Player.ts`, M3 besitzt dieselben Dateien (AP-16, AP-20), das Design muss deshalb vorher fertig sein. AP-16 hängt von M2c-DEP ab. M2b-DEP-Checkliste unverändert, nur mit Hinweis | Planner-Empfehlung, Bestätigung offen (H-11) | Planner (angenommen) |
+| PE-60 | (bestätigt 2026-10-25, H-11) Reihenfolge: M2c (Design) läuft nach M2b-DEP und vor M3. Gründe: M2b-DEP prüft Funktion und Passform, nicht Optik, und findet Fehler noch in der alten Optik. Die Design-Pakete besitzen `HudScene`, `ResultScene`, `config/assets.ts` und `Player.ts`, M3 besitzt dieselben Dateien (AP-16, AP-20), das Design muss deshalb vorher fertig sein. AP-16 hängt von M2c-DEP ab. M2b-DEP-Checkliste unverändert, nur mit Hinweis | Planner-Empfehlung, Nutzer bestätigt am 2026-10-25 (H-11) | Nutzer (bestätigt) |
+| PE-61 | Handtest M2b-DEP (PC und iPhone) am 2026-10-25 abgenommen, fünf Befunde: (a) Stick auf dem Handy etwa 10 % zu groß, (b) grauer Kasten hinter den Power-up-Anzeigen im HUD, (c) die ersten Level sind zu einfach, (d) jede Runde soll mit spawnenden Gegnern beginnen, nicht mit leerem Feld, (e) der Baum stirbt mit einem Laser. Umsetzung: (a) und (b) als Akzeptanzkriterien in AP-53 (M2c W2), weil AP-53 `VirtualStick.ts` und `HudScene.ts` ohnehin neu baut, kein separates Vorab-Paket (Begründung in §18). (c) bis (e) als M2b-Nachtrag AP-56 vor M2c W1 (Balancing und Rundenstart, Dateien ohne Überschneidung mit AP-50/AP-51). Umfang §2 unverändert (Fehlerbehebung und Balancing). Stick-Größe: Das Design gibt `size.stick` 88 px vor (heute 140 px, also deutlich mehr als 10 % kleiner), siehe Q-32 | Handtest-Befunde, Wortlaut Nutzer über Lead | Nutzer am 2026-10-25 (Befunde); Zahlen in AP-56 (Startwerte, angenommen) |
 
 ### Offene Fragen
 
@@ -2632,7 +2674,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-21 | Rüstungen: Richtwerte Feuerring (Radius 72 px, Schaden 20/s, Dauer 5 s). Gelten die Richtwerte oder soll der Nutzer sie festlegen? Gilt die Rüstung nur in der Runde, nicht im Menü? | K | PE-47, AP-37a, AP-37c | Richtwerte gelten, nur in der Runde | geklärt (PE-52) |
 | Q-22 | Auf Touch-Geräten: Bleibt das Tippen auf das Spielfeld als Zielen erhalten, wenn der Stick dazukommt? | W | PE-03, PE-55, AP-39 | Ja, der Stick hat Vorrang vor Tippen und Maus | geklärt (PE-55, Nutzer am 2026-10-25) |
 | Q-23 | Feuerring: Drop-Chance je Gegner (Richtwert 2 %, angenommen) und trifft der Ring ab M3 auch Bosse? In M2b trifft er keine Bosse | W | PE-57, AP-37a, AP-33, M3 (AP-16 ff.) | 2 % je Gegner, Bosse ab M3 nur nach Entscheidung mit PE-34 | geklärt (PE-57), Nutzer am 2026-10-25 |
-| Q-31 | Timer-Label nach Ablauf bei lebendem Boss: „BOSS!“ (Design-Brief, Grundsatz 4) oder „Boss besiegen!“ (bisheriger Text in AP-20)? | O | AP-20, AP-53 (Zustand `setOvertime`) | „BOSS!“ laut Design, weil es zum Funk-HUD und zu den Mockups passt | offen (AP-20 ist mit „BOSS!“ eingetragen) |
+| Q-31 | Timer-Label nach Ablauf bei lebendem Boss: „BOSS!“ (Design-Brief, Grundsatz 4) oder „Boss besiegen!“ (bisheriger Text in AP-20)? | O | AP-20, AP-53 (Zustand `setOvertime`) | „BOSS!“ laut Design, weil es zum Funk-HUD und zu den Mockups passt | geklärt: „BOSS!“ (Nutzer am 2026-10-25), AP-20 trägt „BOSS!“ |
+| Q-32 | Stick-Größe auf dem Handy: Befund „10 % zu groß“ (140 px, also etwa 126 px) oder Designvorgabe `size.stick` 88 px und `size.stick-knob` 28 px (-37 %)? 88 px ist als Zielfläche für den Daumen klein | W | PE-61, AP-53 | AP-53 nimmt die Token-Größe 88/28 (Vorgabe des Leads: Design vor Befund), Fangbereich zum Starten des Sticks bleibt bei 126 px (Durchmesser), damit der Daumen ihn trifft. Der Nutzer prüft in M2c-DEP; ist 88 px zu klein, wird nur der Token-Wert geändert (eine Zeile in `docs/design/tokens.json` durch den Designer plus `theme:build`) | offen (AP-53 mit Empfehlung eingetragen, angenommen) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -2730,6 +2773,8 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | Rüstung Feuerring: Drop, Aktivierung, Ring-Schaden, Abklingzeit, Pause (PE-52, PE-57) | AP-37a (Logik), AP-37c (Entity, Pickup), AP-33 (Verdrahtung), M2b-DEP (Handtest) |
 | iPhone-Befunde M2: Vollbild im Querformat, Astronautin mittig, HUD lesbar (PE-54) | AP-38, M2b-DEP (Handtest) |
 | Virtueller Stick auf Touch-Geräten, 360°-Zielen, Stick vor Tippen und Maus (PE-55, §2 F-01) | AP-39 (`logic/aimSource`), M2b-DEP (Handtest) |
+| Handtest-Befunde M2b-DEP (PE-61): Stick zu groß, grauer Kasten hinter Power-ups | AP-53 (Akzeptanzkriterien), Q-32, M2c-DEP |
+| Handtest-Befunde M2b-DEP (PE-61): erste Level zu einfach, Rundenstart mit leerem Feld, Baum stirbt mit einem Laser | AP-56 (Balancing, Rundenstart), M2b-Nachtrag vor M2c W1 |
 | Schild gilt für alle Schadensquellen (PE-42, PE-43) | AP-30, AP-31, AP-33 |
 | §5 Spielstand v2, robustes Laden (PE-44) | AP-28 |
 | R1 Asset-Lizenzen M2b | AP-26, AP-36 |
@@ -2875,3 +2920,4 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-25 | Entscheidung Nutzer: Q-23 bestätigt (Feuerring-Drop 2 % je Gegner, Bosse ab M3 nur nach Entscheidung mit PE-34). PE-57 bestätigt, Annahmemarker in §0, §12 (AP-37a) und §16 entfernt, Q-23 `geklärt` | Nutzer-Entscheidung 2026-10-25 | §0, §12 AP-37a, §16 (PE-57, Q-23) | Planner (Pflege) |
 | 2026-10-25 | Pflegeauftrag Lead Wellenabschluss M2b W6: §0 Lagebericht ersetzt (Budget team 0 %, nächste Welle W7 M2b-DEP), Gates in §0, §10 (AP-36 `fertig`, M2b-DEP `bereit`), §16 und §18 wie oben. Keine Änderung an §2, §4, §5 | Lead-Auftrag Wellenabschluss M2b W6 | §0, §10, §12, §16, §18 | Planner (Pflege) |
 | 2026-10-25 | Pflegeauftrag Lead „Design übernehmen“ (Brief vom 2026-10-25, `freigegeben`, Commit 5e58bf2): PE-59 (Design übernommen) und PE-60 (Reihenfolge, angenommen). Neuer Meilenstein M2c mit AP-50 (Theme, Waffen-Geometrie, Hülle), AP-51 (Schriften, Icons, Assets), AP-52 (Menü), AP-53 (Runde), AP-54 (Waffe, Spielerin, Laser) und AP-55 (Lint-Regel, Restfunde) sowie M2c-DEP. W1: AP-50, AP-51; W2: AP-52 bis AP-54 mit Design-Review; W3: AP-55; W4: M2c-DEP. Abweichungen vom Brief-Vorschlag: reine Funktionen für die Waffe und die Bewegungseinstellung (`weaponMount.ts`, `motion.ts`) liegen in AP-50 (W1), damit AP-52 und AP-54 sie nutzen können (Regel „Verträge eine Welle vorher“); `ui-icons` wird in AP-51 neu belegt (kurzer Zwischenzustand mit falschen Symbolen in dev bis W2); `PreloadScene` gehört in W1 AP-51 (ohne Änderung würde `bitmapFont` als Audio geladen) und in W2 AP-52; Funk-Buttons des Ergebnisses kommen aus `scenes/hud/` (AP-53); `ItemPickup`/`ArmourPickup` (Blinken bei reduzierter Bewegung) und die Übergabe der Ausbaustufe in `GameScene` gehören AP-54. AP-16 hängt jetzt von M2c-DEP ab, AP-17–AP-20 bekommen Design-Hinweise (AP-20 Design-Review). Neu: Q-31 (Timer-Text „BOSS!“), H-11 bis H-13, RI-17, K9, §17-Zeilen, Vorschläge zu Backlog (Tastatur-Navigation), Sprites und Tokenquelle. M2b-DEP-Checkliste bleibt, mit Hinweis „Funktion und Passform“. Keine Änderung an §2, §4, §5, keine neuen Abhängigkeiten | Lead-Auftrag Design übernehmen | §0, §8, §9, §10, §11, §12, §13, §14, §15, §16, §17, AP-16–AP-20, AP-50–AP-55 | Planner (Pflege) |
+| 2026-10-25 | Pflegeauftrag Lead „Pflege nach Handtest M2b-DEP“: M2b-DEP abgenommen (PC und iPhone) und `fertig`. H-11 bestätigt (PE-60 nicht mehr angenommen, Reihenfolge M2b-DEP, M2c, M3), Q-31 geklärt („BOSS!“, AP-20 und Lagebericht angepasst, Annahmemarker entfernt). Neu PE-61 (fünf Befunde) und Q-32 (Stick-Größe: Befund 10 % kleiner gegen Design-Token 88 px). (a) Stick und (b) grauer Kasten als Akzeptanzkriterien in AP-53; **Entscheidung gegen ein Vorab-Fix-Paket:** `VirtualStick.ts`, `HudScene.ts` und `hud/*` werden in M2c W2 ohnehin vollständig neu gebaut (AP-53), ein Vorab-Fix würde dieselben Dateien zweimal ändern und in der alten Optik gleich wieder verworfen, das Design gibt für den Stick sogar eine eigene Größe vor; der Kasten ist das Rechteck `ROW_PANEL_W` in `HudScene.ts`, Ursache bekannt; Wartezeit bis W2 ist kurz, weil W1 und W2 direkt hintereinander laufen. (c) bis (e) als AP-56 (M2b-Nachtrag, W8, vor M2c W1, sonnet, M): Ursache (d) Anfangs-Cooldown gleich dem ersten Intervall und Ring-Radius 391 px, Ursache (e) Baum-HP 30 gegen Salve aus drei Lasern mit Schaden-Upgrade, Ursache (c) Druck Level 0 nur 0,27. Eigentum `spawn.ts`, `levels.ts`, `enemies.ts`, `coins.ts` (nur `dropChance`), zugehörige Tests und `docs/balancing.md`, keine Überschneidung mit AP-50/AP-51. Hinweis: Der Draft „Verbesserungsplan Wellenkonzept“ (AP-40 ff., nicht freigegeben, §16) nennt `spawn.ts` und `levels.ts` als Eigentum; AP-56 liegt davor, ein späteres AP-40 baut auf der Eröffnungswelle auf (Kollision beim Zusammenführen prüfen). Keine Änderung an §2, §4, §5 | Lead-Auftrag Pflege nach Handtest M2b-DEP, Nachricht Lead (H-11, Q-31) | §0, §8, §9, §10, §11, §12 (AP-20, AP-53, AP-56), §13, §16, §17 | Planner (Pflege) |
