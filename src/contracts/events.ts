@@ -1,5 +1,6 @@
 import type { ActiveArmour } from './armour';
 import type { BossId } from './boss';
+import type { PowerStoreState } from './powerStore';
 import type { ActivePowers } from './weapon';
 
 export const GameEvents = {
@@ -14,6 +15,7 @@ export const GameEvents = {
   BossSpawned: 'boss-spawned',
   BossHpChanged: 'boss-hp-changed',
   BossDefeated: 'boss-defeated',
+  PowerStoreChanged: 'power-store-changed',
 } as const;
 
 export type GameEventName = (typeof GameEvents)[keyof typeof GameEvents];
@@ -31,4 +33,5 @@ export interface GameEventPayloads {
   'boss-spawned': { bossId: BossId; hp: number; maxHp: number };
   'boss-hp-changed': { hp: number; maxHp: number };
   'boss-defeated': { bossId: BossId };
+  'power-store-changed': PowerStoreState;
 }

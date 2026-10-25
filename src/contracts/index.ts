@@ -11,3 +11,4 @@ export * from './assets';
 export * from './coin';
 export * from './upgrade';
 export * from './armour';
+export * from './powerStore';
