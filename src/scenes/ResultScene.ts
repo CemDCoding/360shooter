@@ -3,15 +3,18 @@ import { getLevel } from '../config/levels';
 import { themeColor, type ColorName } from '../config/theme';
 import type { BatchId } from '../contracts';
 import { getSoundService } from '../platform/audio';
+import { hudScale } from '../platform/layout';
 import { isValidLevelId, MAX_LEVEL_ID } from './debug';
 import type { ResultSceneData } from './GameScene';
 import { FunkButton } from './hud/FunkButton';
-import { FUNK_GLYPH_H, funkText } from './hud/FunkPanel';
+import { FUNK_GLYPH_H, funkScale, funkText } from './hud/FunkPanel';
 import { formatTime } from './hud/hudMath';
 import { BATCH_LABELS } from './menu/levelGroups';
 
 const SIDE = 32;
 const BAND_H = 6;
+/** Same cap as the HUD so labels stay readable on phones without overflowing. */
+const MAX_K = 1.4;
 const BUTTON_GAP = 12;
 const FACT_LABEL_X = SIDE;
 const FACT_VALUE_X = 182;
@@ -31,6 +34,7 @@ function nonNegative(value: unknown): number {
 /** Round result in the radio style: log head, big verdict, fact list, buttons bottom right. */
 export class ResultScene extends Phaser.Scene {
   private done = false;
+  private lab = 1;
 
   constructor() {
     super('ResultScene');
@@ -39,6 +43,7 @@ export class ResultScene extends Phaser.Scene {
   create(data: ResultSceneData): void {
     const { width, height } = this.scale;
     this.done = false;
+    this.lab = funkScale(1, Math.min(MAX_K, hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight)));
     const levelId = isValidLevelId(data?.levelId) ? data.levelId : 0;
     const level = getLevel(levelId);
     const won = data?.result === 'won';
@@ -57,10 +62,10 @@ export class ResultScene extends Phaser.Scene {
     const biome = batch ? BATCH_LABELS[batch] : '';
     const logParts = ['LOG', `LEVEL ${levelId}`];
     if (biome) logParts.push(biome);
-    funkText(this, SIDE, 20 + BAND_H, logParts.join(' · '), 1, 'hud.text-muted').setOrigin(0, 0);
+    funkText(this, SIDE, 20 + BAND_H, logParts.join(' · '), this.lab, 'hud.text-muted').setOrigin(0, 0);
     // The survived time is only known for a won round (the full level time).
     if (won && level) {
-      funkText(this, width - SIDE, 20 + BAND_H, `${formatTime(level.durationSec)} ÜBERLEBT`, 1, 'hud.text-muted').setOrigin(1, 0);
+      funkText(this, width - SIDE, 20 + BAND_H, `${formatTime(level.durationSec)} ÜBERLEBT`, this.lab, 'hud.text-muted').setOrigin(1, 0);
     }
 
     this.add.image(SIDE + 48, 96, 'astronaut', 0).setScale(3);
@@ -71,7 +76,7 @@ export class ResultScene extends Phaser.Scene {
       heroX,
       74 + FUNK_GLYPH_H * 2 + 18,
       won ? 'DER WALD IST WIEDER STILL.' : 'DIE ASTRONAUTIN ZIEHT SICH ZURÜCK.',
-      1,
+      this.lab,
       'hud.text-muted',
     ).setOrigin(0, 0.5);
 
@@ -95,7 +100,7 @@ export class ResultScene extends Phaser.Scene {
     const goldTotal = nonNegative(data?.goldTotal);
     const row = (i: number, label: string): number => {
       const y = FACT_TOP + i * FACT_STEP;
-      funkText(this, FACT_LABEL_X, y, label, 1, 'hud.text-muted').setOrigin(0, 0.5);
+      funkText(this, FACT_LABEL_X, y, label, this.lab, 'hud.text-muted').setOrigin(0, 0.5);
       return y;
     };
 
@@ -121,7 +126,7 @@ export class ResultScene extends Phaser.Scene {
         ? 'FORTSCHRITT KONNTE NICHT GESPEICHERT WERDEN.'
         : '';
     if (note) {
-      funkText(this, FACT_LABEL_X, FACT_TOP + 4 * FACT_STEP, note, 1, 'hud.danger').setOrigin(0, 0.5);
+      funkText(this, FACT_LABEL_X, FACT_TOP + 4 * FACT_STEP, note, this.lab, 'hud.danger').setOrigin(0, 0.5);
     }
   }
 

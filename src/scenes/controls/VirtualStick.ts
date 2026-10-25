@@ -1,12 +1,13 @@
 import Phaser from 'phaser';
 import { THEME, themeColor } from '../../config/theme';
+import { STICK_CATCH_DIAMETER } from '../hud/hudMath';
 import { stickAngleRad, stickVector } from '../../platform/stick';
 
 /** Layout/feel constants of the stick (arena units). Drawn size comes from the design tokens. */
 const BASE_DIAMETER = THEME.sizePx['size.stick'];
 const KNOB_DIAMETER = THEME.sizePx['size.stick-knob'];
 /** Catch area where a finger starts the stick: independent of the drawn size, at least 126 px. */
-export const CATCH_DIAMETER = 126;
+export const CATCH_DIAMETER = STICK_CATCH_DIAMETER;
 const EDGE_MARGIN = 24;
 const DEAD_ZONE_RATIO = 0.15;
 const DEPTH = 50;

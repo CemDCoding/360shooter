@@ -9,9 +9,14 @@ export const FUNK_GLYPH_H = 8;
 const FALLBACK_ADVANCE = 6;
 const CHAMFER = 4;
 
-/** Integer font scale for a base scale (1..4) and the HUD factor k (never below the base). */
+/**
+ * Integer font scale for a base scale (1..4) and the HUD factor k (never below the base).
+ * Base-1 labels carry state (ENERGIE!, rest time) and must stay readable: above k = 1 they
+ * get at least 2x and round up.
+ */
 export function funkScale(base: number, k: number): number {
-  const s = Math.round(base * (Number.isFinite(k) && k > 1 ? k : 1));
+  if (!Number.isFinite(k) || k <= 1) return base;
+  const s = base === 1 ? Math.max(2, Math.ceil(k)) : Math.round(base * k);
   return Math.min(8, Math.max(base, s));
 }
 

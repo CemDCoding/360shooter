@@ -89,3 +89,6 @@ export function layoutRow(widths: readonly (number | null)[], gap: number, start
     return left;
   });
 }
+
+/** Catch area diameter of the virtual stick in px (finger start zone, independent of the drawn size). */
+export const STICK_CATCH_DIAMETER = 126;
