@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ENEMIES, WEAPON_BASE } from '../../src/config';
+import { CONTACT_DESPAWN_DAMAGE, ENEMIES, PLAYER, WEAPON_BASE } from '../../src/config';
 
 describe('enemies', () => {
   it.each(Object.values(ENEMIES))('$id has positive values', (e) => {
@@ -22,6 +22,16 @@ describe('enemies', () => {
     const salvo = 3 * (WEAPON_BASE.damage * 1.5); // Doppelschuss Stufe 2, Schaden-Upgrade Stufe 5
     expect(salvo).toBeLessThan(hp);
     expect(Math.ceil(hp / WEAPON_BASE.damage)).toBe(5);
+  });
+
+  it('only the cursed tree despawns after contact damage (AP-60)', () => {
+    const limit = CONTACT_DESPAWN_DAMAGE.cursedTree;
+    expect(Number.isFinite(limit)).toBe(true);
+    expect(limit).toBeGreaterThan(0);
+    expect(limit).toBeLessThanOrEqual(PLAYER.maxHp / 2);
+    expect(CONTACT_DESPAWN_DAMAGE.forestWitch).toBeUndefined();
+    expect(CONTACT_DESPAWN_DAMAGE.zombieSquirrel).toBeUndefined();
+    expect(CONTACT_DESPAWN_DAMAGE.forestSpirit).toBeUndefined();
   });
 
   it('zombie squirrel is slowed down (AP-23)', () => {

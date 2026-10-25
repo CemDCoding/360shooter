@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { animKey } from '../../config/assets';
 import { THEME } from '../../config/theme';
-import { ENEMIES } from '../../config/enemies';
+import { CONTACT_DESPAWN_DAMAGE, ENEMIES } from '../../config/enemies';
+import { addContact, isContactSpent } from '../../logic/contactBudget';
 import type { EnemyDef, EnemyId } from '../../contracts';
 import { distance } from '../../logic/geometry';
 import { applyDamage, auraDamage, isDead } from '../../logic/health';
@@ -24,6 +25,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected readonly center: { x: number; y: number };
   private readonly ctx: EnemyContext;
   private flashLeftMs = 0;
+  private contactDealt = 0;
+  private contactSpent = false;
   private auraGfx?: Phaser.GameObjects.Arc;
 
   constructor(scene: Phaser.Scene, id: EnemyId, ctx: EnemyContext = {}) {
@@ -48,6 +51,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   spawn(x: number, y: number): void {
     this.hp = this.def.hp;
     this.flashLeftMs = 0;
+    this.contactDealt = 0;
+    this.contactSpent = false;
     this.clearTint();
     this.enableBody(true, x, y, true, true);
     this.setActive(true).setVisible(true);
@@ -83,7 +88,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   /** Contact damage for dtMs of ongoing contact with the player (config value is per second). */
   contactDamageFor(dtMs: number): number {
-    return auraDamage(this.def.contactDamage, dtMs);
+    const dmg = auraDamage(this.def.contactDamage, dtMs);
+    this.contactDealt = addContact(this.contactDealt, dmg);
+    if (isContactSpent(this.contactDealt, CONTACT_DESPAWN_DAMAGE[this.def.id])) {
+      this.contactSpent = true;
+    }
+    return dmg;
   }
 
   /** Aura damage dealt to a target at (tx, ty) during dtMs; 0 if no aura or out of range. */
@@ -96,6 +106,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   update(_time: number, delta: number): void {
     if (!this.active) return;
+    if (this.contactSpent) {
+      // No onDeath: no coin, item, xp or kill count (AP-60). Runs here, not in the physics callback.
+      this.despawn();
+      return;
+    }
     if (this.flashLeftMs > 0) {
       this.flashLeftMs -= delta;
       if (this.flashLeftMs <= 0) this.clearTint();
