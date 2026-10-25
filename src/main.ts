@@ -5,7 +5,7 @@ import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
 import { HudScene } from './scenes/HudScene';
 import { ResultScene } from './scenes/ResultScene';
-import { fitArena } from './platform/layout';
+import { fitArena, visibleArea } from './platform/layout';
 import { THEME } from './config/theme';
 
 const ARENA_W = 640;
@@ -24,11 +24,13 @@ function layoutArena(): void {
     bottom: px(cs.paddingBottom),
     left: px(cs.paddingLeft),
   };
-  const f = fitArena(probe.clientWidth, probe.clientHeight, insets, ARENA_W, ARENA_H);
+  // visualViewport is the truth on iOS (toolbar, rotation); 100dvh alone can be stale.
+  const area = visibleArea(probe.clientWidth, probe.clientHeight, insets, window.visualViewport);
+  const f = fitArena(area.width, area.height, area.insets, ARENA_W, ARENA_H);
   host.style.right = 'auto';
   host.style.bottom = 'auto';
-  host.style.left = `${f.offsetX}px`;
-  host.style.top = `${f.offsetY}px`;
+  host.style.left = `${area.x + f.offsetX}px`;
+  host.style.top = `${area.y + f.offsetY}px`;
   host.style.width = `${Math.floor(f.width)}px`;
   host.style.height = `${Math.floor(f.height)}px`;
 }
@@ -58,4 +60,10 @@ const relayout = (): void => {
   game.scale.refresh();
 };
 window.addEventListener('resize', relayout);
-window.addEventListener('orientationchange', () => setTimeout(relayout, 200));
+window.addEventListener('orientationchange', () => {
+  setTimeout(relayout, 200);
+  setTimeout(relayout, 600);
+});
+// One registration each: iOS toolbar changes and pinch/scroll offsets only fire on visualViewport.
+window.visualViewport?.addEventListener('resize', relayout);
+window.visualViewport?.addEventListener('scroll', relayout);

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { BASE_HUD_FONT, fitArena, hudScale, MIN_HUD_FONT_CSS } from '../../src/platform/layout';
+import {
+  BASE_HUD_FONT,
+  fitArena,
+  hudScale,
+  MIN_HUD_FONT_CSS,
+  visibleArea,
+} from '../../src/platform/layout';
 
 const none = { top: 0, right: 0, bottom: 0, left: 0 };
 
@@ -43,5 +49,77 @@ describe('hudScale', () => {
   it('never below 1 and finite', () => {
     expect(hudScale(0)).toBeGreaterThanOrEqual(1);
     expect(Number.isFinite(hudScale(NaN))).toBe(true);
+  });
+});
+
+describe('visibleArea + fitArena on iPhone landscape sizes', () => {
+  const phones: [number, number, number][] = [
+    [844, 390, 47],
+    [932, 430, 59],
+    [667, 375, 0],
+  ];
+  for (const [w, h, notch] of phones) {
+    for (const visH of [h, h - 50]) {
+      it(`${w}x${h} notch ${notch}, visible height ${visH}: arena inside safe area, centred`, () => {
+        const probeInsets = { top: 0, right: notch, bottom: notch ? 21 : 0, left: notch };
+        const vv = { width: w, height: visH, offsetLeft: 0, offsetTop: 0 };
+        const a = visibleArea(w, h, probeInsets, vv);
+        const f = fitArena(a.width, a.height, a.insets, 640, 360);
+        const left = a.x + f.offsetX;
+        const top = a.y + f.offsetY;
+        const areaL = a.x + a.insets.left;
+        const areaR = a.x + a.width - a.insets.right;
+        const areaT = a.y + a.insets.top;
+        const areaB = a.y + a.height - a.insets.bottom;
+        expect(left).toBeGreaterThanOrEqual(areaL - 1e-6);
+        expect(left + f.width).toBeLessThanOrEqual(areaR + 1e-6);
+        expect(top).toBeGreaterThanOrEqual(areaT - 1e-6);
+        expect(top + f.height).toBeLessThanOrEqual(areaB + 1e-6);
+        expect(Math.abs(left + f.width / 2 - (areaL + areaR) / 2)).toBeLessThanOrEqual(1);
+        expect(Math.abs(top + f.height / 2 - (areaT + areaB) / 2)).toBeLessThanOrEqual(1);
+        expect(top + f.height).toBeLessThanOrEqual(visH + 1e-6);
+      });
+    }
+  }
+  it('without visualViewport the probe size is used unchanged', () => {
+    const ins = { top: 0, right: 47, bottom: 21, left: 47 };
+    expect(visibleArea(844, 390, ins, null)).toEqual({
+      x: 0,
+      y: 0,
+      width: 844,
+      height: 390,
+      insets: ins,
+    });
+  });
+  it('a hidden home bar inset is dropped when the toolbar covers the bottom', () => {
+    const a = visibleArea(
+      844,
+      390,
+      { top: 0, right: 0, bottom: 21, left: 0 },
+      { width: 844, height: 340, offsetLeft: 0, offsetTop: 0 },
+    );
+    expect(a.insets.bottom).toBe(0);
+    expect(a.height).toBe(340);
+  });
+  it('portrait and degenerate input do not crash', () => {
+    const a = visibleArea(
+      390,
+      844,
+      { top: 47, right: 0, bottom: 34, left: 0 },
+      { width: NaN, height: 0, offsetLeft: -5, offsetTop: NaN },
+    );
+    expect(a.width).toBe(390);
+    expect(fitArena(a.width, a.height, a.insets, 640, 360).scale).toBeGreaterThan(0);
+  });
+  it('desktop stays identical to the plain fit', () => {
+    for (const [w, h] of [
+      [1280, 720],
+      [1920, 1080],
+    ]) {
+      const a = visibleArea(w, h, none, { width: w, height: h, offsetLeft: 0, offsetTop: 0 });
+      expect(fitArena(a.width, a.height, a.insets, 640, 360)).toEqual(
+        fitArena(w, h, none, 640, 360),
+      );
+    }
   });
 });
