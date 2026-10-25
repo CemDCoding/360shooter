@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="512" height="512" shape-rendering="crispEdges" role="img" aria-label="360shooter App-Icon: Helm der Astronautin">
+  <!-- Template for public/icons/icon-180/192/512.png. Own work. Colours from tokens.json (menu.bg, sprite.*). -->
+  <rect width="16" height="16" fill="#1a0f24"/>
+  <rect x="0" y="12" width="16" height="4" fill="#2d1a3d"/>
+  <rect x="1" y="1" width="1" height="1" fill="#ffa0ae" opacity=".6"/>
+  <rect x="14" y="2" width="1" height="1" fill="#fff4e8" opacity=".6"/>
+  <g transform="translate(0 2)">
+    <!-- outline -->
+    <rect x="5" y="0" width="6" height="1" fill="#0b0610"/>
+    <rect x="3" y="1" width="10" height="1" fill="#0b0610"/>
+    <rect x="2" y="2" width="12" height="1" fill="#0b0610"/>
+    <rect x="1" y="3" width="14" height="6" fill="#0b0610"/>
+    <rect x="2" y="9" width="12" height="1" fill="#0b0610"/>
+    <rect x="3" y="10" width="10" height="1" fill="#0b0610"/>
+    <!-- suit -->
+    <rect x="5" y="1" width="6" height="1" fill="#fff4e8"/>
+    <rect x="3" y="2" width="10" height="1" fill="#fff4e8"/>
+    <rect x="2" y="3" width="12" height="6" fill="#fff4e8"/>
+    <rect x="3" y="9" width="10" height="1" fill="#fff4e8"/>
+    <!-- visor -->
+    <rect x="4" y="3" width="8" height="1" fill="#2a1640"/>
+    <rect x="3" y="4" width="10" height="4" fill="#2a1640"/>
+    <rect x="4" y="8" width="8" height="1" fill="#2a1640"/>
+    <rect x="4" y="4" width="1" height="1" fill="#ffa0ae"/>
+    <!-- eyes and cheeks -->
+    <rect x="5" y="5" width="1" height="2" fill="#5fe0c0"/>
+    <rect x="10" y="5" width="1" height="2" fill="#5fe0c0"/>
+    <rect x="4" y="7" width="1" height="1" fill="#ffa0ae"/>
+    <rect x="11" y="7" width="1" height="1" fill="#ffa0ae"/>
+    <!-- collar -->
+    <rect x="6" y="10" width="4" height="1" fill="#ff6b8a"/>
+  </g>
+</svg>
