@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hauptmenü · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .k-panel.col { display: flex; flex-direction: column; }
+  .legend { margin-top: auto; display: flex; gap: 14px; align-items: center; }
+  .legend .row { gap: 4px; }
+  .group { margin-bottom: 10px; }
+  .group-head { height: 14px; margin-bottom: 13px; display: flex; gap: 6px; align-items: center; }
+  .up { position: absolute; left: 64px; top: 28px; width: 512px; height: 304px; padding: 14px 16px; }
+  .uprow { display: grid; grid-template-columns: 120px 72px 40px 1fr; align-items: center; gap: 8px; padding: 5px 8px; margin-top: 6px; }
+  .dlg { position: absolute; left: 140px; top: 106px; width: 360px; padding: 16px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Hauptmenü · Kassette</h1>
+  <p>MenuScene, LevelGrid, UpgradePanel und ConfirmDialog. Schrift Astro Kapsel. Echte Spielstände: Spielerlevel 7, 86 Gold, Level 0–6 geschafft. Die Positionen sind logische Pixel der Spielfläche 640×360.</p>
+</header>
+
+<section><h2>1 · STANDARD (Level 7 aktuell)</h2><div class="stage-wrap"><div class="stage" id="s1" data-component="MenuScene" data-font="kapsel"></div></div></section>
+<section><h2>2 · UPGRADE-PANEL OFFEN (UpgradePanel)</h2><div class="stage-wrap"><div class="stage" id="s2" data-component="MenuScene" data-font="kapsel"></div></div></section>
+<section><h2>3 · FORTSCHRITT ZURÜCKSETZEN (ConfirmDialog, Fokus auf „Abbrechen“)</h2><div class="stage-wrap"><div class="stage" id="s3" data-component="MenuScene" data-font="kapsel"></div></div></section>
+<section><h2>4 · ERSTSTART (leerer Spielstand)</h2><div class="stage-wrap"><div class="stage" id="s4" data-component="MenuScene" data-font="kapsel"></div></div></section>
+
+<script>
+  const P = (t, s, c, extra) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"${extra || ''}></span>`;
+  const lockSpr = '<span class="spr" data-n="lock" data-s="2" style="--px-o:var(--color-menu-locked-fg);--px-k:var(--color-menu-locked-bg)"></span>';
+  function tile(i, st) {
+    if (st.done.includes(i)) return `<div class="k-tile done" aria-label="Level ${i} geschafft">${P(i, 2, '--color-menu-done-fg')}<span class="badge spr" data-n="star"></span></div>`;
+    if (i === st.current) return `<div class="k-tile current" aria-current="true" aria-label="Level ${i}, aktuell">${P(i, 2, '--color-menu-action-fg')}</div>`;
+    return `<div class="k-tile locked" aria-label="Level ${i} gesperrt">${lockSpr}</div>`;
+  }
+  function group(name, from, to, biome, st) {
+    let tiles = '';
+    for (let i = from; i <= to; i++) tiles += tile(i, st);
+    return `<div class="group"><div class="group-head"><span class="k-sticker"><i class="k-swatch" style="background:var(--color-biome-${biome})"></i>${P(name, 0, '--color-menu-sticker-fg')}</span>${P(from + '–' + to, 0, '--color-menu-text-muted')}</div><div class="tiles">${tiles}</div></div>`;
+  }
+  function menu(id, st) {
+    const el = document.getElementById(id);
+    el.innerHTML = `
+      <div class="k-scene"></div><div class="k-stars"></div><div class="k-planet"></div>
+      <span class="abs row" style="left:16px;top:14px;gap:6px">${P('360', 3, '--color-menu-action-bg', ' data-sh="--color-menu-outline"')}${P('SHOOTER', 3, '--color-menu-text', ' data-sh="--color-menu-outline"')}</span>
+      <div class="abs k-btn icon" style="left:592px;top:10px" data-component="MuteButton" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text);--px-k:var(--color-menu-surface)"></span></div>
+      <div class="abs m-profile k-panel col" data-component="PlayerCard">
+        <div class="row" style="gap:10px">
+          <div class="portrait k-sunken"><span class="spr" data-n="astronaut" data-s="3" aria-label="Astronautin"></span></div>
+          <div>${P('SPIELERLEVEL', 0, '--color-menu-text-muted')}<div style="margin-top:8px">${P(st.level, 4, '--color-menu-text', ' data-sh="--color-menu-outline"')}</div></div>
+        </div>
+        <div class="k-bar" style="margin-top:10px" role="img" aria-label="Erfahrung ${st.xp} von ${st.xpNext}"><i style="width:${Math.round(100 * st.xp / st.xpNext)}%"></i></div>
+        <div class="row" style="justify-content:space-between;margin-top:6px">${P('XP', 0, '--color-menu-text-muted')}${P(st.xp + ' / ' + st.xpNext, 0, '--color-menu-text-muted')}</div>
+        <hr class="k-rule" style="margin:10px 0 8px">
+        <div class="row" style="gap:6px"><span class="spr" data-n="coin" data-s="2"></span>${P(st.gold, 2, '--color-menu-gold', ' data-sh="--color-menu-outline"')}${P('GOLD', 0, '--color-menu-text-muted')}</div>
+        <div class="row" style="justify-content:space-between;margin-top:10px"><span class="row" style="gap:5px"><span class="spr" data-n="raygun${st.tier}" aria-label="Strahlenpistole Ausbau ${st.tier}"></span>${P('WAFFE', 0, '--color-menu-text-muted')}</span>${P(st.weapon + ' / 20', 0, '--color-menu-text')}</div>
+        <div class="row" style="justify-content:space-between;margin-top:6px">${P('ANZUG', 0, '--color-menu-text-muted')}${P(st.suit + ' / 20', 0, '--color-menu-text')}</div>
+        <div class="k-btn primary" style="margin-top:auto" data-component="Button" role="button">${P('UPGRADES', 2, '--color-menu-action-fg')}</div>
+      </div>
+      <div class="abs m-levels k-panel col" style="padding-top:14px" data-component="LevelGrid">
+        ${group('WALD', 0, 4, 'forest', st)}${group('WALD BEI NACHT', 5, 9, 'night', st)}${group('ELFENWALD', 10, 20, 'elf', st)}
+        <div class="legend">
+          <span class="row"><span class="spr" data-n="star"></span>${P('GESCHAFFT', 0, '--color-menu-text-muted')}</span>
+          <span class="row"><i class="k-swatch" style="background:var(--color-menu-action-bg);outline-color:var(--color-menu-focus)"></i>${P('AKTUELL', 0, '--color-menu-text-muted')}</span>
+          <span class="row"><span class="spr" data-n="lock" style="--px-o:var(--color-menu-text-muted);--px-k:var(--color-menu-locked-bg)"></span>${P('GESPERRT', 0, '--color-menu-text-muted')}</span>
+        </div>
+      </div>
+      <div class="abs m-reset k-btn danger" data-component="Button" role="button">${P('FORTSCHRITT ZURÜCKSETZEN', 0, '--color-menu-danger-fg')}</div>
+      <span class="abs" style="right:16px;top:328px">${P(st.hint, 0, st.hintColor || '--color-menu-text-muted')}</span>`;
+    return el;
+  }
+  function pips(n) { let s = ''; for (let i = 0; i < 10; i++) s += `<i class="${i < n ? 'on' : ''}"></i>`; return `<span class="k-pips">${s}</span>`; }
+  function uprow(name, lvl, price, state) {
+    let btn;
+    if (state === 'max') btn = `<div class="k-btn done is-disabled" style="height:24px;--b:var(--color-menu-done-bg)">${P('MAX', 0, '--color-menu-done-fg')}</div>`;
+    else if (state === 'poor') btn = `<div class="k-btn is-disabled" style="height:24px" aria-disabled="true"><span class="spr" data-n="coin" style="opacity:.6"></span>${P(price + ' · ZU TEUER', 0, '--color-menu-text-disabled')}</div>`;
+    else btn = `<div class="k-btn primary" style="height:24px" role="button"><span class="spr" data-n="coin"></span>${P('KAUFEN ' + price, 0, '--color-menu-action-fg')}</div>`;
+    return `<div class="k-sunken uprow">${P(name, 0, '--color-menu-text')}${pips(lvl)}${P(lvl + '/10', 0, '--color-menu-text-muted')}${btn}</div>`;
+  }
+
+  const std = { level: 7, xp: 640, xpNext: 900, gold: 86, weapon: 5, suit: 17, tier: 1, done: [0, 1, 2, 3, 4, 5, 6], current: 7, hint: 'TIPPE AUF EIN FREIES LEVEL.' };
+  menu('s1', std);
+
+  menu('s2', std).insertAdjacentHTML('beforeend', `
+    <div class="k-scrim"></div>
+    <div class="k-panel up" data-component="UpgradePanel">
+      <div class="row" style="justify-content:space-between">${P('UPGRADES', 3, '--color-menu-text', ' data-sh="--color-menu-outline"')}<span class="row" style="gap:6px"><span class="spr" data-n="coin" data-s="2"></span>${P('86', 2, '--color-menu-gold', ' data-sh="--color-menu-outline"')}</span></div>
+      <div class="row" style="justify-content:space-between;margin-top:12px">
+        <span class="k-sticker">${P('WAFFE', 0, '--color-menu-sticker-fg')}</span>
+        <span class="row" style="gap:6px">${P('AUSBAU 2 AB STUFE 7', 0, '--color-menu-text-muted')}<span class="spr" data-n="raygun1" data-s="2"></span>${P('>', 0, '--color-menu-text-muted')}<span class="spr" data-n="raygun2" data-s="2" style="opacity:.55"></span></span>
+      </div>
+      ${uprow('FEUERRATE', 3, 27, 'buy')}${uprow('SCHADEN', 2, 20, 'buy')}
+      <div class="row" style="margin-top:12px"><span class="k-sticker">${P('ANZUG', 0, '--color-menu-sticker-fg')}</span></div>
+      ${uprow('LEBENSPUNKTE', 10, 0, 'max')}${uprow('DREHGESCHW.', 7, 105, 'poor')}
+      <div class="row" style="justify-content:center;margin-top:14px"><div class="k-btn" role="button">${P('SCHLIESSEN', 2, '--color-menu-text')}</div></div>
+    </div>`);
+
+  menu('s3', std).insertAdjacentHTML('beforeend', `
+    <div class="k-scrim"></div>
+    <div class="k-panel dlg" role="dialog" aria-modal="true" data-component="ConfirmDialog">
+      ${P('WIRKLICH LÖSCHEN?', 2, '--color-menu-text')}
+      ${P('AUCH GOLD UND UPGRADES WERDEN GELÖSCHT.', 0, '--color-menu-text-muted')}
+      <div class="row" style="gap:16px;margin-top:6px"><div class="k-btn danger" role="button">${P('JA, LÖSCHEN', 2, '--color-menu-danger-fg')}</div><div class="k-btn is-focus" role="button">${P('ABBRECHEN', 2, '--color-menu-text')}</div></div>
+    </div>`);
+
+  menu('s4', { level: 0, xp: 0, xpNext: 100, gold: 0, weapon: 0, suit: 0, tier: 1, done: [], current: 0, hint: 'WILLKOMMEN! STARTE MIT LEVEL 0.', hintColor: '--color-menu-text' });
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>

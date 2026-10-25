@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runde und HUD · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .h-energy { width: 160px; height: 44px; }
+  .h-timer { display: grid; place-items: center; }
+  .h-row { top: 58px; gap: 4px; }
+  .w-laser.r0 { transform: rotate(0deg); } .w-laser.r23 { transform: rotate(23deg); } .w-laser.r30 { transform: rotate(30deg); }
+  .night-trees { --px-f: #3d5f9a; --px-F: #2a4578; --px-t: #5a4a72; --px-d: #1a1230; }
+  .elf-trees { --px-f: #8a6bd0; --px-F: #6a4fb0; --px-t: #4a3a6a; --px-d: #1e1236; }
+  .enemy { --px-o: #070a14; }
+  .boss { --px-G: #9a92b0; --px-e: #ff4a8a; --px-m: #2a2140; --px-o: #0b0610; }
+  .boss-bar { left: 220px; top: 334px; width: 200px; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Runde · Funkgerät</h1>
+  <p>GameScene und HudScene, Schrift Astro Funk. Das HUD liegt auf dunklem Glas mit Phosphorlinien und bleibt in jedem Biom gleich. Die Astronautin steht aufrecht in der Mitte, die Strahlenpistole kreist an ihrer Hand und zeigt die Ausbaustufe.</p>
+</header>
+
+<section><h2>1 · WALD, LEVEL 2 · Start der Runde, Energie voll, Ziel rechts, Ausbau 1</h2><div class="stage-wrap"><div class="stage" id="r1" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>2 · WALD BEI NACHT, LEVEL 7 · Kräfte aktiv (Doppelschuss, Schild, Dauerfeuer, Feuerring), Stick aktiv, Ziel oben links (gespiegelt)</h2><div class="stage-wrap"><div class="stage" id="r2" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>3 · ELFENWALD, LEVEL 16 · Boss-Nachspielzeit, Energie niedrig, Ausbau 3</h2><div class="stage-wrap"><div class="stage" id="r3" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>4 · PAUSE (über Level 7)</h2><div class="stage-wrap"><div class="stage" id="r4" data-component="GameScene" data-font="funk"></div></div></section>
+
+<script>
+  const P = (t, s, c) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"></span>`;
+  const S = (n, x, y, s, cls, style) => `<span class="abs spr ${cls || ''}" data-n="${n}" data-s="${s || 2}" style="left:${x}px;top:${y}px;${style || ''}"></span>`;
+  function segs(v, low) { let h = ''; for (let i = 0; i < 10; i++) { const f = v / 10 - i; h += `<i class="${f >= 1 ? '' : f > 0 ? 'half' : 'off'}"></i>`; } return h; }
+  function rig(tier, angle, flip) {
+    const gx = flip ? 302 : 324;
+    const tr = flip ? `rotate(${angle}deg) scaleY(-1)` : `rotate(${angle}deg)`;
+    const gun = `<span class="gun spr" data-n="raygun${tier}" data-s="2" style="left:${gx - 304}px;top:13px;transform:${tr}"></span>`;
+    const body = '<span class="body spr" data-n="astronaut" data-s="2" aria-label="Astronautin"></span>';
+    const behind = angle < -20 && angle > -160;
+    return `<div class="w-rig ${flip ? 'flip' : ''}" style="left:304px;top:164px" data-component="Player">${behind ? gun + body : body + gun}</div>`;
+  }
+  function hud(st) {
+    const low = st.energy <= 25;
+    const chips = (st.chips || []).map((c) => c).join('');
+    return `
+      <div class="abs f-glass f-energy h-energy ${low ? 'low' : ''}" data-component="HudScene.energy" role="img" aria-label="Energie ${st.energy} von 100">
+        ${P(st.energy, 3, low ? '--color-hud-energy-low' : '--color-hud-text')}
+        <div>${P(low ? 'ENERGIE!' : 'ENERGIE', 0, low ? '--color-hud-energy-low' : '--color-hud-text-muted')}<div class="f-segs">${segs(st.energy)}</div></div>
+      </div>
+      <div class="abs f-glass h-timer" style="${st.timerWarn ? 'border-color:var(--color-hud-danger)' : ''}" data-component="HudScene.timer">${P(st.timer, 3, st.timerWarn ? '--color-hud-danger' : '--color-hud-text')}</div>
+      <div class="abs f-btn icon" style="left:560px;top:8px" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs f-btn icon" style="left:600px;top:8px" aria-label="Pause"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs h-row" data-component="PowerIndicators">
+        <div class="f-glass f-chip" data-component="CoinCounter"><span class="spr" data-n="coin" data-s="2"></span>${P('+' + st.coins, 2, '--color-hud-gold')}</div>${chips}
+      </div>
+      ${st.stick ? `<div class="f-stick ${st.stick === 'active' ? 'is-active' : ''}" style="left:536px;top:256px" data-component="VirtualStick"><i></i></div>` : ''}`;
+  }
+  const chip = {
+    double: (v) => `<div class="f-glass f-chip" aria-label="Doppelschuss ${v}"><span class="spr" data-n="double" data-s="2" style="--px-L:var(--color-hud-accent);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`,
+    shield: (v) => `<div class="f-glass f-chip" aria-label="Schild ${v}"><span class="spr" data-n="shield" data-s="2" style="--px-B:var(--color-game-shield-ring);--px-b:var(--color-hud-text);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`,
+    rapid: (v) => `<div class="f-glass f-chip" aria-label="Dauerfeuer ${v}"><span class="spr" data-n="rapid" data-s="2" style="--px-Y:var(--color-hud-accent);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`,
+    ringOn: (v) => `<div class="f-glass f-chip active" aria-label="Feuerring aktiv ${v}"><span class="spr" data-n="ring" data-s="2" style="--px-F:var(--color-game-fire-ring);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`,
+    ringCool: (v) => `<div class="f-glass dim f-chip" aria-label="Feuerring lädt ${v}"><span class="spr" data-n="ring" data-s="2" style="--px-F:var(--color-hud-line);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text-muted')}</div>`,
+  };
+  const ff = (cls, pts) => pts.map(([x, y]) => `<i class="${cls}" style="left:${x}px;top:${y}px"></i>`).join('');
+
+  // 1 · forest
+  document.getElementById('r1').innerHTML = `
+    <div class="w-ground forest"></div>
+    ${S('tree', 520, 150, 2, 'enemy')}${S('tree', 560, 70, 2, 'enemy')}${S('tree', 80, 270, 2, 'enemy')}${S('tree', 150, 40, 2, 'enemy')}
+    ${S('coin', 470, 120, 1)}
+    <i class="w-laser r0" style="left:360px;top:183px"></i><i class="w-laser r0" style="left:400px;top:183px"></i><i class="w-laser r0" style="left:440px;top:183px"></i>
+    ${rig(1, 0, false)}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 100, timer: '2:31', coins: 4, stick: 'idle' })}`;
+
+  // 2 · night
+  document.getElementById('r2').innerHTML = `
+    <div class="w-ground night"></div>
+    ${ff('w-ff', [[60, 150], [180, 300], [430, 160], [590, 120], [350, 320], [250, 60], [500, 330], [30, 310]])}
+    <div class="w-ring fire" aria-hidden="true"></div>
+    <div class="night-trees">${S('tree', 104, 96, 2, 'enemy')}${S('tree', 470, 250, 2, 'enemy')}${S('tree', 500, 110, 2, 'enemy')}</div>
+    ${S('squirrel', 200, 262, 2, 'enemy')}${S('squirrel', 300, 100, 2, 'enemy')}${S('witch', 70, 214, 2, 'enemy')}${S('bolt', 140, 214, 2, 'enemy')}
+    ${S('coin', 262, 122, 1)}${S('shield', 382, 230, 1)}
+    <div class="w-ring shield" aria-hidden="true"></div>
+    <i class="w-laser r23" style="left:272px;top:173px"></i><i class="w-laser r23" style="left:235px;top:158px"></i><i class="w-laser r23" style="left:198px;top:142px"></i>
+    <i class="w-laser r23" style="left:262px;top:184px"></i><i class="w-laser r23" style="left:225px;top:169px"></i>
+    ${rig(1, -157, true)}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 87, timer: '1:42', coins: 23, stick: 'active', chips: [chip.double('1/2'), chip.shield('2/3'), chip.rapid('4s'), chip.ringOn('5s')] })}`;
+
+  // 3 · elf forest, boss overtime
+  document.getElementById('r3').innerHTML = `
+    <div class="w-ground elf"></div>
+    ${ff('w-spore', [[40, 120], [120, 300], [260, 40], [380, 300], [560, 80], [600, 300], [200, 200], [470, 60], [90, 60], [330, 250]])}
+    <div class="elf-trees">${S('tree', 90, 120, 2, 'enemy')}${S('tree', 220, 280, 2, 'enemy')}</div>
+    ${S('spirit', 170, 200, 2, 'enemy')}${S('spirit', 380, 110, 2, 'enemy')}${S('squirrel', 560, 160, 2, 'enemy')}
+    ${S('spirit', 430, 230, 6, 'boss', '')}
+    <i class="w-laser r30" style="left:366px;top:207px"></i><i class="w-laser r30" style="left:400px;top:227px"></i>
+    ${rig(3, 30, false)}
+    <div class="w-vignette"></div>
+    <div class="abs boss-bar" data-component="BossBar">
+      <div class="row" style="justify-content:space-between;margin-bottom:3px">${P('RIESEN-STEIN', 0, '--color-hud-text')}${P('BOSS', 0, '--color-hud-danger')}</div>
+      <div class="f-glass" style="height:8px;position:relative;border-color:var(--color-hud-danger)"><i style="position:absolute;left:1px;top:1px;bottom:1px;width:38%;background:var(--color-hud-danger);display:block"></i></div>
+    </div>
+    ${hud({ energy: 18, timer: 'BOSS!', timerWarn: true, coins: 41, stick: 'idle', chips: [chip.double('2/2'), chip.ringCool('12s')] })}`;
+
+  // 4 · pause
+  document.getElementById('r4').innerHTML = document.getElementById('r2').innerHTML + `
+    <div class="f-scrim"></div><div class="f-scan"></div>
+    <div class="abs" style="left:0;right:0;top:118px;display:flex;flex-direction:column;align-items:center;gap:14px" data-component="HudScene.pause">
+      ${P('— PAUSE —', 4, '--color-hud-text')}
+      ${P('LEVEL 7 · WALD BEI NACHT · 1:42 ÜBRIG', 0, '--color-hud-text-muted')}
+      ${P('TIPPEN, ESC ODER P ZUM WEITERSPIELEN', 0, '--color-hud-accent')}
+    </div>`;
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>

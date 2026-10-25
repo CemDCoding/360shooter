@@ -314,7 +314,7 @@
   }
   function drawFontText(el, font) {
     const raw = el.dataset.t || '';
-    const t = raw.toUpperCase();
+    const t = [...raw].map((ch) => (font.g[ch] ? ch : ch.toUpperCase())).join('');
     const s = +el.dataset.s || 1;
     const sh = el.dataset.sh;
     const glyph = (ch) => {

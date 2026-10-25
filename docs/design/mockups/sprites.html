@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprite-Styleguide · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .sg { max-width: 1280px; margin: 0 auto 32px; }
+  .sg h2 { font-size: 1rem; color: var(--page-fg); margin-bottom: 6px; }
+  .sg p, .sg li { color: var(--page-muted); font-size: .875rem; max-width: 90ch; }
+  .sg ul { margin: 6px 0 12px 18px; }
+  .biomes { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .biomes { grid-template-columns: 1fr 1fr 1fr; } }
+  .biome { position: relative; height: 200px; overflow: hidden; }
+  .biome .lab { position: absolute; left: 10px; top: 8px; font: 600 12px/1 var(--font-text); color: var(--color-hud-text); background: #0008; padding: 3px 6px; }
+  .lineup { position: absolute; left: 12px; right: 12px; bottom: 18px; display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+  .forest-pal { --px-f: #4f8a3c; --px-F: #3a6b2c; --px-t: #6b4a32; --px-d: #2a1a12; }
+  .night-pal { --px-f: #3d5f9a; --px-F: #2a4578; --px-t: #5a4a72; --px-d: #1a1230; }
+  .elf-pal { --px-f: #8a6bd0; --px-F: #6a4fb0; --px-t: #4a3a6a; --px-d: #1e1236; }
+  .enemy { --px-o: #070a14; }
+  table { border-collapse: collapse; font-size: .8125rem; color: var(--page-fg); width: 100%; max-width: 1000px; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--color-plum-600); vertical-align: top; }
+  th { color: var(--page-muted); font-weight: 600; }
+  code { color: var(--color-coral-300); }
+  .spec { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; background: var(--color-menu-surface); padding: 20px; }
+  .anchor { position: relative; display: inline-block; background-image: linear-gradient(#ffffff10 1px, transparent 1px), linear-gradient(90deg, #ffffff10 1px, transparent 1px); background-size: 8px 8px; }
+  .dot { position: absolute; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); outline: 2px solid var(--color-ink-950); }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Sprite-Styleguide</h1>
+  <p>Regeln für alle Sprites in <code>public/assets/sprites/</code>. Die Pixel-Vorlagen hier zeigen Silhouette, Proportion und Farbaufteilung. Die finale Grafik wird in voller Framegröße gezeichnet (siehe Tabelle) und ersetzt die Platzhalter, ohne Code zu ändern (F-12).</p>
+</header>
+
+<section class="sg">
+  <h2>Grundregeln</h2>
+  <ul>
+    <li><b>Ein Pixelraster:</b> 1 Grafik-Pixel = 1 logischer Pixel der Spielfläche 640×360. Sprites werden nicht skaliert (Ausnahme: Boss-Sprites dürfen ganzzahlig 2× gezeigt werden).</li>
+    <li><b>Umriss:</b> Jede Figur hat einen geschlossenen 1-px-Umriss. Spielerin, Waffe, Münzen und Items: Tinte <code>#0b0610</code>. Gegner: Nachtschwarz <code>#070a14</code>.</li>
+    <li><b>Lesbarkeit:</b> Die Spielerin ist das Hellste im Bild (Creme), Gegner sind mittelhell und tragen die Farbe ihres Bioms. Gegner-Augen leuchten rot oder magenta, damit man sie in jedem Biom sofort erkennt. Der Boden bleibt ruhig: Muster haben höchstens 1,5:1 Kontrast untereinander.</li>
+    <li><b>Licht:</b> von oben links. Glanzlicht oben links, Schatten unten rechts, wie die Fase der Menü-Buttons.</li>
+    <li><b>Feste Palette der Spielerin</b> (alle Biome gleich): Anzug <code>#fff4e8</code>/<code>#e0c9d6</code>, Visier <code>#2a1640</code>, Augen <code>#5fe0c0</code>, Wangen <code>#ffa0ae</code>, Akzent <code>#ff6b8a</code>. Siehe Tokens <code>color.sprite.*</code>.</li>
+    <li><b>Keine Zahlen über Gegnern</b> (kein Schadensregen, siehe Abgrenzung). Ein Treffer ist ein weißer Blitz von 120 ms auf dem Gegner.</li>
+  </ul>
+</section>
+
+<section class="sg">
+  <h2>Gegner und Spielerin je Biom</h2>
+  <div class="biomes">
+    <div class="biome"><div class="w-ground forest"></div><span class="lab">WALD 0–4</span>
+      <div class="lineup forest-pal"><span class="spr" data-n="astronaut" data-s="2"></span><span class="spr enemy" data-n="tree" data-s="2"></span><span class="spr" data-n="coin" data-s="2"></span><span class="spr" data-n="heal" data-s="2" style="--px-H:var(--color-mint-400)"></span></div></div>
+    <div class="biome"><div class="w-ground night"></div><span class="lab">WALD BEI NACHT 5–9</span>
+      <div class="lineup night-pal"><span class="spr" data-n="astronaut" data-s="2"></span><span class="spr enemy" data-n="tree" data-s="2"></span><span class="spr enemy" data-n="witch" data-s="2"></span><span class="spr enemy" data-n="bolt" data-s="2"></span><span class="spr enemy" data-n="squirrel" data-s="2"></span><span class="spr" data-n="shield" data-s="2"></span></div></div>
+    <div class="biome"><div class="w-ground elf"></div><span class="lab">ELFENWALD 10–20</span>
+      <div class="lineup elf-pal"><span class="spr" data-n="astronaut" data-s="2"></span><span class="spr enemy" data-n="tree" data-s="2"></span><span class="spr enemy" data-n="spirit" data-s="2"></span><span class="spr enemy" data-n="squirrel" data-s="2"></span><span class="spr" data-n="ring" data-s="2" style="--px-F:var(--color-game-fire-ring)"></span><span class="spr" data-n="rapid" data-s="2"></span></div></div>
+  </div>
+</section>
+
+<section class="sg">
+  <h2>Strahlenpistole: Ankerpunkte und Ausbau</h2>
+  <p>Die Waffe ist ein eigenes Spritesheet, nach rechts zeigend (0°). Der Griff sitzt auf dem Handpunkt der Spielerin, die Waffe dreht sich um den Griff. Der Laser startet an der Mündung. Zielt die Spielerin nach links (|Winkel| &gt; 90°), wird die Figur waagrecht gespiegelt und die Waffe senkrecht (<code>flipY</code>), damit die Flosse oben bleibt. Zielt sie nach oben (−160° bis −20°), liegt die Waffe hinter der Figur.</p>
+  <div class="spec">
+    <figure><span class="anchor"><span class="spr" data-n="raygun1" data-s="16"></span><i class="dot" style="left:56px;top:96px;background:var(--color-mint-400)"></i><i class="dot" style="left:176px;top:56px;background:var(--color-gold-400)"></i></span>
+      <figcaption style="color:var(--page-muted);font-size:.8125rem;margin-top:8px">Vorlage 12×8, finale Frames 24×16. Griff (grün) und Mündung (gelb).</figcaption></figure>
+    <table style="max-width:520px">
+      <tr><th>Wert</th><th>Vorlage 12×8</th><th>Final 24×16</th></tr>
+      <tr><td>Griff = Drehpunkt (<code>origin</code>)</td><td>3,5 | 6</td><td>7 | 12</td></tr>
+      <tr><td>Mündung relativ zum Griff</td><td>+7,5 | −2,5</td><td>+15 | −5</td></tr>
+      <tr><td>Handpunkt relativ zur Mitte der Spielerin (32×32)</td><td>–</td><td>+10 | +9 (gespiegelt −10 | +9)</td></tr>
+      <tr><td>Frames je Ausbaustufe</td><td colspan="2">0 = Ruhe, 1 = Schuss (Mündung leuchtet 1 Frame)</td></tr>
+      <tr><td>Ausbaustufe</td><td colspan="2">Summe der Waffen-Upgrades (Feuerrate + Schaden): 0–6 → 1, 7–13 → 2, 14–20 → 3</td></tr>
+      <tr><td>Laserfarbe</td><td colspan="2"><code>color.game.laser-raygun</code> (gehört zur Waffe, neue Waffen bringen eigene)</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="sg">
+  <h2>Sprite-Liste (Soll-Größen)</h2>
+  <table>
+    <tr><th>Datei</th><th>Frame</th><th>Frames</th><th>Inhalt und Regel</th></tr>
+    <tr><td><code>astronaut.png</code></td><td>32×32</td><td>4</td><td>Frontansicht, aufrecht. 0–1 Ruhe (Atmen, Visier-Glanz wandert), 2–3 Rückstoß. Die Waffe ist nicht mehr Teil der Figur. Die Hand bleibt am Handpunkt.</td></tr>
+    <tr><td><code>weapon-raygun.png</code> <em>(neu)</em></td><td>24×16</td><td>6</td><td>3 Ausbaustufen × (Ruhe, Schuss). Nach rechts zeigend.</td></tr>
+    <tr><td><code>laser.png</code></td><td>16×4</td><td>1</td><td>Weiß mit Kern; die Farbe kommt per Tint aus der Waffe. Kopf 2 px hell, Schweif läuft aus.</td></tr>
+    <tr><td><code>enemy-*.png</code></td><td>32×32</td><td>4</td><td>Nachtschwarzer Umriss, Augen leuchten. Die Biome färben per Tint (siehe <code>config/maps.ts</code>), Grundfarbe deshalb hell und wenig gesättigt zeichnen.</td></tr>
+    <tr><td><code>coin-small.png</code> / <code>coin-big.png</code></td><td>8×8 / 12×12</td><td>wie bisher</td><td>Gold <code>#ffcf4a</code>, Glanz oben links, Tinte-Umriss.</td></tr>
+    <tr><td><code>item-*.png</code></td><td>16×16</td><td>wie bisher</td><td>Gleiches Symbol wie im HUD-Chip. Liegende Items blinken in den letzten 3 s (bei reduzierter Bewegung: Umriss wird gestrichelt).</td></tr>
+    <tr><td><code>ui-icons.png</code></td><td>16×16</td><td>4</td><td>Ton an, Ton aus, Pause, Schloss. Zwei Farben: Linie + Füllung, Farben per Tint.</td></tr>
+    <tr><td><code>font-kapsel.png</code> / <code>font-funk.png</code> <em>(neu)</em></td><td>Glyphen</td><td>–</td><td>Bitmap-Schrift „Astro“ aus <code>docs/design/assets/fonts.js</code>, weiß auf transparent, dazu XML für Phaser.</td></tr>
+  </table>
+</section>
+
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>
