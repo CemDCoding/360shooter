@@ -47,6 +47,7 @@ export const ASSETS: readonly AssetDef[] = [
   sprite('item-double-shot', 16, 16, 2, 'Item: Doppelschuss.'),
   sprite('item-shield', 16, 16, 2, 'Item: Schutzschild.'),
   sprite('item-rapid-fire', 16, 16, 2, 'Item: Schnellfeuer.'),
+  sprite('item-fire-ring', 16, 16, 2, 'Ruestung: Feuerring.'),
   sprite('coin-small', 8, 8, 4, 'Kleine Muenze, Drehung in 4 Frames.'),
   sprite('coin-big', 16, 16, 4, 'Grosse Muenze, Drehung in 4 Frames.'),
   sprite('tiles-forest', 32, 32, 4, 'Map-Kacheln: Wald.'),

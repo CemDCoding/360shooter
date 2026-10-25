@@ -49,6 +49,7 @@ describe('asset manifest', () => {
       'item-double-shot': [16, 16, 2],
       'item-shield': [16, 16, 2],
       'item-rapid-fire': [16, 16, 2],
+      'item-fire-ring': [16, 16, 2],
       'coin-small': [8, 8, 4],
       'coin-big': [16, 16, 4],
     };
