@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { stickAngleRad, stickVector } from '../../src/platform/stick';
+import {
+  STICK_ON_DESKTOP,
+  stickAngleRad,
+  stickVector,
+  stickVisible,
+} from '../../src/platform/stick';
 
 const R = 70;
 const DZ = 0.15;
@@ -28,5 +33,17 @@ describe('stickVector / stickAngleRad', () => {
   it('handles invalid input', () => {
     expect(stickVector(NaN, 1, R, DZ).active).toBe(false);
     expect(stickVector(1, 1, 0, DZ).active).toBe(false);
+  });
+});
+
+describe('stickVisible', () => {
+  it('covers the four cases', () => {
+    expect(stickVisible(false, true)).toBe(true);
+    expect(stickVisible(false, false)).toBe(false);
+    expect(stickVisible(true, true)).toBe(true);
+    expect(stickVisible(true, false)).toBe(true);
+  });
+  it('shows the stick on desktop by default', () => {
+    expect(STICK_ON_DESKTOP).toBe(true);
   });
 });

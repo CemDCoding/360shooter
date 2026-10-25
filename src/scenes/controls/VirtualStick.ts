@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { THEME, themeColor } from '../../config/theme';
 import { STICK_CATCH_DIAMETER } from '../hud/hudMath';
-import { stickAngleRad, stickVector } from '../../platform/stick';
+import { STICK_ON_DESKTOP, stickAngleRad, stickVector, stickVisible } from '../../platform/stick';
 
 /** Layout/feel constants of the stick (arena units). Drawn size comes from the design tokens. */
 const BASE_DIAMETER = THEME.sizePx['size.stick'];
@@ -13,7 +13,7 @@ const DEAD_ZONE_RATIO = 0.15;
 const DEPTH = 50;
 
 /**
- * Virtual stick, bottom right, touch devices only. Owns one pointer (by id).
+ * Virtual stick, bottom right, touch devices and (switch) desktop with mouse. Owns one pointer (by id; the mouse has id 0).
  * The canvas already lies inside the safe area (layoutArena), so the margin is relative to it.
  */
 export class VirtualStick {
@@ -34,7 +34,7 @@ export class VirtualStick {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    this.enabled = !!scene.sys.game.device.input.touch;
+    this.enabled = stickVisible(!!scene.sys.game.device.input.touch, STICK_ON_DESKTOP);
     const { width, height } = scene.scale;
     this.cx = width - EDGE_MARGIN - this.catchRadius;
     this.cy = height - EDGE_MARGIN - this.catchRadius;
@@ -52,10 +52,15 @@ export class VirtualStick {
       .setDepth(DEPTH)
       .setVisible(this.enabled);
     this.ring.fillStyle(accent, 1);
-    const dots = Math.round(Math.PI * BASE_DIAMETER / 3);
+    const dots = Math.round((Math.PI * BASE_DIAMETER) / 3);
     for (let i = 0; i < dots; i++) {
       const a = (i / dots) * Math.PI * 2;
-      this.ring.fillRect(Math.round(Math.cos(a) * (this.radius - 0.5)), Math.round(Math.sin(a) * (this.radius - 0.5)), 1, 1);
+      this.ring.fillRect(
+        Math.round(Math.cos(a) * (this.radius - 0.5)),
+        Math.round(Math.sin(a) * (this.radius - 0.5)),
+        1,
+        1,
+      );
     }
     this.knob = scene.add
       .circle(this.cx, this.cy, KNOB_DIAMETER / 2, accent, 0.2)
@@ -70,6 +75,8 @@ export class VirtualStick {
     scene.input.on('pointerup', this.onUp, this);
     scene.input.on('pointerupoutside', this.onUp, this);
     // A paused scene gets no pointerup: release the stick on pause and resume.
+    // Mouse released outside the window / window loses focus: do not leave the stick stuck.
+    scene.game.events.on(Phaser.Core.Events.BLUR, this.reset, this);
     scene.events.on(Phaser.Scenes.Events.PAUSE, this.reset, this);
     scene.events.on(Phaser.Scenes.Events.RESUME, this.reset, this);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
@@ -96,12 +103,20 @@ export class VirtualStick {
 
   private onDown(pointer: Phaser.Input.Pointer): void {
     if (this.ownerId !== null || !this.contains(pointer.x, pointer.y)) return;
+    // Only the primary button starts the stick (right/middle click does not).
+    if (!pointer.wasTouch && pointer.button !== 0) return;
     this.ownerId = pointer.id;
     this.track(pointer);
   }
 
   private onMove(pointer: Phaser.Input.Pointer): void {
-    if (pointer.id === this.ownerId) this.track(pointer);
+    if (pointer.id !== this.ownerId) return;
+    // Mouse moved without a pressed button (release was missed): free the stick.
+    if (!pointer.isDown) {
+      this.reset();
+      return;
+    }
+    this.track(pointer);
   }
 
   private onUp(pointer: Phaser.Input.Pointer): void {
@@ -130,6 +145,7 @@ export class VirtualStick {
       this.scene.input.off('pointermove', this.onMove, this);
       this.scene.input.off('pointerup', this.onUp, this);
       this.scene.input.off('pointerupoutside', this.onUp, this);
+      this.scene.game.events.off(Phaser.Core.Events.BLUR, this.reset, this);
       this.scene.events.off(Phaser.Scenes.Events.PAUSE, this.reset, this);
       this.scene.events.off(Phaser.Scenes.Events.RESUME, this.reset, this);
     }
