@@ -6,13 +6,8 @@ import { applyDamage, applyHeal, isDead } from '../logic/health';
 import { applyPowerItem } from '../logic/items';
 import { absorbDamage, emptyPowers, tickPowers } from '../logic/powers';
 import { stepRotation } from '../logic/rotation';
-import {
-  faceLeft,
-  handPoint,
-  muzzlePoint,
-  weaponBehindFigure,
-  weaponFrame,
-} from '../logic/weaponMount';
+import { faceLeft, weaponFrame, weaponPose } from '../logic/weaponMount';
+import type { WeaponPose } from '../logic/weaponMount';
 import { WEAPON_MOUNT } from '../config/weaponMount';
 import { THEME } from '../config/theme';
 import { computeWeaponStats, FireTimer } from '../logic/weapon';
@@ -136,13 +131,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const rad = Phaser.Math.DegToRad(this.facingDeg);
     const left = faceLeft(this.facingDeg);
     this.setFlipX(left);
-    const hand = handPoint(this.x, this.y, left);
-    this.updateWeapon(hand, left);
+    const pose = weaponPose(this.x, this.y, this.facingDeg, left ? -1 : 1);
+    this.updateWeapon(pose);
 
     const shots = this.fireTimer.tick(dt, this.stats.fireRatePerSec);
     if (shots > 0) {
       for (let i = 0; i < shots; i++) {
-        const muzzle = muzzlePoint(hand.x, hand.y, this.facingDeg, left);
+        const muzzle = pose.muzzle;
         this.lasers.fire(muzzle.x, muzzle.y, rad, this.stats, this.powers.doubleShotStage);
       }
       this.shootAnimLeft = SHOOT_ANIM_MS;
@@ -151,13 +146,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.updateVisuals(dt);
   }
 
-  private updateWeapon(hand: { x: number; y: number }, left: boolean): void {
+  private updateWeapon(pose: WeaponPose): void {
     if (!this.weapon) return;
+    // scaleY statt flipY: flipY spiegelt um die Framemitte, der Griff wanderte um 8 px (siehe weaponPose).
     this.weapon
-      .setPosition(hand.x, hand.y)
-      .setRotation(Phaser.Math.DegToRad(this.facingDeg))
-      .setFlipY(left)
-      .setDepth(this.depth + (weaponBehindFigure(this.facingDeg) ? -1 : 1));
+      .setPosition(pose.hand.x, pose.hand.y)
+      .setRotation(Phaser.Math.DegToRad(pose.rotationDeg))
+      .setScale(1, pose.flipY ? -1 : 1)
+      .setDepth(this.depth + (pose.behind ? -1 : 1));
   }
 
   private updatePowers(dt: number): void {
