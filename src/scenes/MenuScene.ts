@@ -6,6 +6,7 @@ import { loadSave, resetSave } from '../platform/storage';
 import { isValidLevelId } from './debug';
 import { Button } from './menu/Button';
 import { ConfirmDialog } from './menu/ConfirmDialog';
+import { UpgradePanel } from './menu/UpgradePanel';
 import { LevelGrid } from './menu/LevelGrid';
 import { isLevelUnlocked, xpFraction } from './menu/levelGroups';
 
@@ -13,6 +14,8 @@ const IDLE_ANIM = 'astronaut-idle';
 
 export class MenuScene extends Phaser.Scene {
   private dialog: ConfirmDialog | null = null;
+  private panel: UpgradePanel | null = null;
+  private goldText: Phaser.GameObjects.Text | null = null;
   private starting = false;
 
   constructor() {
@@ -21,6 +24,7 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     this.dialog = null;
+    this.panel = null;
     this.starting = false;
     getSoundService(this.game).reload();
     const save = loadSave();
@@ -55,6 +59,16 @@ export class MenuScene extends Phaser.Scene {
       this.startLevel(id, save.highestUnlockedLevel),
     );
 
+    this.goldText = this.add.text(barX + barW + 16, 44, `Gold: ${save.gold ?? 0}`, {
+      color: '#ffd24a',
+      fontSize: '14px',
+    });
+    new Button(this, barX + barW + 60, 76, 'Upgrade', () => this.openUpgrades(), {
+      width: 90,
+      height: 32,
+      fontSize: 13,
+    });
+
     new Button(this, width / 2, height - 20, 'Fortschritt zurücksetzen', () => this.askReset(), {
       width: 190,
       height: 32,
@@ -68,7 +82,22 @@ export class MenuScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.tweens.killAll();
       this.dialog = null;
+      this.panel?.destroy();
+      this.panel = null;
+      this.goldText = null;
     });
+  }
+
+  private openUpgrades(): void {
+    if (this.dialog || this.panel) return;
+    this.panel = new UpgradePanel(
+      this,
+      () => this.goldText?.setText(`Gold: ${loadSave().gold ?? 0}`),
+      () => {
+        this.panel?.destroy();
+        this.panel = null;
+      },
+    );
   }
 
   private ensureIdleAnim(): boolean {
@@ -85,17 +114,17 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private startLevel(levelId: number, highestUnlocked: number): void {
-    if (this.starting || this.dialog) return;
+    if (this.starting || this.dialog || this.panel) return;
     if (!isValidLevelId(levelId) || !isLevelUnlocked(levelId, highestUnlocked)) return;
     this.starting = true;
     this.scene.start('GameScene', { levelId });
   }
 
   private askReset(): void {
-    if (this.dialog) return;
+    if (this.dialog || this.panel) return;
     this.dialog = new ConfirmDialog(
       this,
-      'Wirklich löschen?',
+      'Wirklich löschen?\nAuch Gold und Upgrades werden gelöscht.',
       () => {
         resetSave();
         this.scene.restart();
