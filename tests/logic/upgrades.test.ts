@@ -74,7 +74,7 @@ describe('upgradeFactors', () => {
     expect(f.weaponFireRateMult).toBe(1);
     expect(f.weaponDamageMult).toBe(1);
     expect(f.playerMaxHp).toBe(100);
-    expect(f.playerTurnSpeedDegPerSec).toBe(270);
+    expect(f.playerTurnSpeedDegPerSec).toBe(360);
   });
   it('applies +10 percent, +10 hp, +15 deg/s per level', () => {
     const f = upgradeFactors({
@@ -86,6 +86,6 @@ describe('upgradeFactors', () => {
     expect(f.weaponFireRateMult).toBeCloseTo(2);
     expect(f.weaponDamageMult).toBeCloseTo(1.5);
     expect(f.playerMaxHp).toBe(200);
-    expect(f.playerTurnSpeedDegPerSec).toBe(420);
+    expect(f.playerTurnSpeedDegPerSec).toBe(510);
   });
 });

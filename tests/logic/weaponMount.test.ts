@@ -3,6 +3,7 @@ import {
   faceLeft,
   handPoint,
   muzzlePoint,
+  stepMirror,
   weaponBehindFigure,
   weaponFrame,
   weaponPose,
@@ -148,6 +149,52 @@ describe('weaponPose (AP-58)', () => {
       const grip = viaMatrix(WEAPON_MOUNT.grip, a, m, p.hand);
       expect(grip.x).toBeCloseTo(p.hand.x, 6);
       expect(grip.y).toBeCloseTo(p.hand.y, 6);
+    }
+  });
+});
+
+describe('stepMirror (AP-59)', () => {
+  const ms = WEAPON_MOUNT.mirrorMs;
+  it('reaches +1 after durationMs from -1 and never overshoots', () => {
+    let m = -1;
+    let prev = m;
+    for (let t = 0; t < ms; t += 10) {
+      m = stepMirror(m, 1, 10, ms);
+      expect(m).toBeGreaterThanOrEqual(prev);
+      expect(m).toBeLessThanOrEqual(1);
+      prev = m;
+    }
+    expect(m).toBeCloseTo(1);
+    expect(stepMirror(0.99, 1, 1000, ms)).toBe(1);
+    expect(stepMirror(-0.99, -1, 1000, ms)).toBe(-1);
+  });
+  it('moves down too', () => {
+    expect(stepMirror(1, -1, 30, 120)).toBeCloseTo(0.5);
+  });
+  it('jumps immediately when durationMs <= 0', () => {
+    expect(stepMirror(1, -1, 16, 0)).toBe(-1);
+    expect(stepMirror(-1, 1, 16, -5)).toBe(1);
+  });
+  it('does nothing when dtMs <= 0', () => {
+    expect(stepMirror(0.3, 1, 0, ms)).toBe(0.3);
+    expect(stepMirror(0.3, 1, -4, ms)).toBe(0.3);
+  });
+  it('hand moves at most ~3.3 px per frame while crossing 90 degrees', () => {
+    let m = 1;
+    let prevX = weaponPose(100, 100, 80, m).hand.x;
+    for (let a = 80; a <= 100; a += 1) {
+      m = stepMirror(m, faceLeft(a) ? -1 : 1, 16.7, ms);
+      const p = weaponPose(100, 100, a, m);
+      expect(Math.abs(p.hand.x - prevX)).toBeLessThanOrEqual((20 * 16.7) / ms + 0.5);
+      prevX = p.hand.x;
+    }
+    expect(weaponPose(100, 100, 90, 0).hand.x).toBe(100);
+  });
+  it('muzzle keeps a constant distance to the grip for intermediate mirror values', () => {
+    for (const m of [1, 0.5, 0, -0.5, -1]) {
+      const p = weaponPose(100, 100, 37, m);
+      const d = Math.hypot(p.muzzle.x - p.hand.x, p.muzzle.y - p.hand.y);
+      expect(d).toBeCloseTo(Math.hypot(WEAPON_MOUNT.muzzle.x, WEAPON_MOUNT.muzzle.y * m));
     }
   });
 });
