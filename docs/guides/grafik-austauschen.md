@@ -54,9 +54,45 @@ Beispiel: `astronaut.png` hat 4 Frames mit je 32 x 32 Pixel. Die Datei ist also 
 | tiles-forest.png          | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald"                    | Vier Kachel-Varianten. Reihenfolge wie in der Platzhalter-Datei lassen        |
 | tiles-forest-night.png    | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald bei Nacht"          | Vier Kachel-Varianten. Reihenfolge wie in der Platzhalter-Datei lassen        |
 | tiles-elf-forest.png      | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Elfenwald"               | Vier Kachel-Varianten. Reihenfolge wie in der Platzhalter-Datei lassen        |
-| ui-icons.png              | 16 x 16             | 3      | 48 x 16                       | Symbole der Oberfläche (Herz, Ton an/aus) | Frame 1: Herz. Frame 2: Ton an. Frame 3: Ton aus                              |
+| weapon-raygun.png         | 24 x 16             | 6      | 144 x 16                      | Die Strahlenpistole, nach rechts zeigend  | Je Ausbaustufe 2 Frames (Ruhe, Schuss): Frame 1 und 2 Stufe 1, 3 und 4 Stufe 2, 5 und 6 Stufe 3 |
+| ui-icons.png              | 16 x 16             | 4      | 64 x 16                       | Symbole der Oberfläche                    | Frame 1: Ton an. Frame 2: Ton aus. Frame 3: Pause. Frame 4: Schloss           |
 
 Tipp: Öffne zuerst die vorhandene Platzhalter-Datei. So siehst du, wie die Frames angeordnet sind.
+
+### Strahlenpistole (`weapon-raygun.png`)
+
+- Die Waffe ist ein **eigenes Sprite**, nicht Teil der Astronautin. Sie zeigt nach rechts (0 Grad) und dreht sich im Spiel um den Griff.
+- **Griff** (Drehpunkt) liegt im Frame bei x 7, y 12. Die **Mündung** (hier startet der Laser) liegt 15 Pixel rechts und 5 Pixel über dem Griff. Zeichne so, dass diese beiden Punkte stimmen.
+- Frame 1 jeder Stufe ist die Ruhe, Frame 2 der Schuss (die Mündung leuchtet einen Frame lang).
+- Stufe 1 ist schlicht, Stufe 2 hat Kühlrippen und eine größere Flosse, Stufe 3 einen leuchtenden Kern und eine große Mündung.
+- Die Laserfarbe gehört zur Waffe (Korallenrosa `#ff8fae`), sie steckt nicht im Sprite.
+
+### Symbole (`ui-icons.png`)
+
+Zwei Farben: Linie und Füllung. Das Spiel färbt die Symbole per Tint ein, zeichne sie deshalb in der Linienfarbe `#14101c` und mit heller Füllung `#e8ecf2`. Das Herz gibt es nicht mehr.
+
+### Schriften (`public/assets/fonts/`)
+
+Die Schriften **Astro Kapsel** (dick, für Titel und Zahlen) und **Astro Funk** (schmal, für HUD und Beschriftungen) werden **nicht von Hand ersetzt**. Sie entstehen aus den Pixel-Glyphen in `docs/design/assets/fonts.js`. Wenn du Zeichen änderst, bearbeitest du diese Datei und tippst dann:
+
+```
+npm run fonts:build
+```
+
+Der Befehl schreibt je Schrift eine PNG (weiße Zeichen, transparent) und eine XML in `public/assets/fonts/`. Danach prüft `npm run assets:check` beide Dateien: Jede Zeichen-ID kommt nur einmal vor und jedes Zeichen liegt im Bild. Die Schriften haben nur Großbuchstaben (und Funk zusätzlich ein kleines `s`). Der Text muss im Spiel also groß geschrieben übergeben werden.
+
+### Regeln für alle Sprites (aus dem Sprite-Styleguide)
+
+- **Raster:** 1 Pixel der Grafik ist 1 Pixel der Spielfläche (640 x 360). Sprites werden nicht skaliert. Nur Boss-Sprites dürfen ganzzahlig doppelt gezeigt werden.
+- **Palette:** Die Astronautin trägt in allen Biomen dieselben Farben: Anzug `#fff4e8` und `#e0c9d6`, Visier `#2a1640`, Augen `#5fe0c0`, Wangen `#ffa0ae`, Akzent `#ff6b8a`. Gegner sind mittelhell, zeichne sie hell und wenig gesättigt, denn die Biome färben sie ein. Gegner-Augen leuchten rot oder magenta.
+- **Umriss:** Jede Figur hat einen geschlossenen Umriss von 1 Pixel. Astronautin, Waffe, Münzen und Items nutzen Tinte `#0b0610`, Gegner Nachtschwarz `#070a14`.
+- **Licht:** von oben links. Glanzlicht oben links, Schatten unten rechts.
+- **Ankerpunkte:** Bei der Waffe sind Griff und Mündung fest (siehe oben). Die Hand der Astronautin sitzt 10 Pixel rechts und 9 Pixel unter der Mitte ihres Frames, dort sitzt der Griff.
+- **Keine Zahlen über Gegnern.** Ein Treffer ist ein weißer Blitz von 120 Millisekunden.
+
+### App-Icons (`public/icons/`)
+
+Die Icons `icon-180.png`, `icon-192.png` und `icon-512.png` entstehen aus `docs/design/assets/app-icon.svg` (Helm der Astronautin) und werden scharf (ohne Glättung) hochgerechnet. Nach einer Änderung an der SVG tippst du `npm run icons`. Es werden nur Rechtecke, Gruppen mit Verschiebung und Deckkraft unterstützt, alles andere meldet das Skript als Fehler.
 
 ## Schritt für Schritt
 

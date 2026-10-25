@@ -21,6 +21,17 @@ function sprite(
   };
 }
 
+/** Bitmap-Schrift: Atlas-PNG plus BMFont-XML. Entsteht aus `npm run fonts:build`, nicht von Hand. */
+function font(key: string, description: string): AssetDef {
+  return {
+    key,
+    kind: 'bitmapFont',
+    path: `assets/fonts/${key}.png`,
+    xmlPath: `assets/fonts/${key}.xml`,
+    description: `${description} Wird mit "npm run fonts:build" erzeugt (PNG und XML), nicht von Hand ersetzen.`,
+  };
+}
+
 function sound(name: string, description: string): AssetDef {
   return {
     key: `sfx-${name}`,
@@ -50,7 +61,25 @@ export const ASSETS: readonly AssetDef[] = [
   sprite('tiles-forest', 32, 32, 4, 'Map-Kacheln: Wald.'),
   sprite('tiles-forest-night', 32, 32, 4, 'Map-Kacheln: Wald bei Nacht.'),
   sprite('tiles-elf-forest', 32, 32, 4, 'Map-Kacheln: Elfenwald.'),
-  sprite('ui-icons', 16, 16, 3, 'Oberflaechen-Symbole: Herz, Ton an, Ton aus.'),
+  sprite(
+    'weapon-raygun',
+    24,
+    16,
+    6,
+    'Strahlenpistole, nach rechts zeigend: je Ausbaustufe 2 Frames (Ruhe, Schuss), Stufe 1 bis 3.',
+  ),
+  sprite(
+    'ui-icons',
+    16,
+    16,
+    4,
+    'Oberflaechen-Symbole: Frame 0 Ton an, 1 Ton aus, 2 Pause, 3 Schloss.',
+  ),
+  font(
+    'astro-kapsel',
+    'Bitmap-Schrift "Astro Kapsel": dicke Schrift fuer Titel, Menue und grosse Zahlen.',
+  ),
+  font('astro-funk', 'Bitmap-Schrift "Astro Funk": schmale Schrift fuer HUD und Beschriftungen.'),
   sound('laser', 'Laserschuss.'),
   sound('hit', 'Treffer auf einen Gegner.'),
   sound('enemy-death', 'Gegner wird besiegt.'),
