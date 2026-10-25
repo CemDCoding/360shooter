@@ -205,6 +205,8 @@ const SOUNDS = {
   'sfx-round-won': { f0: 500, f1: 1000, dur: 0.5, wave: 'sine' },
   'sfx-round-lost': { f0: 400, f1: 100, dur: 0.6, wave: 'sine' },
   'sfx-coin': { f0: 900, f1: 1500, dur: 0.1, wave: 'square' },
+  'sfx-boss-warning': { f0: 300, f1: 900, dur: 0.6, wave: 'square' },
+  'sfx-boss-defeated': { f0: 800, f1: 100, dur: 0.8, wave: 'saw' },
   'sfx-shield-break': { f0: 700, f1: 150, dur: 0.3, wave: 'saw' },
 };
 function makeWav(spec) {

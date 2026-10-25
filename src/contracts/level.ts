@@ -1,3 +1,4 @@
+import type { BossId } from './boss';
 import type { EnemyId } from './enemy';
 
 export type BatchId = 'forest' | 'forestNight' | 'elfForest';
@@ -14,5 +15,6 @@ export interface LevelDef {
   enemyPool: EnemyPoolEntry[];
   spawnIntervalMs: number;
   maxEnemies: number;
-  bossId?: string;
+  /** Boss of the level (AP-16). Set: the round ends only with the boss defeat (PE-18). */
+  bossId?: BossId;
 }

@@ -1,3 +1,4 @@
+export * from './boss';
 export * from './level';
 export * from './enemy';
 export * from './item';
