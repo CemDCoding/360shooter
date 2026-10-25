@@ -8,6 +8,12 @@ export const COIN_RULES: CoinRules = {
   magnetSpeedPxPerSec: 320,
 };
 
+/** Sanfter Magnet-Einflug (AP-64, Q-36): Balancing, Startwerte angenommen (PE-72). Hoechstgeschwindigkeit: COIN_RULES.magnetSpeedPxPerSec */
+export const COIN_MAGNET_EASE = {
+  startSpeedPxPerSec: 60,
+  rampMs: 600,
+};
+
 /** Ab diesem Wert wird die grosse Muenze gezeigt */
 export const BIG_COIN_MIN_VALUE = 5;
 /** Anteil des Goldes, der nach einem Sieg behalten wird */
