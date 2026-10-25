@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
-import type { ItemDef, WeaponStacks, WeaponStats } from '../contracts';
-import { ITEMS, PLAYER, WEAPON_BASE } from '../config';
+import type { ActivePowers, ItemDef, WeaponStats } from '../contracts';
+import { WEAPON_BASE } from '../config';
 import { animKey } from '../config/assets';
 import { applyDamage, applyHeal, isDead } from '../logic/health';
-import { applyItem } from '../logic/items';
+import { applyPowerItem } from '../logic/items';
+import { absorbDamage, emptyPowers, tickPowers } from '../logic/powers';
 import { stepRotation } from '../logic/rotation';
-import { computeWeaponStats, emptyStacks, FireTimer } from '../logic/weapon';
+import { computeWeaponStats, FireTimer } from '../logic/weapon';
+import type { WeaponFactors } from '../logic/weapon';
 import { LaserPool } from './LaserPool';
 
 const HIT_TINT = 0xffb0b0;
@@ -16,9 +18,20 @@ const BODY_RADIUS = 10;
 const IDLE_ANIM = `${animKey('astronaut')}-idle`;
 const SHOOT_ANIM = `${animKey('astronaut')}-shoot`;
 
+/** Upgrade values, passed in by the scene (see upgradeFactors). */
+export interface PlayerConfig extends WeaponFactors {
+  maxHp: number;
+  turnSpeedDegPerSec: number;
+}
+
+const SHIELD_RING_RADIUS = 20;
+const SHIELD_RING_COLOR = 0x66ccff;
+
 export interface PlayerCallbacks {
   onHpChange?: (hp: number, maxHp: number) => void;
-  onStatsChange?: (stats: WeaponStats, stacks: WeaponStacks) => void;
+  onStatsChange?: (stats: WeaponStats, powers: ActivePowers) => void;
+  /** Remaining shield points after damage was absorbed. */
+  onShieldChange?: (shieldLeft: number) => void;
   onShoot?: () => void;
   onHurt?: () => void;
   onDeath?: () => void;
@@ -27,20 +40,33 @@ export interface PlayerCallbacks {
 /** Player in the screen center: delayed turning, auto-fire. No scene imports. */
 export class Player extends Phaser.Physics.Arcade.Sprite {
   readonly callbacks: PlayerCallbacks = {};
-  hp: number = PLAYER.maxHp;
-  stacks: WeaponStacks = emptyStacks();
-  stats: WeaponStats = computeWeaponStats(WEAPON_BASE, this.stacks, ITEMS);
+  hp: number;
+  powers: ActivePowers = emptyPowers();
+  stats: WeaponStats;
   /** Facing in degrees, (-180, 180]. */
   facingDeg = 0;
   private readonly fireTimer = new FireTimer();
   private readonly lasers: LaserPool;
   private hitTintLeft = 0;
   private shootAnimLeft = 0;
+  private readonly shieldRing: Phaser.GameObjects.Arc;
   private dead = false;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, lasers: LaserPool) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    lasers: LaserPool,
+    private readonly config: PlayerConfig,
+  ) {
     super(scene, x, y, 'astronaut');
     this.lasers = lasers;
+    this.hp = config.maxHp;
+    this.stats = this.computeStats();
+    this.shieldRing = scene.add
+      .circle(x, y, SHIELD_RING_RADIUS, SHIELD_RING_COLOR, 0.15)
+      .setStrokeStyle(2, SHIELD_RING_COLOR, 0.6)
+      .setVisible(false);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     (this.body as Phaser.Physics.Arcade.Body).setCircle(
@@ -72,6 +98,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
+  private computeStats(): WeaponStats {
+    return computeWeaponStats(WEAPON_BASE, this.config, this.powers);
+  }
+
   get isDead(): boolean {
     return this.dead;
   }
@@ -79,10 +109,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   /** dt in ms, targetAngle in radians (from AimInput). */
   update(dt: number, targetAngle: number): void {
     if (this.dead) return;
+    this.updatePowers(dt);
     this.facingDeg = stepRotation(
       this.facingDeg,
       Phaser.Math.RadToDeg(targetAngle),
-      PLAYER.turnSpeedDegPerSec,
+      this.config.turnSpeedDegPerSec,
       dt,
     );
     const rad = Phaser.Math.DegToRad(this.facingDeg);
@@ -96,6 +127,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           this.y + Math.sin(rad) * MUZZLE_OFFSET,
           rad,
           this.stats,
+          this.powers.doubleShotStage,
         );
       }
       this.shootAnimLeft = SHOOT_ANIM_MS;
@@ -104,7 +136,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.updateVisuals(dt);
   }
 
+  private updatePowers(dt: number): void {
+    const wasRapid = this.powers.rapidFireMsLeft > 0;
+    this.powers = tickPowers(this.powers, dt);
+    if (wasRapid && this.powers.rapidFireMsLeft <= 0) this.refreshStats();
+  }
+
+  private refreshStats(): void {
+    this.stats = this.computeStats();
+    this.callbacks.onStatsChange?.(this.stats, this.powers);
+  }
+
   private updateVisuals(dt: number): void {
+    this.shieldRing.setPosition(this.x, this.y).setVisible(this.powers.shieldLeft > 0);
     const key = this.shootAnimLeft > 0 ? SHOOT_ANIM : IDLE_ANIM;
     this.shootAnimLeft = Math.max(0, this.shootAnimLeft - dt);
     if (this.anims.currentAnim?.key !== key) this.play(key);
@@ -116,29 +160,46 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   takeDamage(amount: number): void {
     if (this.dead) return;
-    this.hp = applyDamage(this.hp, amount);
+    const absorbed = absorbDamage(this.powers, amount);
+    const shieldChanged = absorbed.state.shieldLeft !== this.powers.shieldLeft;
+    this.powers = absorbed.state;
+    if (shieldChanged) {
+      this.shieldRing.setVisible(this.powers.shieldLeft > 0);
+      this.callbacks.onShieldChange?.(this.powers.shieldLeft);
+    }
     this.setTint(HIT_TINT);
     this.hitTintLeft = HIT_TINT_MS;
     this.callbacks.onHurt?.();
-    this.callbacks.onHpChange?.(this.hp, PLAYER.maxHp);
+    if (absorbed.remainingDamage <= 0) return;
+    this.hp = applyDamage(this.hp, absorbed.remainingDamage);
+    this.callbacks.onHpChange?.(this.hp, this.config.maxHp);
     if (isDead(this.hp)) {
       this.dead = true;
+      this.shieldRing.setVisible(false);
       this.callbacks.onDeath?.();
     }
   }
 
   heal(amount: number): void {
     if (this.dead) return;
-    this.hp = applyHeal(this.hp, amount, PLAYER.maxHp);
-    this.callbacks.onHpChange?.(this.hp, PLAYER.maxHp);
+    this.hp = applyHeal(this.hp, amount, this.config.maxHp);
+    this.callbacks.onHpChange?.(this.hp, this.config.maxHp);
   }
 
   applyItem(def: ItemDef): void {
     if (this.dead) return;
-    const result = applyItem(this.stacks, def);
-    this.stacks = result.stacks;
-    this.stats = computeWeaponStats(WEAPON_BASE, this.stacks, ITEMS);
-    if (result.heal > 0) this.heal(result.heal);
-    this.callbacks.onStatsChange?.(this.stats, this.stacks);
+    if (def.effect === 'heal') {
+      this.heal(def.perStack);
+      return;
+    }
+    this.powers = applyPowerItem(this.powers, def);
+    this.shieldRing.setVisible(this.powers.shieldLeft > 0);
+    this.refreshStats();
+    this.callbacks.onShieldChange?.(this.powers.shieldLeft);
+  }
+
+  destroy(fromScene?: boolean): void {
+    this.shieldRing.destroy();
+    super.destroy(fromScene);
   }
 }
