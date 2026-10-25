@@ -10,6 +10,7 @@ describe('coins', () => {
   it('values are positive and drop chance is a probability', () => {
     expect(COIN_RULES.dropChance).toBeGreaterThan(0);
     expect(COIN_RULES.dropChance).toBeLessThan(1);
+    expect(COIN_RULES.dropChance).toBe(0.048);
     expect(COIN_RULES.magnetRadiusPx).toBeGreaterThan(0);
     expect(COIN_RULES.collectRadiusPx).toBeGreaterThan(0);
     expect(COIN_RULES.magnetSpeedPxPerSec).toBeGreaterThan(0);

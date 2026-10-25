@@ -18,8 +18,8 @@ describe('items and base values', () => {
   it('values and weights', () => {
     const by = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
     expect(by.doubleShot).toMatchObject({ perStack: 1, maxStacks: 2 });
-    expect(by.shield).toMatchObject({ perStack: 60, maxStacks: 3 });
-    expect(by.rapidFire).toMatchObject({ maxStacks: 1, durationMs: 5000 });
+    expect(by.shield).toMatchObject({ perStack: 60, maxStacks: 2 });
+    expect(by.rapidFire).toMatchObject({ maxStacks: 1, durationMs: 4000 });
     expect(by.heal).toMatchObject({ perStack: 25, maxStacks: 1 });
     expect(ITEMS.reduce((s, i) => s + i.dropWeight, 0)).toBe(100);
     for (const i of ITEMS) {

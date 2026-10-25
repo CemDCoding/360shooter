@@ -1,8 +1,8 @@
-// Muenzen (AP-27), Startwerte PE-39 bis PE-43, Feintuning in AP-35.
+// Muenzen (AP-27), Startwerte PE-39 bis PE-43, kalibriert in AP-35 (Gold-Mittel ca. 45 je Level).
 import type { CoinRules } from '../contracts';
 
 export const COIN_RULES: CoinRules = {
-  dropChance: 0.05,
+  dropChance: 0.048,
   magnetRadiusPx: 400,
   collectRadiusPx: 12,
   magnetSpeedPxPerSec: 320,
