@@ -15,7 +15,12 @@ export class ConfirmDialog extends Phaser.GameObjects.Container {
       .rectangle(width / 2, height / 2, 280, 120, 0x1b2430)
       .setStrokeStyle(2, 0xffffff, 0.8);
     const text = scene.add
-      .text(width / 2, height / 2 - 28, message, { color: '#ffffff', fontSize: '16px' })
+      .text(width / 2, height / 2 - 28, message, {
+        color: '#ffffff',
+        fontSize: '14px',
+        align: 'center',
+        wordWrap: { width: 260 },
+      })
       .setOrigin(0.5);
     const yes = new Button(scene, width / 2 - 60, height / 2 + 28, 'Ja, löschen', onConfirm, {
       width: 100,
