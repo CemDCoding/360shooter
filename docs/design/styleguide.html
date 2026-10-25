@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Styleguide · 360shooter</title>
+<link rel="stylesheet" href="export/tokens.css">
+<link rel="stylesheet" href="assets/mockup-base.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  .sg { max-width: 1280px; margin: 0 auto 36px; }
+  .sg > h2 { font-size: 1rem; color: var(--page-fg); margin-bottom: 4px; }
+  .sg > p { color: var(--page-muted); font-size: .875rem; margin-bottom: 12px; max-width: 80ch; }
+  .board { padding: 20px; overflow-x: auto; }
+  .board.menu { background: var(--color-menu-bg); outline: 1px solid var(--color-plum-600); }
+  .board.hud { background: var(--color-biome-night-ground); outline: 1px solid var(--color-phos-800); }
+  .z { zoom: 2; }
+  .z.fit { zoom: 1.4; }
+  .items { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+  .item { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  .lab { font: 600 5px/1.2 var(--font-text); color: var(--page-muted); letter-spacing: .02em; }
+  .board.hud .lab { color: var(--color-hud-text-muted); }
+  .sw { width: 120px; }
+  .sw i { display: block; height: 36px; box-shadow: 0 0 0 1px #ffffff22; }
+  .sw b { display: block; font: 600 12px/1.3 var(--font-text); margin-top: 4px; }
+  .sw code { font-size: 11px; color: var(--page-muted); }
+  .swatches { display: flex; flex-wrap: wrap; gap: 12px; }
+  .rowline { display: flex; align-items: center; gap: 8px; }
+  .uprow { display: grid; grid-template-columns: 86px 74px 1fr; align-items: center; gap: 8px; width: 300px; padding: 6px 8px; }
+  .chipline { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Styleguide 360shooter</h1>
+  <p>Außen die Spielkassette, innen das Funkgerät im Anzug. Alle Werte stammen aus <code>tokens.json</code>. Die Darstellung hier ist 2× vergrößert, 1 Pixel entspricht 1 logischen Pixel der Spielfläche 640×360.</p>
+</header>
+
+<section class="sg">
+  <h2>Farben · Menü (Kassette)</h2>
+  <div class="swatches">
+    <div class="sw"><i style="background:var(--color-menu-bg)"></i><b>menu.bg</b><code>#1a0f24</code></div>
+    <div class="sw"><i style="background:var(--color-menu-surface)"></i><b>menu.surface</b><code>#2d1a3d</code></div>
+    <div class="sw"><i style="background:var(--color-menu-surface-sunken)"></i><b>menu.surface-sunken</b><code>#3d2252</code></div>
+    <div class="sw"><i style="background:var(--color-menu-outline)"></i><b>menu.outline</b><code>#0b0610</code></div>
+    <div class="sw"><i style="background:var(--color-menu-text)"></i><b>menu.text</b><code>#fff4e8</code></div>
+    <div class="sw"><i style="background:var(--color-menu-text-muted)"></i><b>menu.text-muted</b><code>#d8c3d6</code></div>
+    <div class="sw"><i style="background:var(--color-menu-action-bg)"></i><b>menu.action-bg</b><code>#ff6b8a</code></div>
+    <div class="sw"><i style="background:var(--color-menu-done-bg)"></i><b>menu.done-bg</b><code>#5fe0c0</code></div>
+    <div class="sw"><i style="background:var(--color-menu-gold)"></i><b>menu.gold</b><code>#ffcf4a</code></div>
+    <div class="sw"><i style="background:var(--color-menu-danger-fg)"></i><b>menu.danger-fg</b><code>#ff8a7b</code></div>
+    <div class="sw"><i style="background:var(--color-menu-locked-bg)"></i><b>menu.locked-bg</b><code>#24142f</code></div>
+  </div>
+</section>
+
+<section class="sg">
+  <h2>Farben · Runde (Funk) und Welt</h2>
+  <div class="swatches">
+    <div class="sw"><i style="background:var(--color-hud-screen)"></i><b>hud.screen</b><code>#0a1108</code></div>
+    <div class="sw"><i style="background:var(--color-hud-glass)"></i><b>hud.glass</b><code>#060c05 · 72 %</code></div>
+    <div class="sw"><i style="background:var(--color-hud-line)"></i><b>hud.line</b><code>#567f02</code></div>
+    <div class="sw"><i style="background:var(--color-hud-text)"></i><b>hud.text</b><code>#e5f2d8</code></div>
+    <div class="sw"><i style="background:var(--color-hud-accent)"></i><b>hud.accent / energy</b><code>#a8d86b</code></div>
+    <div class="sw"><i style="background:var(--color-hud-energy-low)"></i><b>hud.energy-low</b><code>#ff8a7b</code></div>
+    <div class="sw"><i style="background:var(--color-game-laser-raygun)"></i><b>game.laser-raygun</b><code>#ff8fae</code></div>
+    <div class="sw"><i style="background:var(--color-game-shield-ring)"></i><b>game.shield-ring</b><code>#5fb8ff</code></div>
+    <div class="sw"><i style="background:var(--color-game-fire-ring)"></i><b>game.fire-ring</b><code>#ff8a3a</code></div>
+    <div class="sw"><i style="background:var(--color-biome-forest-ground)"></i><b>biome.forest-ground</b><code>#2f5d34</code></div>
+    <div class="sw"><i style="background:var(--color-biome-night-ground)"></i><b>biome.night-ground</b><code>#0f1c3a</code></div>
+    <div class="sw"><i style="background:var(--color-biome-elf-ground)"></i><b>biome.elf-ground</b><code>#3b2a6b</code></div>
+  </div>
+</section>
+
+<section class="sg">
+  <h2>Schrift „Astro“</h2>
+  <p>Eigene Bitmap-Schrift, nur ganzzahlig skalieren (1×–4×). Kapsel nur im Menü, Funk nur in der Runde, in der Pause und auf dem Ergebnis-Screen. Alles in Großbuchstaben.</p>
+  <div class="board menu"><div class="z items" data-font="kapsel">
+    <div class="item"><span class="lab">KAPSEL 4× · Logo, Spielerlevel</span><span class="px" data-t="360 SHOOTER" data-s="4" data-c="--color-menu-text" data-sh="--color-menu-outline"></span></div>
+    <div class="item"><span class="lab">3× · Gold im Panel</span><span class="px" data-t="1.240" data-s="3" data-c="--color-menu-gold" data-sh="--color-menu-outline"></span></div>
+    <div class="item"><span class="lab">2× · Buttons, Biome</span><span class="px" data-t="UPGRADES" data-s="2" data-c="--color-menu-text"></span></div>
+    <div class="item"><span class="lab">1× · Labels, Hinweise</span><span class="px" data-t="TIPPE AUF EIN FREIES LEVEL." data-c="--color-menu-text-muted"></span></div>
+  </div></div>
+  <div class="board hud" style="margin-top:12px"><div class="z items" data-font="funk">
+    <div class="item"><span class="lab">FUNK 3× · Timer, Energie</span><span class="px" data-t="1:42" data-s="3" data-c="--color-hud-text"></span></div>
+    <div class="item"><span class="lab">2× · Werte in Chips</span><span class="px" data-t="2/3  4S  +23" data-s="2" data-c="--color-hud-text"></span></div>
+    <div class="item"><span class="lab">1× · Labels, Hinweise</span><span class="px" data-t="ENERGIE · TIPPEN ZUM WEITERSPIELEN" data-c="--color-hud-text-muted"></span></div>
+  </div></div>
+</section>
+
+<section class="sg">
+  <h2>Buttons · Menü (Kassette)</h2>
+  <p>Mindestens 32×32. Der Fokus ist ein cremefarbener Ring mit 4 px Abstand. Beim Drücken rutscht der Button 2 px in seinen Schatten. Deaktivierte Buttons verlieren Fase und Schatten und zeigen einen Grund im Text, z. B. „ZU TEUER“.</p>
+  <div class="board menu"><div class="z fit" data-font="kapsel" style="display:grid;grid-template-columns:repeat(5,max-content);gap:12px 18px;align-items:end">
+    <span class="lab">NORMAL</span><span class="lab">HOVER</span><span class="lab">FOCUS-VISIBLE</span><span class="lab">ACTIVE</span><span class="lab">DISABLED</span>
+    <div class="k-btn primary"><span class="px" data-t="UPGRADES" data-s="2" data-c="--color-menu-action-fg"></span></div>
+    <div class="k-btn primary is-hover"><span class="px" data-t="UPGRADES" data-s="2" data-c="--color-menu-action-fg"></span></div>
+    <div class="k-btn primary is-focus"><span class="px" data-t="UPGRADES" data-s="2" data-c="--color-menu-action-fg"></span></div>
+    <div class="k-btn primary is-active"><span class="px" data-t="UPGRADES" data-s="2" data-c="--color-menu-action-fg"></span></div>
+    <div class="k-btn primary is-disabled"><span class="px" data-t="ZU TEUER" data-s="2" data-c="--color-menu-text-disabled"></span></div>
+    <div class="k-btn"><span class="px" data-t="ABBRECHEN" data-s="2" data-c="--color-menu-text"></span></div>
+    <div class="k-btn is-hover"><span class="px" data-t="ABBRECHEN" data-s="2" data-c="--color-menu-text"></span></div>
+    <div class="k-btn is-focus"><span class="px" data-t="ABBRECHEN" data-s="2" data-c="--color-menu-text"></span></div>
+    <div class="k-btn is-active"><span class="px" data-t="ABBRECHEN" data-s="2" data-c="--color-menu-text"></span></div>
+    <div class="k-btn is-disabled"><span class="px" data-t="ABBRECHEN" data-s="2" data-c="--color-menu-text-disabled"></span></div>
+    <div class="k-btn danger"><span class="px" data-t="JA, LÖSCHEN" data-s="2" data-c="--color-menu-danger-fg"></span></div>
+    <div class="k-btn danger is-hover"><span class="px" data-t="JA, LÖSCHEN" data-s="2" data-c="--color-menu-danger-fg"></span></div>
+    <div class="k-btn danger is-focus"><span class="px" data-t="JA, LÖSCHEN" data-s="2" data-c="--color-menu-danger-fg"></span></div>
+    <div class="k-btn danger is-active"><span class="px" data-t="JA, LÖSCHEN" data-s="2" data-c="--color-menu-danger-fg"></span></div>
+    <div class="k-btn danger is-disabled"><span class="px" data-t="JA, LÖSCHEN" data-s="2" data-c="--color-menu-text-disabled"></span></div>
+    <div class="k-btn icon" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text);--px-k:var(--color-menu-surface)"></span></div>
+    <div class="k-btn icon is-hover"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text);--px-k:var(--color-menu-surface)"></span></div>
+    <div class="k-btn icon is-focus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text);--px-k:var(--color-menu-surface)"></span></div>
+    <div class="k-btn icon is-active"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text);--px-k:var(--color-menu-surface)"></span></div>
+    <div class="k-btn icon is-disabled"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text-disabled);--px-k:var(--color-menu-locked-bg)"></span></div>
+  </div></div>
+</section>
+
+<section class="sg">
+  <h2>Level-Kachel, Biom-Aufkleber, Fortschritt</h2>
+  <p>Ein Zustand wird nie nur über Farbe gezeigt: Geschaffte Level tragen einen Stern, das aktuelle hat Ring und Pfeil, gesperrte ein Schloss.</p>
+  <div class="board menu"><div class="z items" data-font="kapsel">
+    <div class="item"><span class="lab">GESCHAFFT</span><div class="k-tile done"><span class="px" data-t="4" data-s="2" data-c="--color-menu-done-fg"></span><span class="badge spr" data-n="star"></span></div></div>
+    <div class="item"><span class="lab">AKTUELL</span><div class="k-tile current" style="margin-top:12px"><span class="px" data-t="7" data-s="2" data-c="--color-menu-action-fg"></span></div></div>
+    <div class="item"><span class="lab">FREI, NICHT GESCHAFFT</span><div class="k-tile"><span class="px" data-t="8" data-s="2" data-c="--color-menu-text"></span></div></div>
+    <div class="item"><span class="lab">GESPERRT</span><div class="k-tile locked"><span class="spr" data-n="lock" data-s="2" style="--px-o:var(--color-menu-locked-fg);--px-k:var(--color-menu-locked-bg)"></span></div></div>
+    <div class="item"><span class="lab">FOCUS-VISIBLE</span><div class="k-tile done is-focus"><span class="px" data-t="5" data-s="2" data-c="--color-menu-done-fg"></span><span class="badge spr" data-n="star"></span></div></div>
+    <div class="item"><span class="lab">BIOM-AUFKLEBER</span><span class="rowline"><span class="k-sticker"><i class="k-swatch" style="background:var(--color-biome-night)"></i><span class="px" data-t="WALD BEI NACHT" data-c="--color-menu-sticker-fg"></span></span><span class="px" data-t="5–9" data-c="--color-menu-text-muted"></span></span></div>
+    <div class="item" style="width:140px"><span class="lab">XP-BALKEN 71 %</span><div class="k-bar" style="width:140px"><i style="width:71%"></i></div></div>
+    <div class="item" style="width:140px"><span class="lab">XP-BALKEN LEER (ERSTSTART)</span><div class="k-bar" style="width:140px"><i style="width:0"></i></div></div>
+  </div></div>
+</section>
+
+<section class="sg">
+  <h2>Upgrade-Zeile</h2>
+  <p>Stufe als 10 Pips und Zahl. Der Preis steht immer im Button. Zustände: kaufbar, zu teuer und maximal.</p>
+  <div class="board menu"><div class="z items" data-font="kapsel">
+    <div class="k-sunken uprow"><span class="px" data-t="FEUERRATE" data-c="--color-menu-text"></span><span class="k-pips"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <div class="k-btn primary" style="height:24px;min-height:24px"><span class="spr" data-n="coin"></span><span class="px" data-t="27" data-c="--color-menu-action-fg"></span></div></div>
+    <div class="k-sunken uprow"><span class="px" data-t="DREHEN" data-c="--color-menu-text"></span><span class="k-pips"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>
+      <div class="k-btn is-disabled" style="height:24px"><span class="spr" data-n="coin" style="opacity:.6"></span><span class="px" data-t="105" data-c="--color-menu-text-disabled"></span></div></div>
+    <div class="k-sunken uprow"><span class="px" data-t="LEBEN" data-c="--color-menu-text"></span><span class="k-pips"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
+      <div class="k-btn done is-disabled" style="height:24px;--b:var(--color-menu-done-bg)"><span class="px" data-t="MAX" data-c="--color-menu-done-fg"></span></div></div>
+  </div></div>
+</section>
+
+<section class="sg">
+  <h2>HUD · Energie, Timer, Chips</h2>
+  <p>Energie hat 10 Segmente, jedes steht für 10 % der maximalen Energie. Ab 25 % oder weniger wird sie warnrot, das Label wechselt auf „ENERGIE!“ und blinkt (bei reduzierter Bewegung ohne Blinken). Chips erscheinen nur für aktive Kräfte.</p>
+  <div class="board hud"><div class="z items" data-font="funk">
+    <div class="item"><span class="lab">ENERGIE VOLL</span><div class="f-glass f-energy" style="width:156px"><span class="px" data-t="100" data-s="3" data-c="--color-hud-text"></span><div><span class="px" data-t="ENERGIE" data-c="--color-hud-text-muted"></span><div class="f-segs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+    <div class="item"><span class="lab">ENERGIE 87</span><div class="f-glass f-energy" style="width:156px"><span class="px" data-t="87" data-s="3" data-c="--color-hud-text"></span><div><span class="px" data-t="ENERGIE" data-c="--color-hud-text-muted"></span><div class="f-segs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="half"></i><i class="off"></i></div></div></div></div>
+    <div class="item"><span class="lab">ENERGIE NIEDRIG (≤ 25 %)</span><div class="f-glass f-energy low" style="width:156px"><span class="px" data-t="18" data-s="3" data-c="--color-hud-energy-low"></span><div><span class="px" data-t="ENERGIE!" data-c="--color-hud-energy-low"></span><div class="f-segs"><i></i><i class="half"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></div></div></div></div>
+    <div class="item"><span class="lab">TIMER</span><div class="f-glass" style="width:100px;height:36px;display:grid;place-items:center"><span class="px" data-t="1:42" data-s="3" data-c="--color-hud-text"></span></div></div>
+    <div class="item"><span class="lab">TIMER &lt; 10 S (BLINKT)</span><div class="f-glass" style="width:100px;height:36px;display:grid;place-items:center;border-color:var(--color-hud-danger)"><span class="px" data-t="0:07" data-s="3" data-c="--color-hud-danger"></span></div></div>
+    <div class="item"><span class="lab">BOSS-NACHSPIELZEIT</span><div class="f-glass" style="width:100px;height:36px;display:grid;place-items:center;border-color:var(--color-hud-danger)"><span class="px" data-t="BOSS!" data-s="3" data-c="--color-hud-danger"></span></div></div>
+  </div>
+  <div class="z items" data-font="funk" style="margin-top:10px">
+    <div class="item"><span class="lab">MÜNZEN</span><div class="f-glass f-chip"><span class="spr" data-n="coin" data-s="2"></span><span class="px" data-t="+23" data-s="2" data-c="--color-hud-gold"></span></div></div>
+    <div class="item"><span class="lab">DOPPELSCHUSS 1/2</span><div class="f-glass f-chip"><span class="spr" data-n="double" data-s="2" style="--px-L:var(--color-hud-accent);--px-o:var(--color-hud-screen)"></span><span class="px" data-t="1/2" data-s="2" data-c="--color-hud-text"></span></div></div>
+    <div class="item"><span class="lab">SCHILD 2/3</span><div class="f-glass f-chip"><span class="spr" data-n="shield" data-s="2" style="--px-B:var(--color-game-shield-ring);--px-b:var(--color-hud-text);--px-o:var(--color-hud-screen)"></span><span class="px" data-t="2/3" data-s="2" data-c="--color-hud-text"></span></div></div>
+    <div class="item"><span class="lab">DAUERFEUER 4 S</span><div class="f-glass f-chip"><span class="spr" data-n="rapid" data-s="2" style="--px-Y:var(--color-hud-accent);--px-o:var(--color-hud-screen)"></span><span class="px" data-t="4S" data-s="2" data-c="--color-hud-text"></span></div></div>
+    <div class="item"><span class="lab">FEUERRING AKTIV 5 S</span><div class="f-glass f-chip active"><span class="spr" data-n="ring" data-s="2" style="--px-F:var(--color-game-fire-ring);--px-o:var(--color-hud-screen)"></span><span class="px" data-t="5S" data-s="2" data-c="--color-hud-text"></span></div></div>
+    <div class="item"><span class="lab">FEUERRING LÄDT 12 S</span><div class="f-glass dim f-chip"><span class="spr" data-n="ring" data-s="2" style="--px-F:var(--color-hud-line);--px-o:var(--color-hud-screen)"></span><span class="px" data-t="12S" data-s="2" data-c="--color-hud-text-muted"></span></div></div>
+  </div></div>
+</section>
+
+<section class="sg">
+  <h2>HUD · Buttons und Stick</h2>
+  <div class="board hud"><div class="z" data-font="funk" style="display:grid;grid-template-columns:repeat(5,max-content);gap:12px 18px;align-items:end">
+    <span class="lab">NORMAL</span><span class="lab">HOVER</span><span class="lab">FOCUS-VISIBLE</span><span class="lab">ACTIVE</span><span class="lab">DISABLED</span>
+    <div class="f-btn icon" aria-label="Pause"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+    <div class="f-btn icon is-hover"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+    <div class="f-btn icon is-focus"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+    <div class="f-btn icon is-active"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-screen);--px-k:var(--color-hud-accent)"></span></div>
+    <div class="f-btn icon is-disabled"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-line-dim);--px-k:var(--color-hud-screen)"></span></div>
+    <div class="f-btn primary"><span class="px" data-t="NOCHMAL" data-s="2" data-c="--color-hud-accent"></span></div>
+    <div class="f-btn primary is-hover"><span class="px" data-t="NOCHMAL" data-s="2" data-c="--color-hud-accent"></span></div>
+    <div class="f-btn primary is-focus"><span class="px" data-t="NOCHMAL" data-s="2" data-c="--color-hud-accent"></span></div>
+    <div class="f-btn primary is-active"><span class="px" data-t="NOCHMAL" data-s="2" data-c="--color-hud-screen"></span></div>
+    <div class="f-btn primary is-disabled"><span class="px" data-t="NOCHMAL" data-s="2" data-c="--color-hud-line"></span></div>
+  </div>
+  <div class="z items" style="margin-top:10px">
+    <div class="item"><span class="lab">STICK RUHE</span><div style="position:relative;width:88px;height:88px"><div class="f-stick" style="left:0;top:0"><i></i></div></div></div>
+    <div class="item"><span class="lab">STICK AKTIV (ZIEL OBEN RECHTS)</span><div style="position:relative;width:88px;height:88px"><div class="f-stick is-active" style="left:0;top:0"><i></i></div></div></div>
+  </div></div>
+</section>
+
+<section class="sg">
+  <h2>Laden und Dialog</h2>
+  <div class="board menu"><div class="z items" data-font="kapsel">
+    <div class="item"><span class="lab">LADEN (PRELOADSCENE)</span><div class="k-panel" style="padding:10px 12px;width:180px"><span class="px" data-t="LADE KASSETTE …" data-c="--color-menu-text"></span><div class="k-bar" style="margin-top:8px"><i style="width:40%"></i></div></div></div>
+    <div class="item"><span class="lab">DIALOG (CONFIRMDIALOG)</span>
+      <div class="k-panel" style="padding:14px;width:250px;display:flex;flex-direction:column;gap:10px;align-items:center">
+        <span class="px" data-t="WIRKLICH LÖSCHEN?" data-s="2" data-c="--color-menu-text"></span>
+        <span class="px" data-t="AUCH GOLD UND UPGRADES WERDEN GELÖSCHT." data-c="--color-menu-text-muted"></span>
+        <div class="rowline" style="gap:14px;margin-top:4px"><div class="k-btn danger"><span class="px" data-t="JA, LÖSCHEN" data-s="2" data-c="--color-menu-danger-fg"></span></div><div class="k-btn is-focus"><span class="px" data-t="ABBRECHEN" data-s="2" data-c="--color-menu-text"></span></div></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<script src="assets/fonts.js"></script>
+<script src="assets/pixel.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@
       "plum": {
         "400": "#8a6a9a",
         "500": "#4a2c60",
+        "550": "#55306e",
         "600": "#3d2252",
         "700": "#2d1a3d",
         "750": "#24142f",
@@ -55,7 +56,27 @@
         "elf": "#c89bff",
         "forest-ground": "#2f5d34",
         "night-ground": "#0f1c3a",
-        "elf-ground": "#3b2a6b"
+        "elf-ground": "#3b2a6b",
+        "forest-ground-hi": "#3a6e3f",
+        "forest-ground-lo": "#26502b",
+        "night-ground-hi": "#1c2d58",
+        "night-ground-lo": "#0a142c",
+        "elf-ground-hi": "#4a3880",
+        "elf-ground-lo": "#30215a"
+      },
+      "sprite": {
+        "outline": "#0b0610",
+        "suit": "#fff4e8",
+        "suit-shade": "#e0c9d6",
+        "visor": "#2a1640",
+        "visor-glint": "#ffa0ae",
+        "eyes": "#5fe0c0",
+        "cheeks": "#ffa0ae",
+        "accent": "#ff6b8a",
+        "raygun-glow": "#ff8fae",
+        "coin": "#ffcf4a",
+        "coin-hi": "#ffe2a0",
+        "coin-lo": "#c7922a"
       },
       "menu": {
         "bg": "#1a0f24",
@@ -63,6 +84,7 @@
         "surface-hi": "#4a2c60",
         "surface-lo": "#20122c",
         "surface-sunken": "#3d2252",
+        "surface-sunken-hi": "#55306e",
         "outline": "#0b0610",
         "text": "#fff4e8",
         "text-muted": "#d8c3d6",

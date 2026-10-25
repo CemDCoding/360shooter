@@ -8,6 +8,7 @@ export const tokens = {
     "plum": {
       "400": "var(--color-plum-400)",
       "500": "var(--color-plum-500)",
+      "550": "var(--color-plum-550)",
       "600": "var(--color-plum-600)",
       "700": "var(--color-plum-700)",
       "750": "var(--color-plum-750)",
@@ -56,7 +57,27 @@ export const tokens = {
       "elf": "var(--color-biome-elf)",
       "forest-ground": "var(--color-biome-forest-ground)",
       "night-ground": "var(--color-biome-night-ground)",
-      "elf-ground": "var(--color-biome-elf-ground)"
+      "elf-ground": "var(--color-biome-elf-ground)",
+      "forest-ground-hi": "var(--color-biome-forest-ground-hi)",
+      "forest-ground-lo": "var(--color-biome-forest-ground-lo)",
+      "night-ground-hi": "var(--color-biome-night-ground-hi)",
+      "night-ground-lo": "var(--color-biome-night-ground-lo)",
+      "elf-ground-hi": "var(--color-biome-elf-ground-hi)",
+      "elf-ground-lo": "var(--color-biome-elf-ground-lo)"
+    },
+    "sprite": {
+      "outline": "var(--color-sprite-outline)",
+      "suit": "var(--color-sprite-suit)",
+      "suit-shade": "var(--color-sprite-suit-shade)",
+      "visor": "var(--color-sprite-visor)",
+      "visor-glint": "var(--color-sprite-visor-glint)",
+      "eyes": "var(--color-sprite-eyes)",
+      "cheeks": "var(--color-sprite-cheeks)",
+      "accent": "var(--color-sprite-accent)",
+      "raygun-glow": "var(--color-sprite-raygun-glow)",
+      "coin": "var(--color-sprite-coin)",
+      "coin-hi": "var(--color-sprite-coin-hi)",
+      "coin-lo": "var(--color-sprite-coin-lo)"
     },
     "menu": {
       "bg": "var(--color-menu-bg)",
@@ -64,6 +85,7 @@ export const tokens = {
       "surface-hi": "var(--color-menu-surface-hi)",
       "surface-lo": "var(--color-menu-surface-lo)",
       "surface-sunken": "var(--color-menu-surface-sunken)",
+      "surface-sunken-hi": "var(--color-menu-surface-sunken-hi)",
       "outline": "var(--color-menu-outline)",
       "text": "var(--color-menu-text)",
       "text-muted": "var(--color-menu-text-muted)",
