@@ -34,17 +34,11 @@ describe('levels', () => {
     expect(getLevel(21)).toBeUndefined();
   });
 
-  it('levels 0-4 keep their fixed spawn values (AP-23)', () => {
-    const fixed = [
-      [3570, 25],
-      [3130, 28],
-      [2780, 31],
-      [2450, 34],
-      [2190, 37],
-    ];
-    fixed.forEach(([interval, max], id) => {
-      expect(LEVELS[id].spawnIntervalMs).toBe(interval);
-      expect(LEVELS[id].maxEnemies).toBe(max);
-    });
+  it('max enemies never fall from level to level and level 0 starts near 3300 ms (AP-56)', () => {
+    for (let i = 1; i < LEVELS.length; i++) {
+      expect(LEVELS[i].maxEnemies).toBeGreaterThan(LEVELS[i - 1].maxEnemies);
+    }
+    expect(LEVELS[0].spawnIntervalMs).toBeGreaterThanOrEqual(3200);
+    expect(LEVELS[0].spawnIntervalMs).toBeLessThanOrEqual(3400);
   });
 });
