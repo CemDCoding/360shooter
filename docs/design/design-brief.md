@@ -34,7 +34,9 @@
 
 ## Gewählte Richtung
 
-**Kombination (Nutzer, 2026-10-25):** Hauptmenü und Level-Auswahl aus **B „Sternenkassette“**, Look in der Runde (HUD) aus **C „Funklogbuch“**. Details zur Verbindung beider Teile: siehe Entscheidungen (Runde 4 offen).
+**Kombination (Nutzer, 2026-10-25):** Hauptmenü und Level-Auswahl aus **B „Sternenkassette“**, Look in der Runde (HUD) aus **C „Funklogbuch“**. Leitidee der Verbindung (12a): *„Außen die Spielkassette, innen das Funkgerät im Anzug.“* Menü, Level-Auswahl, Upgrade-Panel und Dialoge im Kassetten-Stil. Runde, Pause und Ergebnis im Funkgerät-Stil. Eine gemeinsame Schriftfamilie (Menü fett, HUD fein). Gold, Warnrot und Sprites sind überall gleich.
+**Schrift:** Der Nutzer lehnt eine generisch wirkende Pixelschrift ab („zu KI-mäßig“). Vorschlag: eigene Bitmap-Schrift (Schnitte „Kapsel“ und „Funk“), Probe in `mockups/schrift.html`.
+**Waffe (13a, 14a, 15a):** Die Figur bleibt aufrecht und spiegelt sich nur links/rechts. Die Waffe ist ein eigenes Sprite an der Hand und dreht sich um 360° (Gungeon-Prinzip). Look: Retro-Strahlenpistole (Creme, Korallen-Akzent, leuchtende Mündung) mit drei Ausbaustufen nach Waffen-Upgrade-Stufe (0–6, 7–13, 14–20).
 
 **Neu: Waffe als eigenes Design.** Die Waffe ist ein eigenes Sprite, das an der Astronautin befestigt wird (Ankerpunkte). So lassen sich Waffe und Aussehen später tauschen, ohne die Figur zu ändern.
 
@@ -64,6 +66,7 @@ Hinweis: Die Mockups zeichnen Schrift und Sprites mit `assets/pixel.js`, einem 5
 - 2026-10-25 Nutzer: 1a Umfang UI + Sprite-Styleguide · 2a niedlich, mutig, geheimnisvoll · 3a Metroid als Haltung, Visier-Rahmen gegen süße Figur · 4a Pixelschrift für Titel und Zahlen, lesbare Schrift für Fließtext
 - 2026-10-25 Nutzer: 5b größeres HUD · 6a Logo-Schriftzug und App-Icons · 7a + Zelda · 8a ruhiges Menü, kompaktes HUD, Arcade-Retro-Anteil behalten, Spielerporträt im Startmenü behalten
 - 2026-10-25 Nutzer: 9a HP als Energiezahl + Segmentbalken · 10b Level-Raster bleibt · 11a Visier-UI unabhängig vom Biom
+- 2026-10-25 Nutzer: Menü und Level-Auswahl aus B, Runde aus C · Waffe als eigenes, austauschbares Sprite · 12a eine Schriftfamilie, aber keine generische („zu KI-mäßig“) · 13a Figur aufrecht, Waffe kreist · 14a Retro-Strahlenpistole · 15a drei Ausbaustufen
 
 ## Übergabe an den Planner
 
