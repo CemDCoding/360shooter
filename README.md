@@ -64,11 +64,11 @@ An die Adresse anh√§ngen, z. B. `http://localhost:5173/?level=5`:
 
 ## Design
 
-Gestaltung, Grunds‰tze und Mockups stehen in `docs/design/` (Einstieg: `docs/design/design-brief.md`).
+Gestaltung, Grunds√§tze und Mockups stehen in `docs/design/` (Einstieg: `docs/design/design-brief.md`).
 
 - `npm run theme:build` erzeugt aus den Design-Tokens die Theme-Datei `src/config/theme.ts`.
 - `npm run fonts:build` bereitet die Schriften auf.
-- Regel "nur Tokens": In `src/scenes/**` und `src/entities/**` sind keine Farb-Literale (`0xÖ`, `#Ö`) und keine Systemschrift erlaubt. ESLint (`npm run lint`) erzwingt das. Farben und Schriften kommen aus `src/config/theme.ts`.
+- Regel "nur Tokens": In `src/scenes/**` und `src/entities/**` sind keine Farb-Literale (`0x‚Ä¶`, `#‚Ä¶`) und keine Systemschrift erlaubt. ESLint (`npm run lint`) erzwingt das. Farben und Schriften kommen aus `src/config/theme.ts`.
 
 ## Ordnerstruktur
 
