@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** entwurf
-**Stand:** Schritt 5: Design-System, Screens und Sprite-Styleguide fertig, Übergabe geschrieben. Wartet auf die Freigabe durch den Nutzer.
+**Status:** freigegeben am 2026-10-25
+**Stand:** Freigegeben. Nächster Schritt: Lead beauftragt den Planner mit „Design übernehmen“ (Übergabe unten).
 
 ## Ausgangslage
 
@@ -66,6 +66,7 @@ Keine neuen npm-Abhängigkeiten.
 - 2026-10-25 Nutzer: 9a Energie als Zahl + 10 Segmente · 10b Level-Raster bleibt · 11a UI unabhängig vom Biom
 - 2026-10-25 Nutzer: Menü und Level-Auswahl aus B, Runde aus C · Waffe als eigenes, austauschbares Sprite · 12a eine Schriftfamilie, keine generische · 13a Figur aufrecht, Waffe kreist · 14a Retro-Strahlenpistole · 15a drei Ausbaustufen
 - 2026-10-25 Nutzer: 16a eigene Schrift „Astro“ (Kapsel + Funk) · 17a Strahlenpistole wie entworfen
+- 2026-10-25 Nutzer: Design freigegeben (inklusive der folgenden Annahmen)
 - (angenommen) Laserfarbe gehört zur Waffe: Strahlenpistole Korallenrosa `#ff8fae`.
 - (angenommen) Sekundenangaben im HUD mit kleinem „s“ (z. B. „4s“), damit sie nicht wie „45“ gelesen werden.
 - (angenommen) Name „360shooter“ bleibt, das Logo ist der Kapsel-Schriftzug „360“ in Koralle + „SHOOTER“ in Creme.
