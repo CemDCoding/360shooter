@@ -37,6 +37,8 @@ export class PreloadScene extends Phaser.Scene {
         });
       } else if (def.kind === 'image') {
         this.load.image(def.key, def.path);
+      } else if (def.kind === 'bitmapFont') {
+        this.load.bitmapFont(def.key, def.path, def.xmlPath);
       } else {
         this.load.audio(def.key, def.path);
       }

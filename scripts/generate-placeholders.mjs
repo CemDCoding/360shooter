@@ -97,7 +97,97 @@ function drawFrame(px, sheetW, ox, fw, fh, key, frame, frames) {
     }
   }
 }
+
+// ---------- Design-Vorlagen (docs/design/assets/pixel.js, mockups/sprites.html) ----------
+// Die Vorlagen werden ganzzahlig 2x vergroessert (12x8 -> 24x16, 8x8 -> 16x16).
+const hex = (s) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16));
+const RAYGUN_PALETTE = {
+  o: '#0b0610', // Tinte (Umriss der Waffe, Sprite-Styleguide)
+  w: '#f4f1f8',
+  l: '#c9c2d6',
+  a: '#ff6b8a',
+  x: '#ff8fae',
+  y: '#fff3b0', // Muendungsleuchten im Schuss-Frame
+};
+const RAYGUN = [
+  [
+    '.ooo........',
+    'owwwo.......',
+    'owwwoooooo..',
+    'owlwwwwwwoxo',
+    'owwwoooooo..',
+    '.owwo.......',
+    '..owo.......',
+    '..ooo.......',
+  ],
+  [
+    '.oaao.......',
+    'owwwo.......',
+    'owwwoooooo..',
+    'owlwawawaoxo',
+    'owwwoooooo..',
+    '.owwo.......',
+    '..owo.......',
+    '..ooo.......',
+  ],
+  [
+    '.oaao.......',
+    'owxwo.......',
+    'owxwooooooxo',
+    'owlwawawaoxo',
+    'owwwooooooxo',
+    '.owwo.......',
+    '..owo.......',
+    '..ooo.......',
+  ],
+];
+const ICON_PALETTE = { o: '#14101c', k: '#e8ecf2' }; // Linie + Fuellung, Farben per Tint
+const UI_ICONS = [
+  // 0 Ton an
+  ['....o...', '...oo..o', 'oooko.o.', 'okkko.o.', 'okkko.o.', 'oooko.o.', '...oo..o', '....o...'],
+  // 1 Ton aus
+  ['....o...', '...oo...', 'oookoo.o', 'okkko.o.', 'okkko.o.', 'oookoo.o', '...oo...', '....o...'],
+  // 2 Pause
+  ['ooo..ooo', 'oko..oko', 'oko..oko', 'oko..oko', 'oko..oko', 'oko..oko', 'oko..oko', 'ooo..ooo'],
+  // 3 Schloss
+  ['..oooo..', '.o....o.', '.o....o.', 'oooooooo', 'okkkkkko', 'okkookko', 'okkkkkko', 'oooooooo'],
+];
+
+/** Zeichnet Vorlagen (Zeichenraster) 2x vergroessert nebeneinander in ein Spritesheet. */
+function makeFromTemplates(frames, palette, fw, fh) {
+  const w = fw * frames.length;
+  const px = Buffer.alloc(w * fh * 4);
+  frames.forEach((rows, f) => {
+    rows.forEach((row, ty) => {
+      [...row].forEach((k, tx) => {
+        if (k === '.') return;
+        const c = hex(palette[k]);
+        for (let dy = 0; dy < 2; dy++) {
+          for (let dx = 0; dx < 2; dx++) {
+            const i = ((ty * 2 + dy) * w + f * fw + tx * 2 + dx) * 4;
+            px[i] = c[0];
+            px[i + 1] = c[1];
+            px[i + 2] = c[2];
+            px[i + 3] = 255;
+          }
+        }
+      });
+    });
+  });
+  return encodePng(w, fh, px);
+}
+function makeRaygun(def) {
+  // Je Ausbaustufe: Ruhe, Schuss (Muendung 'x' leuchtet im Schuss-Frame)
+  const frames = RAYGUN.flatMap((rows) => [rows, rows.map((r) => r.replaceAll('x', 'y'))]);
+  return makeFromTemplates(frames, RAYGUN_PALETTE, def.frameWidth, def.frameHeight);
+}
+function makeUiIcons(def) {
+  return makeFromTemplates(UI_ICONS, ICON_PALETTE, def.frameWidth, def.frameHeight);
+}
+const SPECIAL = { 'weapon-raygun': makeRaygun, 'ui-icons': makeUiIcons };
+
 function makeSprite(def) {
+  if (SPECIAL[def.key]) return SPECIAL[def.key](def);
   const { frameWidth: fw, frameHeight: fh, frames } = def;
   const w = fw * frames;
   const px = Buffer.alloc(w * fh * 4);
@@ -153,6 +243,7 @@ const sha = (buf) => createHash('sha256').update(buf).digest('hex');
 const marker = existsSync(markerPath) ? JSON.parse(readFileSync(markerPath, 'utf8')) : {};
 let written = 0;
 for (const def of ASSETS) {
+  if (def.kind === 'bitmapFont') continue; // Schriften entstehen nur mit "npm run fonts:build"
   const file = join(publicDir, def.path);
   const content = def.kind === 'audio' ? makeWav(SOUNDS[def.key]) : makeSprite(def);
   let write = false;

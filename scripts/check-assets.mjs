@@ -24,8 +24,9 @@ function checkPng(buf, asset) {
   const width = buf.readUInt32BE(16);
   const height = buf.readUInt32BE(20);
   const colorType = buf[25];
-  const expW = asset.frameWidth * asset.frames;
-  const expH = asset.frameHeight;
+  // asset === null: Schrift-Atlas, dessen Groesse die XML bestimmt
+  const expW = asset ? asset.frameWidth * asset.frames : width;
+  const expH = asset ? asset.frameHeight : height;
   if (width !== expW || height !== expH) {
     errors.push(
       `Falsche Groesse: ${width}x${height} Pixel. Erwartet: ${expW}x${expH} Pixel ` +
@@ -35,6 +36,54 @@ function checkPng(buf, asset) {
   const hasAlpha = colorType === 4 || colorType === 6 || buf.includes(Buffer.from('tRNS'));
   if (!hasAlpha) {
     warnings.push('Die PNG hat keinen transparenten Hintergrund (kein Alphakanal).');
+  }
+  return { errors, warnings };
+}
+
+/** Prueft Schrift-PNG (nur Format, Alpha) und die BMFont-XML (Zeichen eindeutig, im Bild). */
+function checkBitmapFont(buf, xml) {
+  const { errors, warnings } = checkPng(buf, null);
+  if (errors.length > 0) return { errors, warnings };
+  const imgW = buf.readUInt32BE(16);
+  const imgH = buf.readUInt32BE(20);
+  if (xml === null) {
+    errors.push('Die XML-Datei der Schrift fehlt. Sie entsteht mit "npm run fonts:build".');
+    return { errors, warnings };
+  }
+  if (!/<font[\s>]/.test(xml) || !/<\/font>/.test(xml) || !/<chars[\s>]/.test(xml)) {
+    errors.push('Die XML-Datei der Schrift ist kaputt (kein <font> mit <chars>).');
+    return { errors, warnings };
+  }
+  const common = /<common\b[^>]*>/.exec(xml);
+  const scaleW = common && /\bscaleW="(\d+)"/.exec(common[0]);
+  const scaleH = common && /\bscaleH="(\d+)"/.exec(common[0]);
+  if (!scaleW || !scaleH) {
+    errors.push('Die XML-Datei der Schrift ist kaputt (<common> ohne scaleW/scaleH).');
+  } else if (Number(scaleW[1]) !== imgW || Number(scaleH[1]) !== imgH) {
+    errors.push(
+      `Die XML passt nicht zum Bild: scaleW/scaleH ${scaleW[1]}x${scaleH[1]}, das Bild ist ${imgW}x${imgH} Pixel.`,
+    );
+  }
+  const tags = xml.match(/<char\b[^>]*\/?>/g) ?? [];
+  if (tags.length === 0) errors.push('Die XML-Datei der Schrift enthaelt keine Zeichen.');
+  const seen = new Set();
+  const num = (tag, name) => {
+    const m = new RegExp(`\\b${name}="(-?\\d+)"`).exec(tag);
+    return m ? Number(m[1]) : null;
+  };
+  for (const tag of tags) {
+    const [id, x, y, w, h] = ['id', 'x', 'y', 'width', 'height'].map((n) => num(tag, n));
+    if ([id, x, y, w, h].some((v) => v === null)) {
+      errors.push(`Ein Zeichen in der XML ist unvollstaendig: ${tag.trim()}`);
+      continue;
+    }
+    if (seen.has(id)) errors.push(`Zeichen-ID ${id} kommt in der XML mehrfach vor.`);
+    seen.add(id);
+    if (x < 0 || y < 0 || w < 0 || h < 0 || x + w > imgW || y + h > imgH) {
+      errors.push(
+        `Zeichen ${id} liegt nicht im Bild (x=${x}, y=${y}, ${w}x${h}; Bild ${imgW}x${imgH}).`,
+      );
+    }
   }
   return { errors, warnings };
 }
@@ -93,7 +142,12 @@ export function checkAssets(publicDir, assets = ASSETS) {
       r = { errors: ['Datei fehlt. Sie muss genau so heissen und hier liegen.'], warnings: [] };
     } else {
       const buf = readFileSync(file);
-      r = asset.kind === 'spritesheet' ? checkPng(buf, asset) : checkWav(buf);
+      if (asset.kind === 'spritesheet') r = checkPng(buf, asset);
+      else if (asset.kind === 'bitmapFont') {
+        const xmlFile = join(publicDir, asset.xmlPath ?? '');
+        const xml = asset.xmlPath && existsSync(xmlFile) ? readFileSync(xmlFile, 'utf8') : null;
+        r = checkBitmapFont(buf, xml);
+      } else r = checkWav(buf);
     }
     results.push({ path: asset.path, ...r });
   }
