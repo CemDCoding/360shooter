@@ -15,6 +15,8 @@
     "assets:placeholders": "node scripts/generate-placeholders.mjs",
     "assets:check": "node scripts/check-assets.mjs",
     "icons": "node scripts/generate-icons.mjs",
+    "theme:build": "node scripts/build-theme.mjs",
+    "fonts:build": "node scripts/build-fonts.mjs",
     "preview:lan": "npm run build && vite preview --host"
   },
   "type": "module",

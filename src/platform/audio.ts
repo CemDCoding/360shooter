@@ -117,7 +117,14 @@ const ICON_OFF = 2;
 const MUTE_BUTTON_SIZE = 32;
 
 /** Mute toggle (32x32 touch target) showing ui-icons frame 1 (on) or 2 (off). Cleans up itself. */
-export function addMuteButton(scene: Phaser.Scene, x: number, y: number): void {
+export function addMuteButton(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  // Optik je Welt folgt in AP-52; bis dahin ohne Wirkung.
+  world: 'menu' | 'hud' = 'menu',
+): void {
+  void world;
   const service = getSoundService(scene.game);
   const bg = scene.add
     .rectangle(x, y, MUTE_BUTTON_SIZE, MUTE_BUTTON_SIZE, 0x000000, 0.5)

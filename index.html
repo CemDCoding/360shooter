@@ -10,11 +10,12 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="360shooter" />
-    <meta name="theme-color" content="#0b0b14" />
+    <meta name="theme-color" content="#1a0f24" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/icon-180.png" />
     <title>360shooter</title>
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
     <style>
       html,
       body {
@@ -23,7 +24,7 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: #0b0b14;
+        background: var(--color-menu-bg);
         touch-action: none;
         overscroll-behavior: none;
         -webkit-user-select: none;
@@ -68,7 +69,7 @@
         justify-content: center;
         flex-direction: column;
         gap: 12px;
-        background: #0b0b14;
+        background: var(--color-menu-bg);
         color: #ffd64a;
         font-family: monospace;
         font-size: 24px;
