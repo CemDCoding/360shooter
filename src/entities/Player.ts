@@ -6,7 +6,8 @@ import { applyDamage, applyHeal, isDead } from '../logic/health';
 import { applyPowerItem } from '../logic/items';
 import { absorbDamage, emptyPowers, tickPowers } from '../logic/powers';
 import { stepRotation } from '../logic/rotation';
-import { faceLeft, weaponFrame, weaponPose } from '../logic/weaponMount';
+import { faceLeft, stepMirror, weaponFrame, weaponPose } from '../logic/weaponMount';
+import { prefersReducedMotion } from '../platform/motion';
 import type { WeaponPose } from '../logic/weaponMount';
 import { WEAPON_MOUNT } from '../config/weaponMount';
 import { THEME } from '../config/theme';
@@ -50,6 +51,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   stats: WeaponStats;
   /** Facing in degrees, (-180, 180]. */
   facingDeg = 0;
+  /** Weapon side, continuous in [-1, 1]: +1 right hand, -1 mirrored (see stepMirror). */
+  private mirror = 1;
   private readonly fireTimer = new FireTimer();
   private readonly lasers: LaserPool;
   private hitTintLeft = 0;
@@ -131,7 +134,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const rad = Phaser.Math.DegToRad(this.facingDeg);
     const left = faceLeft(this.facingDeg);
     this.setFlipX(left);
-    const pose = weaponPose(this.x, this.y, this.facingDeg, left ? -1 : 1);
+    this.mirror = stepMirror(
+      this.mirror,
+      left ? -1 : 1,
+      dt,
+      prefersReducedMotion() ? 0 : WEAPON_MOUNT.mirrorMs,
+    );
+    const pose = weaponPose(this.x, this.y, this.facingDeg, this.mirror);
     this.updateWeapon(pose);
 
     const shots = this.fireTimer.tick(dt, this.stats.fireRatePerSec);
@@ -152,7 +161,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.weapon
       .setPosition(pose.hand.x, pose.hand.y)
       .setRotation(Phaser.Math.DegToRad(pose.rotationDeg))
-      .setScale(1, pose.flipY ? -1 : 1)
+      .setScale(1, this.mirror)
       .setDepth(this.depth + (pose.behind ? -1 : 1));
   }
 

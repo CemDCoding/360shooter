@@ -30,6 +30,23 @@ export function faceLeft(angleDeg: number): boolean {
   return Math.abs(normalizeDeg(angleDeg)) > 90;
 }
 
+/**
+ * Bewegt den Spiegelwert linear von current zu target (±1). Der Weg von -1 nach +1 dauert
+ * durationMs; kein Überschwingen. durationMs <= 0 springt sofort, dtMs <= 0 ändert nichts.
+ */
+export function stepMirror(
+  current: number,
+  target: number,
+  dtMs: number,
+  durationMs: number,
+): number {
+  if (durationMs <= 0) return target;
+  if (dtMs <= 0) return current;
+  const step = (2 * dtMs) / durationMs;
+  if (current < target) return Math.min(target, current + step);
+  return Math.max(target, current - step);
+}
+
 /** Handpunkt in Weltkoordinaten; gespiegelt wird die x-Verschiebung negiert. */
 export function handPoint(centerX: number, centerY: number, faceLeftNow: boolean): Point {
   const dx = faceLeftNow ? -WEAPON_MOUNT.hand.x : WEAPON_MOUNT.hand.x;
