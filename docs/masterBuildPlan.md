@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-25 · M3 W2b (AP-67) gemergt · `dev` auf 1b89792, gepusht, Checks grün (Install, lint, typecheck, 412/412 Tests, assets:check, build). **Autonomer Modus** (PE-69): Lead arbeitet ohne Freigabe pro Meilenstein weiter, bis „stop“.
-- **Fertig:** AP-01–AP-19, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-63, AP-65, AP-67, M0-DEP, M1-DEP, M2-DEP, M2b-DEP. AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
-- **Bereit:** AP-20 (Boss-Einbindung, M, sonnet high, Design-Review ja; AP-17–19 und AP-67 gemergt) und AP-64 (Gold-Magnet weicher, S, sonnet medium, nicht gestartet). **Blockiert:** AP-66 (Designer-Ergänzung H-14, AP-20). **Offen:** M3-DEP nach AP-20. M2c-DEP-Wiederholung [Mensch] blockiert M3 nicht (PE-69).
-- **Laufend oder unterbrochen:** Keine laufende Arbeit. Der Nutzer pausiert gegen 00:15 und macht danach mit `& "D:\Private Projekte\MultiAgent\start-agent.ps1" -Project "D:\Private Projekte\360shooter" -Role lead` weiter. Budget nicht im Wellenauftrag gemeldet, Stand in `.claude/ma-usage.json` prüfen.
+- **Stand:** 2026-10-26 · AP-64 (N3) gemergt · `dev` auf 49bd360, gepusht, Checks grün (Install, lint, typecheck, 419/419 Tests, assets:check, build). **Autonomer Modus** (PE-69): Lead arbeitet ohne Freigabe pro Meilenstein weiter, bis „stop“.
+- **Fertig:** AP-01–AP-19, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-63, AP-64, AP-65, AP-67, M0-DEP, M1-DEP, M2-DEP, M2b-DEP. AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
+- **Bereit:** AP-20 (Boss-Einbindung, M, sonnet high, Design-Review ja; AP-17–19 und AP-67 gemergt). **Blockiert:** AP-66 (Designer-Ergänzung H-14, AP-20). **Offen:** M3-DEP nach AP-20. M2c-DEP-Wiederholung [Mensch] blockiert M3 nicht (PE-69).
+- **Laufend oder unterbrochen:** Keine laufende Arbeit. Der Nutzer pausiert um ca. 00:15 und macht danach mit `& "D:\Private Projekte\MultiAgent\start-agent.ps1" -Project "D:\Private Projekte\360shooter" -Role lead` weiter. Budget nicht im Wellenauftrag gemeldet, Stand in `.claude/ma-usage.json` prüfen.
 - **Erkenntnisse (Details §18):** `dev` ist erst nach AP-20 durchspielbar (alle Level haben `bossId`, der Timer bleibt sonst bei 0:00). Deshalb kein PR `dev` → `stage` vor AP-20. AP-67 liefert die Schnittstellen für AP-20 (`BossBase.isInvulnerable`, `RootSpike.laserHit()`, `BOSS_TUNING`). AP-65 liefert `slotStatus(state, id, blocked)` für AP-66, `blocked` kommt aus der Szene. AP-63: wahrscheinlichste Ursache ist eine veraltete Startmessung, nicht am Gerät bestätigt.
-- **Nächster Schritt:** Lead startet AP-20 und AP-64 parallel (keine gemeinsame Datei). Danach M3-DEP [Mensch]. AP-66 erst nach H-14 und AP-20. Weitere offene M3-Pakete außer AP-20 gibt es nicht.
-- **Offene Fragen an den Nutzer:** (1) PE-34 und PE-75 (Boss-Verhalten, Fairness) bestätigen. Zu bestätigen (angenommen): PE-41, PE-43 bis PE-45, PE-66, PE-67, Baum-HP 50 und Radiusfaktor 0,65 (AP-56), Stick-Größe Q-32. (2) Designer-Interview für den Lagerplatz (H-14) starten (`start-agent.ps1 -Role designer`). (3) Handtest-Liste nach M3 [Mensch]: iPhone-Lesbarkeit, Waffe, Stick am PC, Baum-Despawn, Boss-Fairness (Knospe, Ringwurzeln, Geisterkugeln, Stein-Beschuss). Dazu die Homescreen-App neu laden (ggf. löschen und neu hinzufügen); passt das Bild nicht, Foto von `?layout=1` senden.
+- **Nächster Schritt:** Lead startet AP-20 (AP-64 ist gemergt). Danach M3-DEP [Mensch]. AP-66 erst nach H-14 und AP-20. Weitere offene M3-Pakete außer AP-20 gibt es nicht.
+- **Offene Fragen an den Nutzer:** (1) PE-34 und PE-75 (Boss-Verhalten, Fairness) bestätigen. Zu bestätigen (angenommen): PE-41, PE-43 bis PE-45, PE-66, PE-67, Baum-HP 50 und Radiusfaktor 0,65 (AP-56), Stick-Größe Q-32. (2) Designer-Interview für den Lagerplatz (H-14) starten (`start-agent.ps1 -Role designer`). (3) Handtest-Liste nach M3 [Mensch]: iPhone-Lesbarkeit, Waffe, Stick am PC, Baum-Despawn, Gold-Magnet (AP-64), Boss-Fairness (Knospe, Ringwurzeln, Geisterkugeln, Stein-Beschuss). Dazu die Homescreen-App neu laden (ggf. löschen und neu hinzufügen); passt das Bild nicht, Foto von `?layout=1` senden.
 
 <!-- Ende Lagebericht -->
 
@@ -729,7 +729,7 @@ flowchart TD
 
 - **Prüfpunkte (Handtest, Nutzer):**
   - [ ] iPhone Homescreen-App im Querformat: Bild passt vollständig, nichts zu groß, nach dem Start aus dem Homescreen und nach Drehen (AP-63). Optional: `?layout=1` zeigt die gemessenen Werte
-  - [ ] Gold fliegt langsam los und beschleunigt, kein ruckartiger Start mehr (AP-64)
+  - [ ] Gold fliegt langsam los und beschleunigt (ca. 0,6 s bis Vollgeschwindigkeit), kein ruckartiger Start mehr. Am Ziel wird nichts später eingesammelt als vorher, Einsammeln bleibt bei 12 px (AP-64, PE-72)
   - [ ] Dauerfeuer und Feuerring liegen nach dem Anschießen im Lagerplatz und starten erst nach Tippen (AP-65, AP-66)
   - [ ] Ein zweites Dauerfeuer-Item bei vollem Platz ändert nichts, aktive Zeit und Abklingzeit werden nicht verlängert (AP-65, PE-70)
   - [ ] Pause: Tippen auf den Lagerplatz wirkt nicht, nach dem Fortsetzen ist alles unverändert (AP-66)
@@ -827,7 +827,7 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-20 | Boss-Einbindung | M3 | GAME | W3 | AP-17–19, **AP-67** | M | sonnet (high) | – | bereit (AP-67 gemergt) |
 | M3-DEP | Abnahme M3 | M3 | HUM | W4 | AP-20 | H | – | – | offen |
 | AP-63 | Fix: iPhone Homescreen-App (Standalone), Bild zu groß (PE-71, Q-35, Folge von AP-61) | Nachtrag 2 | GAME/OPS | N3 | AP-61 (fertig); parallel zu AP-16 möglich | M | sonnet (high) | – (gemergt 1b89792) | fertig (Review Runde 1 bestanden; Ursache nicht am Gerät bestätigt, Handtest offen) |
-| AP-64 | Gold-Magnet weicher (Beschleunigung statt konstant 320 px/s, PE-72, Q-36) | Nachtrag 2 | LOG/GAME | N3 | AP-29, AP-31 (fertig); parallel zu AP-16 möglich | S | sonnet (medium) | – | bereit |
+| AP-64 | Gold-Magnet weicher (Beschleunigung statt konstant 320 px/s, PE-72, Q-36) | Nachtrag 2 | LOG/GAME | N3 | AP-29, AP-31 (fertig); parallel zu AP-16 möglich | S | sonnet (medium) | – (gemergt 49bd360) | fertig (Review Runde 1 bestanden, 419/419 Tests; Handtest offen) |
 | AP-65 | Power-up-Lagerplatz: Vertrag, Config, Logik (PE-70, Q-34) | Nachtrag 2 | SH/LOG | N4 | AP-16, AP-30, AP-37a (alle fertig) | M | sonnet (high) | – (gemergt 4b20704) | fertig (Review Runde 1 bestanden) |
 | AP-66 | Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung in die Spielszene (PE-70, Q-34; Design-Review ja) | Nachtrag 2 | GAME | N5 | AP-65, AP-20 (gleiche Szenendateien); **Designer-Ergänzung in `docs/design/` (Lagerplatz-Symbol, HUD-Platz)** | L | sonnet (high) | – | blockiert (Designer-Ergänzung, AP-20, AP-65; Nutzer wartet auf den Designer, PE-74) |
 
