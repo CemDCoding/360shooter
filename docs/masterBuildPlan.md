@@ -21,12 +21,12 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-25 · M0, M1, M2, M2b abgenommen (M2b-DEP am 2026-10-25, PC und iPhone) · `dev` auf 44b27c3 plus Plan-Commits (Push nach origin ausstehend, Lead) · **Design übernommen** (PE-59): M2c (AP-50–AP-55, M2c-DEP) liegt nach M2b-DEP und vor M3, Reihenfolge vom Nutzer bestätigt (PE-60, H-11). Handtest-Befunde: PE-61
-- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, M0-DEP, M1-DEP, M2-DEP, M2b-DEP (alle in dev). Checks auf dev grün: Install, lint, typecheck, 249/249 Tests, assets:check, build. **Bereit:** AP-56 (M2b-Nachtrag W8: Rundenstart mit Eröffnungswelle, Baum-HP 30 auf 50, Balancing der ersten Level; sonnet, M; vor M2c W1). **Danach:** M2c W1 (AP-50, AP-51). **Offen:** AP-52–AP-55 (M2c), AP-16–AP-20 (warten auf M2c-DEP), M2c-DEP, M3-DEP.
+- **Stand:** 2026-10-25 · M0, M1, M2, M2b abgenommen (M2b-DEP am 2026-10-25, PC und iPhone) · `dev` auf cfcdde7 (AP-56 gemergt) plus Plan-Commits (Push nach origin ausstehend, Lead) · **Design übernommen** (PE-59): M2c (AP-50–AP-55, M2c-DEP) liegt nach M2b-DEP und vor M3, Reihenfolge vom Nutzer bestätigt (PE-60, H-11). Handtest-Befunde: PE-61 (AP-56 erledigt, AP-53 offen). Lint-Fix: PE-62 (AP-57)
+- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-56 (gemergt cfcdde7, Review bestanden, 254/254 Tests), M0-DEP, M1-DEP, M2-DEP, M2b-DEP (alle in dev). Checks auf dev: **lint rot** (18 Fehler `no-undef` nur in `docs/design/assets/{fonts,pixel}.js`, seit Design-Commit 5e58bf2), sonst grün: Install, typecheck, Tests, assets:check, build. **Bereit:** AP-57 (M2b-Nachtrag W8, Lint-Fix: ESLint ignoriert `docs/design/**`; sonnet, S; vor M2c W1). **Danach:** M2c W1 (AP-50, AP-51). **Offen:** AP-52–AP-55 (M2c), AP-16–AP-20 (warten auf M2c-DEP), M2c-DEP, M3-DEP.
 - **Budget:** `.claude/ma-usage.json`: team 0 % (Reset erfolgt, `resets_at` 2026-10-25 16:50 UTC), Zielwert 45 %, Obergrenze 54 % (§7.2). Das Budget ist für die nächste Welle frei.
 - **Unterbrochen oder laufend:** Keine laufende Arbeit. Keine Agent-Branches und keine Worktrees offen (geprüft). Push `dev` nach origin ausstehend (Lead, §9.1 Schritt 7).
-- **Erkenntnisse:** AP-36 gemergt: alte Waffen-Items, Event `weapon-changed` und 3 Platzhalter-PNGs entfernt. Außerhalb des Eigentums geändert: `tests/entities/ItemPickup.test.ts` und `public/assets/.placeholders.json` (§18). AP-31 war kurz vor AP-33 in dev rot (Lehre §18). Feuerring trifft Bosse ab M3 nur nach Entscheidung mit PE-34 (Q-23, §18).
-- **Nächster Schritt:** Lead startet AP-56 (W8, ein Coder, normales Review), danach M2c W1 (AP-50, AP-51), dann W2 (AP-52 bis AP-54, je mit Design-Review; AP-53 trägt die Handtest-Befunde Stick-Größe und grauer Kasten), W3 (AP-55), M2c-DEP. Erst nach M2c-DEP startet AP-16 (M3).
+- **Erkenntnisse:** AP-36 gemergt: alte Waffen-Items, Event `weapon-changed` und 3 Platzhalter-PNGs entfernt. Außerhalb des Eigentums geändert: `tests/entities/ItemPickup.test.ts` und `public/assets/.placeholders.json` (§18). AP-31 war kurz vor AP-33 in dev rot (Lehre §18). Feuerring trifft Bosse ab M3 nur nach Entscheidung mit PE-34 (Q-23, §18). Design-Commit 5e58bf2 hat `npm run lint` rot gemacht (Browser-Skripte in `docs/design/assets`, AP-57).
+- **Nächster Schritt:** Lead startet AP-57 (W8, ein Coder, normales Review), Merge vor M2c W1, danach M2c W1 (AP-50, AP-51), dann W2 (AP-52 bis AP-54, je mit Design-Review; AP-53 trägt die Handtest-Befunde Stick-Größe und grauer Kasten), W3 (AP-55), M2c-DEP. Erst nach M2c-DEP startet AP-16 (M3).
 - **Offene Fragen an den Nutzer:** Q-32 Stick-Größe (Befund 10 % kleiner = 126 px oder Design-Token 88 px, AP-53 nimmt Token 88 mit Fangbereich 126 px, angenommen). Stumm-Taste im Debug-Modus (§18, offen). Zu bestätigen (angenommen): PE-34, PE-41, PE-43 bis PE-45, Startwerte in AP-56. Vorschlag §16: Lead-Skript für Buchstaben-IDs (Werkzeug, Entscheidung Nutzer). Geklärt am 2026-10-25: H-11 (Reihenfolge), Q-31 (Timer-Text „BOSS!“).
 
 <!-- Ende Lagebericht -->
@@ -74,11 +74,11 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 bestätigt 2026-10-25; M2b-Nachtrag AP-56 neu) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-DEP | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-DEP | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57) neu | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
@@ -472,6 +472,7 @@ flowchart TD
 | W5 | AP-35 | `src/config/{levels,enemies,weapon,items,coins,upgrades}.ts`, `tests/config/*` (ohne `assets`, `maps`, `player`), `tests/logic/balance.test.ts`, `docs/balancing.md` |
 | W6 | AP-36 | `src/contracts/{item,weapon}.ts`, `src/contracts/events.ts` (nur Event `weapon-changed`), `src/logic/{items,weapon}.ts`, `tests/logic/{items,weapon,balance,powers}.test.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, alte Item-Platzhalter, `docs/guides/*`, `public/assets/LICENSES.md` |
 | W8 (Nachtrag, PE-61) | AP-56 | `src/logic/spawn.ts`, `tests/logic/spawn.test.ts`, `src/config/{levels,enemies}.ts`, `src/config/coins.ts` (nur `dropChance`), `tests/config/{levels,enemies,coins}.test.ts`, `tests/logic/balance.test.ts`, `docs/balancing.md` (keine Überschneidung mit M2c W1: AP-50 und AP-51 besitzen diese Dateien nicht) |
+| W8 (Nachtrag, PE-62) | AP-57 | `eslint.config.js` (nur der Eintrag `docs/design/**` in `ignores`). Keine Überschneidung mit AP-56 und mit M2c W1. AP-55 (W3) ändert dieselbe Datei später, die Zeile bleibt erhalten |
 
 **M2c (Design-Umsetzung, Eigentum je Welle, Design-Brief vom 2026-10-25, PE-59, PE-60):** Die Spiellogik ändert sich nicht. `docs/design/` gehört dem Designer und ist für alle Coder nur lesbar. Höchstens drei Pakete je Welle (PE-15). Die drei UI-Pakete der W2 hängen nur von W1 ab und teilen keine Datei. Gemeinsame Hilfen der Welt „Funk“ (Panel, Button) liegen in `src/scenes/hud/` und gehören AP-53. Die Resultat-Buttons nutzen sie von dort, nicht aus `menu/Button.ts`.
 
@@ -482,7 +483,7 @@ flowchart TD
 | W2 | AP-52 | `src/scenes/MenuScene.ts`, `src/scenes/menu/{Button,LevelGrid,UpgradePanel,ConfirmDialog}.ts`, `src/scenes/PreloadScene.ts`, `src/scenes/BootScene.ts`, `src/platform/audio.ts` (`addMuteButton`), `index.html` (nur Hochformat-Hinweis), zugehörige Tests (`tests/platform/audio.test.ts` nur falls betroffen) |
 | W2 | AP-53 | `src/scenes/HudScene.ts`, `src/scenes/hud/*` (inkl. neu `FunkPanel.ts`, `FunkButton.ts`), `src/scenes/ResultScene.ts`, `src/scenes/controls/VirtualStick.ts`, `src/config/maps.ts`, `src/entities/MapBackground.ts`, `tests/scenes/hud.test.ts`, `tests/config/maps.test.ts` |
 | W2 | AP-54 | `src/entities/{Player,Laser,LaserPool,ArmourRing,ItemPickup,ArmourPickup}.ts`, `src/entities/enemies/Enemy.ts` (nur Treffer-Blitz und Aura-Farbe), `src/scenes/GameScene.ts` (nur Übergabe der Waffen-Ausbaustufe), `tests/entities/ItemPickup.test.ts` |
-| W3 | AP-55 | `eslint.config.js`, `README.md`, Restfunde in `src/scenes/**` und `src/entities/**` (nur Farb-Literale), `docs/guides/*` (Verweise) |
+| W3 | AP-55 | `eslint.config.js` (nach AP-57, dessen `docs/design/**`-Eintrag bleibt), `README.md`, Restfunde in `src/scenes/**` und `src/entities/**` (nur Farb-Literale), `docs/guides/*` (Verweise) |
 
 ---
 
@@ -607,7 +608,7 @@ flowchart TD
 | W5 | AP-32 Hauptmenü Upgrade-Overlay (GAME), AP-33 Spielszene und Ergebnis mit Gold, Rüstungs-Einbindung (GAME, opus), AP-35 Neu-Balancing (SH) |
 | W6 | AP-36 Aufräumen alter Waffen-Items (SH/ASSET) |
 | W7 | M2b-DEP [Mensch] (abgenommen 2026-10-25) |
-| W8 (Nachtrag, PE-61) | AP-56 Rundenstart, Baum-Leben, Balancing der ersten Level (SH/LOG); danach M2c W1 |
+| W8 (Nachtrag, PE-61/PE-62) | AP-56 Rundenstart, Baum-Leben, Balancing der ersten Level (SH/LOG); AP-57 Lint-Fix: ESLint ignoriert `docs/design/**` (OPS); danach M2c W1 |
 
 **Integration:** nach W2 und nach W5 `npm install`, alle Checks, `npm run dev`. Nach W1 bleibt der Typecheck grün, weil alle Vertragsänderungen additiv sind. Nach W3 und W4 Typecheck und Tests. AP-32 wechselt von W4 nach W5, weil W4 sonst vier Pakete hätte (Limit drei, PE-15).
 
@@ -747,13 +748,14 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-38 | Fix iPhone-Darstellung, Mitte und HUD-Lesbarkeit (PE-54) | M2b | GAME/OPS | W1 | keine (M2 abgenommen) | M | sonnet (medium) | c38 / agent/AP-38-c38 | fertig |
 | AP-39 | Virtueller Stick für Touch-Geräten (PE-55) | M2b | GAME | W2 | AP-38 (Datei GameScene, Reihenfolge) | M | sonnet (high) | c39 / agent/AP-39-c39 | fertig |
 | M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36, AP-37a, AP-37c, AP-38, AP-39 | H | – | – | fertig (abgenommen 2026-10-25) |
-| AP-56 | Nachtrag Handtest M2b-DEP: Rundenstart, Baum-Leben, Balancing der ersten Level (PE-61) | M2b-Nachtrag | SH/LOG | W8 | M2b-DEP (fertig); vor M2c W1 (Vorgabe Lead) | M | sonnet (high) | – | bereit |
+| AP-56 | Nachtrag Handtest M2b-DEP: Rundenstart, Baum-Leben, Balancing der ersten Level (PE-61) | M2b-Nachtrag | SH/LOG | W8 | M2b-DEP (fertig); vor M2c W1 (Vorgabe Lead) | M | sonnet (high) | – (gemergt cfcdde7) | fertig (Review bestanden, 254/254) |
+| AP-57 | Lint-Fix: ESLint ignoriert `docs/design/**` (PE-62) | M2b-Nachtrag | OPS | W8 | keine (Design-Commit 5e58bf2 auf dev); keine gemeinsame Datei, Merge vor M2c W1 | S | sonnet (medium) | – | bereit |
 | AP-50 | Theme, Waffen-Geometrie und Farben der Hülle (Design) | M2c | OPS/SH/LOG | W1 | M2b-DEP | M | sonnet (high) | – | offen |
 | AP-51 | Schriften, Icons und Asset-Pipeline (Design) | M2c | ASSET | W1 | M2b-DEP | L | sonnet (high) | – | offen |
 | AP-52 | Menü, Level-Auswahl, Upgrade-Panel, Laden, Hochformat-Hinweis (Design, Design-Review) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – | offen |
 | AP-53 | Runde: HUD, Pause, Stick, Ergebnis, Maps (Design, Design-Review; Befunde PE-61: Stick kleiner, kein grauer Kasten) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – | offen |
 | AP-54 | Waffe als eigenes Sprite, Spielerin spiegelt, Laser, Treffer-Blitz (Design, Design-Review) | M2c | GAME/LOG | W2 | AP-50, AP-51 | M | sonnet (high) | – | offen |
-| AP-55 | Design-Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README | M2c | OPS | W3 | AP-52, AP-53, AP-54 | S | sonnet (medium) | – | offen |
+| AP-55 | Design-Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README | M2c | OPS | W3 | AP-52, AP-53, AP-54, AP-57 (Datei `eslint.config.js`, Reihenfolge) | S | sonnet (medium) | – | offen |
 | M2c-DEP | Abnahme M2c (PC + iPhone) | M2c | HUM | W4 | AP-50–AP-55 | H | – | – | offen |
 | AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2c-DEP | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -815,8 +817,9 @@ flowchart LR
   AP02 --> AP07
   AP04 & AP06 --> AP21
   AP10 --> AP11 & AP12 & AP13 & AP15
-  M2bDEP --> AP56["AP-56 Nachtrag"] & AP50 & AP51
+  M2bDEP --> AP56["AP-56 Nachtrag"] & AP57["AP-57 Lint-Fix"] & AP50 & AP51
   M2cDEP --> AP16
+  AP57 -.->|Datei eslint.config.js, vor AP-55| AP55
   AP10 & AP11 --> AP22["AP-22"]
   AP09 & AP10 --> AP24
   AP14 & AP15 & AP22 & AP23 & AP24 --> M2DEP["M2-DEP"]
@@ -2119,6 +2122,37 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 - **Kürzbar bei Budgetnot:** nein (Nutzerbefund)
 - **Commit-Typ:** `fix(AP-56): open rounds with a spawn wave and toughen trees`
 
+#### AP-57 – Lint-Fix: `docs/design/**` von ESLint ausnehmen (PE-62)
+
+- **Meilenstein, Lane, Welle:** M2b-Nachtrag · OPS · W8 (vor M2c W1; PE-62)
+- **Ziel:** `npm run lint` ist auf dev wieder grün. Der Design-Commit `5e58bf2` hat die Browser-Skripte `docs/design/assets/fonts.js` und `docs/design/assets/pixel.js` nach dev gebracht. ESLint meldet dort 18 `no-undef`-Fehler für `document` und `window`. Der Ordner wird aus dem Lint ausgenommen, die Designer-Dateien bleiben unverändert.
+- **Ist-Stand (Planner hat gelesen):** `eslint.config.js` ist eine Flat-Config mit `ignores: ['dist/', 'node_modules/']`. `package.json` setzt `"lint": "eslint ."`. Eine `.eslintignore` gibt es nicht.
+- **Pflichtlektüre:** PE-62, `eslint.config.js`, `package.json` (Skript `lint`), §9 (Eigentum von `eslint.config.js`: AP-57 in W8, AP-55 in W3)
+- **Abhängigkeiten:** Design-Commit `5e58bf2` auf dev (erfüllt)
+- **Parallel möglich mit:** keine gemeinsame Datei mit anderen Paketen. Merge vor dem Start von M2c W1, damit `npm run lint` als Basis grün ist
+- **Dateien (Eigentum):** `eslint.config.js` (nur diese Datei)
+- **Nicht anfassen:** `docs/design/**` (nicht ändern, nicht löschen, nicht verschieben), `src/**`, `tests/**`, `package.json`, `tsconfig*.json`
+- **Freigegebene Abhängigkeiten:** keine. Keine neuen ESLint-Plugins und keine Erweiterung der Globals
+- **Umsetzung:**
+  1. In `eslint.config.js` den Eintrag `{ ignores: ['dist/', 'node_modules/'] }` um `'docs/design/**'` ergänzen. Nur diese Zeile, keine neuen Konfigurationsblöcke.
+  2. Ein Kommentar über dem Eintrag: Designer-Dateien (Browser-Skripte, PE-62) sind nicht Teil des Projektcodes.
+  3. Prüfen: `npm run lint` ohne Fehler, `git status` zeigt nur `eslint.config.js`, keine Änderung unter `docs/design/`.
+  4. Gegenprobe, nur manuell und nicht eingecheckt: eine undefinierte Variable in einer Datei unter `src/` anlegen, `npm run lint` muss sie melden, danach die Datei wieder entfernen. Das belegt, dass die Ausnahme eng ist.
+- **Schnittstellen:** –
+- **Akzeptanzkriterien:**
+  - `npm run lint` auf dev ohne Fehler (vorher 18 Fehler)
+  - Einzige geänderte Datei: `eslint.config.js`. `git diff dev -- docs/design` ist leer
+  - Gegenprobe aus Umsetzung 4 wird gemeldet (manuell geprüft, nicht eingecheckt)
+  - Andere Checks unverändert grün: Install, typecheck, Tests, assets:check, build
+- **Tests:** – (Konfigurationsänderung, Prüfung über die Checks und die Gegenprobe)
+- **Review-Schwerpunkte:** Ausnahme nur `docs/design/**`, keine Regel gelockert, keine Globals-Erweiterung, keine Änderung in `src/`
+- **Doku-Pflichten:** –
+- **Design-Review:** nein
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (blockiert den Lint-Check auf dev)
+- **Commit-Typ:** `fix(AP-57): ignore designer browser scripts in eslint`
+
 ### M2c – Design-Umsetzung
 
 Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Abschnitte „Gewählte Richtung“, „Grundsätze“, „Übergabe an den Planner“), PE-59, PE-60. `docs/design/` ist für Coder nur lesbar (Eigentum des Designers). Neue Abhängigkeiten gibt es nicht (Brief, „Neue Abhängigkeiten: keine“). Die Spiellogik und alle Werte in `src/config/` (außer den neuen Design-Dateien) bleiben unverändert.
@@ -2297,7 +2331,7 @@ Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Absc
 - **Meilenstein, Lane, Welle:** M2c · OPS · W3
 - **Ziel:** Grundsatz 1 des Designs wird automatisch erzwungen: Keine `0x…`- und `#…`-Farbliterale und keine Systemschrift in `src/scenes/**` und `src/entities/**`. Restfunde werden behoben, die README nennt die neuen Skripte.
 - **Pflichtlektüre:** Brief („Grundsätze“, Punkt 1), `eslint.config.js`, `README.md`, `src/config/theme.ts`
-- **Abhängigkeiten:** AP-52, AP-53, AP-54
+- **Abhängigkeiten:** AP-52, AP-53, AP-54, AP-57 (Reihenfolge wegen `eslint.config.js`, PE-62: der `docs/design/**`-Eintrag aus AP-57 bleibt erhalten)
 - **Parallel möglich mit:** –
 - **Dateien (Eigentum):** `eslint.config.js`, `README.md`, Restfunde in `src/scenes/**` und `src/entities/**` (nur das Ersetzen von Farb-Literalen durch Tokens), `docs/guides/*` (nur Verweise)
 - **Nicht anfassen:** `docs/design/**`, `src/config/**`, `src/logic/**`, `package.json`
@@ -2646,6 +2680,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-59 | Design übernommen (Brief vom 2026-10-25, Status `freigegeben`, Richtung „Außen die Spielkassette, innen das Funkgerät im Anzug“). Umsetzung als Meilenstein M2c mit AP-50 bis AP-55: Tokens als `src/config/theme.ts` (erzeugt aus `tokens.resolved.json`), eigene Bitmap-Schriften Astro Kapsel und Astro Funk, Menü im Kassetten-Stil, Runde im Funk-Stil, Waffe als eigenes kreisendes Sprite mit drei Ausbaustufen, Lint-Regel „nur Tokens“. Keine neuen Abhängigkeiten, Spiellogik unverändert. Angenommen im Brief: Laserfarbe Korallenrosa, „s“ bei Sekunden, Logo-Schriftzug, kein Fließtext-Font. Kein Impressum nötig (R3 erst bei Veröffentlichung, Brief) | Lead-Auftrag „Design übernehmen“, Übergabe im Brief | Nutzer (Design freigegeben am 2026-10-25), Paketschnitt Planner |
 | PE-60 | (bestätigt 2026-10-25, H-11) Reihenfolge: M2c (Design) läuft nach M2b-DEP und vor M3. Gründe: M2b-DEP prüft Funktion und Passform, nicht Optik, und findet Fehler noch in der alten Optik. Die Design-Pakete besitzen `HudScene`, `ResultScene`, `config/assets.ts` und `Player.ts`, M3 besitzt dieselben Dateien (AP-16, AP-20), das Design muss deshalb vorher fertig sein. AP-16 hängt von M2c-DEP ab. M2b-DEP-Checkliste unverändert, nur mit Hinweis | Planner-Empfehlung, Nutzer bestätigt am 2026-10-25 (H-11) | Nutzer (bestätigt) |
 | PE-61 | Handtest M2b-DEP (PC und iPhone) am 2026-10-25 abgenommen, fünf Befunde: (a) Stick auf dem Handy etwa 10 % zu groß, (b) grauer Kasten hinter den Power-up-Anzeigen im HUD, (c) die ersten Level sind zu einfach, (d) jede Runde soll mit spawnenden Gegnern beginnen, nicht mit leerem Feld, (e) der Baum stirbt mit einem Laser. Umsetzung: (a) und (b) als Akzeptanzkriterien in AP-53 (M2c W2), weil AP-53 `VirtualStick.ts` und `HudScene.ts` ohnehin neu baut, kein separates Vorab-Paket (Begründung in §18). (c) bis (e) als M2b-Nachtrag AP-56 vor M2c W1 (Balancing und Rundenstart, Dateien ohne Überschneidung mit AP-50/AP-51). Umfang §2 unverändert (Fehlerbehebung und Balancing). Stick-Größe: Das Design gibt `size.stick` 88 px vor (heute 140 px, also deutlich mehr als 10 % kleiner), siehe Q-32 | Handtest-Befunde, Wortlaut Nutzer über Lead | Nutzer am 2026-10-25 (Befunde); Zahlen in AP-56 (Startwerte, angenommen) |
+| PE-62 | Lint-Fix auf dev: `npm run lint` (`eslint .`) ist seit dem Design-Commit 5e58bf2 rot, 18 Fehler `no-undef` (`document`, `window`) nur in `docs/design/assets/{fonts,pixel}.js`, Browser-Skripte des Designers. Umsetzung AP-57 (M2b-Nachtrag W8, vor M2c W1): `docs/design/**` in `eslint.config.js` ignorieren, Designer-Dateien bleiben unverändert. Keine Globals-Erweiterung und keine Regel gelockert, `src/` bleibt voll geprüft. AP-55 (W3) ändert `eslint.config.js` danach, die Ignore-Zeile bleibt | Lead-Auftrag „Fix-Paket“ am 2026-10-25 (Pflege, kein Umfang, keine Architektur- oder Sicherheitsänderung) | Lead (Auftrag 2026-10-25), Planner-Vorschlag Paket und Reihenfolge |
 
 ### Offene Fragen
 
