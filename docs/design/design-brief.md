@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** entwurf
-**Stand:** Interview Runde 1 beantwortet (Umfang, Wirkung, Metroid-Bezug, Schrift). Nächste Runde: Nutzungssituation, Bestand, Vorbilder, Dichte und Ton.
+**Stand:** Interview Runden 1 und 2 beantwortet. Nächste Runde: Zelda-Bezug, HP-Darstellung, Biom-Rahmen, Schriftwahl.
 
 ## Ausgangslage
 
@@ -22,7 +22,12 @@
 - **Drei Adjektive:** niedlich, mutig, geheimnisvoll (2a)
 - **Auf keinen Fall:** düster-brutal, Handy-Casino-bunt
 - **Vorbild:** Metroid als Haltung (3a): dunkle fremde Welt, kräftige Leuchtakzente, kantige Sci-Fi-Rahmen um HUD und Menüs wie ein Anzugvisier. Die Astronautin bleibt rund und süß. Der Kontrast aus kantigem Visier und runder Figur ist das Erkennungsmerkmal.
-- **Abgrenzung:** {{offen}}
+- **Weitere Vorbilder (7a):** Zelda (Pixel-Abenteuer mit Charme), Celeste (süße Pixel-Figur in stimmungsvoller Welt), Vampire Survivors nur fürs Spielprinzip.
+- **Abgrenzung:** kein wuseliger, überladener Survivor-Look mit Zahlenregen und grellen Effekten.
+- **Lesbarkeit (5b):** größeres HUD zugunsten der Lesbarkeit auf dem iPhone, auch wenn es mehr Spielfläche verdeckt. Zustände nie nur über Farbe (Icon + Zahl).
+- **Dichte und Ton (8a):** Menü ruhig und luftig wie ein Raumschiff-Terminal, HUD kompakt und sachlich, verspielt nur Astronautin, Münzen und Treffer (kurze Animationen, abschaltbar bei reduzierter Bewegung). **Arcade-Retro-Anteil bleibt** erhalten.
+- **Bleibt aus dem Bestand:** das Spielerporträt (animierte Astronautin) neben dem Spielerlevel im Startmenü, ausdrücklicher Wunsch des Nutzers.
+- **Logo und Icons (6a):** Pixel-Schriftzug „360shooter“ als Logo (Name bleibt, angenommen) und neue App-Icons (Helm mit Visier-Rahmen) als SVG-Vorlage.
 
 ## Gewählte Richtung
 
@@ -42,6 +47,7 @@
 ## Entscheidungen
 
 - 2026-10-25 Nutzer: 1a Umfang UI + Sprite-Styleguide · 2a niedlich, mutig, geheimnisvoll · 3a Metroid als Haltung, Visier-Rahmen gegen süße Figur · 4a Pixelschrift für Titel und Zahlen, lesbare Schrift für Fließtext
+- 2026-10-25 Nutzer: 5b größeres HUD · 6a Logo-Schriftzug und App-Icons · 7a + Zelda · 8a ruhiges Menü, kompaktes HUD, Arcade-Retro-Anteil behalten, Spielerporträt im Startmenü behalten
 
 ## Übergabe an den Planner
 
