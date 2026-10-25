@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-25 · M0, M1, M2 abgenommen · laufender Meilenstein M2b: W1–W6 abgeschlossen, `dev` auf 44b27c3 (Push nach origin ausstehend, Lead) · nächste Welle W7 M2b-DEP (Handtest PC und iPhone)
-- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, M0-DEP, M1-DEP, M2-DEP (alle in dev). Checks auf dev grün: Install, lint, typecheck, 249/249 Tests, assets:check, build. **Bereit:** M2b-DEP (W7, Mensch). Keine Coder-Pakete bereit. **Offen:** AP-16–AP-20 (warten auf M2b-DEP), M3-DEP.
+- **Stand:** 2026-10-25 · M0, M1, M2 abgenommen · laufender Meilenstein M2b: W1–W6 abgeschlossen, `dev` auf 44b27c3 (Push nach origin ausstehend, Lead) · nächste Welle W7 M2b-DEP (Handtest PC und iPhone). **Design übernommen** (Brief vom 2026-10-25, PE-59): neuer Meilenstein M2c (AP-50–AP-55, M2c-DEP) zwischen M2b-DEP und M3 (PE-60, angenommen)
+- **Fertig:** AP-01–AP-15, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, M0-DEP, M1-DEP, M2-DEP (alle in dev). Checks auf dev grün: Install, lint, typecheck, 249/249 Tests, assets:check, build. **Bereit:** M2b-DEP (W7, Mensch). Keine Coder-Pakete bereit. **Offen:** AP-50–AP-55 (M2c, warten auf M2b-DEP), AP-16–AP-20 (warten auf M2c-DEP), M2c-DEP, M3-DEP.
 - **Budget:** `.claude/ma-usage.json`: team 0 % (Reset erfolgt, `resets_at` 2026-10-25 16:50 UTC), Zielwert 45 %, Obergrenze 54 % (§7.2). Das Budget ist für die nächste Welle frei.
 - **Unterbrochen oder laufend:** Keine laufende Arbeit. Keine Agent-Branches und keine Worktrees offen (geprüft). Push `dev` nach origin ausstehend (Lead, §9.1 Schritt 7).
 - **Erkenntnisse:** AP-36 gemergt: alte Waffen-Items, Event `weapon-changed` und 3 Platzhalter-PNGs entfernt. Außerhalb des Eigentums geändert: `tests/entities/ItemPickup.test.ts` und `public/assets/.placeholders.json` (§18). AP-31 war kurz vor AP-33 in dev rot (Lehre §18). Feuerring trifft Bosse ab M3 nur nach Entscheidung mit PE-34 (Q-23, §18).
-- **Nächster Schritt:** Nutzer macht M2b-DEP (W7, Mensch) nach §9.2 auf PC und iPhone, inkl. der AP-33-, AP-32- und AP-39-Punkte. Nach Abnahme startet der Lead AP-16 (M3, W1).
-- **Offene Fragen an den Nutzer:** Stumm-Taste im Debug-Modus (§18, offen). Zu bestätigen (angenommen): PE-34, PE-41, PE-43 bis PE-45. Vorschlag §16: Lead-Skript für Buchstaben-IDs (Werkzeug, Entscheidung Nutzer). Q-23 und PE-57 sind am 2026-10-25 bestätigt.
+- **Nächster Schritt:** Nutzer macht M2b-DEP (W7, Mensch) nach §9.2 auf PC und iPhone (Optik ist Platzhalter, geprüft werden Funktion und Passform). Danach startet der Lead M2c W1 (AP-50, AP-51), dann W2 (AP-52 bis AP-54, je mit Design-Review), W3 (AP-55), M2c-DEP. Erst nach M2c-DEP startet AP-16 (M3).
+- **Offene Fragen an den Nutzer:** Reihenfolge Design nach M2b-DEP und vor M3 bestätigen (PE-60, angenommen). Q-31 Timer-Text „BOSS!“ (Design) oder „Boss besiegen!“ (AP-20). Stumm-Taste im Debug-Modus (§18, offen). Zu bestätigen (angenommen): PE-34, PE-41, PE-43 bis PE-45. Vorschlag §16: Lead-Skript für Buchstaben-IDs (Werkzeug, Entscheidung Nutzer).
 
 <!-- Ende Lagebericht -->
 
@@ -71,18 +71,18 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 6 | Umgebungen, Branches, Deployment | fertig | – | G1 |
 | 7 | Team-Steuerung | fertig | – | G1 |
 | 8 | Lanes und Dateieigentum | fertig | – | G2 |
-| 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5) | G2 |
+| 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 angenommen) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M3 detailliert, Boss-Verhalten angenommen (PE-34) | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 angenommen; M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-DEP | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, angenommen), Q-31 neu | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) `bereit`, wartet auf den Nutzer.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) `bereit`, wartet auf den Nutzer. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 mit Annahme PE-60 (Bestätigung durch den Nutzer vor dem Start von M2c).
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -449,6 +449,7 @@ flowchart TD
 | `src/scenes/{GameScene,HudScene,ResultScene}.ts` in M3 | AP-20 | M3 W3 |
 | `src/scenes/GameScene.ts` in M2b | AP-38 (Mitte, Vollbild), AP-39 (Stick-Einbindung), AP-33 (Ergebnis und Gold, Upgrades beim Start, Rüstungs-Einbindung) | M2b W1, W2, W5 |
 | `src/main.ts` in M2b | AP-38 (Scale-Einstellung, nur falls nötig) | M2b W1 |
+| M2c (Design): `package.json`, `src/platform/audio.ts`, `index.html`, `src/config/assets.ts`, `src/contracts/assets.ts`, `src/scenes/PreloadScene.ts` | `package.json` nur AP-50 (Skripte `theme:build`, `fonts:build`). `audio.ts`: AP-50 (Signatur) → AP-52. `index.html`: AP-50 → AP-52. `PreloadScene.ts`: AP-51 (Schrift laden) → AP-52 (Ladebalken). `assets.ts`, `contracts/assets.ts`: nur AP-51 | M2c W1, W2 |
 
 **M2b (Eigentum je Welle, freigegeben am 2026-10-24, H-07; ergänzt am 2026-10-25 um AP-38, AP-39 und die Rüstungspakete AP-37a und AP-37c, PE-58):** Innerhalb einer Welle höchstens ein Paket je Datei. Vertragsänderungen in W1 sind additiv, Aufräumen in W6. AP-38 und AP-39 teilen `GameScene.ts`, daher liegen sie in zwei Wellen nacheinander (AP-38 zuerst). AP-33 teilt `GameScene.ts` mit keinem anderen Paket, deshalb trägt es in W5 die Rüstungs-Einbindung. Höchstens drei Pakete je Welle (PE-15).
 
@@ -471,6 +472,17 @@ flowchart TD
 | W5 | AP-35 | `src/config/{levels,enemies,weapon,items,coins,upgrades}.ts`, `tests/config/*` (ohne `assets`, `maps`, `player`), `tests/logic/balance.test.ts`, `docs/balancing.md` |
 | W6 | AP-36 | `src/contracts/{item,weapon}.ts`, `src/contracts/events.ts` (nur Event `weapon-changed`), `src/logic/{items,weapon}.ts`, `tests/logic/{items,weapon,balance,powers}.test.ts`, `src/config/assets.ts`, `tests/config/assets.test.ts`, `tests/contracts/contracts.test.ts`, alte Item-Platzhalter, `docs/guides/*`, `public/assets/LICENSES.md` |
 
+**M2c (Design-Umsetzung, Eigentum je Welle, Design-Brief vom 2026-10-25, PE-59, PE-60):** Die Spiellogik ändert sich nicht. `docs/design/` gehört dem Designer und ist für alle Coder nur lesbar. Höchstens drei Pakete je Welle (PE-15). Die drei UI-Pakete der W2 hängen nur von W1 ab und teilen keine Datei. Gemeinsame Hilfen der Welt „Funk“ (Panel, Button) liegen in `src/scenes/hud/` und gehören AP-53. Die Resultat-Buttons nutzen sie von dort, nicht aus `menu/Button.ts`.
+
+| Welle | Paket | Dateien |
+|---|---|---|
+| W1 | AP-50 | `scripts/build-theme.mjs` (neu), `src/config/theme.ts` (neu, erzeugt), `src/config/weaponMount.ts` (neu), `src/logic/weaponMount.ts` (neu), `src/platform/motion.ts` (neu), `src/styles/tokens.css` (neu, Kopie von `docs/design/export/tokens.css`), `package.json` (nur Skripte), `index.html` (nur Farben und Verweis auf `tokens.css`), `public/manifest.webmanifest`, `src/main.ts` (nur `backgroundColor`), `src/platform/audio.ts` (nur Signatur von `addMuteButton`, Verhalten unverändert), `tests/config/theme.test.ts`, `tests/logic/weaponMount.test.ts`, `tests/platform/motion.test.ts` (alle neu) |
+| W1 | AP-51 | `scripts/build-fonts.mjs` (neu), `scripts/generate-placeholders.mjs`, `scripts/check-assets.mjs`, `scripts/generate-icons.mjs`, `tests/scripts/check-assets.test.ts`, `src/contracts/assets.ts` (nur `AssetKind` um `bitmapFont`), `src/config/assets.ts`, `tests/config/assets.test.ts`, `src/scenes/PreloadScene.ts` (nur Schrift laden), `public/assets/fonts/*` (neu), `public/assets/sprites/{weapon-raygun,ui-icons}.png`, `public/assets/.placeholders.json`, `public/assets/LICENSES.md`, `public/icons/*`, `docs/guides/grafik-austauschen.md` |
+| W2 | AP-52 | `src/scenes/MenuScene.ts`, `src/scenes/menu/{Button,LevelGrid,UpgradePanel,ConfirmDialog}.ts`, `src/scenes/PreloadScene.ts`, `src/scenes/BootScene.ts`, `src/platform/audio.ts` (`addMuteButton`), `index.html` (nur Hochformat-Hinweis), zugehörige Tests (`tests/platform/audio.test.ts` nur falls betroffen) |
+| W2 | AP-53 | `src/scenes/HudScene.ts`, `src/scenes/hud/*` (inkl. neu `FunkPanel.ts`, `FunkButton.ts`), `src/scenes/ResultScene.ts`, `src/scenes/controls/VirtualStick.ts`, `src/config/maps.ts`, `src/entities/MapBackground.ts`, `tests/scenes/hud.test.ts`, `tests/config/maps.test.ts` |
+| W2 | AP-54 | `src/entities/{Player,Laser,LaserPool,ArmourRing,ItemPickup,ArmourPickup}.ts`, `src/entities/enemies/Enemy.ts` (nur Treffer-Blitz und Aura-Farbe), `src/scenes/GameScene.ts` (nur Übergabe der Waffen-Ausbaustufe), `tests/entities/ItemPickup.test.ts` |
+| W3 | AP-55 | `eslint.config.js`, `README.md`, Restfunde in `src/scenes/**` und `src/entities/**` (nur Farb-Literale), `docs/guides/*` (Verweise) |
+
 ---
 
 ## 9. Meilensteine und Wellen
@@ -486,6 +498,7 @@ flowchart TD
 | M1 | Kernspiel | Drehen und Auto-Schuss, 4 Gegnertypen, Items durch Anschießen, HP, Timer, Sieg/Niederlage, HUD; Designer-Anleitungen | Level 0 (und per Debug-Parameter jedes Level 0–20) am PC spielbar |
 | M2 | Inhalte, Menü, iPhone | Hauptmenü mit Level-Auswahl und Spielerlevel, Maps je Batch, PWA + Querformat, Platzhalter-Sounds mit Stummschalten, Balancing 0–20 | Level 0–20 nacheinander freispielbar, am PC und auf dem iPhone |
 | M2b | Gold und Waffen-Items (freigegeben, H-07) | Gold-Münzen aus Gegnern, Upgrade-Overlay im Hauptmenü (Waffe: Feuerrate, Schaden; Spielerin: max. HP, Drehgeschwindigkeit; je 10 Stufen), Waffen-Items neu (Doppelschuss, Schild, Dauerfeuer), Neu-Balancing, Fix iPhone-Darstellung (AP-38), virtueller Stick auf Touch-Geräten (AP-39), Rüstung Feuerring (AP-37a, AP-37c, Einbindung AP-33, Anzeige AP-34) | Upgrades kaufbar, Gold bleibt nach Neuladen, Reset löscht Gold und Upgrades; iPhone: Spielfeld passt ins Bild, Stick steuert die Zielrichtung; Feuerring wirkt 5 s, danach 20 s Abklingzeit |
+| M2c | Design-Umsetzung (Design freigegeben 2026-10-25, PE-59, PE-60) | Tokens als `theme.ts`, eigene Bitmap-Schriften Astro Kapsel und Astro Funk, App-Icons, Menü im Kassetten-Stil, Runde, HUD, Pause und Ergebnis im Funk-Stil, Waffe als eigenes kreisendes Sprite mit drei Ausbaustufen | Alle Bildschirme im neuen Stil auf PC und iPhone, Spiellogik unverändert, keine Farb-Literale in Szenen und Entities |
 | M3 | Bosse | Boss-Rahmen, drei Bosse mit Varianten je Level, Einbindung (PE-18, PE-33, PE-34) | jedes Level endet mit seinem Boss |
 
 ### 9.1 Ablauf einer Welle
@@ -599,6 +612,7 @@ flowchart TD
 ##### M2b-DEP – Abnahme [Mensch]
 
 - Pull Requests `dev` → `stage` → `master`, Test am PC und auf dem iPhone (H-03)
+- **Hinweis (PE-59, PE-60):** Die Optik ist Platzhalter und wird in M2c durch das freigegebene Design ersetzt. Diese Abnahme prüft Funktion und Passform, nicht Aussehen. Die Punkte „Lesbarkeit im HUD“ und „Abstand Gold-Anzeige und Upgrade-Button“ gelten nur grob (nichts ist abgeschnitten oder überlappt unbenutzbar). Die genaue Lesbarkeit und das Layout prüft M2c-DEP. Fehler aus dieser Abnahme werden noch in der alten Optik behoben, bevor M2c startet.
 - **Smoke-Test:**
   - [ ] Gegner lassen selten (ca. 5 %) Gold-Münzen fallen, bei stärkeren Gegnern mehr Gold und größere Münzen
   - [ ] Münzen fliegen automatisch zur Astronautin, der Zähler im HUD steigt
@@ -630,6 +644,36 @@ flowchart TD
   - [ ] `?level=5` startet eine Debug-Runde, Erfahrung, Freischaltung und Gold bleiben unverändert (AP-33, PE-49)
   - [ ] „Nochmal“ dreimal hintereinander: keine doppelten Sounds, die Debug-Runde bleibt Debug (AP-33)
 
+#### M2c – Design-Umsetzung
+
+**Einordnung (PE-59, PE-60):** eigener Meilenstein nach M2b-DEP und vor M3. Gründe: (1) M2b-DEP prüft Funktion und Passform auf dem iPhone und soll nicht mit einem Optik-Umbau vermischt werden. Findet er Fehler, werden sie noch in der alten Optik behoben. (2) Die Design-Pakete besitzen `HudScene`, `ResultScene`, `config/assets.ts` und `Player.ts`. M3 (AP-16, AP-20) besitzt dieselben Dateien. Läuft das Design danach, müssten AP-20 und die Boss-Anzeige neu gebaut werden. (3) Der Umbau ändert keine Logik, M3 baut dann gleich auf `theme.ts` und der Funk-Schrift auf. Quelle: `docs/design/design-brief.md` (Übergabe an den Planner). Keine neuen npm-Abhängigkeiten.
+
+| Welle | Pakete (parallel) |
+|---|---|
+| W1 | AP-50 Theme, Waffen-Geometrie und Farben der Hülle (OPS/SH/LOG), AP-51 Schriften, Icons und Asset-Pipeline (ASSET) |
+| W2 | AP-52 Menü, Level-Auswahl, Upgrade-Panel, Laden, Hochformat-Hinweis (GAME), AP-53 Runde: HUD, Pause, Stick, Ergebnis, Maps (GAME), AP-54 Waffe als eigenes Sprite, Spielerin, Laser (GAME/LOG) |
+| W3 | AP-55 Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README (OPS) |
+| W4 | M2c-DEP [Mensch] |
+
+**Integration:** nach W1 `npm install`, alle Checks, `npm run fonts:build` und `npm run theme:build` erzeugen unveränderte Dateien (kein Diff). Nach W2 alle Checks und Sichtprüfung der Szenen mit `npm run dev` (Menü, Level 0, Pause, Ergebnis). **Design-Review** (`ma-designer`, Modus Review) für AP-52, AP-53 und AP-54 zusätzlich zum normalen Review; Prüfgrundlage: Grundsätze im Brief, `docs/design/tokens.json`, `docs/design/screenshots/`. W1 und W2 werden direkt hintereinander gemergt und nicht einzeln im Browser abgenommen: In W1 ändert sich die Frame-Belegung von `ui-icons` und die Schrift wird geladen, aber noch nicht genutzt.
+
+##### M2c-DEP – Abnahme [Mensch]
+
+- Pull Requests `dev` → `stage` → `master`, Test am PC und auf dem iPhone im Querformat (H-03)
+- **Smoke-Test:**
+  - [ ] Menü: Logo, Porträt-Karte, Level-Raster nach Biom gruppiert mit Aufklebern, Kachelzustände (geschafft mit Stern, aktuell mit Ring und Pfeil, gesperrt mit Schloss), Legende; leerer Spielstand zeigt „WILLKOMMEN! STARTE MIT LEVEL 0.“
+  - [ ] Upgrade-Panel: zehn Pips, „x/10“, Zustände kaufbar, „ZU TEUER“, „MAX“; Reset-Dialog hat den Fokus zuerst auf „ABBRECHEN“
+  - [ ] Ladebildschirm „LADE KASSETTE …“ erscheint, danach das Menü ohne Systemschrift
+  - [ ] Runde: Funk-HUD mit Energie (Zahl und 10 Segmente), Warnzustand und Label „ENERGIE!“ bei 25 % oder weniger, Timer-Panel (unter 10 s Warnung), Münzen, Chips nur für aktive Kräfte, Sekunden mit kleinem „s“
+  - [ ] Pause-Overlay im Funk-Stil mit Level, Biom und Restzeit; Ergebnis im Funk-Stil mit Biom-Farbband, GEWONNEN/VERLOREN, Fakten, Hauptaktion mit Fokus
+  - [ ] Waffe: Die Astronautin dreht sich nicht mehr, sie spiegelt sich; die Pistole kreist um die Hand, der Laser startet an der Mündung; Ausbaustufe wechselt bei Waffen-Upgrade 7 und 14 (zum Prüfen Spielstand mit Stufen oder Debug)
+  - [ ] Hochformat-Hinweis im Kassetten-Stil, App-Icon auf dem Homescreen (Helm mit Visier)
+  - [ ] Stick, Schild-Ring und Feuerring in den neuen Farben; Feuerring gestrichelt
+  - [ ] **iPhone-Lesbarkeit (Brief, Handtest):** Funk 1× (Labels im HUD) und Kapsel 1× (Legende, Hinweis) ohne Zoomen lesbar. Wenn nicht, die Labels auf 2× anheben (kleines Fix-Paket, Platz im Layout ist vorhanden)
+  - [ ] Kein Blinken bei `prefers-reduced-motion` (iPhone: Einstellungen, Bedienungshilfen, Bewegung, Bewegung reduzieren), keine Bildschirm-Erschütterung
+  - [ ] Funktion unverändert: Level 0 spielbar, Gold und Upgrades, Items, Schild, Feuerring, Pause, Stick, Fortschritt bleibt nach Neuladen
+  - [ ] Zustände nie nur über Farbe: Stern, Schloss, „ZU TEUER“, „MAX“, „ENERGIE!“ sind sichtbar (Brief, Grundsatz 4)
+
 #### M3 – Bosse
 
 | Welle | Pakete (parallel) |
@@ -647,6 +691,7 @@ flowchart TD
   - [ ] Der Timer läuft ab, die Runde endet aber erst mit dem Sieg über den Boss
   - [ ] `?level=0`, `?level=3`, `?level=7`, `?level=18`: Boss passt zum Batch, spätere Level haben stärkere Varianten mit Zusatzangriff
   - [ ] Jeder Angriff wird vorher sichtbar angekündigt (fair)
+  - [ ] Design: Boss-Lebensleiste und Timer-Label im Funk-Stil (Brief `runde.html` 3, Q-31), Warnanzeigen in Warnrot, keine Farb-Literale in den Boss-Dateien (Design-Review AP-20)
 
 ---
 
@@ -697,7 +742,14 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-38 | Fix iPhone-Darstellung, Mitte und HUD-Lesbarkeit (PE-54) | M2b | GAME/OPS | W1 | keine (M2 abgenommen) | M | sonnet (medium) | c38 / agent/AP-38-c38 | fertig |
 | AP-39 | Virtueller Stick für Touch-Geräten (PE-55) | M2b | GAME | W2 | AP-38 (Datei GameScene, Reihenfolge) | M | sonnet (high) | c39 / agent/AP-39-c39 | fertig |
 | M2b-DEP | Abnahme M2b (PC + iPhone) | M2b | HUM | W7 | AP-31–AP-36, AP-37a, AP-37c, AP-38, AP-39 | H | – | – | bereit |
-| AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2b-DEP | L | sonnet (high) | – | offen |
+| AP-50 | Theme, Waffen-Geometrie und Farben der Hülle (Design) | M2c | OPS/SH/LOG | W1 | M2b-DEP | M | sonnet (high) | – | offen |
+| AP-51 | Schriften, Icons und Asset-Pipeline (Design) | M2c | ASSET | W1 | M2b-DEP | L | sonnet (high) | – | offen |
+| AP-52 | Menü, Level-Auswahl, Upgrade-Panel, Laden, Hochformat-Hinweis (Design, Design-Review) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – | offen |
+| AP-53 | Runde: HUD, Pause, Stick, Ergebnis, Maps (Design, Design-Review) | M2c | GAME | W2 | AP-50, AP-51 | L | sonnet (high) | – | offen |
+| AP-54 | Waffe als eigenes Sprite, Spielerin spiegelt, Laser, Treffer-Blitz (Design, Design-Review) | M2c | GAME/LOG | W2 | AP-50, AP-51 | M | sonnet (high) | – | offen |
+| AP-55 | Design-Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README | M2c | OPS | W3 | AP-52, AP-53, AP-54 | S | sonnet (medium) | – | offen |
+| M2c-DEP | Abnahme M2c (PC + iPhone) | M2c | HUM | W4 | AP-50–AP-55 | H | – | – | offen |
+| AP-16 | Boss-Rahmen | M3 | SH/LOG | W1 | M2c-DEP | L | sonnet (high) | – | offen |
 | AP-17 | Boss Baummonster (Wald 0–4) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
 | AP-19 | Boss Riesen-Stein (Elfenwald 10–20) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – | offen |
@@ -743,6 +795,12 @@ flowchart LR
     AP33 & AP35 --> AP36["AP-36"]
     AP31 & AP32 & AP33 & AP34 & AP35 & AP36 & AP37a & AP37c & AP38 & AP39 --> M2bDEP["M2b-DEP"]
   end
+  subgraph M2c["M2c Design-Umsetzung"]
+    AP50["AP-50"] --> AP52["AP-52"] & AP53["AP-53"] & AP54["AP-54"]
+    AP51["AP-51"] --> AP52 & AP53 & AP54
+    AP52 & AP53 & AP54 --> AP55["AP-55"]
+    AP50 & AP51 & AP52 & AP53 & AP54 & AP55 --> M2cDEP["M2c-DEP"]
+  end
   subgraph M3["M3 Bosse"]
     AP16["AP-16"] --> AP17["AP-17"] & AP18["AP-18"] & AP19["AP-19"]
     AP17 & AP18 & AP19 --> AP20["AP-20"]
@@ -751,7 +809,8 @@ flowchart LR
   AP02 --> AP07
   AP04 & AP06 --> AP21
   AP10 --> AP11 & AP12 & AP13 & AP15
-  M2bDEP --> AP16
+  M2bDEP --> AP50 & AP51
+  M2cDEP --> AP16
   AP10 & AP11 --> AP22["AP-22"]
   AP09 & AP10 --> AP24
   AP14 & AP15 & AP22 & AP23 & AP24 --> M2DEP["M2-DEP"]
@@ -759,9 +818,11 @@ flowchart LR
 
 **M2b:** Die Reihenfolgekante M2-DEP → AP-25/AP-26 (PE-46) ist mit der Abnahme vom 2026-10-25 erfüllt und entfernt. W1 und W2 sind je ein Paket pro Datei. AP-38 (W1) und AP-39 (W2) teilen `GameScene.ts`, daher nacheinander. AP-34 (HUD, W4) und AP-33 (GameScene, W5) starten erst nach AP-38 bzw. AP-39. W5 läuft mit AP-35 (Config) und AP-32 (Menü) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt. Rüstungen (PE-58): AP-37a (W3) liefert Vertrag und Logik, AP-37c (W4) Entity und Sprite, AP-34 (W4) die Anzeige, AP-33 (W5) die Einbindung in `GameScene`. Die Einbindung steckt in AP-33, weil `GameScene.ts` in W5 schon AP-33 gehört. Ein eigenes Einbindungspaket wäre erst in W6 möglich und verletzte „spätestens W5“ (PE-58).
 
+**M2c (PE-59, PE-60):** M2c startet nach M2b-DEP (Reihenfolgekante, keine Code-Abhängigkeit, wie bei M2b nach M2-DEP) und endet vor M3. AP-16 hängt von M2c-DEP ab, weil AP-51 `config/assets.ts` besitzt (wie AP-16) und AP-53 `HudScene`/`ResultScene` (wie AP-20). W2 hängt von W1 ab, weil `theme.ts` und die Schrift Verträge für die UI-Pakete sind. AP-52, AP-53 und AP-54 teilen keine Datei und nutzen keine Funktion aus derselben Welle: Die Ton-Taste ruft AP-53 mit der von AP-50 vorbereiteten Signatur `addMuteButton(scene, x, y, world)` auf, und die Funk-Buttons des Ergebnisses kommen aus `scenes/hud/` (AP-53), nicht aus `menu/Button.ts` (AP-52).
+
 **M2 W4:** AP-23 (nur `src/config/*`, `tests/config/*`, `tests/logic/balance.test.ts`, `docs/balancing.md`) und AP-24 (`src/scenes/GameScene.ts`, `src/logic/projectiles.ts`, Test) teilen keine Datei und laufen parallel.
 
-**Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11/AP-12 → AP-14 → (M2b) AP-25 → AP-27 → AP-29/AP-30 → AP-31 → AP-33 → AP-36 → M2b-DEP → (M3) AP-16 → AP-17–AP-19 → AP-20
+**Kritischer Pfad:** AP-01 → AP-03/AP-04 → AP-05 → AP-08/AP-09 → AP-10 → AP-11/AP-12 → AP-14 → (M2b) AP-25 → AP-27 → AP-29/AP-30 → AP-31 → AP-33 → AP-36 → M2b-DEP → (M2c) AP-50/AP-51 → AP-52–AP-54 → AP-55 → M2c-DEP → (M3) AP-16 → AP-17–AP-19 → AP-20
 
 ---
 
@@ -2019,6 +2080,204 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 - **Kürzbar bei Budgetnot:** ja (Größe und Totzone fest, keine Anpassung je Gerät)
 - **Commit-Typ:** `feat(AP-39): add virtual stick for touch aiming`
 
+### M2c – Design-Umsetzung
+
+Gemeinsame Pflichtlektüre aller M2c-Pakete: `docs/design/design-brief.md` (Abschnitte „Gewählte Richtung“, „Grundsätze“, „Übergabe an den Planner“), PE-59, PE-60. `docs/design/` ist für Coder nur lesbar (Eigentum des Designers). Neue Abhängigkeiten gibt es nicht (Brief, „Neue Abhängigkeiten: keine“). Die Spiellogik und alle Werte in `src/config/` (außer den neuen Design-Dateien) bleiben unverändert.
+
+#### AP-50 – Theme, Waffen-Geometrie und Farben der Hülle (Design)
+
+- **Meilenstein, Lane, Welle:** M2c · OPS/SH/LOG · W1
+- **Ziel:** Die Design-Tokens liegen typisiert im Code (`src/config/theme.ts`), die reinen Funktionen für die Waffe (Ausbaustufe, Handpunkt, Mündung, Tiefe, Spiegeln) und die Bewegungseinstellung stehen als Verträge für die UI-Pakete bereit, und die Hülle (HTML, Manifest, Canvas) nutzt `menu.bg`. Keine sichtbare Änderung in den Szenen.
+- **Pflichtlektüre:** Brief-Abschnitt „Exporte und Zielorte“ und Zeile `Player.ts` der Tabelle „Anzupassende Screens“ (Maße der Waffe), `docs/design/export/tokens.resolved.json`, `docs/design/tokens.json` (Namen der Tokens), `docs/design/mockups/{sprites,schrift-und-waffe}.html` (Ankerpunkte, Frames der Waffe), `src/main.ts`, `index.html`, `public/manifest.webmanifest`, `src/platform/audio.ts` (nur `addMuteButton`), `src/config/upgrades.ts`, `src/contracts/upgrade.ts`
+- **Abhängigkeiten:** M2b-DEP (Reihenfolgekante, PE-60)
+- **Parallel möglich mit:** AP-51 (keine gemeinsame Datei; `package.json` gehört nur AP-50)
+- **Dateien (Eigentum):** `scripts/build-theme.mjs` (neu), `src/config/theme.ts` (neu, erzeugt), `src/styles/tokens.css` (neu, Kopie von `docs/design/export/tokens.css`), `src/config/weaponMount.ts` (neu), `src/logic/weaponMount.ts` (neu), `src/platform/motion.ts` (neu), `package.json` (nur die Skripte `theme:build` und `fonts:build`), `index.html` (nur Farben und Verweis auf `tokens.css`), `public/manifest.webmanifest`, `src/main.ts` (nur `backgroundColor`), `src/platform/audio.ts` (nur die Signatur von `addMuteButton`), `tests/config/theme.test.ts`, `tests/logic/weaponMount.test.ts`, `tests/platform/motion.test.ts` (alle neu)
+- **Nicht anfassen:** `docs/design/**`, `src/scenes/**` (außer den genannten Dateien), `src/entities/**`, übrige `src/logic/*` und `src/config/*`, `package-lock.json` (keine neuen Pakete)
+- **Freigegebene Abhängigkeiten:** keine (nur Node-Bordmittel)
+- **Umsetzung:**
+  1. `scripts/build-theme.mjs`: liest `tokens.resolved.json` und schreibt `src/config/theme.ts` mit Kopfzeile „erzeugt, nicht von Hand ändern“. Die Logik steckt in einer exportierten Funktion `buildTheme(json)`, die Datei wird nur beim direkten Aufruf geschrieben (testbar). Farben als Paar `num` (`0xRRGGBB`) und `css` (`'#rrggbb'`), Alpha-Tokens (`hud.glass`, `menu.scrim`, `hud.scrim`) als Paar aus Farbe und Alpha. Abstände, Größen und Zeiten als Zahlen mit Einheit im Namen. Die Typen sind so, dass ein falscher Tokenname ein Typfehler ist. `export/tokens.ts` und `tokens.css` sind für Phaser nicht nutzbar und werden nicht importiert. Das Skript kopiert zusätzlich `docs/design/export/tokens.css` nach `src/styles/tokens.css` (für `index.html`), der Test prüft beide Dateien auf Gleichheit.
+  2. `package.json`: Skripte `theme:build` (`node scripts/build-theme.mjs`) und `fonts:build` (`node scripts/build-fonts.mjs`, das Skript legt AP-51 an). Sonst keine Änderung.
+  3. `src/config/weaponMount.ts` (Werte aus dem Brief): Maße 24×16, Griff (7 | 12), Handpunkt (+10 | +9 von der Mitte, gespiegelt −10), Mündung (+15 | −5 vom Griff), Stufengrenzen der Summe der Waffen-Upgrades (0–6, 7–13, 14–20), Tiefenbereich hinter der Figur (−160° bis −20°), Frames je Stufe (zwei Frames je Stufe, Frames 0–1, 2–3, 4–5; weicht `sprites.html` ab, gilt `sprites.html` und der Coder meldet es). `src/logic/weaponMount.ts` (rein, ohne Phaser): `weaponStageForUpgrades(levels)` (Summe der beiden Waffen-Spuren, Ergebnis 0..2), `faceLeft(angleDeg)` (Betrag größer als 90°), `handPoint(centerX, centerY, faceLeft)`, `muzzlePoint(handX, handY, angleDeg, faceLeft)` (mitrotiert, `flipY` beim Zielen nach links berücksichtigt), `weaponBehindFigure(angleDeg)`, `weaponFrame(stage, frameInStage)`.
+  4. `src/platform/motion.ts`: `prefersReducedMotion()` über `matchMedia('(prefers-reduced-motion: reduce)')`, ohne Fehler, wenn `matchMedia` fehlt (Standard `false`). Test mit einem Ersatzobjekt. Grundsatz 7 des Briefs.
+  5. `index.html`: `theme-color` und Hintergrund aus `menu.bg` (bisher `#0b0b14`), `src/styles/tokens.css` einbinden. Der Hochformat-Hinweis bleibt in dieser Welle unverändert (AP-52). `public/manifest.webmanifest`: `background_color` und `theme_color` aus `menu.bg`. `src/main.ts`: `backgroundColor` aus `THEME`.
+  6. `audio.ts`: `addMuteButton(scene, x, y, world: 'menu' | 'hud' = 'menu')`. Der Parameter wird in dieser Welle nur entgegengenommen, das Verhalten bleibt gleich (AP-52 setzt die Optik).
+  7. `theme.test.ts`: Datei ist aktuell (Ausgabe von `buildTheme` gleich dem Inhalt von `theme.ts`), `num` und `css` stimmen überein, Pflichtnamen vorhanden (`menu.bg`, `menu.focus`, `hud.focus`, `hud.glass`, `gold.400`, `red.300`, `game.laser-raygun`, `game.shield-ring`, `game.fire-ring`, `game.firefly`, `game.spore`, `biome.*-ground`), Alpha im Bereich 0..1. Die Test-Datei liest `docs/design/export/tokens.resolved.json` (`node:fs` wie im Asset-Test).
+- **Schnittstellen:** stellt `THEME`, die Funktionen aus `weaponMount.ts`, `prefersReducedMotion` und die Signatur von `addMuteButton` für AP-52 bis AP-54 bereit.
+- **Akzeptanzkriterien:**
+  - `npm run theme:build` erzeugt eine identische Datei (kein Diff)
+  - Keine Handwerte in `theme.ts`, alle Werte stammen aus `tokens.resolved.json`
+  - Stufengrenzen 6/7 und 13/14 sind getestet, Mündung stimmt in den vier Himmelsrichtungen
+  - Checks grün, keine sichtbare Änderung in den Szenen außer der Hintergrundfarbe
+- **Tests:** `theme.test.ts`, `weaponMount.test.ts` (Stufen, Spiegeln bei ±90°, Handpunkt, Mündung bei 0°, 90°, 180°, −90°, Tiefe), `motion.test.ts`
+- **Review-Schwerpunkte:** `theme.ts` ist wirklich erzeugt, Typen sperren falsche Namen, Werte stammen aus dem Brief, keine neuen Pakete
+- **Doku-Pflichten:** –
+- **Design-Review:** nein (keine sichtbare Oberfläche außer der Hintergrundfarbe)
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-50): add design theme tokens and weapon geometry`
+
+#### AP-51 – Schriften, Icons und Asset-Pipeline (Design)
+
+- **Meilenstein, Lane, Welle:** M2c · ASSET · W1
+- **Ziel:** Die eigenen Bitmap-Schriften „Astro Kapsel“ und „Astro Funk“, das Waffen-Sprite, die neuen UI-Symbole und die App-Icons liegen als Dateien im Projekt, werden vom Manifest, vom Loader und von `assets:check` erkannt, und die Anleitung für Grafikdesigner ist aktuell. Die Szenen ändern sich nicht.
+- **Pflichtlektüre:** Brief-Abschnitte „Schriften und Assets“ und „Exporte und Zielorte“ (Zeilen Schrift, Icon, `assets.ts`), `docs/design/assets/{fonts.js,pixel.js,app-icon.svg}`, `docs/design/mockups/{sprites,schrift-und-waffe}.html`, `src/config/assets.ts`, `src/contracts/assets.ts`, `scripts/{generate-placeholders,check-assets,generate-icons}.mjs`, `src/scenes/PreloadScene.ts`, `docs/guides/grafik-austauschen.md`, `public/assets/LICENSES.md`, §18 (Erkenntnisse AP-02, AP-26: `animKey`, Präfixe, Prettier nie in Pipes)
+- **Abhängigkeiten:** M2b-DEP (Reihenfolgekante, PE-60)
+- **Parallel möglich mit:** AP-50 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `scripts/build-fonts.mjs` (neu), `scripts/generate-placeholders.mjs`, `scripts/check-assets.mjs`, `scripts/generate-icons.mjs`, `tests/scripts/check-assets.test.ts`, `src/contracts/assets.ts` (nur `AssetKind` um `bitmapFont`), `src/config/assets.ts`, `tests/config/assets.test.ts`, `src/scenes/PreloadScene.ts` (nur Laden der Schriften), `public/assets/fonts/{astro-kapsel,astro-funk}.{png,xml}` (neu), `public/assets/sprites/{weapon-raygun,ui-icons}.png`, `public/assets/.placeholders.json`, `public/assets/LICENSES.md`, `public/icons/icon-{180,192,512}.png`, `docs/guides/grafik-austauschen.md`
+- **Nicht anfassen:** `docs/design/**`, `package.json`, `src/scenes/**` (außer `PreloadScene.ts`), `src/entities/**`, `src/logic/**`, `src/platform/**`
+- **Freigegebene Abhängigkeiten:** keine (PNG-Ausgabe mit `zlib`, kein Bildpaket)
+- **Umsetzung:**
+  1. `scripts/build-fonts.mjs`: liest die Glyphen aus `docs/design/assets/fonts.js` (`window.PX_FONTS`; die Datei in einem leeren `vm`-Kontext mit `window = {}` auswerten, kein Netz) und schreibt je Schrift ein PNG (weiße Glyphen, transparent, Atlas) und eine BMFont-XML. Laufweite 1 px, Leerzeichen Kapsel 3 px, Funk 2 px, Funk enthält zusätzlich das kleine `s`. Die Ausgabe ist deterministisch (gleicher Lauf, gleiche Bytes). Prüft der Coder per Suche, welche Zeichen das Spiel in Texten braucht (Großbuchstaben, Umlaute, Ziffern, `/ % : ! . x s`), und meldet fehlende Zeichen dem Lead. Er entwirft selbst keine Glyphen.
+  2. `contracts/assets.ts`: `AssetKind` bekommt `'bitmapFont'`, `AssetDef` ein optionales Feld für die XML-Datei. `config/assets.ts`: Einträge `astro-kapsel` und `astro-funk` (deutsche Beschreibung), `weapon-raygun` (Spritesheet 24×16, 6 Frames, zwei Frames je Ausbaustufe), `ui-icons` neu belegt (16×16, 4 Frames: 0 Ton an, 1 Ton aus, 2 Pause, 3 Schloss; das Herz entfällt).
+  3. `generate-placeholders.mjs`: erzeugt `weapon-raygun.png` aus den Vorlagen (`pixel.js`, `sprites.html`) und das neue `ui-icons.png`. Die Schriften erzeugt nur `fonts:build`. Echte Designer-Dateien werden nie überschrieben. `check-assets.mjs` und sein Test prüfen Schrift-PNG und XML (Zeichen-IDs eindeutig, jedes Zeichen liegt im Bild).
+  4. `PreloadScene.ts`: Der Zweig `else` lädt sonst jede unbekannte Art als Audio. Die Art `bitmapFont` wird mit `load.bitmapFont(key, path, xmlPath)` geladen. Mehr ändert dieses Paket an der Datei nicht (AP-52 übernimmt in W2 das Laden der Schrift in `BootScene`).
+  5. `generate-icons.mjs`: rasterisiert `docs/design/assets/app-icon.svg` ohne Zusatzpaket nach 180, 192 und 512 px (Nearest-Neighbor). Das SVG besteht aus `<rect>`, einer `<g transform="translate">` und `opacity`. Ein kleiner eigener Parser genügt. Enthält das SVG Elemente, die er nicht kann, stoppt der Coder und meldet es dem Lead (kein Paket installieren).
+  6. `grafik-austauschen.md`: Einträge für `weapon-raygun`, das neue `ui-icons` und die Schriften (Schriften entstehen aus dem Skript, nicht von Hand ersetzen), dazu die Sprite-Regeln aus `sprites.html` (Raster, Palette, Umriss, Ankerpunkte). `LICENSES.md`: Schriften, Icon und Sprites als „eigene Arbeit des Projekts“ (Brief, Tabelle „Schriften und Assets“).
+  7. **Bekannter Zwischenzustand:** `audio.ts` (Frame 1 und 2) und `HudScene` (Frame 0, Herz) nutzen `ui-icons` mit der alten Belegung. Bis AP-52 und AP-53 in W2 gemergt sind, zeigt dev dort falsche Symbole. Das ist akzeptiert, W1 und W2 werden direkt hintereinander gemergt.
+- **Schnittstellen:** Keys `astro-kapsel`, `astro-funk`, `weapon-raygun`, `ui-icons` (neue Belegung) für AP-52 bis AP-54.
+- **Akzeptanzkriterien:**
+  - `npm run fonts:build` erzeugt identische Dateien, `npm run assets:check` ist grün
+  - Beide Schriften sind in `?assets=1` bzw. im Loader fehlerfrei geladen
+  - Die Icons sind scharf (Nearest-Neighbor), das Helm-Motiv entspricht `app-icon-desktop.png` in `docs/design/screenshots/`
+  - Checks grün
+- **Tests:** `assets.test.ts` (neue Keys, Frame-Zahlen, Art `bitmapFont`), `check-assets.test.ts` (kaputte XML, fehlendes Zeichen), Determinismus von `fonts:build`
+- **Review-Schwerpunkte:** Prettier nicht in Pipes (§18), `git diff --stat` auf geleerte Dateien, Binärdateien gegen dev vergleichen, `LICENSES.md` vollständig, Glyphen stimmen mit dem Screenshot `schrift-und-waffe-desktop.png` überein
+- **Doku-Pflichten:** Anleitung `grafik-austauschen.md` und `LICENSES.md`
+- **Design-Review:** nein (Reviewer vergleicht die erzeugten Bilder mit den Screenshots, der Nutzer prüft in M2c-DEP)
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-51): add bitmap fonts, weapon sprite and design icons`
+
+#### AP-52 – Menü, Level-Auswahl, Upgrade-Panel, Laden, Hochformat-Hinweis (Design)
+
+- **Meilenstein, Lane, Welle:** M2c · GAME · W2
+- **Ziel:** Alle Menü-Szenen im Kassetten-Stil nach den Mockups: Schrift Astro Kapsel, nur `color.menu.*`, keine Farb-Literale.
+- **Pflichtlektüre:** Brief (Grundsätze 1–7, Tabelle „Anzupassende Screens“, Zeilen `Button.ts`, `MenuScene.ts`, `LevelGrid.ts`, `UpgradePanel.ts`, `ConfirmDialog.ts`, `PreloadScene.ts`, `index.html`, Ton-Button), `docs/design/tokens.json`, `docs/design/mockups/hauptmenue.html` (Ansichten 1 bis 4), `docs/design/mockups/ergebnis.html` (Ansicht 3, Hochformat-Hinweis), `docs/design/styleguide.html` („Buttons · Menü“, „Laden“), Screenshots `hauptmenue-desktop.png`, `styleguide-desktop.png`, `src/config/theme.ts`, `src/logic/weaponMount.ts` (AP-50), Ist-Stand aller Dateien, §18 (Erkenntnisse AP-32)
+- **Abhängigkeiten:** AP-50, AP-51
+- **Parallel möglich mit:** AP-53, AP-54 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/scenes/MenuScene.ts`, `src/scenes/menu/{Button,LevelGrid,UpgradePanel,ConfirmDialog}.ts`, `src/scenes/PreloadScene.ts`, `src/scenes/BootScene.ts`, `src/platform/audio.ts` (`addMuteButton`), `index.html` (nur Hochformat-Hinweis), zugehörige Tests (`tests/scenes/levelGroups.test.ts` bleibt grün, `tests/platform/audio.test.ts` falls betroffen)
+- **Nicht anfassen:** `src/scenes/{GameScene,HudScene,ResultScene}.ts`, `src/scenes/hud/*`, `src/scenes/controls/*`, `src/entities/**`, `src/logic/*`, `src/config/*`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `Button.ts`: Kassetten-Button mit Fase (2 px hell oben links, dunkel unten rechts), 2-px-Umriss und 4-px-Schatten. Varianten primary, secondary, danger, icon. Zustände hover, active (2 px versetzt), disabled, Fokus (2-px-Ring `menu.focus` mit Abstand). Mindestgröße 32×32. Text in Astro Kapsel 2×, nur ganzzahlig skaliert.
+  2. `MenuScene.ts` nach `hauptmenue.html` 1 und 4: Logo (Kapsel-Schriftzug „360“ in Koralle, „SHOOTER“ in Creme), Porträt-Karte (Spielerlevel, XP-Balken, Gold, „Waffe x/20“ mit Waffen-Symbol der Ausbaustufe aus `weaponStageForUpgrades` und `weapon-raygun`, „Anzug x/20“, Button „UPGRADES“ als Hauptaktion in Koralle), Level-Panel, Zurücksetzen, Hinweiszeile, Sternenhimmel und Planet als Hintergrund. Leerer Spielstand: „WILLKOMMEN! STARTE MIT LEVEL 0.“ Die Ton-Taste ruft `addMuteButton(..., 'menu')` auf.
+  3. `LevelGrid.ts` (und Daten aus `levelGroups.ts`, unverändert): nach Biom gruppiert mit Aufkleber und Bereich (0–4, 5–9, 10–20), Kachelzustände geschafft (Minze und Stern), aktuell (Koralle, Creme-Ring, Pfeil), gesperrt (Schloss aus `ui-icons`), Legende unten.
+  4. `UpgradePanel.ts`: Gruppen WAFFE und ANZUG, je Zeile 10 Pips, „x/10“ und Kaufen-Button mit Preis. Zustände kaufbar, zu teuer (deaktiviert, Text „ZU TEUER“) und „MAX“. Zeigt die nächste Waffen-Ausbaustufe. Kauf-Logik und Storage-Zugriff bleiben unverändert (AP-29, AP-28).
+  5. `ConfirmDialog.ts`: Kassetten-Dialog, der Fokus liegt zuerst auf „ABBRECHEN“.
+  6. `BootScene.ts` lädt die Einträge der Art `bitmapFont` aus dem Manifest zuerst, `PreloadScene.ts` überspringt sie und zeigt den Ladebalken im Kassetten-Stil „LADE KASSETTE …“ in Astro Kapsel. Fehlt die Schrift, bleibt der Balken ohne Text (kein Absturz).
+  7. `audio.ts`: `addMuteButton` zeichnet im Fall `'menu'` einen Kassetten-Icon-Button (Frames 0 und 1 von `ui-icons`), im Fall `'hud'` die Funk-Variante nach `styleguide.html` mit `THEME.hud.*`. Mindestgröße 32×32, Fokus-Ring.
+  8. `index.html`: Hochformat-Hinweis im Kassetten-Stil (Astronautin, „BITTE DREHEN“, Symbol Hoch → Quer) als HTML/CSS mit Variablen aus `tokens.css`, kein Bild aus dem Netz, keine externe Schrift (Systemschrift mit Pixel-Anmutung ist erlaubt, wenn die Bitmap-Schrift hier nicht nutzbar ist).
+  9. Keine `0x…`- oder `#…`-Literale und keine `monospace`-Angabe in den eigenen Dateien. Bewegungen 80–300 ms in Stufen, bei `prefersReducedMotion()` ohne Animation.
+- **Schnittstellen:** nutzt `THEME`, `weaponMount`, `motion` (AP-50) und Keys aus AP-51. Stellt `Button` für künftige Menü-Szenen bereit.
+- **Akzeptanzkriterien:**
+  - Menü, Level-Raster, Upgrade-Panel, Dialog und Ladebildschirm entsprechen den Mockups, alle Zustände sind sichtbar und nie nur über Farbe erkennbar (Stern, Schloss, „ZU TEUER“, „MAX“)
+  - Ziele mindestens 32×32, Fokus-Ring sichtbar
+  - Funktion unverändert: Kauf, Reset mit Dialog, Level starten, Gold-Anzeige, Ton-Taste
+  - Checks grün
+- **Tests:** keine Phaser-Tests; reine Hilfsfunktionen (z. B. Pip-Anzahl) als Funktion mit Test, falls nötig
+- **Review-Schwerpunkte:** Grundsätze 1 bis 7, keine doppelten Listener nach Szenenwechsel, Touch-Bedienung, Fokus-Reihenfolge im Dialog, keine Systemschrift
+- **Doku-Pflichten:** –
+- **Design-Review:** ja (`ma-designer`, Modus Review, zusätzlich zum normalen Review)
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-52): restyle menu scenes with cartridge design`
+
+#### AP-53 – Runde: HUD, Pause, Stick, Ergebnis, Maps (Design)
+
+- **Meilenstein, Lane, Welle:** M2c · GAME · W2
+- **Ziel:** Alle Runden-Bildschirme im Funkgerät-Stil: Schrift Astro Funk, nur `color.hud.*`, Biom nur in der Welt und als Farbband im Ergebnis. Die Spiellogik bleibt unverändert.
+- **Pflichtlektüre:** Brief (Grundsätze 1–8, Zeilen `HudScene.ts` und `hud/*`, `VirtualStick.ts`, `ResultScene.ts`, `maps.ts`), `docs/design/mockups/runde.html` (Ansichten 1 bis 4), `docs/design/mockups/ergebnis.html` (Ansichten 1 und 2), `docs/design/styleguide.html` („Stick“, HUD-Komponenten), Screenshots `runde-desktop.png`, `ergebnis-desktop.png`, `src/config/theme.ts`, `src/platform/{layout,motion}.ts`, Ist-Stand der Dateien, §18 (Erkenntnisse AP-34: HUD liest keinen Startzustand, `hudMath.ts`; AP-38: `hudScale`)
+- **Abhängigkeiten:** AP-50, AP-51
+- **Parallel möglich mit:** AP-52, AP-54 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/scenes/HudScene.ts`, `src/scenes/hud/{CoinCounter,PowerIndicators,ArmourIndicator,hudMath}.ts`, `src/scenes/hud/{FunkPanel,FunkButton}.ts` (neu), `src/scenes/ResultScene.ts`, `src/scenes/controls/VirtualStick.ts`, `src/config/maps.ts`, `src/entities/MapBackground.ts`, `tests/scenes/hud.test.ts`, `tests/config/maps.test.ts`
+- **Nicht anfassen:** `src/scenes/{GameScene,MenuScene,PreloadScene,BootScene}.ts`, `src/scenes/menu/*`, `src/platform/*`, `src/entities/` (außer `MapBackground.ts`), `src/logic/*`, übrige `src/config/*`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `FunkPanel` (dunkles Glas `hud.glass`, 1-px-Linien, gepunktete Trenner, Logbuch-Kopf, angeschliffene Ecke oben links) und `FunkButton` (Zustände, Fokus-Ring `hud.focus`, mindestens 32×32) als wiederverwendbare Bausteine. Ergebnis und Pause nutzen sie, nicht `menu/Button.ts`.
+  2. `HudScene` nach `runde.html` 1 bis 4: Energie-Panel (Zahl 3× und 10 Segmente, Warnzustand ab 25 % oder weniger mit Label „ENERGIE!“), Timer-Panel (Warnung unter 10 s; Zustand „BOSS!“ als schaltbarer Zustand `setOvertime(on)`, in diesem Meilenstein noch nie aktiv, die Verdrahtung macht AP-20), Chips nur für aktive Kräfte mit Zahl oder Sekunden (kleines „s“, z. B. „4s“), Münz-Anzeige, Feuerring aktiv (Akzentrahmen) bzw. lädt (gepunktet). Größeres HUD (Brief, 5b), Layout mit `hudScale` und Safe-Area. Pause- und Ton-Taste als Funk-Icon-Buttons (`ui-icons` Frame 2 und `addMuteButton(..., 'hud')`). Das Herz-Symbol entfällt (Frame 0 hat jetzt eine andere Bedeutung).
+  3. Pause-Overlay im Funk-Stil mit Level, Biom und Restzeit. Fehlen Biom oder Level in den Szenendaten, leitet der Coder sie aus der Level-ID über `src/config` ab (keine Änderung an `GameScene`, sonst Rückfrage an den Lead).
+  4. `ResultScene` nach `ergebnis.html` 1 bis 2: Biom-Farbband oben, Logbuch-Kopf, GEWONNEN/VERLOREN in Astro Funk 4×, Faktenliste (Dauer, Erfahrung, Gold wie bisher), Buttons rechts unten, der Fokus liegt auf der Hauptaktion („NÄCHSTES LEVEL“ oder „NOCHMAL“, Akzentrahmen). Die Regeln aus AP-33 und AP-10 (z. B. „Nächstes Level“ nur nach Sieg) bleiben.
+  5. `VirtualStick`: gepunkteter Phosphor-Ring, Knopf mit Phosphor-Rand, aktiv heller. Maße und Verhalten aus AP-39 bleiben unverändert.
+  6. `maps.ts`: `baseColor` aus `biome.*-ground`, Partikel mit `game.firefly` und `game.spore`. `MapBackground.ts` ohne Farb-Literale.
+  7. Reine Hilfsfunktionen (Segmentzahl, Warnschwelle, Sekundentext) in `hudMath.ts` mit Tests. `prefersReducedMotion()`: kein Blinken von Energie und Timer, die Information bleibt über Text und Umriss erhalten.
+  8. Listener beim Szenenende abmelden (wie bisher). Keine Zahlen über Gegnern (Grundsatz 8).
+- **Schnittstellen:** nutzt `THEME`, `layout`, `motion` und die Keys aus AP-51. Die HUD-Events aus dem Vertrag bleiben unverändert.
+- **Akzeptanzkriterien:**
+  - HUD, Pause und Ergebnis entsprechen den Mockups, Warnzustände haben ein zweites Merkmal (Text, Umriss)
+  - Alle Funktionen der HUD- und Ergebnis-Szenen wie vorher (Pause, Weiterspielen, „Nochmal“, „Nächstes Level“, Menü)
+  - Keine Farb-Literale und keine `monospace`-Angabe in den eigenen Dateien
+  - Checks grün
+- **Tests:** `hudMath` (Segmente bei 0, 25, 100 %, Sekundentext mit „s“), `maps.test.ts` an die Tokens angepasst
+- **Review-Schwerpunkte:** Grundsätze 1 bis 8, Listener aufräumen, Lesbarkeit auf dem Handy (HUD größer), `ENERGIE!` und `BOSS!` nicht nur über Farbe, Safe-Area
+- **Doku-Pflichten:** –
+- **Design-Review:** ja (`ma-designer`, Modus Review, zusätzlich zum normalen Review)
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-53): restyle hud, pause, result and maps with radio design`
+
+#### AP-54 – Waffe als eigenes Sprite, Spielerin spiegelt, Laser (Design)
+
+- **Meilenstein, Lane, Welle:** M2c · GAME · W2
+- **Ziel:** Die Spielerin steht aufrecht und spiegelt sich nach links und rechts, die Strahlenpistole ist ein eigenes Sprite, das um die Hand kreist (360°). Der Laser startet an der Mündung. Laser, Ringe und Treffer-Blitz nutzen Tokens. `facingDeg` und die Logik bleiben unverändert.
+- **Pflichtlektüre:** Brief (Grundsätze 1, 3, 7, 8, Zeile `Player.ts` der Tabelle, Zeilen `Laser.ts`/`LaserPool.ts` und „Schild-Ring, Feuerring“), `docs/design/mockups/{sprites,schrift-und-waffe,runde}.html` (Waffe, Ringe), `src/config/theme.ts`, `src/config/weaponMount.ts`, `src/logic/weaponMount.ts`, `src/platform/motion.ts` (AP-50), Ist-Stand der Dateien, §18 (Erkenntnisse AP-08, AP-31: API von `Player`, `LaserPool`; `AimInput`)
+- **Abhängigkeiten:** AP-50, AP-51
+- **Parallel möglich mit:** AP-52, AP-53 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/entities/{Player,Laser,LaserPool,ArmourRing,ItemPickup,ArmourPickup}.ts`, `src/entities/enemies/Enemy.ts` (nur Treffer-Blitz und Aura-Farbe), `src/scenes/GameScene.ts` (nur die Übergabe der Waffen-Ausbaustufe an `PlayerConfig`), `tests/entities/ItemPickup.test.ts`
+- **Nicht anfassen:** `src/scenes/{HudScene,ResultScene,MenuScene}.ts`, `src/scenes/hud/*`, `src/logic/*`, `src/config/*`, `src/contracts/*`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `Player`: Die Figur dreht sich nicht mehr (kein `setRotation`), sie spiegelt sich per `flipX` bei Zielwinkel über 90° im Betrag (`faceLeft`). `facingDeg` und `stepRotation` bleiben unverändert. Neues Waffen-Sprite `weapon-raygun` als eigenes GameObject: Origin am Griff, Position am Handpunkt, Rotation gleich dem Zielwinkel, `flipY` beim Zielen nach links, Tiefe hinter der Figur bei −160° bis −20° (alles über die Funktionen aus `weaponMount.ts`). Frame aus der Ausbaustufe (Summe der Waffen-Upgrades 0–6, 7–13, 14–20).
+  2. `PlayerConfig` bekommt `weaponStage` (0..2). `GameScene` berechnet sie mit `weaponStageForUpgrades` aus dem geladenen Spielstand und übergibt sie. Mehr ändert dieses Paket in der Szene nicht.
+  3. Der Laser startet an der Mündung (`muzzlePoint`) statt bei `MUZZLE_OFFSET` (Konstante entfällt). Doppelschuss-Versätze aus AP-30 bleiben, sie beziehen sich auf die Mündung.
+  4. `Laser`/`LaserPool`: Tint `game.laser-raygun`. `Player`: Schild-Ring `game.shield-ring`, Treffer-Tint aus einem passenden Token (gibt es keines, meldet der Coder es dem Lead und erfindet keinen Wert). `ArmourRing`: `game.fire-ring`, gestrichelt (Alpha und Tiefe wie bisher).
+  5. `Enemy.ts`: Treffer als weißer Blitz von 120 ms (Grundsatz 8), die Aura-Farbe aus einem Token statt `0x9b59b6`.
+  6. `ItemPickup`/`ArmourPickup`: Mit `prefersReducedMotion()` blinken liegende Items nicht (Grundsatz 7), die Restzeit bleibt über einen Umriss erkennbar. Der bestehende Test bleibt grün, Ergänzung für den Fall „reduziert“.
+- **Schnittstellen:** nutzt `weaponMount`, `THEME`, `motion`, `weapon-raygun`. Die öffentliche API von `Player` bleibt (Callbacks, `facingDeg`, `takeDamage`), neu ist nur `PlayerConfig.weaponStage`.
+- **Akzeptanzkriterien:**
+  - Die Astronautin ist nie gedreht, die Waffe kreist in 360° um die Hand, Tiefe und Spiegeln stimmen in allen vier Richtungen (Sichtprüfung gegen `schrift-und-waffe.html`)
+  - Der Laser trifft das Ziel in Zielrichtung wie bisher, Feuerrate, Schaden und Doppelschuss unverändert
+  - Ausbaustufe 1/2/3 wechselt bei Summe 7 und 14
+  - Keine Farb-Literale in den eigenen Dateien, Checks grün
+- **Tests:** Die reinen Funktionen sind in AP-50 getestet. Hier nur `ItemPickup.test.ts` angepasst. Handtest-Liste im Bericht.
+- **Review-Schwerpunkte:** Grundsätze 1, 3, 7, 8; Waffe wird beim Tod und bei „Nochmal“ aufgeräumt (kein Waffen-Sprite bleibt stehen); Schild-Reihenfolge und Pooling unverändert; Pause friert die Waffe nicht ein, sie folgt weiter dem Ziel
+- **Doku-Pflichten:** –
+- **Design-Review:** ja (`ma-designer`, Modus Review, zusätzlich zum normalen Review)
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-54): add rotating raygun sprite and mirror the player`
+
+#### AP-55 – Design-Abschluss: Lint-Regel gegen Farb-Literale, Restfunde, README
+
+- **Meilenstein, Lane, Welle:** M2c · OPS · W3
+- **Ziel:** Grundsatz 1 des Designs wird automatisch erzwungen: Keine `0x…`- und `#…`-Farbliterale und keine Systemschrift in `src/scenes/**` und `src/entities/**`. Restfunde werden behoben, die README nennt die neuen Skripte.
+- **Pflichtlektüre:** Brief („Grundsätze“, Punkt 1), `eslint.config.js`, `README.md`, `src/config/theme.ts`
+- **Abhängigkeiten:** AP-52, AP-53, AP-54
+- **Parallel möglich mit:** –
+- **Dateien (Eigentum):** `eslint.config.js`, `README.md`, Restfunde in `src/scenes/**` und `src/entities/**` (nur das Ersetzen von Farb-Literalen durch Tokens), `docs/guides/*` (nur Verweise)
+- **Nicht anfassen:** `docs/design/**`, `src/config/**`, `src/logic/**`, `package.json`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. ESLint-Regel (`no-restricted-syntax` mit Selektoren auf Zeichenketten `#rrggbb` und Zahlenliterale `0xRRGGBB`, dazu `monospace`) für `src/scenes/**` und `src/entities/**`. `src/config/theme.ts` ist ausgenommen. Die Meldung nennt `src/config/theme.ts`.
+  2. `npm run lint` zeigt dann alle Restfunde. Der Coder ersetzt sie durch Tokens. Fehlt ein passendes Token, meldet er es dem Lead (kein Wert erfunden) und lässt die Stelle mit einer begründeten Ausnahme stehen.
+  3. README: Abschnitt „Design“ (Verweis auf `docs/design/`, Skripte `theme:build`, `fonts:build`, Regel „nur Tokens“).
+- **Schnittstellen:** –
+- **Akzeptanzkriterien:**
+  - `npm run lint` meldet kein Farb-Literal in Szenen und Entities, die Regel schlägt bei einem absichtlichen Test-Literal an (manuell geprüft, nicht eingecheckt)
+  - Checks grün
+- **Tests:** –
+- **Review-Schwerpunkte:** Regel ist nicht zu breit (keine Fehlalarme bei Hash-Konstanten), Ausnahmen begründet
+- **Doku-Pflichten:** README
+- **Design-Review:** nein
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja (nur Restfunde ohne Regel; die Regel kann später folgen)
+- **Commit-Typ:** `chore(AP-55): enforce theme tokens with a lint rule`
+
 ### M3 – Bosse
 
 #### AP-16 – Boss-Rahmen
@@ -2031,7 +2290,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 
   Die drei Boss-Pakete bauen nur noch ihr Verhalten.
 - **Pflichtlektüre:** PE-18, PE-31, PE-33, PE-34, `src/contracts/*`, `src/logic/{round,spawn}.ts`, `src/config/{levels,assets}.ts`, `docs/guides/*`
-- **Abhängigkeiten:** M2b-DEP (PE-46: M3 startet nach M2b, damit Schild und Münzen von Anfang an gelten)
+- **Abhängigkeiten:** M2c-DEP (PE-46: M3 startet nach M2b, damit Schild und Münzen von Anfang an gelten; PE-60: und nach dem Design-Umbau M2c, weil `config/assets.ts` und die Szenen sonst doppelt angefasst würden). Zusätzliche Pflichtlektüre aus dem Design: `src/config/theme.ts`, `docs/design/mockups/sprites.html` (Sprite-Regeln für die Boss-Platzhalter), Brief-Grundsätze 1 und 4. Telegraph-Farben (Warnrot `red.300`) nur aus `theme.ts`.
 - **Parallel möglich mit:** –
 - **Dateien (Eigentum):** `src/contracts/{boss,events,index}.ts`, `src/config/{bosses,levels,assets}.ts`, `src/logic/{boss,round,spawn}.ts`, `src/entities/bosses/{BossBase,Telegraph}.ts`, `public/assets/sprites/boss-*`, `public/assets/sounds/boss-*`, `public/assets/.placeholders.json`, `docs/guides/{grafik,sound}-austauschen.md`, zugehörige Tests unter `tests/`
 - **Nicht anfassen:** `src/scenes/*`, `scripts/*`, übrige Entities
@@ -2081,7 +2340,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 
 - **Meilenstein, Lane, Welle:** M3 · GAME · W2
 - **Ziel:** Das verwurzelte Baummonster nach PE-34.
-- **Pflichtlektüre:** PE-34 (Baummonster), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`
+- **Pflichtlektüre:** PE-34 (Baummonster), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`, `src/config/theme.ts` (keine Farb-Literale, Lint-Regel AP-55)
 - **Abhängigkeiten:** AP-16
 - **Parallel möglich mit:** AP-18, AP-19
 - **Dateien (Eigentum):** `src/entities/bosses/{RootMonster,RootSpike}.ts`
@@ -2108,7 +2367,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 
 - **Meilenstein, Lane, Welle:** M3 · GAME · W2
 - **Ziel:** Der Waldgeist nach PE-34.
-- **Pflichtlektüre:** PE-34 (Waldgeist), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`
+- **Pflichtlektüre:** PE-34 (Waldgeist), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`, `src/config/theme.ts` (keine Farb-Literale, Lint-Regel AP-55)
 - **Abhängigkeiten:** AP-16
 - **Parallel möglich mit:** AP-17, AP-19
 - **Dateien (Eigentum):** `src/entities/bosses/{ForestGhost,GhostOrb}.ts`
@@ -2135,7 +2394,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 
 - **Meilenstein, Lane, Welle:** M3 · GAME · W2
 - **Ziel:** Der Riesen-Stein nach PE-34.
-- **Pflichtlektüre:** PE-34 (Riesen-Stein), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`
+- **Pflichtlektüre:** PE-34 (Riesen-Stein), PE-31, `src/entities/bosses/{BossBase,Telegraph}.ts`, `src/logic/boss.ts`, `src/config/bosses.ts`, `src/config/theme.ts` (keine Farb-Literale, Lint-Regel AP-55)
 - **Abhängigkeiten:** AP-16
 - **Parallel möglich mit:** AP-17, AP-18
 - **Dateien (Eigentum):** `src/entities/bosses/GiantStone.ts`
@@ -2166,7 +2425,8 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 
 - **Meilenstein, Lane, Welle:** M3 · GAME · W3
 - **Ziel:** Bosse im Spiel: Warnung, Erscheinen, Kollisionen, HP-Leiste, Sieg nach Boss, Ergebnis.
-- **Pflichtlektüre:** PE-18, PE-31, PE-33, PE-34, `src/contracts/{boss,events}.ts`, `src/logic/{round,boss}.ts`, Boss-Entities aus AP-16 bis AP-19
+- **Pflichtlektüre:** PE-18, PE-31, PE-33, PE-34, `src/contracts/{boss,events}.ts`, `src/logic/{round,boss}.ts`, Boss-Entities aus AP-16 bis AP-19, Design: Brief-Grundsätze, `docs/design/mockups/runde.html` (Ansicht 3, Boss-Lebensleiste), `src/config/theme.ts`, `src/scenes/hud/{FunkPanel,FunkButton}.ts` (AP-53)
+- **Design-Review:** ja (Boss-Lebensleiste, Timer-Label und Ergebnis sind sichtbare Oberfläche)
 - **Abhängigkeiten:** AP-17, AP-18, AP-19
 - **Parallel möglich mit:** –
 - **Dateien (Eigentum):** `src/entities/bosses/createBoss.ts`, `src/scenes/{GameScene,HudScene,ResultScene}.ts`
@@ -2182,7 +2442,7 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
        - Boss-Angriffe ↔ Spielerin
        - Spawn-Callbacks (Baummonster)
      - `bossDefeated` an `RoundState`, dazu der Sound `boss-defeated`.
-  3. `HudScene`: Boss-HP-Leiste oben mit Namen (deutsch: „Verwurzeltes Baummonster“, „Waldgeist“, „Riesen-Stein“). Der Timer zeigt nach Ablauf „Boss besiegen!“.
+  3. `HudScene`: Boss-HP-Leiste oben mit Namen (deutsch: „Verwurzeltes Baummonster“, „Waldgeist“, „Riesen-Stein“) im Funk-Stil nach `runde.html` 3 (Vorschlag des Designers für M3), mit `FunkPanel` aus AP-53, Farben nur aus `theme.ts`. Das Timer-Panel hat seit AP-53 den Zustand `setOvertime(on)` mit dem Label „BOSS!“. AP-20 schaltet ihn ein, sobald der Timer abgelaufen ist und der Boss lebt. Der Text des Labels ist „BOSS!“ laut Design (statt „Boss besiegen!“), Bestätigung offen (Q-31).
   4. `ResultScene`: zeigt „Boss besiegt“.
 - **Akzeptanzkriterien:**
   - Alle Smoke-Test-Punkte von M3-DEP
@@ -2207,11 +2467,14 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 | H-03 | iPhone im selben WLAN; Windows-Firewall erlaubt Node im privaten Netz (Abfrage beim ersten `npm run preview -- --host` mit „Zulassen“ bestätigen) | M2-DEP | M2-DEP | ☑ (PC und iPhone, 2026-10-25) |
 | H-04 | Bosse beschreiben (Q-04); angenommenes Verhalten PE-34 vor M3-Freigabe prüfen | vor M3 | AP-16–AP-20 | ☑ Namen / ☐ PE-34 prüfen |
 | H-05 | Optional: eigene Grafiken und Sounds nach den Anleitungen aus AP-07 austauschen | ab M1 | – | ☐ |
-| H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☑ M0–M2 (2026-10-25) / ☐ M2b, M3 |
+| H-06 | Abnahmen M0–M3 (Pull Requests und Smoke-Tests) | je Meilenstein | nächster Meilenstein | ☑ M0–M2 (2026-10-25) / ☐ M2b, M2c, M3 |
 | H-07 | Freigabe Umfang, Verträge und Reihenfolge M2b: V-01 bis V-04 (in §16, inzwischen übernommen) | vor M2b | AP-25, AP-26 | ☑ (2026-10-24) |
-| H-08 | Abnahme M2b: Smoke-Test am PC und auf dem iPhone (M2b-DEP) | nach M2b | M3 (AP-16 ff.) | ☐ |
+| H-08 | Abnahme M2b: Smoke-Test am PC und auf dem iPhone (M2b-DEP) | nach M2b | M2c (AP-50, AP-51), danach M3 | ☐ |
 | H-09 | Rüstungen klären: Q-19 (Katalog), Q-20 (Auslöser, Abklingzeit), Q-21 (Feuerring-Werte) beantworten | vor AP-37a | AP-37a, AP-37c | ☑ (Pilot PE-52, Katalog spätere Planung; Umsetzung PE-58) |
 | H-10 | Freigabe Umfang: V-05 (Stick, §2 F-01) und V-06 (F-17 nach „Optional“, §2) entscheiden. Erst danach trägt der Planner die §2-Änderungen ein | vor AP-39 bzw. §2 | AP-39 | ☑ V-05 übernommen (2026-10-25), V-06 abgelehnt, F-17 bleibt Pflicht (PE-56) |
+| H-11 | Reihenfolge bestätigen: Design-Umsetzung (M2c) nach M2b-DEP und vor M3 (PE-60, angenommen). Antwort „ja“ oder „Design zuerst, vor M2b-DEP“ | vor M2c W1 | AP-50, AP-51 | ☐ |
+| H-12 | Abnahme M2c: Smoke-Test am PC und auf dem iPhone (M2c-DEP), inklusive Lesbarkeit von Funk 1× und Kapsel 1× im Querformat | nach M2c | M3 (AP-16 ff.) | ☐ |
+| H-13 | Optional: die 30 Platzhalter-Sprites (Astronautin, Gegner, Items, Bosse) nach `docs/design/mockups/sprites.html` und der Anleitung `docs/guides/grafik-austauschen.md` neu zeichnen. Reiner Dateiaustausch ohne Code. Kein Paket geplant (Brief, Reihenfolge-Empfehlung 5) | jederzeit nach M2c W1 | – | ☐ |
 
 ---
 
@@ -2223,10 +2486,11 @@ Rüstungen (PE-47, PE-52, PE-58): Pilot ist der Feuerring. Der Katalog weiterer 
 | M1 | 7 | ≈ 10 h (+ Review ≈ 13 h) | ≈ 4–5 |
 | M2 | 5 | ≈ 6,75 h (+ Review ≈ 9 h) | ≈ 3–4 |
 | M2b | 16 | ≈ 23,75 h (+ Review ≈ 30 h) | ≈ 11–12 |
+| M2c | 6 | ≈ 11,25 h (+ Review inkl. 3 Design-Reviews ≈ 15 h) | ≈ 5–6 (bei 45 % Zielwert ≈ 4) |
 | M3 | 5 | ≈ 8,5 h (+ Review ≈ 11 h) | ≈ 4–5 |
-| **Gesamt** | **37** | **≈ 54 h (+ Review ≈ 69 h)** | **≈ 24–29** |
+| **Gesamt** | **43** | **≈ 65 h (+ Review ≈ 84 h)** | **≈ 29–35** |
 
-Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h. Die Fensterzahlen oben gelten noch für 30 % Zielwert. Bei 45 % sinkt die Zahl rechnerisch auf etwa zwei Drittel, Neuberechnung nach M2b-DEP (§18).
+Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h. Die Fensterzahlen oben gelten noch für 30 % Zielwert. Bei 45 % sinkt die Zahl rechnerisch auf etwa zwei Drittel, Neuberechnung nach M2b-DEP (§18). Die M2c-Zeile (PE-59) enthält AP-50 und AP-54 (je M, ca. 1,5 h), AP-51, AP-52 und AP-53 (je L, ca. 2,5 h) und AP-55 (S, ca. 0,75 h), alle angenommen. Dazu kommen drei Design-Reviews durch `ma-designer`, deren Kosten als Review-Zuschlag gerechnet sind. Optional sind die Pakete AP-55 (Regel kann später folgen) und H-13 (Sprites, Mensch). Das Risiko steht in RI-17.
 
 **Zeit des Nutzers:** Abnahmen und Smoke-Tests ≈ 0,5–1 h je Meilenstein, Freigaben pro Meilenstein, Boss-Beschreibung (Q-04), optional Grafik und Sound. Zusammen ≈ 4–6 h ohne Grafik.
 
@@ -2245,6 +2509,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | K6 | Dauerfeuer weglassen (dann entfällt auch die Obergrenze 20 Schuss/s, Q-16) | ≈ 0,5 h | AP-27, AP-30, AP-34 |
 | K7 | Neu-Balancing nur als Kennzahltabelle, ohne Zielwert-Tests | ≈ 0,5 h | AP-35 |
 | K8 | Feuerring ohne Pulsieren, nur statische Linie (Rüstung bleibt Pflicht, F-17) | ≈ 0,3 h | AP-37c |
+| K9 | AP-55 nur als Restfunde-Bereinigung ohne ESLint-Regel (Grundsatz 1 prüft dann nur das Review) | ≈ 0,3 h | AP-55 |
 | nie | Sicherheit, Datenschutz, robustes Laden, Asset-Lizenzen, Designer-Anleitungen | – | – |
 
 ---
@@ -2268,6 +2533,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | RI-13 | Gold-Kurve trifft das Ziel nicht (zu viel oder zu wenig Gold, Upgrades zu schnell oder zu langsam) | Kennzahl-Tabelle und Zielwert-Test in AP-35, nur Config; Nutzer prüft nach M2b-DEP | AP-35 |
 | RI-14 | Rüstungen (PE-47) erweitern den Umfang, bevor der Katalog feststeht (Scope Creep) | Pilot Feuerring fest (PE-52), Katalog weiterer Rüstungen offen. Nur Daten (`ArmourDef` in Config, PE-58), kein Katalog in M2b. Weitere Rüstungen erst nach Klärung in der Planung | AP-37a, AP-37c |
 | RI-15 | Touch-Stick: Multi-Touch-Konflikte mit der Pause-Taste, Fehlklicks am Bildschirmrand, Safari-Vollbild ändert die Höhe beim Drehen | Eigener Pointer je Stick, Winkelfunktion als reine Funktion getestet, Handtest auf dem iPhone in M2b-DEP | AP-38, AP-39 |
+| RI-17 | Design-Umbau (M2c) berührt fast alle Szenen und Entities. Fehler könnten Funktion brechen, Pakete sind mit L groß, und Schrift (Bitmap), Waffen-Sprite und Lesbarkeit auf dem iPhone sind noch nie am Gerät geprüft | Logik bleibt unverändert, reine Funktionen für die Waffe mit Tests (AP-50), Szenen in drei getrennten Paketen mit Design-Review, Lint-Regel AP-55, Handtest-Punkt „Funktion unverändert“ in M2c-DEP, Fix-Reserve für Schrift 2× | AP-50–AP-55 |
 | RI-16 | AP-33 wird groß (opus, L): Spielszene, Drop, Pickup und Ringschaden in einem Paket, dazu das Rundenende. Ein Fehler in der Szene trifft alle Runden | Feuerring-Logik ist in AP-37a getestet, AP-33 verdrahtet nur. Review-Punkt Rundenende-Reihenfolge. Falls AP-33 zu groß wird, ist eine Aufteilung nur mit Freigabe des Nutzers möglich, weil PE-58 die Einbindung spätestens in W5 verlangt | AP-33, AP-37a, AP-37c |
 
 ---
@@ -2336,6 +2602,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-56 | F-17 Rüstungen (Pilot Feuerring) bleiben Pflicht. Der Vorschlag, F-17 nach „Optional“ zu verschieben (V-06), ist abgelehnt. Der Katalog weiterer Rüstungen ist spätere Planung, der Pilot bleibt wie in PE-52 | Lead-Auftrag 2026-10-25 (V-06) | Nutzer am 2026-10-25 (V-06 abgelehnt) |
 | PE-57 | Feuerring-Regeln: Drop-Chance 2 % je besiegtem Gegner (Richtwert). Eingesammelt wird das Pickup durch Anschießen wie ein Item. Es verfällt nach `ITEM_RULES.lifetimeMs`. Aufnahme während aktiver Rüstung oder Abklingzeit wirkt nicht. Die Zeit ist die pausierbare Spielzeit (PE-29). Der Ring fügt Gegnern im Radius Schaden über den bestehenden Todespfad zu. Eigener Zustand `ActiveArmour`, getrennt von `ActivePowers`. Bosse nehmen in M2b keinen Ringschaden. Bosse ab M3 nur nach Entscheidung mit PE-34 (Q-23) | Umsetzung der Regeln aus PE-47 und PE-52, Planer-Vorschlag, bestätigt (Q-23) | Nutzer am 2026-10-25 (Q-23) |
 | PE-58 | Rüstungs-Priorität: Der Feuerring kommt zeitnah in M2b. AP-37a (W3, Vertrag, Config, Logik), AP-37c (W4, Entity, Pickup-Sprite), Anzeige in AP-34 (W4), Einbindung in AP-33 (W5). AP-32 wird dafür nach W5 verschoben. Weitere Rüstungen sind später reine Daten in `src/config/armour.ts` | Nutzer-Auftrag Priorität, Konflikt Wellenlimit (max. drei Pakete je Welle, PE-15) | Nutzer am 2026-10-25 |
+| PE-59 | Design übernommen (Brief vom 2026-10-25, Status `freigegeben`, Richtung „Außen die Spielkassette, innen das Funkgerät im Anzug“). Umsetzung als Meilenstein M2c mit AP-50 bis AP-55: Tokens als `src/config/theme.ts` (erzeugt aus `tokens.resolved.json`), eigene Bitmap-Schriften Astro Kapsel und Astro Funk, Menü im Kassetten-Stil, Runde im Funk-Stil, Waffe als eigenes kreisendes Sprite mit drei Ausbaustufen, Lint-Regel „nur Tokens“. Keine neuen Abhängigkeiten, Spiellogik unverändert. Angenommen im Brief: Laserfarbe Korallenrosa, „s“ bei Sekunden, Logo-Schriftzug, kein Fließtext-Font. Kein Impressum nötig (R3 erst bei Veröffentlichung, Brief) | Lead-Auftrag „Design übernehmen“, Übergabe im Brief | Nutzer (Design freigegeben am 2026-10-25), Paketschnitt Planner |
+| PE-60 | Reihenfolge: M2c (Design) läuft nach M2b-DEP und vor M3. Gründe: M2b-DEP prüft Funktion und Passform, nicht Optik, und findet Fehler noch in der alten Optik. Die Design-Pakete besitzen `HudScene`, `ResultScene`, `config/assets.ts` und `Player.ts`, M3 besitzt dieselben Dateien (AP-16, AP-20), das Design muss deshalb vorher fertig sein. AP-16 hängt von M2c-DEP ab. M2b-DEP-Checkliste unverändert, nur mit Hinweis | Planner-Empfehlung, Bestätigung offen (H-11) | Planner (angenommen) |
 
 ### Offene Fragen
 
@@ -2364,6 +2632,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-21 | Rüstungen: Richtwerte Feuerring (Radius 72 px, Schaden 20/s, Dauer 5 s). Gelten die Richtwerte oder soll der Nutzer sie festlegen? Gilt die Rüstung nur in der Runde, nicht im Menü? | K | PE-47, AP-37a, AP-37c | Richtwerte gelten, nur in der Runde | geklärt (PE-52) |
 | Q-22 | Auf Touch-Geräten: Bleibt das Tippen auf das Spielfeld als Zielen erhalten, wenn der Stick dazukommt? | W | PE-03, PE-55, AP-39 | Ja, der Stick hat Vorrang vor Tippen und Maus | geklärt (PE-55, Nutzer am 2026-10-25) |
 | Q-23 | Feuerring: Drop-Chance je Gegner (Richtwert 2 %, angenommen) und trifft der Ring ab M3 auch Bosse? In M2b trifft er keine Bosse | W | PE-57, AP-37a, AP-33, M3 (AP-16 ff.) | 2 % je Gegner, Bosse ab M3 nur nach Entscheidung mit PE-34 | geklärt (PE-57), Nutzer am 2026-10-25 |
+| Q-31 | Timer-Label nach Ablauf bei lebendem Boss: „BOSS!“ (Design-Brief, Grundsatz 4) oder „Boss besiegen!“ (bisheriger Text in AP-20)? | O | AP-20, AP-53 (Zustand `setOvertime`) | „BOSS!“ laut Design, weil es zum Funk-HUD und zu den Mockups passt | offen (AP-20 ist mit „BOSS!“ eingetragen) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -2377,6 +2646,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | `ActivePowers.doubleShotStage` (Typ-Schärfung) | AP-25 spezifiziert `0–2`, Ist-Typ ist `number`. Vorschlag: auf `0 \| 1 \| 2` schärfen. Eigentum: `src/contracts/weapon.ts` (AP-25-Datei), nur mit Freigabe und vor AP-30 | Review-Hinweis AP-38, niedrig | Lead (Wellenabschluss M2b W1) |
 | §11 Abhängigkeitsgraph | Kanten AP-29 → AP-35 und AP-30 → AP-35 ergänzen. §10 nennt beide Abhängigkeiten, der Graph zeigt nur AP-27 → AP-35. Keine Auswirkung auf die Wellen, AP-35 ist W5 | Prüfung Eigentum und Wellen W3 | Planner (Pflege, Wellenabschluss M2b W2) |
 | Lead-Skript: Paket-IDs mit Buchstabe (Werkzeug) | Das Skript akzeptiert im Branch und im Commit-Betreff nur `AP-<nr>`. AP-37a und AP-37c werden deshalb als `AP-37` geführt (`agent/AP-37-c<n>`, `feat(AP-37): ...`). Vorschlag: das Skript auf `AP-<nr>[a-z]?` erweitern, danach gelten Branch und Commit-Betreff wie im Paket (`feat(AP-37c): ...`). Bis zur Entscheidung bleibt das Workaround-Schema. Nicht geändert, Werkzeug-Mangel für den Nutzer | Befund Wellenabschluss M2b W3 (AP-37a) | Lead (Wellenabschluss M2b W3) |
+| Design: Kandidaten für den Backlog (Product Owner) | Tastatur-Navigation im Menü (Fokus-Ring ist gestaltet, aber heute keine Funktion) als neue Anforderung an `docs/backlog.md`. Boss-Lebensleiste (`runde.html` 3) ist in AP-20 eingeplant, nicht Teil von M2c | Brief, „Offene Punkte für spätere Pakete“. Der Planner schreibt das Backlog nicht | Planner (Pflege, Auftrag „Design übernehmen“) |
+| Design: Sprites neu zeichnen (H-13) | Die Platzhalter der Astronautin, Gegner, Items und Bosse nach `sprites.html` neu zeichnen. Als Dateiaustausch durch den Nutzer (H-13) oder als späteres Coder-Paket mit eigener Planung. Nicht in M2c geplant | Brief, Reihenfolge-Empfehlung 5 (optional) | Planner (Pflege, Auftrag „Design übernehmen“) |
+| Design: Tokenquelle im Repo | `src/styles/tokens.css` ist eine Kopie von `docs/design/export/tokens.css`. Ändert der Designer die Tokens, laufen `npm run theme:build` und ein Kopieren von `tokens.css` neu. Vorschlag: `theme:build` kopiert die CSS-Datei mit (in AP-50 vorgesehen) und ein Test meldet Abweichungen | Brief, Zielorte | Planner (Pflege, Auftrag „Design übernehmen“) |
 
 #### Verbesserungsplan Wellenkonzept (Entwurf, nicht freigegeben)
 
@@ -2471,6 +2743,17 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | R4 Secrets | alle (Review), PE-26 |
 | R5 Rollen | alle (Wächter, Lead) |
 | R6 Prompt-Injection, Abhängigkeiten | AP-01 (`npm audit`), Review aller Pakete |
+| Design (PE-59): Tokens als `theme.ts`, Hülle (`index.html`, Manifest, `backgroundColor`) | AP-50 |
+| Design: Bitmap-Schriften Astro Kapsel und Funk, App-Icons, Waffen-Sprite und `ui-icons`, Anleitung (F-12) | AP-51 |
+| Design: Menü, Level-Auswahl, Upgrade-Panel, Dialog, Laden, Hochformat-Hinweis, Ton-Taste (F-09, F-10, F-14) | AP-52 |
+| Design: HUD, Pause, Stick, Ergebnis, Maps (F-03, F-11, F-01) | AP-53 |
+| Design: Waffe als eigenes Sprite, 360° um die Hand, drei Ausbaustufen, Laser, Ringe, Treffer-Blitz (F-02, F-12, F-17) | AP-50 (reine Funktionen), AP-54 (Darstellung) |
+| Design-Grundsatz 1 „Nur Tokens“ | AP-50, AP-52, AP-53, AP-54, AP-55 (Lint-Regel), Review |
+| Design-Grundsatz 4 „Nie nur Farbe“, 5 „Ziele mindestens 32×32“ | AP-52, AP-53, Design-Review, M2c-DEP |
+| Design-Grundsatz 7 „Bewegung abschaltbar“ (`prefers-reduced-motion`) | AP-50 (`motion.ts`), AP-52, AP-53, AP-54, M2c-DEP |
+| Design-Grundsatz 8 „Keine Zahlen über Gegnern“ (Treffer-Blitz 120 ms) | AP-54 (PE-31 gilt schon) |
+| R1 Asset-Lizenzen M2c (eigene Schriften, Icons, Sprites) | AP-51 (`LICENSES.md`) |
+| Design für M3: Boss-Lebensleiste, Timer-Label, Telegraph-Farben | AP-16, AP-20 (Q-31), AP-17–AP-19 (Tokens) |
 
 ---
 
@@ -2591,3 +2874,4 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-25 | Review-Hinweis AP-36, niedrig, ohne Paket: Grammatikfehler im Kommentar über `applyPowerItem` in `src/logic/items.ts` („heal leave it unchanged“). Kein eigenes Paket, der Lead entscheidet, ob es in einen späteren Schritt geht | Review-Befund AP-36 | – | Lead (Pflege) |
 | 2026-10-25 | Entscheidung Nutzer: Q-23 bestätigt (Feuerring-Drop 2 % je Gegner, Bosse ab M3 nur nach Entscheidung mit PE-34). PE-57 bestätigt, Annahmemarker in §0, §12 (AP-37a) und §16 entfernt, Q-23 `geklärt` | Nutzer-Entscheidung 2026-10-25 | §0, §12 AP-37a, §16 (PE-57, Q-23) | Planner (Pflege) |
 | 2026-10-25 | Pflegeauftrag Lead Wellenabschluss M2b W6: §0 Lagebericht ersetzt (Budget team 0 %, nächste Welle W7 M2b-DEP), Gates in §0, §10 (AP-36 `fertig`, M2b-DEP `bereit`), §16 und §18 wie oben. Keine Änderung an §2, §4, §5 | Lead-Auftrag Wellenabschluss M2b W6 | §0, §10, §12, §16, §18 | Planner (Pflege) |
+| 2026-10-25 | Pflegeauftrag Lead „Design übernehmen“ (Brief vom 2026-10-25, `freigegeben`, Commit 5e58bf2): PE-59 (Design übernommen) und PE-60 (Reihenfolge, angenommen). Neuer Meilenstein M2c mit AP-50 (Theme, Waffen-Geometrie, Hülle), AP-51 (Schriften, Icons, Assets), AP-52 (Menü), AP-53 (Runde), AP-54 (Waffe, Spielerin, Laser) und AP-55 (Lint-Regel, Restfunde) sowie M2c-DEP. W1: AP-50, AP-51; W2: AP-52 bis AP-54 mit Design-Review; W3: AP-55; W4: M2c-DEP. Abweichungen vom Brief-Vorschlag: reine Funktionen für die Waffe und die Bewegungseinstellung (`weaponMount.ts`, `motion.ts`) liegen in AP-50 (W1), damit AP-52 und AP-54 sie nutzen können (Regel „Verträge eine Welle vorher“); `ui-icons` wird in AP-51 neu belegt (kurzer Zwischenzustand mit falschen Symbolen in dev bis W2); `PreloadScene` gehört in W1 AP-51 (ohne Änderung würde `bitmapFont` als Audio geladen) und in W2 AP-52; Funk-Buttons des Ergebnisses kommen aus `scenes/hud/` (AP-53); `ItemPickup`/`ArmourPickup` (Blinken bei reduzierter Bewegung) und die Übergabe der Ausbaustufe in `GameScene` gehören AP-54. AP-16 hängt jetzt von M2c-DEP ab, AP-17–AP-20 bekommen Design-Hinweise (AP-20 Design-Review). Neu: Q-31 (Timer-Text „BOSS!“), H-11 bis H-13, RI-17, K9, §17-Zeilen, Vorschläge zu Backlog (Tastatur-Navigation), Sprites und Tokenquelle. M2b-DEP-Checkliste bleibt, mit Hinweis „Funktion und Passform“. Keine Änderung an §2, §4, §5, keine neuen Abhängigkeiten | Lead-Auftrag Design übernehmen | §0, §8, §9, §10, §11, §12, §13, §14, §15, §16, §17, AP-16–AP-20, AP-50–AP-55 | Planner (Pflege) |
