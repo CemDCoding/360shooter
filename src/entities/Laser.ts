@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { THEME } from '../config/theme';
 
 /** Pooled laser projectile. Created and recycled by LaserPool only. */
 export class Laser extends Phaser.Physics.Arcade.Sprite {
@@ -9,6 +10,7 @@ export class Laser extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'laser');
+    this.setTint(THEME.colors['game.laser-raygun'].num);
   }
 
   fire(

@@ -1,10 +1,14 @@
 import Phaser from 'phaser';
 import type { ItemDef, ItemRules } from '../contracts';
+import { THEME } from '../config/theme';
 import { isExpired } from '../logic/items';
+import { prefersReducedMotion } from '../platform/motion';
 
 /** Last part of the lifetime in which the item blinks. */
 const BLINK_WINDOW_MS = 3000;
 const BLINK_PERIOD_MS = 250;
+const OUTLINE_COLOR = THEME.colors['game.hit-flash'].num;
+const OUTLINE_WIDTH_PX = 2;
 
 /** Item that appears where an enemy died; shoot it to collect it. */
 export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
@@ -12,6 +16,7 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
   private readonly spawnedAt: number;
   private readonly lifetimeMs: number;
   private collected = false;
+  private outlined = false;
   /** Called once when collected by a laser. */
   onCollected?: (def: ItemDef) => void;
 
@@ -48,7 +53,15 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
     }
     const remaining = this.lifetimeMs - (nowMs - this.spawnedAt);
     if (remaining <= BLINK_WINDOW_MS) {
-      this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      if (prefersReducedMotion()) {
+        // No blinking: the remaining time stays visible through a static outline.
+        if (!this.outlined) {
+          this.outlined = true;
+          this.preFX?.addGlow(OUTLINE_COLOR, OUTLINE_WIDTH_PX, 0, false, 0.1, 4);
+        }
+      } else {
+        this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      }
     }
     return true;
   }

@@ -14,6 +14,8 @@ vi.mock('phaser', () => {
     play(): this {
       return this;
     }
+    glows = 0;
+    preFX = { addGlow: () => (this.glows += 1) };
     destroy(): void {
       this.active = false;
     }
@@ -73,5 +75,26 @@ describe('ItemPickup lifetime', () => {
     expect(item.collect()).toBe(true);
     expect(item.collect()).toBe(false);
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ItemPickup reduced motion', () => {
+  it('does not blink but shows a static outline in the last seconds', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    try {
+      const item = new ItemPickup(fakeScene(0), 0, 0, DEF, RULES, 0);
+      expect(item.update(8_000)).toBe(true);
+      expect(item.update(8_300)).toBe(true);
+      expect((item as unknown as { alpha: number }).alpha).toBe(1);
+      expect((item as unknown as { glows: number }).glows).toBe(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('still blinks without the preference', () => {
+    const item = new ItemPickup(fakeScene(0), 0, 0, DEF, RULES, 0);
+    item.update(8_000);
+    expect((item as unknown as { alpha: number }).alpha).not.toBe(1);
   });
 });

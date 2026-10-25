@@ -6,14 +6,22 @@ import { applyDamage, applyHeal, isDead } from '../logic/health';
 import { applyPowerItem } from '../logic/items';
 import { absorbDamage, emptyPowers, tickPowers } from '../logic/powers';
 import { stepRotation } from '../logic/rotation';
+import {
+  faceLeft,
+  handPoint,
+  muzzlePoint,
+  weaponBehindFigure,
+  weaponFrame,
+} from '../logic/weaponMount';
+import { WEAPON_MOUNT } from '../config/weaponMount';
+import { THEME } from '../config/theme';
 import { computeWeaponStats, FireTimer } from '../logic/weapon';
 import type { WeaponFactors } from '../logic/weapon';
 import { LaserPool } from './LaserPool';
 
-const HIT_TINT = 0xffb0b0;
+const HIT_TINT = THEME.colors['game.hit-flash'].num;
 const HIT_TINT_MS = 120;
 const SHOOT_ANIM_MS = 150;
-const MUZZLE_OFFSET = 14;
 const BODY_RADIUS = 10;
 const IDLE_ANIM = `${animKey('astronaut')}-idle`;
 const SHOOT_ANIM = `${animKey('astronaut')}-shoot`;
@@ -22,10 +30,12 @@ const SHOOT_ANIM = `${animKey('astronaut')}-shoot`;
 export interface PlayerConfig extends WeaponFactors {
   maxHp: number;
   turnSpeedDegPerSec: number;
+  /** Weapon sprite stage 0..2 (see weaponStageForUpgrades). */
+  weaponStage: number;
 }
 
 const SHIELD_RING_RADIUS = 20;
-const SHIELD_RING_COLOR = 0x66ccff;
+const SHIELD_RING_COLOR = THEME.colors['game.shield-ring'].num;
 
 export interface PlayerCallbacks {
   onHpChange?: (hp: number, maxHp: number) => void;
@@ -50,6 +60,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private hitTintLeft = 0;
   private shootAnimLeft = 0;
   private readonly shieldRing: Phaser.GameObjects.Arc;
+  private weapon: Phaser.GameObjects.Sprite | null;
   private dead = false;
 
   constructor(
@@ -68,6 +79,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .setStrokeStyle(2, SHIELD_RING_COLOR, 0.6)
       .setVisible(false);
     scene.add.existing(this);
+    this.weapon = scene.add
+      .sprite(x, y, 'weapon-raygun', weaponFrame(config.weaponStage, 0))
+      .setOrigin(
+        WEAPON_MOUNT.grip.x / WEAPON_MOUNT.frame.width,
+        WEAPON_MOUNT.grip.y / WEAPON_MOUNT.frame.height,
+      );
     scene.physics.add.existing(this);
     (this.body as Phaser.Physics.Arcade.Body).setCircle(
       BODY_RADIUS,
@@ -117,23 +134,30 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       dt,
     );
     const rad = Phaser.Math.DegToRad(this.facingDeg);
-    this.setRotation(rad);
+    const left = faceLeft(this.facingDeg);
+    this.setFlipX(left);
+    const hand = handPoint(this.x, this.y, left);
+    this.updateWeapon(hand, left);
 
     const shots = this.fireTimer.tick(dt, this.stats.fireRatePerSec);
     if (shots > 0) {
       for (let i = 0; i < shots; i++) {
-        this.lasers.fire(
-          this.x + Math.cos(rad) * MUZZLE_OFFSET,
-          this.y + Math.sin(rad) * MUZZLE_OFFSET,
-          rad,
-          this.stats,
-          this.powers.doubleShotStage,
-        );
+        const muzzle = muzzlePoint(hand.x, hand.y, this.facingDeg, left);
+        this.lasers.fire(muzzle.x, muzzle.y, rad, this.stats, this.powers.doubleShotStage);
       }
       this.shootAnimLeft = SHOOT_ANIM_MS;
       this.callbacks.onShoot?.();
     }
     this.updateVisuals(dt);
+  }
+
+  private updateWeapon(hand: { x: number; y: number }, left: boolean): void {
+    if (!this.weapon) return;
+    this.weapon
+      .setPosition(hand.x, hand.y)
+      .setRotation(Phaser.Math.DegToRad(this.facingDeg))
+      .setFlipY(left)
+      .setDepth(this.depth + (weaponBehindFigure(this.facingDeg) ? -1 : 1));
   }
 
   private updatePowers(dt: number): void {
@@ -152,6 +176,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const key = this.shootAnimLeft > 0 ? SHOOT_ANIM : IDLE_ANIM;
     this.shootAnimLeft = Math.max(0, this.shootAnimLeft - dt);
     if (this.anims.currentAnim?.key !== key) this.play(key);
+    this.weapon?.setFrame(weaponFrame(this.config.weaponStage, key === SHOOT_ANIM ? 1 : 0));
     if (this.hitTintLeft > 0) {
       this.hitTintLeft -= dt;
       if (this.hitTintLeft <= 0) this.clearTint();
@@ -167,7 +192,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.shieldRing.setVisible(this.powers.shieldLeft > 0);
       this.callbacks.onShieldChange?.(this.powers.shieldLeft);
     }
-    this.setTint(HIT_TINT);
+    this.setTintFill(HIT_TINT);
     this.hitTintLeft = HIT_TINT_MS;
     this.callbacks.onHurt?.();
     if (absorbed.remainingDamage <= 0) return;
@@ -176,6 +201,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (isDead(this.hp)) {
       this.dead = true;
       this.shieldRing.setVisible(false);
+      this.weapon?.setVisible(false);
       this.callbacks.onDeath?.();
     }
   }
@@ -200,6 +226,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   destroy(fromScene?: boolean): void {
     this.shieldRing.destroy();
+    this.weapon?.destroy();
+    this.weapon = null;
     super.destroy(fromScene);
   }
 }

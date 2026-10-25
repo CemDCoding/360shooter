@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
 import type { ArmourDef } from '../contracts/armour';
 import type { ItemRules } from '../contracts';
+import { THEME } from '../config/theme';
 import { isExpired } from '../logic/items';
+import { prefersReducedMotion } from '../platform/motion';
 
 export const ARMOUR_PICKUP_SPRITE = 'item-fire-ring';
 const BLINK_WINDOW_MS = 3000;
 const BLINK_PERIOD_MS = 250;
+const OUTLINE_COLOR = THEME.colors['game.hit-flash'].num;
+const OUTLINE_WIDTH_PX = 2;
 
 /** Armour pickup that appears where an enemy died; shoot it to collect it. */
 export class ArmourPickup extends Phaser.Physics.Arcade.Sprite {
@@ -13,6 +17,7 @@ export class ArmourPickup extends Phaser.Physics.Arcade.Sprite {
   private readonly spawnedAt: number;
   private readonly lifetimeMs: number;
   private collected = false;
+  private outlined = false;
   /** Called once when collected by a laser. */
   onCollected?: (def: ArmourDef) => void;
 
@@ -48,7 +53,15 @@ export class ArmourPickup extends Phaser.Physics.Arcade.Sprite {
     }
     const remaining = this.lifetimeMs - (nowMs - this.spawnedAt);
     if (remaining <= BLINK_WINDOW_MS) {
-      this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      if (prefersReducedMotion()) {
+        // No blinking: the remaining time stays visible through a static outline.
+        if (!this.outlined) {
+          this.outlined = true;
+          this.preFX?.addGlow(OUTLINE_COLOR, OUTLINE_WIDTH_PX, 0, false, 0.1, 4);
+        }
+      } else {
+        this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      }
     }
     return true;
   }
