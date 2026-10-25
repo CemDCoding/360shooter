@@ -1,4 +1,4 @@
-export type ItemEffect = 'fireRate' | 'damage' | 'size' | 'heal' | 'doubleShot' | 'shield' | 'rapidFire';
+export type ItemEffect = 'doubleShot' | 'shield' | 'rapidFire' | 'heal';
 
 export interface ItemDef {
   id: string;

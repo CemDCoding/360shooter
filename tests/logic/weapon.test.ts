@@ -1,27 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { ITEMS, RAPID_FIRE_MAX_PER_SEC, WEAPON_BASE } from '../../src/config';
+import { RAPID_FIRE_MAX_PER_SEC, WEAPON_BASE } from '../../src/config';
 import { emptyPowers } from '../../src/logic/powers';
-import { FireTimer, computeWeaponStats, emptyStacks } from '../../src/logic/weapon';
-
-const per = (effect: string): number => ITEMS.find((i) => i.effect === effect)?.perStack ?? 0;
-
-describe('computeWeaponStats', () => {
-  it('returns base with zero stacks', () => {
-    expect(computeWeaponStats(WEAPON_BASE, emptyStacks(), ITEMS)).toEqual(WEAPON_BASE);
-  });
-  it('applies perStack per effect and keeps speed/range', () => {
-    const s = computeWeaponStats(WEAPON_BASE, { fireRate: 5, damage: 2, size: 1 }, ITEMS);
-    expect(s.fireRatePerSec).toBeCloseTo(WEAPON_BASE.fireRatePerSec * (1 + per('fireRate') * 5));
-    expect(s.damage).toBeCloseTo(WEAPON_BASE.damage * (1 + per('damage') * 2));
-    expect(s.projectileScale).toBeCloseTo(WEAPON_BASE.projectileScale * (1 + per('size')));
-    expect(s.projectileSpeed).toBe(WEAPON_BASE.projectileSpeed);
-    expect(s.range).toBe(WEAPON_BASE.range);
-  });
-  it('ignores effects without a def', () => {
-    const s = computeWeaponStats(WEAPON_BASE, { fireRate: 3, damage: 3, size: 3 }, []);
-    expect(s).toEqual(WEAPON_BASE);
-  });
-});
+import { FireTimer, computeWeaponStats } from '../../src/logic/weapon';
 
 describe('FireTimer', () => {
   const shotsOver = (fps: number, seconds: number, rate: number): number => {

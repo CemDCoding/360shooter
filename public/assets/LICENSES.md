@@ -14,9 +14,6 @@ Platzhalter werden von `npm run assets:placeholders` erzeugt (`scripts/generate-
 | sprites/enemy-forest-witch.png    | selbst erzeugt | selbst erzeugt |
 | sprites/enemy-zombie-squirrel.png | selbst erzeugt | selbst erzeugt |
 | sprites/enemy-forest-spirit.png   | selbst erzeugt | selbst erzeugt |
-| sprites/item-fire-rate.png        | selbst erzeugt | selbst erzeugt |
-| sprites/item-damage.png           | selbst erzeugt | selbst erzeugt |
-| sprites/item-size.png             | selbst erzeugt | selbst erzeugt |
 | sprites/item-heal.png             | selbst erzeugt | selbst erzeugt |
 | sprites/item-double-shot.png      | selbst erzeugt | selbst erzeugt |
 | sprites/item-shield.png           | selbst erzeugt | selbst erzeugt |
