@@ -4,11 +4,12 @@ import type { EnemyDef, EnemyId } from '../contracts';
 export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
   cursedTree: {
     id: 'cursedTree',
-    hp: 30,
+    hp: 50,
     speed: 30,
     contactDamage: 10,
     behavior: 'chase',
     xp: 5,
+    coinValue: 2,
     spriteKey: 'enemy-cursed-tree',
   },
   forestWitch: {
@@ -18,6 +19,7 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     contactDamage: 5,
     behavior: 'shooter',
     xp: 10,
+    coinValue: 5,
     spriteKey: 'enemy-forest-witch',
     projectile: { damage: 8, speed: 120, intervalMs: 2000, keepDistance: 140 },
   },
@@ -28,6 +30,7 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     contactDamage: 5,
     behavior: 'chase',
     xp: 4,
+    coinValue: 2,
     spriteKey: 'enemy-zombie-squirrel',
   },
   forestSpirit: {
@@ -37,6 +40,7 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     contactDamage: 0,
     behavior: 'aura',
     xp: 8,
+    coinValue: 8,
     spriteKey: 'enemy-forest-spirit',
     aura: { radius: 48, dps: 12 },
   },

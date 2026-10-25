@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   GameEvents,
+  MAX_UPGRADE_LEVEL,
+  type ActivePowers,
+  type CoinRules,
+  type UpgradeLevels,
   type AssetDef,
   type EnemyDef,
   type GameEventPayloads,
@@ -10,7 +14,6 @@ import {
   type PlayerDef,
   type ProgressionRules,
   type SaveGame,
-  type WeaponStacks,
   type WeaponStats,
 } from '../../src/contracts';
 
@@ -46,7 +49,7 @@ describe('contracts', () => {
     };
     const item: ItemDef = {
       id: 'rapid',
-      effect: 'fireRate',
+      effect: 'rapidFire',
       perStack: 0.1,
       maxStacks: 5,
       dropWeight: 1,
@@ -60,7 +63,6 @@ describe('contracts', () => {
       projectileSpeed: 300,
       range: 400,
     };
-    const stacks: WeaponStacks = { fireRate: 0, damage: 0, size: 0 };
     const player: PlayerDef = { maxHp: 10, turnSpeedDegPerSec: 180 };
     const prog: ProgressionRules = { xpCurveBase: 100, xpCurveExponent: 1.5, lossXpFactor: 0.5 };
     const save: SaveGame = {
@@ -88,13 +90,27 @@ describe('contracts', () => {
       item,
       rules,
       weapon,
-      stacks,
       player,
       prog,
       save,
       asset,
-    ]).toHaveLength(11);
+    ]).toHaveLength(10);
     expect(payload.result).toBe('won');
     expect(GameEvents.RoundEnded).toBe('round-ended');
+  });
+
+  it('accepts example objects for coin, upgrade and power contracts', () => {
+    const coin: CoinRules = { dropChance: 0.05, magnetRadiusPx: 80, collectRadiusPx: 16, magnetSpeedPxPerSec: 300 };
+    const levels: UpgradeLevels = { weaponFireRate: 0, weaponDamage: 1, playerMaxHp: 2, playerTurnSpeed: MAX_UPGRADE_LEVEL };
+    const powers: ActivePowers = { doubleShotStage: 1, shieldLeft: 2, rapidFireMsLeft: 5000 };
+    const item: ItemDef = { id: 'rapid', effect: 'rapidFire', perStack: 1, maxStacks: 1, dropWeight: 1, spriteKey: 'r', durationMs: 5000 };
+    const save: SaveGame = { version: 2, playerXp: 0, playerLevel: 1, highestUnlockedLevel: 0, muted: false, gold: 10, upgrades: levels };
+    const old: SaveGame = { version: 1, playerXp: 0, playerLevel: 1, highestUnlockedLevel: 0, muted: false };
+    const coins: GameEventPayloads['coins-changed'] = { roundCoins: 3 };
+    const p: GameEventPayloads['powers-changed'] = powers;
+    expect(GameEvents.CoinsChanged).toBe('coins-changed');
+    expect(GameEvents.PowersChanged).toBe('powers-changed');
+    expect(MAX_UPGRADE_LEVEL).toBe(10);
+    expect([coin, item, save, old, coins, p].length).toBe(6);
   });
 });

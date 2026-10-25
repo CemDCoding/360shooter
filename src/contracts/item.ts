@@ -1,4 +1,4 @@
-export type ItemEffect = 'fireRate' | 'damage' | 'size' | 'heal';
+export type ItemEffect = 'doubleShot' | 'shield' | 'rapidFire' | 'heal';
 
 export interface ItemDef {
   id: string;
@@ -7,6 +7,8 @@ export interface ItemDef {
   maxStacks: number;
   dropWeight: number;
   spriteKey: string;
+  /** Nur Dauerfeuer (rapidFire): Wirkdauer in ms */
+  durationMs?: number;
 }
 
 export interface ItemRules {

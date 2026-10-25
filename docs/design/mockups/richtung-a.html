@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Richtung A – Visier · 360shooter</title>
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<style>
+  :root {
+    --font-pixel: "Silkscreen", "Courier New", monospace;
+    --font-text: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+    --page-bg: #04080e; --page-fg: #d6f4ef; --page-muted: #8fb3ad;
+    --bg: #070d16;
+    --panel: rgba(7, 22, 30, 0.86);
+    --line: #36d6c3;        /* visor 300 */
+    --line-dim: #1d5e57;
+    --fg: #e4f7f3;
+    --muted: #8fb3ad;
+    --accent: #36d6c3;
+    --accent-fg: #002420;
+    --gold: #f6c453;
+    --danger: #ff8a7b;
+    --laser: #7ff0e0;
+    --b-forest: #5fae4a; --b-night: #5a74d6; --b-elf: #b48cf0;
+    /* astronaut */
+    --px-o: #0a0f1a; --px-w: #eef3f6; --px-l: #a9b8c4; --px-v: #10223a; --px-g: #a9e8dd; --px-e: #36d6c3; --px-c: #ff97b3; --px-a: #36d6c3;
+    --px-k: #e4f7f3; --px-s: #f6c453;
+  }
+  .scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(54, 214, 195, 0.035) 0 1px, transparent 1px 3px); }
+  /* signature: targeting brackets on every visor surface */
+  .brk {
+    --k: var(--line); --len: 8px; --w: 2px;
+    background:
+      linear-gradient(var(--k), var(--k)) left top / var(--len) var(--w) no-repeat,
+      linear-gradient(var(--k), var(--k)) left top / var(--w) var(--len) no-repeat,
+      linear-gradient(var(--k), var(--k)) right top / var(--len) var(--w) no-repeat,
+      linear-gradient(var(--k), var(--k)) right top / var(--w) var(--len) no-repeat,
+      linear-gradient(var(--k), var(--k)) left bottom / var(--len) var(--w) no-repeat,
+      linear-gradient(var(--k), var(--k)) left bottom / var(--w) var(--len) no-repeat,
+      linear-gradient(var(--k), var(--k)) right bottom / var(--len) var(--w) no-repeat,
+      linear-gradient(var(--k), var(--k)) right bottom / var(--w) var(--len) no-repeat,
+      var(--fill, var(--panel));
+    outline: 1px solid var(--line-dim); outline-offset: -1px;
+  }
+  .panel { display: flex; flex-direction: column; }
+  .frame { --fill: #0b1d2b; }
+  .track { background: #0b2a2a; outline: 1px solid var(--line-dim); }
+  .track > i { background: var(--accent); }
+  hr { border: 0; border-top: 1px solid var(--line-dim); margin: 12px 0 10px; }
+  .btn.primary { --fill: var(--accent); --k: #e4f7f3; outline: 0; margin-top: auto; }
+  .btn.danger { --fill: transparent; --k: var(--danger); outline-color: #6b3a36; }
+  .btn.ghost { --fill: rgba(7, 22, 30, 0.7); }
+  .tile { outline: 1px solid var(--line-dim); outline-offset: -1px; background: #0a1a24; }
+  .tile.done { background: #0c2329; }
+  .tile.current { --fill: #0f3a3a; --k: #e4f7f3; outline: 2px solid var(--accent); outline-offset: -2px; box-shadow: 0 0 8px rgba(54, 214, 195, 0.45); }
+  .tile.locked { background: transparent; outline-style: dashed; }
+  .legend { margin-top: auto; display: flex; gap: 14px; align-items: center; }
+  .legend .row { gap: 4px; }
+  .m-hint { color: var(--muted); font-size: 9px; }
+  /* HUD */
+  .world { --px-f: #3d5f9a; --px-F: #2a4578; --px-t: #5a4a72; --px-d: #1a1230; --px-o: #070a14; --px-H: #3a2a5e; --px-K: #8fd08a; --px-R: #5a3a8a; --px-S: #8a9aa8; --px-Z: #6a7a8a; }
+  .h-energy { flex-direction: row; align-items: center; gap: 8px; }
+  .h-timer { align-items: center; justify-content: center; }
+  .segs > i { width: 8px; background: var(--accent); }
+  .segs > i.half { background: linear-gradient(90deg, var(--accent) 60%, #0b2a2a 60%); }
+  .segs > i.off { background: #0b2a2a; outline: 1px solid var(--line-dim); outline-offset: -1px; }
+  .chip { --len: 4px; }
+  .chip.cool { --k: var(--line-dim); }
+  .stick { border: 2px solid rgba(54, 214, 195, 0.35); background: rgba(7, 22, 30, 0.35); }
+  .stick > i { background: rgba(54, 214, 195, 0.55); outline: 2px solid #e4f7f3; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Richtung A – „Visier“</h1>
+  <p>Die UI ist das Innere ihres Helms: kühles Türkis-Leuchten, Zielklammern und feine Linien wie bei Metroid, mittendrin die runde, süße Astronautin.</p>
+  <dl>
+    <dt>Schrift</dt><dd>Silkscreen (Pixel, Titel und Zahlen) + Atkinson Hyperlegible Next (Hinweise) · OFL. Im Mockup steht ein Pixel-Platzhalter für Silkscreen.</dd>
+    <dt>Farbe</dt><dd>Visier-Türkis #36d6c3 · Helmschwarz #070d16 · Gold #f6c453 · Warnrot #ff8a7b</dd>
+    <dt>Erkennungsmerkmal</dt><dd>Zielklammern an allen Ecken jeder Fläche, Scanline-Hauch</dd>
+  </dl>
+</header>
+
+<section>
+  <h2>HAUPTMENÜ (MenuScene)</h2>
+  <div class="stage-wrap">
+    <div class="stage" data-component="MenuScene">
+      <span class="abs m-logo px" data-t="360SHOOTER" data-s="3" data-c="--fg" data-sh="#0b3a36"></span>
+      <div class="abs m-mute btn ghost brk" data-component="MuteButton" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-k:#e4f7f3;--px-o:#36d6c3"></span></div>
+
+      <div class="abs m-profile panel brk" data-component="PlayerCard">
+        <div class="row" style="gap:10px">
+          <div class="portrait frame brk"><span class="spr" data-n="astronaut" data-s="3" aria-label="Astronautin"></span></div>
+          <div>
+            <span class="px" data-t="SPIELERLEVEL" data-c="--muted"></span>
+            <div style="margin-top:8px"><span class="px" data-t="7" data-s="4" data-c="--fg"></span></div>
+          </div>
+        </div>
+        <div class="xpbar track" role="img" aria-label="Erfahrung 640 von 900"><i style="width:71%"></i></div>
+        <div class="row" style="justify-content:space-between;margin-top:5px">
+          <span class="px" data-t="XP" data-c="--muted"></span><span class="px" data-t="640 / 900" data-c="--muted"></span>
+        </div>
+        <hr>
+        <div class="row" style="gap:6px">
+          <span class="spr" data-n="coin" data-s="2"></span>
+          <span class="px" data-t="1.240" data-s="2" data-c="--gold"></span>
+          <span class="px" data-t="GOLD" data-c="--muted"></span>
+        </div>
+        <div class="row" style="justify-content:space-between;margin-top:12px"><span class="px" data-t="WAFFE" data-c="--muted"></span><span class="px" data-t="STUFE 5 / 20" data-c="--fg"></span></div>
+        <div class="row" style="justify-content:space-between;margin-top:6px"><span class="px" data-t="ANZUG" data-c="--muted"></span><span class="px" data-t="STUFE 3 / 20" data-c="--fg"></span></div>
+        <div class="btn primary brk" data-component="Button" role="button"><span class="px" data-t="UPGRADES" data-s="2" data-c="--accent-fg"></span></div>
+      </div>
+
+      <div class="abs m-levels panel brk" data-component="LevelGrid">
+        <div class="group">
+          <div class="group-head"><i class="swatch" style="background:var(--b-forest)"></i><span class="px" data-t="WALD" data-c="--fg"></span><span class="px" data-t="0–4" data-c="--muted"></span></div>
+          <div class="tiles">
+            <div class="tile done"><span class="px" data-t="0" data-s="2" data-c="--fg"></span><span class="badge spr" data-n="star"></span></div>
+            <div class="tile done"><span class="px" data-t="1" data-s="2" data-c="--fg"></span><span class="badge spr" data-n="star"></span></div>
+            <div class="tile done"><span class="px" data-t="2" data-s="2" data-c="--fg"></span><span class="badge spr" data-n="star"></span></div>
+            <div class="tile done"><span class="px" data-t="3" data-s="2" data-c="--fg"></span><span class="badge spr" data-n="star"></span></div>
+            <div class="tile done"><span class="px" data-t="4" data-s="2" data-c="--fg"></span><span class="badge spr" data-n="star"></span></div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-head"><i class="swatch" style="background:var(--b-night)"></i><span class="px" data-t="WALD BEI NACHT" data-c="--fg"></span><span class="px" data-t="5–9" data-c="--muted"></span></div>
+          <div class="tiles">
+            <div class="tile done"><span class="px" data-t="5" data-s="2" data-c="--fg"></span><span class="badge spr" data-n="star"></span></div>
+            <div class="tile done"><span class="px" data-t="6" data-s="2" data-c="--fg"></span><span class="badge spr" data-n="star"></span></div>
+            <div class="tile current brk" aria-current="true"><span class="px" data-t="7" data-s="2" data-c="--fg"></span></div>
+            <div class="tile locked"><span class="spr" data-n="lock" data-s="2" style="--px-o:#4f8a84;--px-k:#16302f"></span></div>
+            <div class="tile locked"><span class="spr" data-n="lock" data-s="2" style="--px-o:#4f8a84;--px-k:#16302f"></span></div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-head"><i class="swatch" style="background:var(--b-elf)"></i><span class="px" data-t="ELFENWALD" data-c="--fg"></span><span class="px" data-t="10–20" data-c="--muted"></span></div>
+          <div class="tiles" id="elf"></div>
+        </div>
+        <div class="legend">
+          <span class="row"><span class="spr" data-n="star"></span><span class="px" data-t="GESCHAFFT" data-c="--muted"></span></span>
+          <span class="row"><i class="swatch" style="outline:2px solid var(--accent);outline-offset:-2px"></i><span class="px" data-t="AKTUELL" data-c="--muted"></span></span>
+          <span class="row"><span class="spr" data-n="lock" style="--px-o:#8fb3ad;--px-k:#16302f"></span><span class="px" data-t="GESPERRT" data-c="--muted"></span></span>
+        </div>
+      </div>
+
+      <div class="abs m-reset btn danger brk" data-component="Button" role="button"><span class="px" data-t="FORTSCHRITT ZURÜCKSETZEN" data-c="--danger"></span></div>
+      <p class="abs m-hint">Tippe auf ein freies Level, um die Runde zu starten.</p>
+      <div class="scan"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>RUNDE MIT HUD (Level 7, Wald bei Nacht · GameScene + HudScene)</h2>
+  <div class="stage-wrap">
+    <div class="stage" data-component="GameScene">
+      <div class="world"></div>
+      <i class="ff" style="left:60px;top:150px"></i><i class="ff" style="left:180px;top:300px"></i><i class="ff" style="left:430px;top:160px"></i>
+      <i class="ff" style="left:590px;top:120px"></i><i class="ff" style="left:350px;top:320px"></i><i class="ff" style="left:250px;top:60px"></i>
+      <i class="ff" style="left:500px;top:330px"></i><i class="ff" style="left:30px;top:310px"></i>
+      <div class="world-ents" style="position:absolute;inset:0">
+        <span class="abs spr" data-n="tree" data-s="2" style="left:104px;top:84px;--px-f:#3d5f9a;--px-F:#2a4578;--px-t:#5a4a72;--px-d:#1a1230;--px-o:#070a14"></span>
+        <span class="abs spr" data-n="tree" data-s="2" style="left:470px;top:250px;--px-f:#3d5f9a;--px-F:#2a4578;--px-t:#5a4a72;--px-d:#1a1230;--px-o:#070a14"></span>
+        <span class="abs spr" data-n="tree" data-s="2" style="left:500px;top:96px;--px-f:#3d5f9a;--px-F:#2a4578;--px-t:#5a4a72;--px-d:#1a1230;--px-o:#070a14"></span>
+        <span class="abs spr" data-n="squirrel" data-s="2" style="left:200px;top:262px;--px-o:#070a14"></span>
+        <span class="abs spr" data-n="squirrel" data-s="2" style="left:392px;top:44px;--px-o:#070a14"></span>
+        <span class="abs spr" data-n="witch" data-s="2" style="left:70px;top:214px;--px-o:#070a14"></span>
+        <span class="abs spr" data-n="bolt" data-s="2" style="left:140px;top:214px;--px-o:#070a14"></span>
+        <span class="abs spr" data-n="coin" data-s="1" style="left:262px;top:122px"></span>
+        <span class="abs spr" data-n="shield" data-s="1" style="left:382px;top:230px"></span>
+        <span class="abs spr" data-n="astronaut" data-s="2" style="left:304px;top:164px" aria-label="Astronautin"></span>
+        <i class="laser" style="left:279px;top:164px"></i><i class="laser" style="left:242px;top:148px"></i><i class="laser" style="left:205px;top:133px"></i>
+      </div>
+      <div class="vignette"></div>
+
+      <div class="abs h-energy panel brk" data-component="HudScene.energy" role="img" aria-label="Energie 87 von 100">
+        <span class="px" data-t="87" data-s="3" data-c="--fg"></span>
+        <div>
+          <span class="px" data-t="ENERGIE" data-c="--muted"></span>
+          <div class="segs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="half"></i><i class="off"></i></div>
+        </div>
+      </div>
+      <div class="abs h-timer panel brk" data-component="HudScene.timer"><span class="px" data-t="1:42" data-s="3" data-c="--fg"></span></div>
+      <div class="abs h-mute btn ghost brk" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-k:#e4f7f3;--px-o:#36d6c3"></span></div>
+      <div class="abs h-pause btn ghost brk" aria-label="Pause"><span class="spr" data-n="pause" data-s="2" style="--px-k:#e4f7f3;--px-o:#36d6c3"></span></div>
+
+      <div class="abs h-row" data-component="PowerIndicators">
+        <div class="chip brk" data-component="CoinCounter"><span class="spr" data-n="coin" data-s="2"></span><span class="px" data-t="23" data-s="2" data-c="--gold"></span></div>
+        <div class="chip brk" aria-label="Doppelschuss Stufe 2"><span class="spr" data-n="double" data-s="2"></span><span class="px" data-t="×2" data-s="2" data-c="--fg"></span></div>
+        <div class="chip brk" aria-label="Schild 2 von 3"><span class="spr" data-n="shield" data-s="2"></span><span class="px" data-t="2/3" data-s="2" data-c="--fg"></span></div>
+        <div class="chip brk" aria-label="Dauerfeuer noch 3 Sekunden"><span class="spr" data-n="rapid" data-s="2"></span><span class="px" data-t="3S" data-s="2" data-c="--fg"></span></div>
+        <div class="chip brk cool" data-component="ArmourIndicator" aria-label="Feuerring lädt, 12 Sekunden"><span class="spr" data-n="ring" data-s="2" style="opacity:.55"></span><span class="px" data-t="12S" data-s="2" data-c="--muted"></span></div>
+      </div>
+      <div class="abs stick" data-component="VirtualStick"><i></i></div>
+      <div class="scan"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Elfenwald 10–20: all locked in this state
+  const elf = document.getElementById('elf');
+  for (let i = 10; i <= 20; i++) {
+    elf.insertAdjacentHTML('beforeend', '<div class="tile locked" aria-label="Level ' + i + ' gesperrt"><span class="spr" data-n="lock" data-s="2" style="--px-o:#4f8a84;--px-k:#16302f"></span></div>');
+  }
+</script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>

@@ -10,11 +10,12 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="360shooter" />
-    <meta name="theme-color" content="#0b0b14" />
+    <meta name="theme-color" content="#1a0f24" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/icon-180.png" />
     <title>360shooter</title>
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
     <style>
       html,
       body {
@@ -23,7 +24,7 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: #0b0b14;
+        background: var(--color-menu-bg);
         touch-action: none;
         overscroll-behavior: none;
         -webkit-user-select: none;
@@ -32,14 +33,27 @@
         -webkit-tap-highlight-color: transparent;
         position: fixed;
       }
-      #game {
+      /* Safe-area probe: only its padding is read (layout.ts); the canvas is never padded. */
+      #safe {
         position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
         width: 100%;
-        height: 100%;
+        height: 100vh;
+        height: 100dvh;
         box-sizing: border-box;
+        pointer-events: none;
         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
           env(safe-area-inset-left);
+      }
+      /* Size and position are set by src/main.ts via fitArena(); fallback fills the safe area. */
+      #game {
+        position: fixed;
+        top: env(safe-area-inset-top);
+        left: env(safe-area-inset-left);
+        right: env(safe-area-inset-right);
+        bottom: env(safe-area-inset-bottom);
+        pointer-events: auto;
       }
       canvas {
         display: block;
@@ -54,15 +68,69 @@
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        gap: 12px;
-        background: #0b0b14;
-        color: #ffd64a;
-        font-family: monospace;
-        font-size: 24px;
+        gap: var(--space-4);
+        background-color: var(--color-menu-bg);
+        background-image:
+          radial-gradient(var(--color-cream-50) 0.8px, transparent 1.2px),
+          radial-gradient(var(--color-coral-300) 0.8px, transparent 1.2px);
+        background-size:
+          53px 41px,
+          89px 67px;
+        background-position:
+          7px 11px,
+          31px 29px;
+        color: var(--color-menu-text);
+        /* No webfont: bold system sans, upper case, wide tracking reads blocky enough. */
+        font-family: system-ui, 'Segoe UI', Arial, sans-serif;
+        font-weight: 900;
         text-align: center;
+        text-transform: uppercase;
       }
-      #rotate-hint span {
-        font-size: 56px;
+      #rotate-hint .astro {
+        width: 128px;
+        height: 128px;
+        background: url('assets/sprites/astronaut.png') 0 0 / 512px 128px no-repeat;
+        image-rendering: pixelated;
+      }
+      #rotate-hint .card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4);
+        background: var(--color-menu-surface);
+        box-shadow:
+          inset 2px 2px 0 var(--color-menu-surface-hi),
+          inset -2px -2px 0 var(--color-menu-surface-lo),
+          0 0 0 var(--border-menu) var(--color-menu-outline),
+          4px 4px 0 var(--border-menu) var(--color-menu-outline);
+      }
+      #rotate-hint .title {
+        font-size: 24px;
+        letter-spacing: 2px;
+      }
+      #rotate-hint .sub {
+        color: var(--color-menu-text-muted);
+        font-size: 11px;
+        letter-spacing: 1px;
+      }
+      #rotate-hint .turn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--color-menu-action-bg);
+        font-size: 24px;
+      }
+      #rotate-hint .turn i {
+        display: block;
+        border: var(--border-menu) solid var(--color-menu-text-muted);
+        width: 16px;
+        height: 28px;
+      }
+      #rotate-hint .turn i + b + i {
+        border-color: var(--color-menu-action-bg);
+        width: 28px;
+        height: 16px;
       }
       @media (orientation: portrait) {
         #rotate-hint {
@@ -72,10 +140,16 @@
     </style>
   </head>
   <body>
+    <div id="safe"></div>
     <div id="game"></div>
     <div id="rotate-hint" role="alert">
-      <span aria-hidden="true">&#x21BB;</span>
-      Bitte drehen
+      <div class="astro" aria-hidden="true"></div>
+      <div class="card">
+        <div class="title">Bitte drehen</div>
+        <div class="sub">360shooter läuft</div>
+        <div class="sub">im Querformat.</div>
+      </div>
+      <div class="turn" aria-hidden="true"><i></i><b>&rsaquo;</b><i></i></div>
     </div>
     <script>
       // iOS ignores user-scalable=no: block pinch gestures and the context menu.

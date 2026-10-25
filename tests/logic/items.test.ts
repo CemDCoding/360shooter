@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS, ITEM_RULES } from '../../src/config';
 import type { ItemDef } from '../../src/contracts';
-import { applyItem, isExpired, rollDrop } from '../../src/logic/items';
+import { applyPowerItem, isExpired, rollDrop } from '../../src/logic/items';
+import { emptyPowers } from '../../src/logic/powers';
 import { createRng } from '../../src/logic/rng';
-import { emptyStacks } from '../../src/logic/weapon';
 
 const def = (id: string): ItemDef => {
   const d = ITEMS.find((i) => i.id === id);
@@ -54,25 +54,31 @@ describe('rollDrop', () => {
   });
 });
 
-describe('applyItem', () => {
-  it('adds a stack without mutating input', () => {
-    const s = emptyStacks();
-    const r = applyItem(s, def('damage'));
-    expect(r.stacks.damage).toBe(1);
-    expect(s.damage).toBe(0);
-    expect(r.heal).toBe(0);
+describe('applyPowerItem', () => {
+  it('doubleShot stacks up to maxStacks without mutating', () => {
+    const s0 = emptyPowers();
+    let s = s0;
+    for (let i = 0; i < 5; i++) s = applyPowerItem(s, def('doubleShot'));
+    expect(s.doubleShotStage).toBe(def('doubleShot').maxStacks);
+    expect(s0.doubleShotStage).toBe(0);
   });
-  it('caps at maxStacks', () => {
-    let s = emptyStacks();
-    const d = def('fireRate');
-    for (let i = 0; i < d.maxStacks + 3; i++) s = applyItem(s, d).stacks;
-    expect(s.fireRate).toBe(d.maxStacks);
+  it('shield adds perStack, capped at maxStacks * perStack', () => {
+    const d = def('shield');
+    let s = applyPowerItem(emptyPowers(), d);
+    expect(s.shieldLeft).toBe(d.perStack);
+    for (let i = 0; i < 6; i++) s = applyPowerItem(s, d);
+    expect(s.shieldLeft).toBe(d.maxStacks * d.perStack);
   });
-  it('heal keeps stacks and returns amount', () => {
-    const s = { fireRate: 2, damage: 1, size: 0 };
-    const r = applyItem(s, def('heal'));
-    expect(r.stacks).toEqual(s);
-    expect(r.heal).toBe(def('heal').perStack);
+  it('rapidFire sets the duration and does not stack', () => {
+    const d = def('rapidFire');
+    let s = applyPowerItem({ ...emptyPowers(), rapidFireMsLeft: 1200 }, d);
+    expect(s.rapidFireMsLeft).toBe(d.durationMs);
+    s = applyPowerItem(s, d);
+    expect(s.rapidFireMsLeft).toBe(d.durationMs);
+  });
+  it('heal leaves powers unchanged', () => {
+    const s = { doubleShotStage: 1, shieldLeft: 10, rapidFireMsLeft: 100 };
+    expect(applyPowerItem(s, def('heal'))).toEqual(s);
   });
 });
 

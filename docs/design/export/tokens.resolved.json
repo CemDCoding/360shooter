@@ -1,0 +1,195 @@
+{
+  "base": {
+    "color": {
+      "ink": {
+        "950": "#0b0610"
+      },
+      "plum": {
+        "400": "#8a6a9a",
+        "500": "#4a2c60",
+        "550": "#55306e",
+        "600": "#3d2252",
+        "700": "#2d1a3d",
+        "750": "#24142f",
+        "800": "#20122c",
+        "900": "#1a0f24",
+        "950": "#120a19"
+      },
+      "coral": {
+        "300": "#ffa0ae",
+        "400": "#ff6b8a",
+        "500": "#de4c6e",
+        "600": "#bf3458"
+      },
+      "mint": {
+        "200": "#b8ffe9",
+        "400": "#5fe0c0",
+        "600": "#2fb393"
+      },
+      "cream": {
+        "50": "#fff4e8",
+        "200": "#e0c9d6",
+        "300": "#d8c3d6"
+      },
+      "gold": {
+        "200": "#ffe2a0",
+        "400": "#ffcf4a",
+        "600": "#c7922a"
+      },
+      "red": {
+        "300": "#ff8a7b",
+        "700": "#5a2236",
+        "800": "#3a1726"
+      },
+      "phos": {
+        "50": "#e5f2d8",
+        "200": "#cae3af",
+        "300": "#a8d86b",
+        "350": "#a9c48a",
+        "600": "#567f02",
+        "800": "#2c4210",
+        "950": "#0a1108"
+      },
+      "biome": {
+        "forest": "#6cc04a",
+        "night": "#6a86ff",
+        "elf": "#c89bff",
+        "forest-ground": "#2f5d34",
+        "night-ground": "#0f1c3a",
+        "elf-ground": "#3b2a6b",
+        "forest-ground-hi": "#3a6e3f",
+        "forest-ground-lo": "#26502b",
+        "night-ground-hi": "#1c2d58",
+        "night-ground-lo": "#0a142c",
+        "elf-ground-hi": "#4a3880",
+        "elf-ground-lo": "#30215a"
+      },
+      "sprite": {
+        "outline": "#0b0610",
+        "suit": "#fff4e8",
+        "suit-shade": "#e0c9d6",
+        "visor": "#2a1640",
+        "visor-glint": "#ffa0ae",
+        "eyes": "#5fe0c0",
+        "cheeks": "#ffa0ae",
+        "accent": "#ff6b8a",
+        "raygun-glow": "#ff8fae",
+        "coin": "#ffcf4a",
+        "coin-hi": "#ffe2a0",
+        "coin-lo": "#c7922a"
+      },
+      "menu": {
+        "bg": "#1a0f24",
+        "surface": "#2d1a3d",
+        "surface-hi": "#4a2c60",
+        "surface-lo": "#20122c",
+        "surface-sunken": "#3d2252",
+        "surface-sunken-hi": "#55306e",
+        "outline": "#0b0610",
+        "text": "#fff4e8",
+        "text-muted": "#d8c3d6",
+        "text-disabled": "#8a6a9a",
+        "action-bg": "#ff6b8a",
+        "action-hi": "#ffa0ae",
+        "action-lo": "#bf3458",
+        "action-fg": "#0b0610",
+        "done-bg": "#5fe0c0",
+        "done-hi": "#b8ffe9",
+        "done-lo": "#2fb393",
+        "done-fg": "#0b0610",
+        "locked-bg": "#24142f",
+        "locked-fg": "#8a6a9a",
+        "sticker-bg": "#fff4e8",
+        "sticker-fg": "#0b0610",
+        "danger-bg": "#3a1726",
+        "danger-hi": "#5a2236",
+        "danger-fg": "#ff8a7b",
+        "gold": "#ffcf4a",
+        "focus": "#fff4e8",
+        "scrim": "#0b0610cc"
+      },
+      "hud": {
+        "glass": "#060c05b8",
+        "screen": "#0a1108",
+        "line": "#567f02",
+        "line-dim": "#2c4210",
+        "text": "#e5f2d8",
+        "text-muted": "#a9c48a",
+        "accent": "#a8d86b",
+        "energy": "#a8d86b",
+        "energy-low": "#ff8a7b",
+        "gold": "#ffcf4a",
+        "danger": "#ff8a7b",
+        "glow": "#a8d86b73",
+        "scrim": "#0a1108d9",
+        "focus": "#e5f2d8"
+      },
+      "game": {
+        "laser-raygun": "#ff8fae",
+        "shield-ring": "#5fb8ff",
+        "fire-ring": "#ff8a3a",
+        "hit-flash": "#fff4e8",
+        "firefly": "#f3f07a",
+        "spore": "#9ff5ec"
+      }
+    },
+    "font": {
+      "family": {
+        "menu": [
+          "Astro Kapsel"
+        ],
+        "hud": [
+          "Astro Funk"
+        ]
+      },
+      "scale": {
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4
+      },
+      "tracking": 1,
+      "lineGap": 3
+    },
+    "space": {
+      "1": "4px",
+      "2": "8px",
+      "3": "12px",
+      "4": "16px",
+      "6": "24px",
+      "8": "32px",
+      "half": "2px"
+    },
+    "border": {
+      "menu": "2px",
+      "hud": "1px",
+      "focus": "2px"
+    },
+    "shadow": {
+      "menu-drop": "4px 4px 0 #0b0610",
+      "menu-drop-small": "2px 2px 0 #0b0610",
+      "menu-bevel": "inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo)"
+    },
+    "size": {
+      "target": "32px",
+      "tile": "32px",
+      "button-h": "32px",
+      "hud-chip-h": "24px",
+      "stick": "88px",
+      "stick-knob": "28px",
+      "energy-segments": 10
+    },
+    "motion": {
+      "duration": {
+        "fast": "80ms",
+        "base": "150ms",
+        "slow": "300ms",
+        "blink": "500ms"
+      },
+      "easing": {
+        "pixel": "steps(3)",
+        "out": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+      }
+    }
+  }
+}

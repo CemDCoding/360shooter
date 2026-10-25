@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ergebnis und Hinweise · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .res { position: absolute; inset: 0; background: var(--color-hud-screen); }
+  .band { position: absolute; left: 0; right: 0; top: 0; height: 6px; }
+  .logline { position: absolute; left: 32px; top: 20px; right: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .hero { position: absolute; left: 32px; top: 52px; display: flex; gap: 18px; align-items: center; }
+  .facts { position: absolute; left: 32px; top: 150px; width: 576px; display: grid; grid-template-columns: 150px 1fr; row-gap: 9px; column-gap: 12px; padding-top: 12px; border-top: 1px dotted var(--color-hud-line); }
+  .actions { position: absolute; left: 32px; right: 32px; top: 300px; display: flex; gap: 12px; justify-content: flex-end; }
+  .portrait-wrap { width: 270px; height: 480px; position: relative; overflow: hidden; margin: 0 auto; }
+  .portrait-stage { position: absolute; left: 0; top: 0; width: 180px; height: 320px; transform: scale(1.5); transform-origin: 0 0; background: var(--color-menu-bg); }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Ergebnis, Pause-Funk und Hochformat-Hinweis</h1>
+  <p>ResultScene im Funkgerät-Stil. Das Biom des Levels erscheint nur als Farbband und im Logbuch-Kopf (11a). Die Zahlen folgen den Regeln F-15 und F-11: Bei Sieg gibt es 100 % Gold, bei Niederlage 50 %.</p>
+</header>
+
+<section><h2>1 · SIEG MIT LEVELAUFSTIEG (Level 7, Wald bei Nacht)</h2><div class="stage-wrap"><div class="stage" id="e1" data-component="ResultScene" data-font="funk"></div></div></section>
+<section><h2>2 · NIEDERLAGE (Level 16, Elfenwald)</h2><div class="stage-wrap"><div class="stage" id="e2" data-component="ResultScene" data-font="funk"></div></div></section>
+<section><h2>3 · HOCHFORMAT-HINWEIS (iPhone, F-14)</h2><div class="portrait-wrap"><div class="portrait-stage" data-component="RotateHint" data-font="kapsel" id="e3"></div></div></section>
+
+<script>
+  const P = (t, s, c) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"></span>`;
+  function result(id, r) {
+    const won = r.won;
+    document.getElementById(id).innerHTML = `
+      <div class="res"></div><div class="band" style="background:var(--color-biome-${r.biome})"></div>
+      <div class="logline">${P('LOG · LEVEL ' + r.level + ' · ' + r.biomeName, 0, '--color-hud-text-muted')}${P(r.time, 0, '--color-hud-text-muted')}</div>
+      <div class="hero">
+        <span class="spr" data-n="astronaut" data-s="4" aria-label="Astronautin"></span>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${P(won ? 'GEWONNEN' : 'VERLOREN', 4, won ? '--color-hud-accent' : '--color-hud-danger')}
+          ${P(won ? 'DER WALD IST WIEDER STILL.' : 'DIE ASTRONAUTIN ZIEHT SICH ZURÜCK.', 0, '--color-hud-text-muted')}
+        </div>
+      </div>
+      <div class="facts">
+        ${P('ERFAHRUNG', 0, '--color-hud-text-muted')}${P('+' + r.xp + ' XP', 2, '--color-hud-text')}
+        ${P('SPIELERLEVEL', 0, '--color-hud-text-muted')}<span class="row" style="gap:10px">${P(r.plevel, 2, '--color-hud-text')}${r.levelUp ? P('LEVELAUFSTIEG!', 2, '--color-hud-accent') : ''}</span>
+        ${P('MÜNZEN', 0, '--color-hud-text-muted')}<span class="row" style="gap:8px"><span class="spr" data-n="coin" data-s="2"></span>${P(r.coins + ' · ANTEIL ' + r.share + ' % · +' + r.gold + ' GOLD', 2, '--color-hud-gold')}</span>
+        ${P('GOLD GESAMT', 0, '--color-hud-text-muted')}${P(r.total, 2, '--color-hud-gold')}
+      </div>
+      <div class="actions">${r.actions}</div>
+      <div class="f-scan"></div>`;
+  }
+  const btn = (label, primary, focus) => `<div class="f-btn ${primary ? 'primary' : ''} ${focus ? 'is-focus' : ''}" role="button">${P(label, 2, primary ? '--color-hud-accent' : '--color-hud-text')}</div>`;
+  result('e1', { won: true, level: 7, biome: 'night', biomeName: 'WALD BEI NACHT', time: '5:00 ÜBERLEBT', xp: 120, plevel: 8, levelUp: true, coins: 23, share: 100, gold: 23, total: 109,
+    actions: btn('NOCHMAL') + btn('NÄCHSTES LEVEL', true, true) + btn('MENÜ') });
+  result('e2', { won: false, level: 16, biome: 'elf', biomeName: 'ELFENWALD', time: '3:12 ÜBERLEBT', xp: 40, plevel: 8, levelUp: false, coins: 18, share: 50, gold: 9, total: 118,
+    actions: btn('NOCHMAL', true, true) + btn('MENÜ') });
+  document.getElementById('e3').innerHTML = `
+    <div class="k-stars"></div>
+    <div style="position:absolute;left:0;right:0;top:70px;display:flex;flex-direction:column;align-items:center;gap:16px">
+      <span class="spr" data-n="astronaut" data-s="4" aria-label="Astronautin"></span>
+      <div class="k-panel" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px">
+        ${P('BITTE DREHEN', 2, '--color-menu-text')}
+        ${P('360SHOOTER LÄUFT', 0, '--color-menu-text-muted')}
+        ${P('IM QUERFORMAT.', 0, '--color-menu-text-muted')}
+      </div>
+      <div class="row" style="gap:10px" aria-hidden="true">
+        <i style="display:block;width:16px;height:28px;border:2px solid var(--color-menu-text-muted)"></i>
+        ${P('>', 2, '--color-menu-action-bg')}
+        <i style="display:block;width:28px;height:16px;border:2px solid var(--color-menu-action-bg)"></i>
+      </div>
+    </div>`;
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>

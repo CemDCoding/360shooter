@@ -1,4 +1,5 @@
 import type { BatchId } from '../contracts';
+import { themeColor } from './theme';
 
 export type MapEffect = 'none' | 'fireflies' | 'spores';
 
@@ -7,8 +8,8 @@ export interface MapDef {
   tilesetKey: string;
   /** Background color behind the tiles (0xRRGGBB). */
   baseColor: number;
-  /** Tint applied to all tiles (0xFFFFFF = none). */
-  tint: number;
+  /** Tint applied to all tiles (undefined = none). */
+  tint?: number;
   /** Share of cells that get a decoration tile (0..1). */
   decoDensity: number;
   effect: MapEffect;
@@ -25,31 +26,30 @@ export const MAX_MAP_PARTICLES = 40;
 export const MAPS: Readonly<Record<BatchId, MapDef>> = {
   forest: {
     tilesetKey: 'tiles-forest',
-    baseColor: 0x2f5d34,
-    tint: 0xffffff,
+    baseColor: themeColor('biome.forest-ground').num,
     decoDensity: 0.12,
     effect: 'none',
-    effectColor: 0xffffff,
+    effectColor: themeColor('game.hit-flash').num,
     effectCount: 0,
     vignette: 0.35,
   },
   forestNight: {
     tilesetKey: 'tiles-forest-night',
-    baseColor: 0x0f1c3a,
-    tint: 0x7f8fd0,
+    baseColor: themeColor('biome.night-ground').num,
+    tint: themeColor('biome.night').num,
     decoDensity: 0.14,
     effect: 'fireflies',
-    effectColor: 0xf3f07a,
+    effectColor: themeColor('game.firefly').num,
     effectCount: 24,
     vignette: 0.6,
   },
   elfForest: {
     tilesetKey: 'tiles-elf-forest',
-    baseColor: 0x3b2a6b,
-    tint: 0xd9b8ff,
+    baseColor: themeColor('biome.elf-ground').num,
+    tint: themeColor('biome.elf').num,
     decoDensity: 0.18,
     effect: 'spores',
-    effectColor: 0x9ff5ec,
+    effectColor: themeColor('game.spore').num,
     effectCount: 30,
     vignette: 0.45,
   },

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { animKey } from '../../config/assets';
+import { THEME } from '../../config/theme';
 import { ENEMIES } from '../../config/enemies';
 import type { EnemyDef, EnemyId } from '../../contracts';
 import { distance } from '../../logic/geometry';
@@ -7,7 +8,7 @@ import { applyDamage, auraDamage, isDead } from '../../logic/health';
 
 export const ARENA_CENTER = { x: 320, y: 180 } as const;
 const FLASH_MS = 120;
-const FLASH_TINT = 0xffb0b0;
+const FLASH_TINT = THEME.colors['game.hit-flash'].num;
 
 export interface EnemyContext {
   /** Target point, defaults to the arena center (player position). */
@@ -36,6 +37,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     if (def.aura) {
       this.auraGfx = scene.add
+        // eslint-disable-next-line no-restricted-syntax -- design system has no token game.aura yet (reported in AP-55)
         .circle(0, 0, def.aura.radius, 0x9b59b6, 0.25)
         .setDepth(this.depth - 1)
         .setVisible(false);
@@ -75,7 +77,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       return true;
     }
     this.flashLeftMs = FLASH_MS;
-    this.setTint(FLASH_TINT);
+    this.setTintFill(FLASH_TINT);
     return false;
   }
 

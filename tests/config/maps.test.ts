@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ASSETS } from '../../src/config/assets';
 import { LEVELS } from '../../src/config/levels';
 import { MAPS, MAX_MAP_PARTICLES } from '../../src/config/maps';
+import { themeColor } from '../../src/config/theme';
 import type { BatchId } from '../../src/contracts';
 
 const BATCHES: BatchId[] = ['forest', 'forestNight', 'elfForest'];
@@ -35,5 +36,13 @@ describe('maps', () => {
     expect(MAPS.forest.effect).toBe('none');
     expect(MAPS.forestNight.effect).toBe('fireflies');
     expect(MAPS.elfForest.effect).toBe('spores');
+  });
+
+  it('takes ground and particle colours from the design tokens', () => {
+    expect(MAPS.forest.baseColor).toBe(themeColor('biome.forest-ground').num);
+    expect(MAPS.forestNight.baseColor).toBe(themeColor('biome.night-ground').num);
+    expect(MAPS.elfForest.baseColor).toBe(themeColor('biome.elf-ground').num);
+    expect(MAPS.forestNight.effectColor).toBe(themeColor('game.firefly').num);
+    expect(MAPS.elfForest.effectColor).toBe(themeColor('game.spore').num);
   });
 });

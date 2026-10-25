@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { BatchId } from '../contracts';
 import { getMap, MAX_MAP_PARTICLES, type MapDef } from '../config/maps';
+import { themeColor } from '../config/theme';
 import { createRng, type Rng } from '../logic/rng';
 
 const TILE_PX = 32;
@@ -57,7 +58,7 @@ export class MapBackground {
     if (def.effect === 'none') return;
     if (!this.scene.textures.exists(DOT_KEY)) {
       const g = this.scene.make.graphics({ x: 0, y: 0 }, false);
-      g.fillStyle(0xffffff, 1).fillCircle(2, 2, 2);
+      g.fillStyle(themeColor('game.hit-flash').num, 1).fillCircle(2, 2, 2);
       g.generateTexture(DOT_KEY, 4, 4);
       g.destroy();
     }

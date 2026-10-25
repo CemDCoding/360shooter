@@ -1,5 +1,6 @@
 import type Phaser from 'phaser';
 import { GameEvents, type GameEventPayloads } from '../contracts';
+import { THEME } from '../config/theme';
 import { defaultSave, loadSave, writeSave, type StorageLike } from './storage';
 
 /** Base volume for all effects (0..1). One place to change it. */
@@ -112,22 +113,139 @@ export function getSoundService(game: Phaser.Game): SoundService {
   return service;
 }
 
-const ICON_ON = 1;
-const ICON_OFF = 2;
-const MUTE_BUTTON_SIZE = 32;
+const ICON_ON = 0;
+const ICON_OFF = 1;
+const MUTE_BUTTON_SIZE = THEME.sizePx['size.target'];
 
-/** Mute toggle (32x32 touch target) showing ui-icons frame 1 (on) or 2 (off). Cleans up itself. */
-export function addMuteButton(scene: Phaser.Scene, x: number, y: number): void {
+/**
+ * Mute toggle (32x32 touch target) showing ui-icons frame 0 (sound on) or 1 (sound off). Cleans up itself.
+ * 'menu': cartridge icon button (bevel, outline, drop shadow); 'hud': radio variant with THEME.hud colors.
+ * Hover and press show the focus ring; the button is not part of the keyboard focus order.
+ */
+export function addMuteButton(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  world: 'menu' | 'hud' = 'menu',
+): void {
   const service = getSoundService(scene.game);
-  const bg = scene.add
-    .rectangle(x, y, MUTE_BUTTON_SIZE, MUTE_BUTTON_SIZE, 0x000000, 0.5)
-    .setStrokeStyle(1, 0xffffff, 0.8)
-    .setInteractive({ useHandCursor: true });
-  const icon = scene.add.image(x, y, 'ui-icons', service.isMuted() ? ICON_OFF : ICON_ON);
-  const onChange = (p: GameEventPayloads['mute-changed']): void => {
-    icon.setFrame(p.muted ? ICON_OFF : ICON_ON);
+  const frame = (muted: boolean): number => (muted ? ICON_OFF : ICON_ON);
+  const g = scene.add.graphics();
+  const icon = scene.add.image(x, y, 'ui-icons', frame(service.isMuted()));
+  const state = { hover: false, pressed: false };
+  const draw = (): void => {
+    g.clear();
+    if (world === 'menu') drawMenuButton(g, x, y, state);
+    else drawRadioButton(g, x, y, state.hover || state.pressed);
+    const off = world === 'menu' && state.pressed ? THEME.spacePx['space.half'] : 0;
+    icon
+      .setPosition(x + off, y + off)
+      .setTint(THEME.colors[world === 'menu' ? 'menu.text' : 'hud.text'].num);
   };
-  bg.on('pointerup', () => service.toggleMuted());
+  draw();
+  const zone = scene.add
+    .zone(x, y, MUTE_BUTTON_SIZE, MUTE_BUTTON_SIZE)
+    .setInteractive({ useHandCursor: true });
+  zone.on('pointerover', () => {
+    state.hover = true;
+    draw();
+  });
+  zone.on('pointerout', () => {
+    state.hover = false;
+    state.pressed = false;
+    draw();
+  });
+  zone.on('pointerdown', () => {
+    state.pressed = true;
+    draw();
+  });
+  zone.on('pointerup', () => {
+    const was = state.pressed;
+    state.pressed = false;
+    draw();
+    if (was) service.toggleMuted();
+  });
+  const onChange = (p: GameEventPayloads['mute-changed']): void => {
+    icon.setFrame(frame(p.muted));
+  };
   scene.game.events.on(GameEvents.MuteChanged, onChange);
   scene.events.once('shutdown', () => scene.game.events.off(GameEvents.MuteChanged, onChange));
+}
+
+function rect(
+  g: Phaser.GameObjects.Graphics,
+  color: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): void {
+  g.fillStyle(color, 1).fillRect(x, y, w, h);
+}
+
+function drawRing(g: Phaser.GameObjects.Graphics, x: number, y: number, color: number): void {
+  const t = THEME.borderPx['border.focus'];
+  const half =
+    MUTE_BUTTON_SIZE / 2 + THEME.borderPx['border.menu'] + THEME.spacePx['space.half'] + t;
+  g.lineStyle(t, color, 1).strokeRect(
+    x - half + t / 2,
+    y - half + t / 2,
+    half * 2 - t,
+    half * 2 - t,
+  );
+}
+
+/** Kassetten-Icon-Knopf: 2-px-Fase, 2-px-Umriss, 4-px-Schatten; gedrückt 2 px versetzt. */
+function drawMenuButton(
+  g: Phaser.GameObjects.Graphics,
+  cx: number,
+  cy: number,
+  state: { hover: boolean; pressed: boolean },
+): void {
+  const c = THEME.colors;
+  const s = MUTE_BUTTON_SIZE;
+  const b = THEME.borderPx['border.menu'];
+  const off = state.pressed ? THEME.spacePx['space.half'] : 0;
+  const x = cx - s / 2 + off;
+  const y = cy - s / 2 + off;
+  const face = state.hover && !state.pressed ? c['menu.surface-hi'].num : c['menu.surface'].num;
+  const drop = state.pressed ? off : THEME.spacePx['space.1'];
+  rect(
+    g,
+    c['menu.outline'].num,
+    cx - s / 2 + drop - b,
+    cy - s / 2 + drop - b,
+    s + 2 * b,
+    s + 2 * b,
+  );
+  rect(g, c['menu.outline'].num, x - b, y - b, s + 2 * b, s + 2 * b);
+  rect(g, face, x, y, s, s);
+  rect(g, c['menu.surface-lo'].num, x, y + s - b, s, b);
+  rect(g, c['menu.surface-lo'].num, x + s - b, y, b, s);
+  if (!state.pressed) {
+    rect(g, c['menu.surface-hi'].num, x, y, s, b);
+    rect(g, c['menu.surface-hi'].num, x, y, b, s);
+  }
+  if (state.hover || state.pressed) drawRing(g, cx, cy, c['menu.focus'].num);
+}
+
+/** Funk-Knopf: dunkles Glas, 1-px-Linie in hud.line (hover: hud.accent plus Fokus-Ring). */
+function drawRadioButton(
+  g: Phaser.GameObjects.Graphics,
+  cx: number,
+  cy: number,
+  active: boolean,
+): void {
+  const c = THEME.colors;
+  const s = MUTE_BUTTON_SIZE;
+  const line = THEME.borderPx['border.hud'];
+  const glass = c['hud.glass'];
+  g.fillStyle(glass.num, glass.alpha ?? 1).fillRect(cx - s / 2, cy - s / 2, s, s);
+  g.lineStyle(line, c[active ? 'hud.accent' : 'hud.line'].num, 1).strokeRect(
+    cx - s / 2 + line / 2,
+    cy - s / 2 + line / 2,
+    s - line,
+    s - line,
+  );
+  if (active) drawRing(g, cx, cy, c['hud.focus'].num);
 }

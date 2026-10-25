@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Richtung C – Funklogbuch · 360shooter</title>
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<style>
+  :root {
+    --font-pixel: "Pixelify Sans", "Courier New", monospace;
+    --font-text: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+    --page-bg: #070c06; --page-fg: #e5f2d8; --page-muted: #a9c48a;
+    --bg: #0a1108;
+    --phos: #a8d86b;       /* moss 300 */
+    --line: #567f02;       /* moss 600 */
+    --line-dim: #2c4210;
+    --fg: #e5f2d8;
+    --muted: #a9c48a;
+    --amber: #f2b84b;
+    --danger: #ff8a7a;
+    --laser: #c8f08a;
+    --px-o: #0a1108; --px-w: #cae3af; --px-l: #89b351; --px-v: #152300; --px-g: #e5f2d8; --px-e: #a8d86b; --px-c: #89b351; --px-a: #a8d86b;
+    --px-k: #0a1108; --px-s: #f2b84b;
+  }
+  .stage .px canvas { filter: drop-shadow(0 0 2px rgba(168, 216, 107, 0.45)); }
+  .scan { position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 2px),
+                radial-gradient(ellipse at 50% 50%, rgba(168, 216, 107, 0.05), transparent 70%); }
+  .rule { border: 0; border-top: 1px dotted var(--line); }
+  /* signature: log numbering "01 —" in front of every block, dotted rules, no filled panels */
+  .lognr { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .m-profile { left: 24px; top: 56px; width: 168px; height: auto; padding: 0; }
+  .m-levels { left: 220px; top: 56px; width: 396px; height: auto; padding: 0; }
+  .portrait { width: 56px; height: 56px; border: 1px dotted var(--line); }
+  .track { background: transparent; border: 1px solid var(--line); height: 8px; }
+  .track > i { background: var(--phos); top: 1px; bottom: 1px; left: 1px; }
+  .btn.primary { margin-top: 14px; border: 1px solid var(--phos); background: rgba(168, 216, 107, 0.08); justify-content: space-between; padding: 0 10px; }
+  .btn.danger { border: 1px dotted var(--danger); justify-content: flex-start; padding: 0 10px; }
+  .btn.ghost { border: 1px dotted var(--line); }
+  .lrow { display: grid; grid-template-columns: 96px 1fr; align-items: start; gap: 6px; padding: 7px 0; border-top: 1px dotted var(--line-dim); }
+  .lrow:first-of-type { border-top: 0; }
+  .lrow .name { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; }
+  .tiles { flex-wrap: wrap; gap: 4px; }
+  .tile { border: 1px solid var(--line); width: 23px; height: 32px; }
+  .tile.done { background: var(--phos); border-color: var(--phos); }
+  .tile.current { border: 2px solid var(--fg); background: rgba(168, 216, 107, 0.15); }
+  .tile.current::after { content: ""; position: absolute; left: 4px; right: 4px; bottom: 3px; height: 2px; background: var(--fg); }
+  .tile.locked { border-style: dotted; border-color: var(--line-dim); }
+  .tile .badge { right: 2px; bottom: 2px; }
+  .legend { display: flex; gap: 14px; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px dotted var(--line-dim); }
+  .legend .row { gap: 4px; }
+  .m-reset { left: 24px; top: 316px; width: 168px; }
+  .m-hint { color: var(--muted); font-size: 9px; left: 220px; width: 396px; }
+  /* HUD: thin lines on dark glass, amber only for gold */
+  .hud-glass { background: rgba(6, 12, 5, 0.72); border: 1px solid var(--line); }
+  .h-energy { display: flex; align-items: center; gap: 8px; }
+  .h-timer { align-items: center; justify-content: center; display: flex; }
+  .segs > i { width: 8px; background: var(--phos); }
+  .segs > i.half { background: linear-gradient(90deg, var(--phos) 60%, transparent 60%); outline: 1px solid var(--line); outline-offset: -1px; }
+  .segs > i.off { background: transparent; outline: 1px solid var(--line); outline-offset: -1px; }
+  .chip.cool { border-style: dotted; }
+  .stick { border: 1px dotted var(--phos); background: rgba(6, 12, 5, 0.35); }
+  .stick > i { border: 2px solid var(--phos); background: rgba(168, 216, 107, 0.2); }
+  .sprite-color { --px-o: #070a14; --px-w: #eef3f6; --px-l: #a9b8c4; --px-v: #10223a; --px-g: #a9e8dd; --px-e: #a8d86b; --px-c: #ff97b3; --px-a: #a8d86b; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Richtung C – „Funklogbuch“</h1>
+  <p>Das Funkgerät der Gestrandeten: ein grünes Phosphor-Display, fast einfarbig, jede Angabe nummeriert wie ein Logbucheintrag. Leise, geheimnisvoll, Game-Boy-nah. Farbe gibt es nur in der Spielwelt.</p>
+  <dl>
+    <dt>Schrift</dt><dd>Pixelify Sans (runde Pixelschrift, Titel und Zahlen) + Atkinson Hyperlegible Next (Hinweise) · OFL. Im Mockup steht ein Pixel-Platzhalter.</dd>
+    <dt>Farbe</dt><dd>Phosphor #a8d86b · Moos #567f02 · Nachtgrün #0a1108 · Bernstein #f2b84b nur für Gold</dd>
+    <dt>Erkennungsmerkmal</dt><dd>Logbuchnummern „01 —“ vor jedem Block, gepunktete Linien, keine gefüllten Flächen, Leuchten wie auf einem Röhrenbildschirm</dd>
+  </dl>
+</header>
+
+<section>
+  <h2>HAUPTMENÜ (MenuScene)</h2>
+  <div class="stage-wrap">
+    <div class="stage" data-component="MenuScene">
+      <span class="abs" style="left:24px;top:14px"><span class="px" data-t="360SHOOTER" data-s="3" data-c="--phos"></span></span>
+      <span class="abs" style="left:220px;top:26px"><span class="px" data-t="> FUNKLOG / PLANET KX-7" data-c="--muted"></span></span>
+      <div class="abs m-mute btn ghost" data-component="MuteButton" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:#a8d86b;--px-k:#0a1108"></span></div>
+      <hr class="abs rule" style="left:24px;top:47px;width:592px">
+
+      <div class="abs m-profile" data-component="PlayerCard">
+        <div class="lognr"><span class="px" data-t="01 —" data-c="--line"></span><span class="px" data-t="PILOTIN" data-c="--muted"></span></div>
+        <div class="row" style="gap:10px">
+          <div class="portrait" style="display:grid;place-items:center"><span class="spr" data-n="astronaut" data-s="3" aria-label="Astronautin"></span></div>
+          <div>
+            <span class="px" data-t="LEVEL" data-c="--muted"></span>
+            <div style="margin-top:8px"><span class="px" data-t="07" data-s="4" data-c="--fg"></span></div>
+          </div>
+        </div>
+        <div class="xpbar track" role="img" aria-label="Erfahrung 640 von 900"><i style="width:70%"></i></div>
+        <div class="row" style="justify-content:space-between;margin-top:5px"><span class="px" data-t="XP" data-c="--muted"></span><span class="px" data-t="640 / 900" data-c="--muted"></span></div>
+        <hr class="rule" style="margin:12px 0 10px">
+        <div class="lognr"><span class="px" data-t="02 —" data-c="--line"></span><span class="px" data-t="VORRAT" data-c="--muted"></span></div>
+        <div class="row" style="gap:6px"><span class="spr" data-n="coin" data-s="2" style="--px-o:#0a1108;--px-Y:#f2b84b;--px-y:#ffe2a0;--px-D:#a8761e"></span><span class="px" data-t="1.240" data-s="2" data-c="--amber"></span><span class="px" data-t="GOLD" data-c="--muted"></span></div>
+        <div class="row" style="justify-content:space-between;margin-top:10px"><span class="px" data-t="WAFFE" data-c="--muted"></span><span class="px" data-t="05 / 20" data-c="--fg"></span></div>
+        <div class="row" style="justify-content:space-between;margin-top:6px"><span class="px" data-t="ANZUG" data-c="--muted"></span><span class="px" data-t="03 / 20" data-c="--fg"></span></div>
+        <div class="btn primary" data-component="Button" role="button"><span class="px" data-t="UPGRADES" data-s="2" data-c="--phos"></span><span class="px" data-t=">" data-s="2" data-c="--phos"></span></div>
+      </div>
+
+      <div class="abs m-levels" data-component="LevelGrid">
+        <div class="lognr"><span class="px" data-t="03 —" data-c="--line"></span><span class="px" data-t="SEKTOREN" data-c="--muted"></span></div>
+        <div class="lrow">
+          <div class="name"><span class="px" data-t="WALD" data-c="--fg"></span><span class="px" data-t="0–4 · 5/5" data-c="--muted"></span></div>
+          <div class="tiles" id="t-forest"></div>
+        </div>
+        <div class="lrow">
+          <div class="name"><span class="px" data-t="NACHTWALD" data-c="--fg"></span><span class="px" data-t="5–9 · 2/5" data-c="--muted"></span></div>
+          <div class="tiles" id="t-night"></div>
+        </div>
+        <div class="lrow">
+          <div class="name"><span class="px" data-t="ELFENWALD" data-c="--fg"></span><span class="px" data-t="10–20 · 0/11" data-c="--muted"></span></div>
+          <div class="tiles" id="t-elf"></div>
+        </div>
+        <div class="legend">
+          <span class="row"><i class="swatch" style="background:var(--phos)"></i><span class="px" data-t="GESCHAFFT" data-c="--muted"></span></span>
+          <span class="row"><i class="swatch" style="outline:2px solid var(--fg);outline-offset:-2px"></i><span class="px" data-t="AKTUELL" data-c="--muted"></span></span>
+          <span class="row"><i class="swatch" style="outline:1px dotted var(--line);outline-offset:-1px"></i><span class="px" data-t="GESPERRT" data-c="--muted"></span></span>
+        </div>
+      </div>
+
+      <div class="abs m-reset btn danger" data-component="Button" role="button"><span class="px" data-t="X  FORTSCHRITT LÖSCHEN" data-c="--danger"></span></div>
+      <p class="abs m-hint" style="top:324px">Tippe auf ein freies Level, um die Runde zu starten.</p>
+      <div class="scan"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>RUNDE MIT HUD (Level 7, Wald bei Nacht · GameScene + HudScene)</h2>
+  <div class="stage-wrap">
+    <div class="stage" data-component="GameScene">
+      <div class="world"></div>
+      <i class="ff" style="left:60px;top:150px"></i><i class="ff" style="left:180px;top:300px"></i><i class="ff" style="left:430px;top:160px"></i>
+      <i class="ff" style="left:590px;top:120px"></i><i class="ff" style="left:350px;top:320px"></i><i class="ff" style="left:250px;top:60px"></i>
+      <i class="ff" style="left:500px;top:330px"></i><i class="ff" style="left:30px;top:310px"></i>
+      <div class="sprite-color" style="position:absolute;inset:0">
+        <span class="abs spr" data-n="tree" data-s="2" style="left:104px;top:96px;--px-f:#3d5f9a;--px-F:#2a4578;--px-t:#5a4a72;--px-d:#1a1230"></span>
+        <span class="abs spr" data-n="tree" data-s="2" style="left:470px;top:250px;--px-f:#3d5f9a;--px-F:#2a4578;--px-t:#5a4a72;--px-d:#1a1230"></span>
+        <span class="abs spr" data-n="tree" data-s="2" style="left:500px;top:110px;--px-f:#3d5f9a;--px-F:#2a4578;--px-t:#5a4a72;--px-d:#1a1230"></span>
+        <span class="abs spr" data-n="squirrel" data-s="2" style="left:200px;top:262px"></span>
+        <span class="abs spr" data-n="squirrel" data-s="2" style="left:392px;top:100px"></span>
+        <span class="abs spr" data-n="witch" data-s="2" style="left:70px;top:214px"></span>
+        <span class="abs spr" data-n="bolt" data-s="2" style="left:140px;top:214px"></span>
+        <span class="abs spr" data-n="coin" data-s="1" style="left:262px;top:122px"></span>
+        <span class="abs spr" data-n="shield" data-s="1" style="left:382px;top:230px"></span>
+        <span class="abs spr" data-n="astronaut" data-s="2" style="left:304px;top:164px" aria-label="Astronautin"></span>
+        <i class="laser" style="left:279px;top:164px"></i><i class="laser" style="left:242px;top:148px"></i><i class="laser" style="left:205px;top:133px"></i>
+      </div>
+      <div class="vignette"></div>
+
+      <div class="abs h-energy hud-glass" data-component="HudScene.energy" role="img" aria-label="Energie 87 von 100">
+        <span class="px" data-t="87" data-s="3" data-c="--fg"></span>
+        <div>
+          <span class="px" data-t="ENERGIE" data-c="--muted"></span>
+          <div class="segs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="half"></i><i class="off"></i></div>
+        </div>
+      </div>
+      <div class="abs h-timer hud-glass" data-component="HudScene.timer"><span class="px" data-t="1:42" data-s="3" data-c="--fg"></span></div>
+      <div class="abs h-mute btn ghost hud-glass" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:#a8d86b"></span></div>
+      <div class="abs h-pause btn ghost hud-glass" aria-label="Pause"><span class="spr" data-n="pause" data-s="2" style="--px-o:#a8d86b"></span></div>
+
+      <div class="abs h-row" data-component="PowerIndicators">
+        <div class="chip hud-glass" data-component="CoinCounter"><span class="spr" data-n="coin" data-s="2" style="--px-Y:#f2b84b;--px-y:#ffe2a0;--px-D:#a8761e"></span><span class="px" data-t="23" data-s="2" data-c="--amber"></span></div>
+        <div class="chip hud-glass" aria-label="Doppelschuss Stufe 2"><span class="spr" data-n="double" data-s="2" style="--px-L:#a8d86b;--px-o:#0a1108"></span><span class="px" data-t="×2" data-s="2" data-c="--fg"></span></div>
+        <div class="chip hud-glass" aria-label="Schild 2 von 3"><span class="spr" data-n="shield" data-s="2" style="--px-B:#a8d86b;--px-b:#e5f2d8;--px-o:#0a1108"></span><span class="px" data-t="2/3" data-s="2" data-c="--fg"></span></div>
+        <div class="chip hud-glass" aria-label="Dauerfeuer noch 3 Sekunden"><span class="spr" data-n="rapid" data-s="2" style="--px-Y:#a8d86b;--px-o:#0a1108"></span><span class="px" data-t="3S" data-s="2" data-c="--fg"></span></div>
+        <div class="chip hud-glass cool" data-component="ArmourIndicator" aria-label="Feuerring lädt, 12 Sekunden"><span class="spr" data-n="ring" data-s="2" style="--px-F:#567f02;--px-o:#0a1108"></span><span class="px" data-t="12S" data-s="2" data-c="--muted"></span></div>
+      </div>
+      <div class="abs stick" data-component="VirtualStick"><i></i></div>
+      <div class="scan" style="opacity:.5"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function tiles(id, from, to, done, current) {
+    const el = document.getElementById(id);
+    for (let i = from; i <= to; i++) {
+      const n = String(i).padStart(2, '0');
+      if (i <= done) el.insertAdjacentHTML('beforeend', '<div class="tile done"><span class="px" data-t="' + n + '" data-c="#0a1108"></span></div>');
+      else if (i === current) el.insertAdjacentHTML('beforeend', '<div class="tile current" aria-current="true"><span class="px" data-t="' + n + '" data-c="--fg"></span></div>');
+      else el.insertAdjacentHTML('beforeend', '<div class="tile locked" aria-label="Level ' + i + ' gesperrt"><span class="px" data-t="' + n + '" data-c="#4a6a2a"></span></div>');
+    }
+  }
+  tiles('t-forest', 0, 4, 6, 7); tiles('t-night', 5, 9, 6, 7); tiles('t-elf', 10, 20, 6, 7);
+</script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>

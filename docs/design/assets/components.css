@@ -1,0 +1,117 @@
+/* Components for styleguide and final mockups. Only token variables from ../export/tokens.css.
+ * k-* = "Kapsel" (menu, cartridge look) · f-* = "Funk" (round, radio look)
+ * State classes .is-hover/.is-focus/.is-active/.is-disabled mirror the interactive states for the styleguide.
+ */
+:root {
+  --font-text: "Segoe UI", system-ui, sans-serif; /* only for the documentation around the mockups */
+  --page-bg: var(--color-plum-950); --page-fg: var(--color-cream-50); --page-muted: var(--color-cream-300);
+  --bg: var(--color-menu-bg); --fg: var(--color-menu-text); --muted: var(--color-menu-text-muted);
+  /* sprite palette: astronaut, raygun, coins (pixel.js reads --px-<letter>) */
+  --px-o: var(--color-sprite-outline); --px-w: var(--color-sprite-suit); --px-l: var(--color-sprite-suit-shade); --px-v: var(--color-sprite-visor);
+  --px-g: var(--color-sprite-visor-glint); --px-e: var(--color-sprite-eyes); --px-c: var(--color-sprite-cheeks); --px-a: var(--color-sprite-accent);
+  --px-x: var(--color-sprite-raygun-glow); --px-Y: var(--color-sprite-coin); --px-y: var(--color-sprite-coin-hi); --px-D: var(--color-sprite-coin-lo);
+  --px-s: var(--color-sprite-coin);
+}
+
+/* ---------- Kapsel (menu) ---------- */
+.k-scene { position: absolute; inset: 0; background: var(--color-menu-bg); }
+.k-stars { position: absolute; inset: 0; opacity: .5;
+  background-image: radial-gradient(var(--color-cream-50) .8px, transparent 1.2px), radial-gradient(var(--color-coral-300) .8px, transparent 1.2px);
+  background-size: 53px 41px, 89px 67px; background-position: 7px 11px, 31px 29px; }
+.k-planet { position: absolute; left: 420px; top: 250px; width: 360px; height: 360px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #5a2a52 0 40%, #3a1838 40% 100%); }
+
+.k-panel {
+  --hi: var(--color-menu-surface-hi); --lo: var(--color-menu-surface-lo);
+  background: var(--color-menu-surface);
+  box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 0 0 0 2px var(--color-menu-outline), 4px 4px 0 2px var(--color-menu-outline);
+}
+.k-sunken { background: var(--color-menu-surface-sunken); box-shadow: inset 2px 2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline); }
+.k-rule { border: 0; border-top: 2px dashed var(--color-menu-surface-hi); }
+
+.k-btn {
+  --b: var(--color-menu-surface); --hi: var(--color-menu-surface-hi); --lo: var(--color-menu-surface-lo);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 32px; height: 32px; padding: 0 10px;
+  background: var(--b); cursor: pointer; position: relative;
+  box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 0 0 0 2px var(--color-menu-outline), 4px 4px 0 2px var(--color-menu-outline);
+}
+.k-btn.primary { --b: var(--color-menu-action-bg); --hi: var(--color-menu-action-hi); --lo: var(--color-menu-action-lo); }
+.k-btn.done { --b: var(--color-menu-done-bg); --hi: var(--color-menu-done-hi); --lo: var(--color-menu-done-lo); }
+.k-btn.danger { --b: var(--color-menu-danger-bg); --hi: var(--color-menu-danger-hi); --lo: var(--color-menu-danger-bg); }
+.k-btn.icon { padding: 0; width: 32px; }
+.k-btn.is-hover, .k-btn:hover { filter: brightness(1.12); }
+.k-btn.is-active, .k-btn:active { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 var(--lo), 0 0 0 2px var(--color-menu-outline), 2px 2px 0 2px var(--color-menu-outline); }
+.k-btn.is-focus, .k-btn:focus-visible { outline: 2px solid var(--color-menu-focus); outline-offset: 4px; }
+.k-btn.is-disabled { --b: var(--color-menu-locked-bg); --hi: var(--color-menu-locked-bg); --lo: var(--color-menu-locked-bg); box-shadow: 0 0 0 2px var(--color-menu-outline); cursor: not-allowed; }
+
+.k-sticker { display: inline-flex; align-items: center; gap: 5px; height: 14px; padding: 0 5px; background: var(--color-menu-sticker-bg);
+  box-shadow: 0 0 0 2px var(--color-menu-outline), 2px 2px 0 2px var(--color-menu-outline); }
+.k-swatch { width: 8px; height: 8px; display: inline-block; outline: 1px solid var(--color-menu-outline); }
+
+.k-tile { width: 32px; height: 32px; position: relative; display: grid; place-items: center;
+  background: var(--color-menu-surface-sunken); box-shadow: inset 2px 2px 0 var(--color-menu-surface-sunken-hi), inset -2px -2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline); }
+.k-tile.done { background: var(--color-menu-done-bg); box-shadow: inset 2px 2px 0 var(--color-menu-done-hi), inset -2px -2px 0 var(--color-menu-done-lo), 0 0 0 2px var(--color-menu-outline); }
+.k-tile.current { background: var(--color-menu-action-bg); box-shadow: inset 2px 2px 0 var(--color-menu-action-hi), inset -2px -2px 0 var(--color-menu-action-lo), 0 0 0 2px var(--color-menu-outline), 0 0 0 4px var(--color-menu-focus); }
+.k-tile.current::before { content: ""; position: absolute; top: -13px; left: 11px; border: 5px solid transparent; border-top: 6px solid var(--color-menu-focus); }
+.k-tile.locked { background: var(--color-menu-locked-bg); box-shadow: 0 0 0 2px var(--color-menu-outline); }
+.k-tile.is-focus { outline: 2px solid var(--color-menu-focus); outline-offset: 4px; }
+.k-tile .badge { position: absolute; right: 1px; bottom: 1px; }
+
+.k-bar { height: 8px; background: var(--color-menu-outline); position: relative; box-shadow: 0 0 0 2px var(--color-menu-outline); }
+.k-bar > i { position: absolute; left: 0; top: 0; bottom: 0; display: block; background: var(--color-menu-done-bg); box-shadow: inset 0 2px 0 var(--color-menu-done-hi); }
+.k-pips { display: flex; gap: 2px; }
+.k-pips > i { width: 6px; height: 8px; display: block; background: var(--color-menu-outline); }
+.k-pips > i.on { background: var(--color-menu-done-bg); box-shadow: inset 0 2px 0 var(--color-menu-done-hi); }
+.k-scrim { position: absolute; inset: 0; background: var(--color-menu-scrim); }
+
+/* ---------- Funk (round / HUD) ---------- */
+.f-glass { background: var(--color-hud-glass); border: 1px solid var(--color-hud-line); }
+.f-glass.dim { border-style: dotted; }
+.f-screen { background: var(--color-hud-screen); }
+.f-rule { border: 0; border-top: 1px dotted var(--color-hud-line); }
+.f-glow canvas, [data-font="funk"] .px canvas { filter: drop-shadow(0 0 2px var(--color-hud-glow)); }
+.f-scan { position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 2px); }
+.f-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 32px; height: 32px; padding: 0 10px;
+  background: var(--color-hud-glass); border: 1px solid var(--color-hud-line); cursor: pointer; }
+.f-btn.primary { border-color: var(--color-hud-accent); background: #a8d86b1f; }
+.f-btn.icon { padding: 0; width: 32px; }
+.f-btn.is-hover, .f-btn:hover { background: #a8d86b2e; }
+.f-btn.is-active, .f-btn:active { background: var(--color-hud-accent); }
+.f-btn.is-focus, .f-btn:focus-visible { outline: 2px solid var(--color-hud-focus); outline-offset: 2px; }
+.f-btn.is-disabled { border-style: dotted; border-color: var(--color-hud-line-dim); }
+
+.f-energy { display: flex; align-items: center; gap: 8px; padding: 5px 8px; }
+.f-segs { display: flex; gap: 2px; margin-top: 4px; }
+.f-segs > i { width: 8px; height: 6px; display: block; background: var(--color-hud-energy); }
+.f-segs > i.half { background: linear-gradient(90deg, var(--color-hud-energy) 50%, transparent 50%); outline: 1px solid var(--color-hud-line); outline-offset: -1px; }
+.f-segs > i.off { background: transparent; outline: 1px solid var(--color-hud-line); outline-offset: -1px; }
+.f-energy.low { border-color: var(--color-hud-energy-low); }
+.f-energy.low .f-segs > i { background: var(--color-hud-energy-low); }
+.f-energy.low .f-segs > i.off { background: transparent; outline-color: var(--color-red-700); }
+.f-chip { height: 24px; padding: 0 6px; display: flex; align-items: center; gap: 4px; }
+.f-chip.active { border-color: var(--color-hud-accent); box-shadow: 0 0 6px var(--color-hud-glow); }
+.f-stick { width: 88px; height: 88px; border-radius: 50%; border: 1px dotted var(--color-hud-accent); background: #060c0559; position: absolute; }
+.f-stick > i { position: absolute; left: 30px; top: 30px; width: 28px; height: 28px; border-radius: 50%; display: block; border: 2px solid var(--color-hud-accent); background: #a8d86b33; }
+.f-stick.is-active > i { left: 44px; top: 16px; background: #a8d86b80; }
+.f-scrim { position: absolute; inset: 0; background: var(--color-hud-scrim); }
+.f-lognr { display: inline-flex; gap: 6px; align-items: center; }
+
+/* ---------- World (GameScene) ---------- */
+.w-ground { position: absolute; inset: 0; background-color: var(--g);
+  background-image: radial-gradient(var(--g2) 1px, transparent 1.6px), radial-gradient(var(--g3) 1px, transparent 1.6px);
+  background-size: 16px 16px, 24px 24px; background-position: 0 0, 8px 12px; }
+.w-ground.forest { --g: var(--color-biome-forest-ground); --g2: var(--color-biome-forest-ground-hi); --g3: var(--color-biome-forest-ground-lo); }
+.w-ground.night { --g: var(--color-biome-night-ground); --g2: var(--color-biome-night-ground-hi); --g3: var(--color-biome-night-ground-lo); }
+.w-ground.elf { --g: var(--color-biome-elf-ground); --g2: var(--color-biome-elf-ground-hi); --g3: var(--color-biome-elf-ground-lo); }
+.w-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0, 0, 8, .55) 100%); }
+.w-ff { position: absolute; width: 2px; height: 2px; background: var(--color-game-firefly); box-shadow: 0 0 4px 1px #f3f07a8c; }
+.w-spore { position: absolute; width: 2px; height: 2px; background: var(--color-game-spore); box-shadow: 0 0 4px 1px #9ff5ec8c; }
+.w-laser { position: absolute; width: 10px; height: 2px; background: var(--color-game-laser-raygun); box-shadow: 0 0 3px var(--color-game-laser-raygun); }
+.w-ring { position: absolute; border-radius: 50%; }
+.w-ring.shield { left: 300px; top: 160px; width: 40px; height: 40px; border: 2px solid var(--color-game-shield-ring); background: #5fb8ff26; }
+.w-ring.fire { left: 248px; top: 108px; width: 144px; height: 144px; border: 2px dashed var(--color-game-fire-ring); background: radial-gradient(circle, transparent 60%, #ff8a3a33 100%); }
+.w-rig { position: absolute; width: 32px; height: 32px; }
+.w-rig .gun { position: absolute; transform-origin: 7px 12px; }
+.w-rig.flip .body { transform: scaleX(-1); }
+.w-rig .body { position: absolute; left: 0; top: 0; }

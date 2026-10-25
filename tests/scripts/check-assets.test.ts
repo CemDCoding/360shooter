@@ -14,7 +14,7 @@ interface BufferCtor {
 interface Fs {
   mkdtempSync(prefix: string): string;
   mkdirSync(p: string, o: { recursive: boolean }): void;
-  writeFileSync(p: string, d: Buf): void;
+  writeFileSync(p: string, d: Buf | string): void;
   rmSync(p: string, o: { recursive: boolean; force: boolean }): void;
 }
 interface Result {
@@ -24,8 +24,9 @@ interface Result {
 }
 interface Def {
   key: string;
-  kind: 'spritesheet' | 'audio';
+  kind: 'spritesheet' | 'audio' | 'bitmapFont';
   path: string;
+  xmlPath?: string;
   frameWidth?: number;
   frameHeight?: number;
   frames?: number;
@@ -43,6 +44,7 @@ const { checkAssets } = (await imp('../../scripts/check-assets.mjs')) as { check
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-assets-'));
 fs.mkdirSync(path.join(dir, 'assets', 'sprites'), { recursive: true });
 fs.mkdirSync(path.join(dir, 'assets', 'sounds'), { recursive: true });
+fs.mkdirSync(path.join(dir, 'assets', 'fonts'), { recursive: true });
 afterAll(() => fs.rmSync(dir, { recursive: true, force: true }));
 
 function png(w: number, h: number, colorType = 6): Buf {
@@ -88,7 +90,25 @@ const sound = (name: string): Def => ({
   path: `assets/sounds/${name}.wav`,
   description: 'Test',
 });
-const put = (rel: string, data: Buf): void => fs.writeFileSync(path.join(dir, rel), data);
+const font = (name: string): Def => ({
+  key: name,
+  kind: 'bitmapFont',
+  path: `assets/fonts/${name}.png`,
+  xmlPath: `assets/fonts/${name}.xml`,
+  description: 'Test',
+});
+const fontXml = (chars: string, scale = '64" scaleH="32'): string =>
+  `<?xml version="1.0"?>
+<font>
+<common lineHeight="9" base="7" scaleW="${scale}" pages="1"/>
+<chars count="2">
+${chars}
+</chars>
+</font>
+`;
+const ch = (id: number, x: number, y: number): string =>
+  `<char id="${id}" x="${x}" y="${y}" width="6" height="7" xoffset="0" yoffset="0" xadvance="7" page="0" chnl="15"/>`;
+const put = (rel: string, data: Buf | string): void => fs.writeFileSync(path.join(dir, rel), data);
 const run = (a: Def): Result => checkAssets(dir, [a]).results[0];
 
 describe('check-assets', () => {
@@ -139,5 +159,50 @@ describe('check-assets', () => {
   it('reports a non-WAV file', () => {
     put('assets/sounds/fake.wav', png(1, 1));
     expect(run(sound('fake')).errors[0]).toContain('keine gueltige WAV');
+  });
+
+  it('accepts a correct bitmap font', () => {
+    put('assets/fonts/ok.png', png(64, 32));
+    put('assets/fonts/ok.xml', fontXml(ch(65, 1, 1) + ch(66, 8, 1)));
+    expect(run(font('ok')).errors).toEqual([]);
+  });
+
+  it('reports a broken font XML', () => {
+    put('assets/fonts/broken.png', png(64, 32));
+    put('assets/fonts/broken.xml', '<font><chars>');
+    expect(run(font('broken')).errors[0]).toContain('XML-Datei der Schrift ist kaputt');
+  });
+
+  it('reports a missing font XML', () => {
+    put('assets/fonts/noxml.png', png(64, 32));
+    expect(run(font('noxml')).errors[0]).toContain('XML-Datei der Schrift fehlt');
+  });
+
+  it('reports a font XML without characters', () => {
+    put('assets/fonts/empty.png', png(64, 32));
+    put('assets/fonts/empty.xml', fontXml(''));
+    expect(run(font('empty')).errors.join(' ')).toContain('keine Zeichen');
+  });
+
+  it('reports a duplicate character id', () => {
+    put('assets/fonts/dup.png', png(64, 32));
+    put('assets/fonts/dup.xml', fontXml(ch(65, 1, 1) + ch(65, 8, 1)));
+    expect(run(font('dup')).errors.join(' ')).toContain(
+      'Zeichen-ID 65 kommt in der XML mehrfach vor',
+    );
+  });
+
+  it('reports a character outside the image', () => {
+    put('assets/fonts/out.png', png(64, 32));
+    put('assets/fonts/out.xml', fontXml(ch(65, 1, 1) + ch(66, 60, 1)));
+    const r = run(font('out'));
+    expect(r.errors).toHaveLength(1);
+    expect(r.errors[0]).toContain('Zeichen 66 liegt nicht im Bild');
+  });
+
+  it('reports a font XML that does not match the image size', () => {
+    put('assets/fonts/size.png', png(128, 32));
+    put('assets/fonts/size.xml', fontXml(ch(65, 1, 1)));
+    expect(run(font('size')).errors[0]).toContain('passt nicht zum Bild');
   });
 });

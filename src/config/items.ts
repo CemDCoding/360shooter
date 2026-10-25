@@ -1,30 +1,31 @@
-// Balancing (AP-15), Erklaerung in docs/balancing.md.
+// Balancing (AP-27), Startwerte PE-39 bis PE-43, Feintuning in AP-35.
 import type { ItemDef, ItemRules } from '../contracts';
 
 export const ITEMS: readonly ItemDef[] = [
   {
-    id: 'fireRate',
-    effect: 'fireRate',
-    perStack: 0.2,
-    maxStacks: 5,
+    id: 'doubleShot',
+    effect: 'doubleShot',
+    perStack: 1,
+    maxStacks: 2,
     dropWeight: 30,
-    spriteKey: 'item-fire-rate',
+    spriteKey: 'item-double-shot',
   },
   {
-    id: 'damage',
-    effect: 'damage',
-    perStack: 0.25,
-    maxStacks: 5,
+    id: 'shield',
+    effect: 'shield',
+    perStack: 60,
+    maxStacks: 2,
     dropWeight: 30,
-    spriteKey: 'item-damage',
+    spriteKey: 'item-shield',
   },
   {
-    id: 'size',
-    effect: 'size',
-    perStack: 0.25,
-    maxStacks: 5,
+    id: 'rapidFire',
+    effect: 'rapidFire',
+    perStack: 1,
+    maxStacks: 1,
     dropWeight: 30,
-    spriteKey: 'item-size',
+    durationMs: 4000,
+    spriteKey: 'item-rapid-fire',
   },
   {
     id: 'heal',
@@ -37,3 +38,6 @@ export const ITEMS: readonly ItemDef[] = [
 ];
 
 export const ITEM_RULES: ItemRules = { dropChance: 0.08, lifetimeMs: 10000 };
+
+/** Obergrenze der Feuerrate waehrend Dauerfeuer */
+export const RAPID_FIRE_MAX_PER_SEC = 20;

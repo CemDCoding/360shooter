@@ -44,6 +44,44 @@ describe('asset manifest', () => {
     }
   });
 
+  it('has the M2b coin and item assets with the expected frames', () => {
+    const expected: Record<string, [number, number, number]> = {
+      'item-double-shot': [16, 16, 2],
+      'item-shield': [16, 16, 2],
+      'item-rapid-fire': [16, 16, 2],
+      'item-fire-ring': [16, 16, 2],
+      'coin-small': [8, 8, 4],
+      'coin-big': [16, 16, 4],
+    };
+    for (const [key, [w, h, n]] of Object.entries(expected)) {
+      const a = ASSETS.find((x) => x.key === key);
+      expect(a, key).toBeDefined();
+      expect([a?.frameWidth, a?.frameHeight, a?.frames], key).toEqual([w, h, n]);
+    }
+    for (const key of ['sfx-coin', 'sfx-shield-break']) {
+      expect(ASSETS.find((x) => x.key === key)?.kind, key).toBe('audio');
+    }
+  });
+
+  it('has the M2c design assets: weapon, icons and bitmap fonts', () => {
+    const expected: Record<string, [number, number, number]> = {
+      'weapon-raygun': [24, 16, 6],
+      'ui-icons': [16, 16, 4],
+    };
+    for (const [key, [w, h, n]] of Object.entries(expected)) {
+      const a = ASSETS.find((x) => x.key === key);
+      expect(a?.kind, key).toBe('spritesheet');
+      expect([a?.frameWidth, a?.frameHeight, a?.frames], key).toEqual([w, h, n]);
+    }
+    for (const key of ['astro-kapsel', 'astro-funk']) {
+      const a = ASSETS.find((x) => x.key === key);
+      expect(a?.kind, key).toBe('bitmapFont');
+      expect(a?.path, key).toBe(`assets/fonts/${key}.png`);
+      expect(a?.xmlPath, key).toBe(`assets/fonts/${key}.xml`);
+      expect(existsSync(a?.xmlPath ?? ''), key).toBe(true);
+    }
+  });
+
   it('has valid mono 16-bit 44.1 kHz WAV files', () => {
     for (const a of ASSETS.filter((x) => x.kind === 'audio')) {
       const buf = readFileSync(a.path);

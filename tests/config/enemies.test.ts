@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ENEMIES } from '../../src/config';
+import { ENEMIES, WEAPON_BASE } from '../../src/config';
 
 describe('enemies', () => {
   it.each(Object.values(ENEMIES))('$id has positive values', (e) => {
@@ -7,6 +7,21 @@ describe('enemies', () => {
     expect(e.speed).toBeGreaterThan(0);
     expect(e.xp).toBeGreaterThan(0);
     expect(e.contactDamage).toBeGreaterThanOrEqual(0);
+  });
+
+  it('coin values match PE-39..43 for all four enemies', () => {
+    expect(ENEMIES.cursedTree.coinValue).toBe(2);
+    expect(ENEMIES.zombieSquirrel.coinValue).toBe(2);
+    expect(ENEMIES.forestWitch.coinValue).toBe(5);
+    expect(ENEMIES.forestSpirit.coinValue).toBe(8);
+  });
+
+  it('cursed tree survives one laser and a double-shot salvo with damage upgrade 5 (AP-56)', () => {
+    const hp = ENEMIES.cursedTree.hp;
+    expect(hp).toBeGreaterThanOrEqual(5 * WEAPON_BASE.damage);
+    const salvo = 3 * (WEAPON_BASE.damage * 1.5); // Doppelschuss Stufe 2, Schaden-Upgrade Stufe 5
+    expect(salvo).toBeLessThan(hp);
+    expect(Math.ceil(hp / WEAPON_BASE.damage)).toBe(5);
   });
 
   it('zombie squirrel is slowed down (AP-23)', () => {
