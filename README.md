@@ -62,6 +62,14 @@ An die Adresse anhängen, z. B. `http://localhost:5173/?level=5`:
 - `npm run assets:check` prüft, ob alle erwarteten Sprites vorhanden und gültig sind.
 - `npm run assets:placeholders` erzeugt die Platzhalter-Grafiken neu (überschreibt eigene Dateien, vorher sichern).
 
+## Design
+
+Gestaltung, Grundsätze und Mockups stehen in `docs/design/` (Einstieg: `docs/design/design-brief.md`).
+
+- `npm run theme:build` erzeugt aus den Design-Tokens die Theme-Datei `src/config/theme.ts`.
+- `npm run fonts:build` bereitet die Schriften auf.
+- Regel "nur Tokens": In `src/scenes/**` und `src/entities/**` sind keine Farb-Literale (`0x…`, `#…`) und keine Systemschrift erlaubt. ESLint (`npm run lint`) erzwingt das. Farben und Schriften kommen aus `src/config/theme.ts`.
+
 ## Ordnerstruktur
 
 - `src/contracts/` gemeinsame Typen und Event-Namen (ohne Phaser)

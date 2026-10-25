@@ -37,6 +37,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     if (def.aura) {
       this.auraGfx = scene.add
+        // eslint-disable-next-line no-restricted-syntax -- design system has no token game.aura yet (reported in AP-55)
         .circle(0, 0, def.aura.radius, 0x9b59b6, 0.25)
         .setDepth(this.depth - 1)
         .setVisible(false);
