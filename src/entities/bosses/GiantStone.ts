@@ -1,23 +1,16 @@
 import Phaser from 'phaser';
+import { BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
 import type { BossAttackDef } from '../../contracts';
 import { BossBase, type BossContext } from './BossBase';
+import { clampToArena, fragmentPositions, stepToward } from './bossGeometry';
 import { Telegraph } from './Telegraph';
 
-const CENTER_DEFAULT = { x: 320, y: 180 } as const;
-/** Half axes of the rim where the stone waits (inside the 640x360 arena). */
-const RIM_RX = 150;
-const RIM_RY = 115;
-const ROLL_SPEED = 300;
-const RETURN_SPEED = 140;
-/** Full damage window after the impact (ms). */
-const VULNERABLE_MS = 2000;
-const ARMOR_FACTOR = 0.5;
-const SPLIT_AT = 0.5;
-const BASE_RADIUS = 28;
-/** Player hit radius used for the roll collision. */
-const PLAYER_RADIUS = 14;
-const ARRIVE_DIST = 6;
+const T = BOSS_TUNING.giantStone;
+const CENTER_DEFAULT = {
+  x: BOSS_TUNING.arena.width / 2,
+  y: BOSS_TUNING.arena.height / 2,
+} as const;
 const GLOW_COLOR = THEME.colors['game.fire-ring'].num;
 const CRACK_COLOR = THEME.colors['game.hit-flash'].num;
 
@@ -59,6 +52,7 @@ export class GiantStone extends BossBase {
   private readonly isFragment: boolean;
   private readonly rand: () => number;
   private time = 0;
+  private retreatMs = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -73,7 +67,7 @@ export class GiantStone extends BossBase {
     this.sizeScale = opts.scale ?? 1;
     this.isFragment = this.sizeScale < 1;
     this.rand = ctx.rng ? () => ctx.rng!.next() : Math.random;
-    this.damageFactor = ARMOR_FACTOR;
+    this.damageFactor = T.armorFactor;
     this.fx = scene.add.graphics();
     this.fx.setDepth(this.depth + 1).setVisible(false);
     this.setScale(this.sizeScale);
@@ -86,7 +80,7 @@ export class GiantStone extends BossBase {
   }
 
   private get radius(): number {
-    return BASE_RADIUS * this.sizeScale;
+    return T.baseRadius * this.sizeScale;
   }
 
   private get middle(): { x: number; y: number } {
@@ -97,8 +91,9 @@ export class GiantStone extends BossBase {
     this.clearFragments();
     this.split = false;
     this.phase = 'idle';
+    this.retreatMs = 0;
     this.vulnerableLeftMs = 0;
-    this.damageFactor = ARMOR_FACTOR;
+    this.damageFactor = T.armorFactor;
     this.setScale(this.sizeScale);
     this.setVelocity(0, 0);
     this.fx?.setVisible(true);
@@ -134,7 +129,6 @@ export class GiantStone extends BossBase {
     this.phase = 'rolling';
     this.hitDone = false;
     this.pendingDamage = damage;
-    this.moveTowards(this.target, ROLL_SPEED);
   }
 
   private pendingDamage = 0;
@@ -146,27 +140,23 @@ export class GiantStone extends BossBase {
       const hitPlayer =
         !this.hitDone &&
         Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y) <=
-          this.radius + PLAYER_RADIUS;
+          this.radius + BOSS_TUNING.playerHitRadius;
       if (hitPlayer) {
         this.hitDone = true;
         this.opts.onPlayerHit?.(this.pendingDamage);
       }
-      const arrived =
-        Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y) <= ARRIVE_DIST;
+      const arrived = this.advance(delta, T.rollSpeed);
       if (hitPlayer || arrived) this.impact();
     } else if (this.phase === 'retreating') {
-      if (
-        Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y) <= ARRIVE_DIST
-      ) {
-        this.setVelocity(0, 0);
-        this.phase = 'idle';
-      }
+      this.retreatMs += delta;
+      // Safety: a retreat that takes too long ends where the stone is (no soft lock).
+      if (this.advance(delta, T.returnSpeed) || this.retreatMs > T.retreatMaxMs) this.finishRetreat();
     }
     if (this.vulnerableLeftMs > 0) {
       this.vulnerableLeftMs -= delta;
       if (this.vulnerableLeftMs <= 0) {
         this.vulnerableLeftMs = 0;
-        this.damageFactor = ARMOR_FACTOR;
+        this.damageFactor = T.armorFactor;
         this.setScale(this.sizeScale);
       }
     }
@@ -175,18 +165,38 @@ export class GiantStone extends BossBase {
 
   /** Bounce: the armour opens for a short time, the stone goes back to a new rim position. */
   private impact(): void {
-    this.vulnerableLeftMs = VULNERABLE_MS;
+    this.vulnerableLeftMs = T.vulnerableMs;
     this.damageFactor = 1;
     const m = this.middle;
     const angle = this.rand() * Math.PI * 2;
-    this.target = { x: m.x + Math.cos(angle) * RIM_RX, y: m.y + Math.sin(angle) * RIM_RY };
+    this.target = { x: m.x + Math.cos(angle) * T.rim.rx, y: m.y + Math.sin(angle) * T.rim.ry };
+    this.target = clampToArena(this.target, BOSS_TUNING.arena);
     this.phase = 'retreating';
-    this.moveTowards(this.target, RETURN_SPEED);
+    this.retreatMs = 0;
   }
 
-  private moveTowards(to: { x: number; y: number }, speed: number): void {
-    const a = Math.atan2(to.y - this.y, to.x - this.x);
-    this.setVelocity(Math.cos(a) * speed, Math.sin(a) * speed);
+  private finishRetreat(): void {
+    this.setVelocity(0, 0);
+    this.phase = 'idle';
+    this.retreatMs = 0;
+  }
+
+  /**
+   * Moves toward the target without overshooting and keeps the stone inside the arena.
+   * Position is set directly (no velocity), so a long frame cannot skip the target. Returns true on arrival.
+   */
+  private advance(delta: number, speed: number): boolean {
+    const next = stepToward({ x: this.x, y: this.y }, this.target, speed, delta);
+    const p = clampToArena(next, BOSS_TUNING.arena);
+    this.setPosition(p.x, p.y);
+    this.body?.updateFromGameObject();
+    const left = Phaser.Math.Distance.Between(p.x, p.y, this.target.x, this.target.y);
+    if (next.arrived || left <= T.arriveDist) {
+      this.setPosition(this.target.x, this.target.y);
+      this.body?.updateFromGameObject();
+      return true;
+    }
+    return false;
   }
 
   /** Glow ring and cracks while the armour is open, so the window is easy to see. */
@@ -222,7 +232,7 @@ export class GiantStone extends BossBase {
       !this.isFragment &&
       !this.split &&
       this.variant.extraAttack &&
-      this.hp <= this.maxHp * SPLIT_AT
+      this.hp <= this.maxHp * T.splitAt
     ) {
       this.breakApart();
     }
@@ -238,7 +248,14 @@ export class GiantStone extends BossBase {
     this.splitting = false;
     this.fragmentsLeft = 2;
     const share = hp / 2;
-    for (const dir of [-1, 1]) {
+    const spots = fragmentPositions(
+      { x, y },
+      this.middle,
+      T.fragmentOffset,
+      T.fragmentMinCenterDist,
+      BOSS_TUNING.arena,
+    );
+    for (let i = 0; i < 2; i++) {
       const frag: GiantStone = new GiantStone(
         this.scene,
         this.levelId,
@@ -250,7 +267,7 @@ export class GiantStone extends BossBase {
         },
         { ...this.opts, scale: 0.5 },
       );
-      frag.spawnFragment(x + dir * 24, y, share);
+      frag.spawnFragment(spots[i].x, spots[i].y, share);
       this.fragments.push(frag);
     }
     this.reportSum();

@@ -1,21 +1,13 @@
 import Phaser from 'phaser';
+import { BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
 import type { BossAttackDef } from '../../contracts';
 import { BossBase, type BossContext } from './BossBase';
 import { GhostOrb } from './GhostOrb';
 import { Telegraph } from './Telegraph';
 
-const ORBIT_RADIUS = 110;
-const ORBIT_SPEED = 0.6; // rad/s
-const FAN_COUNT = 5;
-const FAN_SPREAD = Phaser.Math.DegToRad(50); // total opening angle
-const ORB_SPEED = 120;
-const ORB_LIFE_MS = 4000;
-const WARN_LINE_WIDTH = 10;
-const FADE_DURATION_MS = 2500;
-const FADE_ALPHA = 0.3;
-const DECOY_DURATION_MS = 5000;
-const DECOY_ALPHA = 0.75;
+const T = BOSS_TUNING.forestGhost;
+const FAN_SPREAD = Phaser.Math.DegToRad(T.fanSpreadDeg); // total opening angle
 const SHIELD_COLOR = THEME.colors['mint.200'].num;
 
 /**
@@ -23,7 +15,9 @@ const SHIELD_COLOR = THEME.colors['mint.200'].num;
  * - fade: half transparent and invulnerable for a short time (announced by blinking, shield ring while it lasts).
  * - orbFan: warning lines, then 5 GhostOrbs in a fan towards the middle.
  * - decoys (extra attack): 2 decoys for a few seconds. They do not shoot and have no body; only the real one takes damage.
- * The scene reads `orbs` for the overlap with the player (orb.damage, orb.kill()).
+ * The scene reads `orbs` for the overlap with the player (orb.damage, orb.kill()) and destroys orbs with
+ * lasers like the witch projectile (PE-37, one laser hits one orb, orb.kill()). Orbs need at least MIN_REACTION_MS
+ * (PE-75) from the orbit to the player.
  * While invulnerable takeDamage does nothing, so lasers pass through; the scene still recycles them.
  */
 export class ForestGhost extends BossBase {
@@ -60,7 +54,7 @@ export class ForestGhost extends BossBase {
   }
 
   protected behave(delta: number): void {
-    if (!this.holdMovement) this.orbitAngle += (ORBIT_SPEED * delta) / 1000;
+    if (!this.holdMovement) this.orbitAngle += (T.orbitSpeedRadPerSec * delta) / 1000;
     this.placeOnOrbit();
 
     if (this.fadeLeftMs > 0) {
@@ -81,8 +75,8 @@ export class ForestGhost extends BossBase {
       // Hold still so the warning lines match the shot.
       this.holdMovement = true;
       const base = this.angleToCenter();
-      const len = ORBIT_RADIUS * 2.2;
-      for (let i = 0; i < FAN_COUNT; i++) {
+      const len = T.orbitRadius * 2.2;
+      for (let i = 0; i < T.fanCount; i++) {
         const a = base + this.fanOffset(i);
         this.track(
           Telegraph.line(
@@ -91,7 +85,7 @@ export class ForestGhost extends BossBase {
             this.y,
             this.x + Math.cos(a) * len,
             this.y + Math.sin(a) * len,
-            WARN_LINE_WIDTH,
+            T.warnLineWidth,
             attack.telegraphMs,
           ),
         );
@@ -100,7 +94,7 @@ export class ForestGhost extends BossBase {
       // Blink during the warning, then the shield starts.
       this.scene.tweens.add({
         targets: this,
-        alpha: FADE_ALPHA,
+        alpha: T.fadeAlpha,
         duration: attack.telegraphMs / 4,
         yoyo: true,
         repeat: 1,
@@ -113,21 +107,21 @@ export class ForestGhost extends BossBase {
   protected onAttack(attackId: string, damage: number): void {
     if (attackId === 'orbFan') {
       const base = this.angleToCenter();
-      for (let i = 0; i < FAN_COUNT; i++) {
-        this.takeOrb().fire(this.x, this.y, base + this.fanOffset(i), ORB_SPEED, damage, ORB_LIFE_MS);
+      for (let i = 0; i < T.fanCount; i++) {
+        this.takeOrb().fire(this.x, this.y, base + this.fanOffset(i), T.orbSpeedPxPerSec, damage, T.orbLifeMs);
       }
       this.holdMovement = false;
     } else if (attackId === 'fade') {
       this.scene.tweens.killTweensOf(this);
-      this.fadeLeftMs = FADE_DURATION_MS;
+      this.fadeLeftMs = T.fadeDurationMs;
       this.invulnerable = true;
-      this.setAlpha(FADE_ALPHA);
+      this.setAlpha(T.fadeAlpha);
     } else if (attackId === 'decoys') {
-      this.decoyLeftMs = DECOY_DURATION_MS;
-      for (let i = 0; i < 2; i++) {
+      this.decoyLeftMs = T.decoyDurationMs;
+      for (let i = 0; i < T.decoyCount; i++) {
         const d = this.scene.add
           .sprite(this.x, this.y, this.def.spriteKey)
-          .setAlpha(DECOY_ALPHA)
+          .setAlpha(T.decoyAlpha)
           .setDepth(this.depth - 0.1);
         this.decoys.push(d);
       }
@@ -136,7 +130,7 @@ export class ForestGhost extends BossBase {
   }
 
   private fanOffset(i: number): number {
-    return (i / (FAN_COUNT - 1) - 0.5) * FAN_SPREAD;
+    return (i / (T.fanCount - 1) - 0.5) * FAN_SPREAD;
   }
 
   private angleToCenter(): number {
@@ -145,15 +139,15 @@ export class ForestGhost extends BossBase {
 
   private placeOnOrbit(): void {
     this.setPosition(
-      this.center.x + Math.cos(this.orbitAngle) * ORBIT_RADIUS,
-      this.center.y + Math.sin(this.orbitAngle) * ORBIT_RADIUS,
+      this.center.x + Math.cos(this.orbitAngle) * T.orbitRadius,
+      this.center.y + Math.sin(this.orbitAngle) * T.orbitRadius,
     );
   }
 
   private placeDecoys(): void {
     this.decoys.forEach((d, i) => {
-      const a = this.orbitAngle + ((i + 1) * Math.PI * 2) / 3;
-      d.setPosition(this.center.x + Math.cos(a) * ORBIT_RADIUS, this.center.y + Math.sin(a) * ORBIT_RADIUS);
+      const a = this.orbitAngle + ((i + 1) * Math.PI * 2) / (T.decoyCount + 1);
+      d.setPosition(this.center.x + Math.cos(a) * T.orbitRadius, this.center.y + Math.sin(a) * T.orbitRadius);
     });
   }
 

@@ -1,20 +1,12 @@
 import Phaser from 'phaser';
+import { BOSS_TUNING } from '../../config/bosses';
 import type { BossAttackDef } from '../../contracts';
+import { ringSpikeAngles, treePositions } from './bossGeometry';
 import { BossBase, type BossContext } from './BossBase';
 import { RootSpike } from './RootSpike';
 import { Telegraph } from './Telegraph';
 
-// Geometry of the attacks (not balance values; timing, damage and cooldowns come from config/bosses.ts).
-const SPIKE_WARN_RADIUS = 22;
-const CALL_MIN_TREES = 3;
-const CALL_MAX_TREES = 5;
-const CALL_DISTANCE = 56;
-const CALL_WARN_RADIUS = 16;
-const RING_RADIUS = 96;
-const RING_THICKNESS = 20;
-const RING_SPIKE_COUNT = 12;
-/** Width of the visible gap in the ring (radians, about 70 degrees). */
-const RING_GAP = 1.2;
+const TUNING = BOSS_TUNING.rootMonster;
 const FULL_TURN = Math.PI * 2;
 
 export interface RootMonsterContext extends BossContext {
@@ -24,9 +16,13 @@ export interface RootMonsterContext extends BossContext {
 
 /**
  * Boss "Baummonster" (Forest 0-4, PE-34): stands rooted and never moves.
- * Attacks: rootThrust (spike under the player), forestCall (summons 3-5 cursed trees),
- * rootRing (extra attack: ring of roots with one gap). Every attack shows a Telegraph first.
- * The scene reads `activeSpikes` and calls spike.tryHit() on overlap with the player.
+ * Attacks (all announced with a Telegraph first, all counterable with the laser, PE-75):
+ * - rootThrust: a harmless root bud appears at the player at once and grows during the announcement.
+ *   Every laser hit weakens it (spike.laserHit()); afterwards the root hurts once with the reduced damage.
+ * - forestCall: summons 3-5 cursed trees inside the arena.
+ * - rootRing (extra attack): ring of roots with one gap, the roots creep toward the player; a laser removes a root.
+ * Scene contract: `activeSpikes` holds buds, roots and ring roots. Player overlap: spike.tryHit(); laser overlap:
+ * if (spike.laserHit()) recycle the laser.
  */
 export class RootMonster extends BossBase {
   private spikes: RootSpike[] | undefined;
@@ -81,11 +77,17 @@ export class RootMonster extends BossBase {
   protected override onTelegraph(attack: BossAttackDef): void {
     const ms = attack.telegraphMs;
     if (attack.id === 'rootThrust') {
-      this.track(Telegraph.circle(this.scene, this.center.x, this.center.y, SPIKE_WARN_RADIUS, ms));
+      // The bud sits under the player at once and grows while the warning runs.
+      const x = this.center.x;
+      const y = this.center.y;
+      this.spikes?.push(
+        new RootSpike(this.scene, x, y, this.attackDamage('rootThrust'), { mode: 'sprout', sproutMs: ms }),
+      );
+      this.track(Telegraph.circle(this.scene, x, y, TUNING.sprout.hitRadius, ms));
     } else if (attack.id === 'forestCall') {
       this.pendingTrees = this.pickTreePositions();
       for (const p of this.pendingTrees) {
-        this.track(Telegraph.circle(this.scene, p.x, p.y, CALL_WARN_RADIUS, ms));
+        this.track(Telegraph.circle(this.scene, p.x, p.y, TUNING.call.warnRadius, ms));
       }
     } else if (attack.id === 'rootRing') {
       this.ringGapStart = this.random() * FULL_TURN;
@@ -94,41 +96,37 @@ export class RootMonster extends BossBase {
           this.scene,
           this.center.x,
           this.center.y,
-          RING_RADIUS,
-          RING_THICKNESS,
+          TUNING.ring.radius,
+          TUNING.ring.thickness,
           ms,
           undefined,
-          { start: this.ringGapStart, size: RING_GAP },
+          { start: this.ringGapStart, size: TUNING.ring.gapRad },
         ),
       );
     }
   }
 
   protected override onAttack(attackId: string, damage: number): void {
-    if (attackId === 'rootThrust') {
-      this.addSpike(this.center.x, this.center.y, damage);
-    } else if (attackId === 'forestCall') {
+    if (attackId === 'forestCall') {
       const positions = this.pendingTrees;
       this.pendingTrees = [];
       this.monsterCtx.onSummonTrees?.(positions);
     } else if (attackId === 'rootRing') {
-      const step = FULL_TURN / RING_SPIKE_COUNT;
-      for (let i = 0; i < RING_SPIKE_COUNT; i++) {
-        const angle = i * step;
-        // Distance of the angle from the gap start (0..2pi). Inside the gap there is no spike.
-        const rel = (((angle - this.ringGapStart) % FULL_TURN) + FULL_TURN) % FULL_TURN;
-        if (rel < RING_GAP) continue;
-        this.addSpike(
-          this.center.x + Math.cos(angle) * RING_RADIUS,
-          this.center.y + Math.sin(angle) * RING_RADIUS,
-          damage,
+      const ring = TUNING.ring;
+      const target = { x: this.center.x, y: this.center.y };
+      for (const angle of ringSpikeAngles(ring.spikeCount, this.ringGapStart, ring.gapRad)) {
+        this.spikes?.push(
+          new RootSpike(
+            this.scene,
+            target.x + Math.cos(angle) * ring.radius,
+            target.y + Math.sin(angle) * ring.radius,
+            damage * ring.damageShare,
+            { mode: 'creep', target, speedPxPerSec: ring.speedPxPerSec },
+          ),
         );
       }
     }
-  }
-
-  private addSpike(x: number, y: number, damage: number): void {
-    this.spikes?.push(new RootSpike(this.scene, x, y, damage));
+    // rootThrust: the bud made in onTelegraph turns into the root by itself (RootSpike.tick).
   }
 
   /** Keeps a telegraph so despawn() can cancel it; finished ones are dropped. */
@@ -140,17 +138,9 @@ export class RootMonster extends BossBase {
   }
 
   private pickTreePositions(): { x: number; y: number }[] {
-    const count =
-      CALL_MIN_TREES + Math.floor(this.random() * (CALL_MAX_TREES - CALL_MIN_TREES + 1));
+    const call = TUNING.call;
+    const count = call.minTrees + Math.floor(this.random() * (call.maxTrees - call.minTrees + 1));
     const base = this.random() * FULL_TURN;
-    const out: { x: number; y: number }[] = [];
-    for (let i = 0; i < count; i++) {
-      const angle = base + (i / count) * FULL_TURN;
-      out.push({
-        x: this.x + Math.cos(angle) * CALL_DISTANCE,
-        y: this.y + Math.sin(angle) * CALL_DISTANCE,
-      });
-    }
-    return out;
+    return treePositions({ x: this.x, y: this.y }, count, base, call.distance, BOSS_TUNING.arena);
   }
 }
