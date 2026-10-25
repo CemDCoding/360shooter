@@ -67,7 +67,14 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     this.scheduler = new AttackScheduler(def, this.variant, ctx.rng ?? { next: Math.random });
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    // Rule for subclasses: this call runs inside the base constructor, before their fields exist.
+    // An overridden despawn() must guard its own fields with ?. / ?? / early return.
     this.despawn();
+  }
+
+  /** true while hits do nothing (e.g. ghost phase). The scene lets lasers pass through then. */
+  get isInvulnerable(): boolean {
+    return this.invulnerable;
   }
 
   /** Brings the boss into the arena at (x, y) with full HP. */
