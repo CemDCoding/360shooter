@@ -1,37 +1,47 @@
 import Phaser from 'phaser';
+import { THEME } from '../config/theme';
 import type { ArmourDef } from '../contracts/armour';
 
-const RING_ALPHA = 0.5;
 const RING_DEPTH = 50;
-const RING_COLOR = 0xff7a1a;
+const RING_COLOR = THEME.colors['game.fire-ring'].num;
+const RING_STROKE_PX = 2;
+const DASH_PX = 6;
 
-/** Visual ring around the player. Display only; damage and timing live in the armour logic. */
+/** Visual dashed ring around the player. Display only; damage and timing live in the armour logic. */
 export class ArmourRing {
-  private circle: Phaser.GameObjects.Arc | null;
+  private gfx: Phaser.GameObjects.Graphics | null;
 
   constructor(scene: Phaser.Scene) {
-    this.circle = scene.add
-      .circle(0, 0, 1, RING_COLOR, RING_ALPHA)
-      .setDepth(RING_DEPTH)
-      .setVisible(false);
+    this.gfx = scene.add.graphics().setDepth(RING_DEPTH).setVisible(false);
   }
 
-  /** Shows the ring with the radius of the given armour. */
+  /** Shows the dashed ring with the radius of the given armour. */
   show(def: ArmourDef): void {
-    this.circle?.setRadius(def.radiusPx).setVisible(true);
+    const gfx = this.gfx;
+    if (!gfx) return;
+    const r = def.radiusPx;
+    const dashes = Math.max(8, Math.round((Math.PI * 2 * r) / DASH_PX / 2) * 2);
+    const step = (Math.PI * 2) / dashes;
+    gfx.clear().lineStyle(RING_STROKE_PX, RING_COLOR, 1);
+    for (let i = 0; i < dashes; i += 2) {
+      gfx.beginPath();
+      gfx.arc(0, 0, r, i * step, (i + 1) * step);
+      gfx.strokePath();
+    }
+    gfx.setVisible(true);
   }
 
   hide(): void {
-    this.circle?.setVisible(false);
+    this.gfx?.setVisible(false);
   }
 
   /** Call every frame with the player position. */
   setCenter(x: number, y: number): void {
-    this.circle?.setPosition(x, y);
+    this.gfx?.setPosition(x, y);
   }
 
   destroy(): void {
-    this.circle?.destroy();
-    this.circle = null;
+    this.gfx?.destroy();
+    this.gfx = null;
   }
 }

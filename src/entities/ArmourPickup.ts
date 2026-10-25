@@ -1,11 +1,20 @@
 import Phaser from 'phaser';
 import type { ArmourDef } from '../contracts/armour';
 import type { ItemRules } from '../contracts';
+import { THEME } from '../config/theme';
 import { isExpired } from '../logic/items';
+import { prefersReducedMotion } from '../platform/motion';
 
 export const ARMOUR_PICKUP_SPRITE = 'item-fire-ring';
 const BLINK_WINDOW_MS = 3000;
 const BLINK_PERIOD_MS = 250;
+const OUTLINE_COLOR = THEME.colors['game.hit-flash'].num;
+const OUTLINE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
 
 /** Armour pickup that appears where an enemy died; shoot it to collect it. */
 export class ArmourPickup extends Phaser.Physics.Arcade.Sprite {
@@ -13,6 +22,7 @@ export class ArmourPickup extends Phaser.Physics.Arcade.Sprite {
   private readonly spawnedAt: number;
   private readonly lifetimeMs: number;
   private collected = false;
+  private outline: Phaser.GameObjects.Sprite[] = [];
   /** Called once when collected by a laser. */
   onCollected?: (def: ArmourDef) => void;
 
@@ -48,9 +58,34 @@ export class ArmourPickup extends Phaser.Physics.Arcade.Sprite {
     }
     const remaining = this.lifetimeMs - (nowMs - this.spawnedAt);
     if (remaining <= BLINK_WINDOW_MS) {
-      this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      if (prefersReducedMotion()) {
+        // No blinking: the remaining time stays visible through a static outline.
+        this.updateOutline();
+      } else {
+        this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      }
     }
     return true;
+  }
+
+  /** Hard 1 px outline from four offset, flat-tinted copies (renderer independent). */
+  private updateOutline(): void {
+    if (this.outline.length === 0) {
+      this.outline = OUTLINE_OFFSETS.map(([dx, dy]) =>
+        this.scene.add
+          .sprite(this.x + dx, this.y + dy, this.texture.key, this.frame.name)
+          .setTintFill(OUTLINE_COLOR)
+          .setDepth(this.depth - 1),
+      );
+    }
+    for (const copy of this.outline) copy.setFrame(this.frame.name);
+  }
+
+  override destroy(fromScene?: boolean): void {
+    this.onCollected = undefined;
+    for (const copy of this.outline) copy.destroy();
+    this.outline = [];
+    super.destroy(fromScene);
   }
 
   /** Called when a laser hits the pickup. Returns false if already collected. */
@@ -60,10 +95,5 @@ export class ArmourPickup extends Phaser.Physics.Arcade.Sprite {
     this.onCollected?.(this.def);
     this.destroy();
     return true;
-  }
-
-  override destroy(fromScene?: boolean): void {
-    this.onCollected = undefined;
-    super.destroy(fromScene);
   }
 }

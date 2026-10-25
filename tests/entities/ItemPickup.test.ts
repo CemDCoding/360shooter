@@ -4,6 +4,10 @@ import type { ItemDef, ItemRules } from '../../src/contracts';
 // Minimal Phaser stand-in: ItemPickup only needs a sprite base class.
 vi.mock('phaser', () => {
   class Sprite {
+    scene: unknown;
+    constructor(scene: unknown) {
+      this.scene = scene;
+    }
     active = true;
     alpha = 1;
     body = { setCircle: () => undefined };
@@ -14,6 +18,11 @@ vi.mock('phaser', () => {
     play(): this {
       return this;
     }
+    x = 0;
+    y = 0;
+    depth = 0;
+    texture = { key: 'tex' };
+    frame = { name: 0 };
     destroy(): void {
       this.active = false;
     }
@@ -33,12 +42,27 @@ const DEF: ItemDef = {
 };
 const RULES: ItemRules = { dropChance: 1, lifetimeMs: 10_000 };
 
+const copies: { destroyed: boolean }[] = [];
+function makeCopy() {
+  const c = {
+    destroyed: false,
+    setTintFill: () => c,
+    setDepth: () => c,
+    setFrame: () => c,
+    destroy: () => {
+      c.destroyed = true;
+    },
+  };
+  copies.push(c);
+  return c;
+}
+
 function fakeScene(now: number) {
   return {
     time: { now },
-    add: { existing: () => undefined },
     physics: { add: { existing: () => undefined } },
     anims: { exists: () => false },
+    add: { existing: () => undefined, sprite: () => makeCopy() },
   } as unknown as ConstructorParameters<typeof ItemPickup>[0];
 }
 
@@ -73,5 +97,47 @@ describe('ItemPickup lifetime', () => {
     expect(item.collect()).toBe(true);
     expect(item.collect()).toBe(false);
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ItemPickup reduced motion', () => {
+  it('does not blink but shows a static outline in the last seconds', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    try {
+      const item = new ItemPickup(fakeScene(0), 0, 0, DEF, RULES, 0);
+      expect(item.update(8_000)).toBe(true);
+      expect(item.update(8_300)).toBe(true);
+      expect((item as unknown as { alpha: number }).alpha).toBe(1);
+      expect(copies).toHaveLength(4);
+      item.collect();
+      expect(copies.every((c) => c.destroyed)).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('still blinks without the preference', () => {
+    const item = new ItemPickup(fakeScene(0), 0, 0, DEF, RULES, 0);
+    item.update(8_000);
+    expect((item as unknown as { alpha: number }).alpha).not.toBe(1);
+  });
+});
+
+describe('ArmourPickup reduced motion', () => {
+  it('shows a static outline instead of blinking and cleans it up', async () => {
+    const { ArmourPickup } = await import('../../src/entities/ArmourPickup');
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    copies.length = 0;
+    try {
+      const def = { id: 'fire-ring' } as unknown as ConstructorParameters<typeof ArmourPickup>[3];
+      const pickup = new ArmourPickup(fakeScene(0), 0, 0, def, RULES, 0);
+      expect(pickup.update(8_000)).toBe(true);
+      expect((pickup as unknown as { alpha: number }).alpha).toBe(1);
+      expect(copies).toHaveLength(4);
+      pickup.destroy();
+      expect(copies.every((c) => c.destroyed)).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

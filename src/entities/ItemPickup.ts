@@ -1,10 +1,19 @@
 import Phaser from 'phaser';
 import type { ItemDef, ItemRules } from '../contracts';
+import { THEME } from '../config/theme';
 import { isExpired } from '../logic/items';
+import { prefersReducedMotion } from '../platform/motion';
 
 /** Last part of the lifetime in which the item blinks. */
 const BLINK_WINDOW_MS = 3000;
 const BLINK_PERIOD_MS = 250;
+const OUTLINE_COLOR = THEME.colors['game.hit-flash'].num;
+const OUTLINE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
 
 /** Item that appears where an enemy died; shoot it to collect it. */
 export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
@@ -12,6 +21,7 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
   private readonly spawnedAt: number;
   private readonly lifetimeMs: number;
   private collected = false;
+  private outline: Phaser.GameObjects.Sprite[] = [];
   /** Called once when collected by a laser. */
   onCollected?: (def: ItemDef) => void;
 
@@ -48,9 +58,33 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
     }
     const remaining = this.lifetimeMs - (nowMs - this.spawnedAt);
     if (remaining <= BLINK_WINDOW_MS) {
-      this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      if (prefersReducedMotion()) {
+        // No blinking: the remaining time stays visible through a static outline.
+        this.updateOutline();
+      } else {
+        this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
+      }
     }
     return true;
+  }
+
+  /** Hard 1 px outline from four offset, flat-tinted copies (renderer independent). */
+  private updateOutline(): void {
+    if (this.outline.length === 0) {
+      this.outline = OUTLINE_OFFSETS.map(([dx, dy]) =>
+        this.scene.add
+          .sprite(this.x + dx, this.y + dy, this.texture.key, this.frame.name)
+          .setTintFill(OUTLINE_COLOR)
+          .setDepth(this.depth - 1),
+      );
+    }
+    for (const copy of this.outline) copy.setFrame(this.frame.name);
+  }
+
+  override destroy(fromScene?: boolean): void {
+    for (const copy of this.outline) copy.destroy();
+    this.outline = [];
+    super.destroy(fromScene);
   }
 
   /** Called when a laser hits the item. Returns false if already collected. */

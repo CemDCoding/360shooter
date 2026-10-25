@@ -50,6 +50,7 @@ import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
 import { SpawnDirector } from '../logic/spawn';
 import { upgradeFactors } from '../logic/upgrades';
+import { weaponStageForUpgrades } from '../logic/weaponMount';
 import { getSoundService, type SoundService } from '../platform/audio';
 import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
@@ -132,6 +133,7 @@ function playerConfigFrom(levels: UpgradeLevels | undefined): PlayerConfig {
     turnSpeedDegPerSec: f.playerTurnSpeedDegPerSec,
     weaponFireRateMult: f.weaponFireRateMult,
     weaponDamageMult: f.weaponDamageMult,
+    weaponStage: weaponStageForUpgrades(levels ?? { weaponFireRate: 0, weaponDamage: 0 }),
   };
 }
 
