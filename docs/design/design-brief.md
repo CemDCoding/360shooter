@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** entwurf
-**Stand:** Schritt 3: drei Richtungen liegen vor (`mockups/richtung-a|b|c.html`, Screenshots in `screenshots/`). Wartet auf die Wahl des Nutzers.
+**Stand:** Schritt 3: Wahl getroffen (Menü B + HUD C, dazu Waffe als eigenes Sprite). Runde 4 klärt Verbindung, Waffen-Befestigung und Waffen-Look, danach Schritt 4 (Design-System).
 
 ## Ausgangslage
 
@@ -34,7 +34,9 @@
 
 ## Gewählte Richtung
 
-{{offen, Wahl des Nutzers}}
+**Kombination (Nutzer, 2026-10-25):** Hauptmenü und Level-Auswahl aus **B „Sternenkassette“**, Look in der Runde (HUD) aus **C „Funklogbuch“**. Details zur Verbindung beider Teile: siehe Entscheidungen (Runde 4 offen).
+
+**Neu: Waffe als eigenes Design.** Die Waffe ist ein eigenes Sprite, das an der Astronautin befestigt wird (Ankerpunkte). So lassen sich Waffe und Aussehen später tauschen, ohne die Figur zu ändern.
 
 Vorgelegt am 2026-10-25:
 
