@@ -8,7 +8,12 @@ import { prefersReducedMotion } from '../platform/motion';
 const BLINK_WINDOW_MS = 3000;
 const BLINK_PERIOD_MS = 250;
 const OUTLINE_COLOR = THEME.colors['game.hit-flash'].num;
-const OUTLINE_WIDTH_PX = 2;
+const OUTLINE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
 
 /** Item that appears where an enemy died; shoot it to collect it. */
 export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
@@ -16,7 +21,7 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
   private readonly spawnedAt: number;
   private readonly lifetimeMs: number;
   private collected = false;
-  private outlined = false;
+  private outline: Phaser.GameObjects.Sprite[] = [];
   /** Called once when collected by a laser. */
   onCollected?: (def: ItemDef) => void;
 
@@ -55,15 +60,31 @@ export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
     if (remaining <= BLINK_WINDOW_MS) {
       if (prefersReducedMotion()) {
         // No blinking: the remaining time stays visible through a static outline.
-        if (!this.outlined) {
-          this.outlined = true;
-          this.preFX?.addGlow(OUTLINE_COLOR, OUTLINE_WIDTH_PX, 0, false, 0.1, 4);
-        }
+        this.updateOutline();
       } else {
         this.setAlpha(Math.floor(remaining / BLINK_PERIOD_MS) % 2 === 0 ? 0.35 : 1);
       }
     }
     return true;
+  }
+
+  /** Hard 1 px outline from four offset, flat-tinted copies (renderer independent). */
+  private updateOutline(): void {
+    if (this.outline.length === 0) {
+      this.outline = OUTLINE_OFFSETS.map(([dx, dy]) =>
+        this.scene.add
+          .sprite(this.x + dx, this.y + dy, this.texture.key, this.frame.name)
+          .setTintFill(OUTLINE_COLOR)
+          .setDepth(this.depth - 1),
+      );
+    }
+    for (const copy of this.outline) copy.setFrame(this.frame.name);
+  }
+
+  override destroy(fromScene?: boolean): void {
+    for (const copy of this.outline) copy.destroy();
+    this.outline = [];
+    super.destroy(fromScene);
   }
 
   /** Called when a laser hits the item. Returns false if already collected. */

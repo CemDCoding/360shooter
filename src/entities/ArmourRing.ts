@@ -2,10 +2,9 @@ import Phaser from 'phaser';
 import { THEME } from '../config/theme';
 import type { ArmourDef } from '../contracts/armour';
 
-const RING_ALPHA = 0.5;
 const RING_DEPTH = 50;
 const RING_COLOR = THEME.colors['game.fire-ring'].num;
-const RING_STROKE_PX = 3;
+const RING_STROKE_PX = 2;
 const DASH_PX = 6;
 
 /** Visual dashed ring around the player. Display only; damage and timing live in the armour logic. */
@@ -13,7 +12,7 @@ export class ArmourRing {
   private gfx: Phaser.GameObjects.Graphics | null;
 
   constructor(scene: Phaser.Scene) {
-    this.gfx = scene.add.graphics().setDepth(RING_DEPTH).setAlpha(RING_ALPHA).setVisible(false);
+    this.gfx = scene.add.graphics().setDepth(RING_DEPTH).setVisible(false);
   }
 
   /** Shows the dashed ring with the radius of the given armour. */

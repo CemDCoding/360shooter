@@ -76,7 +76,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.stats = this.computeStats();
     this.shieldRing = scene.add
       .circle(x, y, SHIELD_RING_RADIUS, SHIELD_RING_COLOR, 0.15)
-      .setStrokeStyle(2, SHIELD_RING_COLOR, 0.6)
+      .setStrokeStyle(2, SHIELD_RING_COLOR, 1)
       .setVisible(false);
     scene.add.existing(this);
     this.weapon = scene.add
@@ -179,7 +179,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.weapon?.setFrame(weaponFrame(this.config.weaponStage, key === SHOOT_ANIM ? 1 : 0));
     if (this.hitTintLeft > 0) {
       this.hitTintLeft -= dt;
-      if (this.hitTintLeft <= 0) this.clearTint();
+      if (this.hitTintLeft <= 0) {
+        this.clearTint();
+        this.weapon?.clearTint();
+      }
     }
   }
 
@@ -193,6 +196,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.callbacks.onShieldChange?.(this.powers.shieldLeft);
     }
     this.setTintFill(HIT_TINT);
+    this.weapon?.setTintFill(HIT_TINT);
     this.hitTintLeft = HIT_TINT_MS;
     this.callbacks.onHurt?.();
     if (absorbed.remainingDamage <= 0) return;
