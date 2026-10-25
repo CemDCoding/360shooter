@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** entwurf
-**Stand:** Interview abgeschlossen (Runden 1–3). Schritt 3: drei Richtungen als Mockups (Menü + HUD).
+**Stand:** Schritt 3: drei Richtungen liegen vor (`mockups/richtung-a|b|c.html`, Screenshots in `screenshots/`). Wartet auf die Wahl des Nutzers.
 
 ## Ausgangslage
 
@@ -34,7 +34,15 @@
 
 ## Gewählte Richtung
 
-{{offen, Schritt 3}}
+{{offen, Wahl des Nutzers}}
+
+Vorgelegt am 2026-10-25:
+
+- **A „Visier“:** Die UI ist das Innere des Helms: Türkis #36d6c3 auf Helmschwarz, Zielklammern an allen Ecken, Silkscreen.
+- **B „Sternenkassette“:** wie ein Kassetten-Etikett: Koralle #ff6b8a, Minze, Pflaume, Fase mit hartem Pixelschatten, Biom-Aufkleber, Press Start 2P.
+- **C „Funklogbuch“:** Phosphor-Display, fast einfarbig #a8d86b, Logbuchnummern, gepunktete Linien, Pixelify Sans.
+
+Hinweis: Die Mockups zeichnen Schrift und Sprites mit `assets/pixel.js`, einem 5×7-Platzhalter für die gewählte Pixelschrift. Die Sprites dort sind Entwürfe für den Sprite-Styleguide.
 
 ## Grundsätze
 
@@ -44,8 +52,10 @@
 
 | Schrift/Asset | Nutzung | Lizenz | Quelle/Paket |
 |---|---|---|---|
-| Pixelschrift {{Wahl offen}} | Titel, Zahlen (Timer, Gold, HP) | OFL | lokal |
-| Lesbare Textschrift {{Wahl offen}} | Beschreibungen, kleiner Text | OFL | lokal |
+| Silkscreen (Kandidat A) | Titel, Zahlen | OFL-1.1 (fontsource.org/fonts/silkscreen) | `@fontsource/silkscreen` |
+| Press Start 2P (Kandidat B) | Titel, Zahlen | OFL-1.1 (fontlibrary.org/font/press-start-2p) | `@fontsource/press-start-2p` |
+| Pixelify Sans (Kandidat C) | Titel, Zahlen | OFL-1.1 (fontsource.org/fonts/pixelify-sans), variabel 400–700 | `@fontsource-variable/pixelify-sans` |
+| Atkinson Hyperlegible Next | Hinweise, kleiner Text | OFL-1.1 (fontsource.org/fonts/atkinson-hyperlegible-next), variabel 200–800 | `@fontsource-variable/atkinson-hyperlegible-next` |
 
 ## Entscheidungen
 
