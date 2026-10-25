@@ -45,3 +45,10 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     aura: { radius: 48, dps: 12 },
   },
 };
+
+/**
+ * Contact damage after which an enemy despawns by itself (AP-60).
+ * Balancing, Startwert angenommen (PE-66): 3 s Kontakt bei 10 Schaden je Sekunde,
+ * ein Drittel der HP der Spielerin. Enemies without an entry never despawn this way.
+ */
+export const CONTACT_DESPAWN_DAMAGE: Partial<Record<EnemyId, number>> = { cursedTree: 30 };
