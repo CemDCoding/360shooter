@@ -6,6 +6,7 @@ import { GameScene } from './scenes/GameScene';
 import { HudScene } from './scenes/HudScene';
 import { ResultScene } from './scenes/ResultScene';
 import { fitArena } from './platform/layout';
+import { THEME } from './config/theme';
 
 const ARENA_W = 640;
 const ARENA_H = 360;
@@ -40,7 +41,7 @@ const game = new Phaser.Game({
   width: ARENA_W,
   height: ARENA_H,
   pixelArt: true,
-  backgroundColor: '#0b0b14',
+  backgroundColor: THEME.colors['menu.bg'].css,
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
