@@ -258,6 +258,36 @@
       'oko..oko',
       'ooo..ooo',
     ],
+    raygun1: [
+      '.ooo........',
+      'owwwo.......',
+      'owwwoooooo..',
+      'owlwwwwwwoxo',
+      'owwwoooooo..',
+      '.owwo.......',
+      '..owo.......',
+      '..ooo.......',
+    ],
+    raygun2: [
+      '.oaao.......',
+      'owwwo.......',
+      'owwwoooooo..',
+      'owlwawawaoxo',
+      'owwwoooooo..',
+      '.owwo.......',
+      '..owo.......',
+      '..ooo.......',
+    ],
+    raygun3: [
+      '.oaao.......',
+      'owxwo.......',
+      'owxwooooooxo',
+      'owlwawawaoxo',
+      'owwwooooooxo',
+      '.owwo.......',
+      '..owo.......',
+      '..ooo.......',
+    ],
     bolt: [
       '.oo.',
       'oPPo',
@@ -270,7 +300,7 @@
     f: '#4f8a3c', F: '#3a6b2c', t: '#6b4a32', d: '#2a1a12', r: '#ff4a3a',
     S: '#8a9a7a', Z: '#6d7d5e', R: '#ff4a3a', G: '#b9f5ee', m: '#2a3d4a',
     H: '#4a2d6b', K: '#9fd08a', Y: '#ffd24a', y: '#fff3b0', D: '#c7922a', B: '#5fb8ff', b: '#d6f0ff',
-    L: '#ff6b8a', P: '#c86bff', k: '#e8ecf2', s: '#ffd24a',
+    L: '#ff6b8a', P: '#c86bff', k: '#e8ecf2', s: '#ffd24a', x: '#ff8fae',
   };
   function col(c, el) {
     if (!c) return '#ffffff';
@@ -282,7 +312,42 @@
     for (const ch of t) { const g = P[ch] || P['?']; w += g.max - g.min + 1 + (bold ? 1 : 0) + 1; }
     return Math.max(0, w - 1);
   }
+  function drawFontText(el, font) {
+    const raw = el.dataset.t || '';
+    const t = raw.toUpperCase();
+    const s = +el.dataset.s || 1;
+    const sh = el.dataset.sh;
+    const glyph = (ch) => {
+      if (ch === ' ') return { w: font.space, rows: null };
+      const src = font.g[ch] || font.g['?'];
+      const rows = src.split('/');
+      return { w: rows[0].length, rows };
+    };
+    const gs = [...t].map(glyph);
+    const w = Math.max(1, gs.reduce((a, g) => a + g.w + 1, 0) - 1) + (sh ? 1 : 0);
+    const h = font.h + (sh ? 1 : 0);
+    const cv = document.createElement('canvas');
+    cv.width = w * s; cv.height = h * s;
+    cv.style.width = w * s + 'px'; cv.style.height = h * s + 'px';
+    const ctx = cv.getContext('2d');
+    const pass = (c, ox, oy) => {
+      ctx.fillStyle = c;
+      let x = 0;
+      for (const g of gs) {
+        if (g.rows) g.rows.forEach((r, ry) => { for (let cx = 0; cx < r.length; cx++) if (r[cx] === '#') ctx.fillRect((x + cx + ox) * s, (ry + oy) * s, s, s); });
+        x += g.w + 1;
+      }
+    };
+    if (sh) pass(col(sh, el), 1, 1);
+    pass(col(el.dataset.c, el), 0, 0);
+    el.textContent = '';
+    el.appendChild(cv);
+    el.setAttribute('role', 'img');
+    el.setAttribute('aria-label', raw);
+  }
   function drawText(el) {
+    const f = el.dataset.f || (el.closest('[data-font]') && el.closest('[data-font]').dataset.font);
+    if (f && window.PX_FONTS && window.PX_FONTS[f]) return drawFontText(el, window.PX_FONTS[f]);
     const raw = el.dataset.t || '';
     const t = raw.toUpperCase();
     const s = +el.dataset.s || 1;

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eigene Schrift und Waffe · 360shooter</title>
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<style>
+  :root {
+    --font-text: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+    --page-bg: #120a19; --page-fg: #fff4e8; --page-muted: #d8c3d6;
+    --ink: #0b0610; --cream: #fff4e8; --coral: #ff6b8a; --mint: #5fe0c0; --gold: #ffcf4a; --plum: #2d1a3d;
+    --phos: #a8d86b; --phos-fg: #e5f2d8; --phos-muted: #a9c48a; --phos-line: #567f02;
+    --px-o: #0b0610; --px-w: #fff4e8; --px-l: #e0c9d6; --px-v: #2a1640; --px-g: #ffc9d0; --px-e: #5fe0c0; --px-c: #ff97b3; --px-a: #ff6b8a; --px-x: #ff8fae;
+  }
+  .grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .grid.two { grid-template-columns: 1fr 1fr; } .grid.three { grid-template-columns: 1fr 1fr 1fr; } }
+  .card { padding: 20px; overflow: hidden; }
+  .card h3 { font-size: 0.875rem; margin-bottom: 4px; }
+  .card p { font-size: 0.8125rem; color: var(--page-muted); margin-bottom: 14px; max-width: 60ch; }
+  .lines > * { display: block; margin-bottom: 12px; }
+  .old { background: #1c1424; outline: 1px dashed #5a4a6a; }
+  .menu { background: var(--plum); box-shadow: inset 4px 4px 0 #4a2c60, inset -4px -4px 0 #20122c, 0 0 0 4px var(--ink), 8px 8px 0 4px var(--ink); }
+  .menu p { color: #d8c3d6; }
+  .hud { background: #0a1108; outline: 2px solid var(--phos-line); }
+  .hud p { color: var(--phos-muted); }
+  .hud .px canvas { filter: drop-shadow(0 0 3px rgba(168, 216, 107, 0.5)); }
+  .gunbox { display: flex; gap: 28px; align-items: flex-end; flex-wrap: wrap; }
+  .gunbox figure { text-align: center; }
+  figcaption { margin-top: 8px; font-size: 0.75rem; color: var(--page-muted); }
+  .anchor { position: relative; display: inline-block; }
+  .dot { position: absolute; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); outline: 2px solid var(--ink); }
+  .dot.grip { background: var(--mint); }
+  .dot.muzzle { background: var(--gold); }
+  .rigs { display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; padding: 24px 12px 12px; background: #0f1c3a; }
+  .rig { position: relative; width: 96px; height: 120px; }
+  .rig .body { position: absolute; left: 0; top: 0; }
+  .rig .gun { position: absolute; transform-origin: 21px 36px; }
+  .rig.flip .body { transform: scaleX(-1); }
+  .rig .cap { position: absolute; top: 104px; left: -10px; right: -10px; text-align: center; font-size: 0.75rem; color: #c9d4f0; }
+  .legend { display: flex; gap: 18px; margin-top: 10px; font-size: 0.8125rem; color: var(--page-muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; outline: 2px solid var(--ink); }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Eigene Schrift „Astro“ und die Strahlenpistole</h1>
+  <p>Statt einer fertigen Pixelschrift bekommt das Spiel eine eigene Bitmap-Familie mit zwei Schnitten. „Kapsel“ ist kräftig und weich, für Menü und Titel. „Funk“ ist schmal, hoch und oben links angeschliffen, für das HUD. Beide sind eigene Arbeit, brauchen keine Lizenz und werden in Phaser als BitmapText gezeichnet.</p>
+</header>
+
+<section>
+  <h2>SCHRIFT · VORHER UND NACHHER</h2>
+  <div class="grid three">
+    <div class="card old">
+      <h3>Bisher: Platzhalter 5×7</h3>
+      <p>Die Standardform, wie man sie aus vielen Vorlagen kennt.</p>
+      <div class="lines">
+        <span class="px" data-t="360SHOOTER" data-s="4" data-c="#fff4e8"></span>
+        <span class="px" data-t="WALD BEI NACHT" data-s="2" data-c="#d8c3d6"></span>
+        <span class="px" data-t="ENERGIE 87 · 1:42" data-s="2" data-c="#d8c3d6"></span>
+      </div>
+    </div>
+    <div class="card menu" data-font="kapsel">
+      <h3>Kapsel: Menü, Titel, große Zahlen</h3>
+      <p>Senkrechte Striche 2 px breit, weiche Ecken, breite Formen. Wirkt wie eine Spielkassette.</p>
+      <div class="lines">
+        <span class="row" style="gap:8px"><span class="px" data-t="360" data-s="4" data-c="--coral" data-sh="--ink"></span><span class="px" data-t="SHOOTER" data-s="4" data-c="--cream" data-sh="--ink"></span></span>
+        <span class="px" data-t="WALD BEI NACHT" data-s="2" data-c="--cream"></span>
+        <span class="px" data-t="UPGRADES · 1.240" data-s="2" data-c="--gold" data-sh="--ink"></span>
+        <span class="px" data-t="FORTSCHRITT ZURÜCKSETZEN?" data-s="2" data-c="--coral"></span>
+      </div>
+    </div>
+    <div class="card hud" data-font="funk">
+      <h3>Funk: HUD, Labels, kleine Werte</h3>
+      <p>Schmal und hoch, 1-px-Striche, die Ecke oben links ist angeschliffen. Wirkt wie eine Funkanzeige.</p>
+      <div class="lines">
+        <span class="row" style="gap:10px"><span class="px" data-t="87" data-s="4" data-c="--phos-fg"></span><span class="px" data-t="ENERGIE" data-s="2" data-c="--phos-muted"></span></span>
+        <span class="px" data-t="1:42" data-s="4" data-c="--phos-fg"></span>
+        <span class="px" data-t="×2  2/3  3S  12S  +23" data-s="2" data-c="--phos-fg"></span>
+        <span class="px" data-t="PAUSE – TIPPEN ZUM WEITERSPIELEN" data-s="2" data-c="--phos-muted"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>ZEICHENSATZ</h2>
+  <div class="grid two">
+    <div class="card menu" data-font="kapsel">
+      <div class="lines">
+        <span class="px" data-t="ABCDEFGHIJKLM" data-s="3" data-c="--cream"></span>
+        <span class="px" data-t="NOPQRSTUVWXYZ" data-s="3" data-c="--cream"></span>
+        <span class="px" data-t="ÄÖÜ 0123456789" data-s="3" data-c="--cream"></span>
+        <span class="px" data-t=".,:!?-+/%×()<>'" data-s="3" data-c="--cream"></span>
+      </div>
+    </div>
+    <div class="card hud" data-font="funk">
+      <div class="lines">
+        <span class="px" data-t="ABCDEFGHIJKLM" data-s="3" data-c="--phos-fg"></span>
+        <span class="px" data-t="NOPQRSTUVWXYZ" data-s="3" data-c="--phos-fg"></span>
+        <span class="px" data-t="ÄÖÜ 0123456789" data-s="3" data-c="--phos-fg"></span>
+        <span class="px" data-t=".,:!?-+/%×()<>'" data-s="3" data-c="--phos-fg"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>STRAHLENPISTOLE · DREI AUSBAUSTUFEN (nach Waffen-Upgrade-Stufe)</h2>
+  <div class="card menu">
+    <div class="gunbox">
+      <figure><span class="spr" data-n="raygun1" data-s="8" aria-label="Strahlenpistole Stufe 1"></span><figcaption>Stufe 1 · Upgrades 0–6 · schlicht</figcaption></figure>
+      <figure><span class="spr" data-n="raygun2" data-s="8" aria-label="Strahlenpistole Stufe 2"></span><figcaption>Stufe 2 · 7–13 · Kühlrippen, größere Flosse</figcaption></figure>
+      <figure><span class="spr" data-n="raygun3" data-s="8" aria-label="Strahlenpistole Stufe 3"></span><figcaption>Stufe 3 · 14–20 · leuchtender Kern, große Mündung</figcaption></figure>
+      <figure>
+        <span class="anchor"><span class="spr" data-n="raygun1" data-s="12"></span>
+          <i class="dot grip" style="left:42px;top:72px"></i><i class="dot muzzle" style="left:132px;top:42px"></i></span>
+        <figcaption>Ankerpunkte: Griff (3,5 | 6) und Mündung (11 | 3,5)</figcaption>
+      </figure>
+    </div>
+    <div class="legend"><span><i style="background:var(--mint)"></i>Griff = Drehpunkt, sitzt auf der Hand</span><span><i style="background:var(--gold)"></i>Mündung = Startpunkt des Lasers</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>DIE WAFFE KREIST, DIE ASTRONAUTIN BLEIBT AUFRECHT (spiegelt sich nur)</h2>
+  <div class="rigs">
+    <div class="rig"><span class="body spr" data-n="astronaut" data-s="6"></span><span class="gun spr" data-n="raygun1" data-s="6" style="left:60px;top:39px;transform:rotate(0deg)"></span><span class="cap">rechts · 0°</span></div>
+    <div class="rig"><span class="gun spr" data-n="raygun1" data-s="6" style="left:60px;top:39px;transform:rotate(-45deg)"></span><span class="body spr" data-n="astronaut" data-s="6"></span><span class="cap">oben rechts · −45° (Waffe hinter ihr)</span></div>
+    <div class="rig"><span class="body spr" data-n="astronaut" data-s="6"></span><span class="gun spr" data-n="raygun2" data-s="6" style="left:60px;top:39px;transform:rotate(80deg)"></span><span class="cap">unten · 80°</span></div>
+    <div class="rig flip"><span class="gun spr" data-n="raygun2" data-s="6" style="left:-6px;top:39px;transform:rotate(-135deg) scaleY(-1)"></span><span class="body spr" data-n="astronaut" data-s="6"></span><span class="cap">oben links · −135°, gespiegelt</span></div>
+    <div class="rig flip"><span class="body spr" data-n="astronaut" data-s="6"></span><span class="gun spr" data-n="raygun3" data-s="6" style="left:-6px;top:39px;transform:rotate(180deg) scaleY(-1)"></span><span class="cap">links · 180°, gespiegelt</span></div>
+  </div>
+</section>
+
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>
