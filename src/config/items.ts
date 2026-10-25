@@ -14,7 +14,7 @@ export const ITEMS: readonly ItemDef[] = [
     id: 'shield',
     effect: 'shield',
     perStack: 60,
-    maxStacks: 3,
+    maxStacks: 2,
     dropWeight: 30,
     spriteKey: 'item-shield',
   },
@@ -24,7 +24,7 @@ export const ITEMS: readonly ItemDef[] = [
     perStack: 1,
     maxStacks: 1,
     dropWeight: 30,
-    durationMs: 5000,
+    durationMs: 4000,
     spriteKey: 'item-rapid-fire',
   },
   {

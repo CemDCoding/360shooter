@@ -3,7 +3,7 @@ import type { UpgradeTrack } from '../contracts';
 
 export interface UpgradeDef {
   label: string;
-  /** Effekt je Stufe: multiplikativ (Faktor je Stufe) oder additiv */
+  /** Zuwachs je Stufe, additiv aufsummiert (Logik: 1 + perLevel * Stufe bei multiplicative, sonst Basis + perLevel * Stufe) */
   mode: 'multiplicative' | 'additive';
   perLevel: number;
 }

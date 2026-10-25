@@ -1,19 +1,41 @@
 import { describe, expect, it } from 'vitest';
-import { ENEMIES, ITEMS, LEVELS, WEAPON_BASE } from '../../src/config';
-import type { LevelDef, WeaponStacks } from '../../src/contracts';
+import {
+  COIN_RULES,
+  ENEMIES,
+  ITEMS,
+  ITEM_RULES,
+  LEVELS,
+  PLAYER,
+  RAPID_FIRE_MAX_PER_SEC,
+  WEAPON_BASE,
+} from '../../src/config';
+import type { ActivePowers, LevelDef } from '../../src/contracts';
+import { MAX_UPGRADE_LEVEL } from '../../src/contracts';
+import { upgradeCost } from '../../src/logic/upgrades';
 import { computeWeaponStats } from '../../src/logic/weapon';
 import { MIN_INTERVAL_FACTOR } from '../../src/logic/spawn';
 
 /** Annahme: Gegner starten etwa so weit vom Zentrum (Diagonale/2 + Rand der 640x360-Arena). */
 const SPAWN_RADIUS = 380;
-const MAX_STACKS: WeaponStacks = { fireRate: 5, damage: 5, size: 5 };
-const HALF_STACKS: WeaponStacks = { fireRate: 2, damage: 2, size: 2 };
-const NO_STACKS: WeaponStacks = { fireRate: 0, damage: 0, size: 0 };
+const FACTORS_BASE = { weaponFireRateMult: 1, weaponDamageMult: 1 };
+const power = (doubleShotStage: number, rapidFireMsLeft = 0): ActivePowers => ({
+  doubleShotStage,
+  shieldLeft: 0,
+  rapidFireMsLeft,
+});
 
-function dps(stacks: WeaponStacks): number {
-  const w = computeWeaponStats(WEAPON_BASE, stacks, ITEMS);
-  return w.fireRatePerSec * w.damage;
+/** Schaden pro Sekunde (alle Schuesse zusammen, volle Trefferquote) mit Items. */
+function dps(doubleShotStage: number, rapidFire = false): number {
+  const w = computeWeaponStats(
+    WEAPON_BASE,
+    FACTORS_BASE,
+    power(doubleShotStage, rapidFire ? 1 : 0),
+  );
+  return w.fireRatePerSec * w.damage * (w.shotCount ?? 1);
 }
+const BASE_DPS = dps(0);
+
+const itemDef = (id: string) => ITEMS.find((i) => i.id === id)!;
 
 /** Gegnerschaden pro Sekunde, wenn er die Astronautin erreicht hat. */
 function threatDps(enemyId: keyof typeof ENEMIES): number {
@@ -38,7 +60,10 @@ interface Metrics {
 
 function metrics(level: LevelDef): Metrics {
   const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
-  const meanHp = level.enemyPool.reduce((s, e) => s + (e.weight / total) * ENEMIES[e.enemyId].hp, 0);
+  const meanHp = level.enemyPool.reduce(
+    (s, e) => s + (e.weight / total) * ENEMIES[e.enemyId].hp,
+    0,
+  );
 
   const durMs = level.durationSec * 1000;
   let t = level.spawnIntervalMs;
@@ -65,20 +90,100 @@ function metrics(level: LevelDef): Metrics {
     spawnsPerMin,
     enemyHpPerMin,
     hpPerSec: enemyHpPerMin / 60,
-    pressure: enemyHpPerMin / 60 / dps(NO_STACKS),
+    pressure: enemyHpPerMin / 60 / BASE_DPS,
     freeRunDamagePerMin: freeDamage / minutes,
   };
 }
 
 const M = LEVELS.map(metrics);
+/** Gewonnenes Level: alle Gegner besiegt. Anzahl Spawns wie in `metrics`. */
+function spawnCount(level: LevelDef): number {
+  const durMs = level.durationSec * 1000;
+  let t = level.spawnIntervalMs;
+  let n = 0;
+  while (t < durMs) {
+    n += 1;
+    t += level.spawnIntervalMs * (1 - (1 - MIN_INTERVAL_FACTOR) * Math.min(1, t / durMs));
+  }
+  return n;
+}
+
+/** Gold je gewonnenem Level = Gegnerzahl x Muenz-Drop-Chance x mittlerer Muenzwert. */
+function goldOf(level: LevelDef): number {
+  const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
+  const meanCoin = level.enemyPool.reduce(
+    (s, e) => s + (e.weight / total) * (ENEMIES[e.enemyId].coinValue ?? 0),
+    0,
+  );
+  return spawnCount(level) * COIN_RULES.dropChance * meanCoin;
+}
+
+/** Anteil der Rundenzeit mit Dauerfeuer, wenn jedes Item aufgesammelt wird und nichts ueberlappt. */
+function rapidFireUptime(level: LevelDef): number {
+  const share = itemDef('rapidFire').dropWeight / ITEMS.reduce((s, i) => s + i.dropWeight, 0);
+  const drops = spawnCount(level) * ITEM_RULES.dropChance * share;
+  return Math.min(1, (drops * (itemDef('rapidFire').durationMs ?? 0)) / (level.durationSec * 1000));
+}
+
+const GOLD = LEVELS.map(goldOf);
+const GOLD_MEAN = GOLD.reduce((a, b) => a + b, 0) / GOLD.length;
+const TRACKS = ['weaponFireRate', 'weaponDamage', 'playerMaxHp', 'playerTurnSpeed'] as const;
+const trackCost = (track: (typeof TRACKS)[number]): number => {
+  let sum = 0;
+  for (let k = 0; k < MAX_UPGRADE_LEVEL; k++) sum += upgradeCost(track, k) ?? 0;
+  return sum;
+};
+
 const batchOf = (id: number) => LEVELS[id].batch;
 
 describe('balance: player damage', () => {
-  // TODO: AP-35 kalibriert neu (alte Stack-Items fireRate/damage/size sind nicht mehr in ITEMS).
-  it.skip('items raise dps step by step', () => {
-    expect(dps(NO_STACKS)).toBeLessThan(dps(HALF_STACKS));
-    expect(dps(HALF_STACKS)).toBeLessThan(dps(MAX_STACKS));
-    expect(dps(MAX_STACKS) / dps(NO_STACKS)).toBeGreaterThan(3);
+  it('items raise dps step by step', () => {
+    expect(dps(0)).toBeLessThan(dps(1));
+    expect(dps(1)).toBeLessThan(dps(2));
+    expect(dps(2)).toBeLessThan(dps(2, true));
+    expect(dps(2) / dps(0)).toBeCloseTo(3, 5);
+  });
+
+  it('double shot, shield and rapid fire are noticeable but not dominant', () => {
+    // Doppelschuss: Stufe 1 spuerbar (mindestens +50 %), Stufe 2 hoechstens das Dreifache.
+    expect(dps(1) / BASE_DPS).toBeGreaterThanOrEqual(1.5);
+    expect(dps(2) / BASE_DPS).toBeLessThanOrEqual(3);
+    // Schild-Puffer: hoechstens 1,5-mal die Lebenspunkte, mindestens die Haelfte.
+    const shield = itemDef('shield');
+    const buffer = shield.perStack * shield.maxStacks;
+    expect(buffer).toBeLessThanOrEqual(PLAYER.maxHp * 1.5);
+    expect(buffer).toBeGreaterThanOrEqual(PLAYER.maxHp * 0.5);
+    // Dauerfeuer: fuer sich spuerbar, im Mittel ueber die Runde (Level 20) weniger als +100 %.
+    expect(RAPID_FIRE_MAX_PER_SEC / WEAPON_BASE.fireRatePerSec).toBeGreaterThan(2);
+    const uptime = rapidFireUptime(LEVELS[20]);
+    expect(uptime).toBeGreaterThan(0.1);
+    expect(1 + uptime * (dps(0, true) / BASE_DPS - 1)).toBeLessThan(2);
+  });
+});
+
+describe('balance: gold and upgrades', () => {
+  it('mean gold per won level is about 45', () => {
+    expect(GOLD_MEAN).toBeGreaterThanOrEqual(43);
+    expect(GOLD_MEAN).toBeLessThanOrEqual(47);
+  });
+
+  it('late levels pay more gold than early levels (5-minute levels pay more than 3-minute ones)', () => {
+    expect(GOLD[20]).toBeGreaterThan(GOLD[0] * 5);
+    expect(Math.min(...GOLD)).toBeGreaterThan(5);
+  });
+
+  it('level 10 of one upgrade is reached after 15 to 20 levels at mean gold', () => {
+    for (const track of TRACKS) {
+      const levels = trackCost(track) / GOLD_MEAN;
+      expect(levels, track).toBeGreaterThanOrEqual(15);
+      expect(levels, track).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it('all four upgrades at level 10 cost about 2800 gold together', () => {
+    const total = TRACKS.reduce((s, t) => s + trackCost(t), 0);
+    expect(total).toBeGreaterThanOrEqual(2700);
+    expect(total).toBeLessThanOrEqual(2900);
   });
 });
 
@@ -93,11 +198,10 @@ describe('balance: difficulty curve', () => {
     expect(M[0].pressure).toBeLessThanOrEqual(0.4);
   });
 
-  // TODO: AP-35 kalibriert neu (Voll-Item-DPS beruht auf den alten Stack-Items).
-  it.skip('level 20 is demanding but fair: base weapon not enough, full items clearly enough', () => {
-    expect(M[20].pressure).toBeGreaterThan(0.8);
-    expect(M[20].hpPerSec).toBeLessThan(dps(HALF_STACKS));
-    expect(M[20].hpPerSec).toBeLessThan(dps(MAX_STACKS) / 2);
+  it('level 20 is demanding but fair: base weapon not enough, double shot clearly enough', () => {
+    expect(M[20].pressure).toBeGreaterThanOrEqual(0.9);
+    expect(M[20].hpPerSec).toBeLessThan(dps(1));
+    expect(M[20].hpPerSec).toBeLessThan(dps(2) / 2);
   });
 
   it('spawn density rises with every level', () => {

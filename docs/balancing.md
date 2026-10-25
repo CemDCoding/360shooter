@@ -17,7 +17,7 @@ Schwierigkeit nicht mehr stetig steigt.
 | `aura.dps` / `radius` | `enemies.ts` | Dauerschaden und Reichweite des Waldgeists. |
 | `xp` | `enemies.ts` | Erfahrung pro besiegtem Gegner (Spielerlevel). |
 | `fireRatePerSec`, `damage` | `weapon.ts` | Schuesse pro Sekunde und Schaden pro Schuss der Laserpistole ohne Items. |
-| `perStack` | `items.ts` | Wie viel ein eingesammeltes Item bringt (0,25 = +25 % des Grundwerts pro Stufe, bis Stufe 5). |
+| `perStack`, `maxStacks`, `durationMs` | `items.ts` | Wie viel ein Item bringt, wie oft es sich stapeln laesst (Schild: 60 je Stufe, bis Stufe 2) und wie lange Dauerfeuer haelt (4000 ms). |
 | `dropWeight` | `items.ts` | Relative Haeufigkeit eines Item-Typs beim Drop. |
 | `dropChance`, `lifetimeMs` | `items.ts` | Drop-Chance pro besiegtem Gegner (0,08 = 8 %) und wie lange das Item liegen bleibt. |
 | `maxHp` | `player.ts` | Lebenspunkte der Astronautin. |
@@ -29,7 +29,7 @@ Schwierigkeit nicht mehr stetig steigt.
 - **Gegner-HP/Min**: Summe der Lebenspunkte aller neuen Gegner pro Minute.
 - **Druck**: Gegner-HP pro Sekunde geteilt durch den Schaden pro Sekunde der Laserpistole ohne Items
   (jetzt 4 Schuesse/s mal 10 Schaden = 40 pro Sekunde). Unter 1 reicht die Grundwaffe rechnerisch,
-  ueber 1 braucht man Items. Mit allen Items auf Stufe 5 ist der Schaden rund 4,5-mal so hoch (180 pro Sekunde).
+  ueber 1 braucht man Items. Mit Doppelschuss Stufe 2 (drei Schuesse) ist der Schaden 3-mal so hoch (120 pro Sekunde).
   In der Praxis trifft man nicht immer, deshalb ist Level 0 mit 0,27 bewusst weit unter 1.
 - **Schaden ohne Abschuss/Min**: Schaden pro Minute an der Astronautin, wenn sie gar nichts trifft und
   alle Gegner ungestoert ankommen. Sie ist nur zum Vergleichen der Level gedacht (die Zahl waechst mit
@@ -68,8 +68,10 @@ Schwierigkeit nicht mehr stetig steigt.
   und groesser als jeder normale Schritt im neuen Batch.
 - Ab Level 5 waechst der Druck je Level um hoechstens 10 %.
 - 5-Minuten-Level sind in ihrem Batch fordernder als die 3-Minuten-Level.
-- Level 0 hat Druck von hoechstens 0,4. Level 20 liegt ueber 0,8 und
-  bleibt mit einem Teil der Items schaffbar.
+- Level 0 hat Druck von hoechstens 0,4. Level 20 liegt bei mindestens 0,9 (Ist 0,96): die Grundwaffe reicht nicht,
+  schon Doppelschuss Stufe 1 (80 pro Sekunde) reicht rechnerisch aus.
+- Gold im Mittel etwa 45 je gewonnenem Level, Stufe 10 eines Upgrades nach 15 bis 20 Leveln (siehe unten).
+- Doppelschuss, Schild und Dauerfeuer bleiben spuerbar, aber nicht uebermaechtig (siehe unten).
 
 ## Aenderung nach dem Handtest (AP-23)
 
@@ -83,10 +85,37 @@ Im Handtest kippte das Spiel ab Level 5, Level 12 war zu schwer. Deshalb:
   danach hoechstens +10 % je Level. Alt: Abstand Level 5 = 1200 ms, Level 12 = 660 ms, Level 20 = 500 ms. Neu: 1330, 860, 620 ms.
 - Die Druck-Werte sind nicht mit den Werten aus AP-15 vergleichbar, weil die Grundwaffe jetzt 40 statt 30 Schaden pro Sekunde macht.
 
+## Gold und Upgrades (AP-35)
+
+Gold kommt aus Muenzen: jeder besiegte Gegner laesst mit 4,8 % Chance eine Muenze fallen
+(`dropChance` in `coins.ts`), der Wert steht je Gegner in `enemies.ts` (`coinValue`). Gold je gewonnenem Level
+ist also Gegnerzahl mal 0,048 mal mittlerer Muenzwert. Bei Sieg bleibt alles Gold, bei Niederlage die Haelfte.
+Der Preis fuer Stufe k auf k+1 ist `round(10 * 1,4^k)` (`COST_BASE`, `COST_GROWTH` in `upgrades.ts`).
+Die Stufe 10 gilt fuer das Spiel-Level (0 bis 20), nicht fuers Spielerlevel (PE-50).
+
+| Kennzahl | Wert | Woher |
+|---|---|---|
+| Gold je gewonnenem Level, Mittel ueber Level 0-20 | etwa 45 (Level 0: etwa 6, Level 20: etwa 100) | `dropChance` 0,048, `coinValue` |
+| Preis Stufe 0 auf 1 / Stufe 9 auf 10 | 10 / 207 Gold | `COST_BASE`, `COST_GROWTH` |
+| Eine Upgrade-Spur auf Stufe 10 | 698 Gold, also etwa 15,5 Level im Mittel | Summe der Preise |
+| Alle vier Spuren auf Stufe 10 | 2792 Gold (etwa 2 800) | 4 mal 698 |
+| Wirkung je Stufe | Feuerrate und Schaden +10 %, Leben +10, Drehtempo +15 Grad/s (additiv aufsummiert, Stufe 10 = +100 % bzw. +100 / +150) | `UPGRADES` |
+| Doppelschuss | Stufe 1: zwei Schuesse, Stufe 2: drei Schuesse (2-fach bzw. 3-fach Schaden pro Sekunde, hoechstens 3-fach) | `items.ts`, `maxStacks` 2 |
+| Schild | 60 je Stufe, hoechstens 2 Stufen = 120 Puffer (1,2-mal die 100 Leben) | `perStack` 60, `maxStacks` 2 |
+| Dauerfeuer | 20 Schuesse/s (5-mal die Grundwaffe) fuer 4 Sekunden | `durationMs` 4000, `RAPID_FIRE_MAX_PER_SEC` |
+| Dauerfeuer-Anteil in Level 20 | etwa 20 % der Rundenzeit, Schaden im Mittel etwa 1,8-fach | bei 8 % Item-Drop, 30 von 100 Gewicht |
+
+Was sich gegenueber AP-27 geaendert hat:
+
+- `dropChance` Muenzen 0,05 auf 0,048: das Gold-Mittel lag bei 46,8 und damit eine Stufe-10-Spur bei 14,9 Leveln (unter 15). Jetzt etwa 45 und 15,5.
+- Schild `maxStacks` 3 auf 2: 180 Puffer waren fast das Doppelte der Leben, das ist zu stark. Jetzt 120.
+- Dauerfeuer `durationMs` 5000 auf 4000: in Level 20 war man etwa 25 % der Zeit im Dauerfeuer (Schaden im Mittel fast 2-fach), jetzt etwa 20 %.
+- Unveraendert: Doppelschuss, Upgrade-Preise und -Wirkung, Level- und Gegnerwerte (Spawn-Werte Level 0-4 bleiben gleich).
+
 ## Nachjustieren: Beispiele
 
 - Level 0 zu schwer: in `levels.ts` den ersten Eintrag von `SPAWN_INTERVAL_MS` erhoehen (z. B. 4000).
   Dann stimmt eventuell der Abstand zu Level 1 nicht mehr, der Test sagt es dir.
-- Items zu stark: `perStack` in `items.ts` senken.
+- Items zu stark: `perStack` oder `maxStacks` in `items.ts` senken, bei Dauerfeuer `durationMs`.
 - Mehr Items: `dropChance` in `items.ts` erhoehen.
 - Handtest-Ziel (M2-DEP): Level 0 gut schaffbar, Level 20 nur mit Items.
