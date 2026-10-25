@@ -21,6 +21,7 @@ Platzhalter werden von `npm run assets:placeholders` erzeugt (`scripts/generate-
 | sprites/item-double-shot.png      | selbst erzeugt | selbst erzeugt |
 | sprites/item-shield.png           | selbst erzeugt | selbst erzeugt |
 | sprites/item-rapid-fire.png       | selbst erzeugt | selbst erzeugt |
+| sprites/item-fire-ring.png         | selbst erzeugt | selbst erzeugt |
 | sprites/coin-small.png            | selbst erzeugt | selbst erzeugt |
 | sprites/coin-big.png              | selbst erzeugt | selbst erzeugt |
 | sprites/tiles-forest.png          | selbst erzeugt | selbst erzeugt |
