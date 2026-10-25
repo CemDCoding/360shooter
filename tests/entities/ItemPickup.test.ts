@@ -25,7 +25,7 @@ const { ItemPickup } = await import('../../src/entities/ItemPickup');
 
 const DEF: ItemDef = {
   id: 'test',
-  effect: 'damage',
+  effect: 'rapidFire',
   perStack: 0.1,
   maxStacks: 5,
   dropWeight: 1,

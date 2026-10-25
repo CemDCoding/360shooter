@@ -14,7 +14,6 @@ import {
   type PlayerDef,
   type ProgressionRules,
   type SaveGame,
-  type WeaponStacks,
   type WeaponStats,
 } from '../../src/contracts';
 
@@ -50,7 +49,7 @@ describe('contracts', () => {
     };
     const item: ItemDef = {
       id: 'rapid',
-      effect: 'fireRate',
+      effect: 'rapidFire',
       perStack: 0.1,
       maxStacks: 5,
       dropWeight: 1,
@@ -64,7 +63,6 @@ describe('contracts', () => {
       projectileSpeed: 300,
       range: 400,
     };
-    const stacks: WeaponStacks = { fireRate: 0, damage: 0, size: 0 };
     const player: PlayerDef = { maxHp: 10, turnSpeedDegPerSec: 180 };
     const prog: ProgressionRules = { xpCurveBase: 100, xpCurveExponent: 1.5, lossXpFactor: 0.5 };
     const save: SaveGame = {
@@ -92,12 +90,11 @@ describe('contracts', () => {
       item,
       rules,
       weapon,
-      stacks,
       player,
       prog,
       save,
       asset,
-    ]).toHaveLength(11);
+    ]).toHaveLength(10);
     expect(payload.result).toBe('won');
     expect(GameEvents.RoundEnded).toBe('round-ended');
   });

@@ -1,25 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS, ITEM_RULES } from '../../src/config';
 import type { ItemDef } from '../../src/contracts';
-import { applyItem, applyPowerItem, isExpired, rollDrop } from '../../src/logic/items';
+import { applyPowerItem, isExpired, rollDrop } from '../../src/logic/items';
 import { emptyPowers } from '../../src/logic/powers';
 import { createRng } from '../../src/logic/rng';
-import { emptyStacks } from '../../src/logic/weapon';
 
 const def = (id: string): ItemDef => {
   const d = ITEMS.find((i) => i.id === id);
   if (!d) throw new Error(`missing item ${id}`);
   return d;
 };
-// Alte Item-Typen sind nicht mehr in ITEMS (AP-27), applyItem kennt sie noch.
-const legacy = (effect: 'fireRate' | 'damage' | 'size'): ItemDef => ({
-  id: effect,
-  effect,
-  perStack: 0.2,
-  maxStacks: 5,
-  dropWeight: 30,
-  spriteKey: `item-${effect}`,
-});
 const always = { ...ITEM_RULES, dropChance: 1 };
 
 describe('rollDrop', () => {
@@ -61,36 +51,6 @@ describe('rollDrop', () => {
   it('falls back to the last def when rounding leaves the roll non-negative', () => {
     const seq = [0, 1];
     expect(rollDrop({ next: () => seq.shift() ?? 1 }, always, ITEMS)).toBe(ITEMS[ITEMS.length - 1]);
-  });
-});
-
-describe('applyItem', () => {
-  it('adds a stack without mutating input', () => {
-    const s = emptyStacks();
-    const r = applyItem(s, legacy('damage'));
-    expect(r.stacks.damage).toBe(1);
-    expect(s.damage).toBe(0);
-    expect(r.heal).toBe(0);
-  });
-  it('caps at maxStacks', () => {
-    let s = emptyStacks();
-    const d = legacy('fireRate');
-    for (let i = 0; i < d.maxStacks + 3; i++) s = applyItem(s, d).stacks;
-    expect(s.fireRate).toBe(d.maxStacks);
-  });
-  it('heal keeps stacks and returns amount', () => {
-    const s = { fireRate: 2, damage: 1, size: 0 };
-    const r = applyItem(s, def('heal'));
-    expect(r.stacks).toEqual(s);
-    expect(r.heal).toBe(def('heal').perStack);
-  });
-  it('new effects leave stacks unchanged', () => {
-    const s = { fireRate: 2, damage: 1, size: 0 };
-    for (const effect of ['doubleShot', 'shield', 'rapidFire'] as const) {
-      const r = applyItem(s, { ...legacy('damage'), effect });
-      expect(r.stacks).toEqual(s);
-      expect(r.heal).toBe(0);
-    }
   });
 });
 

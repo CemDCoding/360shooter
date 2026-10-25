@@ -34,9 +34,10 @@ describe('absorbDamage', () => {
 
 describe('tickPowers', () => {
   it('rapid fire ends after its duration of game time; dt 0 (pause) does not count', () => {
-    let s = { ...emptyPowers(), rapidFireMsLeft: 5000 };
+    const DURATION_MS = 5000;
+    let s = { ...emptyPowers(), rapidFireMsLeft: DURATION_MS };
     for (let i = 0; i < 100; i++) s = tickPowers(s, 0);
-    expect(s.rapidFireMsLeft).toBe(5000);
+    expect(s.rapidFireMsLeft).toBe(DURATION_MS);
     for (let i = 0; i < 299; i++) s = tickPowers(s, 1000 / 60);
     expect(s.rapidFireMsLeft).toBeGreaterThan(0);
     s = tickPowers(s, 1000 / 60);

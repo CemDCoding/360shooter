@@ -8,12 +8,6 @@ export interface WeaponStats {
   shotCount?: number;
 }
 
-export interface WeaponStacks {
-  fireRate: number;
-  damage: number;
-  size: number;
-}
-
 /** Aktive Item-Effekte der laufenden Runde */
 export interface ActivePowers {
   /** 0 = aus, 1..2 = Stufe */
