@@ -15,7 +15,16 @@ export interface SpawnRequest {
 /** Faktor auf das Spawn-Intervall am Rundenende (Start: 1,0). */
 export const MIN_INTERVAL_FACTOR = 0.6;
 
+/** Radius der Eroeffnungswelle als Anteil des Spawn-Radius (Startwert, angenommen; AP-56). */
+export const OPENING_RADIUS_FACTOR = 0.65;
+
+/** Anzahl der Gegner der Eroeffnungswelle: 15 % von maxEnemies, mindestens 3, hoechstens 8. */
+export function openingCount(level: LevelDef): number {
+  return Math.min(8, Math.max(3, Math.round(level.maxEnemies * 0.15)));
+}
+
 export class SpawnDirector {
+  private openingDone = false;
   private elapsedMs = 0;
   private cooldownMs: number;
   private readonly totalWeight: number;
@@ -46,6 +55,22 @@ export class SpawnDirector {
     this.elapsedMs += dtMs;
     this.cooldownMs -= dtMs;
     let alive = aliveCount;
+    if (!this.openingDone) {
+      // Eroeffnungswelle: genau einmal, sofort, gleichmaessig auf dem Ring verteilt.
+      this.openingDone = true;
+      const n = Math.max(0, Math.min(openingCount(this.level), this.level.maxEnemies - alive));
+      if (n > 0) {
+        const start = this.rng.next() * Math.PI * 2;
+        for (let i = 0; i < n; i++) {
+          out.push({
+            enemyId: this.pickEnemy(),
+            angle: (start + (i * Math.PI * 2) / n) % (Math.PI * 2),
+            radius: this.spawnRadius * OPENING_RADIUS_FACTOR,
+          });
+        }
+        alive += n;
+      }
+    }
     while (this.cooldownMs <= 0) {
       if (alive >= this.level.maxEnemies) {
         // Kein Aufstauen: verpasste Spawns werden nicht nachgeholt.

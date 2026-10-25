@@ -4,7 +4,7 @@ import type { EnemyDef, EnemyId } from '../contracts';
 export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
   cursedTree: {
     id: 'cursedTree',
-    hp: 30,
+    hp: 50,
     speed: 30,
     contactDamage: 10,
     behavior: 'chase',

@@ -13,7 +13,7 @@ import type { ActivePowers, LevelDef } from '../../src/contracts';
 import { MAX_UPGRADE_LEVEL } from '../../src/contracts';
 import { upgradeCost } from '../../src/logic/upgrades';
 import { computeWeaponStats } from '../../src/logic/weapon';
-import { MIN_INTERVAL_FACTOR } from '../../src/logic/spawn';
+import { MIN_INTERVAL_FACTOR, openingCount } from '../../src/logic/spawn';
 
 /** Annahme: Gegner starten etwa so weit vom Zentrum (Diagonale/2 + Rand der 640x360-Arena). */
 const SPAWN_RADIUS = 380;
@@ -69,7 +69,8 @@ function metrics(level: LevelDef): Metrics {
   let t = level.spawnIntervalMs;
   let spawned = 0;
   let freeDamage = 0;
-  let allSpawns = 0;
+  // Die Eroeffnungswelle (AP-56) zaehlt als Spawns mit; sie erscheint am Rundenstart.
+  let allSpawns = Math.min(openingCount(level), level.maxEnemies);
   while (t < durMs) {
     allSpawns += 1;
     if (spawned < level.maxEnemies) {
@@ -100,7 +101,7 @@ const M = LEVELS.map(metrics);
 function spawnCount(level: LevelDef): number {
   const durMs = level.durationSec * 1000;
   let t = level.spawnIntervalMs;
-  let n = 0;
+  let n = Math.min(openingCount(level), level.maxEnemies);
   while (t < durMs) {
     n += 1;
     t += level.spawnIntervalMs * (1 - (1 - MIN_INTERVAL_FACTOR) * Math.min(1, t / durMs));
@@ -194,12 +195,19 @@ describe('balance: difficulty curve', () => {
     }
   });
 
-  it('level 0 is easy: base weapon clearly outdamages the enemy HP stream', () => {
-    expect(M[0].pressure).toBeLessThanOrEqual(0.4);
+  it('level 0 is easy but not trivial (AP-56): pressure 0.45 to 0.55', () => {
+    expect(M[0].pressure).toBeGreaterThanOrEqual(0.45);
+    expect(M[0].pressure).toBeLessThanOrEqual(0.55);
+  });
+
+  it('level 4 (end of the first batch) has pressure 0.72 to 0.80 (AP-56)', () => {
+    expect(M[4].pressure).toBeGreaterThanOrEqual(0.72);
+    expect(M[4].pressure).toBeLessThanOrEqual(0.8);
   });
 
   it('level 20 is demanding but fair: base weapon not enough, double shot clearly enough', () => {
-    expect(M[20].pressure).toBeGreaterThanOrEqual(0.9);
+    expect(M[20].pressure).toBeGreaterThanOrEqual(0.95);
+    expect(M[20].pressure).toBeLessThanOrEqual(1.25);
     expect(M[20].hpPerSec).toBeLessThan(dps(1));
     expect(M[20].hpPerSec).toBeLessThan(dps(2) / 2);
   });
@@ -218,7 +226,7 @@ describe('balance: difficulty curve', () => {
     const jump = M[b].pressure / M[a].pressure;
     expect(jump).toBeGreaterThanOrEqual(1.08);
     expect(jump).toBeLessThanOrEqual(a === 4 ? 1.12 : 1.1);
-    // Der Sprung ist groesser als jeder normale Schritt im neuen Batch (Level 0-4 sind Festwerte).
+    // Der Sprung ist groesser als jeder normale Schritt im neuen Batch (Level 0-4 sind keine Festwerte mehr, AP-56).
     for (const batch of [batchOf(b)]) {
       for (let i = 1; i < M.length; i++) {
         if (batchOf(i) === batch && batchOf(i - 1) === batch) {
