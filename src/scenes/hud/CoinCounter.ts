@@ -1,18 +1,18 @@
 import Phaser from 'phaser';
+import { FunkChip } from './FunkPanel';
 
-/** Coin icon with the number of coins collected this round. */
+/** Chip with the coin icon and the number of coins collected this round ("+4"). */
 export class CoinCounter {
-  private readonly text: Phaser.GameObjects.Text;
+  readonly chip: FunkChip;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, k: number, fontPx: number) {
-    scene.add.image(x, y, 'coin-small', 0).setScale(k * 1.5);
-    this.text = scene.add
-      .text(x + 8 * k, y, '0', { fontFamily: 'monospace', fontSize: `${fontPx}px`, color: '#ffd700' })
-      .setOrigin(0, 0.5)
-      .setStroke('#000000', 2);
+  constructor(scene: Phaser.Scene, k: number, private readonly onChange: () => void) {
+    this.chip = new FunkChip(scene, { icon: { key: 'coin-small', frame: 0, scale: 2 }, k });
+    this.set(0);
   }
 
   set(roundCoins: number): void {
-    this.text.setText(String(Math.max(0, Math.floor(roundCoins) || 0)));
+    const n = Math.max(0, Math.floor(roundCoins) || 0);
+    this.chip.setContent(`+${n}`, 'hud.gold');
+    this.onChange();
   }
 }

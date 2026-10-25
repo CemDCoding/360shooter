@@ -1,39 +1,76 @@
 import Phaser from 'phaser';
+import { getLevel } from '../config/levels';
+import { THEME, themeColor, type ColorName } from '../config/theme';
 import { GameEvents, type GameEventPayloads } from '../contracts';
 import { addMuteButton } from '../platform/audio';
-import { BASE_HUD_FONT, hudScale } from '../platform/layout';
+import { hudScale } from '../platform/layout';
+import { prefersReducedMotion } from '../platform/motion';
 import { parseDebugFps } from './debug';
 import type { HudInitData } from './GameScene';
 import { ArmourIndicator } from './hud/ArmourIndicator';
 import { CoinCounter } from './hud/CoinCounter';
+import { FunkButton } from './hud/FunkButton';
+import {
+  FUNK_GLYPH_H,
+  FunkPanel,
+  funkScale,
+  funkText,
+  measureFunk,
+  setFunk,
+  type FunkChip,
+} from './hud/FunkPanel';
+import {
+  energyRatio,
+  energySegments,
+  formatTime,
+  isEnergyLow,
+  isTimerWarning,
+  layoutRow,
+} from './hud/hudMath';
 import { PowerIndicators } from './hud/PowerIndicators';
+import { BATCH_LABELS } from './menu/levelGroups';
+
+export { formatTime };
 
 const GAME_KEY = 'GameScene';
-const FONT = 'monospace';
-const HP_BAR_W = 100;
-const HP_BAR_H = 8;
-/** Touch target: at least 32x32 logical pixels. */
-const BUTTON_SIZE = 32;
-/** HUD row 2 layout in logical pixels per scale unit (candidates for the config). */
-const ROW_COIN_W = 36;
-const ROW_STEP = 40;
-const ROW_PANEL_W = 290;
+/** Outer margin and chip gap in arena units at k = 1 (candidates for the config). */
+const MARGIN = 8;
+const CHIP_GAP = 4;
+/** The HUD factor is capped so energy, timer and buttons never collide on small screens. */
+const MAX_K = 1.4;
+const PAUSE_DEPTH = 100;
 
-/** Formats seconds as m:ss. */
-export function formatTime(totalSec: number): string {
-  const s = Math.max(0, Math.ceil(Number.isFinite(totalSec) ? totalSec : 0));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-}
-
-/** Overlay for timer, HP, coins, power states and the pause button. Listens to GameScene events. */
+/** Overlay for energy, timer, chips, pause and mute buttons. Listens to GameScene events. */
 export class HudScene extends Phaser.Scene {
-  private timerText!: Phaser.GameObjects.Text;
-  private hpFill!: Phaser.GameObjects.Rectangle;
   private coinCounter!: CoinCounter;
   private powers!: PowerIndicators;
   private armour!: ArmourIndicator;
+  private chipRow: FunkChip[] = [];
+  private rowY = 0;
+  private k = 1;
+
+  private energyPanel!: FunkPanel;
+  private energyNum!: Phaser.GameObjects.BitmapText;
+  private energyLabel!: Phaser.GameObjects.BitmapText;
+  private segGfx!: Phaser.GameObjects.Graphics;
+  private segW = 8;
+  private segH = 6;
+  private segGap = 2;
+  private segX = 0;
+  private segY = 0;
+  private energyLow = false;
+
+  private timerPanel!: FunkPanel;
+  private timerText!: Phaser.GameObjects.BitmapText;
+  private timerSec = 0;
+  private overtime = false;
+
   private pauseOverlay!: Phaser.GameObjects.Container;
-  private fpsText?: Phaser.GameObjects.Text;
+  private pauseInfo!: Phaser.GameObjects.BitmapText;
+  private levelId = 0;
+
+  private blinks = new Map<string, Phaser.Tweens.Tween>();
+  private fpsText?: Phaser.GameObjects.BitmapText;
   private gameEvents?: Phaser.Events.EventEmitter;
 
   constructor() {
@@ -43,43 +80,26 @@ export class HudScene extends Phaser.Scene {
   create(data: HudInitData): void {
     const { width, height } = this.scale;
     this.fpsText = undefined;
+    this.chipRow = [];
+    this.blinks = new Map();
+    this.timerSec = 0;
+    this.overtime = false;
+    this.energyLow = false;
+    this.levelId = Number.isFinite(data?.levelId) ? data.levelId : 0;
 
-    this.add.image(14, 14, 'ui-icons', 0);
-    this.add
-      .rectangle(26, 14, HP_BAR_W + 2, HP_BAR_H + 2, 0x000000, 0.6)
-      .setOrigin(0, 0.5)
-      .setStrokeStyle(1, 0xffffff, 0.8);
-    this.hpFill = this.add.rectangle(27, 14, HP_BAR_W, HP_BAR_H, 0xe74c3c).setOrigin(0, 0.5);
+    const k = Math.min(MAX_K, hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight));
+    this.k = k;
+    const m = Math.round(MARGIN * k);
 
-    this.timerText = this.add
-      .text(width / 2, 14, '', { fontFamily: FONT, fontSize: '16px', color: '#ffffff' })
-      .setOrigin(0.5)
-      .setStroke('#000000', 3);
-
-    // Second row: coins, double shot, shield, rapid fire, armour. On small screens (k > 1)
-    // sizes grow and the row sits on a dark panel. Values are config candidates.
-    const k = hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight);
-    const fontPx = Math.round(BASE_HUD_FONT * k);
-    const y = k > 1 ? 26 + 11 * k : 36;
-    const coinX = 14;
-    const powersX = coinX + ROW_COIN_W * k;
-    if (k > 1) {
-      this.add
-        .rectangle(6, 26, ROW_PANEL_W * k, 22 * k, 0x000000, 0.55)
-        .setOrigin(0, 0);
-    }
-    this.coinCounter = new CoinCounter(this, coinX + 4 * (k > 1 ? 1 : 0), y, k, fontPx);
-    this.powers = new PowerIndicators(this, powersX, y, ROW_STEP * k, k, fontPx);
-    this.armour = new ArmourIndicator(this, this.powers.nextX(k), y, k, fontPx);
-
-    this.createPauseButton(width);
-    addMuteButton(this, width - BUTTON_SIZE * 1.5 - 8, BUTTON_SIZE / 2 + 4);
-    this.pauseOverlay = this.createPauseOverlay(width, height);
+    this.createEnergy(m, k);
+    this.createTimer(width, m, k);
+    const btn = Math.round(THEME.sizePx['size.target'] * Math.max(1, k));
+    this.createButtons(width, m, btn);
+    this.createChips(m, k);
+    this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
-      this.fpsText = this.add
-        .text(width - 4, height - 4, '', { fontFamily: FONT, fontSize: '10px', color: '#00ff00' })
-        .setOrigin(1, 1);
+      this.fpsText = funkText(this, width - 4, height - 4, '', 1, 'hud.accent').setOrigin(1, 1);
     }
 
     this.setHp(data?.hp ?? 0, data?.maxHp ?? 1);
@@ -102,45 +122,106 @@ export class HudScene extends Phaser.Scene {
   }
 
   update(): void {
-    this.fpsText?.setText(`${Math.round(this.game.loop.actualFps)} fps`);
+    if (this.fpsText) setFunk(this.fpsText, `${Math.round(this.game.loop.actualFps)} FPS`, 'hud.accent');
   }
 
-  private createPauseButton(width: number): void {
-    const x = width - BUTTON_SIZE / 2 - 4;
-    const y = BUTTON_SIZE / 2 + 4;
-    const bg = this.add
-      .rectangle(x, y, BUTTON_SIZE, BUTTON_SIZE, 0x000000, 0.5)
-      .setStrokeStyle(1, 0xffffff, 0.8)
-      .setInteractive({ useHandCursor: true });
-    this.add
-      .text(x, y, 'II', { fontFamily: FONT, fontSize: '14px', color: '#ffffff' })
-      .setOrigin(0.5);
-    bg.on('pointerover', () => bg.setFillStyle(0x333333, 0.7));
-    bg.on('pointerout', () => bg.setFillStyle(0x000000, 0.5));
-    bg.on('pointerup', this.togglePause, this);
+  /** Boss overtime: the timer shows "BOSS!". Only a state, wired up in AP-20. */
+  setOvertime(on: boolean): void {
+    this.overtime = on === true;
+    this.refreshTimer();
   }
 
-  private createPauseOverlay(width: number, height: number): Phaser.GameObjects.Container {
+  /** Energy panel: number (3x), label and ten segments. */
+  private createEnergy(m: number, k: number): void {
+    const numScale = funkScale(3, k);
+    const labScale = funkScale(1, k);
+    const pad = Math.round(8 * k);
+    const numW = measureFunk(this, '100', numScale);
+    this.segW = Math.round(8 * k);
+    this.segH = Math.round(6 * k);
+    this.segGap = Math.max(2, Math.round(2 * k));
+    const count = THEME.sizeCount['size.energy-segments'];
+    const segsW = count * this.segW + (count - 1) * this.segGap;
+    const labW = measureFunk(this, 'ENERGIE!', labScale);
+    const gap = Math.round(8 * k);
+    const w = pad * 2 + numW + gap + Math.max(segsW, labW);
+    const h = FUNK_GLYPH_H * numScale + pad * 2;
+    this.energyPanel = new FunkPanel(this, m, m, w, h, true);
+    this.energyNum = funkText(this, m + pad, m + h / 2, '0', numScale, 'hud.text').setOrigin(0, 0.5);
+    const blockH = FUNK_GLYPH_H * labScale + Math.round(4 * k) + this.segH;
+    const top = m + (h - blockH) / 2;
+    const bx = m + pad + numW + gap;
+    this.energyLabel = funkText(this, bx, top, 'ENERGIE', labScale, 'hud.text-muted');
+    this.segX = bx;
+    this.segY = top + FUNK_GLYPH_H * labScale + Math.round(4 * k);
+    this.segGfx = this.add.graphics();
+    this.rowY = m + h + Math.round(CHIP_GAP * k);
+  }
+
+  private createTimer(width: number, m: number, k: number): void {
+    const scale = funkScale(3, k);
+    const pad = Math.round(8 * k);
+    const w = Math.max(measureFunk(this, '10:00', scale), measureFunk(this, 'BOSS!', scale)) + pad * 2;
+    const h = FUNK_GLYPH_H * scale + pad * 2;
+    this.timerPanel = new FunkPanel(this, Math.round(width / 2 - w / 2), m, w, h);
+    this.timerText = funkText(this, width / 2, m + h / 2, '0:00', scale, 'hud.text').setOrigin(0.5);
+  }
+
+  private createButtons(width: number, m: number, size: number): void {
+    const px = width - m - size / 2;
+    const y = m + size / 2;
+    new FunkButton(this, px, y, {
+      icon: { key: 'ui-icons', frame: 2 },
+      width: size,
+      height: size,
+      onClick: () => this.togglePause(),
+    });
+    addMuteButton(this, px - size - 8, y, 'hud');
+  }
+
+  /** Chip row: coins always, power chips and the fire ring only while active. */
+  private createChips(m: number, k: number): void {
+    const relayout = (): void => this.relayoutChips(m);
+    this.coinCounter = new CoinCounter(this, k, relayout);
+    this.powers = new PowerIndicators(this, k, relayout);
+    this.armour = new ArmourIndicator(this, k, relayout);
+    this.chipRow = [this.coinCounter.chip, ...this.powers.chips, this.armour.chip];
+    this.relayoutChips(m);
+  }
+
+  private relayoutChips(m: number): void {
+    if (this.chipRow.length === 0) return;
+    const xs = layoutRow(
+      this.chipRow.map((c) => (c.visible ? c.width : null)),
+      Math.round(CHIP_GAP * this.k),
+      m,
+    );
+    this.chipRow.forEach((c, i) => {
+      const x = xs[i];
+      if (x !== null) c.setPosition(x, this.rowY);
+    });
+  }
+
+  private createPauseOverlay(width: number, height: number, k: number): Phaser.GameObjects.Container {
+    const scrim = themeColor('hud.scrim');
     const dim = this.add
-      .rectangle(0, 0, width, height, 0x000000, 0.6)
+      .rectangle(0, 0, width, height, scrim.num, scrim.alpha ?? 1)
       .setOrigin(0)
       .setInteractive();
     dim.on('pointerup', this.togglePause, this);
-    const title = this.add
-      .text(width / 2, height / 2 - 12, 'Pause', {
-        fontFamily: FONT,
-        fontSize: '24px',
-        color: '#ffffff',
-      })
-      .setOrigin(0.5);
-    const hint = this.add
-      .text(width / 2, height / 2 + 16, 'Tippen, Esc oder P zum Weiterspielen', {
-        fontFamily: FONT,
-        fontSize: '10px',
-        color: '#cccccc',
-      })
-      .setOrigin(0.5);
-    return this.add.container(0, 0, [dim, title, hint]).setDepth(100).setVisible(false);
+    const cy = Math.round(height * 0.33);
+    const title = funkText(this, width / 2, cy, '— PAUSE —', funkScale(4, k), 'hud.text').setOrigin(0.5);
+    const lab = funkScale(1, k);
+    this.pauseInfo = funkText(this, width / 2, cy + Math.round(36 * k), '', lab, 'hud.text-muted').setOrigin(0.5);
+    const hint = funkText(
+      this,
+      width / 2,
+      cy + Math.round(52 * k),
+      'TIPPEN, ESC ODER P ZUM WEITERSPIELEN',
+      lab,
+      'hud.accent',
+    ).setOrigin(0.5);
+    return this.add.container(0, 0, [dim, title, this.pauseInfo, hint]).setDepth(PAUSE_DEPTH).setVisible(false);
   }
 
   private togglePause(): void {
@@ -149,6 +230,12 @@ export class HudScene extends Phaser.Scene {
   }
 
   private onGamePaused(): void {
+    const level = getLevel(this.levelId);
+    const biome = level ? BATCH_LABELS[level.batch] : '';
+    const parts = [`LEVEL ${this.levelId}`];
+    if (biome) parts.push(biome);
+    parts.push(`${formatTime(this.timerSec)} ÜBRIG`);
+    setFunk(this.pauseInfo, parts.join(' · '), 'hud.text-muted');
     this.pauseOverlay.setVisible(true);
   }
 
@@ -177,17 +264,82 @@ export class HudScene extends Phaser.Scene {
   }
 
   private setHp(hp: number, maxHp: number): void {
-    const ratio = maxHp > 0 ? Phaser.Math.Clamp(hp / maxHp, 0, 1) : 0;
-    this.hpFill.width = HP_BAR_W * ratio;
+    const ratio = energyRatio(hp, maxHp);
+    const low = isEnergyLow(ratio);
+    this.energyLow = low;
+    const color: ColorName = low ? 'hud.energy-low' : 'hud.text';
+    const shown = Number.isFinite(hp) ? Math.max(0, Math.ceil(hp)) : 0;
+    setFunk(this.energyNum, String(shown), color);
+    setFunk(this.energyLabel, low ? 'ENERGIE!' : 'ENERGIE', low ? 'hud.energy-low' : 'hud.text-muted');
+    this.energyPanel.setStyle({ line: low ? 'hud.energy-low' : 'hud.line' });
+    this.drawSegments(ratio, low);
+    this.setBlink('energy', low, [this.energyPanel.gfx, this.energyNum, this.energyLabel, this.segGfx]);
+  }
+
+  private drawSegments(ratio: number, low: boolean): void {
+    const g = this.segGfx;
+    const fill = themeColor(low ? 'hud.energy-low' : 'hud.energy').num;
+    const outline = themeColor(low ? 'red.700' : 'hud.line').num;
+    g.clear();
+    energySegments(ratio, THEME.sizeCount['size.energy-segments']).forEach((s, i) => {
+      const x = this.segX + i * (this.segW + this.segGap);
+      if (s === 'full') {
+        g.fillStyle(fill, 1);
+        g.fillRect(x, this.segY, this.segW, this.segH);
+      } else {
+        if (s === 'half') {
+          g.fillStyle(fill, 1);
+          g.fillRect(x, this.segY, Math.floor(this.segW / 2), this.segH);
+        }
+        g.lineStyle(1, outline, 1);
+        g.strokeRect(x + 0.5, this.segY + 0.5, this.segW - 1, this.segH - 1);
+      }
+    });
   }
 
   private setTimer(sec: number): void {
-    this.timerText.setText(formatTime(sec));
+    this.timerSec = Number.isFinite(sec) ? Math.max(0, sec) : 0;
+    this.refreshTimer();
+  }
+
+  /** Timer text: "BOSS!" in overtime, else m:ss; warning below 10 s (colour and outline). */
+  private refreshTimer(): void {
+    const warn = this.overtime || isTimerWarning(this.timerSec);
+    const color: ColorName = warn ? 'hud.danger' : 'hud.text';
+    setFunk(this.timerText, this.overtime ? 'BOSS!' : formatTime(this.timerSec), color);
+    this.timerPanel.setStyle({ line: warn ? 'hud.danger' : 'hud.line' });
+    this.setBlink('timer', warn && !this.overtime, [this.timerPanel.gfx, this.timerText]);
+  }
+
+  /** Blinking is only a hint on top of text and outline; not with reduced motion. */
+  private setBlink(id: string, on: boolean, targets: Phaser.GameObjects.GameObject[]): void {
+    const active = on && !prefersReducedMotion();
+    const existing = this.blinks.get(id);
+    if (active && existing) return;
+    if (existing) {
+      existing.stop();
+      this.blinks.delete(id);
+    }
+    for (const t of targets) (t as unknown as { setAlpha(a: number): void }).setAlpha(1);
+    if (!active) return;
+    this.blinks.set(
+      id,
+      this.tweens.add({
+        targets,
+        alpha: 0.55,
+        duration: THEME.motionMs['motion.blink'],
+        yoyo: true,
+        repeat: -1,
+      }),
+    );
   }
 
   private cleanup(): void {
     this.input.keyboard?.off('keydown-ESC', this.togglePause, this);
     this.input.keyboard?.off('keydown-P', this.togglePause, this);
+    for (const t of this.blinks.values()) t.stop();
+    this.blinks.clear();
+    this.chipRow = [];
     if (this.gameEvents) {
       this.gameEvents.off(GameEvents.HpChanged, this.onHp, this);
       this.gameEvents.off(GameEvents.TimerTick, this.onTimer, this);
