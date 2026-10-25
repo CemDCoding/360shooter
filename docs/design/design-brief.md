@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** entwurf
-**Stand:** Interview Runden 1 und 2 beantwortet. Nächste Runde: Zelda-Bezug, HP-Darstellung, Biom-Rahmen, Schriftwahl.
+**Stand:** Interview abgeschlossen (Runden 1–3). Schritt 3: drei Richtungen als Mockups (Menü + HUD).
 
 ## Ausgangslage
 
@@ -26,6 +26,9 @@
 - **Abgrenzung:** kein wuseliger, überladener Survivor-Look mit Zahlenregen und grellen Effekten.
 - **Lesbarkeit (5b):** größeres HUD zugunsten der Lesbarkeit auf dem iPhone, auch wenn es mehr Spielfläche verdeckt. Zustände nie nur über Farbe (Icon + Zahl).
 - **Dichte und Ton (8a):** Menü ruhig und luftig wie ein Raumschiff-Terminal, HUD kompakt und sachlich, verspielt nur Astronautin, Münzen und Treffer (kurze Animationen, abschaltbar bei reduzierter Bewegung). **Arcade-Retro-Anteil bleibt** erhalten.
+- **Lebenspunkte (9a):** Metroid-Stil: große Pixelzahl „ENERGIE 87“ + Segmentbalken (10 Segmente). Zelda prägt Menü, Münzen und Items.
+- **Level-Auswahl (10b):** bleibt ein Raster, kein Umbau zur Weltkarte. Gestaltung: gruppiert nach Biom.
+- **UI und Biom (11a):** Das Visier-UI ist in allen Biomen gleich (Anker der Figur). Biom-Farben nur in der Welt und als Akzent auf dem Ergebnis-Screen.
 - **Bleibt aus dem Bestand:** das Spielerporträt (animierte Astronautin) neben dem Spielerlevel im Startmenü, ausdrücklicher Wunsch des Nutzers.
 - **Logo und Icons (6a):** Pixel-Schriftzug „360shooter“ als Logo (Name bleibt, angenommen) und neue App-Icons (Helm mit Visier-Rahmen) als SVG-Vorlage.
 
@@ -48,6 +51,7 @@
 
 - 2026-10-25 Nutzer: 1a Umfang UI + Sprite-Styleguide · 2a niedlich, mutig, geheimnisvoll · 3a Metroid als Haltung, Visier-Rahmen gegen süße Figur · 4a Pixelschrift für Titel und Zahlen, lesbare Schrift für Fließtext
 - 2026-10-25 Nutzer: 5b größeres HUD · 6a Logo-Schriftzug und App-Icons · 7a + Zelda · 8a ruhiges Menü, kompaktes HUD, Arcade-Retro-Anteil behalten, Spielerporträt im Startmenü behalten
+- 2026-10-25 Nutzer: 9a HP als Energiezahl + Segmentbalken · 10b Level-Raster bleibt · 11a Visier-UI unabhängig vom Biom
 
 ## Übergabe an den Planner
 
