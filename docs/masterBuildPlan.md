@@ -9,7 +9,7 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 # Master-Build-Plan 360shooter
 
-**Stand:** 2026-10-25 · **Planversion:** 1 · **Gepflegt von:** ma-planner · **Gesteuert von:** ma-lead · **Nutzer:** Cem Dogan
+**Stand:** 2026-10-26 · **Planversion:** 1 · **Gepflegt von:** ma-planner · **Gesteuert von:** ma-lead · **Nutzer:** Cem Dogan
 
 360shooter ist ein 2D-Pixel-Survival-Shooter im Metroid-Stil für Handy und PC. Eine Astronautin steht in der Bildschirmmitte, dreht sich um 360° und schießt automatisch mit einer Laserpistole in Blickrichtung. Sie muss in jeder Runde überleben, bis der Timer abläuft. Monster greifen von allen Seiten an. Der erste Stich umfasst die Level 0–20 (Batches Wald, Wald bei Nacht, Elfenwald) und läuft nur lokal. Grundlage ist die Idee in `idee.txt`. Meilensteine und Pakete folgen nach G1.
 
@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-26 · AP-64 (N3) gemergt · `dev` auf 49bd360, gepusht, Checks grün (Install, lint, typecheck, 419/419 Tests, assets:check, build). **Autonomer Modus** (PE-69): Lead arbeitet ohne Freigabe pro Meilenstein weiter, bis „stop“.
-- **Fertig:** AP-01–AP-19, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-63, AP-64, AP-65, AP-67, M0-DEP, M1-DEP, M2-DEP, M2b-DEP. AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
-- **Bereit:** AP-20 (Boss-Einbindung, M, sonnet high, Design-Review ja; AP-17–19 und AP-67 gemergt). **Blockiert:** AP-66 (Designer-Ergänzung H-14, AP-20). **Offen:** M3-DEP nach AP-20. M2c-DEP-Wiederholung [Mensch] blockiert M3 nicht (PE-69).
-- **Laufend oder unterbrochen:** Keine laufende Arbeit. Der Nutzer pausiert um ca. 00:15 und macht danach mit `& "D:\Private Projekte\MultiAgent\start-agent.ps1" -Project "D:\Private Projekte\360shooter" -Role lead` weiter. Budget nicht im Wellenauftrag gemeldet, Stand in `.claude/ma-usage.json` prüfen.
-- **Erkenntnisse (Details §18):** `dev` ist erst nach AP-20 durchspielbar (alle Level haben `bossId`, der Timer bleibt sonst bei 0:00). Deshalb kein PR `dev` → `stage` vor AP-20. AP-67 liefert die Schnittstellen für AP-20 (`BossBase.isInvulnerable`, `RootSpike.laserHit()`, `BOSS_TUNING`). AP-65 liefert `slotStatus(state, id, blocked)` für AP-66, `blocked` kommt aus der Szene. AP-63: wahrscheinlichste Ursache ist eine veraltete Startmessung, nicht am Gerät bestätigt.
-- **Nächster Schritt:** Lead startet AP-20 (AP-64 ist gemergt). Danach M3-DEP [Mensch]. AP-66 erst nach H-14 und AP-20. Weitere offene M3-Pakete außer AP-20 gibt es nicht.
-- **Offene Fragen an den Nutzer:** (1) PE-34 und PE-75 (Boss-Verhalten, Fairness) bestätigen. Zu bestätigen (angenommen): PE-41, PE-43 bis PE-45, PE-66, PE-67, Baum-HP 50 und Radiusfaktor 0,65 (AP-56), Stick-Größe Q-32. (2) Designer-Interview für den Lagerplatz (H-14) starten (`start-agent.ps1 -Role designer`). (3) Handtest-Liste nach M3 [Mensch]: iPhone-Lesbarkeit, Waffe, Stick am PC, Baum-Despawn, Gold-Magnet (AP-64), Boss-Fairness (Knospe, Ringwurzeln, Geisterkugeln, Stein-Beschuss). Dazu die Homescreen-App neu laden (ggf. löschen und neu hinzufügen); passt das Bild nicht, Foto von `?layout=1` senden.
+- **Stand:** 2026-10-26 · AP-20 (M3 W3, Boss-Einbindung) gemergt (95ee5c6) · `dev` auf 95ee5c6, gepusht, Checks grün (Install, lint, typecheck, 419/419 Tests, assets:check, build). **Autonomer Modus** (PE-69): Lead arbeitet ohne Freigabe pro Meilenstein weiter, bis „stop“.
+- **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-63, AP-64, AP-65, AP-67, M0-DEP, M1-DEP, M2-DEP, M2b-DEP. AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
+- **Bereit:** M3-DEP [Mensch] (Abnahme M3 am PC und iPhone, Smoke-Test und Handtest-Liste in §12). Keine Coder-Pakete bereit. **Blockiert:** AP-66 (wartet auf die Designer-Ergänzung H-14; AP-20 und AP-65 sind fertig). **Offen [Mensch]:** H-12 (M2c-DEP-Wiederholung, blockiert M3 nicht, PE-69).
+- **Laufend oder unterbrochen:** Keine laufende Arbeit. Budget nicht im Wellenauftrag gemeldet, Stand in `.claude/ma-usage.json` prüfen.
+- **Erkenntnisse (Details §18):** `createBoss(scene, bossId, levelId, ctx)`, der dritte Parameter ist `levelId`. Die Boss-Leiste sitzt unten mittig nach Mockup `runde.html` 3, nicht oben. Bei lebendem Boss kommt nur halb so oft ein Gegner, und der Feuerring trifft Bosse nicht. Design-Lücken für den Designer: Banner „BOSS KOMMT!“, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste. Prettier-Altlast in GameScene, HudScene und ResultScene, kein Check in §3.
+- **Nächster Schritt:** Nutzer führt M3-DEP durch (Handtest PC und iPhone). Danach H-14 (Designer-Interview), dann Lead startet AP-66.
+- **Offene Fragen an den Nutzer:** (1) PE-34 und PE-75 (Boss-Verhalten, Fairness) im Handtest bestätigen. (2) Designer-Interview für H-14 starten (`start-agent.ps1 -Role designer`), inklusive der Boss-Lücken. (3) Handtest-Befunde aus M2c-DEP-Wiederholung und M3-DEP sammeln; passt das Homescreen-Bild nicht, Foto von `?layout=1` senden.
 
 <!-- Ende Lagebericht -->
 
@@ -755,6 +755,7 @@ flowchart TD
   - [ ] Jeder Angriff wird vorher sichtbar angekündigt (fair)
   - [ ] **Fairness bei fester Spielerin (PE-75, AP-67, Handtest):** Baummonster: Die Wurzelknospe unter der Astronautin lässt sich abschießen, der Schaden sinkt mit jedem Treffer. Wurzelring: Die Wurzeln ziehen sich von außen zusammen, einzelne lassen sich abschießen, die Lücke ist sichtbar. Waldgeist: Geisterkugeln lassen sich abschießen und brauchen etwa 1 s bis zur Astronautin; in der Fade-Phase gehen Laser durch den Geist, ohne verbraucht zu werden. Riesen-Stein: Der Rollangriff bleibt unausweichlich (Gegenwehr nur durch Beschuss des Steins), prüfen, ob das als fair empfunden wird. Zerbrechen: Teilsteine überlappen weder die Mitte noch bleiben sie hängen
   - [ ] Design: Boss-Lebensleiste und Timer-Label im Funk-Stil (Brief `runde.html` 3, Text „BOSS!“ laut Q-31), Warnanzeigen in Warnrot, keine Farb-Literale in den Boss-Dateien (Design-Review AP-20)
+  - [ ] Handtest AP-20 (Coder-Bericht, Details §18): Warnung bei 1:03, Boss bei 1:00, Leiste unten mittig, Overtime „BOSS!“, Baummonster-Knospe und Ring, Waldgeist-Kugeln und Fade, Stein-Roll und Teilsteine, Niederlage und „Nochmal“ ohne Reste, Pause, Feuerring trifft Bosse nicht, halbe Gegner-Spawnrate bei lebendem Boss
 
 ---
 
@@ -824,12 +825,12 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-18 | Boss Waldgeist (Nacht 5–9) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – (gemergt d1c5e48) | fertig (Review Runde 1 bestanden, 369/369) |
 | AP-19 | Boss Riesen-Stein (Elfenwald 10–20) | M3 | GAME | W2 | AP-16 | M | sonnet (medium) | – (gemergt 74fc6f5) | fertig (Review Runde 1 bestanden, 369/369) |
 | AP-67 | Fix: Boss-Fairness bei fester Spielerin, Konfig-Werte, Robustheit (PE-75) | M3 | GAME/SH | W2b | AP-17, AP-18, AP-19 (fertig) | M | sonnet (high) | – (gemergt b808ed8) | fertig (Review Runde 2 bestanden; Runde 1 behoben) |
-| AP-20 | Boss-Einbindung | M3 | GAME | W3 | AP-17–19, **AP-67** | M | sonnet (high) | – | bereit (AP-67 gemergt) |
-| M3-DEP | Abnahme M3 | M3 | HUM | W4 | AP-20 | H | – | – | offen |
+| AP-20 | Boss-Einbindung | M3 | GAME | W3 | AP-17–19, **AP-67** | M | sonnet (high) | – (gemergt 95ee5c6) | fertig (Review Runde 1 bestanden; Design-Review Runde 2 bestanden nach Fix e5ae90f; 419/419 Tests) |
+| M3-DEP | Abnahme M3 | M3 | HUM | W4 | AP-20 | H | – | – | bereit (Handtest [Mensch] offen) |
 | AP-63 | Fix: iPhone Homescreen-App (Standalone), Bild zu groß (PE-71, Q-35, Folge von AP-61) | Nachtrag 2 | GAME/OPS | N3 | AP-61 (fertig); parallel zu AP-16 möglich | M | sonnet (high) | – (gemergt 1b89792) | fertig (Review Runde 1 bestanden; Ursache nicht am Gerät bestätigt, Handtest offen) |
 | AP-64 | Gold-Magnet weicher (Beschleunigung statt konstant 320 px/s, PE-72, Q-36) | Nachtrag 2 | LOG/GAME | N3 | AP-29, AP-31 (fertig); parallel zu AP-16 möglich | S | sonnet (medium) | – (gemergt 49bd360) | fertig (Review Runde 1 bestanden, 419/419 Tests; Handtest offen) |
 | AP-65 | Power-up-Lagerplatz: Vertrag, Config, Logik (PE-70, Q-34) | Nachtrag 2 | SH/LOG | N4 | AP-16, AP-30, AP-37a (alle fertig) | M | sonnet (high) | – (gemergt 4b20704) | fertig (Review Runde 1 bestanden) |
-| AP-66 | Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung in die Spielszene (PE-70, Q-34; Design-Review ja) | Nachtrag 2 | GAME | N5 | AP-65, AP-20 (gleiche Szenendateien); **Designer-Ergänzung in `docs/design/` (Lagerplatz-Symbol, HUD-Platz)** | L | sonnet (high) | – | blockiert (Designer-Ergänzung, AP-20, AP-65; Nutzer wartet auf den Designer, PE-74) |
+| AP-66 | Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung in die Spielszene (PE-70, Q-34; Design-Review ja) | Nachtrag 2 | GAME | N5 | AP-65, AP-20 (gleiche Szenendateien); **Designer-Ergänzung in `docs/design/` (Lagerplatz-Symbol, HUD-Platz)** | L | sonnet (high) | – | blockiert (Designer-Ergänzung H-14; AP-20 und AP-65 fertig; Nutzer wartet auf den Designer, PE-74) |
 
 ---
 
@@ -2968,7 +2969,7 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 - **Nicht anfassen:** `src/logic/*`, `src/config/*`, übrige Boss-Dateien (auch `BossBase.ts`: den Getter `isInvulnerable` liefert AP-67)
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
-  1. `createBoss(scene, bossId, variant)`: Fabrik für die drei Bosse.
+  1. `createBoss(scene, bossId, levelId, ctx)`: Fabrik für die drei Bosse. Der dritte Parameter ist `levelId` statt `variant`; die Konstruktoren bilden die Variante selbst (`variantForLevel`). Angepasst nach AP-20 (§18).
   2. `GameScene`:
      - Bei `boss-warning` zeigt sie „Boss kommt!“ für 3 s und spielt `boss-warning`.
      - Bei Boss-Start erscheint der Boss aus einer zufälligen Richtung.
@@ -2977,7 +2978,7 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
        - Boss-Angriffe ↔ Spielerin
        - Spawn-Callbacks (Baummonster)
      - `bossDefeated` an `RoundState`, dazu der Sound `boss-defeated`.
-  3. `HudScene`: Boss-HP-Leiste oben mit Namen (deutsch: „Verwurzeltes Baummonster“, „Waldgeist“, „Riesen-Stein“) im Funk-Stil nach `runde.html` 3 (Vorschlag des Designers für M3), mit `FunkPanel` aus AP-53, Farben nur aus `theme.ts`. Das Timer-Panel hat seit AP-53 den Zustand `setOvertime(on)` mit dem Label „BOSS!“. AP-20 schaltet ihn ein, sobald der Timer abgelaufen ist und der Boss lebt. Der Text des Labels ist „BOSS!“ laut Design (statt „Boss besiegen!“), vom Nutzer bestätigt am 2026-10-25 (Q-31).
+  3. `HudScene`: Boss-Lebensleiste unten mittig (x 220, top 334, Breite 200·Skalierung, wie Mockup `runde.html` 3; angepasst nach AP-20, §18) mit Namen, bei zu wenig Platz fällt der Name auf Skalierung 1 zurück (deutsch: „Verwurzeltes Baummonster“, „Waldgeist“, „Riesen-Stein“) im Funk-Stil nach `runde.html` 3 (Vorschlag des Designers für M3), mit `FunkPanel` aus AP-53, Farben nur aus `theme.ts`. Das Timer-Panel hat seit AP-53 den Zustand `setOvertime(on)` mit dem Label „BOSS!“. AP-20 schaltet ihn ein, sobald der Timer abgelaufen ist und der Boss lebt. Der Text des Labels ist „BOSS!“ laut Design (statt „Boss besiegen!“), vom Nutzer bestätigt am 2026-10-25 (Q-31).
   4. `ResultScene`: zeigt „Boss besiegt“.
   5. **Szenen-Vertrag der Bosse (Ist-Stand nach AP-17 bis AP-19, ergänzt um AP-67; bei Abweichung gilt der gemergte Code, Abweichungen meldet der Coder):**
      - Alle Bosse: Die Szene ruft `boss.update(time, delta)` genau einmal je Frame und Boss auf und am Ende (Sieg, Niederlage, „Nochmal“, Szenenende) `boss.despawn()`. Laser prüfen den Boss mit `takeDamage(amount)`; ist `boss.isInvulnerable` (Getter aus AP-67) wahr, gehen Laser **durch**: nicht verbrauchen, kein Treffer-Ton, kein Blitz. Kontaktschaden des Körpers über `contactDamageFor(dtMs)`. Schaden an der Astronautin immer über `Player.takeDamage` (Schild zuerst). `BossBase` ruft `despawn()` schon im Konstruktor: Unterklassen sichern mit `?.`/`??`, die Szene darf `despawn()` jederzeit mehrfach aufrufen
@@ -3016,7 +3017,7 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 | H-11 | Reihenfolge bestätigen: Design-Umsetzung (M2c) nach M2b-DEP und vor M3 (PE-60) | vor M2c W1 | AP-50, AP-51 | ☑ (bestätigt 2026-10-25) |
 | H-12 | Abnahme M2c: Smoke-Test am PC und auf dem iPhone (M2c-DEP), Wiederholung nach N2, inklusive Lesbarkeit von Funk 1× und Kapsel 1× im Querformat | nach N2 (M2c-Nachtrag) | nichts, blockiert M3 nicht (PE-69); Befunde werden Fix-Pakete | ☐ |
 | H-13 | Optional: die 30 Platzhalter-Sprites (Astronautin, Gegner, Items, Bosse) nach `docs/design/mockups/sprites.html` und der Anleitung `docs/guides/grafik-austauschen.md` neu zeichnen. Reiner Dateiaustausch ohne Code. Kein Paket geplant (Brief, Reihenfolge-Empfehlung 5) | jederzeit nach M2c W1 | – | ☐ |
-| H-14 | Designer-Interview für den Power-up-Lagerplatz: Lagerplatz-Symbol, HUD-Platz, Zustände leer, bereit, gesperrt, Mockup, in `docs/design/` (Q-34, Q-37). Der Nutzer startet den Designer (`start-agent.ps1 … -Role designer`), der Lead nicht | vor AP-66 (spätestens bis Ende M3 W3) | AP-66 | ☐ |
+| H-14 | Designer-Interview für den Power-up-Lagerplatz: Lagerplatz-Symbol, HUD-Platz, Zustände leer, bereit, gesperrt, Mockup, in `docs/design/` (Q-34, Q-37), dazu die Boss-Lücken aus §18 (AP-20: Banner „BOSS KOMMT!“, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste). Der Nutzer startet den Designer (`start-agent.ps1 … -Role designer`), der Lead nicht | vor AP-66 (spätestens bis Ende M3 W3) | AP-66 | ☐ |
 
 ---
 
@@ -3509,3 +3510,11 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-25 | Erkenntnis AP-63 (Ursache nicht am Gerät bestätigt): Wahrscheinlichster Kandidat ist eine veraltete Startmessung ohne Neu-Layout (Kandidat a). Rechnung: etwa 10 bis 11 % zu große Arena bei 844 × 390 mit Insets 47/21. Umgesetzt: `clampedArea` (Fläche zusätzlich auf `innerWidth`/`innerHeight` geklemmt), `RELAYOUT_DELAYS_MS` [100, 300, 1000] mit `scheduleRelayout` in `main.ts` (Auslöser `load`, `pageshow`, `visibilitychange`, Orientierung, Display-Modus), Mess-Hilfe `?layout=1` (`src/platform/layoutDebug.ts`). `index.html` und Manifest unverändert. Insets sind Annahmen (iPhone 15: 59/21). Offen, niedrig: `clampedArea` nicht mit gesetztem `visualViewport` getestet; Anzeige unten rechts evtl. vom Home-Balken verdeckt | Review AP-63 Runde 1 | M2c-DEP-Wiederholung, Q-35 | Lead (Pflege) |
 | 2026-10-25 | Erkenntnis Spielbarkeit: `dev` ist erst nach AP-20 durchspielbar. Alle Level haben `bossId`, ohne Boss bleibt der Timer bei 0:00. Deshalb kein PR `dev` → `stage` vor AP-20 | Lead-Auftrag Wellenabschluss M3 W2b | AP-20, §6, M3-DEP | Lead (Pflege) |
 | 2026-10-25 | Erkenntnis AP-65 (Ist-API für AP-66): `createPowerStore()`, `storePower(state, id)` liefert `{ state, accepted }`, `takePower(state, id)` liefert `{ state, taken }`, `slotStatus(state, id, blocked)` liefert `empty`, `ready` oder `blocked`, `canActivate(state, id, blocked)`, `resetPowerStore()`, dazu `STORABLE_POWERS` und `GameEvents.PowerStoreChanged`. Die Szene liefert `blocked` (Kraft aktiv oder Abklingzeit, aus `ActiveArmour` bzw. `rapidFireMsLeft`) | Review AP-65 Runde 1 | AP-66 | Lead (Pflege) |
+| 2026-10-26 | Wellenabschluss M3 W3: AP-20 (merge 95ee5c6, Review Runde 1 bestanden, Design-Review Runde 2 bestanden nach Fix e5ae90f, Befund Namen und BOSS-Tag überlappen behoben). `dev` auf 95ee5c6, gepusht. Checks grün (Install, lint, typecheck, 419/419 Tests, assets:check, build). AP-20 `fertig`, M3-DEP `bereit` ([Mensch] offen), AP-66 weiter `blockiert` (H-14). Lagebericht ersetzt, Stand aktualisiert | Wellenabschluss M3 W3 | §0, §10, AP-20, M3-DEP, AP-66 | Lead (Pflege) |
+| 2026-10-26 | Erkenntnis AP-20 (Signatur, Abweichung vom Plantext): `createBoss(scene, bossId, levelId, ctx)`. Der dritte Parameter ist `levelId` statt `variant`, die Konstruktoren bilden die Variante per `variantForLevel`. Plantext §12 (AP-20 Punkt 1) angepasst | Coder-Bericht AP-20 | AP-20, §12 | Lead (Pflege) |
+| 2026-10-26 | Erkenntnis AP-20 (Boss-Leiste, Design): Die Leiste sitzt unten mittig (x 220, top 334, Breite 200 · Skalierung) nach Mockup `runde.html` 3, nicht oben wie im Plantext. Bei zu wenig Platz fällt der Name auf Skalierung 1 zurück. Design bestätigt: keine Kollision mit dem Stick (Fangfläche ab x = 490). Plantext §12 (AP-20 Punkt 3) angeglichen | Coder-Bericht AP-20, Design-Review Runde 2 | AP-20, §12 | Lead (Pflege) |
+| 2026-10-26 | Erkenntnis AP-20 (Sound und HUD): Sound-Keys `sfx-boss-warning` und `sfx-boss-defeated`. Banner „BOSS KOMMT!“ (Großbuchstaben, der Smoke-Test-Punkt „Boss kommt!“ meint das sinngemäß) in `HudScene` auf das Ereignis `boss-warning`, weg bei `boss-spawned`. Das Overtime-Label „BOSS!“ leitet `HudScene` aus den Ereignissen ab. `ResultSceneData.bossDefeated` ist neu, „BOSS BESIEGT!“ steht als Untertitel in `ResultScene` | Coder-Bericht AP-20 | AP-20, M3-DEP | Lead (Pflege) |
+| 2026-10-26 | Erkenntnis AP-20 (Spawn, Feuerring, Ort): Bei lebendem Boss halbe Gegner-Spawnrate. Der Feuerring trifft Bosse nicht. Der Boss erscheint am Ellipsenrand mit `BOSS_TUNING.giantStone.rim`. Dieser Wert ist für das Baummonster geliehen und niedrig, also Balancing-Kandidat. Siegbedingung PE-18 unverändert: Boss vor 0:00 besiegt, die Runde läuft bis zum Timer-Ende | Coder-Bericht AP-20 | AP-20, `docs/balancing.md` (V-09) | Lead (Pflege) |
+| 2026-10-26 | Design-Lücken für den Designer (zusammen mit H-14): Vorlage für das Banner „BOSS KOMMT!“, Ergebnis nach Boss-Sieg (`ergebnis.html`), Zustände der Boss-Leiste (kritisch, Treffer-Blitz, unverwundbar) | Coder-Bericht AP-20 | H-14, AP-66 (Designer-Interview) | Lead (Pflege) |
+| 2026-10-26 | Befund Prettier (Altlast, nicht durch AP-20): `GameScene`, `HudScene` und `ResultScene` sind schon auf `dev` nicht Prettier-konform, der Check meldet sie. Prettier ist kein Check in §3. Ein Fix braucht ein eigenes Paket, nur auf Wunsch des Nutzers | Coder-Bericht AP-20 | keine Änderung an §3 | Lead (Pflege) |
+| 2026-10-26 | Handtest-Liste AP-20 in M3-DEP (§12) als Smoke-Test-Punkt übernommen: Warnung bei 1:03, Boss bei 1:00, Leiste, Overtime „BOSS!“, Baummonster-Knospe und Ring, Waldgeist-Kugeln und Fade, Stein-Roll und Teilsteine, Niederlage und „Nochmal“ ohne Reste, Pause, Feuerring, halbe Spawnrate | Coder-Bericht AP-20 | M3-DEP | Lead (Pflege) |
