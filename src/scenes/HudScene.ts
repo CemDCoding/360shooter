@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { getLevel } from '../config/levels';
 import { THEME, themeColor, type ColorName } from '../config/theme';
-import { GameEvents, type GameEventPayloads } from '../contracts';
+import { GameEvents, type BossId, type GameEventPayloads } from '../contracts';
 import { addMuteButton } from '../platform/audio';
 import { hudScale } from '../platform/layout';
 import { prefersReducedMotion } from '../platform/motion';
@@ -39,6 +39,14 @@ const CHIP_GAP = 4;
 /** The HUD factor is capped so energy, timer and buttons never collide on small screens. */
 const MAX_K = 1.4;
 const PAUSE_DEPTH = 100;
+/** Boss bar width in arena units at k = 1 (runde.html 3: 200 px, bottom centre). */
+const BOSS_BAR_W = 200;
+const BOSS_BAR_H = 8;
+const BOSS_NAMES: Readonly<Record<BossId, string>> = {
+  rootMonster: 'Verwurzeltes Baummonster',
+  forestGhost: 'Waldgeist',
+  giantStone: 'Riesen-Stein',
+};
 
 /** Overlay for energy, timer, chips, pause and mute buttons. Listens to GameScene events. */
 export class HudScene extends Phaser.Scene {
@@ -65,6 +73,19 @@ export class HudScene extends Phaser.Scene {
   private timerSec = 0;
   private overtime = false;
 
+  private bossBar: {
+    panel: FunkPanel;
+    fill: Phaser.GameObjects.Graphics;
+    name: Phaser.GameObjects.BitmapText;
+    tag: Phaser.GameObjects.BitmapText;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  } | null = null;
+  private bossBanner: { panel: FunkPanel; text: Phaser.GameObjects.BitmapText } | null = null;
+  private bossAlive = false;
+
   private pauseOverlay!: Phaser.GameObjects.Container;
   private pauseInfo!: Phaser.GameObjects.BitmapText;
   private levelId = 0;
@@ -84,6 +105,9 @@ export class HudScene extends Phaser.Scene {
     this.blinks = new Map();
     this.timerSec = 0;
     this.overtime = false;
+    this.bossAlive = false;
+    this.bossBar = null;
+    this.bossBanner = null;
     this.energyLow = false;
     this.levelId = Number.isFinite(data?.levelId) ? data.levelId : 0;
 
@@ -96,6 +120,7 @@ export class HudScene extends Phaser.Scene {
     const btn = Math.round(THEME.sizePx['size.target'] * Math.max(1, k));
     this.createButtons(width, m, btn);
     this.createChips(m, k);
+    this.createBossUi(width, height, m, k);
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
@@ -115,6 +140,10 @@ export class HudScene extends Phaser.Scene {
     this.gameEvents.on(GameEvents.CoinsChanged, this.onCoins, this);
     this.gameEvents.on(GameEvents.PowersChanged, this.onPowers, this);
     this.gameEvents.on(GameEvents.ArmourChanged, this.onArmour, this);
+    this.gameEvents.on(GameEvents.BossWarning, this.onBossWarning, this);
+    this.gameEvents.on(GameEvents.BossSpawned, this.onBossSpawned, this);
+    this.gameEvents.on(GameEvents.BossHpChanged, this.onBossHp, this);
+    this.gameEvents.on(GameEvents.BossDefeated, this.onBossDefeated, this);
     this.gameEvents.on(Phaser.Scenes.Events.PAUSE, this.onGamePaused, this);
     this.gameEvents.on(Phaser.Scenes.Events.RESUME, this.onGameResumed, this);
 
@@ -125,7 +154,7 @@ export class HudScene extends Phaser.Scene {
     if (this.fpsText) setFunk(this.fpsText, `${Math.round(this.game.loop.actualFps)} FPS`, 'hud.accent');
   }
 
-  /** Boss overtime: the timer shows "BOSS!". Only a state, wired up in AP-20. */
+  /** Boss overtime: the timer shows "BOSS!" (on while the timer is over and the boss lives, AP-20). */
   setOvertime(on: boolean): void {
     this.overtime = on === true;
     this.refreshTimer();
@@ -165,6 +194,105 @@ export class HudScene extends Phaser.Scene {
     const h = FUNK_GLYPH_H * scale + pad * 2;
     this.timerPanel = new FunkPanel(this, Math.round(width / 2 - w / 2), m, w, h);
     this.timerText = funkText(this, width / 2, m + h / 2, '0:00', scale, 'hud.text').setOrigin(0.5);
+  }
+
+  /** Boss bar at the bottom centre and the "Boss kommt!" banner, both hidden until needed (runde.html 3). */
+  private createBossUi(width: number, height: number, m: number, k: number): void {
+    const lab = funkScale(1, k);
+    const w = Math.round(BOSS_BAR_W * k);
+    const h = Math.round(BOSS_BAR_H * k);
+    const x = Math.round(width / 2 - w / 2);
+    const y = height - m - h;
+    const panel = new FunkPanel(this, x, y, w, h, false, { line: 'hud.danger' });
+    const fill = this.add.graphics();
+    const name = funkText(this, x, y - 3, '', lab, 'hud.text').setOrigin(0, 1);
+    const tag = funkText(this, x + w, y - 3, 'BOSS', lab, 'hud.danger').setOrigin(1, 1);
+    this.bossBar = { panel, fill, name, tag, x, y, w, h };
+    this.showBossBar(false);
+
+    const scale = funkScale(3, k);
+    const pad = Math.round(8 * k);
+    const label = 'BOSS KOMMT!';
+    const bw = measureFunk(this, label, scale) + pad * 2;
+    const bh = FUNK_GLYPH_H * scale + pad * 2;
+    const by = Math.round(height * 0.28);
+    const bannerPanel = new FunkPanel(this, Math.round(width / 2 - bw / 2), by, bw, bh, true, {
+      line: 'hud.danger',
+      glow: true,
+    });
+    const text = funkText(this, width / 2, by + bh / 2, label, scale, 'hud.danger').setOrigin(0.5);
+    this.bossBanner = { panel: bannerPanel, text };
+    this.showBanner(false);
+  }
+
+  private showBossBar(on: boolean): void {
+    const b = this.bossBar;
+    if (!b) return;
+    b.panel.setVisible(on);
+    b.fill.setVisible(on);
+    b.name.setVisible(on);
+    b.tag.setVisible(on);
+  }
+
+  private showBanner(on: boolean): void {
+    const b = this.bossBanner;
+    if (!b) return;
+    b.panel.setVisible(on);
+    b.text.setVisible(on);
+    this.setBlink('bossBanner', on, [b.panel.gfx, b.text]);
+  }
+
+  private drawBossBar(hp: number, maxHp: number): void {
+    const b = this.bossBar;
+    if (!b) return;
+    const ratio = energyRatio(hp, maxHp);
+    b.fill.clear();
+    b.fill.fillStyle(themeColor('hud.danger').num, 1);
+    b.fill.fillRect(b.x + 1, b.y + 1, Math.round((b.w - 2) * ratio), b.h - 2);
+  }
+
+  private onBossWarning(): void {
+    this.showBanner(true);
+  }
+
+  private onBossSpawned(p: GameEventPayloads['boss-spawned']): void {
+    this.showBanner(false);
+    this.bossAlive = true;
+    if (this.bossBar) {
+      const bar = this.bossBar;
+      const label = BOSS_NAMES[p.bossId] ?? 'Boss';
+      setFunk(bar.name, label, 'hud.text');
+      // Name and "BOSS" must never overlap: fall back to scale 1 when the name is too wide.
+      const lab = funkScale(1, this.k);
+      const gap = Math.round(8 * this.k);
+      const tagW = measureFunk(this, 'BOSS', lab);
+      const fits = measureFunk(this, label, lab) + tagW + gap <= bar.w;
+      const nameScale = fits ? lab : 1;
+      bar.name.setFontSize(FUNK_GLYPH_H * nameScale);
+      if (!fits && measureFunk(this, label, 1) + measureFunk(this, 'BOSS', 1) + gap > bar.w) {
+        bar.tag.setFontSize(FUNK_GLYPH_H);
+      } else {
+        bar.tag.setFontSize(FUNK_GLYPH_H * lab);
+      }
+    }
+    this.drawBossBar(p.hp, p.maxHp);
+    this.showBossBar(true);
+    this.updateOvertime();
+  }
+
+  private onBossHp(p: GameEventPayloads['boss-hp-changed']): void {
+    this.drawBossBar(p.hp, p.maxHp);
+  }
+
+  private onBossDefeated(): void {
+    this.showBanner(false);
+    this.bossAlive = false;
+    this.showBossBar(false);
+    this.updateOvertime();
+  }
+
+  private updateOvertime(): void {
+    this.setOvertime(this.bossAlive && this.timerSec <= 0);
   }
 
   private createButtons(width: number, m: number, size: number): void {
@@ -249,6 +377,7 @@ export class HudScene extends Phaser.Scene {
 
   private onTimer(p: GameEventPayloads['timer-tick']): void {
     this.setTimer(p.remainingSec);
+    this.updateOvertime();
   }
 
   private onCoins(p: GameEventPayloads['coins-changed']): void {
@@ -346,6 +475,10 @@ export class HudScene extends Phaser.Scene {
       this.gameEvents.off(GameEvents.CoinsChanged, this.onCoins, this);
       this.gameEvents.off(GameEvents.PowersChanged, this.onPowers, this);
       this.gameEvents.off(GameEvents.ArmourChanged, this.onArmour, this);
+      this.gameEvents.off(GameEvents.BossWarning, this.onBossWarning, this);
+      this.gameEvents.off(GameEvents.BossSpawned, this.onBossSpawned, this);
+      this.gameEvents.off(GameEvents.BossHpChanged, this.onBossHp, this);
+      this.gameEvents.off(GameEvents.BossDefeated, this.onBossDefeated, this);
       this.gameEvents.off(Phaser.Scenes.Events.PAUSE, this.onGamePaused, this);
       this.gameEvents.off(Phaser.Scenes.Events.RESUME, this.onGameResumed, this);
       this.gameEvents = undefined;

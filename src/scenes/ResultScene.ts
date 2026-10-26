@@ -75,7 +75,7 @@ export class ResultScene extends Phaser.Scene {
       this,
       heroX,
       74 + FUNK_GLYPH_H * 2 + 18,
-      won ? 'DER WALD IST WIEDER STILL.' : 'DIE ASTRONAUTIN ZIEHT SICH ZURÜCK.',
+      won ? (data?.bossDefeated === true ? 'BOSS BESIEGT!' : 'DER WALD IST WIEDER STILL.') : 'DIE ASTRONAUTIN ZIEHT SICH ZURÜCK.',
       this.lab,
       'hud.text-muted',
     ).setOrigin(0, 0.5);
