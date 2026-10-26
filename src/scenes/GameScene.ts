@@ -74,7 +74,7 @@ import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
 import { VirtualStick } from './controls/VirtualStick';
 import { parseDebugLevel, resolveLevelId } from './debug';
-import { powerBlock } from './hud/hudMath';
+import { energyRatio, powerBlock } from './hud/hudMath';
 import { POWER_SLOT_PRESSED } from './hud/PowerSlots';
 
 /** Layout only: distance of the spawn ring beyond the visible corners (pixels). */
@@ -116,6 +116,8 @@ export interface ResultSceneData {
   debugRound: boolean;
   /** The round's boss was defeated (result screen shows "Boss besiegt"). */
   bossDefeated?: boolean;
+  /** Boss level only: share of the boss HP left at the end of the round (0..1, AP-72). */
+  bossHpLeft?: number;
 }
 
 /** Typed emit for the events contract (src/contracts/events.ts). */
@@ -208,6 +210,8 @@ export class GameScene extends Phaser.Scene {
   private bossWarned = false;
   private bossSpawned = false;
   private bossDefeatedFlag = false;
+  /** Last `invulnerable` sent with boss-hp-changed (reset in spawnBoss). */
+  private bossInvulnerable = false;
 
   constructor() {
     super('GameScene');
@@ -482,12 +486,11 @@ export class GameScene extends Phaser.Scene {
 
   private spawnBoss(bossId: NonNullable<LevelDef['bossId']>): void {
     this.bossSpawned = true;
+    this.bossInvulnerable = false;
     const boss = createBoss(this, bossId, this.level.id, {
       center: this.center,
       rng: this.rng,
-      onHpChanged: (hp, maxHp) => {
-        if (!this.ended) emitGameEvent(this.events, GameEvents.BossHpChanged, { hp, maxHp });
-      },
+      onHpChanged: (hp, maxHp) => this.emitBossHp(hp, maxHp),
       onDefeated: () => this.onBossDefeated(bossId),
       onSummonTrees: (positions) => {
         if (this.ended) return;
@@ -506,6 +509,13 @@ export class GameScene extends Phaser.Scene {
     boss.spawn(this.center.x + Math.cos(angle) * rim.rx, this.center.y + Math.sin(angle) * rim.ry);
   }
 
+  /** boss-hp-changed with the invulnerable flag from boss.isInvulnerable (V-12, PE-87). */
+  private emitBossHp(hp: number, maxHp: number): void {
+    if (this.ended) return;
+    this.bossInvulnerable = this.boss?.isInvulnerable === true;
+    emitGameEvent(this.events, GameEvents.BossHpChanged, { hp, maxHp, invulnerable: this.bossInvulnerable });
+  }
+
   private onBossDefeated(bossId: NonNullable<LevelDef['bossId']>): void {
     if (this.bossDefeatedFlag || this.ended) return;
     this.bossDefeatedFlag = true;
@@ -520,6 +530,8 @@ export class GameScene extends Phaser.Scene {
     if (!boss || this.bossDefeatedFlag) return;
     boss.update(time, dt);
     if (this.bossDefeatedFlag || this.player.isDead) return;
+    // The ghost phase changes invulnerability without an HP change: tell the HUD (boss bar "IMMUN").
+    if (boss.isInvulnerable !== this.bossInvulnerable) this.emitBossHp(boss.hp, boss.maxHp);
 
     const parts: BossBase[] = boss instanceof GiantStone ? boss.parts : boss.active ? [boss] : [];
 
@@ -742,7 +754,17 @@ export class GameScene extends Phaser.Scene {
     this.armourDef = null;
     this.armourRing?.hide();
     // Round over (win, timeout or death): the storage is emptied, nothing is saved (PE-70).
+    // The HUD hears about it, so it no longer shows a stale "ready" slot (V-14 a).
     this.powerStore = resetPowerStore();
+    this.emitPowerStore();
+    // Boss HP share left for the result screen (boss level only; not yet appeared = full).
+    const boss = this.boss;
+    const bossParts: BossBase[] = boss instanceof GiantStone ? boss.parts : boss?.active ? [boss] : [];
+    const bossHpLeft = !this.level.bossId
+      ? undefined
+      : boss
+        ? energyRatio(bossParts.reduce((s, p) => s + Math.max(0, p.hp), 0), boss.maxHp)
+        : 1;
     this.despawnBoss();
 
     const xpGained = roundXp(this.killXp, result, PROGRESSION);
@@ -767,6 +789,7 @@ export class GameScene extends Phaser.Scene {
       goldTotal: stored.gold ?? 0,
       debugRound: this.debugRound,
       bossDefeated: this.bossDefeatedFlag,
+      bossHpLeft: this.bossDefeatedFlag ? 0 : bossHpLeft,
     };
     this.scene.stop(HUD_KEY);
     this.scene.start('ResultScene', data);
