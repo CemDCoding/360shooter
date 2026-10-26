@@ -122,7 +122,10 @@
         "danger": "#ff8a7b",
         "glow": "#a8d86b73",
         "scrim": "#0a1108d9",
-        "focus": "#e5f2d8"
+        "focus": "#e5f2d8",
+        "flash": "#a8d86b80",
+        "trail": "#e0c9d6",
+        "danger-dim": "#5a2236"
       },
       "game": {
         "laser-raygun": "#ff8fae",
@@ -177,19 +180,30 @@
       "hud-chip-h": "24px",
       "stick": "88px",
       "stick-knob": "28px",
-      "energy-segments": 10
+      "energy-segments": 10,
+      "hud-slot": "40px",
+      "hud-slot-gap": "8px",
+      "hud-slot-icon-scale": 3
     },
     "motion": {
       "duration": {
         "fast": "80ms",
         "base": "150ms",
         "slow": "300ms",
-        "blink": "500ms"
+        "blink": "500ms",
+        "hit": "120ms",
+        "store-flash": "200ms",
+        "trail": "300ms"
       },
+      "banner-blinks": 3,
       "easing": {
         "pixel": "steps(3)",
         "out": "cubic-bezier(0.2, 0.8, 0.2, 1)"
       }
+    },
+    "opacity": {
+      "dim": 0.35,
+      "ghost": 0.6
     }
   }
 }

@@ -123,7 +123,10 @@ export const tokens = {
       "danger": "var(--color-hud-danger)",
       "glow": "var(--color-hud-glow)",
       "scrim": "var(--color-hud-scrim)",
-      "focus": "var(--color-hud-focus)"
+      "focus": "var(--color-hud-focus)",
+      "flash": "var(--color-hud-flash)",
+      "trail": "var(--color-hud-trail)",
+      "danger-dim": "var(--color-hud-danger-dim)"
     },
     "game": {
       "laser-raygun": "var(--color-game-laser-raygun)",
@@ -174,19 +177,30 @@ export const tokens = {
     "hud-chip-h": "var(--size-hud-chip-h)",
     "stick": "var(--size-stick)",
     "stick-knob": "var(--size-stick-knob)",
-    "energy-segments": "var(--size-energy-segments)"
+    "energy-segments": "var(--size-energy-segments)",
+    "hud-slot": "var(--size-hud-slot)",
+    "hud-slot-gap": "var(--size-hud-slot-gap)",
+    "hud-slot-icon-scale": "var(--size-hud-slot-icon-scale)"
   },
   "motion": {
     "duration": {
       "fast": "var(--motion-duration-fast)",
       "base": "var(--motion-duration-base)",
       "slow": "var(--motion-duration-slow)",
-      "blink": "var(--motion-duration-blink)"
+      "blink": "var(--motion-duration-blink)",
+      "hit": "var(--motion-duration-hit)",
+      "store-flash": "var(--motion-duration-store-flash)",
+      "trail": "var(--motion-duration-trail)"
     },
+    "banner-blinks": "var(--motion-banner-blinks)",
     "easing": {
       "pixel": "var(--motion-easing-pixel)",
       "out": "var(--motion-easing-out)"
     }
+  },
+  "opacity": {
+    "dim": "var(--opacity-dim)",
+    "ghost": "var(--opacity-ghost)"
   }
 } as const;
 
