@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-26 (Ergänzung H-14; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Freigegeben. Nächster Schritt: Lead beauftragt den Planner mit „Design übernehmen“ für die Ergänzung H-14 (Übergabe unter „Änderungen“), danach ist AP-66 entblockt.
+**Status:** geändert am 2026-10-26 (Ergänzung „Ingame-Sprites Astronautin“, wartet auf Freigabe; H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Ingame-Sprites der Astronautin, Strahlenpistole und Laser gezeichnet (`assets/sprites.js`, `mockups/sprites-ingame.html`). Wartet auf Freigabe durch den Nutzer. Danach: Planner „Design übernehmen“ (Übergabe unter „Änderungen“).
 
 ## Ausgangslage
 
@@ -54,6 +54,7 @@ Coder und Reviewer prüfen diese Regeln:
 | Astro Kapsel (eigene Bitmap-Schrift) | Menü, Titel, große Zahlen | eigene Arbeit des Projekts | Glyphen in `docs/design/assets/fonts.js` → `public/assets/fonts/astro-kapsel.png` + `.xml` |
 | Astro Funk (eigene Bitmap-Schrift) | HUD, Pause, Ergebnis, Labels | eigene Arbeit des Projekts | Glyphen in `docs/design/assets/fonts.js` → `public/assets/fonts/astro-funk.png` + `.xml` |
 | Sprite-Vorlagen (Astronautin, Strahlenpistole 1–3, Gegner, Items, Icons) | Silhouette und Palette für die finalen Sprites | eigene Arbeit | `docs/design/assets/pixel.js`, `mockups/sprites.html` |
+| Finale Ingame-Sprites (Astronautin 32×32×4, Strahlenpistole 24×16×6, Laser 16×4) | Pixelquelle für `public/assets/sprites/` | eigene Arbeit | `docs/design/assets/sprites.js`, `mockups/sprites-ingame.html` |
 | App-Icon (Helm mit Visier) | `public/icons/icon-180/192/512.png` | eigene Arbeit | `docs/design/assets/app-icon.svg` |
 | Silkscreen, Press Start 2P, Pixelify Sans, Atkinson Hyperlegible Next | nur in den Richtungs-Entwürfen geprüft, **nicht verwendet** | OFL-1.1 | – |
 
@@ -131,6 +132,33 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 - Tastatur-Navigation im Menü (Fokus-Ring ist gestaltet) ist heute keine Funktion. Kandidat für den Backlog.
 
 ## Änderungen
+
+### 2026-10-26 · Ergänzung „Ingame-Sprites Astronautin“ (wartet auf Freigabe)
+
+**Auftrag (Nutzer):** Ingame-Sprites passend zu den Astronautin-Designs (Porträt im Menü, App-Icon, Vorlage in `pixel.js`). Heute ist `astronaut.png` ein Platzhalter (lila Dreiecke), und `weapon-raygun.png` ist die 12×8-Vorlage, nur 2× vergrößert.
+
+**Ergebnis:**
+
+- `docs/design/assets/sprites.js` (`window.PX_SPRITES`) ist die Quelle der finalen Pixel, im Format wie `fonts.js`: reine Daten plus kleine, reine Hilfsfunktionen, ohne DOM und ohne Netz, also im leeren vm-Kontext auswertbar. Schlüssel = Asset-Key, ein Zeichen = ein Pixel, Frames liegen nebeneinander.
+  - `astronaut` 32×32, 4 Frames: 0–1 Ruhe (Kopf sinkt 1 px, Visier-Glanz wandert), 2–3 Rückstoß (Kopf weicht 1 px zurück, Augen kneifen, Antenne wippt). Die rechte Hand liegt in allen Frames auf dem Handpunkt 26|25 (= +10|+9 von der Mitte). Ohrstücke, Antenne, Kragen, Gürtelschnalle und Stiefel in Koralle, Augen in Mint, Wangen in Rosa, wie im Porträt.
+  - `weapon-raygun` 24×16, 6 Frames, nativ gezeichnet statt hochskaliert: Stufe 1 Kolben mit Koralle-Lampe · Stufe 2 Flosse, Spule am Lauf, Energiezelle wird mint · Stufe 3 zusätzlich längerer Emitter und Mint-Spulen. Schuss-Frame: Mündung `muzzle-flash`, Emitterringe glühen. Die Ankerpunkte bleiben unverändert: Griff 7|12, Mündung 22|7.
+  - `laser` 16×4: weißer Kopf, ausfransender Schweif, Farbe per Tint.
+- `mockups/sprites-ingame.html`: Spritesheets (6×), Szenen in allen drei Biomen (3× und 1×), Zielrad mit Spiegeln, Tiefe und Mündung. Die Vorschau prüft Breite, Höhe und Palette jedes Frames und zeigt Fehler oben rot an. Screenshot: `screenshots/sprites-ingame-desktop.png`.
+- Neue Tokens `color.sprite.highlight`, `suit-deep`, `accent-shade`, `eyes-hi`, `eyes-shade`, `muzzle-flash`. Kontrastprüfung grün, Exporte neu gebaut.
+- Gegner, Items, Münzen, Kacheln und Bosse sind **nicht** Teil dieser Ergänzung. Sie bleiben vorerst Platzhalter oder Vorlage.
+
+**Übergabe an den Planner:**
+
+| Datei | Änderung |
+|---|---|
+| `scripts/build-sprites.mjs` (neu), `package.json` | Skript `sprites:build` nach dem Muster von `build-fonts.mjs`: `docs/design/assets/sprites.js` im leeren vm-Kontext auswerten, je Schlüssel ein PNG `public/assets/sprites/<key>.png` (Frames nebeneinander, `.` transparent, sonst deckend). Es prüft Framegröße und Framezahl gegen `src/config/assets.ts` und bricht bei Abweichung ab. |
+| `scripts/generate-placeholders.mjs` | `makeRaygun` und die `RAYGUN`-Vorlage entfernen. Für Schlüssel aus `PX_SPRITES` keine Platzhalter mehr erzeugen (sonst überschreibt `assets:placeholders` die finalen Bilder). |
+| `public/assets/.placeholders.json`, `scripts/check-assets.mjs` | `astronaut.png`, `weapon-raygun.png` und `laser.png` gelten nicht mehr als Platzhalter. |
+| `public/assets/LICENSES.md` | drei Zeilen: „eigene Arbeit des Projekts (Pixel `docs/design/assets/sprites.js`, `npm run sprites:build`)“. |
+| `src/entities/Player.ts`, `src/config/assets.ts` | keine Logik-Änderung. Prüfen, dass die Beschreibung von `astronaut` lautet: 0–1 Ruhe, 2–3 Rückstoß. |
+| `docs/guides/grafik-austauschen.md` | Abschnitt: Sprites in `sprites.js` ändern, `npm run sprites:build`, Vorschau `mockups/sprites-ingame.html`. |
+
+Keine neuen Abhängigkeiten. Ein kleines Paket, ohne Design-Review (keine UI), aber mit Handtest: Figur und Waffe im Spiel in allen drei Ausbaustufen ansehen und nach links zielen.
 
 ### 2026-10-26 · Ergänzung H-14 (freigegeben am 2026-10-26)
 

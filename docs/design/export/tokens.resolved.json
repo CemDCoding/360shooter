@@ -74,6 +74,12 @@
         "cheeks": "#ffa0ae",
         "accent": "#ff6b8a",
         "raygun-glow": "#ff8fae",
+        "highlight": "#ffffff",
+        "suit-deep": "#ac90b0",
+        "accent-shade": "#bf3458",
+        "eyes-hi": "#b8ffe9",
+        "eyes-shade": "#2fb393",
+        "muzzle-flash": "#fff3b0",
         "coin": "#ffcf4a",
         "coin-hi": "#ffe2a0",
         "coin-lo": "#c7922a"

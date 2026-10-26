@@ -75,6 +75,12 @@ export const tokens = {
       "cheeks": "var(--color-sprite-cheeks)",
       "accent": "var(--color-sprite-accent)",
       "raygun-glow": "var(--color-sprite-raygun-glow)",
+      "highlight": "var(--color-sprite-highlight)",
+      "suit-deep": "var(--color-sprite-suit-deep)",
+      "accent-shade": "var(--color-sprite-accent-shade)",
+      "eyes-hi": "var(--color-sprite-eyes-hi)",
+      "eyes-shade": "var(--color-sprite-eyes-shade)",
+      "muzzle-flash": "var(--color-sprite-muzzle-flash)",
       "coin": "var(--color-sprite-coin)",
       "coin-hi": "var(--color-sprite-coin-hi)",
       "coin-lo": "var(--color-sprite-coin-lo)"
