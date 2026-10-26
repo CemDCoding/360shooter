@@ -192,3 +192,54 @@ describe('RELAYOUT_DELAYS_MS', () => {
     });
   });
 });
+
+describe('fitArena evidence: phone landscape side margins (AP-77, PE-94)', () => {
+  // ASSUMPTION (not measured on the device, see Q-48): insets top 0, left/right 47, bottom 21.
+  // The window is about 2.2:1, the arena is 16:9, so the height limits and side bars appear.
+  const ins = { top: 0, right: 47, bottom: 21, left: 47 };
+
+  it('iPhone 15 852x393: height limits, ~95 px each side, 21 px bottom, 0 px top', () => {
+    const f = fitArena(852, 393, ins, 640, 360);
+    // available 758 x 372 -> scale min(758/640, 372/360) = 372/360
+    expect(f.scale).toBeCloseTo(372 / 360, 6);
+    expect(f.scale).toBeCloseTo(1.033, 3);
+    expect(f.width).toBeCloseTo(661.33, 2);
+    expect(f.height).toBeCloseTo(372, 6);
+    expect(f.width / f.height).toBeCloseTo(16 / 9, 6);
+    // side margin = 47 inset + (758 - 661.33) / 2 = 47 + 48.33
+    expect(f.offsetX).toBeCloseTo(95.33, 2);
+    expect(852 - (f.offsetX + f.width)).toBeCloseTo(95.33, 2);
+    expect(f.offsetY).toBeCloseTo(0, 6);
+    expect(393 - (f.offsetY + f.height)).toBeCloseTo(21, 6);
+  });
+
+  it('iPhone 15 Pro Max 932x430 with the same insets (comparison)', () => {
+    const f = fitArena(932, 430, ins, 640, 360);
+    // available 838 x 409 -> scale 409/360
+    expect(f.scale).toBeCloseTo(409 / 360, 6);
+    expect(f.width).toBeCloseTo(727.11, 2);
+    expect(f.height).toBeCloseTo(409, 6);
+    expect(f.offsetX).toBeCloseTo(102.44, 2);
+    expect(f.offsetY).toBeCloseTo(0, 6);
+    expect(430 - (f.offsetY + f.height)).toBeCloseTo(21, 6);
+  });
+
+  it('667x375 without insets: height limits, side bars only ~0.17 px', () => {
+    const f = fitArena(667, 375, none, 640, 360);
+    expect(f.scale).toBeCloseTo(375 / 360, 6);
+    expect(f.width).toBeCloseTo(666.67, 2);
+    expect(f.height).toBeCloseTo(375, 6);
+    expect(f.offsetX).toBeCloseTo(0.17, 2);
+    expect(f.offsetY).toBeCloseTo(0, 6);
+  });
+
+  it('PC 1280x720 and 1920x1080 without insets: arena fills the window, no bars', () => {
+    for (const [w, h, s] of [
+      [1280, 720, 2],
+      [1920, 1080, 3],
+    ] as const) {
+      const f = fitArena(w, h, none, 640, 360);
+      expect(f).toMatchObject({ scale: s, width: w, height: h, offsetX: 0, offsetY: 0 });
+    }
+  });
+});
