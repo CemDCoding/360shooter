@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** geändert (Ergänzung H-14 in Arbeit; Fassung vom 2026-10-25 bleibt bis zur neuen Freigabe gültig)
-**Stand:** 2026-10-26 Interview H-14 läuft: Runde 1 (Lagerplatz) beantwortet, Runde 2 gestellt (Boss-Lücken: Banner, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste), dann Mockup `mockups/lagerplatz-und-boss.html`.
+**Stand:** 2026-10-26 Interview H-14 läuft: Runde 1 und 2 beantwortet, Mockup in Arbeit (Boss-Lücken: Banner, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste), dann Mockup `mockups/lagerplatz-und-boss.html`.
 
 ## Ausgangslage
 
@@ -149,5 +149,11 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 - 2a **Eigener Funk-Knopf 40×40** (1×, skaliert mit `funkScale`) mit großem Item-Symbol, dasselbe Motiv wie das liegende Item.
 - 3c **Fächer immer sichtbar, ohne „TIPP“-Label.** leer: gepunkteter Rahmen, Symbol als blasser Umriss · bereit: durchgezogener Akzentrahmen, Symbol voll · gesperrt: abgedunkelt, darüber die Sekunden der Sperre („8s“).
 - 4a **Einlagern:** einmaliges Aufleuchten 200 ms plus Pickup-Ton. Mit `prefers-reduced-motion` nur der Rahmenwechsel.
+
+**Entscheidungen Boss-Lücken (Nutzer, 2026-10-26):**
+
+- 5a **Banner als Funkspruch:** Logbuch-Zeile „FUNK · WARNUNG“ (Funk 1×, `hud.text-muted`), „BOSS KOMMT!“ (Funk 3×, `hud.danger`), Boss-Name (Funk 1×). Blinkt dreimal, dann ruhig. Mit `prefers-reduced-motion` kein Blinken.
+- 6a **Ergebnis:** Überschrift bleibt „GEWONNEN“. Siegel „BOSS BESIEGT“ mit Pixel-Stern im Logbuch-Kopf, Faktenzeile „BOSS · <NAME> · BESIEGT“. Bei Niederlage gegen den Boss: „BOSS · <NAME> · 38 % ÜBRIG“.
+- 7a **Boss-Leiste:** Treffer 120 ms weiße Füllung plus Nachlaufstück in Creme (300 ms) · kritisch ≤ 25 %: Tag „SCHWACH!“, kein Blinken · unverwundbar: Rahmen gepunktet, Füllung gedimmt, Tag „IMMUN“ mit Schloss.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
