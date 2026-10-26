@@ -44,7 +44,11 @@ function sound(name: string, description: string): AssetDef {
 /** Festes Asset-Manifest. Designer ersetzen nur die Dateien unter public/assets. */
 export const ASSETS: readonly AssetDef[] = [
   sprite('astronaut', 32, 32, 4, 'Astronautin: 2 Frames Idle, 2 Frames Schuss.'),
-  sprite('boss-placeholder', 64, 64, 2, 'Platzhalter-Boss.'),
+  sprite('boss-root-monster', 64, 64, 4, 'Boss: verwurzeltes Baummonster (Wald).'),
+  sprite('boss-root-spike', 16, 32, 3, 'Boss-Angriff: Wurzelspitze des Baummonsters.'),
+  sprite('boss-forest-ghost', 48, 48, 4, 'Boss: Waldgeist (Wald bei Nacht).'),
+  sprite('boss-ghost-orb', 8, 8, 2, 'Boss-Angriff: Geisterkugel des Waldgeists.'),
+  sprite('boss-giant-stone', 64, 64, 4, 'Boss: Riesen-Stein (Elfenwald).'),
   sprite('laser', 16, 4, 1, 'Laserschuss der Astronautin.'),
   sprite('witch-bolt', 8, 8, 2, 'Zauberkugel der Waldhexe.'),
   sprite('enemy-cursed-tree', 32, 32, 4, 'Gegner: verfluchter Baum.'),
@@ -89,6 +93,8 @@ export const ASSETS: readonly AssetDef[] = [
   sound('round-lost', 'Runde verloren.'),
   sound('coin', 'Muenze eingesammelt.'),
   sound('shield-break', 'Schutzschild geht kaputt.'),
+  sound('boss-warning', 'Warnung kurz bevor der Boss erscheint.'),
+  sound('boss-defeated', 'Boss wird besiegt.'),
 ];
 
 /** Animations-Key fuer ein Spritesheet (von PreloadScene angelegt, wenn frames > 1). */

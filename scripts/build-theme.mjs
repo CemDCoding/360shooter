@@ -69,6 +69,9 @@ export function buildTheme(json) {
   }
   const dur = Object.entries(base.motion.duration).map(([k, v]) => [`motion.${k}`, ms(v)]);
   const easing = Object.entries(base.motion.easing).map(([k, v]) => [`motion.${k}`, q(v)]);
+  const blinks = base.motion['banner-blinks'];
+  if (typeof blinks !== 'number') throw new Error('motion.banner-blinks fehlt oder ist keine Zahl');
+  const motionCount = [['motion.banner-blinks', blinks]];
   const f = base.font;
   const fam = (a) => `[${a.map(q).join(', ')}]`;
   const scale = Object.entries(f.scale).map(([k, v]) => `    ${k}: ${v},`);
@@ -91,7 +94,13 @@ export function buildTheme(json) {
     record('SIZE_PX', sizePx, 'Größen in px.'),
     record('SIZE_COUNT', sizeCount, 'Größen als Anzahl.'),
     record('MOTION_MS', dur, 'Zeiten in ms.'),
+    record('MOTION_COUNT', motionCount, 'Bewegung als Anzahl.'),
     record('MOTION_EASING', easing, 'Easing-Angaben (CSS-Schreibweise).'),
+    record(
+      'OPACITY',
+      Object.entries(base.opacity).map(([k, v]) => [k, Number(v)]),
+      'Deckkraft-Stufen, 0..1.',
+    ),
     `/** Schrift: Familien (Fallback-Reihenfolge), Skalierungsstufen, Zeichenabstand und Zeilenabstand in px. */
 const FONT = {
   family: { menu: ${fam(f.family.menu)}, hud: ${fam(f.family.hud)} },
@@ -109,15 +118,20 @@ ${scale.join('\n')}
   sizePx: SIZE_PX,
   sizeCount: SIZE_COUNT,
   motionMs: MOTION_MS,
+  motionCount: MOTION_COUNT,
   motionEasing: MOTION_EASING,
   font: FONT,
+  opacity: OPACITY,
 } as const;
+
+export { OPACITY };
 
 export type ColorName = keyof typeof COLORS;
 export type SpaceName = keyof typeof SPACE_PX;
 export type BorderName = keyof typeof BORDER_PX;
 export type SizeName = keyof typeof SIZE_PX;
 export type MotionName = keyof typeof MOTION_MS;
+export type OpacityName = keyof typeof OPACITY;
 
 /** Farbe nach Tokenname; ein falscher Name ist ein Typfehler. */
 export function themeColor(name: ColorName): ThemeColor {

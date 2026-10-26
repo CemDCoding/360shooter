@@ -9,6 +9,7 @@ import {
   PROGRESSION,
 } from '../config';
 import { ARMOUR_RULES, ARMOURS } from '../config/armour';
+import { STORABLE_POWERS } from '../config/powerStore';
 import {
   GameEvents,
   type ActivePowers,
@@ -16,10 +17,19 @@ import {
   type GameEventPayloads,
   type ItemDef,
   type LevelDef,
+  type PowerStoreState,
   type UpgradeLevels,
 } from '../contracts';
 import type { ActiveArmour, ArmourDef } from '../contracts/armour';
+import { BOSS_TUNING } from '../config/bosses';
 import { ArmourPickup } from '../entities/ArmourPickup';
+import { BossBase } from '../entities/bosses/BossBase';
+import { createBoss } from '../entities/bosses/createBoss';
+import { ForestGhost } from '../entities/bosses/ForestGhost';
+import { GhostOrb } from '../entities/bosses/GhostOrb';
+import { GiantStone } from '../entities/bosses/GiantStone';
+import { RootMonster } from '../entities/bosses/RootMonster';
+import { RootSpike } from '../entities/bosses/RootSpike';
 import { ArmourRing } from '../entities/ArmourRing';
 import { CoinPool } from '../entities/CoinPool';
 import { ItemPickup } from '../entities/ItemPickup';
@@ -45,6 +55,14 @@ import { applyRoundGold, goldPayout } from '../logic/economy';
 import { pointOnRing } from '../logic/geometry';
 import { canLaserDestroyBolt } from '../logic/projectiles';
 import { rollDrop } from '../logic/items';
+import {
+  canActivate,
+  createPowerStore,
+  isStorable,
+  resetPowerStore,
+  storePower,
+  takePower,
+} from '../logic/powerStore';
 import { applyRoundResult, roundXp, type RoundResult } from '../logic/progression';
 import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
@@ -56,6 +74,8 @@ import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
 import { VirtualStick } from './controls/VirtualStick';
 import { parseDebugLevel, resolveLevelId } from './debug';
+import { energyRatio, powerBlock } from './hud/hudMath';
+import { POWER_SLOT_PRESSED } from './hud/PowerSlots';
 
 /** Layout only: distance of the spawn ring beyond the visible corners (pixels). */
 const SPAWN_MARGIN_PX = 24;
@@ -94,6 +114,10 @@ export interface ResultSceneData {
   goldTotal: number;
   /** Debug round (`?level=n`): nothing was written to the save game (PE-49). */
   debugRound: boolean;
+  /** The round's boss was defeated (result screen shows "Boss besiegt"). */
+  bossDefeated?: boolean;
+  /** Boss level only: share of the boss HP left at the end of the round (0..1, AP-72). */
+  bossHpLeft?: number;
 }
 
 /** Typed emit for the events contract (src/contracts/events.ts). */
@@ -167,6 +191,8 @@ export class GameScene extends Phaser.Scene {
   private armour: ActiveArmour = createArmourState();
   /** Definition of the active (or cooling down) armour; needed by tickArmour. */
   private armourDef: ArmourDef | null = null;
+  /** Stored timed powers (round only, never saved, PE-70). */
+  private powerStore: PowerStoreState = createPowerStore();
   private lastPowersKey = '';
   private lastArmourKey = '';
   private lastShieldLeft = 0;
@@ -179,6 +205,13 @@ export class GameScene extends Phaser.Scene {
   private sfx!: SoundService;
   private lastHurtSoundMs = Number.NEGATIVE_INFINITY;
   private center = { x: 0, y: 0 };
+  /** Boss of the level: created when it appears, removed at the end of the round. */
+  private boss?: BossBase;
+  private bossWarned = false;
+  private bossSpawned = false;
+  private bossDefeatedFlag = false;
+  /** Last `invulnerable` sent with boss-hp-changed (reset in spawnBoss). */
+  private bossInvulnerable = false;
 
   constructor() {
     super('GameScene');
@@ -195,6 +228,7 @@ export class GameScene extends Phaser.Scene {
     this.roundCoins = 0;
     this.armour = resetArmour();
     this.armourDef = null;
+    this.powerStore = resetPowerStore();
     this.lastPowersKey = '';
     this.lastArmourKey = '';
     this.lastShieldLeft = 0;
@@ -202,6 +236,10 @@ export class GameScene extends Phaser.Scene {
     this.lastTimerSec = -1;
     this.ended = false;
     this.lastHurtSoundMs = Number.NEGATIVE_INFINITY;
+    this.boss = undefined;
+    this.bossWarned = false;
+    this.bossSpawned = false;
+    this.bossDefeatedFlag = false;
   }
 
   create(): void {
@@ -259,7 +297,11 @@ export class GameScene extends Phaser.Scene {
       remainingSec: Math.ceil(this.round.remainingMs / 1000),
     };
     // The HUD starts with zeros and reads no state: send start values once it exists (AP-34).
-    this.scene.get(HUD_KEY).events.once(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    const hud = this.scene.get(HUD_KEY);
+    hud.events.once(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    // Taps on a power slot come from the HUD as a scene event (AP-66); removed in cleanup.
+    hud.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
+    hud.events.on(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
     this.scene.launch(HUD_KEY, hudData);
     this.scene.bringToTop(HUD_KEY);
   }
@@ -269,6 +311,7 @@ export class GameScene extends Phaser.Scene {
     emitGameEvent(this.events, GameEvents.CoinsChanged, { roundCoins: this.roundCoins });
     this.emitPowers(true);
     this.emitArmour(true);
+    this.emitPowerStore();
   };
 
   private bindPlayerCallbacks(): void {
@@ -362,6 +405,7 @@ export class GameScene extends Phaser.Scene {
     this.spawnEnemies(dt);
     this.applyAreaDamage(dt);
     this.updateArmour(dt);
+    this.updateBoss(time, dt);
     this.spawnDrops();
     this.updateItems(this.playTimeMs);
     this.coinPool?.update(dt, this.player);
@@ -370,6 +414,7 @@ export class GameScene extends Phaser.Scene {
     // Order matters (AP-06): death before the timer, so a loss wins over a simultaneous timeout.
     if (this.player.isDead) this.round.playerDied();
     this.round.tick(dt);
+    this.updateBossTimeline();
     this.emitTimer();
 
     if (this.round.status !== 'running') this.endRound(this.round.status);
@@ -378,7 +423,8 @@ export class GameScene extends Phaser.Scene {
   private spawnEnemies(dt: number): void {
     let alive = 0;
     for (const e of this.enemyPool.enemies) if (e.active) alive += 1;
-    for (const req of this.spawner.tick(dt, alive)) {
+    const bossAlive = this.boss !== undefined && !this.bossDefeatedFlag;
+    for (const req of this.spawner.tick(dt, alive, bossAlive)) {
       const p = pointOnRing(req.angle, req.radius, this.center.x, this.center.y);
       this.enemyPool.spawn(req.enemyId, p.x, p.y);
     }
@@ -400,7 +446,7 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * Armour timing on pausable play time, ring follows the player and damages enemies in the
-   * radius (PE-52, PE-57). M2b has no boss enemies; bosses (M3) must be excluded here (Q-23).
+   * radius (PE-52, PE-57). Bosses are not in the enemy pool, so the ring never hurts them (Q-23).
    */
   private updateArmour(dt: number): void {
     const def = this.armourDef;
@@ -421,6 +467,154 @@ export class GameScene extends Phaser.Scene {
     this.emitArmour();
   }
 
+  /** Boss warning (33 s left) and appearance (30 s left), driven by the round state (PE-18). */
+  private updateBossTimeline(): void {
+    if (this.ended || this.round.status !== 'running') return;
+    const phase = this.round.bossPhase;
+    if (phase === 'none') return;
+    const bossId = this.level.bossId;
+    if (!bossId) return;
+    if (!this.bossWarned) {
+      this.bossWarned = true;
+      if (phase === 'warning') {
+        this.sfx.play('sfx-boss-warning');
+        emitGameEvent(this.events, GameEvents.BossWarning, { bossId });
+      }
+    }
+    if (phase === 'active' && !this.bossSpawned) this.spawnBoss(bossId);
+  }
+
+  private spawnBoss(bossId: NonNullable<LevelDef['bossId']>): void {
+    this.bossSpawned = true;
+    this.bossInvulnerable = false;
+    const boss = createBoss(this, bossId, this.level.id, {
+      center: this.center,
+      rng: this.rng,
+      onHpChanged: (hp, maxHp) => this.emitBossHp(hp, maxHp),
+      onDefeated: () => this.onBossDefeated(bossId),
+      onSummonTrees: (positions) => {
+        if (this.ended) return;
+        for (const p of positions) this.enemyPool.spawn('cursedTree', p.x, p.y);
+      },
+      getPlayerPos: () => ({ x: this.player.x, y: this.player.y }),
+      onPlayerHit: (damage) => {
+        if (!this.ended && !this.player.isDead) this.player.takeDamage(damage);
+      },
+    });
+    this.boss = boss;
+    emitGameEvent(this.events, GameEvents.BossSpawned, { bossId, hp: boss.maxHp, maxHp: boss.maxHp });
+    // Appears from a random direction on the rim around the player.
+    const rim = BOSS_TUNING.giantStone.rim;
+    const angle = this.rng.next() * Math.PI * 2;
+    boss.spawn(this.center.x + Math.cos(angle) * rim.rx, this.center.y + Math.sin(angle) * rim.ry);
+  }
+
+  /** boss-hp-changed with the invulnerable flag from boss.isInvulnerable (V-12, PE-87). */
+  private emitBossHp(hp: number, maxHp: number): void {
+    if (this.ended) return;
+    this.bossInvulnerable = this.boss?.isInvulnerable === true;
+    emitGameEvent(this.events, GameEvents.BossHpChanged, { hp, maxHp, invulnerable: this.bossInvulnerable });
+  }
+
+  private onBossDefeated(bossId: NonNullable<LevelDef['bossId']>): void {
+    if (this.bossDefeatedFlag || this.ended) return;
+    this.bossDefeatedFlag = true;
+    this.sfx.play('sfx-boss-defeated');
+    emitGameEvent(this.events, GameEvents.BossDefeated, { bossId });
+    this.round.bossDefeated();
+  }
+
+  /** Boss update, hits and damage. Runs once per frame (boss.update exactly once, AP-67 contract). */
+  private updateBoss(time: number, dt: number): void {
+    const boss = this.boss;
+    if (!boss || this.bossDefeatedFlag) return;
+    boss.update(time, dt);
+    if (this.bossDefeatedFlag || this.player.isDead) return;
+    // The ghost phase changes invulnerability without an HP change: tell the HUD (boss bar "IMMUN").
+    if (boss.isInvulnerable !== this.bossInvulnerable) this.emitBossHp(boss.hp, boss.maxHp);
+
+    const parts: BossBase[] = boss instanceof GiantStone ? boss.parts : boss.active ? [boss] : [];
+
+    // Laser vs boss body (the stone: its parts). Invulnerable (ghost fade): lasers pass through.
+    if (parts.length > 0) {
+      this.physics.overlap(this.lasers.group, parts, (a, b) => {
+        const laser = pick(a, b, Laser);
+        const part = pick(a, b, BossBase);
+        if (!laser || !part || !laser.active || !part.active || this.ended) return;
+        if (part.isInvulnerable) return;
+        this.lasers.release(laser);
+        if (!part.takeDamage(laser.damage)) this.sfx.play('sfx-hit');
+      });
+    }
+    if (this.bossDefeatedFlag) return;
+
+    // Contact damage of the boss body, scaled by frame time.
+    let damage = 0;
+    if (parts.length > 0) {
+      this.physics.overlap(this.player, parts, (a, b) => {
+        const part = pick(a, b, BossBase);
+        if (part?.active) damage += part.contactDamageFor(dt);
+      });
+    }
+    if (damage > 0) this.player.takeDamage(damage);
+
+    if (boss instanceof RootMonster) this.updateRootSpikes(boss);
+    else if (boss instanceof ForestGhost) this.updateGhostOrbs(boss);
+  }
+
+  private updateRootSpikes(boss: RootMonster): void {
+    const spikes = [...boss.activeSpikes];
+    if (spikes.length === 0) return;
+    this.physics.overlap(this.lasers.group, spikes, (a, b) => {
+      const laser = pick(a, b, Laser);
+      const spike = pick(a, b, RootSpike);
+      if (!laser || !spike || !laser.active || !spike.active || this.ended) return;
+      if (spike.laserHit()) {
+        this.lasers.release(laser);
+        this.sfx.play('sfx-hit');
+      }
+    });
+    this.physics.overlap(this.player, spikes, (a, b) => {
+      const spike = pick(a, b, RootSpike);
+      if (!spike || !spike.active || this.ended) return;
+      const dmg = spike.tryHit();
+      if (dmg > 0) this.player.takeDamage(dmg);
+    });
+  }
+
+  private updateGhostOrbs(boss: ForestGhost): void {
+    const orbs = boss.orbs.filter((o) => o.active);
+    if (orbs.length === 0) return;
+    // Laser vs orb: same circle rule as the witch bolt, one laser destroys one orb (PE-37).
+    this.physics.overlap(this.lasers.group, orbs, (a, b) => {
+      const laser = pick(a, b, Laser);
+      const orb = pick(a, b, GhostOrb);
+      if (!laser || !orb || !laser.active || !orb.active || this.ended) return;
+      const lb = laser.body as Phaser.Physics.Arcade.Body;
+      const ob = orb.body as Phaser.Physics.Arcade.Body;
+      const hit = canLaserDestroyBolt(
+        { active: laser.active, x: lb.center.x, y: lb.center.y, radius: lb.halfWidth },
+        { active: orb.active, x: ob.center.x, y: ob.center.y, radius: ob.halfWidth },
+      );
+      if (!hit) return;
+      this.lasers.release(laser);
+      orb.kill();
+      this.sfx.play('sfx-hit');
+    });
+    this.physics.overlap(this.player, orbs, (a, b) => {
+      const orb = pick(a, b, GhostOrb);
+      if (!orb || !orb.active || this.ended) return;
+      const dmg = orb.damage;
+      orb.kill();
+      this.player.takeDamage(dmg);
+    });
+  }
+
+  private despawnBoss(): void {
+    this.boss?.despawn();
+    this.boss = undefined;
+  }
+
   private spawnDrops(): void {
     for (const { x, y, coinValue } of this.pendingDrops) {
       const def = rollDrop(this.rng, ITEM_RULES, ITEMS);
@@ -439,6 +633,11 @@ export class GameScene extends Phaser.Scene {
     const item = new ItemPickup(this, x, y, def, ITEM_RULES, this.playTimeMs);
     item.setDepth(5);
     item.onCollected = (collected) => {
+      // Timed powers go into the storage slot instead of starting (PE-70).
+      if (isStorable(collected.id)) {
+        this.storeCollected(collected.id);
+        return;
+      }
       this.sfx.play('sfx-item-pickup');
       this.player.applyItem(collected);
     };
@@ -452,17 +651,61 @@ export class GameScene extends Phaser.Scene {
     this.armourPickups.push(pickup);
   }
 
-  /** Activates only without active armour and outside the cooldown (PE-57). */
+  /** Storable armour goes into the slot; other armour activates directly (PE-57, PE-70). */
   private onArmourCollected(def: ArmourDef): void {
     if (this.ended || this.player.isDead) return;
+    if (isStorable(def.id)) {
+      this.storeCollected(def.id);
+      return;
+    }
+    if (this.startArmour(def)) this.sfx.play('sfx-item-pickup');
+  }
+
+  /** Activates only without active armour and outside the cooldown (PE-57). */
+  private startArmour(def: ArmourDef): boolean {
     const next = activateArmour(this.armour, def);
-    if (next === this.armour) return;
+    if (next === this.armour) return false;
     this.armour = next;
     this.armourDef = def;
-    this.sfx.play('sfx-item-pickup');
     this.armourRing?.show(def);
     this.armourRing?.setCenter(this.player.x, this.player.y);
     this.emitArmour(true);
+    return true;
+  }
+
+  /** Stores a picked-up timed power; a full slot makes the pickup do nothing (PE-70). */
+  private storeCollected(id: string): void {
+    if (this.ended || this.player.isDead) return;
+    const r = storePower(this.powerStore, id);
+    if (!r.accepted) return;
+    this.powerStore = r.state;
+    this.sfx.play('sfx-item-pickup');
+    this.emitPowerStore();
+  }
+
+  /** Tap on a ready slot (HUD scene event): start the stored power via the usual path. */
+  private onPowerSlotPressed(id: unknown): void {
+    if (typeof id !== 'string' || this.ended || this.player.isDead || !this.scene.isActive()) return;
+    const def = STORABLE_POWERS.find((p) => p.id === id);
+    if (!def) return;
+    const { blocked } = powerBlock(def, this.player.powers, this.armour);
+    if (!canActivate(this.powerStore, id, blocked)) return;
+    if (def.kind === 'item') {
+      const item = ITEMS.find((i) => i.id === id);
+      if (!item) return;
+      this.powerStore = takePower(this.powerStore, id).state;
+      this.player.applyItem(item);
+      this.emitPowers(true);
+    } else {
+      const armour = ARMOURS.find((a) => a.id === id);
+      if (!armour || !this.startArmour(armour)) return;
+      this.powerStore = takePower(this.powerStore, id).state;
+    }
+    this.emitPowerStore();
+  }
+
+  private emitPowerStore(): void {
+    emitGameEvent(this.events, GameEvents.PowerStoreChanged, { stored: [...this.powerStore.stored] });
   }
 
   /** Updates pickups and removes expired/collected ones in place (the collider keeps the array). */
@@ -510,6 +753,19 @@ export class GameScene extends Phaser.Scene {
     this.armour = resetArmour();
     this.armourDef = null;
     this.armourRing?.hide();
+    // Round over (win, timeout or death): the storage is emptied, nothing is saved (PE-70).
+    // The HUD hears about it, so it no longer shows a stale "ready" slot (V-14 a).
+    this.powerStore = resetPowerStore();
+    this.emitPowerStore();
+    // Boss HP share left for the result screen (boss level only; not yet appeared = full).
+    const boss = this.boss;
+    const bossParts: BossBase[] = boss instanceof GiantStone ? boss.parts : boss?.active ? [boss] : [];
+    const bossHpLeft = !this.level.bossId
+      ? undefined
+      : boss
+        ? energyRatio(bossParts.reduce((s, p) => s + Math.max(0, p.hp), 0), boss.maxHp)
+        : 1;
+    this.despawnBoss();
 
     const xpGained = roundXp(this.killXp, result, PROGRESSION);
     const before = loadSave();
@@ -532,6 +788,8 @@ export class GameScene extends Phaser.Scene {
       goldGained: this.debugRound ? 0 : goldPayout(this.roundCoins, result),
       goldTotal: stored.gold ?? 0,
       debugRound: this.debugRound,
+      bossDefeated: this.bossDefeatedFlag,
+      bossHpLeft: this.bossDefeatedFlag ? 0 : bossHpLeft,
     };
     this.scene.stop(HUD_KEY);
     this.scene.start('ResultScene', data);
@@ -544,7 +802,11 @@ export class GameScene extends Phaser.Scene {
 
   private cleanup(): void {
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
-    this.scene.get(HUD_KEY)?.events.off(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    const hud = this.scene.get(HUD_KEY);
+    hud?.events.off(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    hud?.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
+    this.powerStore = resetPowerStore();
+    this.despawnBoss();
     this.player.callbacks.onHpChange = undefined;
     this.player.callbacks.onStatsChange = undefined;
     this.player.callbacks.onShieldChange = undefined;

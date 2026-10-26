@@ -20,7 +20,7 @@ describe('levels', () => {
     expect(ids.includes('forestSpirit')).toBe(id >= 10);
     expect(l.enemyPool.every((e) => e.weight > 0)).toBe(true);
     expect(l.maxEnemies).toBeLessThanOrEqual(150);
-    expect(l.bossId ?? '').toBe('');
+    expect(l.bossId).toBe(id <= 4 ? 'rootMonster' : id <= 9 ? 'forestGhost' : 'giantStone');
   });
 
   it('spawn interval decreases strictly', () => {

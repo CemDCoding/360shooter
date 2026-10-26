@@ -7,7 +7,11 @@ Platzhalter werden von `npm run assets:placeholders` erzeugt (`scripts/generate-
 | Datei                             | Herkunft                                                                                  | Lizenz                     |
 | --------------------------------- | ----------------------------------------------------------------------------------------- | -------------------------- |
 | sprites/astronaut.png             | selbst erzeugt                                                                            | selbst erzeugt             |
-| sprites/boss-placeholder.png      | selbst erzeugt                                                                            | selbst erzeugt             |
+| sprites/boss-root-monster.png     | selbst erzeugt                                                                            | selbst erzeugt             |
+| sprites/boss-root-spike.png       | selbst erzeugt                                                                            | selbst erzeugt             |
+| sprites/boss-forest-ghost.png     | selbst erzeugt                                                                            | selbst erzeugt             |
+| sprites/boss-ghost-orb.png        | selbst erzeugt                                                                            | selbst erzeugt             |
+| sprites/boss-giant-stone.png      | selbst erzeugt                                                                            | selbst erzeugt             |
 | sprites/laser.png                 | selbst erzeugt                                                                            | selbst erzeugt             |
 | sprites/witch-bolt.png            | selbst erzeugt                                                                            | selbst erzeugt             |
 | sprites/enemy-cursed-tree.png     | selbst erzeugt                                                                            | selbst erzeugt             |
@@ -37,6 +41,8 @@ Platzhalter werden von `npm run assets:placeholders` erzeugt (`scripts/generate-
 | sounds/round-lost.wav             | selbst erzeugt                                                                            | selbst erzeugt             |
 | sounds/coin.wav                   | selbst erzeugt                                                                            | selbst erzeugt             |
 | sounds/shield-break.wav           | selbst erzeugt                                                                            | selbst erzeugt             |
+| sounds/boss-warning.wav           | selbst erzeugt                                                                            | selbst erzeugt             |
+| sounds/boss-defeated.wav          | selbst erzeugt                                                                            | selbst erzeugt             |
 
 ## App-Icons (`public/icons/`)
 

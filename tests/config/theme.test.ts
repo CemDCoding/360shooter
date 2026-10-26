@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { THEME, themeColor, type ColorName } from '../../src/config/theme';
+import { THEME, OPACITY, themeColor, type ColorName } from '../../src/config/theme';
 // @ts-expect-error reines JS-Skript ohne Typen
 import { buildTheme } from '../../scripts/build-theme.mjs';
 
@@ -88,6 +88,7 @@ describe('THEME other tokens', () => {
     expect(THEME.sizePx['size.target']).toBe(32);
     expect(THEME.sizeCount['size.energy-segments']).toBe(10);
     expect(THEME.motionMs['motion.base']).toBe(150);
+    expect(THEME.motionCount['motion.banner-blinks']).toBe(3);
     expect(THEME.font.family.menu[0]).toBe('Astro Kapsel');
   });
 
@@ -95,5 +96,27 @@ describe('THEME other tokens', () => {
     // @ts-expect-error falscher Tokenname ist ein Typfehler
     const bad: ColorName = 'menu.nope';
     expect(bad).toBe('menu.nope');
+  });
+});
+
+describe('OPACITY', () => {
+  const exported = (json as { base: { opacity: Record<string, number> } }).base.opacity;
+
+  it('has dim 0.35 and ghost 0.6', () => {
+    expect(OPACITY.dim).toBe(0.35);
+    expect(OPACITY.ghost).toBe(0.6);
+    expect(Object.keys(OPACITY).sort()).toEqual(['dim', 'ghost']);
+  });
+
+  it('matches the design export', () => {
+    expect({ ...OPACITY }).toEqual(exported);
+    expect(THEME.opacity).toBe(OPACITY);
+  });
+
+  it('stays within 0..1', () => {
+    for (const v of Object.values(OPACITY)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
   });
 });

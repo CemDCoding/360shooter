@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lagerplatz und Boss (H-14) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .h-energy { width: 160px; height: 44px; }
+  .h-timer { display: grid; place-items: center; }
+  .h-row { top: 58px; gap: 4px; }
+  .w-laser.r30 { transform: rotate(30deg); } .w-laser.r0 { transform: rotate(0deg); }
+  .night-trees { --px-f: #3d5f9a; --px-F: #2a4578; --px-t: #5a4a72; --px-d: #1a1230; }
+  .elf-trees { --px-f: #8a6bd0; --px-F: #6a4fb0; --px-t: #4a3a6a; --px-d: #1e1236; }
+  .boss { --px-G: #9a92b0; --px-e: #ff4a8a; --px-m: #2a2140; --px-o: #0b0610; }
+
+  /* ---------- PowerSlots (H-14) ---------- */
+  .slot { position: absolute; width: var(--size-hud-slot); height: var(--size-hud-slot); display: grid; place-items: center;
+    background: var(--color-hud-glass); border: var(--border-hud) solid var(--color-hud-line); cursor: pointer; }
+  .slot > * { grid-area: 1 / 1; }
+  .slot .ico { --px-o: var(--color-hud-screen); }
+  .slot.rapid .ico { --px-Y: var(--color-hud-accent); }
+  .slot.ring .ico { --px-F: var(--color-game-fire-ring); }
+  /* empty: dotted frame, outline icon only */
+  .slot.empty { border-style: dotted; cursor: default; }
+  .slot.empty .ico { --px-o: var(--color-hud-line); --px-Y: transparent; --px-F: transparent; opacity: var(--opacity-ghost); }
+  /* ready: solid accent frame with glow, full icon */
+  .slot.ready { border-color: var(--color-hud-accent); box-shadow: 0 0 6px var(--color-hud-glow); }
+  /* stored right now: lights up once (store-flash 200 ms) */
+  .slot.flash { border-color: var(--color-hud-accent); background: var(--color-hud-flash); box-shadow: 0 0 8px var(--color-hud-glow); }
+  /* blocked (power active or cooldown): dim frame, dimmed icon, seconds on top */
+  .slot.blocked { border-color: var(--color-hud-line-dim); cursor: not-allowed; }
+  .slot.blocked .ico { opacity: var(--opacity-dim); }
+  /* mouse states */
+  .slot.is-hover { border-color: var(--color-hud-accent); background: color-mix(in srgb, var(--color-hud-accent) 18%, var(--color-hud-glass)); }
+  .slot.is-active { background: var(--color-hud-accent); }
+  .slot.is-active .ico { --px-Y: var(--color-hud-screen); --px-o: var(--color-hud-screen); }
+
+  /* ---------- Boss bar states (H-14) ---------- */
+  .bbar { position: absolute; width: 200px; }
+  .bbar .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; height: 8px; }
+  .bbar .track { height: 8px; position: relative; background: var(--color-hud-glass); border: var(--border-hud) solid var(--color-hud-danger); }
+  .bbar .fill, .bbar .trail { position: absolute; top: 1px; bottom: 1px; display: block; }
+  .bbar .fill { left: 1px; background: var(--color-hud-danger); }
+  .bbar .trail { background: var(--color-hud-trail); }
+  .bbar.hit .fill { background: var(--color-game-hit-flash); }
+  .bbar.immune .track { border-style: dotted; }
+  .bbar.immune .fill { background: var(--color-hud-danger-dim); }
+  .tag { display: inline-flex; gap: 3px; align-items: center; }
+
+  /* ---------- Boss banner (H-14) ---------- */
+  .banner { position: absolute; left: 50%; top: 92px; transform: translateX(-50%); padding: 7px 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: var(--color-hud-glass); border: var(--border-hud) solid var(--color-hud-danger); box-shadow: 0 0 8px var(--color-hud-danger); }
+  .banner hr { width: 100%; }
+
+  /* ---------- state sheets ---------- */
+  .sheet { position: absolute; inset: 0; background: var(--color-hud-screen); }
+  .sheet ~ .abs { line-height: 0; }
+  .cell { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+  /* ---------- result ---------- */
+  .res { position: absolute; inset: 0; background: var(--color-hud-screen); }
+  .band { position: absolute; left: 0; right: 0; top: 0; height: 6px; }
+  .logline { position: absolute; left: 32px; top: 20px; right: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .seal { display: inline-flex; gap: 5px; align-items: center; height: 16px; padding: 0 6px; border: var(--border-hud) solid var(--color-hud-accent); background: var(--color-hud-glass); }
+  .hero { position: absolute; left: 32px; top: 48px; display: flex; gap: 18px; align-items: center; }
+  .facts { position: absolute; left: 32px; top: 140px; width: 576px; display: grid; grid-template-columns: 150px 1fr; row-gap: 8px; column-gap: 12px; padding-top: 10px; border-top: 1px dotted var(--color-hud-line); align-items: center; }
+  .actions { position: absolute; left: 32px; right: 32px; top: 308px; display: flex; gap: 12px; justify-content: flex-end; }
+
+  @media (prefers-reduced-motion: reduce) { .slot.flash { background: var(--color-hud-glass); box-shadow: 0 0 6px var(--color-hud-glow); } }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Lagerplatz und Boss · Ergänzung H-14</h1>
+  <p>Funkgerät-Stil wie <code>runde.html</code>. Neu: zwei Lagerplätze unten links für zeitbegrenzte Kräfte (Dauerfeuer, Feuerring), Banner „BOSS KOMMT!“ als Funkspruch, Zustände der Boss-Leiste und das Ergebnis nach einem Boss-Kampf. Alle Maße in logischen px bei 1×, im Spiel mal <code>funkScale</code>.</p>
+  <dl>
+    <dt>Lagerplatz</dt><dd>40×40 (<code>size.hud-slot</code>), Abstand 8, links 8, unten 8. Reihenfolge wie <code>STORABLE_POWERS</code>. Symbol = Item-Sprite 10×10 in 3×. Immer sichtbar, kein Text-Label.</dd>
+    <dt>Zustände</dt><dd>leer: gepunktet, nur Umriss · bereit: Akzentrahmen mit Glühen · gesperrt: gedimmt, Sekunden der Sperre darüber · eingelagert: leuchtet einmal 200 ms auf (ohne bei reduzierter Bewegung).</dd>
+    <dt>Boss</dt><dd>Banner Funk 3× mit Funk-Kopf und Namen, blinkt 3×, dann ruhig · Leiste: Treffer, SCHWACH! ab 25 %, IMMUN · Ergebnis: Siegel und Faktenzeile BOSS.</dd>
+  </dl>
+</header>
+
+<section><h2>1 · WALD BEI NACHT, LEVEL 7 · Dauerfeuer liegt bereit, Feuerring leer, Stick aktiv (iPhone)</h2><div class="stage-wrap"><div class="stage" id="s1" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>2 · ELFENWALD, LEVEL 16 · Boss-Warnung bei 0:33, Dauerfeuer läuft (Fach gesperrt, gleiche Kraft liegt nach), Feuerring bereit</h2><div class="stage-wrap"><div class="stage" id="s2" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>3 · ELFENWALD, LEVEL 16 · Boss-Kampf, Boss unverwundbar, Feuerring in Abklingzeit (Fach gesperrt), Dauerfeuer leer</h2><div class="stage-wrap"><div class="stage" id="s3" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>4 · ZUSTÄNDE LAGERPLATZ (2× vergrößert)</h2><div class="stage-wrap"><div class="stage" id="s4" data-component="PowerSlots" data-font="funk"></div></div></section>
+<section><h2>5 · ZUSTÄNDE BOSS-LEISTE UND BANNER</h2><div class="stage-wrap"><div class="stage" id="s5" data-component="BossBar" data-font="funk"></div></div></section>
+<section><h2>6 · ERGEBNIS NACH BOSS-SIEG (Level 10, Elfenwald)</h2><div class="stage-wrap"><div class="stage" id="s6" data-component="ResultScene" data-font="funk"></div></div></section>
+<section><h2>7 · ERGEBNIS NACH NIEDERLAGE GEGEN DEN BOSS (Level 18, Elfenwald)</h2><div class="stage-wrap"><div class="stage" id="s7" data-component="ResultScene" data-font="funk"></div></div></section>
+
+<script>
+  const P = (t, s, c, sh) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"${sh ? ` data-sh="${sh}"` : ''}></span>`;
+  const S = (n, x, y, s, cls, style) => `<span class="abs spr ${cls || ''}" data-n="${n}" data-s="${s || 2}" style="left:${x}px;top:${y}px;${style || ''}"></span>`;
+  function segs(v) { let h = ''; for (let i = 0; i < 10; i++) { const f = v / 10 - i; h += `<i class="${f >= 1 ? '' : f > 0 ? 'half' : 'off'}"></i>`; } return h; }
+  function rig(tier, angle, flip) {
+    const gx = flip ? 302 : 324;
+    const tr = flip ? `rotate(${angle}deg) scaleY(-1)` : `rotate(${angle}deg)`;
+    const gun = `<span class="gun spr" data-n="raygun${tier}" data-s="2" style="left:${gx - 304}px;top:13px;transform:${tr}"></span>`;
+    const body = '<span class="body spr" data-n="astronaut" data-s="2" aria-label="Astronautin"></span>';
+    return `<div class="w-rig ${flip ? 'flip' : ''}" style="left:304px;top:164px" data-component="Player">${body + gun}</div>`;
+  }
+
+  // ---- power slot ----
+  const NAMES = { rapid: 'Dauerfeuer', ring: 'Feuerring' };
+  function slot(kind, state, x, y, sec, extra) {
+    const label = { empty: 'leer', ready: 'bereit, tippen zum Starten', flash: 'eingelagert', blocked: `gesperrt, ${sec} Sekunden` }[state] || state;
+    const st = state === 'hover' || state === 'press' ? 'ready ' + (state === 'hover' ? 'is-hover' : 'is-active') : state;
+    const num = state === 'blocked' ? P(sec + 's', 2, '--color-hud-text', '--color-hud-screen') : '';
+    return `<div class="slot ${kind} ${st} ${extra || ''}" style="left:${x}px;top:${y}px" role="button" aria-label="Lagerplatz ${NAMES[kind]}: ${label}" data-component="PowerSlots.${kind}">
+      <span class="spr ico" data-n="${kind}" data-s="3"></span>${num}</div>`;
+  }
+  const slots = (a, b) => slot('rapid', a.s, 8, 312, a.sec) + slot('ring', b.s, 56, 312, b.sec);
+
+  // ---- hud ----
+  const chip = {
+    double: (v) => `<div class="f-glass f-chip" aria-label="Doppelschuss ${v}"><span class="spr" data-n="double" data-s="2" style="--px-L:var(--color-hud-accent);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`,
+    shield: (v) => `<div class="f-glass f-chip" aria-label="Schild ${v}"><span class="spr" data-n="shield" data-s="2" style="--px-B:var(--color-game-shield-ring);--px-b:var(--color-hud-text);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`,
+    rapid: (v) => `<div class="f-glass f-chip" aria-label="Dauerfeuer ${v}"><span class="spr" data-n="rapid" data-s="2" style="--px-Y:var(--color-hud-accent);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`,
+    ringCool: (v) => `<div class="f-glass dim f-chip" aria-label="Feuerring lädt ${v}"><span class="spr" data-n="ring" data-s="2" style="--px-F:var(--color-hud-line);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text-muted')}</div>`,
+  };
+  function hud(st) {
+    const low = st.energy <= 25;
+    return `
+      <div class="abs f-glass f-energy h-energy ${low ? 'low' : ''}" role="img" aria-label="Energie ${st.energy} von 100">
+        ${P(st.energy, 3, low ? '--color-hud-energy-low' : '--color-hud-text')}
+        <div>${P(low ? 'ENERGIE!' : 'ENERGIE', 0, low ? '--color-hud-energy-low' : '--color-hud-text-muted')}<div class="f-segs">${segs(st.energy)}</div></div>
+      </div>
+      <div class="abs f-glass h-timer" style="${st.timerWarn ? 'border-color:var(--color-hud-danger)' : ''}">${P(st.timer, 3, st.timerWarn ? '--color-hud-danger' : '--color-hud-text')}</div>
+      <div class="abs f-btn icon" style="left:560px;top:8px" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs f-btn icon" style="left:600px;top:8px" aria-label="Pause"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs h-row"><div class="f-glass f-chip"><span class="spr" data-n="coin" data-s="2"></span>${P('+' + st.coins, 2, '--color-hud-gold')}</div>${(st.chips || []).join('')}</div>
+      ${st.stick ? `<div class="f-stick ${st.stick === 'active' ? 'is-active' : ''}" style="left:536px;top:256px"><i></i></div>` : ''}
+      ${st.slots || ''}`;
+  }
+
+  // ---- boss bar ----
+  function bossBar(x, y, o) {
+    const w = 198;
+    const fill = Math.round(w * o.hp / 100);
+    const trail = o.trail ? `<i class="trail" style="left:${1 + fill}px;width:${Math.round(w * o.trail / 100)}px"></i>` : '';
+    const tag = o.state === 'immune'
+      ? `<span class="tag"><span class="spr" data-n="lock" data-s="1" style="--px-o:var(--color-hud-text-muted);--px-k:var(--color-hud-screen)"></span>${P('IMMUN', 0, '--color-hud-text-muted')}</span>`
+      : o.hp <= 25 ? P('SCHWACH!', 0, '--color-hud-accent') : P('BOSS', 0, '--color-hud-danger');
+    return `<div class="bbar ${o.state || ''}" style="left:${x}px;top:${y}px" data-component="BossBar" role="img" aria-label="${o.name}, ${o.hp} Prozent">
+      <div class="head">${P(o.name, 0, '--color-hud-text')}${tag}</div>
+      <div class="track"><i class="fill" style="width:${fill}px"></i>${trail}</div></div>`;
+  }
+  const banner = (name) => `<div class="banner" data-component="HudScene.bossBanner" role="alert" aria-label="Boss kommt: ${name}">
+      ${P('FUNK · WARNUNG', 0, '--color-hud-text-muted')}${P('BOSS KOMMT!', 3, '--color-hud-danger')}<hr class="f-rule">${P(name, 0, '--color-hud-text')}</div>`;
+
+  const ff = (cls, pts) => pts.map(([x, y]) => `<i class="${cls}" style="left:${x}px;top:${y}px"></i>`).join('');
+  const spores = ff('w-spore', [[40, 120], [120, 300], [260, 40], [380, 300], [560, 80], [600, 300], [200, 200], [470, 60], [90, 60], [330, 250]]);
+
+  // 1 · night, slots ready / empty
+  document.getElementById('s1').innerHTML = `
+    <div class="w-ground night"></div>
+    ${ff('w-ff', [[60, 150], [180, 300], [430, 160], [590, 120], [350, 320], [250, 60], [500, 330], [30, 230]])}
+    <div class="night-trees">${S('tree', 104, 96, 2, 'enemy')}${S('tree', 470, 250, 2, 'enemy')}${S('tree', 500, 110, 2, 'enemy')}</div>
+    ${S('squirrel', 200, 262, 2, 'enemy')}${S('squirrel', 300, 100, 2, 'enemy')}${S('witch', 70, 190, 2, 'enemy')}
+    ${S('coin', 262, 122, 1)}
+    <div class="w-ring shield" aria-hidden="true"></div>
+    <i class="w-laser r30" style="left:340px;top:190px"></i><i class="w-laser r30" style="left:376px;top:211px"></i>
+    ${rig(1, 30, false)}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 87, timer: '1:42', coins: 23, stick: 'active', chips: [chip.double('1/2'), chip.shield('2/3')], slots: slots({ s: 'ready' }, { s: 'empty' }) })}`;
+
+  // 2 · elf forest, boss warning
+  document.getElementById('s2').innerHTML = `
+    <div class="w-ground elf"></div>${spores}
+    <div class="elf-trees">${S('tree', 90, 120, 2, 'enemy')}${S('tree', 220, 280, 2, 'enemy')}</div>
+    ${S('spirit', 170, 220, 2, 'enemy')}${S('spirit', 420, 250, 2, 'enemy')}${S('squirrel', 560, 160, 2, 'enemy')}
+    <i class="w-laser r0" style="left:350px;top:183px"></i><i class="w-laser r0" style="left:380px;top:183px"></i><i class="w-laser r0" style="left:410px;top:183px"></i><i class="w-laser r0" style="left:440px;top:183px"></i>
+    ${rig(3, 0, false)}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 64, timer: '0:33', coins: 41, stick: 'idle', chips: [chip.double('2/2'), chip.rapid('6s')], slots: slots({ s: 'blocked', sec: 6 }, { s: 'ready' }) })}
+    ${banner('RIESEN-STEIN')}`;
+
+  // 3 · elf forest, boss fight, immune
+  document.getElementById('s3').innerHTML = `
+    <div class="w-ground elf"></div>${spores}
+    <div class="elf-trees">${S('tree', 90, 120, 2, 'enemy')}</div>
+    ${S('spirit', 170, 200, 2, 'enemy')}${S('spirit', 380, 110, 2, 'enemy')}
+    ${S('spirit', 430, 210, 6, 'boss')}
+    <i class="w-laser r30" style="left:366px;top:207px"></i><i class="w-laser r30" style="left:400px;top:227px"></i>
+    ${rig(3, 30, false)}
+    <div class="w-vignette"></div>
+    ${bossBar(220, 323, { name: 'RIESEN-STEIN', hp: 62, state: 'immune' })}
+    ${hud({ energy: 42, timer: '0:12', coins: 47, stick: 'idle', chips: [chip.double('2/2'), chip.ringCool('12s')], slots: slots({ s: 'empty' }, { s: 'blocked', sec: 12 }) })}`;
+
+  // 4 · slot state sheet (2x)
+  const cells = [
+    ['rapid', 'empty', 'LEER'], ['rapid', 'ready', 'BEREIT'], ['rapid', 'flash', 'EINGELAGERT'], ['rapid', 'blocked', 'GESPERRT · LÄUFT', 6],
+    ['ring', 'blocked', 'GESPERRT · LÄDT', 12], ['ring', 'hover', 'MAUS DARÜBER'], ['ring', 'press', 'GEDRÜCKT (80MS)'], ['ring', 'ready', 'BEREIT'],
+  ];
+  document.getElementById('s4').innerHTML = `<div class="sheet"></div>
+    <div class="abs" style="left:0;top:0;width:320px;height:180px;transform:scale(2);transform-origin:0 0">
+      ${cells.map((c, i) => `<div class="cell" style="left:${8 + (i % 4) * 78}px;top:${14 + Math.floor(i / 4) * 82}px;width:70px">
+        <div style="position:relative;width:40px;height:40px">${slot(c[0], c[1], 0, 0, c[3])}</div>${P(c[2], 0, '--color-hud-text-muted')}</div>`).join('')}
+    </div>`;
+
+  // 5 · boss bar states + banner
+  document.getElementById('s5').innerHTML = `<div class="sheet"></div>
+    <div class="abs" style="left:24px;top:20px">${P('NORMAL', 0, '--color-hud-text-muted')}</div>${bossBar(24, 36, { name: 'WALDGEIST', hp: 74 })}
+    <div class="abs" style="left:24px;top:80px">${P('TREFFER · 120MS WEISS, NACHLAUF 300MS', 0, '--color-hud-text-muted')}</div>${bossBar(24, 96, { name: 'WALDGEIST', hp: 58, trail: 6, state: 'hit' })}
+    <div class="abs" style="left:24px;top:140px">${P('KRITISCH · AB 25 %', 0, '--color-hud-text-muted')}</div>${bossBar(24, 156, { name: 'WALDGEIST', hp: 19 })}
+    <div class="abs" style="left:24px;top:200px">${P('UNVERWUNDBAR', 0, '--color-hud-text-muted')}</div>${bossBar(24, 216, { name: 'RIESEN-STEIN', hp: 62, state: 'immune' })}
+    <div class="abs" style="left:24px;top:260px">${P('LANGER NAME', 0, '--color-hud-text-muted')}</div>${bossBar(24, 276, { name: 'VERWURZELTES BAUMMONSTER', hp: 88 })}
+    <div class="abs" style="left:300px;top:20px">${P('BANNER · BLINKT 3×, DANN RUHIG', 0, '--color-hud-text-muted')}</div>
+    <div class="abs" style="left:300px;top:0;width:320px;height:200px">${banner('VERWURZELTES BAUMMONSTER')}</div>`;
+
+  // 6/7 · results
+  function result(id, r) {
+    const won = r.won;
+    const seal = r.boss && won ? `<span class="seal"><span class="spr" data-n="star" data-s="1" style="--px-s:var(--color-hud-gold);--px-o:var(--color-hud-screen)"></span>${P('BOSS BESIEGT', 0, '--color-hud-accent')}</span>` : '';
+    document.getElementById(id).innerHTML = `
+      <div class="res"></div><div class="band" style="background:var(--color-biome-${r.biome})"></div>
+      <div class="logline">${P('LOG · LEVEL ' + r.level + ' · ' + r.biomeName, 0, '--color-hud-text-muted')}${seal}${P(r.time, 0, '--color-hud-text-muted')}</div>
+      <div class="hero">
+        <span class="spr" data-n="astronaut" data-s="4" aria-label="Astronautin"></span>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${P(won ? 'GEWONNEN' : 'VERLOREN', 4, won ? '--color-hud-accent' : '--color-hud-danger')}
+          ${P(won ? 'DER RIESEN-STEIN IST ZERFALLEN.' : 'DIE ASTRONAUTIN ZIEHT SICH ZURÜCK.', 0, '--color-hud-text-muted')}
+        </div>
+      </div>
+      <div class="facts">
+        ${P('BOSS', 0, '--color-hud-text-muted')}<span class="row" style="gap:8px">${won ? `<span class="spr" data-n="star" data-s="2" style="--px-s:var(--color-hud-gold);--px-o:var(--color-hud-screen)"></span>` : ''}${P(r.bossName + ' · ' + (won ? 'BESIEGT' : r.bossLeft + ' % ÜBRIG'), 2, won ? '--color-hud-accent' : '--color-hud-danger')}</span>
+        ${P('ERFAHRUNG', 0, '--color-hud-text-muted')}${P('+' + r.xp + ' XP', 2, '--color-hud-text')}
+        ${P('SPIELERLEVEL', 0, '--color-hud-text-muted')}<span class="row" style="gap:10px">${P(r.plevel, 2, '--color-hud-text')}${r.levelUp ? P('LEVELAUFSTIEG!', 2, '--color-hud-accent') : ''}</span>
+        ${P('MÜNZEN', 0, '--color-hud-text-muted')}<span class="row" style="gap:8px"><span class="spr" data-n="coin" data-s="2"></span>${P(r.coins + ' · ANTEIL ' + r.share + ' % · +' + r.gold + ' GOLD', 2, '--color-hud-gold')}</span>
+        ${P('GOLD GESAMT', 0, '--color-hud-text-muted')}${P(r.total, 2, '--color-hud-gold')}
+      </div>
+      <div class="actions">${r.actions}</div>
+      <div class="f-scan"></div>`;
+  }
+  const btn = (label, primary, focus) => `<div class="f-btn ${primary ? 'primary' : ''} ${focus ? 'is-focus' : ''}" role="button">${P(label, 2, primary ? '--color-hud-accent' : '--color-hud-text')}</div>`;
+  result('s6', { won: true, boss: true, level: 10, biome: 'elf', biomeName: 'ELFENWALD', time: '4:41 ÜBERLEBT', bossName: 'RIESEN-STEIN', xp: 180, plevel: 11, levelUp: true, coins: 38, share: 100, gold: 38, total: 212,
+    actions: btn('NOCHMAL') + btn('NÄCHSTES LEVEL', true, true) + btn('MENÜ') });
+  result('s7', { won: false, boss: true, level: 18, biome: 'elf', biomeName: 'ELFENWALD', time: '5:00 · BOSS NICHT BESIEGT', bossName: 'RIESEN-STEIN', bossLeft: 38, xp: 60, plevel: 11, levelUp: false, coins: 27, share: 50, gold: 13, total: 225,
+    actions: btn('NOCHMAL', true, true) + btn('MENÜ') });
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>

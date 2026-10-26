@@ -12,6 +12,8 @@ import {
   type ItemRules,
   type LevelDef,
   type PlayerDef,
+  type PowerStoreState,
+  type StorablePowerDef,
   type ProgressionRules,
   type SaveGame,
   type WeaponStats,
@@ -112,5 +114,24 @@ describe('contracts', () => {
     expect(GameEvents.PowersChanged).toBe('powers-changed');
     expect(MAX_UPGRADE_LEVEL).toBe(10);
     expect([coin, item, save, old, coins, p].length).toBe(6);
+  });
+
+  it('accepts power store contract and event', () => {
+    const def: StorablePowerDef = { id: 'rapidFire', kind: 'item', label: 'Dauerfeuer' };
+    const state: PowerStoreState = { stored: [def.id] };
+    const payload: GameEventPayloads['power-store-changed'] = state;
+    expect(GameEvents.PowerStoreChanged).toBe('power-store-changed');
+    expect(payload.stored).toEqual(['rapidFire']);
+  });
+
+  it('boss-hp-changed carries the invulnerable flag (V-12)', () => {
+    const hit: GameEventPayloads['boss-hp-changed'] = { hp: 300, maxHp: 600, invulnerable: false };
+    const fade: GameEventPayloads['boss-hp-changed'] = { hp: 300, maxHp: 600, invulnerable: true };
+    // @ts-expect-error the field is required: every sender sets it
+    const missing: GameEventPayloads['boss-hp-changed'] = { hp: 1, maxHp: 2 };
+    expect(GameEvents.BossHpChanged).toBe('boss-hp-changed');
+    expect(Object.keys(hit).sort()).toEqual(['hp', 'invulnerable', 'maxHp']);
+    expect(fade.invulnerable).toBe(true);
+    expect(missing.hp).toBe(1);
   });
 });

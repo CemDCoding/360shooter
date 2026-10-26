@@ -30,3 +30,11 @@ export function stickVector(
 export function stickAngleRad(vector: { x: number; y: number }): number {
   return Math.atan2(vector.y, vector.x);
 }
+
+/** PE-77: off on desktop (user finding M3-DEP). Touch devices always show the stick. */
+export const STICK_ON_DESKTOP = false;
+
+/** True if the stick is shown: always on touch devices, on desktop only with the switch on. */
+export function stickVisible(hasTouch: boolean, onDesktop: boolean): boolean {
+  return hasTouch || onDesktop;
+}

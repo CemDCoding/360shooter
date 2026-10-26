@@ -1,3 +1,4 @@
+export * from './boss';
 export * from './level';
 export * from './enemy';
 export * from './item';
@@ -10,3 +11,4 @@ export * from './assets';
 export * from './coin';
 export * from './upgrade';
 export * from './armour';
+export * from './powerStore';

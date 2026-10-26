@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-25
-**Stand:** Freigegeben. Nächster Schritt: Lead beauftragt den Planner mit „Design übernehmen“ (Übergabe unten).
+**Status:** freigegeben am 2026-10-26 (Ergänzung H-14; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Freigegeben. Nächster Schritt: Lead beauftragt den Planner mit „Design übernehmen“ für die Ergänzung H-14 (Übergabe unter „Änderungen“), danach ist AP-66 entblockt.
 
 ## Ausgangslage
 
@@ -132,4 +132,42 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 
 ## Änderungen
 
-- keine (erste Fassung)
+### 2026-10-26 · Ergänzung H-14 (freigegeben am 2026-10-26)
+
+**Auftrag (Plan §13 H-14, PE-70, Q-34, Q-37, AP-66, Coder-Bericht AP-20):**
+
+1. **Power-up-Lagerplatz** für zeitbegrenzte Kräfte (heute Dauerfeuer und Feuerring, später mehr): je Art ein Fach, Stapel 1, Aktivierung nur durch Tippen oder Klick. Gesucht: HUD-Platz, Symbol, Größe, Zustände leer, bereit, gesperrt (Kraft aktiv oder Abklingzeit).
+2. **Boss-Lücken aus AP-20:** Banner „BOSS KOMMT!“ (heute Funk 3×, Rahmen `hud.danger` mit Glühen, blinkt, bei 28 % Höhe), Ergebnis nach Boss-Sieg (`ergebnis.html`), Zustände der Boss-Leiste (kritisch, Treffer-Blitz, unverwundbar).
+
+**Rahmen:** Die Ergänzung bleibt in der freigegebenen Richtung (Funkgerät in der Runde, Grundsätze 1–8). Keine drei neuen Richtungen, sondern Varianten innerhalb des Systems.
+
+**Ist-Stand HUD (1×, 640×360):** oben links Energie (160×44) und darunter die Chip-Reihe (Gold, dann aktive Kräfte), oben Mitte Timer, oben rechts Ton und Pause, unten rechts Stick (Fangfläche ab x = 490, am PC per `STICK_ON_DESKTOP` künftig aus, AP-69), unten Mitte Boss-Leiste (x 220, top 334, 200 breit). Frei: unten links.
+
+**Entscheidungen Lagerplatz (Nutzer, 2026-10-26):**
+
+- 1a **Platz unten links**, zwei Fächer nebeneinander (Reihenfolge wie `STORABLE_POWERS`: Dauerfeuer, Feuerring). Linker Daumen, kein Konflikt mit Stick und Boss-Leiste.
+- 2a **Eigener Funk-Knopf 40×40** (1×, skaliert mit `funkScale`) mit großem Item-Symbol, dasselbe Motiv wie das liegende Item.
+- 3c **Fächer immer sichtbar, ohne „TIPP“-Label.** leer: gepunkteter Rahmen, Symbol als blasser Umriss · bereit: durchgezogener Akzentrahmen, Symbol voll · gesperrt: abgedunkelt, darüber die Sekunden der Sperre („8s“).
+- 4a **Einlagern:** einmaliges Aufleuchten 200 ms plus Pickup-Ton. Mit `prefers-reduced-motion` nur der Rahmenwechsel.
+
+**Entscheidungen Boss-Lücken (Nutzer, 2026-10-26):**
+
+- 5a **Banner als Funkspruch:** Logbuch-Zeile „FUNK · WARNUNG“ (Funk 1×, `hud.text-muted`), „BOSS KOMMT!“ (Funk 3×, `hud.danger`), Boss-Name (Funk 1×). Blinkt dreimal, dann ruhig. Mit `prefers-reduced-motion` kein Blinken.
+- 6a **Ergebnis:** Überschrift bleibt „GEWONNEN“. Siegel „BOSS BESIEGT“ mit Pixel-Stern im Logbuch-Kopf, Faktenzeile „BOSS · <NAME> · BESIEGT“. Bei Niederlage gegen den Boss: „BOSS · <NAME> · 38 % ÜBRIG“.
+- 7a **Boss-Leiste:** Treffer 120 ms weiße Füllung plus Nachlaufstück in Creme (300 ms) · kritisch ≤ 25 %: Tag „SCHWACH!“, kein Blinken · unverwundbar: Rahmen gepunktet, Füllung gedimmt, Tag „IMMUN“ mit Schloss.
+
+**Ergebnis:** `mockups/lagerplatz-und-boss.html` (Ansichten 1–7), Screenshot `screenshots/lagerplatz-und-boss-desktop.png`. Neue Tokens: `color.hud.flash`, `color.hud.trail`, `color.hud.danger-dim`, `size.hud-slot` (40), `size.hud-slot-gap` (8), `size.hud-slot-icon-scale` (3), `motion.duration.hit` (120 ms), `.store-flash` (200 ms), `.trail` (300 ms), `motion.banner-blinks` (3), `opacity.dim` (0,35), `opacity.ghost` (0,6). Kontrastprüfung grün, Exporte neu gebaut. Keine neuen Schriften, Sprites oder Abhängigkeiten: Die Fächer nutzen die Item-Symbole `rapid` und `ring`, das Schloss und der Stern sind vorhanden (`ui-icons`, `pixel.js`).
+
+**Übergabe H-14 an den Planner:**
+
+| Datei | Änderung | Mockup |
+|---|---|---|
+| `src/config/theme.ts` | aus `export/tokens.resolved.json` neu erzeugen (neue Tokens oben) | – |
+| `src/scenes/hud/PowerSlots.ts` (neu, AP-66), `hudMath.ts` | Fächer 40×40 · `funkScale`, links 8, unten 8, Abstand 8, Reihenfolge `STORABLE_POWERS`. Rahmen 1 px. **leer:** gepunktet `hud.line`, Symbol nur Umriss in `hud.line`, Alpha `opacity.ghost`, nicht klickbar. **bereit:** Rahmen `hud.accent` mit Glühen `hud.glow`, Symbol voll (Dauerfeuer Füllung `hud.accent`, Feuerring `game.fire-ring`). **gesperrt:** Rahmen `hud.line-dim`, Symbol Alpha `opacity.dim`, darüber Restsekunden Funk 2× `hud.text` mit 1-px-Schatten `hud.screen` (Kraft aktiv: Restlaufzeit, Abklingzeit: Restsekunden). **eingelagert:** Fläche `hud.flash` für `store-flash`, dann bereit; bei `prefers-reduced-motion` ohne Fläche. **Maus darüber:** Akzentrahmen, Fläche Akzent 18 %. **gedrückt:** Fläche `hud.accent` für `duration.fast`. Die Fächer enden bei x = 96 (1×), liegen also weit weg von der Fangfläche des Sticks (ab x = 490) und berühren die Boss-Leiste (ab x = 220) nicht. | Ansichten 1–4 |
+| `src/scenes/HudScene.ts` (Banner) | Funkspruch: Zeile „FUNK · WARNUNG“ Funk 1× `hud.text-muted`, „BOSS KOMMT!“ Funk 3× `hud.danger`, gepunktete Trennlinie, Boss-Name Funk 1× `hud.text`. Rahmen `hud.danger` mit Glühen. Blinkt `banner-blinks` × `duration.blink`, danach ruhig bis zum Erscheinen; mit `prefers-reduced-motion` gar nicht. Name aus dem Ereignis `boss-warning` (fehlt er dort, meldet der Coder die Lücke). | Ansichten 2, 5 |
+| `src/scenes/HudScene.ts` (Boss-Leiste) | **Treffer:** Füllung `game.hit-flash` für `duration.hit`, das verlorene Stück bleibt in `hud.trail` und verschwindet nach `duration.trail`. **kritisch** (≤ 25 %): Tag „SCHWACH!“ in `hud.accent` statt „BOSS“, kein Blinken. **unverwundbar** (`boss.isInvulnerable`): Rahmen gepunktet, Füllung `hud.danger-dim`, Tag Schloss + „IMMUN“ in `hud.text-muted`. Ohne Bewegung (`prefers-reduced-motion`) entfällt der weiße Blitz, das Nachlaufstück bleibt. | Ansichten 3, 5 |
+| `src/scenes/ResultScene.ts` | Bei Boss-Level: Faktenzeile „BOSS“ als erste Zeile. Sieg: Stern (`hud.gold`) + „<NAME> · BESIEGT“ Funk 2× `hud.accent`, dazu Siegel „BOSS BESIEGT“ (Stern + Funk 1× `hud.accent`, Rahmen `hud.accent`) mittig im Logbuch-Kopf. Niederlage: „<NAME> · <n> % ÜBRIG“ Funk 2× `hud.danger`, Prozent aufgerundet aus Boss-HP. Untertitel Sieg optional je Boss (z. B. „DER RIESEN-STEIN IST ZERFALLEN.“). Zeilenabstand der Faktenliste 8. | Ansichten 6, 7 |
+
+**Paketierung (Vorschlag):** Lagerplatz in AP-66 (Pflichtlektüre: Ansichten 1–4). Die Boss-Lücken betreffen `HudScene.ts` und `ResultScene.ts` und kollidieren deshalb mit AP-66 bei `HudScene.ts`. Entweder in AP-66 mitnehmen oder als eigenes Paket danach. Beide mit Design-Review.
+
+- keine weiteren (erste Fassung vom 2026-10-25)

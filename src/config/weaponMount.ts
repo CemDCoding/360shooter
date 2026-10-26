@@ -14,6 +14,8 @@ export const WEAPON_MOUNT = {
   stageMaxUpgrades: [6, 13, 20],
   /** Waffe liegt hinter der Figur bei Zielwinkeln von -160° bis -20° (inklusive) */
   behindFigureDeg: { from: -160, to: -20 },
+  /** Dauer in ms, in der die Waffe vollständig die Seite wechselt (Weg -1 bis +1), Startwert PE-67 */
+  mirrorMs: 120,
   /** Frames je Ausbaustufe: 0 = Ruhe, 1 = Schuss (Frames 0–1, 2–3, 4–5) */
   framesPerStage: 2,
 } as const;
