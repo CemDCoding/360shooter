@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-25
-**Stand:** Freigegeben. Nächster Schritt: Lead beauftragt den Planner mit „Design übernehmen“ (Übergabe unten).
+**Status:** geändert (Ergänzung H-14 in Arbeit; Fassung vom 2026-10-25 bleibt bis zur neuen Freigabe gültig)
+**Stand:** 2026-10-26 Interview H-14 läuft: Runde 1 (Lagerplatz: Platz, Form, Zustände, Hinweis) gestellt. Danach Runde 2 (Boss-Lücken: Banner, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste), dann Mockup `mockups/lagerplatz-und-boss.html`.
 
 ## Ausgangslage
 
@@ -132,4 +132,15 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 
 ## Änderungen
 
-- keine (erste Fassung)
+### 2026-10-26 · Ergänzung H-14 (in Arbeit)
+
+**Auftrag (Plan §13 H-14, PE-70, Q-34, Q-37, AP-66, Coder-Bericht AP-20):**
+
+1. **Power-up-Lagerplatz** für zeitbegrenzte Kräfte (heute Dauerfeuer und Feuerring, später mehr): je Art ein Fach, Stapel 1, Aktivierung nur durch Tippen oder Klick. Gesucht: HUD-Platz, Symbol, Größe, Zustände leer, bereit, gesperrt (Kraft aktiv oder Abklingzeit).
+2. **Boss-Lücken aus AP-20:** Banner „BOSS KOMMT!“ (heute Funk 3×, Rahmen `hud.danger` mit Glühen, blinkt, bei 28 % Höhe), Ergebnis nach Boss-Sieg (`ergebnis.html`), Zustände der Boss-Leiste (kritisch, Treffer-Blitz, unverwundbar).
+
+**Rahmen:** Die Ergänzung bleibt in der freigegebenen Richtung (Funkgerät in der Runde, Grundsätze 1–8). Keine drei neuen Richtungen, sondern Varianten innerhalb des Systems.
+
+**Ist-Stand HUD (1×, 640×360):** oben links Energie (160×44) und darunter die Chip-Reihe (Gold, dann aktive Kräfte), oben Mitte Timer, oben rechts Ton und Pause, unten rechts Stick (Fangfläche ab x = 490, am PC per `STICK_ON_DESKTOP` künftig aus, AP-69), unten Mitte Boss-Leiste (x 220, top 334, 200 breit). Frei: unten links.
+
+- keine weiteren (erste Fassung vom 2026-10-25)
