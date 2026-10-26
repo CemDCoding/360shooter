@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { BOSS_TUNING, BOSSES, MIN_REACTION_MS, MIN_TELEGRAPH_MS } from '../../src/config/bosses';
+import {
+  BOSS_SPAWN_REMAINING_MS,
+  BOSS_TUNING,
+  BOSS_WARNING_REMAINING_MS,
+  BOSSES,
+  MIN_REACTION_MS,
+  MIN_TELEGRAPH_MS,
+} from '../../src/config/bosses';
 import { WEAPON_MOUNT } from '../../src/config/weaponMount';
 import { flightTimeMs } from '../../src/entities/bosses/bossGeometry';
 
@@ -10,6 +17,13 @@ function numbers(o: unknown, path = ''): [string, number][] {
   }
   return [];
 }
+
+describe('boss timing (PE-76)', () => {
+  it('spawns the boss at 30 s remaining and warns 3 s earlier', () => {
+    expect(BOSS_SPAWN_REMAINING_MS).toBe(30_000);
+    expect(BOSS_WARNING_REMAINING_MS - BOSS_SPAWN_REMAINING_MS).toBe(3000);
+  });
+});
 
 describe('boss config (PE-75)', () => {
   it('announces every attack at least MIN_TELEGRAPH_MS and keeps the cooldown above it', () => {
@@ -40,13 +54,19 @@ describe('boss config (PE-75)', () => {
 
   it('gives the player MIN_REACTION_MS against ghost orbs', () => {
     const g = BOSS_TUNING.forestGhost;
-    const ms = flightTimeMs(g.orbitRadius - BOSS_TUNING.playerHitRadius - g.orbRadius, g.orbSpeedPxPerSec);
+    const ms = flightTimeMs(
+      g.orbitRadius - BOSS_TUNING.playerHitRadius - g.orbRadius,
+      g.orbSpeedPxPerSec,
+    );
     expect(ms).toBeGreaterThanOrEqual(MIN_REACTION_MS);
   });
 
   it('gives the player MIN_REACTION_MS against ring roots', () => {
     const r = BOSS_TUNING.rootMonster.ring;
-    const ms = flightTimeMs(r.radius - BOSS_TUNING.playerHitRadius - r.spikeRadius, r.speedPxPerSec);
+    const ms = flightTimeMs(
+      r.radius - BOSS_TUNING.playerHitRadius - r.spikeRadius,
+      r.speedPxPerSec,
+    );
     expect(ms).toBeGreaterThanOrEqual(MIN_REACTION_MS);
   });
 

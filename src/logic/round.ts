@@ -3,7 +3,7 @@ import type { LevelDef } from '../contracts';
 
 export type RoundStatus = 'running' | 'won' | 'lost';
 
-/** none: boss not yet announced (or level without boss). warning: 63 s to 60 s left. active: boss alive. defeated. */
+/** none: boss not yet announced (or level without boss). warning: 33 s to 30 s left. active: boss alive. defeated. */
 export type BossPhase = 'none' | 'warning' | 'active' | 'defeated';
 
 const FINAL_MINUTE_MS = 60_000;
@@ -42,7 +42,7 @@ export class RoundState {
     return this.statusValue === 'running' && this.remainingMs <= FINAL_MINUTE_MS;
   }
 
-  /** Boss timeline: warning at 63 s left, boss at 60 s left, until bossDefeated(). */
+  /** Boss timeline: warning at 33 s left, boss at 30 s left (PE-76), until bossDefeated(). */
   get bossPhase(): BossPhase {
     if (!this.requiresBossDefeat || this.statusValue === 'lost') return 'none';
     if (this.bossDefeatedFlag) return 'defeated';
@@ -80,8 +80,13 @@ export class RoundState {
 
   private evaluate(): void {
     if (this.statusValue !== 'running') return;
+    // PE-76: a defeated boss ends the round at once, even before 0:00.
+    if (this.requiresBossDefeat && this.bossDefeatedFlag) {
+      this.statusValue = 'won';
+      return;
+    }
     if (this.remainingMs > 0) return;
-    if (this.requiresBossDefeat && !this.bossDefeatedFlag) return;
+    if (this.requiresBossDefeat) return;
     this.statusValue = 'won';
   }
 }
