@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-26 · Handtest M3-DEP bestanden (H-15, PC und iPhone, ohne Befunde) · M3-Nachtrag W2 und Nachtrag 2 N5 abgeschlossen · `dev` mit AP-71 (45672a5) und AP-66 (7b565f3) gemergt und gepusht · **Autonomer Modus** (PE-69).
+- **Stand:** 2026-10-26 · Handtest M3-DEP bestanden (H-15, PC und iPhone, ohne Befunde) · M3-Nachtrag W2 und Nachtrag 2 N5 abgeschlossen · `dev` mit AP-71 (45672a5) und AP-66 (7b565f3) gemergt und gepusht · **Autonomer Modus** (PE-69) · V-12, V-13, V-14 vom Nutzer freigegeben (PE-87 bis PE-89).
 - **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-71 (außer AP-72), M0-DEP, M1-DEP, M2-DEP, M2b-DEP, M3-DEP (abgenommen 2026-10-26). AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
 - **dev ist grün:** 431/431 Tests, alle Checks (Stand nach AP-66). AP-71 hat den Theme-Sync repariert (`theme.ts` und `tokens.css` per `theme:build`).
-- **Bereit:** keines ohne Freigabe. AP-72 (Boss-Lücken, N6, L) wartet nur noch auf **V-12** (Vertragsfeld `invulnerable` in `boss-hp-changed`, Freigabe durch den Nutzer). **Offen [Mensch]:** H-12 (M2c-DEP, blockiert M3 nicht), H-16 (Designer-Nachtrag Münzen, optional), H-17 (stage-Abgleich vor dem PR `dev` → `stage`, Release-Schritt).
-- **Erkenntnisse (Details §18):** AP-66: Fächer skalieren mit dem HUD-Faktor k (max 1,4), Item-Symbole ganzzahlig (2× bei k=1, 3× bei 1,4). Token `size.hud-slot-icon-scale` ist auf 10×10 gerechnet, die Sprites sind 16×16 (Designer prüft). `opacity`-Tokens fehlen im Generator (Vorschlag V-13). Gold-Tempo unverändert (PE-84). Die große Münze mit 32 px ist so groß wie die Astronautin, der Designer empfiehlt 16 px. Q-44 ist nicht beantwortet, 32 px gilt vorläufig.
-- **Nächster Schritt:** Release-Schritte: Lead prüft zuerst den stage-Abgleich (H-17), danach PR `dev` → `stage` durch den Nutzer und M3-DEP-Release mit Smoke-Test auf stage (§9.2). AP-72 (L, sonnet high) wartet auf V-12. Die Low-Funde aus AP-66 (§18, V-14) braucht der Lead nur, wenn er sie in AP-72 mitnimmt oder ein Folgepaket anlegt.
-- **Offene Fragen an den Nutzer:** (1) V-12 freigeben (AP-72). (2) Q-44: Münzgröße 32 px (vorläufig) oder 16 px. (3) H-17: stage-Abgleich und PR #3. (4) Vorschläge V-13 (AP-73 CFG, Theme-Generator) und V-14 (Low-Funde Lagerplatz) entscheiden.
+- **Bereit:** AP-72 (Boss-Lücken, N6, L; jetzt mit V-12 und V-14) und AP-73 (CFG, Opacity-Tokens, N6, S). Beide laufen parallel, keine gemeinsame Datei (PE-88). **Offen [Mensch]:** H-12 (M2c-DEP, blockiert M3 nicht), H-16 (Designer-Nachtrag Münzen, optional), H-17 (stage-Abgleich vor dem PR `dev` → `stage`, Release-Schritt).
+- **Erkenntnisse (Details §18):** AP-66: Fächer skalieren mit dem HUD-Faktor k (max 1,4), Item-Symbole ganzzahlig (2× bei k=1, 3× bei 1,4). Token `size.hud-slot-icon-scale` ist auf 10×10 gerechnet, die Sprites sind 16×16 (Designer prüft). `opacity`-Tokens fehlen im Generator (V-13 freigegeben, AP-73). Low-Funde aus AP-66 (V-14) sind in AP-72 aufgenommen. Gold-Tempo unverändert (PE-84). Die große Münze mit 32 px ist so groß wie die Astronautin, der Designer empfiehlt 16 px. Q-44 ist nicht beantwortet, 32 px gilt vorläufig.
+- **Nächster Schritt:** Release-Schritte: Lead prüft zuerst den stage-Abgleich (H-17), danach PR `dev` → `stage` durch den Nutzer und M3-DEP-Release mit Smoke-Test auf stage (§9.2). AP-72 (L, sonnet high) und AP-73 (S, sonnet medium) starten parallel. Die lokalen Opacity-Konstanten in `PowerSlots.ts` stellt der Lead nach AP-72 und AP-73 auf die Tokens um (Eigentum AP-72, PE-88).
+- **Offene Fragen an den Nutzer:** (1) Q-44: Münzgröße 32 px (vorläufig) oder 16 px. (2) H-17: stage-Abgleich und PR #3. (3) Q-45: Hover-Wert 0,18 als Token in den Designer-Export aufnehmen oder als Konstante lassen.
 
 <!-- Ende Lagebericht -->
 
@@ -500,7 +500,7 @@ flowchart TD
 | N2 | AP-59 | `src/entities/Player.ts`, `src/logic/weaponMount.ts`, `tests/logic/weaponMount.test.ts`, `src/config/weaponMount.ts`, `src/config/player.ts`, `tests/config/items.test.ts` (nur die Zeile mit `PLAYER`), `tests/logic/upgrades.test.ts` (nur die Zeilen mit der Drehgeschwindigkeit), `docs/balancing.md` |
 | N2 | AP-62 | `src/scenes/controls/VirtualStick.ts`, `src/platform/stick.ts`, `tests/platform/stick.test.ts`, `src/platform/input.ts` (nur falls nötig). Keine Überschneidung mit AP-59 |
 
-**Nachtrag 2 (Nutzerantworten Q-34 bis Q-36, PE-70 bis PE-72):** vier Pakete, die zeitlich neben M3 laufen. Höchstens drei Pakete je Welle (PE-15), AP-16 zählt in M3 W1 mit. AP-63 und AP-64 besitzen keine Datei von AP-16 bis AP-20 und können in M3 W1 parallel laufen oder in jeder freien Welle. AP-65 braucht `contracts/{events,index}.ts` (AP-16 ist seit M3 W1 fertig) und ist deshalb `bereit`; es hat keine gemeinsame Datei mit AP-20 oder AP-67 und kann neben ihnen laufen. AP-66 besitzt `GameScene.ts` und `HudScene.ts` wie AP-20 und liegt deshalb nach AP-20 und nach der Designer-Ergänzung. Die Ergänzung ist seit 2026-10-26 freigegeben (PE-85). AP-66 wartet nur noch auf AP-71 (Theme-Sync, PE-86). AP-72 (N6) teilt `HudScene.ts` mit AP-66 und liegt deshalb danach.
+**Nachtrag 2 (Nutzerantworten Q-34 bis Q-36, PE-70 bis PE-72):** vier Pakete, die zeitlich neben M3 laufen. Höchstens drei Pakete je Welle (PE-15), AP-16 zählt in M3 W1 mit. AP-63 und AP-64 besitzen keine Datei von AP-16 bis AP-20 und können in M3 W1 parallel laufen oder in jeder freien Welle. AP-65 braucht `contracts/{events,index}.ts` (AP-16 ist seit M3 W1 fertig) und ist deshalb `bereit`; es hat keine gemeinsame Datei mit AP-20 oder AP-67 und kann neben ihnen laufen. AP-66 besitzt `GameScene.ts` und `HudScene.ts` wie AP-20 und liegt deshalb nach AP-20 und nach der Designer-Ergänzung. Die Ergänzung ist seit 2026-10-26 freigegeben (PE-85). AP-66 wartet nur noch auf AP-71 (Theme-Sync, PE-86). AP-72 (N6) teilt `HudScene.ts` mit AP-66 und liegt deshalb danach. V-12 ist freigegeben (PE-87), AP-72 ist `bereit`. AP-73 (CFG, N6, V-13, PE-88) teilt mit AP-72 keine Datei und läuft parallel. AP-73 braucht nur AP-71 (gemergt).
 
 | Welle | Paket | Dateien |
 |---|---|---|
@@ -508,7 +508,8 @@ flowchart TD
 | N3 | AP-64 | `src/logic/coins.ts`, `src/config/coins.ts`, `src/entities/Coin.ts`, `tests/logic/coins.test.ts`, `tests/config/coins.test.ts`. Keine Änderung in `src/contracts/**` |
 | N4 | AP-65 | `src/contracts/{powerStore,events,index}.ts` (neu: `powerStore.ts`), `src/config/{powerStore,index}.ts` (neu: `powerStore.ts`), `src/logic/powerStore.ts` (neu), `tests/logic/powerStore.test.ts` (neu), `tests/config/powerStore.test.ts` (neu), `tests/contracts/contracts.test.ts` |
 | N5 | AP-66 (nach AP-71) | `src/scenes/GameScene.ts`, `src/scenes/HudScene.ts`, `src/scenes/hud/{PowerSlots,hudMath}.ts` (neu: `PowerSlots.ts`), `tests/scenes/hud.test.ts`, `src/platform/input.ts` (nur falls nötig). Keine Asset-Dateien: die Ergänzung nutzt vorhandene Symbole (PE-85) |
-| N6 | AP-72 (nach AP-66) | `src/scenes/HudScene.ts` (Banner, Boss-Leiste), `src/scenes/ResultScene.ts`, `src/scenes/hud/hudMath.ts` (Zahlenfunktionen), `src/contracts/events.ts` (nur `boss-hp-changed`, additiv, PE-85 und V-12), `src/scenes/GameScene.ts` (nur die Stelle, die `boss-hp-changed` sendet), `tests/scenes/hud.test.ts`, `tests/contracts/contracts.test.ts` |
+| N6 | AP-72 (nach AP-66) | `src/scenes/HudScene.ts` (Banner, Boss-Leiste), `src/scenes/ResultScene.ts`, `src/scenes/hud/hudMath.ts` (Zahlenfunktionen, `powerBlock`, Fachgröße), `src/scenes/hud/PowerSlots.ts` (V-14 b, c, d), `src/contracts/events.ts` (nur `boss-hp-changed`, additiv, PE-85 und V-12/PE-87), `src/scenes/GameScene.ts` (nur die Stelle, die `boss-hp-changed` sendet, und `endRound` für `power-store-changed`, V-14 a), `tests/scenes/hud.test.ts`, `tests/contracts/contracts.test.ts` |
+| N6 | AP-73 (nach AP-71, parallel zu AP-72) | `scripts/build-theme.mjs`, `src/config/theme.ts` und `src/styles/tokens.css` (nur per `npm run theme:build`), `tests/config/theme.test.ts` (V-13, PE-88) |
 
 ---
 
@@ -841,7 +842,8 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-64 | Gold-Magnet weicher (Beschleunigung statt konstant 320 px/s, PE-72, Q-36) | Nachtrag 2 | LOG/GAME | N3 | AP-29, AP-31 (fertig); parallel zu AP-16 möglich | S | sonnet (medium) | – (gemergt 49bd360) | fertig (Review Runde 1 bestanden, 419/419 Tests; Handtest offen) |
 | AP-65 | Power-up-Lagerplatz: Vertrag, Config, Logik (PE-70, Q-34) | Nachtrag 2 | SH/LOG | N4 | AP-16, AP-30, AP-37a (alle fertig) | M | sonnet (high) | – (gemergt 4b20704) | fertig (Review Runde 1 bestanden) |
 | AP-66 | Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung in die Spielszene (PE-70, Q-34, PE-85; Design-Review ja) | Nachtrag 2 | GAME | N5 | AP-65, AP-20 (fertig), **AP-71** (Theme); Designer-Ergänzung H-14 erfüllt (PE-85) | L | sonnet (high) | – (gemergt 7b565f3) | fertig (Code-Review R1 und Design-Review R1 bestanden, 431/431) |
-| AP-72 | Boss-Lücken aus AP-20: Banner „BOSS KOMMT!“ als Funkspruch, Zustände der Boss-Leiste, Ergebnis nach Boss-Sieg (PE-85; Design-Review ja) | Nachtrag 2 | GAME | N6 | AP-66 und AP-71 (fertig), AP-20 (fertig), Freigabe V-12 (Vertragsfeld) | L | sonnet (high) | – | offen (bereit nach Freigabe V-12) |
+| AP-72 | Boss-Lücken aus AP-20: Banner „BOSS KOMMT!“ als Funkspruch, Zustände der Boss-Leiste, Ergebnis nach Boss-Sieg (PE-85; Design-Review ja; V-14 aufgenommen, PE-89) | Nachtrag 2 | GAME | N6 | AP-66 und AP-71 (fertig), AP-20 (fertig), V-12 (freigegeben, PE-87) | L | sonnet (high) | – | bereit (V-12 freigegeben am 2026-10-26) |
+| AP-73 | CFG: Opacity-Tokens (`opacity.dim`, `opacity.ghost`) im Theme-Generator (V-13, PE-88) | Nachtrag 2 | CFG | N6 | AP-71 (fertig), V-13 (freigegeben, PE-88) | S | sonnet (medium) | – | bereit (parallel zu AP-72, keine gemeinsame Datei) |
 
 ---
 
@@ -913,6 +915,7 @@ flowchart LR
   AP71["AP-71 Theme-Sync"] --> AP66
   AP66 --> AP72["AP-72 Boss-Lücken"]
   AP20 --> AP72
+  AP71 --> AP73["AP-73 Opacity-Tokens (parallel zu AP-72)"]
   AP20 --> AP68["AP-68 Boss-Timing"]
   AP62 --> AP69["AP-69 Stick am PC aus"]
   AP31 --> AP70["AP-70 Gold sichtbar"]
@@ -2791,36 +2794,75 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 #### AP-72 – Boss-Lücken aus AP-20: Banner als Funkspruch, Zustände der Boss-Leiste, Ergebnis nach Boss-Sieg (PE-85)
 
 - **Meilenstein, Lane, Welle:** Nachtrag 2 · GAME · N6
-- **Status: offen, bereit nach Freigabe von V-12 durch den Nutzer (Vertragsfeld).** AP-66 (7b565f3) und AP-71 (45672a5) sind gemergt. Herkunft: Lücken aus dem Coder-Bericht AP-20, von der Designer-Ergänzung H-14 gestaltet (Entscheidungen 5a bis 7a, Brief „Änderungen“, Abschnitt „Übergabe an den Planner“, Zeilen Banner, Boss-Leiste, `ResultScene.ts`).
+- **Status: bereit.** V-12 (Vertragsfeld `invulnerable`) ist am 2026-10-26 vom Nutzer freigegeben (PE-87). Die Low-Funde aus AP-66 (V-14, PE-89) sind aufgenommen. AP-66 (7b565f3) und AP-71 (45672a5) sind gemergt. Herkunft: Lücken aus dem Coder-Bericht AP-20, von der Designer-Ergänzung H-14 gestaltet (Entscheidungen 5a bis 7a, Brief „Änderungen“, Abschnitt „Übergabe an den Planner“, Zeilen Banner, Boss-Leiste, `ResultScene.ts`).
 - **Ziel:** Der Boss-Bereich bekommt die freigegebene Gestaltung: Banner „BOSS KOMMT!“ als Funkspruch, Treffer-Blitz und Nachlaufstück an der Boss-Leiste, Zustände kritisch und unverwundbar, Siegel und Faktenzeile im Ergebnis. Die Spiellogik ändert sich nicht.
 - **Befund (Planner hat den Code gelesen):** `src/scenes/HudScene.ts`: `createBossUi(width, height, k)` (Z. 205; nimmt seit AP-66 `k` entgegen und setzt die Leiste über `bossBarRect()` aus `hudMath.ts` Z. 146), `showBanner` (Z. 237), Banner-Text „BOSS KOMMT!“ (Z. 215), `drawBossBar` (Z. 245). `src/scenes/ResultScene.ts`: Siegtitel „BOSS BESIEGT!“ (Z. 78), Faktenliste ohne Boss-Zeile. `src/contracts/events.ts` Z. 34: `boss-hp-changed` trägt nur `{ hp, maxHp }`. Der Zustand „unverwundbar“ (`BossBase.isInvulnerable`, `src/entities/bosses/BossBase.ts`) erreicht die HUD also nicht. Das Boss-Namenfeld kommt aus dem Ereignis `boss-spawned` (`bossId`), der Anzeigename aus der Boss-Konfiguration.
 - **Pflichtlektüre:** PE-85, PE-76, `docs/design/design-brief.md` (Abschnitt „Änderungen“, H-14, Übergabe-Tabelle, Zeilen HudScene Banner, HudScene Boss-Leiste, ResultScene), `docs/design/mockups/lagerplatz-und-boss.html` Ansichten 2, 3, 5, 6, 7, `docs/design/export/tokens.resolved.json`, `src/scenes/HudScene.ts`, `src/scenes/ResultScene.ts`, `src/contracts/events.ts`, `src/entities/bosses/BossBase.ts` (nur lesen), `src/config/bosses.ts` (nur lesen)
-- **Abhängigkeiten:** AP-66 und AP-71 (gemergt), AP-20 (fertig), V-12 (Freigabe durch den Nutzer)
-- **Parallel möglich mit:** keine, es gibt keine offenen Pakete mehr vor AP-72 (AP-66 ist gemergt)
-- **Dateien (Eigentum):** `src/scenes/HudScene.ts` (Banner, Boss-Leiste, Boss-Ereignisse), `src/scenes/ResultScene.ts` (Boss-Zeile, Siegel, Niederlage-Zeile), `src/scenes/hud/hudMath.ts` (nur reine Funktionen für Prozentwert und Banner-Blinkfolge, falls nötig), `src/contracts/events.ts` (nur `boss-hp-changed`, additiv: Feld `invulnerable: boolean`), `src/scenes/GameScene.ts` (nur die Stelle, die `boss-hp-changed` auslöst; Feld mitgeben), `tests/scenes/hud.test.ts`, `tests/contracts/contracts.test.ts`
-- **Nicht anfassen:** `src/scenes/hud/PowerSlots.ts` und der Rest des Lagerplatzes (AP-66), `src/logic/**`, `src/entities/**`, `src/config/{bosses,theme}.ts`, `docs/**`, `docs/design/**` (Eigentum des Designers)
+- **Abhängigkeiten:** AP-66 und AP-71 (gemergt), AP-20 (fertig), V-12 (freigegeben, PE-87)
+- **Parallel möglich mit:** AP-73 (CFG, N6). Keine gemeinsame Datei: AP-73 fasst nur `scripts/build-theme.mjs`, `src/config/theme.ts`, `src/styles/tokens.css` und `tests/config/theme.test.ts`. AP-72 liest `theme.ts`, ändert es aber nicht. Die Umstellung der lokalen Konstanten in `PowerSlots.ts` ist deshalb nicht in AP-73 und folgt nach AP-72 (PE-88).
+- **Dateien (Eigentum):** `src/scenes/HudScene.ts` (Banner, Boss-Leiste, Boss-Ereignisse), `src/scenes/ResultScene.ts` (Boss-Zeile, Siegel, Niederlage-Zeile), `src/scenes/hud/hudMath.ts` (reine Funktionen für Prozentwert, Banner-Blinkfolge, `powerBlock` und Fachgröße, V-14 c und e), `src/scenes/hud/PowerSlots.ts` (nur V-14 b und d; Lagerplatz-Logik bleibt), `src/contracts/events.ts` (nur `boss-hp-changed`, additiv: Feld `invulnerable: boolean`), `src/scenes/GameScene.ts` (nur die Stelle, die `boss-hp-changed` auslöst, und `endRound` für das Ereignis `power-store-changed`, V-14 a), `tests/scenes/hud.test.ts`, `tests/contracts/contracts.test.ts`
+- **Nicht anfassen:** der Rest des Lagerplatzes (AP-66, außer V-14 b bis e), `src/logic/**`, `src/entities/**`, `src/config/{bosses,theme}.ts`, `scripts/**`, `docs/**`, `docs/design/**` (Eigentum des Designers)
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
   1. **Banner (5a):** Funkspruch mit Zeile „FUNK · WARNUNG“ (Funk 1×, `hud.text-muted`), „BOSS KOMMT!“ (Funk 3×, `hud.danger`), gepunktete Trennlinie, Boss-Name (Funk 1×, `hud.text`). Rahmen `hud.danger` mit Glühen `hud.glow`. Blinkt `motion.banner-blinks` (3) mal mit `duration.blink`, dann ruhig bis zum Ausblenden. Mit `prefers-reduced-motion` kein Blinken. Fehlt der Name im Ereignis `boss-warning`, nimmt der Coder ihn aus der Boss-Konfiguration über `bossId` und meldet das.
   2. **Boss-Leiste (7a):** Treffer: Füllung `game.hit-flash` für `motion.duration.hit` (120 ms), das verlorene Stück bleibt als Nachlaufstück in `hud.trail` für `motion.duration.trail` (300 ms). Kritisch (≤ 25 %): Tag „SCHWACH!“ in `hud.accent` statt „BOSS“, kein Blinken. Unverwundbar: Rahmen gepunktet, Füllung `hud.danger-dim`, Tag Schloss plus „IMMUN“ in `hud.text-muted`. Ohne Bewegung (`prefers-reduced-motion`) entfällt der weiße Blitz, das Nachlaufstück bleibt.
-  3. **Vertrag:** `boss-hp-changed` bekommt additiv das Feld `invulnerable: boolean`. `GameScene` setzt es aus `boss.isInvulnerable`. Ältere Aufrufer ohne Feld gibt es im Projekt nicht (prüfen). Der Test im Vertragsordner prüft die Form. Die Änderung berührt den Event-Vertrag `boss-hp-changed`, deshalb startet AP-72 erst nach der Freigabe von V-12 durch den Nutzer.
+  3. **Vertrag:** `boss-hp-changed` bekommt additiv das Feld `invulnerable: boolean`. `GameScene` setzt es aus `boss.isInvulnerable`. Ältere Aufrufer ohne Feld gibt es im Projekt nicht (prüfen). Der Test im Vertragsordner prüft die Form. Die Änderung berührt den Event-Vertrag `boss-hp-changed`. Die Freigabe von V-12 durch den Nutzer liegt vor (PE-87).
   4. **Ergebnis (6a):** Bei Boss-Level Faktenzeile „BOSS“ als erste Zeile. Sieg: Stern (`hud.gold`) und „<NAME> · BESIEGT“ (Funk 2×, `hud.accent`), dazu das Siegel „BOSS BESIEGT“ (Stern, Funk 1×, `hud.accent`, Rahmen `hud.accent`) mittig im Logbuch-Kopf. Die Überschrift bleibt „GEWONNEN“. Niederlage: „<NAME> · <n> % ÜBRIG“ (Funk 2×, `hud.danger`), Prozent aufgerundet aus Boss-HP. Untertitel Sieg optional je Boss (z. B. „DER RIESEN-STEIN IST ZERFALLEN.“). Zeilenabstand der Faktenliste 8.
   5. Keine Farb-Literale in `src/scenes/**` (Lint-Regel AP-55), nur Tokens aus `src/config/theme.ts`.
+  6. **Low-Funde aus AP-66 (V-14, PE-89):** Die Punkte sind klein und stehen unter den Boss-Punkten. Der Coder setzt sie in dieser Reihenfolge um:
+     - (a) `endRound` in `GameScene.ts` leert den Lagerplatz (`resetPowerStore`) und sendet danach `power-store-changed` mit leerem Lager. Die HUD zeigt dann nicht mehr das veraltete „bereit“.
+     - (b) `PowerSlots.panelStyle()`: Die Zustandswahl wird eine reine Funktion mit Test. „Gesperrt“ schlägt „Aufleuchten“, außer der Brief beschreibt Aufleuchten für gesperrte Fächer ausdrücklich. Dann meldet der Coder dem Lead statt zu raten.
+     - (c) Fachgröße bei ungeradem `k` (z. B. 1,125): Maße und Abstände werden ganzzahlig gerundet, sodass keine halben Pixel entstehen. Der Test prüft mindestens k = 1, 1,125 und 1,4.
+     - (d) Die Fach-Zone (`PowerSlots`) reagiert bei Pause nicht. Ein Tippen darauf wirkt nicht und geht nicht an die Szene weiter (wie in AP-66 gefordert).
+     - (e) `powerBlock` in `hudMath.ts` nimmt den Sperrzustand aus dem Zustand der Kraft, statt `rapidFire` fest zu prüfen. Der Test deckt Dauerfeuer und Feuerring ab.
 - **Akzeptanzkriterien:**
   - Banner: drei Zeilen wie beschrieben, Blinken genau dreimal, bei `prefers-reduced-motion` kein Blinken (Test der Funktion oder Sichtprüfung)
   - Boss-Leiste: Zustände normal, kritisch (≤ 25 %), unverwundbar; Treffer-Blitz und Nachlaufstück in den Zeiten aus den Tokens
   - Ergebnis: Sieg mit Siegel und Faktenzeile „<NAME> · BESIEGT“, Niederlage mit Prozentzeile (Rundung nach oben, Test)
   - Vertrag: `boss-hp-changed` trägt `invulnerable`, bestehende Aufrufer und Tests grün
+  - V-14 (PE-89): (a) bis (e) umgesetzt, jeder Punkt mit Test oder benannter Sichtprüfung im Handtest; keine Änderung am Lagerplatz-Verhalten außer diesen Punkten (AP-66 bleibt in Kraft)
   - Keine Änderung an der Spiellogik, an `src/logic/**` oder an der Boss-Entität
   - Design-Review durch `ma-designer` bestanden (Ansichten 2, 3, 5, 6, 7)
   - Checks grün
-- **Tests:** `tests/scenes/hud.test.ts` (Prozentwert, Blinkfolge, Zustandswahl der Leiste, wenn als reine Funktion), `tests/contracts/contracts.test.ts` (Feld `invulnerable`). Szenen nur im Handtest
-- **Review-Schwerpunkte:** Design-Treue, keine Farb-Literale, Vertrag additiv, Boss-Ereignisse einmal angemeldet und abgemeldet (kein Leck nach Rundenende), Ergebnis nur bei Boss-Level
-- **Doku-Pflichten:** keine (Ergänzung nach Handtest über V-12-Hinweis, falls freigegeben)
+- **Tests:** `tests/scenes/hud.test.ts` (Prozentwert, Blinkfolge, Zustandswahl der Leiste, Zustandswahl des Fachs `panelStyle`, Fachgröße bei k, `powerBlock`, wenn als reine Funktion), `tests/contracts/contracts.test.ts` (Feld `invulnerable`). Szenen nur im Handtest. Für V-14 (a) und (d) genügt ein Szenen-Check im Handtest, wenn kein reiner Test möglich ist; das nennt der Coder im Bericht
+- **Review-Schwerpunkte:** Design-Treue, keine Farb-Literale, Vertrag additiv, Boss-Ereignisse einmal angemeldet und abgemeldet (kein Leck nach Rundenende), Ergebnis nur bei Boss-Level, V-14 (a) bis (e) ohne Verhaltensänderung am Lagerplatz außer den genannten Punkten
+- **Doku-Pflichten:** keine
 - **Aufwand:** L · **Modell:** sonnet · **Effort:** high
 - **Opus-Grund:** –
-- **Kürzbar bei Budgetnot:** ja, Punkt 4 (Ergebnis) kann in ein Folgepaket. Banner und Leiste bleiben
+- **Kürzbar bei Budgetnot:** ja, Punkt 4 (Ergebnis) kann in ein Folgepaket. Banner und Leiste bleiben. V-14 (PE-89) kann ebenfalls in ein Folgepaket, wenn der Lead die Punkte mit Eigentum an `PowerSlots.ts` und `hudMath.ts` getrennt planen will
 - **Commit-Typ:** `feat(AP-72): add boss banner, bar states and boss result`
+
+#### AP-73 – Opacity-Tokens im Theme-Generator (V-13, PE-88)
+
+- **Meilenstein, Lane, Welle:** Nachtrag 2 · CFG · N6
+- **Status: bereit.** V-13 ist am 2026-10-26 vom Nutzer freigegeben (PE-88). AP-71 (45672a5) ist gemergt, der Generator ist per `theme:build` synchron. Der Token-Bestand kommt aus dem Designer-Export, es ist keine Designer-Freigabe nötig.
+- **Ziel:** Der Generator übernimmt die Gruppe `opacity` aus `docs/design/export/tokens.resolved.json` (`dim` 0,35 und `ghost` 0,6) in `src/config/theme.ts`. Damit stehen die Deckkraft-Werte im Theme statt als Konstanten im Code. Aussehen und Spielwerte ändern sich nicht. Die Umstellung der Szene folgt nach AP-72 (siehe „Folge“).
+- **Befund (Planner hat den Code gelesen):** `scripts/build-theme.mjs` Z. 58 (`buildTheme(json)`) kennt keine `opacity`-Gruppe, `src/config/theme.ts` hat keinen Export `opacity`. `docs/design/export/tokens.resolved.json` Z. 204 bis 207 enthält `opacity.dim` und `opacity.ghost`. `src/scenes/hud/PowerSlots.ts` Z. 15 bis 19 hält die Werte als lokale Konstanten, der Hover-Wert 0,18 (`HOVER_FILL_ALPHA`) fehlt im Export und bleibt vorerst eine Konstante (Q-45).
+- **Pflichtlektüre:** `scripts/build-theme.mjs`, `tests/config/theme.test.ts`, `docs/design/export/tokens.resolved.json` (nur lesen), `src/config/theme.ts` (nur lesen; Ausgabe per `theme:build`)
+- **Abhängigkeiten:** AP-71 (gemergt), V-13 (freigegeben, PE-88)
+- **Parallel möglich mit:** AP-72 (N6). Keine gemeinsame Datei. AP-72 hat `src/config/theme.ts` nicht im Eigentum und ändert es nicht, AP-73 fasst keine Szene an.
+- **Dateien (Eigentum):** `scripts/build-theme.mjs`, `src/config/theme.ts` (nur über `npm run theme:build`), `src/styles/tokens.css` (nur über `npm run theme:build`), `tests/config/theme.test.ts`
+- **Nicht anfassen:** `docs/**` (auch `docs/design/**`, Eigentum des Designers), `src/scenes/**` (auch `PowerSlots.ts`, Eigentum von AP-72), `src/logic/**`, `src/entities/**`, `src/config/` außer `theme.ts`, `.env`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `scripts/build-theme.mjs`: Gruppe `opacity` aus dem Export lesen und als `OPACITY` mit `dim` und `ghost` ausgeben (Zahlen 0 bis 1, Typ `OpacityName` wie bei den anderen Gruppen). Die Gruppe in `tokens.css` ist bereits enthalten (Kopie des Exports), daher keine Änderung an der Kopierlogik.
+  2. `npm run theme:build` erzeugt `src/config/theme.ts` und `src/styles/tokens.css`. Von Hand wird nichts geändert (PE-86). Weicht ein anderer Wert vom Export ab, meldet der Coder das dem Lead.
+  3. Der Hover-Wert 0,18 kommt nicht ins Theme. Der Coder ergänzt ihn nicht in `docs/design/**` und nicht im Generator aus eigener Quelle.
+  4. `tests/config/theme.test.ts`: prüft, dass `OPACITY.dim` = 0,35 und `OPACITY.ghost` = 0,6 sind, dass beide aus dem Export stammen (Vergleich mit dem JSON) und dass alle Werte zwischen 0 und 1 liegen.
+- **Akzeptanzkriterien:**
+  - `theme:build` erzeugt `theme.ts` und `tokens.css`; der Diff zu `dev` enthält nur die Opacity-Gruppe
+  - `OPACITY.dim` 0,35 und `OPACITY.ghost` 0,6, gespeist aus dem Export (kein Literal im Generator)
+  - Theme-Tests grün, keine Änderung an anderen Tokens
+  - Keine Änderung an `src/scenes/**`; die Konstanten in `PowerSlots.ts` bleiben bis zur Umstellung unverändert
+  - Checks grün (install, lint, typecheck, Tests, build)
+- **Tests:** `tests/config/theme.test.ts` (Gruppe `opacity`, Werte und Bereich)
+- **Review-Schwerpunkte:** nur Generator und erzeugte Dateien, Werte gegen den Export, keine Handarbeit an `theme.ts` oder `tokens.css`
+- **Doku-Pflichten:** keine
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja. Ohne AP-73 bleiben die Konstanten in `PowerSlots.ts` (kein Fehler, nur Schulden)
+- **Folge (nicht in AP-73):** Umstellung der Konstanten in `PowerSlots.ts` auf `OPACITY` nach AP-72 (AP-72 besitzt die Datei). Der Hover-Wert folgt, sobald der Designer ihn als Token liefert (Q-45). Der Lead plant diesen Schritt, sobald AP-72 gemergt ist.
+- **Commit-Typ:** `feat(AP-73): add opacity tokens to the theme generator`
 
 ### M3 – Bosse
 
@@ -3223,7 +3265,7 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | M2b | 16 | ≈ 23,75 h (+ Review ≈ 30 h) | ≈ 11–12 |
 | M2c | 6 | ≈ 11,25 h (+ Review inkl. 3 Design-Reviews ≈ 15 h) | ≈ 5–6 (bei 45 % Zielwert ≈ 4) |
 | M2c-Nachtrag | 5 (AP-58 bis AP-62) | ≈ 5,25 h (3 × S, 2 × M; + Review ≈ 7 h) | ≈ 2–3 (bei 30 % Team-Budget je Fenster etwa 2 bis 3 Pakete mit Review) |
-| Nachtrag 2 | 5 (AP-63 bis AP-66, AP-72) | ≈ 8,75 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L, AP-72 L; + Review inkl. Design-Review AP-66 und AP-72 ≈ 11 h) | ≈ 4–5 (AP-64 kürzbar, ≈ 0,75 h) |
+| Nachtrag 2 | 6 (AP-63 bis AP-66, AP-72, AP-73) | ≈ 9,5 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L, AP-72 L inkl. V-14 ≈ +0,5 h, AP-73 S ≈ 0,75 h, beides angenommen; + Review inkl. Design-Review AP-66 und AP-72 ≈ 12 h) | ≈ 5 (AP-64 und AP-73 kürzbar, ≈ 1,5 h) |
 | M3 | 6 (AP-16 bis AP-20 und AP-67, Fairness-Fix PE-75, M ≈ 1,5 h) | ≈ 10 h (+ Review ≈ 13 h) | ≈ 5–6 |
 | M3-Nachtrag | 4 (AP-68 S, AP-69 S, AP-70 M, AP-71 S; Handtest-Befunde PE-76 bis PE-78, Theme-Sync PE-86) | ≈ 4,25 h (+ Review inkl. Design-Review AP-70 ≈ 5,5 h) | ≈ 1–2 (AP-68 bis AP-70 in W1, AP-71 in W2) |
 | **Gesamt** | **46** | **≈ 70 h (+ Review ≈ 90 h)** | **≈ 32–38** |
@@ -3371,6 +3413,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-84 | **Q-43 entschieden: Münzwerte senken** (Option a). `coinValue` je Gegner auf ganze Zahlen 1/1/4/4, `BIG_COIN_MIN_VALUE` 4, Preise bleiben (PE-83). Gold-Tempo im Ziel 43 bis 47 je Level. Pins in `tests/config/enemies.test.ts` und `docs/balancing.md` nachgezogen. Umsetzung AP-70 (gemergt 4287479) | Nutzer am 2026-10-26 (Q-43) | Nutzer am 2026-10-26 |
 | PE-85 | **Design übernommen (H-14-Ergänzung, Brief vom 2026-10-26):** Der Lagerplatz (AP-66) braucht nur noch AP-71. Die Boss-Lücken (Banner, Boss-Leiste, Ergebnis) bekommen ein eigenes Paket AP-72 (N6) nach AP-66, weil beide `HudScene.ts` besitzen. AP-72 braucht das additive Feld `invulnerable` in `boss-hp-changed` (V-12, Freigabe nötig). Keine neuen Schriften, Sprites oder Abhängigkeiten | Brief-Status freigegeben (2026-10-26), AP-72 als Planner-Annahme | Nutzer am 2026-10-26 (Brief); AP-72 angenommen vom Planner, vom Nutzer zu bestätigen |
 | PE-86 | **Theme-Sync als Fix (AP-71):** `src/config/theme.ts` und `src/styles/tokens.css` werden nur durch `npm run theme:build` erzeugt, nie von Hand. Dev war nach 1373aba rot (zwei Tests in `tests/config/theme.test.ts`). AP-71 läuft in M3-Nachtrag W2, vor AP-66 | Pflegeauftrag Lead, Befund Testlauf auf dev | angenommen vom Planner (2026-10-26) |
+| PE-87 | **V-12 freigegeben:** Vertrag `boss-hp-changed` bekommt additiv `invulnerable: boolean` (`{ hp, maxHp, invulnerable }`). Umsetzung in AP-72 (N6), AP-72 ist `bereit` | Nutzer im Chat am 2026-10-26 („v 12 v 13 v14 freigeben“) | Nutzer am 2026-10-26 |
+| PE-88 | **V-13 freigegeben:** Opacity-Gruppe (`opacity.dim`, `opacity.ghost`) aus dem Designer-Export in den Theme-Generator aufnehmen. Neues Paket AP-73 (CFG, N6, sonnet medium), parallel zu AP-72, weil keine Datei gemeinsam ist. Die Umstellung der lokalen Konstanten in `PowerSlots.ts` gehört zu AP-72 und folgt nach dessen Merge. Der Hover-Wert 0,18 hat keinen Token im Export (Q-45) | Nutzer im Chat am 2026-10-26; Dateikonflikt-Prüfung AP-72 gegen AP-73 durch den Planner (Pflege) | Nutzer am 2026-10-26; Konfliktprüfung angenommen vom Planner |
+| PE-89 | **V-14 freigegeben:** Low-Funde aus AP-66 (a) bis (e) werden in AP-72 mitgenommen, nicht als Folgepaket. Eigentum: `PowerSlots.ts` (b, d), `hudMath.ts` (c, e, nur reine Funktionen), `GameScene.ts` (a, nur die Stelle in `endRound`), zusätzlich zu den V-12-Dateien | Nutzer im Chat am 2026-10-26; Eigentumsfrage für `hudMath.ts` und `GameScene.ts` nach Auftrag des Lead entschieden | Nutzer am 2026-10-26; Eigentum angenommen vom Planner (Pflege) |
 
 ### Offene Fragen
 
@@ -3413,6 +3458,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-42 | Münz-Drop: Plan PE-39 nennt 5 % je Gegner, der Code (`COIN_RULES.dropChance`) 4,5 % (AP-56 nachgezogen). Welcher Wert gilt? | O | PE-39, AP-56, AP-70 | 4,5 % (Code, bewusst kalibriert), PE-39 dann mit Hinweis ergänzen | entschieden (Nutzer am 2026-10-26): 8 %, PE-81. Die Folge für das Gold-Tempo ist Q-43 |
 | Q-43 | Gold-Tempo bei 8 % Drop: Welcher Hebel senkt das Gold je gewonnenem Level von etwa 79 auf etwa 45? Preise allein reichen nicht (PE-83) | K | PE-81, PE-83, AP-70, `config/enemies.ts` | (a) Münzwert `coinValue` je Gegner um etwa 43 % auf ganze Zahlen senken (Pins in `enemies.test.ts` nachziehen, Große-Münze-Schwelle 5 prüfen); Preise bleiben. (b) Preise erhöhen: verworfen, Gold-Test bliebe rot. (c) Gegnerzahl senken: verworfen, Druckbänder in `balance.test.ts` brächen. Empfehlung (a) | beantwortet (Nutzer am 2026-10-26): (a) Münzwerte senken, PE-84 |
 | Q-44 | Große Münze: 32 px (Ist, `bigDisplayScale` 2) oder 16 px (Designer-Empfehlung `bigDisplayScale` 1, Umrandung an die Skalierung koppeln)? Die große Münze ist so groß wie die Astronautin (32 px) | W | AP-70, H-15, H-16 | Designer-Empfehlung 16 px, Entscheidung nach Sichtprüfung im Handtest | offen (H-15 abgenommen 2026-10-26, Stand 32 px vorläufig, Nutzer hat noch nicht entschieden) |
+| Q-45 | Hover-Wert der Lagerplatz-Fächer (Akzent 18 % über dem Glas, `HOVER_FILL_ALPHA` in `PowerSlots.ts`) als Token in den Designer-Export aufnehmen (`opacity.hover`)? Der Export hat ihn nicht, das Mockup schon | W | V-13, AP-73, AP-72 (`PowerSlots.ts`) | Ja, bei nächstem Designer-Auftrag als Token ergänzen, dann Umstellung nach AP-72. Bis dahin bleibt die Konstante | offen (Designer-Auftrag, Nutzer entscheidet; AP-73 blockiert nicht) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -3439,9 +3485,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | **V-09** Hinweis `docs/balancing.md` (Befunde 3 und 6) | Ein Satz zu `CONTACT_DESPAWN_DAMAGE.cursedTree` (Baum despawnt nach 30 Kontaktschaden, PE-66) und zur Basis-Drehgeschwindigkeit 360 °/s (PE-67). Ein Upgrade-Schritt bringt relativ weniger (4,2 % statt 5,6 % je Stufe). Der Planner darf `docs/balancing.md` nicht ändern. AP-59 hat die Datei im Eigentum: Der Lead prüft, ob der Satz dort steht, sonst im nächsten Paket nachtragen, das die Datei ohnehin anfasst | Lead-Auftrag Wellenabschluss M2c-Nachtrag (PE-66, PE-67) | Planner (Hinweis) |
 | **V-10** §7.2 Freigabe pro Meilenstein (PE-15) | PE-69 ersetzt die Freigabe pro Meilenstein durch den autonomen Modus bis „stop“. Vorschlag: §7.2 und PE-15 entsprechend formulieren. Das ändert die Vorgehensweise, daher Bestätigung durch den Nutzer | Lead-Auftrag Wellenabschluss M2c-Nachtrag, PE-69 | Planner (Pflege) |
 | **V-11** (übernommen am 2026-10-26, siehe PE-82) §2 F-05 Boss-Zeitpunkt | Satz „Er erscheint in der letzten Minute.“ ändern in „Er erscheint in den letzten 30 Sekunden (Warnung bei 33 s Restzeit). Wird er besiegt, endet die Runde sofort mit Sieg. Lebt er am Timerende, geht die Runde weiter, bis er besiegt ist.“ Das ist ein Umfangssatz, der Planner trägt ihn nicht selbst ein. Gilt nach Bestätigung zusammen mit PE-76 | Befund Nutzer (Handtest M3-DEP), PE-76 | Planner (Pflege) |
-| **V-12** (Vorschlag, Freigabe nötig vor AP-72, PE-85) Vertrag `boss-hp-changed` (`src/contracts/events.ts`) | Payload um `invulnerable: boolean` erweitern (additiv, `{ hp, maxHp, invulnerable }`). Grund: Die Boss-Leiste braucht den Zustand „unverwundbar“ (Designer-Ergänzung H-14, Zustand 7a), heute kennt die HUD ihn nicht. Umsetzung in AP-72, Eigentum nur für dieses Feld | Befund AP-72 (Planner, Code gelesen: `src/contracts/events.ts` Z. 34) | Planner (Pflege) |
-| **V-13** (Vorschlag, nicht angelegt: Nachzieher Theme-Generator, Kandidat AP-73 CFG) Opacity-Tokens und Hover-Zustand in den Generator aufnehmen | Heute gibt `theme.ts` keine `opacity`-Tokens aus (`opacity.dim` 0,35, `opacity.ghost` 0,6). Die Werte stehen als lokale Konstanten in `PowerSlots.ts`, der Hover von 18 % hat kein Token. Vorschlag für ein kleines Paket (sonnet, medium): `scripts/build-theme.mjs`, `src/config/theme.ts`, `src/styles/tokens.css` (nur per `theme:build`), `tests/config/theme.test.ts`. Die Tokenliste bestätigt der Designer, weil `docs/design/**` ihm gehört | Befund AP-66 (Coder-Bericht, Review R1) | Planner (Pflege, Lead-Auftrag) |
-| **V-14** (Vorschlag: Folgepaket oder Mitnahme in AP-72, Lead entscheidet) Low-Funde aus AP-66 | (a) `endRound` leert den Lagerplatz ohne Ereignis `power-store-changed`; die HUD zeigt bis zur Ergebnisszene ein veraltetes „bereit“. (b) `PowerSlots` `panelStyle`: Aufleuchten hat Vorrang vor „gesperrt“. (c) Ungerade Fachgröße bei k, z. B. 1,125 (halbe Pixel). (d) Fach-Zonen sind bei Pause interaktiv. (e) `powerBlock` in `hudMath.ts` hat `rapidFire` fest. Die Dateien gehören AP-66 (fertig). Ein Folgepaket braucht Eigentum an `GameScene.ts`, `HudScene.ts`, `PowerSlots.ts`, `hudMath.ts`. In AP-72 nur möglich, wenn der Lead die Eigentumsfrage für `hudMath.ts` (nur reine Funktionen) und `GameScene.ts` (nur die Boss-Zeile) so entscheidet | Review AP-66 Runde 1, Befunde niedrig | Planner (Pflege, Lead-Auftrag) |
+| **V-12** (freigegeben am 2026-10-26, PE-87, Umsetzung AP-72) Vertrag `boss-hp-changed` (`src/contracts/events.ts`) | Payload um `invulnerable: boolean` erweitern (additiv, `{ hp, maxHp, invulnerable }`). Grund: Die Boss-Leiste braucht den Zustand „unverwundbar“ (Designer-Ergänzung H-14, Zustand 7a), heute kennt die HUD ihn nicht. Umsetzung in AP-72, Eigentum nur für dieses Feld | Befund AP-72 (Planner, Code gelesen: `src/contracts/events.ts` Z. 34) | Planner (Pflege) |
+| **V-13** (freigegeben am 2026-10-26, PE-88, angelegt als AP-73, CFG, N6) Opacity-Tokens in den Generator aufnehmen | Heute gibt `theme.ts` keine `opacity`-Tokens aus (`opacity.dim` 0,35, `opacity.ghost` 0,6). Die Werte stehen als lokale Konstanten in `PowerSlots.ts`. Umgesetzt: `scripts/build-theme.mjs`, `src/config/theme.ts`, `src/styles/tokens.css` (nur per `theme:build`), `tests/config/theme.test.ts`. Offen: Hover-Token 0,18 (Q-45, Designer), Umstellung von `PowerSlots.ts` nach AP-72 | Befund AP-66 (Coder-Bericht, Review R1) | Planner (Pflege, Lead-Auftrag) |
+| **V-14** (freigegeben am 2026-10-26, PE-89, Mitnahme in AP-72) Low-Funde aus AP-66 | (a) `endRound` leert den Lagerplatz ohne Ereignis `power-store-changed`; die HUD zeigt bis zur Ergebnisszene ein veraltetes „bereit“. (b) `PowerSlots` `panelStyle`: Aufleuchten hat Vorrang vor „gesperrt“. (c) Ungerade Fachgröße bei k, z. B. 1,125 (halbe Pixel). (d) Fach-Zonen sind bei Pause interaktiv. (e) `powerBlock` in `hudMath.ts` hat `rapidFire` fest. Die Dateien gehören AP-66 (fertig). Ein Folgepaket braucht Eigentum an `GameScene.ts`, `HudScene.ts`, `PowerSlots.ts`, `hudMath.ts`. In AP-72 nur möglich, wenn der Lead die Eigentumsfrage für `hudMath.ts` (nur reine Funktionen) und `GameScene.ts` (nur die Boss-Zeile) so entscheidet | Review AP-66 Runde 1, Befunde niedrig | Planner (Pflege, Lead-Auftrag) |
 
 #### Verbesserungsplan Wellenkonzept (Entwurf, nicht freigegeben)
 
@@ -3564,7 +3610,9 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | Design-Ergänzung H-14 (PE-85): Lagerplatz (Ansichten 1–4) | AP-66 |
 | Design-Ergänzung H-14 (PE-85): Boss-Banner, Boss-Leiste, Ergebnis (Ansichten 2, 3, 5, 6, 7) | AP-72 (N6, nach V-12) |
 | Generierte Tokens synchron mit dem Designer-Export (PE-86) | AP-71 |
-| Zustand „unverwundbar“ in der Boss-Leiste (PE-85, V-12) | AP-72 (Feld `invulnerable` in `boss-hp-changed`) |
+| Zustand „unverwundbar“ in der Boss-Leiste (PE-85, V-12, PE-87) | AP-72 (Feld `invulnerable` in `boss-hp-changed`) |
+| Low-Funde AP-66 (PE-89, V-14): Lager-Ereignis nach Rundenende, Fachzustand, Fachgröße bei k, Pause-Zone, `powerBlock` | AP-72 (Punkte a bis e) |
+| Opacity-Tokens im Theme-Generator (PE-88, V-13) | AP-73 (Hover-Token offen, Q-45) |
 | Handtest-Befunde M3-DEP (PE-79): Riesen-Stein testbar über `?level=10` oder `?level=18` (F-05, F-09) | kein Code, H-15 |
 
 ---
@@ -3762,3 +3810,6 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-26 | Befund Nachzieher AP-68 (Kommentar `GameScene.ts` „63 s“ / „60 s“): Suche in `src/` nach beiden Angaben ohne Treffer. Der Nachzieher ist damit wohl erledigt, der Lead bestätigt es beim nächsten Review | Code gelesen (Suche) | AP-66, AP-68 | Planner (Pflege) |
 | 2026-10-26 | Planung AP-72 (Pflege): Status `offen`, Abhängigkeiten AP-66 und AP-71 erfüllt, einzige Sperre ist V-12. Befund in §12 um den Stand von `createBossUi` (`k`, `bossBarRect`) ergänzt. Der Designer-Auftrag für das Banner und die Ergebnisszene ist unverändert (H-14 erfüllt, Design-Review ja) | Planner (Pflege), Code gelesen | AP-72, V-12 | Planner (Pflege) |
 | 2026-10-26 | Handtest M3-DEP bestanden (Wiederholung H-15, PC und iPhone, ohne weitere Befunde): M3-DEP und H-15 abgenommen. PE-34, PE-75 und Q-41 (PE-80) durch den Handtest bestätigt (abgeleitet aus „Handtest bestanden“, keine Einzelaussage). Q-44 (Münzgröße 32 oder 16 px) bleibt offen, Stand 32 px vorläufig. Nächster Schritt: Release dev → stage nach H-17 (stage-Abgleich zuerst), danach M3-DEP-Release mit Smoke-Test auf stage (§9.2). AP-72 wartet auf V-12 | Nutzer im Chat am 2026-10-26, Pflegeauftrag Lead | §0, §2, §9.2, §10, §13, §16, AP-72, H-17 | Planner (Pflege) |
+| 2026-10-26 | Nutzerfreigabe V-12, V-13, V-14 (Chat „v 12 v 13 v14 freigeben“): PE-87 bis PE-89. AP-72 auf `bereit`, V-14 (a) bis (e) als Kriterien und Dateien in AP-72 aufgenommen. AP-73 (CFG, N6, S, sonnet medium) angelegt, `bereit`. Konfliktprüfung AP-72 gegen AP-73: keine gemeinsame Datei, parallel ja. Die Umstellung von `PowerSlots.ts` auf `OPACITY` folgt nach AP-72 | Nutzer im Chat am 2026-10-26, Pflegeauftrag Lead | §0, §9, §10, §11, §12, §14, §16, §17, AP-72, AP-73 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis AP-72 (V-14 a): `endRound` in `src/scenes/GameScene.ts` (Z. 737 ff.) setzt `powerStore` auf leer, ohne Ereignis `power-store-changed`. Die HUD zeigt bis zur Ergebnisszene ein veraltetes „bereit“ | Code gelesen | AP-72, PE-89 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis AP-73 (Export): `docs/design/export/tokens.resolved.json` Z. 204 bis 207 hat `opacity.dim` und `opacity.ghost`. Der Hover-Wert 0,18 (`HOVER_FILL_ALPHA` in `PowerSlots.ts`) steht nicht im Export. `scripts/build-theme.mjs` übernimmt die Gruppe bisher nicht | Code und Export gelesen | AP-73, Q-45 | Planner (Pflege) |
