@@ -99,6 +99,9 @@
   --color-hud-glow: #a8d86b73;
   --color-hud-scrim: #0a1108d9;
   --color-hud-focus: var(--color-phos-50);
+  --color-hud-flash: #a8d86b80;
+  --color-hud-trail: var(--color-cream-200);
+  --color-hud-danger-dim: var(--color-red-700);
   --color-game-laser-raygun: var(--color-sprite-raygun-glow);
   --color-game-shield-ring: #5fb8ff;
   --color-game-fire-ring: #ff8a3a;
@@ -133,10 +136,19 @@
   --size-stick: 88px;
   --size-stick-knob: 28px;
   --size-energy-segments: 10;
+  --size-hud-slot: 40px;
+  --size-hud-slot-gap: 8px;
+  --size-hud-slot-icon-scale: 3;
   --motion-duration-fast: 80ms;
   --motion-duration-base: 150ms;
   --motion-duration-slow: 300ms;
   --motion-duration-blink: 500ms;
+  --motion-duration-hit: 120ms;
+  --motion-duration-store-flash: 200ms;
+  --motion-duration-trail: 300ms;
+  --motion-banner-blinks: 3;
   --motion-easing-pixel: steps(3);
   --motion-easing-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --opacity-dim: 0.35;
+  --opacity-ghost: 0.6;
 }

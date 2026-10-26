@@ -111,6 +111,9 @@ const COLORS = {
   'hud.glow': { num: 0xa8d86b, css: '#a8d86b', alpha: 0.451 },
   'hud.scrim': { num: 0x0a1108, css: '#0a1108', alpha: 0.851 },
   'hud.focus': { num: 0xe5f2d8, css: '#e5f2d8' },
+  'hud.flash': { num: 0xa8d86b, css: '#a8d86b', alpha: 0.502 },
+  'hud.trail': { num: 0xe0c9d6, css: '#e0c9d6' },
+  'hud.danger-dim': { num: 0x5a2236, css: '#5a2236' },
   'game.laser-raygun': { num: 0xff8fae, css: '#ff8fae' },
   'game.shield-ring': { num: 0x5fb8ff, css: '#5fb8ff' },
   'game.fire-ring': { num: 0xff8a3a, css: '#ff8a3a' },
@@ -145,11 +148,14 @@ const SIZE_PX = {
   'size.hud-chip-h': 24,
   'size.stick': 88,
   'size.stick-knob': 28,
+  'size.hud-slot': 40,
+  'size.hud-slot-gap': 8,
 } as const;
 
 /** Größen als Anzahl. */
 const SIZE_COUNT = {
   'size.energy-segments': 10,
+  'size.hud-slot-icon-scale': 3,
 } as const;
 
 /** Zeiten in ms. */
@@ -158,6 +164,9 @@ const MOTION_MS = {
   'motion.base': 150,
   'motion.slow': 300,
   'motion.blink': 500,
+  'motion.hit': 120,
+  'motion.store-flash': 200,
+  'motion.trail': 300,
 } as const;
 
 /** Easing-Angaben (CSS-Schreibweise). */
