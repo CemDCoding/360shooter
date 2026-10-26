@@ -6,7 +6,7 @@ import type { ActiveArmour, ActivePowers, PowerStoreState, StorablePowerDef } fr
 import { ARMOUR_PICKUP_SPRITE } from '../../entities/ArmourPickup';
 import { slotStatus, type SlotStatus } from '../../logic/powerStore';
 import { prefersReducedMotion } from '../../platform/motion';
-import { FunkPanel, funkScale, funkText, setFunk } from './FunkPanel';
+import { FunkPanel, funkText, setFunk } from './FunkPanel';
 import { powerBlock, powerSlotRects, secondsText, slotIconScale, slotPanelStyle, type Rect } from './hudMath';
 
 /** Scene event of the HudScene: a ready slot was tapped (payload: power id). */
@@ -16,6 +16,8 @@ export const POWER_SLOT_PRESSED = 'power-slot-pressed';
 const HOVER_FILL_ALPHA = 0.18;
 /** Item sprites are 16x16 (config/assets.ts). */
 const SPRITE_PX = 16;
+/** Seconds text scale in a slot: fixed desktop step 2, independent of the HUD factor (PE-94). */
+const SLOT_TEXT_SCALE = 2;
 
 type SlotLook = SlotStatus;
 
@@ -177,15 +179,15 @@ export class PowerSlots {
   private powers: ActivePowers = { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 };
   private armour: ActiveArmour = { id: null, activeMsLeft: 0, cooldownMsLeft: 0 };
 
-  constructor(scene: Phaser.Scene, k: number, arenaH: number, onPress: (id: string) => void) {
-    const rects = powerSlotRects(STORABLE_POWERS.length, k, arenaH, {
+  constructor(scene: Phaser.Scene, arenaH: number, onPress: (id: string) => void) {
+    // PE-94: slots keep desktop size (k = 1, edge 40) on phones; no scaling with the HUD factor.
+    const rects = powerSlotRects(STORABLE_POWERS.length, 1, arenaH, {
       size: THEME.sizePx['size.hud-slot'],
       gap: THEME.sizePx['size.hud-slot-gap'],
       margin: THEME.spacePx['space.2'],
     });
     const iconScale = slotIconScale(rects[0]?.w ?? 0, SPRITE_PX, THEME.sizeCount['size.hud-slot-icon-scale']);
-    const textScale = funkScale(2, k);
-    this.slots = STORABLE_POWERS.map((def, i) => new PowerSlot(scene, def, rects[i], iconScale, textScale, onPress));
+    this.slots = STORABLE_POWERS.map((def, i) => new PowerSlot(scene, def, rects[i], iconScale, SLOT_TEXT_SCALE, onPress));
   }
 
   setStore(next: PowerStoreState): void {

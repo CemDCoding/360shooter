@@ -49,6 +49,8 @@ const MARGIN = 8;
 const CHIP_GAP = 4;
 /** The HUD factor is capped so energy, timer and buttons never collide on small screens. */
 const MAX_K = 1.4;
+/** Glyph scale of the energy and timer numbers: desktop step 3, independent of k (PE-94, funkScale would jump to 4 on phones). */
+const HUD_NUMBER_SCALE = 3;
 const PAUSE_DEPTH = 100;
 /** Boss bar width in arena units at k = 1 (runde.html 3: 200 px, bottom centre). */
 const BOSS_BAR_W = 200;
@@ -150,7 +152,7 @@ export class HudScene extends Phaser.Scene {
     this.createButtons(width, m, btn);
     this.createChips(m, k);
     this.createBossUi(width, height, k);
-    this.slots = new PowerSlots(this, k, height, this.onSlotPressed);
+    this.slots = new PowerSlots(this, height, this.onSlotPressed);
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
@@ -193,7 +195,7 @@ export class HudScene extends Phaser.Scene {
 
   /** Energy panel: number (3x), label and ten segments. */
   private createEnergy(m: number, k: number): void {
-    const numScale = funkScale(3, k);
+    const numScale = HUD_NUMBER_SCALE;
     const labScale = funkScale(1, k);
     const pad = Math.round(8 * k);
     const numW = measureFunk(this, '100', numScale);
@@ -219,7 +221,7 @@ export class HudScene extends Phaser.Scene {
   }
 
   private createTimer(width: number, m: number, k: number): void {
-    const scale = funkScale(3, k);
+    const scale = HUD_NUMBER_SCALE;
     const pad = Math.round(8 * k);
     const w = Math.max(measureFunk(this, '10:00', scale), measureFunk(this, 'BOSS!', scale)) + pad * 2;
     const h = FUNK_GLYPH_H * scale + pad * 2;
