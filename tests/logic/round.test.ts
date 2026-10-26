@@ -23,13 +23,11 @@ describe('RoundState', () => {
 
   it('is won when the timer runs out, the player lives and the boss is defeated', () => {
     const r = make(0);
-    r.tick(150_000);
-    r.bossDefeated();
-    r.tick(29_999);
+    r.tick(179_999);
     expect(r.status).toBe('running');
-    r.tick(1);
+    r.bossDefeated();
     expect(r.status).toBe('won');
-    expect(r.remainingMs).toBe(0);
+    expect(r.remainingMs).toBe(1);
   });
 
   it('a level without boss is won at the timer end', () => {
@@ -83,18 +81,18 @@ describe('RoundState', () => {
     for (let id = 0; id <= 20; id++) expect(make(id).requiresBossDefeat).toBe(true);
   });
 
-  it('warns at 63 s and shows the boss at 60 s remaining', () => {
+  it('warns at 33 s and shows the boss at 30 s remaining', () => {
     const r = make(0);
     expect(r.bossPhase).toBe('none');
-    r.tick(116_999);
+    r.tick(146_999);
     expect(r.bossPhase).toBe('none');
     r.tick(1);
-    expect(r.remainingMs).toBe(63_000);
+    expect(r.remainingMs).toBe(33_000);
     expect(r.bossPhase).toBe('warning');
     r.tick(2999);
     expect(r.bossPhase).toBe('warning');
     r.tick(1);
-    expect(r.remainingMs).toBe(60_000);
+    expect(r.remainingMs).toBe(30_000);
     expect(r.bossPhase).toBe('active');
   });
 
@@ -112,14 +110,14 @@ describe('RoundState', () => {
     expect(r.bossPhase).toBe('defeated');
   });
 
-  it('is not won by an early boss defeat, the timer still has to run out', () => {
+  it('is won at once by a boss defeat while time remains (PE-76)', () => {
     const r = make(0);
-    r.tick(125_000);
+    r.tick(150_000);
+    expect(r.bossPhase).toBe('active');
     r.bossDefeated();
-    expect(r.status).toBe('running');
-    expect(r.bossPhase).toBe('defeated');
-    r.tick(55_000);
     expect(r.status).toBe('won');
+    expect(r.bossFight).toBe(false);
+    expect(r.remainingMs).toBeGreaterThan(0);
   });
 
   it('ignores a boss defeat before the boss appeared', () => {

@@ -4,9 +4,9 @@ import type { BossDef, BossId } from '../contracts';
 /** Fairness: every attack is announced at least this long before it hits. */
 export const MIN_TELEGRAPH_MS = 700;
 
-/** Seconds of remaining time at which the warning appears and at which the boss appears (PE-18). */
-export const BOSS_WARNING_REMAINING_MS = 63_000;
-export const BOSS_SPAWN_REMAINING_MS = 60_000;
+/** Remaining time at which the warning appears and at which the boss appears (PE-76: last 30 s, warning 3 s earlier). */
+export const BOSS_WARNING_REMAINING_MS = 33_000;
+export const BOSS_SPAWN_REMAINING_MS = 30_000;
 
 /** HP +15 % and damage +10 % per level index inside the batch (PE-33). */
 export const BOSS_HP_STEP = 0.15;
