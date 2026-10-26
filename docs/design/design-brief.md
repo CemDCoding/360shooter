@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** geändert (Ergänzung H-14 in Arbeit; Fassung vom 2026-10-25 bleibt bis zur neuen Freigabe gültig)
-**Stand:** 2026-10-26 Interview H-14 läuft: Runde 1 (Lagerplatz: Platz, Form, Zustände, Hinweis) gestellt. Danach Runde 2 (Boss-Lücken: Banner, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste), dann Mockup `mockups/lagerplatz-und-boss.html`.
+**Stand:** 2026-10-26 Interview H-14 läuft: Runde 1 (Lagerplatz) beantwortet, Runde 2 gestellt (Boss-Lücken: Banner, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste), dann Mockup `mockups/lagerplatz-und-boss.html`.
 
 ## Ausgangslage
 
@@ -142,5 +142,12 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 **Rahmen:** Die Ergänzung bleibt in der freigegebenen Richtung (Funkgerät in der Runde, Grundsätze 1–8). Keine drei neuen Richtungen, sondern Varianten innerhalb des Systems.
 
 **Ist-Stand HUD (1×, 640×360):** oben links Energie (160×44) und darunter die Chip-Reihe (Gold, dann aktive Kräfte), oben Mitte Timer, oben rechts Ton und Pause, unten rechts Stick (Fangfläche ab x = 490, am PC per `STICK_ON_DESKTOP` künftig aus, AP-69), unten Mitte Boss-Leiste (x 220, top 334, 200 breit). Frei: unten links.
+
+**Entscheidungen Lagerplatz (Nutzer, 2026-10-26):**
+
+- 1a **Platz unten links**, zwei Fächer nebeneinander (Reihenfolge wie `STORABLE_POWERS`: Dauerfeuer, Feuerring). Linker Daumen, kein Konflikt mit Stick und Boss-Leiste.
+- 2a **Eigener Funk-Knopf 40×40** (1×, skaliert mit `funkScale`) mit großem Item-Symbol, dasselbe Motiv wie das liegende Item.
+- 3c **Fächer immer sichtbar, ohne „TIPP“-Label.** leer: gepunkteter Rahmen, Symbol als blasser Umriss · bereit: durchgezogener Akzentrahmen, Symbol voll · gesperrt: abgedunkelt, darüber die Sekunden der Sperre („8s“).
+- 4a **Einlagern:** einmaliges Aufleuchten 200 ms plus Pickup-Ton. Mit `prefers-reduced-motion` nur der Rahmenwechsel.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
