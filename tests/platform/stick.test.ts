@@ -43,7 +43,8 @@ describe('stickVisible', () => {
     expect(stickVisible(true, true)).toBe(true);
     expect(stickVisible(true, false)).toBe(true);
   });
-  it('shows the stick on desktop by default', () => {
-    expect(STICK_ON_DESKTOP).toBe(true);
+  it('hides the stick on desktop (PE-77)', () => {
+    expect(STICK_ON_DESKTOP).toBe(false);
+    expect(stickVisible(false, STICK_ON_DESKTOP)).toBe(false);
   });
 });
