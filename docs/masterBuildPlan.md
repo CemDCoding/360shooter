@@ -21,11 +21,11 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-26 · Wellenabschluss N8 (Nachtrag 3) abgeschlossen (AP-76, AP-77, AP-78 gemergt, Tests 458/458, dev grün) · Nutzer hat die Ingame-Sprites freigegeben (H-19 ☑, Designer-Commit 8c7b88b) und „Design übernehmen“ ist erledigt: **Nachtrag 4** (AP-79, AP-80, Welle N9, PE-107, PE-108) angelegt · Variante B: Interview PE-96 bis PE-106 läuft, Paketschnitt M4 steht aus · **Autonomer Modus** (PE-69).
+- **Stand:** 2026-10-26 · Wellenabschluss N8 (Nachtrag 3) abgeschlossen (AP-76, AP-77, AP-78 gemergt, Tests 458/458, dev grün) · Nutzer hat die Ingame-Sprites freigegeben (H-19 ☑, Designer-Commit 8c7b88b) und „Design übernehmen“ ist erledigt: **Nachtrag 4** (AP-79, AP-80, Welle N9, PE-107, PE-108) angelegt · Variante B: Planner-Interview abgeschlossen, **M4 „Breites Spielfeld“** angelegt (AP-81 bis AP-86, H-23, H-24, PE-99 bis PE-106, PE-109) · **Autonomer Modus** (PE-69).
 - **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-78, M0-DEP, M1-DEP, M2-DEP, M2b-DEP, M3-DEP (abgenommen 2026-10-26). AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt. AP-76 ist am Gerät nur rechnerisch belegt (Sichtprüfung in H-18).
-- **Laufende Arbeit:** keine. **Bereit: AP-79** (Sprite-Pipeline, 24 PNGs, Kacheln ohne Tint; M, sonnet high, Design-Review ja) **und AP-80** (Doku und Lizenzen; S, sonnet medium), parallel in N9, ein Fenster. Der Paketschnitt von M4 (Variante B, Architekturänderung §4) kommt aus dem Planner-Interview, nicht aus der Pflege; M4-Pakete dürfen die Dateien von AP-79 und AP-80 nicht anfassen (§8). **Offen [Mensch]:** H-22 (Sichtprüfung Sprites, Q-46 bestätigen), H-18 (Handtest N6 und N8, zurückgestellt), H-12 (M2c-DEP, blockiert nichts), H-16 (Designer-Nachtrag Münzen, optional). **Erledigt:** H-19 (Sprites freigegeben), H-17, H-21, H-20 (entfällt).
+- **Laufende Arbeit:** keine. **Bereit: AP-79** (Sprite-Pipeline, 24 PNGs, Kacheln ohne Tint; M, sonnet high, Design-Review ja) **und AP-80** (Doku und Lizenzen; S, sonnet medium), parallel in N9, ein Fenster. **Ebenfalls bereit: AP-81** (M4 W1, Vertrag Arena-Größe; S, sonnet medium), darf mit N9 parallel laufen (keine gemeinsame Datei, zusammen drei Pakete). AP-82 bis AP-85 `offen` (W2/W3), AP-86 grob (nach H-23). M4-Pakete fassen die Dateien von AP-79 und AP-80 nicht an (§8). **Offen [Mensch]:** H-22 (Sichtprüfung Sprites, Q-46 bestätigen), H-23 (Designer-Interview „HUD am Handy“, parallel zu M4 W1/W2), H-18 (Handtest N6 und N8, zurückgestellt), H-12 (M2c-DEP, blockiert nichts), H-16 (Designer-Nachtrag Münzen, optional). **Erledigt:** H-19 (Sprites freigegeben), H-17, H-21, H-20 (entfällt).
 - **Erkenntnisse (Details §18):** Chips mit aktiven Kräften (`FunkChip`, `FunkPanel.ts`) skalieren weiter mit k (Text 2 auf 3, Höhe 24·k nicht ganzzahlig): bei weiterer Klage „Power-ups zu groß“ sind das die Chips (Teil der Planung Variante B). Banner und Pause-Titel nutzen `funkScale` mit k (am Handy Stufe 4/5, nicht bemängelt, im Smoke mitbeobachten). Design-System-Lücke: Der Brief regelt das HUD nur bei k = 1, die Tabelle „HUD am Handy“ fehlt (Variante-B-Planung, Designer). Slot-Rand 8 gegen Panel-Rand round(8k) = 11 (niedrig). Designer-Commits an `docs/design/export/` brauchen danach `npm run theme:build` (V-15 entschieden, PE-98: Der Lead legt nach Designer-Commits am Export selbst ein Theme-Sync-Paket an). `HOVER_FILL_ALPHA` 0,18 und `BLINK_ALPHA` 0,55 bleiben Konstanten ohne Token (Q-45). Sprites: Alle 24 Designer-Sprites passen zum Manifest, Code bleibt bis auf `maps.ts` (Tint) unverändert; offen sind `Laser.ts` `setTintFill` (V-16), Sprite-Sync (V-17, RI-21), mehrfarbige Item-Symbole im HUD (V-18).
-- **Nächster Schritt:** Lead startet AP-79 und AP-80 (N9, zwei Coder); Merge AP-79 vor AP-80; Wellenabschluss N9; danach [Mensch] H-22 (Sichtprüfung, Release `dev` → `stage`). Variante B (M4): Paketschnitt aus dem Planner-Interview mit dem Nutzer (PE-99 bis PE-106), HUD-Tabelle „HUD am Handy“ durch den Designer (PE-103); Sprite-Einbau hängt nicht davon ab und kommt zuerst. Vorschläge V-16 (Laser-Tönung), V-17 (Sprite-Sync) und V-18 (Item-Symbole im HUD) warten auf den Nutzer.
+- **Nächster Schritt:** Lead startet AP-79 und AP-80 (N9, zwei Coder); Merge AP-79 vor AP-80; Wellenabschluss N9; danach [Mensch] H-22 (Sichtprüfung, Release `dev` → `stage`). Variante B (M4): AP-81 mit N9 starten, danach W2 (AP-82, AP-83, AP-84), W3 (AP-85, AP-86 nach H-23 und „Design übernehmen“), W4 H-24 (M4-DEP); Sprite-Einbau hängt nicht von M4 ab. Vorschläge V-16 (Laser-Tönung), V-17 (Sprite-Sync) und V-18 (Item-Symbole im HUD) warten auf den Nutzer.
 - **Offene Fragen an den Nutzer:** (1) Q-46 (angenommen, PE-108): Beide Münzen bleiben 16 px, der Unterschied kommt aus den Sprites (Stern auf der großen Münze) und der Kontur; Bestätigung in H-22, sonst Mini-Paket für 8 px. (2) Q-45: Hover-Wert 0,18 und `BLINK_ALPHA` 0,55 als Token in den Designer-Export aufnehmen oder als Konstanten lassen. (3) Niederlage-Text „5:00 · BOSS NICHT BESIEGT“: nur im Mockup, Designer klärt, ob die ResultScene ihn bekommt. (4) Im Interview zu Variante B: Details der Arena-Breite und des HUD am Handy.
 
 <!-- Ende Lagebericht -->
@@ -77,11 +77,11 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu; PE-83 bestätigt (Nutzer 2026-10-26), Q-43 beantwortet (PE-84), PE-85 (Design H-14 übernommen, AP-72 neu), PE-86 (Theme-Sync, AP-71), Q-44 neu, V-12 neu, V-13 und V-14 neu (Vorschläge aus AP-66); Handtest M3-DEP bestanden (2026-10-26): PE-34, PE-75 und Q-41 (PE-80) bestätigt, Q-44 beantwortet (PE-90), Q-46 offen; PE-91 (AP-75, N7; H-18 zurückgestellt, Q-45 erweitert); PE-92 bis PE-94 (Befunde Smoke-Test stage, Ursachen und Ziele, angenommen), Q-47 (Seitenverhältnis A oder B) und Q-48 (Insets-Foto) offen; PE-95 (dev rot nach Designer-Commit 57573d8, AP-78 Theme-Sync); Q-47 beantwortet (Variante B, PE-96), Q-48 beantwortet (Insets bestätigt, PE-97), V-15 entschieden (PE-98, geschlossen); PE-99 bis PE-106 (Variante B: Mechanik, Fairness, Boss-Arena, Menü, HUD-Tabelle Designer, Chips, Banner, Abnahme; Interview) neu; PE-107 (Design übernommen, Brief vom 2026-10-26 Ingame-Sprites, AP-79 und AP-80) und PE-108 (Q-46 über die Sprite-Gestaltung, angenommen, Bestätigung in H-22) neu; V-16 bis V-18 als Vorschläge; Q-45 offen | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu; PE-83 bestätigt (Nutzer 2026-10-26), Q-43 beantwortet (PE-84), PE-85 (Design H-14 übernommen, AP-72 neu), PE-86 (Theme-Sync, AP-71), Q-44 neu, V-12 neu, V-13 und V-14 neu (Vorschläge aus AP-66); Handtest M3-DEP bestanden (2026-10-26): PE-34, PE-75 und Q-41 (PE-80) bestätigt, Q-44 beantwortet (PE-90), Q-46 offen; PE-91 (AP-75, N7; H-18 zurückgestellt, Q-45 erweitert); PE-92 bis PE-94 (Befunde Smoke-Test stage, Ursachen und Ziele, angenommen), Q-47 (Seitenverhältnis A oder B) und Q-48 (Insets-Foto) offen; PE-95 (dev rot nach Designer-Commit 57573d8, AP-78 Theme-Sync); Q-47 beantwortet (Variante B, PE-96), Q-48 beantwortet (Insets bestätigt, PE-97), V-15 entschieden (PE-98, geschlossen); PE-99 bis PE-106 und PE-109 (Variante B: Mechanik, Fairness, Boss-Arena, Menü, HUD-Tabelle Designer, Chips, Banner, Abnahme, Breite fest pro Runde und Schnitt M4; Interview) neu; PE-107 (Design übernommen, Brief vom 2026-10-26 Ingame-Sprites, AP-79 und AP-80) und PE-108 (Q-46 über die Sprite-Gestaltung, angenommen, Bestätigung in H-22) neu; V-16 bis V-18 als Vorschläge; Q-45 offen | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig). M3-Nachtrag W1 (AP-68, AP-69, AP-70) abgeschlossen am 2026-10-26, alle `fertig`. M3-Nachtrag W2 (AP-71) und Nachtrag 2 N5 (AP-66) abgeschlossen am 2026-10-26, beide `fertig`. H-15 [Mensch] abgenommen und M3-DEP abgenommen (Handtest 2026-10-26, PC und iPhone, ohne Befunde); Release nach `stage` offen (H-17). Q-44 beantwortet (16 px, PE-90). N6 (AP-72, AP-73, AP-74) abgeschlossen am 2026-10-26, alle `fertig`; Abnahme des Nachtrags 2 über den Handtest H-18 offen, Q-46 offen. N7 (AP-75) abgeschlossen am 2026-10-26, `fertig` (gemergt 59f53de, Code-Review Runde 1 bestanden). Smoke-Punkt in H-18 offen, blockiert kein Folgepaket. N8 (AP-76, AP-77, AP-78) abgeschlossen am 2026-10-26, alle `fertig` (Reviews Runde 1 bestanden, AP-76 auch Design-Review, 458/458). H-17 erledigt (stage auf dev-Stand). Q-47 Variante B (PE-96): Planung im Planner-Interview läuft. Mechanik, Fairness, Boss-Arena und Menü entschieden (PE-99 bis PE-102), §4 um „Arena-Größe“ ergänzt (freigegeben). HUD-Tabelle durch den Designer (PE-103), Chips und Banner unverändert (PE-104, PE-105), Abnahme (PE-106). G2(M4 „Breites Spielfeld“) offen: Paketschnitt. G2(Nachtrag 4 „Einbau der Ingame-Sprites“) erfüllt (2026-10-26): H-19 ☑ (Nutzer: „sprites sind freigegeben“), AP-79 und AP-80 vollständig, Abhängigkeiten erfüllt (Designer-Commits 57573d8, 7740338, 8c7b88b und AP-78 auf dev), Abdeckungsmatrix ergänzt, [Mensch]-Schritt H-22 steht; N9 (AP-79, AP-80) `bereit`.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig). M3-Nachtrag W1 (AP-68, AP-69, AP-70) abgeschlossen am 2026-10-26, alle `fertig`. M3-Nachtrag W2 (AP-71) und Nachtrag 2 N5 (AP-66) abgeschlossen am 2026-10-26, beide `fertig`. H-15 [Mensch] abgenommen und M3-DEP abgenommen (Handtest 2026-10-26, PC und iPhone, ohne Befunde); Release nach `stage` offen (H-17). Q-44 beantwortet (16 px, PE-90). N6 (AP-72, AP-73, AP-74) abgeschlossen am 2026-10-26, alle `fertig`; Abnahme des Nachtrags 2 über den Handtest H-18 offen, Q-46 offen. N7 (AP-75) abgeschlossen am 2026-10-26, `fertig` (gemergt 59f53de, Code-Review Runde 1 bestanden). Smoke-Punkt in H-18 offen, blockiert kein Folgepaket. N8 (AP-76, AP-77, AP-78) abgeschlossen am 2026-10-26, alle `fertig` (Reviews Runde 1 bestanden, AP-76 auch Design-Review, 458/458). H-17 erledigt (stage auf dev-Stand). Q-47 Variante B (PE-96): Planung im Planner-Interview läuft. Mechanik, Fairness, Boss-Arena und Menü entschieden (PE-99 bis PE-102), §4 um „Arena-Größe“ ergänzt (freigegeben). HUD-Tabelle durch den Designer (PE-103), Chips und Banner unverändert (PE-104, PE-105), Abnahme (PE-106), Breite während der Runde fest (PE-109). **G2(M4 „Breites Spielfeld“) erfüllt** für AP-81 bis AP-85 (Schnitt vom Nutzer bestätigt, 2026-10-26, PE-109); M4 W1 (AP-81) `bereit`, parallel zu N9 möglich (keine gemeinsame Datei). AP-86 ist grob und wird nach H-23 per „Design übernehmen“ verfeinert (G2 für AP-86 offen). G2(Nachtrag 4 „Einbau der Ingame-Sprites“) erfüllt (2026-10-26): H-19 ☑ (Nutzer: „sprites sind freigegeben“), AP-79 und AP-80 vollständig, Abhängigkeiten erfüllt (Designer-Commits 57573d8, 7740338, 8c7b88b und AP-78 auf dev), Abdeckungsmatrix ergänzt, [Mensch]-Schritt H-22 steht; N9 (AP-79, AP-80) `bereit`.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -518,7 +518,13 @@ flowchart TD
 | N8 | AP-78 (Theme-Sync, PE-95) | `src/config/theme.ts` und `src/styles/tokens.css` (nur per `npm run theme:build`), `tests/config/theme.test.ts` (nur falls ein Test nötig) |
 | N9 | AP-79 (Ingame-Sprites einbauen, PE-107) | `scripts/build-sprites.mjs` (neu), `package.json` (nur Skript `sprites:build`), `tests/scripts/build-sprites.test.ts` (neu), `public/assets/sprites/*.png` (24, per `sprites:build`), `scripts/generate-placeholders.mjs` (nur Töne), `public/assets/.placeholders.json`, `scripts/check-assets.mjs` (nur falls nötig), `src/config/assets.ts` (nur `astronaut`-Beschreibung und `SPRITE_NOTE`), `src/config/maps.ts` (nur `tint` bei `forestNight` und `elfForest`), `tests/config/maps.test.ts` |
 | N9 | AP-80 (Doku und Lizenzen, PE-107) | `public/assets/LICENSES.md`, `docs/guides/grafik-austauschen.md`, `README.md` |
-| M4 (später) | Hinweis zur Variante B (PE-96, Paketschnitt steht aus) | Die Pakete von M4 dürfen `public/assets/sprites/**`, `src/config/assets.ts`, den Tint in `src/config/maps.ts` und die Dateien von AP-79 und AP-80 nicht anfassen. `src/scenes/MapBackground.ts`, `src/main.ts`, `src/platform/layout.ts`, `src/scenes/GameScene.ts`, `HudScene.ts`, Gegner- und Boss-Dateien gehören dem Sprite-Einbau nicht und bleiben für M4 frei |
+| M4 W1 | AP-81 (Vertrag Arena-Größe) | `src/contracts/arena.ts` (neu), `src/contracts/index.ts`, `src/config/arena.ts` (neu), `src/config/index.ts`, `src/platform/layout.ts` (nur neue Funktion `arenaWidthFor`, `ARENA_H` aus der Config), `tests/platform/layout.test.ts`, `tests/config/arena.test.ts` (neu), `tests/contracts/contracts.test.ts` (nur falls dort ein Exportmuster existiert) |
+| M4 W2 | AP-82 (Spielgröße, `main.ts`) | `src/main.ts`, `src/platform/layoutDebug.ts`, `tests/platform/layoutDebug.test.ts` |
+| M4 W2 | AP-83 (Fairness Gegner) | `src/logic/approach.ts` (neu), `tests/logic/approach.test.ts` (neu), `src/entities/enemies/Enemy.ts` |
+| M4 W2 | AP-84 (Boss-Arena, Spielszene) | `src/entities/bosses/{BossBase,GiantStone,RootMonster}.ts`, `src/config/bosses.ts` (nur `BOSS_TUNING.arena`), `src/scenes/GameScene.ts`, `tests/config/bosses.test.ts`, `tests/entities/bossGeometry.test.ts`, `tests/logic/boss.test.ts` (nur falls nötig) |
+| M4 W3 | AP-85 (Menü und Ergebnis zentrieren) | `src/scenes/MenuScene.ts`, `src/scenes/ResultScene.ts`, `src/scenes/menu/*.ts` (nur falls nötig) |
+| M4 W3 | AP-86 (HUD am Handy, grob, nach H-23) | `src/scenes/HudScene.ts`, `src/scenes/hud/*.ts` (inklusive `PowerSlots.ts`, V-18 abstimmen), `tests/scenes/hud.test.ts` (endgültig nach „Design übernehmen“) |
+| M4 (Regel) | Hinweis zur Variante B (PE-96, Schnitt PE-109) | Die Pakete von M4 dürfen `public/assets/sprites/**`, `src/config/assets.ts`, den Tint in `src/config/maps.ts` und die Dateien von AP-79 und AP-80 nicht anfassen. `src/scenes/MapBackground.ts`, `src/main.ts`, `src/platform/layout.ts`, `src/scenes/GameScene.ts`, `HudScene.ts`, Gegner- und Boss-Dateien gehören dem Sprite-Einbau nicht und bleiben für M4 frei |
 
 ---
 
@@ -790,6 +796,27 @@ Der Nutzer hat die Sprite-Entwürfe am 2026-10-26 freigegeben („sprites sind f
   - [ ] Treffer-Blitz bleibt weiß; die Hitboxen fühlen sich fair an (unverändert)
   - [ ] Vergleich mit `docs/design/screenshots/sprites-ingame-desktop.png` und `sprites-welt-desktop.png`
 
+#### M4 – Breites Spielfeld (Variante B, PE-96, PE-99 bis PE-106, PE-109)
+
+Ziel: Das Spielfeld wird am Handy breiter (Breite 640..800 bei Höhe 360), damit das Spiel auf jedem Handy gut aussieht. Auf dem iPhone 15 quer bleibt links und rechts nur der Bereich von Notch und Home-Bar frei (je 47 pt statt bisher je 95 pt Rand, Foto `IMG_6372.PNG`, PE-97). Die Spielbalance hängt nicht von der Breite ab (PE-100).
+
+| Welle | Pakete (parallel) |
+|---|---|
+| M4 W1 | **AP-81** Vertrag Arena-Größe, Config und Layout-Rechnung (Gerüst des Meilensteins). Darf parallel zu N9 (AP-79, AP-80) laufen, keine gemeinsame Datei, zusammen drei Pakete (PE-15). Parallel [Mensch] **H-23** Designer-Interview „HUD am Handy“ (PE-103), blockiert nur AP-86 |
+| M4 W2 | **AP-82** Spielgröße in `main.ts`, Breite fest pro Runde (PE-109). **AP-83** Fairness der Gegner (Anlauf bis zum 640er-Ring, PE-100). **AP-84** Boss-Arena und Spielszene (PE-101). Keine gemeinsame Datei, drei Pakete (PE-15) |
+| M4 W3 | **AP-85** Menü und Ergebnis zentrieren (PE-102, Design-Review ja). **AP-86** HUD am Handy (nach H-23 und „Design übernehmen“, Design-Review ja) |
+| M4 W4 | **H-24** [Mensch] M4-DEP: `dev` nach `stage`, Smoke-Test nach PE-106 |
+
+- **Prüfpunkte (M4-DEP, H-24):**
+  - [ ] iPhone 15 quer (Homescreen-App): Das Spielfeld füllt die Breite bis auf Notch und Home-Bar, keine zusätzlichen Seitenbalken, unten nur die Home-Bar
+  - [ ] PC 16:9: Spielfeld wie bisher (640 × 360), keine Balken
+  - [ ] Entwicklertools 19,5:9 und 20:9: kein Balken bis 2,2:1; 4:3: Balken oben und unten wie bisher
+  - [ ] Gegner tauchen nicht sichtbar auf (in den Bildecken höchstens kurz schneller, siehe §15), Zeit bis zum ersten Kontakt am Handy gefühlt wie am PC (PE-100)
+  - [ ] Bosse nutzen die ganze Breite, Riesen-Stein und Bäume bleiben im Bild (PE-101)
+  - [ ] Menü und Ergebnis mittig, Hintergrund über die ganze Breite (PE-102)
+  - [ ] HUD am Handy nach der Designer-Tabelle (AP-86); Chips, Banner und Pause-Titel mitbeobachten (PE-104, PE-105)
+  - [ ] Safari-Leiste ein/aus während einer Runde: kein kaputtes Layout, höchstens kurz Balken (PE-109)
+
 #### M3 – Bosse
 
 | Welle | Pakete (parallel) |
@@ -904,6 +931,14 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-79 | Ingame-Sprites einbauen: Sprite-Pipeline `sprites:build`, 24 PNGs aus dem Designer-Quelltext, Generator nur noch für Töne, Kacheln ohne Tint, Q-46 über die Sprites (PE-107, PE-108; Design-Review ja) | Nachtrag 4 | ASSET/CFG | N9 | Designer-Commits 57573d8, 7740338, 8c7b88b (auf dev), AP-78 (fertig), H-19 (☑) | M | sonnet (high) | – | bereit |
 | AP-80 | Doku und Lizenzen für die Ingame-Sprites: `LICENSES.md`, `grafik-austauschen.md`, `README.md` (PE-107; Design-Review nein) | Nachtrag 4 | ASSET/OPS | N9 | Designer-Commit 8c7b88b (auf dev); parallel zu AP-79 | S | sonnet (medium) | – | bereit |
 | H-22 | Sichtprüfung Ingame-Sprites am PC und iPhone, Münzen-Unterschied (Q-46, PE-108), danach Release nach `stage` | Nachtrag 4 | HUM | N9 Abschluss | AP-79, AP-80 | H | – | – | offen |
+| AP-81 | M4: Vertrag Arena-Größe, `config/arena.ts`, `arenaWidthFor` (PE-99, PE-100, PE-106) | M4 | SH/GAME | M4 W1 | – (AP-77 fertig) | S | sonnet (medium) | – | bereit |
+| H-23 | M4: Designer-Interview „HUD am Handy“ (PE-103) | M4 | HUM | M4 W1/W2 | – | H | – | – | offen |
+| AP-82 | M4: Spielgröße in `main.ts`, Breite fest pro Runde, Layout-Anzeige (PE-99, PE-109) | M4 | GAME | M4 W2 | AP-81 | M | sonnet (high) | – | offen |
+| AP-83 | M4: Fairness der Gegner, Anlauf bis zum 640er-Ring (PE-100) | M4 | LOG/GAME | M4 W2 | AP-81 | M | sonnet (high) | – | offen |
+| AP-84 | M4: Boss-Arena und Spielszene mit echter Arena-Größe (PE-101) | M4 | GAME/SH | M4 W2 | AP-81 | M | sonnet (high) | – | offen |
+| AP-85 | M4: Menü und Ergebnis zentrieren (PE-102; Design-Review ja) | M4 | GAME | M4 W3 | AP-81, AP-82 | S | sonnet (medium) | – | offen |
+| AP-86 | M4: HUD am Handy nach Designer-Tabelle (PE-103; grob, Design-Review ja) | M4 | GAME | M4 W3 | AP-82, H-23, „Design übernehmen“ | S–M | sonnet (medium) | – | offen (grob, G2 nach H-23) |
+| H-24 | M4-DEP: `dev` nach `stage`, Smoke-Test nach PE-106 | M4 | HUM | M4 W4 | AP-81 bis AP-86 | H | – | – | offen |
 
 ---
 
@@ -989,7 +1024,14 @@ flowchart LR
   AP57 -.->|Datei eslint.config.js, vor AP-55| AP55
   AP10 & AP11 --> AP22["AP-22"]
   AP09 & AP10 --> AP24
-  AP14 & AP15 & AP22 & AP23 & AP24 --> M2DEP["M2-DEP"]```
+  AP14 & AP15 & AP22 & AP23 & AP24 --> M2DEP["M2-DEP"]
+  subgraph M4["M4 Breites Spielfeld"]
+    AP81["AP-81 Vertrag Arena"] --> AP82["AP-82 main.ts"] & AP83["AP-83 Fairness Gegner"] & AP84["AP-84 Boss-Arena"]
+    AP82 --> AP85["AP-85 Menü/Ergebnis"] & AP86["AP-86 HUD Handy"]
+    H23["H-23 Designer HUD am Handy"] --> AP86
+    AP82 & AP83 & AP84 & AP85 & AP86 --> H24["H-24 M4-DEP"]
+  end
+```
 
 **M2b:** Die Reihenfolgekante M2-DEP → AP-25/AP-26 (PE-46) ist mit der Abnahme vom 2026-10-25 erfüllt und entfernt. W1 und W2 sind je ein Paket pro Datei. AP-38 (W1) und AP-39 (W2) teilen `GameScene.ts`, daher nacheinander. AP-34 (HUD, W4) und AP-33 (GameScene, W5) starten erst nach AP-38 bzw. AP-39. W5 läuft mit AP-35 (Config) und AP-32 (Menü) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt. Rüstungen (PE-58): AP-37a (W3) liefert Vertrag und Logik, AP-37c (W4) Entity und Sprite, AP-34 (W4) die Anzeige, AP-33 (W5) die Einbindung in `GameScene`. Die Einbindung steckt in AP-33, weil `GameScene.ts` in W5 schon AP-33 gehört. Ein eigenes Einbindungspaket wäre erst in W6 möglich und verletzte „spätestens W5“ (PE-58).
 
@@ -1000,6 +1042,8 @@ flowchart LR
 **Nachtrag 2 (PE-70 bis PE-72):** AP-63 und AP-64 hängen nur von fertigen Paketen ab und teilen keine Datei mit AP-16 bis AP-20, sie laufen parallel zu M3 (zusammen mit AP-16 höchstens drei, PE-15). AP-65 (Vertrag und Logik des Lagerplatzes) nutzt `contracts/{events,index}.ts` von AP-16 und liegt deshalb frühestens in M3 W3. AP-66 (HUD und Szene) braucht den Vertrag von AP-65 eine Welle vorher, die Szenendateien nach AP-20 und die Designer-Ergänzung. Weil AP-66 ohnehin nach AP-20 liegt, kostet das Warten auf den Designer keine Zeit, solange die Ergänzung bis zum Ende von M3 W3 vorliegt. AP-63 bis AP-66 blockieren M3-DEP nicht (PE-69).
 
 **Nachtrag 3 (PE-92 bis PE-94):** AP-76 (`HudScene.ts`, `hud/PowerSlots.ts`, `tests/scenes/hud.test.ts`) und AP-77 (nur `tests/platform/layout.test.ts`) teilen keine Datei und haben keine Kante zueinander, daher laufen sie in N8 parallel. AP-76 hängt an AP-66, AP-72 und AP-75, weil alle drei die HUD-Dateien bereits verändert haben. AP-77 hängt nur an AP-63 (fertig). Die Umsetzung des Seitenverhältnisses (Teil 2) hat keine Kante im Graphen, bis Q-47 entschieden ist. Das Folgepaket bekommt dann eigene Dateien (`main.ts`, `platform/layout.ts`, `index.html` oder Arena-Konstanten). **AP-78 (PE-95):** Theme-Sync (`theme.ts`, `tokens.css`, optional `theme.test.ts`) nach dem Designer-Commit 57573d8. Keine Datei teilt AP-78 mit AP-76 oder AP-77, Kante nur zu AP-71 (fertig). In N8 laufen damit drei Pakete parallel (PE-15).
+
+**M4 (PE-99 bis PE-106, PE-109):** AP-81 legt Vertrag (`ArenaSize`, `ArenaRect`), Config (`config/arena.ts`) und die reine Rechnung (`arenaWidthFor`) an und ist das Gerüst in W1. AP-82 (`main.ts`, `layoutDebug.ts`), AP-83 (`logic/approach.ts`, `Enemy.ts`) und AP-84 (Boss-Entities, `config/bosses.ts`, `GameScene.ts`) nutzen nur AP-81 und teilen keine Datei, daher W2 parallel. AP-85 und AP-86 brauchen die echte Spielgröße aus AP-82, daher W3. AP-86 hängt zusätzlich an H-23 (Designer) und am Pflegeauftrag „Design übernehmen“. Kein M4-Paket vor AP-86 ändert `HudScene.ts` oder `scenes/hud/**`. Keine Datei teilt M4 mit Nachtrag 4 (AP-79, AP-80), daher keine Kante dorthin.
 
 **Nachtrag 4 (PE-107, PE-108):** AP-79 (Skripte, `public/assets/sprites/**`, `assets.ts`, `maps.ts` mit Test, `package.json`) und AP-80 (`LICENSES.md`, `grafik-austauschen.md`, `README.md`) teilen keine Datei und haben keine Kante zueinander, daher laufen beide in N9 parallel (zwei Pakete). Beide hängen nur an fertigen Paketen (AP-78) und den Designer-Commits auf dev. Die Doku in AP-80 nennt `npm run sprites:build` aus AP-79; der Lead merged AP-79 vor AP-80 oder beide in einer Runde, damit die Befehle stimmen. Es gibt keine Kante zu M4 (Variante B): Der Sprite-Einbau fasst keine Szenen-, Entity- oder Layout-Datei an.
 
@@ -3218,6 +3262,163 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 - **Kürzbar bei Budgetnot:** nein (R1: Herkunftsangaben)
 - **Commit-Typ:** `docs(AP-80): describe the sprite build and the sprite licenses`
 
+### M4 – Breites Spielfeld (Variante B, PE-96, PE-99 bis PE-106, PE-109)
+
+Gemeinsame Pflichtlektüre für alle M4-Pakete: §4 „Arena-Größe“, PE-96, PE-99 bis PE-106, PE-109, PE-94, PE-97 (Messwerte iPhone 15: 852 × 393 pt, Insets oben 0, links und rechts 47, unten 21; sicherer Bereich 758 × 372). Dateien von Nachtrag 4 (AP-79, AP-80) sind tabu (§8).
+
+#### AP-81 – Vertrag Arena-Größe, Config und Layout-Rechnung
+
+- **Meilenstein, Lane, Welle:** M4 · SH/GAME · M4 W1
+- **Status: bereit**
+- **Ziel:** Die Arena-Größe ist ein gemeinsamer Wert statt fest 640 × 360. Die reine Rechnung der Breite steht mit Tests bereit. Am Verhalten des Spiels ändert sich in diesem Paket noch nichts (`main.ts` nutzt die Funktion erst in AP-82).
+- **Pflichtlektüre:** gemeinsame M4-Lektüre, `src/platform/layout.ts`, `tests/platform/layout.test.ts` (Fälle aus AP-77), `src/contracts/index.ts`, `src/config/index.ts`, `src/entities/bosses/bossGeometry.ts` (nur lesen: `ArenaRect`), `src/scenes/GameScene.ts` (nur lesen: `SPAWN_MARGIN_PX`, Spawn-Ring)
+- **Abhängigkeiten:** keine offene (AP-63, AP-77 fertig)
+- **Parallel möglich mit:** AP-79, AP-80 (N9), H-23 (keine gemeinsame Datei)
+- **Dateien (Eigentum):**
+  - `src/contracts/arena.ts` (neu): `ArenaSize { width, height }` und `ArenaRect` (Größe plus `margin`). Gibt es `ArenaRect` schon in `bossGeometry.ts`, dort nichts ändern; AP-84 stellt auf den Vertrag um
+  - `src/contracts/index.ts`: Export ergänzen
+  - `src/config/arena.ts` (neu): `ARENA = { height: 360, minWidth: 640, maxWidth: 800, baseWidth: 640, spawnMarginPx: 24, offscreenSpeedFactor: 4 }`, abgeleitet `BASE_SPAWN_RADIUS` (halbe Diagonale von 640 × 360 plus 24, ≈ 391,2) und `spawnRadiusFor(size: ArenaSize)` (halbe Diagonale plus 24)
+  - `src/config/index.ts`: Export ergänzen
+  - `src/platform/layout.ts`: neue reine Funktion `arenaWidthFor(availW, availH)` = Höhe × availW / availH, gerundet und auf `minWidth..maxWidth` begrenzt; bei 0, NaN oder negativen Werten `minWidth`. Die lokale Konstante `ARENA_H` liest den Wert aus der Config. `fitArena` und `hudScale` bleiben unverändert
+  - `tests/platform/layout.test.ts`: neue Fälle, bestehende bleiben
+  - `tests/config/arena.test.ts` (neu)
+  - `tests/contracts/contracts.test.ts`: nur falls dort Exporte geprüft werden
+- **Nicht anfassen:** `src/main.ts`, `src/platform/layoutDebug.ts`, `src/scenes/**`, `src/entities/**`, `src/logic/**`, `src/config/bosses.ts`, Dateien von AP-79 und AP-80, `index.html`, `docs/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Vertrag und Config wie oben, Werte mit kurzem Kommentar und Verweis auf PE-99 und PE-100.
+  2. `arenaWidthFor` in `layout.ts` ergänzen.
+  3. Testfälle (PE-106), jeweils `arenaWidthFor` und danach `fitArena` mit dieser Breite: iPhone 15 852 × 393 mit Insets 0/47/47/21 (sicher 758 × 372) → Breite 734 (± 1), Seitenbalken je 0 (± 1 px), Skalierung ≈ 1,033; 16:9 1280 × 720 → 640, keine Balken; 19,5:9 844 × 390 ohne Insets → ≈ 779; 20:9 800 × 360 → 800; 21:9 2520 × 1080 → 800 (gekappt, kleine Seitenbalken); 4:3 1024 × 768 → 640 (Balken oben und unten).
+  4. Config-Test: `BASE_SPAWN_RADIUS` ≈ 391,2; `spawnRadiusFor` mit 640 × 360 gleich `BASE_SPAWN_RADIUS`; `minWidth` ≤ `baseWidth` ≤ `maxWidth`.
+- **Akzeptanzkriterien:** neue Tests grün, alte unverändert grün; `fitArena` und `hudScale` unverändert; keine Datei außerhalb des Eigentums; Checks grün
+- **Tests:** `tests/platform/layout.test.ts`, `tests/config/arena.test.ts`
+- **Review-Schwerpunkte:** Rundung und Kappung, robuste Eingaben, Werte nur in `src/config` (Grundregel 2), Testwerte nachvollziehbar
+- **Design-Review:** nein (kein sichtbarer Unterschied)
+- **Doku-Pflichten:** Kommentare an `ARENA` und `arenaWidthFor`
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Vertrag für M4)
+- **Commit-Typ:** `feat(AP-81): add arena size contract and width calculation`
+
+#### AP-82 – Spielgröße in `main.ts`, Breite fest pro Runde
+
+- **Meilenstein, Lane, Welle:** M4 · GAME · M4 W2
+- **Status: offen** (bereit nach AP-81)
+- **Ziel:** Phaser läuft mit der Größe `arenaWidthFor(...)` × 360. Auf dem iPhone 15 verschwinden die Letterbox-Balken links und rechts. Während einer Runde bleibt die Breite fest (PE-109).
+- **Pflichtlektüre:** gemeinsame M4-Lektüre, `src/main.ts`, `src/platform/layout.ts`, `src/platform/layoutDebug.ts`, AP-63 (Safe-Area-Logik), AP-77
+- **Abhängigkeiten:** AP-81
+- **Parallel möglich mit:** AP-83, AP-84 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/main.ts`, `src/platform/layoutDebug.ts`, `tests/platform/layoutDebug.test.ts`
+- **Nicht anfassen:** `src/platform/layout.ts` (nur nutzen), `src/scenes/**`, `src/entities/**`, `index.html`, `public/**`, `docs/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Die festen `ARENA_W` und `ARENA_H` in `main.ts` entfallen. In `layoutArena` die gewünschte Breite aus dem sicheren Bereich berechnen (Fläche minus Insets, dann `arenaWidthFor`).
+  2. Beim ersten Layout (vor `new Phaser.Game`) gilt die gewünschte Breite als Spielgröße (`width` in der Game-Config, `height: ARENA.height`).
+  3. Bei jedem späteren Layout: Läuft die `GameScene` (aktiv, pausiert oder schlafend), bleibt die aktuelle Spielbreite, und `fitArena` nutzt sie (höchstens kurz Balken). Sonst wird die neue Breite per `game.scale.setGameSize` gesetzt. Eine aufgeschobene Breite wird angewendet, sobald die `GameScene` endet (Listener auf ihr `shutdown`-Ereignis, aus `main.ts` registriert). Ändert sich die Breite, während Menü oder Ergebnis offen sind, wird die offene Szene neu gestartet, damit ihr Layout stimmt.
+  4. `#game` bekommt Breite und Höhe wie bisher aus `fitArena`, jetzt mit der aktuellen Spielbreite.
+  5. Die Layout-Anzeige (`?layout=1`) zeigt zusätzlich die gewünschte und die aktuelle Arena-Breite.
+- **Akzeptanzkriterien:** iPhone-15-Werte ergeben rechnerisch ein `#game` von etwa 758 × 372 px ohne Letterbox; PC 1280 × 720 unverändert; keine Breitenänderung während einer laufenden oder pausierten Runde; alle bisherigen Relayout-Auslöser bleiben; keine doppelten Listener; Checks grün
+- **Tests:** `tests/platform/layoutDebug.test.ts` (neue Felder). Die Entscheidung „anwenden oder aufschieben“ als kleine reine Funktion in `layoutDebug.ts` oder `main.ts` mit Test ist erwünscht
+- **Review-Schwerpunkte:** keine Regression der iOS-Fixes aus AP-63 (Verzögerungen, visualViewport), kein Größenwechsel mitten in der Runde, Neustart von Menü und Ergebnis ohne Datenverlust
+- **Design-Review:** nein (Sichtprüfung in H-24)
+- **Doku-Pflichten:** Kommentar in `main.ts` zu PE-109
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Kern von M4)
+- **Commit-Typ:** `feat(AP-82): size the game to the phone aspect ratio`
+
+#### AP-83 – Fairness der Gegner: Anlauf bis zum 640er-Ring
+
+- **Meilenstein, Lane, Welle:** M4 · LOG/GAME · M4 W2
+- **Status: offen** (bereit nach AP-81)
+- **Ziel:** Auf breiten Bildschirmen erscheinen Gegner weiter weg (Spawn-Ring = halbe Diagonale plus 24). Damit die Zeit bis zum Kontakt gleich bleibt, laufen sie mit `ARENA.offscreenSpeedFactor` (4), bis sie den Ring `BASE_SPAWN_RADIUS` erreichen (PE-100).
+- **Pflichtlektüre:** gemeinsame M4-Lektüre, `src/entities/enemies/{Enemy,ChaseEnemy,AuraEnemy,ForestWitch}.ts`, `src/config/enemies.ts`, `src/config/arena.ts` (aus AP-81), `src/logic/geometry.ts`
+- **Abhängigkeiten:** AP-81
+- **Parallel möglich mit:** AP-82, AP-84
+- **Dateien (Eigentum):** `src/logic/approach.ts` (neu), `tests/logic/approach.test.ts` (neu), `src/entities/enemies/Enemy.ts`
+- **Nicht anfassen:** `src/scenes/GameScene.ts` (AP-84), `src/logic/spawn.ts`, `src/config/**`, andere Gegner-Dateien (nur lesen; braucht eine Unterklasse eine Änderung, an den Lead melden)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `src/logic/approach.ts`: reine Funktionen `approachSpeedFactor(distanceToCenter, baseRadius, factor)` (außerhalb von `baseRadius` der Faktor, sonst 1) und `contactTimeSec(spawnRadius, contactRadius, speed, baseRadius, factor)` für den Test.
+  2. In `Enemy.ts` (Bewegung, heute `setVelocity` mit `def.speed`) den Faktor anwenden. Die feste Mitte `ARENA_CENTER` (320/180) entfällt; der Rückfallwert kommt aus `ARENA.baseWidth / 2` und `ARENA.height / 2`. Prüfen, dass `ARENA_CENTER` nirgends sonst importiert wird (Stand der Code-Lesung: nein).
+  3. Fernkämpfer (Hexe) und Aura-Gegner: Der Faktor gilt nur für den Anlauf außerhalb von `BASE_SPAWN_RADIUS`, ihr Verhalten innerhalb bleibt gleich.
+- **Akzeptanzkriterien:** Test: Die Kontaktzeit bei Arena 640, 734 und 800 Breite (Höhe 360) weicht für den langsamsten und den schnellsten Gegner aus `ENEMIES` um höchstens 5 % ab; bei 640 ist der Faktor nie aktiv; bestehende Tests grün; Checks grün
+- **Tests:** `tests/logic/approach.test.ts`
+- **Review-Schwerpunkte:** keine Spielwerte im Entity-Code (Grundregel 2), Logik ohne Phaser (Grundregel 1), Verhalten bei 640 identisch zu heute
+- **Design-Review:** nein
+- **Doku-Pflichten:** Kommentar mit Verweis auf PE-100. Ein Absatz in `docs/balancing.md` gehört nicht zum Paket (bei Bedarf Vorschlag an den Lead)
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerentscheidung 2a)
+- **Commit-Typ:** `feat(AP-83): keep enemy contact time equal on wide screens`
+
+#### AP-84 – Boss-Arena und Spielszene mit echter Arena-Größe
+
+- **Meilenstein, Lane, Welle:** M4 · GAME/SH · M4 W2
+- **Status: offen** (bereit nach AP-81)
+- **Ziel:** Bosse nutzen die ganze sichtbare Breite (PE-101). Die Spielszene gibt Arena-Größe und Spawn-Rand aus der Config weiter.
+- **Pflichtlektüre:** gemeinsame M4-Lektüre, `src/entities/bosses/{BossBase,GiantStone,RootMonster,bossGeometry}.ts`, `src/config/bosses.ts` (`BOSS_TUNING`, `MIN_REACTION_MS`), `src/scenes/GameScene.ts` (Spawn-Ring, Boss-Start), PE-75 (Fairness)
+- **Abhängigkeiten:** AP-81
+- **Parallel möglich mit:** AP-82, AP-83
+- **Dateien (Eigentum):** `src/entities/bosses/{BossBase,GiantStone,RootMonster}.ts`, `src/config/bosses.ts` (nur `BOSS_TUNING.arena`), `src/scenes/GameScene.ts`, `tests/config/bosses.test.ts`, `tests/entities/bossGeometry.test.ts`, `tests/logic/boss.test.ts` (nur falls nötig)
+- **Nicht anfassen:** `src/entities/bosses/bossGeometry.ts` (nimmt die Arena schon als Parameter; nur den Typ auf den Vertrag `ArenaRect` umstellen, falls nötig, und im Bericht nennen), `src/entities/enemies/**` (AP-83), `src/main.ts` (AP-82), `src/scenes/HudScene.ts`, Dateien von AP-79 und AP-80
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `BossContext` bekommt `arena?: ArenaRect`. `BOSS_TUNING.arena` behält nur `margin`; die Größe kommt aus dem Kontext, Rückfallwert `ARENA.baseWidth` × `ARENA.height`.
+  2. `BossBase`: Die feste Mitte 320/180 entfällt (Rückfall aus der Config wie in AP-83).
+  3. `GiantStone` (Startpunkt, `clampToArena`, Rollen) und `RootMonster` (Baumpositionen) nutzen die Arena aus dem Kontext.
+  4. `GameScene`: `SPAWN_MARGIN_PX` entfällt, der Spawn-Ring kommt aus `spawnRadiusFor(this.scale)`. Der Boss-Kontext bekommt `arena` aus `this.scale` und `BOSS_TUNING.arena.margin`. Den Boss-Start am Rand (`rim.rx`, `rim.ry`) prüfen: Bei 800 Breite muss er so am Rand liegen wie heute bei 640; sonst `rim` aus der Arena-Größe ableiten.
+  5. Fairness (PE-75): Die bestehenden Tests mit `MIN_REACTION_MS` laufen zusätzlich mit 800 × 360 und bleiben grün. Längere Rollwege des Riesen-Steins dürfen die Reaktionszeit nicht senken.
+- **Akzeptanzkriterien:** bei 640 × 360 gleiches Verhalten wie heute (bestehende Tests unverändert grün); bei 800 × 360 bleiben Bosse, Bäume und Telegraphen in der Arena; Fairness-Tests bei 640 und 800 grün; keine festen 640/320/180 mehr in Boss-Code und `GameScene`; Checks grün
+- **Tests:** `tests/config/bosses.test.ts`, `tests/entities/bossGeometry.test.ts`, bei Bedarf `tests/logic/boss.test.ts`
+- **Review-Schwerpunkte:** Fairness PE-75 bei 800, keine verstreuten Spielwerte, `GameScene` nur so weit wie nötig geändert
+- **Design-Review:** nein
+- **Doku-Pflichten:** Kommentar an `BossContext.arena`
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Nutzerentscheidung 3a)
+- **Commit-Typ:** `feat(AP-84): let bosses use the full arena width`
+
+#### AP-85 – Menü und Ergebnis zentrieren
+
+- **Meilenstein, Lane, Welle:** M4 · GAME · M4 W3
+- **Status: offen** (bereit nach AP-82)
+- **Ziel:** Menü und Ergebnis behalten ihr 640er-Layout und stehen bei breiterer Arena mittig. Der Hintergrund füllt die volle Breite (PE-102).
+- **Pflichtlektüre:** gemeinsame M4-Lektüre, `docs/design/design-brief.md`, `docs/design/export/tokens.json`, Mockup `docs/design/mockups/hauptmenue.html` und das Mockup des Ergebnisbildschirms, `src/scenes/MenuScene.ts`, `src/scenes/ResultScene.ts`, `src/scenes/menu/*`
+- **Abhängigkeiten:** AP-81, AP-82
+- **Parallel möglich mit:** AP-86 (keine gemeinsame Datei)
+- **Dateien (Eigentum):** `src/scenes/MenuScene.ts`, `src/scenes/ResultScene.ts`, `src/scenes/menu/*.ts` (nur falls nötig)
+- **Nicht anfassen:** `src/scenes/HudScene.ts`, `src/scenes/hud/**`, `src/main.ts`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Versatz = (aktuelle Breite − `ARENA.baseWidth`) / 2, gerundet; alle Inhalte des Mockup-Layouts um den Versatz verschieben (am einfachsten über einen Container).
+  2. Hintergrund über die volle Breite; Elemente, die heute `this.scale.width` für Randausrichtung nutzen, auf das 640er-Feld beziehen.
+  3. Overlays (Upgrade-Panel, Bestätigungsdialog) bleiben mittig, der Abdunkler deckt die volle Breite.
+  4. Nur Tokens, keine eigenen Farben, Schriften oder Abstände.
+- **Akzeptanzkriterien:** bei 640 pixelgleich zu heute; bei 734 und 800 mittig, Hintergrund ohne Lücke; Eingaben treffen weiterhin die Buttons; Checks grün
+- **Tests:** bestehende Tests grün; entsteht eine Versatz-Funktion, bekommt sie einen Test
+- **Review-Schwerpunkte:** Klickflächen nach dem Versatz, keine Hartwerte außer `ARENA.baseWidth`
+- **Design-Review:** ja
+- **Doku-Pflichten:** keine
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (sonst kleben Menü und Ergebnis am linken Rand)
+- **Commit-Typ:** `feat(AP-85): centre menu and result on wide arenas`
+
+#### AP-86 – HUD am Handy nach der Designer-Tabelle (grob)
+
+- **Meilenstein, Lane, Welle:** M4 · GAME · M4 W3
+- **Status: offen (grob)**: wird nach H-23 im Pflegeauftrag „Design übernehmen“ verfeinert (G2 für AP-86 offen)
+- **Ziel:** Das HUD folgt am Handy der Tabelle „HUD am Handy“ aus dem Design-Brief (PE-103) und funktioniert bei Arena-Breite 640..800. Chips, Banner und Pause-Titel bleiben, solange die Tabelle nichts anderes festlegt (PE-104, PE-105). V-18 (Item-Symbole im Lagerplatz) wird hier mit erledigt, falls der Designer dazu etwas festlegt.
+- **Pflichtlektüre:** `docs/design/design-brief.md` (Tabelle „HUD am Handy“), `docs/design/export/tokens.json`, passendes Mockup, AP-76, PE-94, V-18
+- **Abhängigkeiten:** AP-82, H-23, Pflegeauftrag „Design übernehmen“
+- **Dateien (Eigentum, vorläufig):** `src/scenes/HudScene.ts`, `src/scenes/hud/*.ts`, `tests/scenes/hud.test.ts`
+- **Design-Review:** ja
+- **Aufwand:** S–M (nach Verfeinerung) · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja, wenn die Designer-Tabelle keine Codeänderung verlangt
+- **Commit-Typ:** `feat(AP-86): apply the phone HUD table`
+
 ### M3 – Bosse
 
 #### AP-16 – Boss-Rahmen
@@ -3611,6 +3812,8 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | H-20 | Bedingt, nur bei Q-47 Option A: Designer gestaltet die Seitenränder am Handy (Rahmen und Hintergrund links und rechts, nur Tokens). Designer-Interview wie H-19. Entfällt bei Option B | nach Q-47 | Folgepaket Seitenverhältnis, Teil 2 (noch nicht angelegt) | ☑ entfällt (Q-47 Variante B, PE-96) |
 | H-21 | Optional, Q-48: Foto der Layout-Anzeige `?layout=1` im Querformat (Homescreen-App und Safari), Unterrand und Insets sichtbar. Kein Code, Foto an den Lead | vor dem Folgepaket Seitenverhältnis, Teil 2 | Q-48 und AP-77 Teil 2 | ☑ erledigt (Foto `IMG_6372.PNG` im Projektordner, ungetrackt, nicht committen; Insets bestätigt, PE-97) |
 | H-22 | Sichtprüfung der Ingame-Sprites (Nachtrag 4) nach AP-79 und AP-80, PC und iPhone: Prüfpunkte in §9.2 „Nachtrag 4“ (alle drei Karten mit Boss, Figur und Waffe in den Ausbaustufen, nach links zielen, Items im HUD, Münzen beider Größen, Symbole). **Q-46 bestätigen** (Münzen bleiben beide 16 px, Unterschied über Sprite und Kontur, PE-108); will der Nutzer die kleine Münze auf 8 px, entsteht ein kleines Folgepaket. Danach Release `dev` → `stage` (Muster H-17). Kann mit H-18 zusammen laufen | nach Wellenabschluss N9 | Abnahme Nachtrag 4, Release nach `stage` | ☐ |
+| H-23 | Designer-Interview „HUD am Handy“ (PE-103): Tabelle im Brief mit Größen bei k über 1, Verhalten bei Arena-Breite 640..800, Slot-Rand gegen Panel-Rand, dazu V-18 (Item-Symbole im Lagerplatz), falls noch offen. Start: `start-agent.ps1 … -Role designer`. Danach Pflegeauftrag „Design übernehmen“ durch den Lead für AP-86 | parallel zu M4 W1/W2 | AP-86 | ☐ |
+| H-24 | M4-DEP: `dev` nach `stage`, Smoke-Test nach PE-106 (iPhone 15 Homescreen-App quer, PC, Entwicklertools 16:9, 19,5:9, 20:9, 4:3), Prüfpunkte in §9.2 „M4“ | nach M4 W3 | Abnahme M4 | ☐ |
 
 ---
 
@@ -3630,6 +3833,7 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | Nachtrag 2 | 7 (AP-63 bis AP-66, AP-72, AP-73, AP-74) | ≈ 10,25 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L, AP-72 L inkl. V-14 ≈ +0,5 h, AP-73 S ≈ 0,75 h, AP-74 S ≈ 0,75 h, angenommen; + Review inkl. Design-Review AP-66, AP-72 und AP-74 ≈ 13 h) | ≈ 5 (AP-64 und AP-73 kürzbar, ≈ 1,5 h; AP-74 nicht kürzen) |
 | M3 | 6 (AP-16 bis AP-20 und AP-67, Fairness-Fix PE-75, M ≈ 1,5 h) | ≈ 10 h (+ Review ≈ 13 h) | ≈ 5–6 |
 | M3-Nachtrag | 4 (AP-68 S, AP-69 S, AP-70 M, AP-71 S; Handtest-Befunde PE-76 bis PE-78, Theme-Sync PE-86) | ≈ 4,25 h (+ Review inkl. Design-Review AP-70 ≈ 5,5 h) | ≈ 1–2 (AP-68 bis AP-70 in W1, AP-71 in W2) |
+| M4 Breites Spielfeld (PE-99 bis PE-106, PE-109) | 6 (AP-81 S, AP-82 M, AP-83 M, AP-84 M, AP-85 S, AP-86 S–M grob) | ≈ 7,25 h (angenommen; + Review inkl. Design-Review AP-85 und AP-86 ≈ 9,5 h) | ≈ 3–4 (W2 mit drei M-Paketen füllt etwa ein Fenster allein; AP-81 kann im Fenster von N9 mitlaufen; Zeile nicht in der Gesamtzeile, wie die Nachträge) |
 | **Gesamt** | **46** | **≈ 70 h (+ Review ≈ 90 h)** | **≈ 32–38** |
 
 Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h. Die Fensterzahlen oben gelten noch für 30 % Zielwert. Bei 45 % sinkt die Zahl rechnerisch auf etwa zwei Drittel, Neuberechnung nach M2b-DEP (§18). Die M2c-Zeile (PE-59) enthält AP-50 und AP-54 (je M, ca. 1,5 h), AP-51, AP-52 und AP-53 (je L, ca. 2,5 h) und AP-55 (S, ca. 0,75 h), alle angenommen. Dazu kommen drei Design-Reviews durch `ma-designer`, deren Kosten als Review-Zuschlag gerechnet sind. Optional sind die Pakete AP-55 (Regel kann später folgen) und H-13 (Sprites, Mensch). Das Risiko steht in RI-17. Die Gesamtzeile enthält die Zeilen M2c-Nachtrag und Nachtrag 2 nicht: Nachtrag 2 (PE-70 bis PE-72) bringt 4 Pakete, ≈ 6,25 h (+ Review ≈ 8 h) und ≈ 3–4 Fenster zusätzlich, Risiko RI-19.
@@ -3680,6 +3884,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | RI-19 | Nachtrag 2: AP-66 (L) hängt an AP-71 (Theme-Sync) und an AP-20. Die Designer-Ergänzung H-14 liegt seit 2026-10-26 vor (PE-85). AP-72 (L) teilt `HudScene.ts` mit AP-66. AP-63 kann die Ursache am iPhone nur rechnerisch eingrenzen, die Bestätigung braucht den Nutzer am Gerät (Manifest-Änderung wirkt erst nach erneutem „Zum Home-Bildschirm“). Beide stören M3 nicht | Wartezeit kostet nichts, solange die Ergänzung bis Ende M3 W3 da ist; Platzhalter-Layout nur mit Freigabe des Nutzers (Q-37); `?layout=1` liefert Messwerte vom Gerät | AP-63, AP-66 |
 | RI-20 | Boss-Fairness bei fester Spielerin (PE-75): Die Astronautin kann nicht ausweichen. AP-67 macht Wurzelstoß, Wurzelring und Geisterkugeln abwehrbar, der Rollangriff des Riesen-Steins bleibt unausweichlich. Die Werte (Knospe 6 Treffer, Ringgeschwindigkeit 60 px/s, Kugeln 90 px/s) sind Startwerte ohne Messung; die Sichtprüfung ist in der Agent-Umgebung nicht möglich | Regel (a) bis (c) als Config-Tests in AP-67, Handtest-Punkt „Fairness“ in M3-DEP, nur Config nachjustieren; Rollangriff im Handtest bewerten | AP-67, AP-20, M3-DEP |
 | RI-21 | Nachtrag 4 (Ingame-Sprites): Ändert der Designer später `sprites.js` oder `sprites-world.js`, sind die committeten PNGs veraltet, und der Test aus AP-79 (PNGs = Build-Ausgabe) macht dev rot, wie bei `theme.ts` (AP-71, AP-78). Dazu kommt, dass der Sprite-Look am Gerät nur vom Nutzer beurteilt werden kann (Hitboxen, Lesbarkeit der Münzen) | Sync-Regel V-17 (nach Designer-Commits an den Sprite-Dateien legt der Lead selbst ein Sync-Paket an: `npm run sprites:build`); Vergleich dekodierter Pixel statt Bytes (zlib-Version); Sichtprüfung H-22; Hitboxen bleiben unverändert | AP-79, H-22 |
+| RI-22 | M4: Breitere Arena verschiebt Spielgefühl und Layout (Gegner in den Bildecken kurz schneller sichtbar bei 2,2:1, iOS-Relayout, Boss-Fairness bei 800) | Anlauf nur außerhalb des 640er-Rings (PE-100), Kontaktzeit-Test ≤ 5 % (AP-83), Breite fest pro Runde (PE-109), Fairness-Tests bei 800 (AP-84), Smoke H-24 mit Entwicklertools-Größen | AP-82 bis AP-84, H-24 |
 | RI-16 | AP-33 wird groß (opus, L): Spielszene, Drop, Pickup und Ringschaden in einem Paket, dazu das Rundenende. Ein Fehler in der Szene trifft alle Runden | Feuerring-Logik ist in AP-37a getestet, AP-33 verdrahtet nur. Review-Punkt Rundenende-Reihenfolge. Falls AP-33 zu groß wird, ist eine Aufteilung nur mit Freigabe des Nutzers möglich, weil PE-58 die Einbindung spätestens in W5 verlangt | AP-33, AP-37a, AP-37c |
 
 ---
@@ -3798,6 +4003,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-106 | **Variante B, Abnahme (8a):** M4 endet mit einem [Mensch]-Smoke-Test auf stage: iPhone 15 (Homescreen-App, quer) und PC, dazu Browser-Entwicklertools mit 16:9, 19,5:9, 20:9 und 4:3. Jede dieser Größen hat einen Testfall in `tests/platform/layout.test.ts`. Kein Android-Gerät. Verworfen: 8b | Nutzer am 2026-10-26 (Planner-Interview, Antwort 8a) | Nutzer am 2026-10-26 |
 | PE-107 | **Design übernommen (Brief vom 2026-10-26, Ergänzung „Ingame-Sprites“).** Der Nutzer hat die Sprites freigegeben (H-19 ☑, Designer-Commits 57573d8, 7740338, 8c7b88b `design: approve in-game sprites`). Paketschnitt als Nachtrag 4, Welle N9: **AP-79** (Sprite-Pipeline `sprites:build` aus `docs/design/assets/sprites.js` und `sprites-world.js`, 24 PNGs, Platzhalter-Generator nur noch für Töne, `.placeholders.json` ohne Sprites, Tint bei Nacht und Elfenwald entfernt, `astronaut`-Beschreibung; Design-Review ja) und **AP-80** (Doku: `LICENSES.md`, `grafik-austauschen.md`, `README.md`). Die Kacheln ohne Tint gehören in AP-79, weil dieselben PNGs die Doppeltönung auslösen und ein eigenes Paket eine weitere Review-Runde kostete. Befund (Code gelesen, Sprites gegen `assets.ts` geprüft): alle 24 Maße, Framezahlen und Paletten stimmen mit dem Manifest überein, `Player.ts`, `weaponMount.ts` (Griff 7\|12, Mündung), Körper und Hitboxen brauchen keine Änderung. Keine neue Abhängigkeit, keine neuen Tokens (`color.sprite.*` sind seit AP-78 im Theme). Reihenfolge zu M4 (Variante B): unabhängig, Sprite-Einbau zuerst. H-13 bleibt durch H-19 ersetzt und ist damit erledigt; H-19 ☑; H-22 neu (Sichtprüfung) | Brief-Status `freigegeben`, Nutzer im Chat „sprites sind freigegeben“ am 2026-10-26, Pflegeauftrag „Design übernehmen“ des Lead | Nutzer am 2026-10-26 (Freigabe der Sprites); Paketschnitt angenommen vom Planner (Pflege) |
 | PE-108 | **Q-46 über die Sprite-Gestaltung gelöst (angenommen).** Beide Münzen bleiben 16 px groß: kleine Münze 8×8 mit `smallDisplayScale` 2, große 16×16 mit `bigDisplayScale` 1 (`COIN_VISUAL`, PE-90, unverändert). Unterscheidung: Sprite (große Münze mit Stern-Prägung in Frame 0, kleine schlicht), 2 px Kontur (`game.hit-flash`) wie in `Coin.ts` und im Designer-Mockup `sprites-welt.html`. Kein Code-Paket nötig. Bestätigung durch den Nutzer in der Sichtprüfung H-22. Will der Nutzer die kleine Münze auf 8 px, entsteht ein Mini-Paket (`smallDisplayScale` 1, dazu `setScale(2)` an den Stellen, die `coin-small` als Symbol zeigen: `CoinCounter`, `ResultScene`, `MenuScene`, `UpgradePanel`) | Planner (Pflege) aus Brief, Mockup `sprites-welt.html` und `src/config/coins.ts` | Planner (Pflege) angenommen; Nutzer bestätigt in H-22 |
+| PE-109 | **Variante B, Größenwechsel (9a) und Schnitt M4.** Während einer Runde (GameScene aktiv, pausiert oder schlafend) bleibt die Arena-Breite fest; nur die Skalierung passt sich an (höchstens kurz Balken). Die neue Breite gilt ab dem nächsten Menü oder der nächsten Runde. Verworfen: 9b (sofort anpassen, alle Szenen neu aufbauen). Der vorgelegte Schnitt M4 ist bestätigt; wegen paralleler Vergabe im Nachtrag 4 umnummeriert (vorgelegt als AP-79 bis AP-84, H-22, H-23; jetzt AP-81 bis AP-86, H-23, H-24). Annahmen des Planners: Anlauf-Faktor 4 und Toleranz 5 % (AP-83), iPhone-15-Breite 734 (gerundet) | Nutzer am 2026-10-26 (Planner-Interview, Antwort 9a, Schnitt vorgelegt) | Nutzer am 2026-10-26; Faktor 4 und Toleranz 5 % angenommen vom Planner |
 
 ### Offene Fragen
 
@@ -3969,7 +4175,8 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | §5 Robustes Laden des Spielstands | AP-04, AP-21 |
 | §5 Dev-Server nur im Heimnetz | AP-13 |
 | R1 Recht (Asset-Lizenzen, Lizenzhinweis PE-27) | AP-01, AP-02, AP-07 |
-| R2 DSGVO (keine personenbezogenen Daten, kein Tracking) | AP-04, Review aller Pakete |
+| R2 DSGVO (keine personenbezogenen Daten, kein Tracking) | AP-04, Review aller Pakete; M4: Layout-Anzeige zeigt nur Maße (AP-82) |
+| PE-96 Variante B: Spielfeld am Handy breiter, gut auf jedem Handy | AP-81 (Vertrag, Rechnung, Testgrößen PE-106), AP-82 (Spielgröße, PE-109), AP-83 (Fairness PE-100), AP-84 (Boss-Arena PE-101), AP-85 (Menü und Ergebnis PE-102), AP-86 und H-23 (HUD am Handy PE-103), H-24 (M4-DEP); R6: keine neuen Abhängigkeiten, Review aller M4-Pakete |
 | R3 Impressum | entfällt im ersten Stich (PE-22); vor Veröffentlichung neues Paket |
 | R4 Secrets | alle (Review), PE-26 |
 | R5 Rollen | alle (Wächter, Lead) |
@@ -4246,3 +4453,4 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-26 | Nachtrag 4 „Einbau der Ingame-Sprites“ angelegt: AP-79 (Sprite-Pipeline `sprites:build`, 24 PNGs, Generator nur Töne, Tint bei Nacht und Elfenwald entfernt; Design-Review ja, M, sonnet high) und AP-80 (Doku und Lizenzen; S, sonnet medium) in Welle N9, parallel. §8 (Eigentum N9 und Hinweis für M4), §9 und §9.2, §10, §11, §12, §13 (H-19 ☑, H-22 neu, H-16 Notiz), §14, §15 (RI-21), §16 (PE-107, PE-108, Q-46, V-16 bis V-18), §17. §2, §4 und §5 unverändert. H-13 bleibt durch H-19 ersetzt | Pflegeauftrag „Design übernehmen“ (Brief vom 2026-10-26, Sprite-Freigabe des Nutzers, Designer-Commit 8c7b88b) | AP-79, AP-80, H-19, H-22 | Nutzer (Freigabe der Sprites); Paketschnitt angenommen vom Planner (Pflege) |
 | 2026-10-26 | Befund Sprite-Einbau (Code und Designer-Dateien gelesen, lesend geprüft): Alle 24 Sprites aus `docs/design/assets/sprites.js` und `sprites-world.js` stimmen in Framegröße, Framezahl, Zeilenlänge und Palette mit `ASSETS` (`src/config/assets.ts`) überein. Die sichtbaren Flächen passen zu den bestehenden Körpern (Spieler Kreis, Gegner Frame-Rechteck, Items Kreis 8). Anker der Waffe (Griff 7\|12, Mündung 22\|7) entsprechen `weaponMount.ts`. Dadurch ist außer `maps.ts` (Tint) und der Beschreibung von `astronaut` keine Code-Änderung nötig | Pflegeauftrag „Design übernehmen“ | AP-79 | Planner (Pflege) |
 | 2026-10-26 | Erkenntnis Sprite-Einbau (Brief gegen Code): (1) `Laser.ts` nutzt `setTintFill` und flacht den Verlauf des Laser-Sprites ab (V-16). (2) Mehrfarbige Item-Sprites in `PowerSlots` und im Chip der Rüstung, die H-14-Vorgaben galten für einfarbige Symbole (V-18, Prüfpunkt im Design-Review AP-79). (3) Sprite-Sync nach Designer-Commits braucht eine Regel wie PE-98 (V-17, RI-21). (4) Der Test aus AP-79 vergleicht dekodierte Pixel statt Bytes, damit eine andere zlib-Version nicht rot macht. (5) Überholte Angaben im Brief und im Plan (30 Sprites, Münze 12×12, Kachel-Tints) sind in §16 vermerkt. (6) Der Brief nennt das Paket „ohne Design-Review (keine UI)“, der Lead verlangt „ja“: AP-79 hat Design-Review ja. (7) M4 (Variante B) darf die Dateien von AP-79 und AP-80 nicht anfassen (Hinweis in §8) | Pflegeauftrag „Design übernehmen“ | AP-79, AP-80, M4 | Planner (Pflege) |
+| 2026-10-26 | Planner-Interview Variante B, Runde 3: Antwort 9a und Schnitt M4 bestätigt (PE-109). M4 „Breites Spielfeld“ angelegt: AP-81 (bereit, W1, parallel zu N9), AP-82 bis AP-85 (W2/W3), AP-86 grob (nach H-23), H-23 (Designer HUD am Handy), H-24 (M4-DEP), RI-22. Wegen paralleler Vergabe im Nachtrag 4 umnummeriert (vorgelegt als AP-79 bis AP-84). Mermaid-Zeilenumbruch vor dem Ende des Graphen in §11 repariert. §0, §8, §9.2, §10, §11, §12, §13, §14, §15, §16, §17 nachgezogen | Nutzer im Planner-Interview | PE-109, AP-81 bis AP-86, H-23, H-24 | Planner (Interview) |
