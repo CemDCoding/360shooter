@@ -201,13 +201,12 @@ export class HudScene extends Phaser.Scene {
     const lab = funkScale(1, k);
     const w = Math.round(BOSS_BAR_W * k);
     const h = Math.round(BOSS_BAR_H * k);
-    const labH = FUNK_GLYPH_H * lab;
     const x = Math.round(width / 2 - w / 2);
     const y = height - m - h;
     const panel = new FunkPanel(this, x, y, w, h, false, { line: 'hud.danger' });
     const fill = this.add.graphics();
-    const name = funkText(this, x, y - 3 - labH, '', lab, 'hud.text').setOrigin(0, 0);
-    const tag = funkText(this, x + w, y - 3 - labH, 'BOSS', lab, 'hud.danger').setOrigin(1, 0);
+    const name = funkText(this, x, y - 3, '', lab, 'hud.text').setOrigin(0, 1);
+    const tag = funkText(this, x + w, y - 3, 'BOSS', lab, 'hud.danger').setOrigin(1, 1);
     this.bossBar = { panel, fill, name, tag, x, y, w, h };
     this.showBossBar(false);
 
@@ -259,7 +258,23 @@ export class HudScene extends Phaser.Scene {
   private onBossSpawned(p: GameEventPayloads['boss-spawned']): void {
     this.showBanner(false);
     this.bossAlive = true;
-    if (this.bossBar) setFunk(this.bossBar.name, BOSS_NAMES[p.bossId] ?? 'Boss', 'hud.text');
+    if (this.bossBar) {
+      const bar = this.bossBar;
+      const label = BOSS_NAMES[p.bossId] ?? 'Boss';
+      setFunk(bar.name, label, 'hud.text');
+      // Name and "BOSS" must never overlap: fall back to scale 1 when the name is too wide.
+      const lab = funkScale(1, this.k);
+      const gap = Math.round(8 * this.k);
+      const tagW = measureFunk(this, 'BOSS', lab);
+      const fits = measureFunk(this, label, lab) + tagW + gap <= bar.w;
+      const nameScale = fits ? lab : 1;
+      bar.name.setFontSize(FUNK_GLYPH_H * nameScale);
+      if (!fits && measureFunk(this, label, 1) + measureFunk(this, 'BOSS', 1) + gap > bar.w) {
+        bar.tag.setFontSize(FUNK_GLYPH_H);
+      } else {
+        bar.tag.setFontSize(FUNK_GLYPH_H * lab);
+      }
+    }
     this.drawBossBar(p.hp, p.maxHp);
     this.showBossBar(true);
     this.updateOvertime();
