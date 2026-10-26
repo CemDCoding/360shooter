@@ -49,4 +49,10 @@ describe('coins', () => {
     expect(v.outlinePx).toBeGreaterThan(0);
     expect(v.outlineColorToken in THEME.colors).toBe(true);
   });
+
+  it('big coin is shown at 16 px: 16 px sprite at scale 1 (Q-44, PE-90)', () => {
+    const BIG_SPRITE_PX = 16;
+    expect(COIN_VISUAL.bigDisplayScale).toBe(1);
+    expect(BIG_SPRITE_PX * COIN_VISUAL.bigDisplayScale).toBe(16);
+  });
 });

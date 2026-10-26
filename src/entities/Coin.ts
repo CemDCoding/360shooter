@@ -37,9 +37,11 @@ export class Coin extends Phaser.Physics.Arcade.Sprite {
     const scale = key === 'coin-big' ? COIN_VISUAL.bigDisplayScale : COIN_VISUAL.smallDisplayScale;
     this.setScale(scale).setDepth(COIN_VISUAL.depth);
     this.enableBody(true, x, y, true, true);
-    // Arcade scales the body with the sprite; the radius in unscaled px keeps the collect radius (logic) as is.
+    // Arcade scales the body with the sprite. The big coin used to be drawn at scale 2 (world body radius 16);
+    // at scale 1 the body would shrink to 8, so the radius is set in unscaled px to keep 16 world px (AP-74).
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setCircle(this.width / 2);
+    const radius = key === 'coin-big' ? (this.width / 2) * 2 : this.width / 2;
+    body.setCircle(radius, this.width / 2 - radius, this.height / 2 - radius);
     const anim = animKey(key);
     if (this.scene.anims.exists(anim)) this.play(anim);
     this.syncHalo(true);
