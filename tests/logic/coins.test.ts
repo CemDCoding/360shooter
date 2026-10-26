@@ -20,10 +20,10 @@ describe('rollCoinDrop', () => {
 });
 
 describe('coinSizeFor', () => {
-  it('switches to big from value 5', () => {
+  it('switches to big from value 4', () => {
     expect(coinSizeFor(1)).toBe('small');
-    expect(coinSizeFor(4)).toBe('small');
-    expect(coinSizeFor(5)).toBe('big');
+    expect(coinSizeFor(3)).toBe('small');
+    expect(coinSizeFor(4)).toBe('big');
     expect(coinSizeFor(20)).toBe('big');
   });
 });

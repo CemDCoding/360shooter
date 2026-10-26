@@ -17,7 +17,7 @@ describe('coins', () => {
     expect(COIN_RULES.magnetRadiusPx).toBeGreaterThan(0);
     expect(COIN_RULES.collectRadiusPx).toBeGreaterThan(0);
     expect(COIN_RULES.magnetSpeedPxPerSec).toBeGreaterThan(0);
-    expect(BIG_COIN_MIN_VALUE).toBe(5);
+    expect(BIG_COIN_MIN_VALUE).toBe(4);
   });
 
   it('magnet ease constants are sane', () => {

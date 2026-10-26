@@ -10,10 +10,10 @@ describe('enemies', () => {
   });
 
   it('coin values match PE-39..43 for all four enemies', () => {
-    expect(ENEMIES.cursedTree.coinValue).toBe(2);
-    expect(ENEMIES.zombieSquirrel.coinValue).toBe(2);
-    expect(ENEMIES.forestWitch.coinValue).toBe(5);
-    expect(ENEMIES.forestSpirit.coinValue).toBe(8);
+    expect(ENEMIES.cursedTree.coinValue).toBe(1);
+    expect(ENEMIES.zombieSquirrel.coinValue).toBe(1);
+    expect(ENEMIES.forestWitch.coinValue).toBe(4);
+    expect(ENEMIES.forestSpirit.coinValue).toBe(4);
   });
 
   it('cursed tree survives one laser and a double-shot salvo with damage upgrade 5 (AP-56)', () => {

@@ -15,7 +15,7 @@ export const COIN_MAGNET_EASE = {
 };
 
 /** Ab diesem Wert wird die grosse Muenze gezeigt */
-export const BIG_COIN_MIN_VALUE = 5;
+export const BIG_COIN_MIN_VALUE = 4;
 /** Anteil des Goldes, der nach einem Sieg behalten wird */
 export const GOLD_KEEP_ON_WIN = 1;
 /** Anteil des Goldes, der nach einer Niederlage behalten wird */
