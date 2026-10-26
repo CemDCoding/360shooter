@@ -21,12 +21,12 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-26 · Wellenabschluss N7: AP-75 (Aufräum-Folgepaket, PE-91) gemergt (59f53de), Code-Review Runde 1 bestanden · Tests 454/454, Checks grün · **Autonomer Modus** (PE-69).
+- **Stand:** 2026-10-26 · Befunde Smoke-Test stage (Nutzer, iPhone 15, iOS 27.0.1, Safari über Homescreen-App, Querformat): HUD zu groß, Seitenverhältnis, Icon gut, Ingame-Sprites (PE-92 bis PE-94) · Nachtrag 3 geplant · Wellenabschluss N7: AP-75 (Aufräum-Folgepaket, PE-91) gemergt (59f53de), Code-Review Runde 1 bestanden · Tests 454/454, Checks grün · **Autonomer Modus** (PE-69).
 - **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-75, M0-DEP, M1-DEP, M2-DEP, M2b-DEP, M3-DEP (abgenommen 2026-10-26). AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
-- **Laufende Arbeit:** keine. Keine Pakete `bereit`. **Offen [Mensch]:** H-18 (Handtest N6 mit Smoke-Punkt zu AP-75, vom Nutzer zurückgestellt, blockiert kein Folgepaket), H-17 (stage-Abgleich und Release), H-12 (M2c-DEP, blockiert M3 nicht), H-16 (Designer-Nachtrag Münzen, optional).
-- **Erkenntnisse (Details §18):** `theme.test.ts` prüft `motionCount` gegen das Literal 3 statt gegen den Export (niedrig, Generator-Lauf ohne Diff belegt Gleichheit). Der Commit-Body von AP-75 enthält eine Co-Authored-By-Zeile (harmlos). `HOVER_FILL_ALPHA` 0,18 und `BLINK_ALPHA` 0,55 bleiben Konstanten ohne Token (Q-45).
-- **Nächster Schritt:** Nutzer macht Handtest H-18 (inklusive Smoke-Punkt AP-75) zu seinem Zeitpunkt. Danach Release-Abgleich (H-17), PR `dev` → `stage` und M3-DEP-Release mit Smoke-Test auf stage (§9.2).
-- **Offene Fragen an den Nutzer:** (1) Q-46: Bleibt die kleine Münze bei 16 px (beide gleich groß, Unterschied über Sprite und Umrandung) oder wird sie 8 px? Entscheidung nach Sichtprüfung in H-18. (2) H-17: stage-Abgleich und PR #3. (3) Q-45: Hover-Wert 0,18 und `BLINK_ALPHA` 0,55 als Token in den Designer-Export aufnehmen oder als Konstanten lassen. (4) Niederlage-Text „5:00 · BOSS NICHT BESIEGT“: nur im Mockup, Designer klärt, ob die ResultScene ihn bekommt.
+- **Laufende Arbeit:** keine. Bereit: AP-76 (HUD-Größe), AP-77 (Seitenverhältnis, Beleg). **Offen [Mensch]:** H-19 (Designer, Ingame-Sprites, neu), H-20 (bedingt nach Q-47), H-21 (Foto für Q-48), H-18 (Handtest N6 mit Smoke-Punkt zu AP-75, vom Nutzer zurückgestellt, blockiert kein Folgepaket), H-17 (stage-Abgleich und Release), H-12 (M2c-DEP, blockiert M3 nicht), H-16 (Designer-Nachtrag Münzen, optional).
+- **Erkenntnisse (Details §18):** HUD-Zahlen springen durch ganzzahlige Schriftstufen (×4 statt ×3), der Lagerplatz wächst mit dem Faktor k (40 zu 54 px), Ursache PE-94. Seitenverhältnis: feste 16:9-Arena im etwa 2,2:1-Fenster (AP-77, Q-47). `theme.test.ts` prüft `motionCount` gegen das Literal 3 statt gegen den Export (niedrig, Generator-Lauf ohne Diff belegt Gleichheit). Der Commit-Body von AP-75 enthält eine Co-Authored-By-Zeile (harmlos). `HOVER_FILL_ALPHA` 0,18 und `BLINK_ALPHA` 0,55 bleiben Konstanten ohne Token (Q-45).
+- **Nächster Schritt:** Lead startet Welle N8 (AP-76 und AP-77 parallel), Nutzer beantwortet Q-47 und Q-48. Nutzer macht Handtest H-18 (inklusive Smoke-Punkt AP-75) zu seinem Zeitpunkt. Danach Release-Abgleich (H-17), PR `dev` → `stage` und M3-DEP-Release mit Smoke-Test auf stage (§9.2).
+- **Offene Fragen an den Nutzer:** (0) Q-47 [K]: Seitenverhältnis am Handy, Option A (Ränder gestalten, Designer) oder B (Spielfeld am Handy breiter, eigener Meilenstein). Q-48: Foto von `?layout=1` im Querformat (Unterrand). (1) Q-46: Bleibt die kleine Münze bei 16 px (beide gleich groß, Unterschied über Sprite und Umrandung) oder wird sie 8 px? Entscheidung nach Sichtprüfung in H-18. (2) H-17: stage-Abgleich und PR #3. (3) Q-45: Hover-Wert 0,18 und `BLINK_ALPHA` 0,55 als Token in den Designer-Export aufnehmen oder als Konstanten lassen. (4) Niederlage-Text „5:00 · BOSS NICHT BESIEGT“: nur im Mockup, Designer klärt, ob die ResultScene ihn bekommt.
 
 <!-- Ende Lagebericht -->
 
@@ -73,11 +73,11 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 bestätigt 2026-10-25; M2b-Nachtrag AP-56 neu; M2c-Nachtrag AP-58–AP-62 (PE-65), AP-16 hängt nach PE-69 am Nachtrag) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de) | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de); Nachtrag 3 AP-76 (HUD-Größe Handy) und AP-77 (Seitenverhältnis, Beleg) bereit (PE-92 bis PE-94, Planung 2026-10-26), Folgepakete nach Q-47 und H-19 noch nicht angelegt | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu; PE-83 bestätigt (Nutzer 2026-10-26), Q-43 beantwortet (PE-84), PE-85 (Design H-14 übernommen, AP-72 neu), PE-86 (Theme-Sync, AP-71), Q-44 neu, V-12 neu, V-13 und V-14 neu (Vorschläge aus AP-66); Handtest M3-DEP bestanden (2026-10-26): PE-34, PE-75 und Q-41 (PE-80) bestätigt, Q-44 beantwortet (PE-90), Q-46 offen; PE-91 (AP-75, N7; H-18 zurückgestellt, Q-45 erweitert) | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu; PE-83 bestätigt (Nutzer 2026-10-26), Q-43 beantwortet (PE-84), PE-85 (Design H-14 übernommen, AP-72 neu), PE-86 (Theme-Sync, AP-71), Q-44 neu, V-12 neu, V-13 und V-14 neu (Vorschläge aus AP-66); Handtest M3-DEP bestanden (2026-10-26): PE-34, PE-75 und Q-41 (PE-80) bestätigt, Q-44 beantwortet (PE-90), Q-46 offen; PE-91 (AP-75, N7; H-18 zurückgestellt, Q-45 erweitert); PE-92 bis PE-94 (Befunde Smoke-Test stage, Ursachen und Ziele, angenommen), Q-47 (Seitenverhältnis A oder B) und Q-48 (Insets-Foto) offen | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
@@ -742,6 +742,21 @@ flowchart TD
   - [ ] Der Lagerplatz am vom Designer festgelegten Platz stört weder Stick noch Zielen noch Pause- und Ton-Taste, Ziel mindestens 32×32 (AP-66, Brief-Grundsatz 5)
   - [ ] Nach AP-75 (N7, PE-91): Boss-Namen im Banner und im Ergebnis wie vorher, Banner blinkt dreimal, Lagerplatz-Fächer unverändert
 
+#### Nachtrag 3 – Befunde Smoke-Test stage (2026-10-26, PE-92 bis PE-94)
+
+Befunde des Nutzers auf dem Handy (iPhone 15, iOS 27.0.1, Safari über die Homescreen-App, Querformat): Zeit, Leben und Lagerplatz im HUD zu groß; Stick, Pause und Stumm „gut“; Seitenverhältnis: links und rechts große Ränder, unten ein schmaler, oben gut; Icon „gut“ (keine Änderung). Ingame-Sprites sollen aus den Astronautin-Designs entstehen (H-19).
+
+| Welle | Pakete (parallel) |
+|---|---|
+| N8 | **AP-76** HUD-Größe auf dem Handy (Zahlen, Lagerplatz, PE-94). **AP-77** Seitenverhältnis am Handy, Teil 1: Beleg und Tests (PE-94). Keine gemeinsame Datei, daher parallel |
+| Folge (noch nicht angelegt) | Seitenverhältnis, Teil 2: Umsetzung nach Q-47 (Option A mit H-20 oder Option B als eigener Meilenstein). Sprite-Einbau nach H-19 als eigenes Folgepaket. Beides wird erst geplant, wenn die Entscheidung vorliegt |
+
+- **Prüfpunkte (Smoke-Test stage, Handy):**
+  - [ ] Zeit, Leben und Lagerplatz im HUD auf dem Handy nicht größer als am PC-Maßstab, Stick, Pause und Stumm unverändert (AP-76, Design-Review)
+  - [ ] Seitenverhältnis: Ränder links und rechts entsprechen der Entscheidung aus Q-47, Unterrand nach Q-48 bestätigt (AP-77 Beleg, Folgepaket)
+  - [ ] Icon unverändert (Befund „gut“)
+  - [ ] Ingame-Sprites nach H-19 (Astronautin, Gegner, Münzen, Items, Bosse), Münzen-Unterschied nach Q-46
+
 #### M3 – Bosse
 
 | Welle | Pakete (parallel) |
@@ -850,6 +865,8 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-73 | CFG: Opacity-Tokens (`opacity.dim`, `opacity.ghost`) im Theme-Generator (V-13, PE-88) | Nachtrag 2 | CFG | N6 | AP-71 (fertig), V-13 (freigegeben, PE-88) | S | sonnet (medium) | – (gemergt 7857e21) | fertig (gemergt 7857e21; Statusnachtrag aus git log, Pflege 2026-10-26) |
 | AP-74 | Große Münze auf 16 px: `bigDisplayScale` 1, Größentest (Q-44, PE-90; Design-Review ja) | Nachtrag 2 | CFG | N6 | AP-70 (fertig), Q-44 (beantwortet, PE-90) | S | sonnet (medium) | – (gemergt 16eadff) | fertig (gemergt 16eadff; Code-Review R1 und Design-Review R1 bestanden; Sichtprüfung H-18, Q-46 offen) |
 | AP-75 | Aufräumen: Boss-Anzeigenamen in der Konfig, `motion.banner-blinks` im Theme, Deckkraft-Konstanten in `PowerSlots.ts` auf Tokens (PE-91) | Nachtrag 2 | CFG/GAME | N7 | AP-72, AP-73 (fertig) | M | sonnet (medium) | – (gemergt 59f53de) | fertig (gemergt 59f53de; Code-Review Runde 1 bestanden, Tests 454/454; Smoke-Punkt in H-18 offen) |
+| AP-76 | Fix: HUD-Größe auf dem Handy, Zahlen Energie und Zeit, Lagerplatz (PE-94; Design-Review ja) | Nachtrag 3 | GAME | N8 | AP-66, AP-72, AP-75 (fertig) | S | sonnet (medium) | c76 / agent/AP-76-c76 | bereit |
+| AP-77 | Fix: Seitenverhältnis am Handy, Teil 1: Beleg und Tests (PE-94; Umsetzung nach Q-47) | Nachtrag 3 | GAME/OPS | N8 | AP-63 (fertig) | S | sonnet (medium) | c77 / agent/AP-77-c77 | bereit (nur Beleg; Umsetzung blockiert durch Q-47) |
 
 ---
 
@@ -924,6 +941,8 @@ flowchart LR
   AP71 --> AP73["AP-73 Opacity-Tokens (parallel zu AP-72)"]
   AP70 --> AP74["AP-74 Große Münze 16 px (parallel zu AP-72)"]
   AP72 & AP73 --> AP75["AP-75 Aufräumen Boss-Namen, Banner-Token, Opacity (PE-91)"]
+  AP66 & AP72 & AP75 --> AP76["AP-76 HUD-Größe Handy (PE-94)"]
+  AP63 --> AP77["AP-77 Seitenverhältnis, Beleg (PE-94)"]
   AP20 --> AP68["AP-68 Boss-Timing"]
   AP62 --> AP69["AP-69 Stick am PC aus"]
   AP31 --> AP70["AP-70 Gold sichtbar"]
@@ -940,6 +959,8 @@ flowchart LR
 **M2c-Nachtrag (PE-65):** AP-58, AP-60 und AP-61 (N1) teilen keine Datei und laufen parallel. AP-62 (Stick am PC) hat keine gemeinsame Datei mit den anderen, liegt aber in N2, weil N1 schon drei Pakete hat (PE-15), und läuft dort parallel zu AP-59. AP-59 (N2) teilt `Player.ts`, `weaponMount.ts` und dessen Test mit AP-58 und nutzt dessen Funktion `weaponPose`, daher eine Welle später. M2c-DEP wird nach N2 wiederholt, blockiert aber M3 nicht (PE-69). AP-16 hängt vom M2c-Nachtrag ab, nicht mehr von M2c-DEP.
 
 **Nachtrag 2 (PE-70 bis PE-72):** AP-63 und AP-64 hängen nur von fertigen Paketen ab und teilen keine Datei mit AP-16 bis AP-20, sie laufen parallel zu M3 (zusammen mit AP-16 höchstens drei, PE-15). AP-65 (Vertrag und Logik des Lagerplatzes) nutzt `contracts/{events,index}.ts` von AP-16 und liegt deshalb frühestens in M3 W3. AP-66 (HUD und Szene) braucht den Vertrag von AP-65 eine Welle vorher, die Szenendateien nach AP-20 und die Designer-Ergänzung. Weil AP-66 ohnehin nach AP-20 liegt, kostet das Warten auf den Designer keine Zeit, solange die Ergänzung bis zum Ende von M3 W3 vorliegt. AP-63 bis AP-66 blockieren M3-DEP nicht (PE-69).
+
+**Nachtrag 3 (PE-92 bis PE-94):** AP-76 (`HudScene.ts`, `hud/PowerSlots.ts`, `tests/scenes/hud.test.ts`) und AP-77 (nur `tests/platform/layout.test.ts`) teilen keine Datei und haben keine Kante zueinander, daher laufen sie in N8 parallel. AP-76 hängt an AP-66, AP-72 und AP-75, weil alle drei die HUD-Dateien bereits verändert haben. AP-77 hängt nur an AP-63 (fertig). Die Umsetzung des Seitenverhältnisses (Teil 2) hat keine Kante im Graphen, bis Q-47 entschieden ist. Das Folgepaket bekommt dann eigene Dateien (`main.ts`, `platform/layout.ts`, `index.html` oder Arena-Konstanten).
 
 **M3 W2b (PE-75):** AP-67 besitzt alle Boss-Entities außer `createBoss.ts` und `config/bosses.ts`. AP-20 nutzt dessen neue Schnittstelle (`laserHit()`, `isInvulnerable`, `activeSpikes` mit Knospen und Ringwurzeln), daher liegt AP-67 eine Welle vor AP-20 (RI-2). AP-63, AP-64 und AP-65 haben keine gemeinsame Datei mit AP-67.
 
@@ -2958,6 +2979,80 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 - **Kürzbar bei Budgetnot:** ja. Ohne AP-75 bleiben die Werte lokal (kein Fehler, nur Schulden). Der Lead kann es nicht sinnvoll teilen, weil `hudMath.ts` und `HudScene.ts` nur von einem Paket gleichzeitig geändert werden dürfen
 - **Commit-Typ:** `refactor(AP-75): move boss names, banner count and opacity to config and theme`
 
+### Nachtrag 3 – Befunde Smoke-Test stage (PE-92 bis PE-94)
+
+#### AP-76 – Fix: HUD-Größe auf dem Handy, Zahlen Energie und Zeit auf Stufe 3, Lagerplatz ohne Skalierung (PE-94)
+
+- **Meilenstein, Lane, Welle:** Nachtrag 3 · GAME · N8
+- **Status: bereit** (angelegt 2026-10-26 nach dem Smoke-Test stage, PE-92; Ursache und Ziel PE-94, angenommen vom Planner, Design-Review ja)
+- **Gerät:** iPhone 15, iOS 27.0.1, Safari über die Homescreen-App, Querformat (Befund des Nutzers, PE-92)
+- **Ziel:** Auf dem Handy sind die Zahlen von Energie und Zeit und der Lagerplatz so groß wie am PC (Zahlen Stufe 3, Lagerplatz Kante 40 Arena-Einheiten). Stick, Pause und Stumm bleiben unverändert, ebenso Labels und Sekundentext im Lagerplatz. Am PC (k = 1) ändert sich nichts.
+- **Ursache (Planner hat den Code gelesen, PE-94):**
+  - `src/scenes/HudScene.ts`, `createEnergy` und `createTimer`: Zahlen mit `funkScale(3, k)`. Auf dem Handy ist `k` etwa 1,36 (Arena-Höhe etwa 372 CSS-Pixel, `hudScale` aus `platform/layout.ts` mit der 14-px-Regel). `funkScale` rundet auf Stufe 4 (+33 %).
+  - `src/scenes/hud/PowerSlots.ts`, Konstruktor: `powerSlotRects(…, k, …)` macht die Kante 40 zu 54 Arena-Einheiten (+37 %). Der Sekundentext `funkScale(2, k)` springt von Stufe 2 auf Stufe 3 (+50 %).
+  - Stick, Pause und Stumm nutzen die stetige Größe `size.target · max(1, k)` ohne Rundungssprünge. Deshalb wirken nur die drei genannten Elemente zu groß, und das passt zum Befund „Stick, Pause, Stumm gut“.
+  - Die Labels (`funkScale(1, k)`, auf dem Handy Stufe 2) bleiben bewusst. Sie sind durch die 14-px-Mindestschrift (`MIN_HUD_FONT_CSS`) und AP-53 (Labels mindestens 2×) begründet.
+- **Pflichtlektüre:** PE-92, PE-94, `docs/design/design-brief.md` (Grundsatz 5, Lagerplatz), `docs/design/mockups/lagerplatz-und-boss.html`, `docs/design/export/tokens.resolved.json` (nur lesen), `src/scenes/HudScene.ts`, `src/scenes/hud/PowerSlots.ts`, `src/scenes/hud/FunkPanel.ts` (`funkScale`, nur lesen), `src/scenes/hud/hudMath.ts` (`powerSlotRects`, nur lesen), `src/platform/layout.ts` (`hudScale`, nur lesen)
+- **Abhängigkeiten:** AP-66 (fertig, Lagerplatz-HUD), AP-72 (fertig, HUD-Dateien), AP-75 (fertig, `PowerSlots.ts`). Keine offene Abhängigkeit
+- **Parallel möglich mit:** AP-77 (keine gemeinsame Datei). Kein weiteres Paket in N8
+- **Dateien (Eigentum):**
+  - `src/scenes/HudScene.ts`: Konstante `HUD_NUMBER_SCALE = 3` (Desktop-Maß, unabhängig von `k`, mit Kommentar und Verweis auf PE-94). In `createEnergy` und `createTimer` steht `HUD_NUMBER_SCALE` statt `funkScale(3, k)`. Labels bleiben `funkScale(1, k)`. Der Aufruf von `PowerSlots` passt sich der neuen Signatur an
+  - `src/scenes/hud/PowerSlots.ts`: Konstruktor `constructor(scene, arenaH, onPress)` ohne `k`. `powerSlotRects(STORABLE_POWERS.length, 1, arenaH, …)`. Sekundentext als Konstante `SLOT_TEXT_SCALE = 2` statt `funkScale(2, k)`
+  - `tests/scenes/hud.test.ts`: nur, wenn ein Testmuster für die Szene existiert (siehe Tests)
+- **Nicht anfassen:** `src/scenes/hud/hudMath.ts` (`powerSlotRects` bleibt unverändert, der Aufruf nutzt `k = 1`), `src/scenes/hud/FunkPanel.ts` (`funkScale` bleibt), `src/platform/layout.ts` (`hudScale` bleibt), Stick, Pause und Stumm (`FunkButton`, Button-Größen), `src/scenes/GameScene.ts`, `src/main.ts`, `index.html`, `src/config/theme.ts`, `docs/**`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `HUD_NUMBER_SCALE = 3` in `HudScene.ts` anlegen. `createEnergy` und `createTimer` verwenden es. Die Labels bleiben unverändert.
+  2. `PowerSlots.ts`: `k` aus dem Konstruktor entfernen, `powerSlotRects` mit `1`, Sekundentext mit `SLOT_TEXT_SCALE = 2`. Den Aufruf in `HudScene.ts` anpassen. Mit `grep` prüfen, dass keine weitere Stelle den alten Konstruktor nutzt.
+  3. Keine anderen Werte ändern (Zeit, Leben, Stick, Pause, Stumm, Farben, Positionen).
+- **Akzeptanzkriterien:**
+  - Auf dem Handy (852 × 393 CSS-Pixel, Querformat): Zahlen Energie und Zeit mit Stufe 3 (Glyphenhöhe 24 Arena-Einheiten, vorher 32), Lagerplatz-Kante 40 (vorher 54)
+  - Am PC (k = 1): Ausgabe unverändert (Sichtprüfung oder Vergleich der Szene)
+  - Stick, Pause und Stumm: Größe und Position unverändert
+  - Labels und Sekundentext im Lagerplatz: Stufe 1 beziehungsweise 2 wie vorher (Labels 2 auf dem Handy), keine Schrift unter 14 CSS-Pixel
+  - Keine neuen Farb-Literale in `src/scenes/**`, nur Tokens (Design-Review)
+  - Checks grün
+- **Tests:** bestehende Tests bleiben grün. Ein neuer Test nur, wenn es in `tests/scenes/` ein Muster für Phaser-Szenen gibt. Sonst gilt die Sichtprüfung auf dem Handy (Smoke-Punkt in §9.2). Der Coder meldet, welcher Fall gilt
+- **Review-Schwerpunkte:** Ursache im Code nachvollziehbar (Rundung `funkScale`, Faktor `k`), Labels bewusst unverändert, am PC keine Änderung, alle Aufrufer von `PowerSlots` angepasst, keine Datei außerhalb des Eigentums
+- **Design-Review:** ja (PE-94). Pflichtlektüre Brief, Tokens und `lagerplatz-und-boss.html`. Prüfung: Maße gegen das Mockup, nur Tokens
+- **Doku-Pflichten:** Kommentare in den geänderten Dateien. Keine Doku-Datei
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein. Ohne AP-76 bleibt der Befund „HUD zu groß“ auf dem Handy offen
+- **Commit-Typ:** `fix(AP-76): keep hud numbers and power slots at desktop size on phones`
+
+#### AP-77 – Fix: Seitenverhältnis am Handy, Teil 1: Beleg und Tests (PE-94)
+
+- **Meilenstein, Lane, Welle:** Nachtrag 3 · GAME/OPS · N8
+- **Status: bereit** (nur Beleg; die Umsetzung des Seitenverhältnisses ist blockiert durch Q-47)
+- **Gerät:** iPhone 15, iOS 27.0.1, Safari über die Homescreen-App, Querformat (PE-92)
+- **Ziel:** Die Ursache des Seitenverhältnisses wird als Test festgehalten, bevor etwas geändert wird. Am Verhalten ändert sich nichts. Damit beruht die Entscheidung Q-47 auf Zahlen.
+- **Ursache (Planner hat den Code gelesen, PE-94):** `fitArena` in `src/platform/layout.ts` skaliert die Arena 640 × 360 (16:9) so, dass sie in den Sicherheitsbereich passt. Das Querformatfenster ist etwa 2,2:1. Die Höhe begrenzt, die Breite bleibt frei, und es entstehen zwei Seitenbalken. Mit den Annahmen aus AP-63 (oben 0, links und rechts 47, unten 21; nicht am Gerät gemessen) ergibt sich: verfügbar 758 × 372, Skalierung 1,033, Arena 661 × 372. Je Seite liegen etwa 47 px Inset und etwa 48 px Letterbox, also rund 95 px. Unten bleiben 21 px, oben 0. Das passt zum Befund des Nutzers („links und rechts groß, unten schmal, oben gut“). Ob die Insets stimmen, klärt Q-48.
+- **Pflichtlektüre:** PE-71, PE-92, PE-94, Q-47, Q-48, `src/platform/layout.ts` (`fitArena`, nur lesen), `src/main.ts` (`layoutArena`, nur lesen), `tests/platform/layout.test.ts`
+- **Abhängigkeiten:** AP-63 (fertig, gemergt ed69779). Keine offene Abhängigkeit
+- **Parallel möglich mit:** AP-76 (keine gemeinsame Datei)
+- **Dateien (Eigentum):**
+  - `tests/platform/layout.test.ts`: nur neue Testfälle, bestehende Erwartungswerte bleiben
+- **Nicht anfassen:** `src/main.ts`, `src/platform/layout.ts`, `src/platform/layoutDebug.ts`, `index.html`, `public/manifest.webmanifest`, `src/scenes/**`, `docs/**`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Testfall mit `fitArena` für 852 × 393, Insets oben 0, links 47, rechts 47, unten 21, Arena 640 × 360: Skalierung etwa 1,033, Breite etwa 661, Höhe etwa 372, Seitenrand je etwa 95, Unterrand 21, oberer Rand 0. Im Kommentar stehen die Insets als Annahme mit Verweis auf Q-48.
+  2. Weitere Fälle: 932 × 430 mit denselben Insets (als Vergleich), 667 × 375 (ohne Insets), PC 1280 × 720 und 1920 × 1080 ohne Insets (Seitenbalken 0, Arena füllt die Höhe oder Breite wie heute).
+  3. Keine Änderung an Produktionscode.
+- **Akzeptanzkriterien:**
+  - Neue Testfälle grün und beschreiben das heutige Verhalten als Beleg
+  - Bestehende Tests unverändert grün
+  - `git diff` zeigt nur `tests/platform/layout.test.ts`
+  - Checks grün
+- **Tests:** `tests/platform/layout.test.ts`
+- **Review-Schwerpunkte:** Testwerte rechnerisch nachvollziehbar, Annahmen als Annahmen gekennzeichnet, keine Änderung an `fitArena`, keine Datei außer dem Test
+- **Design-Review:** nein (kein sichtbarer Unterschied, PE-94)
+- **Doku-Pflichten:** Kommentare in der Testdatei. Keine Doku-Datei
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja. Ohne AP-77 fehlt nur der Zahlenbeleg. Die Umsetzung (Teil 2) hängt ohnehin an Q-47 und Q-48
+- **Commit-Typ:** `test(AP-77): document the phone arena fit and safe-area margins`
+
 ### M3 – Bosse
 
 #### AP-16 – Boss-Rahmen
@@ -3341,12 +3436,15 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | H-10 | Freigabe Umfang: V-05 (Stick, §2 F-01) und V-06 (F-17 nach „Optional“, §2) entscheiden. Erst danach trägt der Planner die §2-Änderungen ein | vor AP-39 bzw. §2 | AP-39 | ☑ V-05 übernommen (2026-10-25), V-06 abgelehnt, F-17 bleibt Pflicht (PE-56) |
 | H-11 | Reihenfolge bestätigen: Design-Umsetzung (M2c) nach M2b-DEP und vor M3 (PE-60) | vor M2c W1 | AP-50, AP-51 | ☑ (bestätigt 2026-10-25) |
 | H-12 | Abnahme M2c: Smoke-Test am PC und auf dem iPhone (M2c-DEP), Wiederholung nach N2, inklusive Lesbarkeit von Funk 1× und Kapsel 1× im Querformat | nach N2 (M2c-Nachtrag) | nichts, blockiert M3 nicht (PE-69); Befunde werden Fix-Pakete | ☐ |
-| H-13 | Optional: die 30 Platzhalter-Sprites (Astronautin, Gegner, Items, Bosse) nach `docs/design/mockups/sprites.html` und der Anleitung `docs/guides/grafik-austauschen.md` neu zeichnen. Reiner Dateiaustausch ohne Code. Kein Paket geplant (Brief, Reihenfolge-Empfehlung 5) | jederzeit nach M2c W1 | – | ☐ |
+| H-13 | Optional: die 30 Platzhalter-Sprites (Astronautin, Gegner, Items, Bosse) nach `docs/design/mockups/sprites.html` und der Anleitung `docs/guides/grafik-austauschen.md` neu zeichnen. Reiner Dateiaustausch ohne Code. Kein Paket geplant (Brief, Reihenfolge-Empfehlung 5) | jederzeit nach M2c W1 | – | ersetzt durch H-19 (PE-93), nicht mehr separat |
 | H-14 | Designer-Interview für den Power-up-Lagerplatz: Lagerplatz-Symbol, HUD-Platz, Zustände leer, bereit, gesperrt, Mockup, in `docs/design/` (Q-34, Q-37), dazu die Boss-Lücken aus §18 (AP-20: Banner „BOSS KOMMT!“, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste). Der Nutzer startet den Designer (`start-agent.ps1 … -Role designer`), der Lead nicht | vor AP-66 (spätestens bis Ende M3 W3) | AP-66, AP-72 | ☑ Ergänzung freigegeben 2026-10-26 (Commits 011b73c, 1373aba, 8390dfb, 6d31f38, f7fdff7, PE-85). Tokens noch nicht in `theme.ts`, dazu AP-71 |
 | H-15 | Wiederholung Handtest M3-DEP (PC und iPhone) nach M3-Nachtrag W1 (AP-68, AP-69, AP-70). Zusätzlich Q-44 entscheiden: Große Münze 32 px (Ist) oder 16 px (Designer-Empfehlung `bigDisplayScale` 1, Kontur an die Skalierung koppeln). Prüfen: Warnung bei 0:33, Boss bei 0:30, Sieg sofort bei Boss-Sieg (PE-76); kein Stick am PC (PE-77); Münzen auf Level 0, 5, 10 (PE-78). Riesen-Stein über `?level=10` oder `?level=18` testen, Spielerlevel 6 reicht nicht (PE-79, kein Fehler) | nach W1 des M3-Nachtrags | M3-DEP-Abnahme | ☑ Handtest bestanden 2026-10-26 (PC und iPhone, ohne Befunde). Q-44 offen, vorläufig 32 px |
 | H-16 | Optional: Designer-Nachtrag Münzen. Lücken aus AP-70: Münzgröße und -kontur (nach Q-44), Token `game.pickup-outline` fehlt (AP-70 nutzt `game.hit-flash`), Ebenenordnung Münze über Glühwürmchen und Vignette. Der Nutzer startet den Designer (`start-agent.ps1 … -Role designer`) | vor der nächsten Münzänderung | – | ☐ |
 | H-17 | Release-Abgleich vor dem PR `dev` → `stage`: Die lokale `stage` weicht von `origin/stage` ab (204 vs. 1 Commits, Lead-Befund). PR #3 „new designs new hud new movement“ ist offen und wurde vom Nutzer abgebrochen. Klären, was in `stage` gehört, bevor der Merge läuft | vor dem ersten PR `dev` → `stage` (M3-DEP) | Release nach `stage` | ☐ |
 | H-18 | Handtest N6 (PC und iPhone) nach AP-72, AP-73, AP-74 (vom Nutzer am 2026-10-26 zurückgestellt; blockiert kein Folgepaket). Zusätzlich nach AP-75: Boss-Namen im Banner und im Ergebnis wie vorher, Banner blinkt dreimal. Prüfen: Banner „BOSS KOMMT!“ als Funkspruch (Erscheinen, Blinken, kein Stau bei Wiederholung); Boss-Leiste in allen Zuständen (normal, unverwundbar, Boss erschienen aber nicht aktiv: 0 %); Ergebnis nach Boss-Sieg (Prozentzeile) und Boss-Niederlage (Restlebenszeile, Sieg auf Boss-Level ohne bossDefeated zeigt eine Prozentzeile, prüfen); Lagerplätze leer nach Rundenende, kein veraltetes „bereit“ (V-14 a); Lagerplätze in der Pause nicht tippbar (V-14 d); Münzen beide 16 px, kleine und große im Gedränge unterscheidbar (Q-46) | nach Wellenabschluss N6 | Abnahme Nachtrag 2, Release nach `stage` (H-17) | ☐ zurückgestellt (Nutzer, 2026-10-26); blockiert kein Folgepaket |
+| H-19 | Designer-Auftrag Ingame-Sprites (PE-93, ersetzt H-13): Der Designer zeichnet die Ingame-Sprites (Astronautin, Gegner, Münzen, Items, Bosse) aus den Astronautin-Designs als Vorlage für Stil und Maß. Q-46 (Münzen-Unterschied über Sprite und Umrandung) mit klären. Der Nutzer startet den Designer: `& "D:/Private Projekte/multiAgentBridge/start-agent.ps1" -Project "D:/Private Projekte/360shooter" -Role designer -Continue`. Ergebnis in `docs/design/`, Ablage im Plan nach Abnahme | jetzt (Smoke-Befund stage, PE-92) | Folgepaket Sprite-Einbau (noch nicht angelegt, erst nach H-19). Blockiert AP-76 und AP-77 nicht | ☐ Teil 1 liegt als Entwurf vor (Designer-Brief-Ergänzung vom 2026-10-26: Astronautin, Strahlenpistole, Laser, `mockups/sprites-ingame.html`), wartet auf Freigabe des Nutzers. Gegner, Münzen, Items und Bosse offen. Danach Planner „Design übernehmen“ |
+| H-20 | Bedingt, nur bei Q-47 Option A: Designer gestaltet die Seitenränder am Handy (Rahmen und Hintergrund links und rechts, nur Tokens). Designer-Interview wie H-19. Entfällt bei Option B | nach Q-47 | Folgepaket Seitenverhältnis, Teil 2 (noch nicht angelegt) | ☐ bedingt |
+| H-21 | Optional, Q-48: Foto der Layout-Anzeige `?layout=1` im Querformat (Homescreen-App und Safari), Unterrand und Insets sichtbar. Kein Code, Foto an den Lead | vor dem Folgepaket Seitenverhältnis, Teil 2 | Q-48 und AP-77 Teil 2 | ☐ |
 
 ---
 
@@ -3360,6 +3458,7 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | M2b | 16 | ≈ 23,75 h (+ Review ≈ 30 h) | ≈ 11–12 |
 | M2c | 6 | ≈ 11,25 h (+ Review inkl. 3 Design-Reviews ≈ 15 h) | ≈ 5–6 (bei 45 % Zielwert ≈ 4) |
 | M2c-Nachtrag | 5 (AP-58 bis AP-62) | ≈ 5,25 h (3 × S, 2 × M; + Review ≈ 7 h) | ≈ 2–3 (bei 30 % Team-Budget je Fenster etwa 2 bis 3 Pakete mit Review) |
+| Nachtrag 3 (Befunde Smoke-Test stage, PE-92 bis PE-94) | 2 (AP-76 S, AP-77 S) | ≈ 1,5 h (S, sonnet medium, angenommen; + Review inkl. Design-Review AP-76 ≈ 2 h) | ≈ 0,75 (AP-77 kürzbar; ein Fenster reicht; Folgepakete Seitenverhältnis Teil 2 und Sprite-Einbau nicht eingerechnet; Zeile nicht in der Gesamtzeile, wie Nachtrag 2) |
 | Nachtrag 2 N7 (Aufräum-Folgepaket PE-91) | 1 (AP-75) | ≈ 1,5 h (M, sonnet medium, angenommen; + Review ≈ 2 h, ohne Design-Review) | ≈ 0,5 (ein Fenster reicht; Zeile nicht in der Gesamtzeile, wie Nachtrag 2) |
 | Nachtrag 2 | 7 (AP-63 bis AP-66, AP-72, AP-73, AP-74) | ≈ 10,25 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L, AP-72 L inkl. V-14 ≈ +0,5 h, AP-73 S ≈ 0,75 h, AP-74 S ≈ 0,75 h, angenommen; + Review inkl. Design-Review AP-66, AP-72 und AP-74 ≈ 13 h) | ≈ 5 (AP-64 und AP-73 kürzbar, ≈ 1,5 h; AP-74 nicht kürzen) |
 | M3 | 6 (AP-16 bis AP-20 und AP-67, Fairness-Fix PE-75, M ≈ 1,5 h) | ≈ 10 h (+ Review ≈ 13 h) | ≈ 5–6 |
@@ -3514,6 +3613,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-89 | **V-14 freigegeben:** Low-Funde aus AP-66 (a) bis (e) werden in AP-72 mitgenommen, nicht als Folgepaket. Eigentum: `PowerSlots.ts` (b, d), `hudMath.ts` (c, e, nur reine Funktionen), `GameScene.ts` (a, nur die Stelle in `endRound`), zusätzlich zu den V-12-Dateien | Nutzer im Chat am 2026-10-26; Eigentumsfrage für `hudMath.ts` und `GameScene.ts` nach Auftrag des Lead entschieden | Nutzer am 2026-10-26; Eigentum angenommen vom Planner (Pflege) |
 | PE-91 | **Aufräum-Folgepaket AP-75 (N7).** Nutzer hat H-18 (Handtest N6) am 2026-10-26 zurückgestellt und den Planner weitermachen lassen. H-18 bleibt offen, blockiert aber kein Folgepaket. AP-75 (CFG/GAME, M, sonnet medium, Design-Review nein, da kein sichtbarer Unterschied): (1) Boss-Anzeigenamen als Feld `name` in `BossDef` (`src/contracts/boss.ts`, additiv) und `src/config/bosses.ts`, `BOSS_NAMES` in `hudMath.ts` entfällt, `bossDisplayName` liest daraus. (2) Token `motion.banner-blinks` (3) in den Generator (`MOTION_COUNT`, `theme:build`), `BANNER_BLINKS` in `HudScene` entfällt. Der Token steht im Export (Z. 198). (3) `OPACITY_DIM` und `OPACITY_GHOST` in `PowerSlots.ts` werden `OPACITY`. `HOVER_FILL_ALPHA` 0,18 und `BLINK_ALPHA` 0,55 bleiben Konstanten (Q-45). Kriterium: Spielverhalten und Aussehen unverändert, Tests grün, bestehende Tests angepasst. Konflikt-Regel: Ein Befund-Fix aus H-18 an denselben Dateien wird nicht parallel umgesetzt | Nutzer im Chat am 2026-10-26 (Pflegeauftrag des Lead, H-18 zurückgestellt) | Nutzer am 2026-10-26; Schnitt und Eigentum angenommen vom Planner (Pflege) |
 | PE-90 | **Q-44 entschieden: große Münze 16 px.** `COIN_VISUAL.bigDisplayScale` 1 (Designer-Empfehlung, 16×16-Sprite ganzzahlig). Die kleine Münze bleibt `smallDisplayScale` 2 (16 px). Umsetzung AP-74 (N6, S, sonnet medium, Design-Review ja), parallel zu AP-72 ohne gemeinsame Datei. Folge: beide Münzen 16 px, das Verhältnis 1:2 entfällt (Q-46) | Nutzer im Chat am 2026-10-26 (Q-44) | Nutzer am 2026-10-26; Umsetzung und Konfliktprüfung angenommen vom Planner (Pflege) |
+| PE-92 | **Befunde Smoke-Test stage auf dem Handy.** Gerät iPhone 15, iOS 27.0.1, Safari über die Homescreen-App, Querformat. (1) Zeit, Leben und Power-up-Lagerplatz im HUD zu groß; Stick, Pause und Stumm „gut“. (2) Seitenverhältnis: links und rechts große Ränder, unten schmal, oben gut. (3) Icon „gut“, keine Änderung. (4) Ingame-Sprites sollen aus den Astronautin-Designs entstehen (H-19). Umsetzung: AP-76 (HUD) und AP-77 (Seitenverhältnis, Beleg) in N8, Folgepakete nach Q-47 und H-19 | Nutzer im Smoke-Test auf stage, Pflegeauftrag Lead am 2026-10-26 | Nutzer am 2026-10-26 (Befunde); Paketschnitt angenommen vom Planner (Pflege) |
+| PE-93 | **Ingame-Sprites über den Designer (H-19).** Die Sprites entstehen im Designer-Interview aus den Astronautin-Designs als Vorlage. Das Folgepaket Sprite-Einbau wird erst nach H-19 geplant. H-13 (Platzhalter-Dateiaustausch) geht darin auf und ist ersetzt. Q-46 (Münzen-Unterschied über Sprite und Umrandung) wird im selben Auftrag mit geklärt | Nutzer am 2026-10-26 (Befund: Sprites aus den Designs) | Nutzer am 2026-10-26; Ablauf angenommen vom Planner (Pflege) |
+| PE-94 | **Ursachen der Befunde PE-92 (im Code belegt, am Gerät nicht gemessen).** HUD: Die Zahlen Energie und Zeit springen durch ganzzahlige Schriftstufen (`funkScale(3, k)`, auf dem Handy k ≈ 1,36, Stufe 4). Der Lagerplatz wächst mit k (40 zu 54 Arena-Einheiten). Stick, Pause und Stumm wachsen stetig und sind deshalb unauffällig. Ziel (angenommen, Design-Review ja): Zahlen Stufe 3, Lagerplatz 40, Labels und Sekundentext bleiben aus Gründen der 14-px-Regel (AP-53). Seitenverhältnis: `fitArena` begrenzt die 16:9-Arena an der Höhe, das Querformatfenster (etwa 2,2:1) lässt die Breite frei, daher zwei Seitenbalken. Annahme: Insets oben 0, links und rechts 47, unten 21 (AP-63, nicht gemessen, Q-48). Umsetzung: AP-76 (HUD) und AP-77 (Beleg und Tests). Die Umsetzung des Seitenverhältnisses wird erst nach Q-47 geplant | Planner (Pflege) aus Code und Befunden PE-92 | Planner (Pflege) angenommen; Gerät bestätigt Ursache noch nicht (H-21) |
 
 ### Offene Fragen
 
@@ -3558,6 +3660,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-44 | Große Münze: 32 px (Ist, `bigDisplayScale` 2) oder 16 px (Designer-Empfehlung `bigDisplayScale` 1, Umrandung an die Skalierung koppeln)? Die große Münze ist so groß wie die Astronautin (32 px) | W | AP-70, H-15, H-16 | Designer-Empfehlung 16 px, Entscheidung nach Sichtprüfung im Handtest | beantwortet (Nutzer im Chat am 2026-10-26): 16 px, PE-90, Umsetzung AP-74 |
 | Q-46 | Nach Q-44 sind große und kleine Münze beide 16 px groß (`smallDisplayScale` 2). Soll die kleine Münze auf 8 px (`smallDisplayScale` 1) gehen, oder bleibt die gleiche Größe, und die Unterscheidung kommt nur über Sprite und Umrandung? | W | PE-90, AP-74, PE-78 | Gleiche Größe lassen (AP-70 hat die kleine Münze bewusst vergrößert, 8 px wäre wieder zu klein). Entscheidung nach der Sichtprüfung von AP-74 | offen (Nutzer, Sichtprüfung im Handtest H-18; AP-74 blockiert nicht) |
 | Q-45 | Hover-Wert der Lagerplatz-Fächer (Akzent 18 % über dem Glas, `HOVER_FILL_ALPHA` in `PowerSlots.ts`) als Token in den Designer-Export aufnehmen (`opacity.hover`)? Der Export hat ihn nicht, das Mockup schon. Gleiches gilt für `BLINK_ALPHA` 0,55 in `HudScene.ts`, falls es dafür keinen Token gibt | W | V-13, AP-73, AP-72 (`PowerSlots.ts`), AP-75 (`PowerSlots.ts`) | Ja, bei nächstem Designer-Auftrag als Token ergänzen, dann Umstellung nach AP-72. Bis dahin bleibt die Konstante | offen (Designer-Auftrag, Nutzer entscheidet; AP-73 blockiert nicht) |
+| Q-47 | Seitenverhältnis am Handy: Die Arena bleibt 16:9, und die Ränder links und rechts werden gestaltet (A). Oder das Spielfeld wird am Handy breiter, bis etwa 2,2:1, damit weniger Rand bleibt (B)? Option A: Der Designer gestaltet die Seitenbalken (H-20), kleine Umsetzung. Option B: betrifft Spielfeld, Gegner-Spawn und Boss-Arena (Arena-Breite 640 in `config/bosses.ts`, Mitte 320/180 in `Enemy.ts` und `BossBase.ts`, Stand der Code-Lesung), also eigener Meilenstein mit Architekturfreigabe (§4). Verworfen: Bild beschneiden (ENVELOPE) und Bild strecken | K | PE-94, AP-77, H-20, §4 | (A) zuerst: schnellste Lösung mit dem Design. (B) nur, wenn der Nutzer den Rand gar nicht will | offen (Nutzer; blockiert das Folgepaket Seitenverhältnis, Teil 2) |
+| Q-48 | Bestätigen die Insets am Gerät (iPhone 15, Querformat, Homescreen-App) die Annahme oben 0, links und rechts 47, unten 21? Dafür ein Foto der Layout-Anzeige `?layout=1` im Querformat | W | PE-94, AP-77, H-21 | Ja, Foto schicken. Die Annahme ist Grundlage von AP-77 (Beleg) | offen (Nutzer, H-21; AP-76 blockiert nicht) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -3657,11 +3761,11 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | F-07 Waffen-Items (geändert, PE-42, H-07) | AP-03, AP-05, AP-08, AP-10 (alt, ersetzt in M2b); neu: AP-25, AP-27, AP-30, AP-31, AP-33, AP-34, AP-36 |
 | F-08 Spielerlevel | AP-06, AP-10, AP-11 |
 | F-09 Hauptmenü und Freischaltung | AP-06, AP-11, AP-21, AP-22 (Direktstart `?level=n` am Menü vorbei) |
-| F-10 iPhone über PWA | AP-13, M2-DEP; Vollbild, Mitte, HUD auf dem iPhone (PE-54): AP-38 |
+| F-10 iPhone über PWA | AP-13, M2-DEP; Vollbild, Mitte, HUD auf dem iPhone (PE-54): AP-38; Handtest stage 2026-10-26 (PE-92): HUD-Größe AP-76, Seitenverhältnis Beleg AP-77 (Umsetzung nach Q-47) |
 | F-11 HP und Niederlage | AP-05, AP-10 |
-| F-12 Grafik austauschbar + Anleitung | AP-02, AP-07 |
+| F-12 Grafik austauschbar + Anleitung | AP-02, AP-07; Ingame-Sprites aus den Astronautin-Designs (PE-93): H-19 (Designer), danach Folgepaket Sprite-Einbau (noch nicht angelegt) |
 | F-13 Sounds austauschbar + Anleitung | AP-02, AP-07, AP-14 |
-| F-14 Querformat | AP-01, AP-13, AP-38 (Darstellung im Querformat) |
+| F-14 Querformat | AP-01, AP-13, AP-38 (Darstellung im Querformat); Seitenverhältnis am Handy (PE-92, PE-94): AP-77 (Beleg), Umsetzung nach Q-47 (Folgepaket) |
 | F-15 Gold-Münzen (PE-39, PE-40, PE-81, PE-83, PE-84) | AP-25, AP-26, AP-27, AP-29, AP-31, AP-33, AP-35, AP-70 (Drop 8 %, Gold-Tempo, Münzwerte aus Q-43, PE-84) |
 | F-16 Dauerhafte Upgrades (PE-41, PE-45) | AP-27, AP-28, AP-29, AP-32, AP-33, AP-35 |
 | F-17 Rüstungen mit passiven Effekten (PE-47, PE-52, PE-56, PE-58; Pflicht, V-06 abgelehnt) | AP-37a, AP-37c, AP-34, AP-33, M2b-DEP (Pilot Feuerring fest, Katalog offen) |
@@ -3931,3 +4035,7 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-26 | Erkenntnis AP-75 (Test, niedrig): `tests/config/theme.test.ts` prüft `motionCount['motion.banner-blinks']` gegen das Literal 3, nicht gegen den Export. Ein Generator-Lauf ohne Diff belegt die Gleichheit. Kein Paket geplant | Reviewer-Bericht AP-75 | AP-75 | Planner (Pflege) |
 | 2026-10-26 | Erkenntnis AP-75 (Commit, harmlos): Der Commit-Body enthält zusätzlich eine Co-Authored-By-Zeile. Keine Aktion | Git log 8b30e71 | AP-75 | Planner (Pflege) |
 | 2026-10-26 | Erkenntnis AP-75 (Konstanten): `HOVER_FILL_ALPHA` 0,18 (`PowerSlots.ts`) und `BLINK_ALPHA` 0,55 (`HudScene.ts`) bleiben ohne Token. Entscheidung offen als Q-45 | Code gelesen, Reviewer-Bericht AP-75 | AP-75, Q-45 | Planner (Pflege) |
+| 2026-10-26 | Befunde Smoke-Test stage auf dem Handy (Nutzer, Pflegeauftrag Lead): iPhone 15, iOS 27.0.1, Safari über die Homescreen-App, Querformat. HUD (Zeit, Leben, Lagerplatz) zu groß, Stick, Pause, Stumm gut, Seitenverhältnis mit großen Rändern links und rechts, Icon gut, Ingame-Sprites aus den Designs gewünscht. Eingetragen als PE-92 | Nutzer im Smoke-Test, Pflegeauftrag Lead | PE-92, §0, §9.2 | Planner (Pflege) |
+| 2026-10-26 | Ursache HUD (PE-94, im Code belegt): `funkScale(3, k)` für Zahlen springt auf Stufe 4 bei k ≈ 1,36 (Handy). `powerSlotRects` mit k macht den Lagerplatz 54 statt 40 Arena-Einheiten, Sekundentext springt von 2 auf 3. Stick, Pause, Stumm wachsen stetig (`size.target · max(1, k)`), deshalb unauffällig. Labels bleiben (14-px-Regel, AP-53). Ziel: Zahlen Stufe 3, Lagerplatz 40, Sekundentext 2 | `HudScene.ts`, `hud/PowerSlots.ts`, `hud/FunkPanel.ts`, `hud/hudMath.ts`, `platform/layout.ts` gelesen | AP-76 | Planner (Pflege) |
+| 2026-10-26 | Ursache Seitenverhältnis (PE-94, im Code belegt, Insets angenommen): `fitArena` hält 16:9 und begrenzt an der Höhe. Querformatfenster etwa 2,2:1, Rechnung 852 × 393 mit Insets 47/21 ergibt Arena 661 × 372, Seitenrand je ≈ 95 px (47 Inset + 48 Letterbox), unten 21, oben 0. Passt zum Befund. Die Insets sind nicht am Gerät gemessen (Q-48, H-21) | `platform/layout.ts`, `main.ts` gelesen; Annahme aus AP-63 | AP-77, Q-47, Q-48 | Planner (Pflege) |
+| 2026-10-26 | Paketschnitt Nachtrag 3 (PE-92 bis PE-94): AP-76 (N8, S, sonnet medium, Design-Review ja) und AP-77 (N8, S, sonnet medium, nur Beleg und Tests) ohne gemeinsame Datei, parallel. Folgepakete Seitenverhältnis Teil 2 (nach Q-47) und Sprite-Einbau (nach H-19) noch nicht angelegt. §0, §9.2, §10, §11, §12, §13, §14, §16, §17 nachgezogen. Keine Änderung an §2, §4, §5 | Pflegeauftrag Lead „Befunde Smoke-Test stage“ | AP-76, AP-77, PE-92 bis PE-94, Q-47, Q-48, H-13 (ersetzt), H-19 bis H-21 | Planner (Pflege) |
