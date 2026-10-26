@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** geändert am 2026-10-26 (Ergänzung „Ingame-Sprites Astronautin“, wartet auf Freigabe; H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Alle 24 Ingame-Sprites gezeichnet: Astronautin, Strahlenpistole, Laser (`assets/sprites.js`, `mockups/sprites-ingame.html`) sowie Gegner, Bosse, Geschosse, Items, Münzen, Kacheln und UI-Icons (`assets/sprites-world.js`, `mockups/sprites-welt.html`). Wartet auf Freigabe durch den Nutzer. Danach: Planner „Design übernehmen“ (Übergabe unter „Änderungen“).
+**Status:** freigegeben am 2026-10-26 (Ergänzung „Ingame-Sprites“; H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Alle 24 Ingame-Sprites gezeichnet: Astronautin, Strahlenpistole, Laser (`assets/sprites.js`, `mockups/sprites-ingame.html`) sowie Gegner, Bosse, Geschosse, Items, Münzen, Kacheln und UI-Icons (`assets/sprites-world.js`, `mockups/sprites-welt.html`). Freigegeben. Nächster Schritt: Der Lead beauftragt den Planner mit „Design übernehmen“ für die Ergänzung „Ingame-Sprites“ (Übergabe unter „Änderungen“).
 
 ## Ausgangslage
 
@@ -134,7 +134,7 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 
 ## Änderungen
 
-### 2026-10-26 · Ergänzung „Ingame-Sprites Astronautin“ (wartet auf Freigabe)
+### 2026-10-26 · Ergänzung „Ingame-Sprites“ (freigegeben am 2026-10-26)
 
 **Auftrag (Nutzer):** Ingame-Sprites passend zu den Astronautin-Designs (Porträt im Menü, App-Icon, Vorlage in `pixel.js`). Heute ist `astronaut.png` ein Platzhalter (lila Dreiecke), und `weapon-raygun.png` ist die 12×8-Vorlage, nur 2× vergrößert.
 
