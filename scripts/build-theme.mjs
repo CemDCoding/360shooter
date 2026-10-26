@@ -92,6 +92,11 @@ export function buildTheme(json) {
     record('SIZE_COUNT', sizeCount, 'Größen als Anzahl.'),
     record('MOTION_MS', dur, 'Zeiten in ms.'),
     record('MOTION_EASING', easing, 'Easing-Angaben (CSS-Schreibweise).'),
+    record(
+      'OPACITY',
+      Object.entries(base.opacity).map(([k, v]) => [k, Number(v)]),
+      'Deckkraft-Stufen, 0..1.',
+    ),
     `/** Schrift: Familien (Fallback-Reihenfolge), Skalierungsstufen, Zeichenabstand und Zeilenabstand in px. */
 const FONT = {
   family: { menu: ${fam(f.family.menu)}, hud: ${fam(f.family.hud)} },
@@ -111,13 +116,17 @@ ${scale.join('\n')}
   motionMs: MOTION_MS,
   motionEasing: MOTION_EASING,
   font: FONT,
+  opacity: OPACITY,
 } as const;
+
+export { OPACITY };
 
 export type ColorName = keyof typeof COLORS;
 export type SpaceName = keyof typeof SPACE_PX;
 export type BorderName = keyof typeof BORDER_PX;
 export type SizeName = keyof typeof SIZE_PX;
 export type MotionName = keyof typeof MOTION_MS;
+export type OpacityName = keyof typeof OPACITY;
 
 /** Farbe nach Tokenname; ein falscher Name ist ein Typfehler. */
 export function themeColor(name: ColorName): ThemeColor {

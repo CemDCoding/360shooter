@@ -175,6 +175,12 @@ const MOTION_EASING = {
   'motion.out': 'cubic-bezier(0.2, 0.8, 0.2, 1)',
 } as const;
 
+/** Deckkraft-Stufen, 0..1. */
+const OPACITY = {
+  'dim': 0.35,
+  'ghost': 0.6,
+} as const;
+
 /** Schrift: Familien (Fallback-Reihenfolge), Skalierungsstufen, Zeichenabstand und Zeilenabstand in px. */
 const FONT = {
   family: { menu: ['Astro Kapsel'], hud: ['Astro Funk'] },
@@ -197,13 +203,17 @@ export const THEME = {
   motionMs: MOTION_MS,
   motionEasing: MOTION_EASING,
   font: FONT,
+  opacity: OPACITY,
 } as const;
+
+export { OPACITY };
 
 export type ColorName = keyof typeof COLORS;
 export type SpaceName = keyof typeof SPACE_PX;
 export type BorderName = keyof typeof BORDER_PX;
 export type SizeName = keyof typeof SIZE_PX;
 export type MotionName = keyof typeof MOTION_MS;
+export type OpacityName = keyof typeof OPACITY;
 
 /** Farbe nach Tokenname; ein falscher Name ist ein Typfehler. */
 export function themeColor(name: ColorName): ThemeColor {
