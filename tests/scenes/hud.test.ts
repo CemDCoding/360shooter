@@ -4,7 +4,20 @@ import { THEME } from '../../src/config/theme';
 import { slotStatus } from '../../src/logic/powerStore';
 import {
   armourDisplay,
+  bannerBlink,
+  BOSS_NAMES,
+  bossBarLook,
   bossBarRect,
+  bossBarState,
+  bossDisplayName,
+  bossPercentLeft,
+  bossTrailTop,
+  itemMsLeft,
+  patternCells,
+  patternWidth,
+  PIXEL_LOCK,
+  PIXEL_STAR,
+  slotPanelStyle,
   energyRatio,
   energySegments,
   formatTime,
@@ -185,5 +198,140 @@ describe('powerBlock', () => {
     expect(slotStatus(stored, 'rapidFire', powerBlock(rapid, idle, noArmour).blocked)).toBe('empty');
     expect(slotStatus(stored, 'fire-ring', powerBlock(ring, idle, noArmour).blocked)).toBe('ready');
     expect(slotStatus(stored, 'fire-ring', powerBlock(ring, idle, cooling).blocked)).toBe('blocked');
+  });
+
+  it('reads the item lock from the power state, not from a fixed id (V-14 e)', () => {
+    expect(itemMsLeft('rapidFire', { ...idle, rapidFireMsLeft: 900 })).toBe(900);
+    expect(itemMsLeft('rapidFire', idle)).toBe(0);
+    // Items without a timed state field never block.
+    expect(itemMsLeft('shield', { ...idle, shieldLeft: 3 })).toBe(0);
+    expect(itemMsLeft('unknown', idle)).toBe(0);
+    expect(powerBlock({ id: 'shield', kind: 'item' }, { ...idle, rapidFireMsLeft: 5000 }, noArmour).blocked).toBe(false);
+    // The fire ring follows the armour state, independent of rapid fire.
+    expect(powerBlock(ring, { ...idle, rapidFireMsLeft: 5000 }, noArmour)).toEqual({ blocked: false, sec: 0 });
+    expect(powerBlock(rapid, idle, { id: 'fire-ring', activeMsLeft: 3000, cooldownMsLeft: 0 })).toEqual({
+      blocked: false,
+      sec: 0,
+    });
+  });
+});
+
+describe('slotPanelStyle (V-14 b)', () => {
+  const s = (look: 'empty' | 'ready' | 'blocked', pressed = false, flashing = false) =>
+    slotPanelStyle({ look, pressed, flashing });
+
+  it('picks the frame per state', () => {
+    expect(s('empty')).toEqual({ line: 'hud.line', dotted: true });
+    expect(s('ready')).toEqual({ line: 'hud.accent', glow: true });
+    expect(s('blocked')).toEqual({ line: 'hud.line-dim' });
+    expect(s('ready', false, true)).toEqual({ line: 'hud.accent', glow: true, fill: 'hud.flash' });
+    expect(s('ready', true)).toEqual({ line: 'hud.accent', fill: 'hud.accent' });
+  });
+
+  it('lets blocked beat the store flash', () => {
+    expect(s('blocked', false, true)).toEqual({ line: 'hud.line-dim' });
+    expect(s('empty', false, true)).toEqual({ line: 'hud.line', dotted: true });
+  });
+});
+
+describe('power slot size at odd k (V-14 c)', () => {
+  const base = {
+    size: THEME.sizePx['size.hud-slot'],
+    gap: THEME.sizePx['size.hud-slot-gap'],
+    margin: THEME.spacePx['space.2'],
+  };
+
+  it.each([1, 1.125, 1.2, 1.375, 1.4])('uses whole pixels and a whole-pixel centre at k = %s', (k) => {
+    for (const r of powerSlotRects(2, k, 360, base)) {
+      for (const v of [r.x, r.y, r.w, r.h]) expect(Number.isInteger(v)).toBe(true);
+      expect(Number.isInteger(r.x + r.w / 2)).toBe(true);
+      expect(Number.isInteger(r.y + r.h / 2)).toBe(true);
+    }
+  });
+
+  it('rounds the size to an even value at k = 1.125', () => {
+    const [a, b] = powerSlotRects(2, 1.125, 360, base);
+    expect(a).toEqual({ x: 9, y: 360 - 9 - 46, w: 46, h: 46 });
+    expect(b.x).toBe(9 + 46 + 9);
+  });
+});
+
+describe('boss HUD (H-14, 5a and 7a)', () => {
+  it('rounds the boss percentage up', () => {
+    expect(bossPercentLeft(380, 1000)).toBe(38);
+    expect(bossPercentLeft(381, 1000)).toBe(39);
+    expect(bossPercentLeft(1, 1000)).toBe(1);
+    expect(bossPercentLeft(0.3, 1)).toBe(30);
+    expect(bossPercentLeft(0, 1000)).toBe(0);
+    expect(bossPercentLeft(1000, 1000)).toBe(100);
+    expect(bossPercentLeft(2, 1)).toBe(100);
+    expect(bossPercentLeft(NaN, 1)).toBe(0);
+    expect(bossPercentLeft(5, 0)).toBe(0);
+  });
+
+  it('blinks the banner exactly three times with motion.blink, not with reduced motion', () => {
+    const blink = THEME.motionMs['motion.blink'];
+    // yoyo + repeat 2 = three full blinks, then the tween ends at full alpha.
+    expect(bannerBlink(3, blink, false)).toEqual({ repeat: 2, durationMs: blink });
+    expect(bannerBlink(3, blink, true)).toBeNull();
+    expect(bannerBlink(0, blink, false)).toBeNull();
+    expect(bannerBlink(3, 0, false)).toBeNull();
+  });
+
+  it('chooses the bar state: immune beats critical, critical at 25 % or less', () => {
+    expect(bossBarState(74, 100, false)).toBe('normal');
+    expect(bossBarState(26, 100, false)).toBe('normal');
+    expect(bossBarState(25, 100, false)).toBe('critical');
+    expect(bossBarState(19, 100, false)).toBe('critical');
+    expect(bossBarState(62, 100, true)).toBe('immune');
+    expect(bossBarState(10, 100, true)).toBe('immune');
+  });
+
+  it('maps each state to tag, colours and frame', () => {
+    expect(bossBarLook('normal')).toEqual({ tag: 'BOSS', tagColor: 'hud.danger', fill: 'hud.danger', dotted: false, lock: false });
+    expect(bossBarLook('critical')).toEqual({
+      tag: 'SCHWACH!',
+      tagColor: 'hud.accent',
+      fill: 'hud.danger',
+      dotted: false,
+      lock: false,
+    });
+    expect(bossBarLook('immune')).toEqual({
+      tag: 'IMMUN',
+      tagColor: 'hud.text-muted',
+      fill: 'hud.danger-dim',
+      dotted: true,
+      lock: true,
+    });
+  });
+
+  it('keeps the lost piece as a trail and extends it on quick follow-up hits', () => {
+    expect(bossTrailTop(0.64, 0.58, null)).toBe(0.64);
+    expect(bossTrailTop(0.58, 0.5, 0.64)).toBe(0.64);
+    expect(bossTrailTop(0.58, 0.58, 0.64)).toBeNull();
+    expect(bossTrailTop(1, 1, null)).toBeNull();
+  });
+
+  it('has timing tokens for hit flash and trail', () => {
+    expect(THEME.motionMs['motion.hit']).toBe(120);
+    expect(THEME.motionMs['motion.trail']).toBe(300);
+  });
+
+  it('names every boss and falls back for unknown ids', () => {
+    expect(bossDisplayName('giantStone')).toBe('Riesen-Stein');
+    expect(bossDisplayName('toString')).toBe('Boss');
+    expect(bossDisplayName(undefined)).toBe('Boss');
+    expect(Object.keys(BOSS_NAMES).sort()).toEqual(['forestGhost', 'giantStone', 'rootMonster']);
+  });
+
+  it('turns pixel patterns into cells', () => {
+    expect(patternCells(['# ', ' #'])).toEqual([
+      [0, 0],
+      [1, 1],
+    ]);
+    expect(patternWidth(PIXEL_LOCK)).toBe(5);
+    expect(patternWidth(PIXEL_STAR)).toBe(7);
+    expect(PIXEL_LOCK.length).toBeLessThanOrEqual(8);
+    expect(PIXEL_STAR.length).toBeLessThanOrEqual(8);
   });
 });

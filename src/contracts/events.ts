@@ -31,7 +31,8 @@ export interface GameEventPayloads {
   /** 3 s before the boss appears. */
   'boss-warning': { bossId: BossId };
   'boss-spawned': { bossId: BossId; hp: number; maxHp: number };
-  'boss-hp-changed': { hp: number; maxHp: number };
+  /** Also sent when only `invulnerable` changes (e.g. ghost phase, V-12/PE-87). */
+  'boss-hp-changed': { hp: number; maxHp: number; invulnerable: boolean };
   'boss-defeated': { bossId: BossId };
   'power-store-changed': PowerStoreState;
 }

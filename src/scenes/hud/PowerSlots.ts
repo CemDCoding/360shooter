@@ -4,10 +4,10 @@ import { STORABLE_POWERS } from '../../config/powerStore';
 import { THEME, themeColor } from '../../config/theme';
 import type { ActiveArmour, ActivePowers, PowerStoreState, StorablePowerDef } from '../../contracts';
 import { ARMOUR_PICKUP_SPRITE } from '../../entities/ArmourPickup';
-import { slotStatus } from '../../logic/powerStore';
+import { slotStatus, type SlotStatus } from '../../logic/powerStore';
 import { prefersReducedMotion } from '../../platform/motion';
-import { FunkPanel, funkScale, funkText, setFunk, type PanelStyle } from './FunkPanel';
-import { powerBlock, powerSlotRects, secondsText, slotIconScale, type Rect } from './hudMath';
+import { FunkPanel, funkScale, funkText, setFunk } from './FunkPanel';
+import { powerBlock, powerSlotRects, secondsText, slotIconScale, slotPanelStyle, type Rect } from './hudMath';
 
 /** Scene event of the HudScene: a ready slot was tapped (payload: power id). */
 export const POWER_SLOT_PRESSED = 'power-slot-pressed';
@@ -20,7 +20,7 @@ const HOVER_FILL_ALPHA = 0.18;
 /** Item sprites are 16x16 (config/assets.ts). */
 const SPRITE_PX = 16;
 
-type SlotLook = 'empty' | 'ready' | 'blocked';
+type SlotLook = SlotStatus;
 
 /** Sprite key of a storable power: item sprite or the armour pickup sprite. */
 function spriteFor(def: StorablePowerDef): string {
@@ -41,6 +41,7 @@ class PowerSlot {
   private hover = false;
   private pressed = false;
   private flashing = false;
+  private paused = false;
   private flashTimer?: Phaser.Time.TimerEvent;
   private pressTimer?: Phaser.Time.TimerEvent;
 
@@ -62,10 +63,12 @@ class PowerSlot {
     // The zone is always interactive: a tap on the slot (even empty or blocked) never reaches the
     // GameScene below and so never moves the aim (Phaser globalTopOnly, like the pause button).
     this.zone = scene.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive();
+    // While the game is paused the zone stays interactive (it still swallows the tap) but does
+    // nothing: no hover, no press, no activation (V-14 d).
     this.zone.on('pointerover', () => this.setHover(true));
     this.zone.on('pointerout', () => this.setHover(false));
     this.zone.on('pointerdown', () => {
-      if (this.look !== 'ready') return;
+      if (this.paused || this.look !== 'ready') return;
       this.showPressed();
       onPress(this.def.id);
     });
@@ -77,6 +80,13 @@ class PowerSlot {
     if (look === 'empty') this.stopFlash();
     this.look = look;
     this.sec = sec;
+    this.redraw();
+  }
+
+  /** Pause of the game: the slot ignores taps and hover until resumed. */
+  setPaused(on: boolean): void {
+    this.paused = on === true;
+    if (this.paused) this.hover = false;
     this.redraw();
   }
 
@@ -112,7 +122,7 @@ class PowerSlot {
   }
 
   private setHover(on: boolean): void {
-    this.hover = on;
+    this.hover = on && !this.paused;
     this.redraw();
   }
 
@@ -127,17 +137,9 @@ class PowerSlot {
     });
   }
 
-  private panelStyle(): PanelStyle {
-    if (this.pressed) return { line: 'hud.accent', fill: 'hud.accent' };
-    if (this.look === 'empty') return { line: 'hud.line', dotted: true };
-    if (this.flashing) return { line: 'hud.accent', glow: true, fill: 'hud.flash' };
-    if (this.look === 'blocked') return { line: 'hud.line-dim' };
-    return { line: 'hud.accent', glow: true };
-  }
-
   private redraw(): void {
     const ready = this.look === 'ready';
-    this.panel.setStyle(this.panelStyle());
+    this.panel.setStyle(slotPanelStyle({ look: this.look, pressed: this.pressed, flashing: this.flashing }));
 
     // Mouse over a ready slot: accent fill at 18 % on top of the glass.
     this.overlay.clear();
@@ -163,7 +165,7 @@ class PowerSlot {
     this.text.setVisible(showSec);
     this.shadow.setVisible(showSec);
 
-    if (this.zone.input) this.zone.input.cursor = ready ? 'pointer' : this.look === 'blocked' ? 'not-allowed' : 'default';
+    if (this.zone.input) this.zone.input.cursor = this.paused ? 'default' : ready ? 'pointer' : this.look === 'blocked' ? 'not-allowed' : 'default';
   }
 }
 
@@ -204,6 +206,11 @@ export class PowerSlots {
   setArmour(a: ActiveArmour): void {
     this.armour = { ...a };
     this.refresh();
+  }
+
+  /** Game paused or resumed: slots ignore taps while paused (V-14 d). */
+  setPaused(on: boolean): void {
+    for (const s of this.slots) s.setPaused(on);
   }
 
   destroy(): void {
