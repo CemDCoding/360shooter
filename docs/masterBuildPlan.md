@@ -21,12 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-26 · M3-Nachtrag W1 läuft (PE-76 bis PE-83) · `dev` mit AP-68 (9a13b87) und AP-69 (12d687a) gemergt · **Autonomer Modus** (PE-69).
-- **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-67, AP-68, AP-69, M0-DEP, M1-DEP, M2-DEP, M2b-DEP. AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
-- **Laufend (M3-Nachtrag W1):** AP-70 Gold besser erkennbar (Coder c70, Branch `agent/AP-70-c70`, Fix `aef341c` fertig, nicht gemergt). Eigentum um Gold-Tempo erweitert (PE-81 bis PE-83). Zwei Tests in `balance.test.ts` sind rot (8 % Drop). **Blockiert:** AP-66 (wartet auf H-14). **Offen [Mensch]:** H-15 (M3-DEP-Wiederholung nach AP-70), H-12 (M2c-DEP-Wiederholung, blockiert M3 nicht).
-- **Erkenntnisse (Details §18):** Münz-Drop 8 % (PE-81) bringt etwa das 1,8-Fache an Gold: 79 statt 44 je Level. Preise allein reichen nicht, Gold-Hebel offen (Q-43, PE-83). Der Stick am PC ist aus (AP-69), der Boss endet in den letzten 30 s sofort mit Sieg (AP-68, V-11 übernommen).
-- **Nächster Schritt:** Lead holt Q-43 beim Nutzer ein, AP-70 setzt das Gold-Tempo um und wird gemergt. Danach H-15 (M3-DEP-Wiederholung), H-14 (Designer-Interview), dann AP-66.
-- **Offene Fragen an den Nutzer:** (1) Q-43: Gold-Hebel bei 8 % Drop (blockiert AP-70). (2) Q-41: Boss-Sieg vor 0:00 wie Timer-Sieg (100 % Gold, angenommen). (3) PE-34 und PE-75 (Boss-Verhalten) im Handtest bestätigen. (4) Designer-Interview für H-14 starten, inklusive Boss-Lücken.
+- **Stand:** 2026-10-26 · M3-Nachtrag W1 abgeschlossen (PE-76 bis PE-84) · `dev` mit AP-68 (9a13b87), AP-69 (12d687a), AP-70 (4287479) gemergt · **Autonomer Modus** (PE-69).
+- **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-70, M0-DEP, M1-DEP, M2-DEP, M2b-DEP. AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
+- **dev ist rot:** `tests/config/theme.test.ts` (2 Tests). Die H-14-Tokens (1373aba) wurden nicht per `theme:build` erzeugt. Fix: AP-71 (M3-Nachtrag W2, vor AP-66).
+- **Bereit nach AP-71:** AP-66 (Lagerplatz, Designer-Ergänzung H-14 erfüllt, PE-85) und danach AP-72 (Boss-Lücken, N6). **Offen [Mensch]:** H-15 (M3-DEP-Wiederholung, jetzt möglich), H-12 (M2c-DEP, blockiert M3 nicht), H-16 (Designer-Nachtrag Münzen, optional), H-17 (stage-Abgleich vor dem PR `dev` → `stage`).
+- **Erkenntnisse (Details §18):** Gold-Tempo: Drop 8 %, Münzwerte 1/1/4/4, Preise unverändert (PE-84, Q-43 beantwortet). Die große Münze ist mit 32 px so groß wie die Astronautin, der Designer empfiehlt 16 px (Q-44, Entscheidung in H-15). `GameScene.ts` Z. 446 nennt noch „63 s / 60 s“, AP-66 zieht das nach.
+- **Nächster Schritt:** Lead startet AP-71 (S, sonnet medium). Danach AP-66 (L), dann AP-72 (L). H-15 läuft parallel, sobald der Nutzer Q-44 beantwortet hat.
+- **Offene Fragen an den Nutzer:** (1) Q-44: Münzgröße 32 px oder 16 px (Handtest H-15). (2) Q-41: Boss-Sieg vor 0:00 wie Timer-Sieg (angenommen, PE-80). (3) PE-34 und PE-75 (Boss-Verhalten) im Handtest bestätigen. (4) AP-72 als eigenes Paket bestätigen (PE-85) und V-12 (Event `boss-hp-changed`) freigeben. (5) H-17: stage-Abgleich und PR #3 klären.
 
 <!-- Ende Lagebericht -->
 
@@ -73,15 +74,15 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 bestätigt 2026-10-25; M2b-Nachtrag AP-56 neu; M2c-Nachtrag AP-58–AP-62 (PE-65), AP-16 hängt nach PE-69 am Nachtrag) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26) | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6 | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu; PE-83 bestätigt (Nutzer 2026-10-26), Q-43 beantwortet (PE-84), PE-85 (Design H-14 übernommen, AP-72 neu), PE-86 (Theme-Sync, AP-71), Q-44 neu, V-12 neu | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig).
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig). M3-Nachtrag W1 (AP-68, AP-69, AP-70) abgeschlossen am 2026-10-26, alle `fertig`. M3-Nachtrag W2: AP-71 (Theme-Sync, `offen`) und H-15 [Mensch]. Nachtrag 2: AP-66 wartet auf AP-71 (PE-85), AP-72 (Boss-Lücken) nach AP-66, N6.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -499,14 +500,15 @@ flowchart TD
 | N2 | AP-59 | `src/entities/Player.ts`, `src/logic/weaponMount.ts`, `tests/logic/weaponMount.test.ts`, `src/config/weaponMount.ts`, `src/config/player.ts`, `tests/config/items.test.ts` (nur die Zeile mit `PLAYER`), `tests/logic/upgrades.test.ts` (nur die Zeilen mit der Drehgeschwindigkeit), `docs/balancing.md` |
 | N2 | AP-62 | `src/scenes/controls/VirtualStick.ts`, `src/platform/stick.ts`, `tests/platform/stick.test.ts`, `src/platform/input.ts` (nur falls nötig). Keine Überschneidung mit AP-59 |
 
-**Nachtrag 2 (Nutzerantworten Q-34 bis Q-36, PE-70 bis PE-72):** vier Pakete, die zeitlich neben M3 laufen. Höchstens drei Pakete je Welle (PE-15), AP-16 zählt in M3 W1 mit. AP-63 und AP-64 besitzen keine Datei von AP-16 bis AP-20 und können in M3 W1 parallel laufen oder in jeder freien Welle. AP-65 braucht `contracts/{events,index}.ts` (AP-16 ist seit M3 W1 fertig) und ist deshalb `bereit`; es hat keine gemeinsame Datei mit AP-20 oder AP-67 und kann neben ihnen laufen. AP-66 besitzt `GameScene.ts` und `HudScene.ts` wie AP-20 und liegt deshalb nach AP-20 und nach der Designer-Ergänzung.
+**Nachtrag 2 (Nutzerantworten Q-34 bis Q-36, PE-70 bis PE-72):** vier Pakete, die zeitlich neben M3 laufen. Höchstens drei Pakete je Welle (PE-15), AP-16 zählt in M3 W1 mit. AP-63 und AP-64 besitzen keine Datei von AP-16 bis AP-20 und können in M3 W1 parallel laufen oder in jeder freien Welle. AP-65 braucht `contracts/{events,index}.ts` (AP-16 ist seit M3 W1 fertig) und ist deshalb `bereit`; es hat keine gemeinsame Datei mit AP-20 oder AP-67 und kann neben ihnen laufen. AP-66 besitzt `GameScene.ts` und `HudScene.ts` wie AP-20 und liegt deshalb nach AP-20 und nach der Designer-Ergänzung. Die Ergänzung ist seit 2026-10-26 freigegeben (PE-85). AP-66 wartet nur noch auf AP-71 (Theme-Sync, PE-86). AP-72 (N6) teilt `HudScene.ts` mit AP-66 und liegt deshalb danach.
 
 | Welle | Paket | Dateien |
 |---|---|---|
 | N3 | AP-63 | `index.html`, `public/manifest.webmanifest`, `src/main.ts`, `src/platform/layout.ts`, `src/platform/layoutDebug.ts` (neu), `tests/platform/layout.test.ts`, `tests/platform/layoutDebug.test.ts` (neu), `src/scenes/HudScene.ts` und `src/scenes/hud/hudMath.ts` (nur falls die Ursache dort liegt, sonst nicht) |
 | N3 | AP-64 | `src/logic/coins.ts`, `src/config/coins.ts`, `src/entities/Coin.ts`, `tests/logic/coins.test.ts`, `tests/config/coins.test.ts`. Keine Änderung in `src/contracts/**` |
 | N4 | AP-65 | `src/contracts/{powerStore,events,index}.ts` (neu: `powerStore.ts`), `src/config/{powerStore,index}.ts` (neu: `powerStore.ts`), `src/logic/powerStore.ts` (neu), `tests/logic/powerStore.test.ts` (neu), `tests/config/powerStore.test.ts` (neu), `tests/contracts/contracts.test.ts` |
-| N5 | AP-66 (blockiert) | `src/scenes/GameScene.ts`, `src/scenes/HudScene.ts`, `src/scenes/hud/{PowerSlots,hudMath}.ts` (neu: `PowerSlots.ts`), `tests/scenes/hud.test.ts`, `src/platform/input.ts` (nur falls nötig), falls der Designer ein neues Symbol liefert: `public/assets/sprites/ui-icons.png`, `src/config/assets.ts`, `public/assets/.placeholders.json`, `public/assets/LICENSES.md` |
+| N5 | AP-66 (nach AP-71) | `src/scenes/GameScene.ts`, `src/scenes/HudScene.ts`, `src/scenes/hud/{PowerSlots,hudMath}.ts` (neu: `PowerSlots.ts`), `tests/scenes/hud.test.ts`, `src/platform/input.ts` (nur falls nötig). Keine Asset-Dateien: die Ergänzung nutzt vorhandene Symbole (PE-85) |
+| N6 | AP-72 (nach AP-66) | `src/scenes/HudScene.ts` (Banner, Boss-Leiste), `src/scenes/ResultScene.ts`, `src/scenes/hud/hudMath.ts` (Zahlenfunktionen), `src/contracts/events.ts` (nur `boss-hp-changed`, additiv, PE-85 und V-12), `src/scenes/GameScene.ts` (nur die Stelle, die `boss-hp-changed` sendet), `tests/scenes/hud.test.ts`, `tests/contracts/contracts.test.ts` |
 
 ---
 
@@ -524,7 +526,7 @@ flowchart TD
 | M2 | Inhalte, Menü, iPhone | Hauptmenü mit Level-Auswahl und Spielerlevel, Maps je Batch, PWA + Querformat, Platzhalter-Sounds mit Stummschalten, Balancing 0–20 | Level 0–20 nacheinander freispielbar, am PC und auf dem iPhone |
 | M2b | Gold und Waffen-Items (freigegeben, H-07) | Gold-Münzen aus Gegnern, Upgrade-Overlay im Hauptmenü (Waffe: Feuerrate, Schaden; Spielerin: max. HP, Drehgeschwindigkeit; je 10 Stufen), Waffen-Items neu (Doppelschuss, Schild, Dauerfeuer), Neu-Balancing, Fix iPhone-Darstellung (AP-38), virtueller Stick auf Touch-Geräten (AP-39), Rüstung Feuerring (AP-37a, AP-37c, Einbindung AP-33, Anzeige AP-34) | Upgrades kaufbar, Gold bleibt nach Neuladen, Reset löscht Gold und Upgrades; iPhone: Spielfeld passt ins Bild, Stick steuert die Zielrichtung; Feuerring wirkt 5 s, danach 20 s Abklingzeit |
 | M2c | Design-Umsetzung (Design freigegeben 2026-10-25, PE-59, PE-60) | Tokens als `theme.ts`, eigene Bitmap-Schriften Astro Kapsel und Astro Funk, App-Icons, Menü im Kassetten-Stil, Runde, HUD, Pause und Ergebnis im Funk-Stil, Waffe als eigenes kreisendes Sprite mit drei Ausbaustufen | Alle Bildschirme im neuen Stil auf PC und iPhone, Spiellogik unverändert, keine Farb-Literale in Szenen und Entities |
-| Nachtrag 2 | Antworten Handtest M2c-DEP (Q-34 bis Q-36, PE-70 bis PE-72) | iPhone Homescreen-App (AP-63), Gold-Magnet weicher (AP-64), Lagerplatz für zeitbegrenzte Kräfte (AP-65 Logik, AP-66 HUD und Szene, blockiert bis zur Designer-Ergänzung). Läuft neben M3, ohne ihn zu blockieren (PE-69) | iPhone-Homescreen-App passt ins Bild, Gold fliegt weich zur Spielerin, Dauerfeuer und Feuerring liegen im Lagerplatz und starten per Tippen |
+| Nachtrag 2 | Antworten Handtest M2c-DEP (Q-34 bis Q-36, PE-70 bis PE-72) | iPhone Homescreen-App (AP-63), Gold-Magnet weicher (AP-64), Lagerplatz für zeitbegrenzte Kräfte (AP-65 Logik, AP-66 HUD und Szene, nach AP-71; Designer-Ergänzung liegt vor, PE-85; AP-72 Boss-Lücken danach). Läuft neben M3, ohne ihn zu blockieren (PE-69) | iPhone-Homescreen-App passt ins Bild, Gold fliegt weich zur Spielerin, Dauerfeuer und Feuerring liegen im Lagerplatz und starten per Tippen |
 | M3 | Bosse | Boss-Rahmen, drei Bosse mit Varianten je Level, Einbindung (PE-18, PE-33, PE-34) | jedes Level endet mit seinem Boss |
 
 ### 9.1 Ablauf einer Welle
@@ -724,7 +726,8 @@ flowchart TD
 |---|---|
 | N3 | AP-63 iPhone Homescreen-App (Standalone), AP-64 Gold-Magnet weicher. Zusammen mit AP-16 (M3 W1) höchstens drei Pakete gleichzeitig |
 | N4 | AP-65 Power-up-Lagerplatz, Vertrag und Logik (`bereit`, AP-16 ist fertig; kann neben M3 laufen) |
-| N5 | AP-66 Power-up-Lagerplatz, HUD und Szene (**blockiert** bis Designer-Ergänzung, AP-20 und AP-65 fertig) |
+| N5 | AP-66 Power-up-Lagerplatz, HUD und Szene (nach AP-71; Designer-Ergänzung, AP-20 und AP-65 erfüllt, PE-85) |
+| N6 | AP-72 Boss-Lücken aus AP-20: Banner, Boss-Leiste, Ergebnis (nach AP-66, PE-85) |
 
 - **Prüfpunkte (Handtest, Nutzer):**
   - [ ] iPhone Homescreen-App im Querformat: Bild passt vollständig, nichts zu groß, nach dem Start aus dem Homescreen und nach Drehen (AP-63). Optional: `?layout=1` zeigt die gemessenen Werte
@@ -831,12 +834,14 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-20 | Boss-Einbindung | M3 | GAME | W3 | AP-17–19, **AP-67** | M | sonnet (high) | – (gemergt 95ee5c6) | fertig (Review Runde 1 bestanden; Design-Review Runde 2 bestanden nach Fix e5ae90f; 419/419 Tests) |
 | AP-68 | Fix: Boss-Timing, Warnung bei 33 s, Boss bei 30 s, Sieg sofort bei Boss-Sieg (PE-76, Befund M3-DEP) | M3-Nachtrag | LOG/CFG | W1 | AP-20 (fertig) | S | sonnet (medium) | – | fertig (gemergt 9a13b87) |
 | AP-69 | Fix: Virtueller Stick am PC ausgeblendet, Touch unverändert (PE-77, PE-68 zurückgenommen) | M3-Nachtrag | GAME | W1 | AP-62 (fertig) | S | haiku (low) | – | fertig (gemergt 12d687a) |
-| AP-70 | Fix: Gold-Münzen besser erkennbar, Untersuchung über alle Hintergründe, Tokens, Design-Review ja (PE-78, Q-40); Nachtrag Gold-Tempo bei 8 % Drop (PE-81, PE-83, Q-43) | M3-Nachtrag | GAME/SH/CFG | W1 | AP-31, AP-51, AP-64 (fertig) | M | sonnet (high) | – | in Arbeit (Fix `aef341c`, Balancing offen bis Q-43) |
+| AP-70 | Fix: Gold-Münzen besser erkennbar, Untersuchung über alle Hintergründe, Tokens, Design-Review ja (PE-78, Q-40); Nachtrag Gold-Tempo bei 8 % Drop (PE-81, PE-83, Q-43, PE-84) | M3-Nachtrag | GAME/SH/CFG | W1 | AP-31, AP-51, AP-64 (fertig) | M | sonnet (high) | – (gemergt 4287479) | fertig (gemergt 4287479; Code-Review R1, Design-Review R2 bestanden; Münzen 2× ganzzahlig, Kontur, Drop 8 %, coinValue 1/1/4/4) |
+| AP-71 | Fix: Theme-Sync, `theme.ts` und `tokens.css` nach den H-14-Tokens mit `theme:build` neu erzeugen (PE-86, zwei dev-Tests rot) | M3-Nachtrag | CFG | W2 | H-14-Tokens (1373aba, auf dev), AP-70 (fertig) | S | sonnet (medium) | – | offen |
 | M3-DEP | Abnahme M3 (Befunde PE-76 bis PE-79) | M3 | HUM | W4 | AP-20, AP-68 bis AP-70 (Wiederholung) | H | – | – | Handtest 2026-10-26 mit Befunden; Wiederholung nach M3-Nachtrag W1 offen (H-15) |
 | AP-63 | Fix: iPhone Homescreen-App (Standalone), Bild zu groß (PE-71, Q-35, Folge von AP-61) | Nachtrag 2 | GAME/OPS | N3 | AP-61 (fertig); parallel zu AP-16 möglich | M | sonnet (high) | – (gemergt 1b89792) | fertig (Review Runde 1 bestanden; Ursache nicht am Gerät bestätigt, Handtest offen) |
 | AP-64 | Gold-Magnet weicher (Beschleunigung statt konstant 320 px/s, PE-72, Q-36) | Nachtrag 2 | LOG/GAME | N3 | AP-29, AP-31 (fertig); parallel zu AP-16 möglich | S | sonnet (medium) | – (gemergt 49bd360) | fertig (Review Runde 1 bestanden, 419/419 Tests; Handtest offen) |
 | AP-65 | Power-up-Lagerplatz: Vertrag, Config, Logik (PE-70, Q-34) | Nachtrag 2 | SH/LOG | N4 | AP-16, AP-30, AP-37a (alle fertig) | M | sonnet (high) | – (gemergt 4b20704) | fertig (Review Runde 1 bestanden) |
-| AP-66 | Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung in die Spielszene (PE-70, Q-34; Design-Review ja) | Nachtrag 2 | GAME | N5 | AP-65, AP-20 (gleiche Szenendateien); **Designer-Ergänzung in `docs/design/` (Lagerplatz-Symbol, HUD-Platz)** | L | sonnet (high) | – | blockiert (Designer-Ergänzung H-14; AP-20 und AP-65 fertig; Nutzer wartet auf den Designer, PE-74) |
+| AP-66 | Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung in die Spielszene (PE-70, Q-34, PE-85; Design-Review ja) | Nachtrag 2 | GAME | N5 | AP-65, AP-20 (fertig), **AP-71** (Theme); Designer-Ergänzung H-14 erfüllt (PE-85) | L | sonnet (high) | – | offen (bereit, sobald AP-71 gemergt ist) |
+| AP-72 | Boss-Lücken aus AP-20: Banner „BOSS KOMMT!“ als Funkspruch, Zustände der Boss-Leiste, Ergebnis nach Boss-Sieg (PE-85; Design-Review ja) | Nachtrag 2 | GAME | N6 | AP-66 (gleiche Datei `HudScene.ts`), AP-71 (Theme), AP-20 (fertig), Freigabe V-12 (Vertragsfeld) | L | sonnet (high) | – | offen (nach AP-66 und V-12) |
 
 ---
 
@@ -899,12 +904,15 @@ flowchart LR
   subgraph NT2["Nachtrag 2 (Q-34 bis Q-36)"]
     AP63["AP-63"]
     AP64["AP-64"]
-    AP65["AP-65"] --> AP66["AP-66 (blockiert: Designer)"]
+    AP65["AP-65"] --> AP66["AP-66 (nach AP-71)"]
   end
   AP61 --> AP63
   AP29 & AP31 --> AP64
   AP16 --> AP65
   AP20 --> AP66
+  AP71["AP-71 Theme-Sync"] --> AP66
+  AP66 --> AP72["AP-72 Boss-Lücken"]
+  AP20 --> AP72
   AP20 --> AP68["AP-68 Boss-Timing"]
   AP62 --> AP69["AP-69 Stick am PC aus"]
   AP31 --> AP70["AP-70 Gold sichtbar"]
@@ -924,7 +932,7 @@ flowchart LR
 
 **M3 W2b (PE-75):** AP-67 besitzt alle Boss-Entities außer `createBoss.ts` und `config/bosses.ts`. AP-20 nutzt dessen neue Schnittstelle (`laserHit()`, `isInvulnerable`, `activeSpikes` mit Knospen und Ringwurzeln), daher liegt AP-67 eine Welle vor AP-20 (RI-2). AP-63, AP-64 und AP-65 haben keine gemeinsame Datei mit AP-67.
 
-**M3-Nachtrag (PE-76 bis PE-80):** AP-68 (`config/bosses.ts`, `logic/round.ts`, Tests), AP-69 (`platform/stick.ts`, Test) und AP-70 (`entities/Coin.ts`, `config/coins.ts`, `logic/coins.ts`, Tests; Nachtrag Gold-Tempo: `tests/logic/balance.test.ts`, `docs/balancing.md`, bedingt `config/enemies.ts`, `config/upgrades.ts`) teilen keine Datei und laufen in einer Welle W1 parallel (drei Pakete, PE-15). AP-68 und AP-69 hängen nur von fertigen Paketen ab. Die Wiederholung von M3-DEP (H-15) braucht alle drei gemergt.
+**M3-Nachtrag (PE-76 bis PE-80):** AP-68 (`config/bosses.ts`, `logic/round.ts`, Tests), AP-69 (`platform/stick.ts`, Test) und AP-70 (`entities/Coin.ts`, `config/coins.ts`, `logic/coins.ts`, Tests; Nachtrag Gold-Tempo: `tests/logic/balance.test.ts`, `docs/balancing.md`, bedingt `config/enemies.ts`, `config/upgrades.ts`) teilen keine Datei und laufen in einer Welle W1 parallel (drei Pakete, PE-15). AP-68 und AP-69 hängen nur von fertigen Paketen ab. Die Wiederholung von M3-DEP (H-15) braucht alle drei gemergt. AP-71 (`src/config/theme.ts`, `src/styles/tokens.css`, nur durch `npm run theme:build`) liegt in W2, vor AP-66 (PE-86), und teilt keine Datei mit AP-68 bis AP-70.
 
 **M2 W4:** AP-23 (nur `src/config/*`, `tests/config/*`, `tests/logic/balance.test.ts`, `docs/balancing.md`) und AP-24 (`src/scenes/GameScene.ts`, `src/logic/projectiles.ts`, Test) teilen keine Datei und laufen parallel.
 
@@ -2743,13 +2751,14 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 #### AP-66 – Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung (blockiert)
 
 - **Meilenstein, Lane, Welle:** Nachtrag 2 · GAME · N5
-- **Status: blockiert.** Vorbedingung 1: **Designer-Ergänzung in `docs/design/`** (Lagerplatz-Symbol und HUD-Platz, Zustände leer, bereit, gesperrt, Größe, Mockup). Der Designer entwickelt sie im Interview mit dem Nutzer (`start-agent.ps1 … -Role designer`). Der Lead startet den Designer nicht selbst, er sagt dem Nutzer Bescheid (Q-37, beantwortet: Der Nutzer wartet auf den Designer, es gibt kein Platzhalter-Layout, PE-74). Vorbedingung 2: AP-20 und AP-65 sind gemergt (gleiche Szenendateien, Vertrag eine Welle vorher). Erst wenn alle drei erfüllt sind, wechselt der Status auf `bereit`.
+- **Status: offen (bereit, sobald AP-71 gemergt ist).** Erfüllt (Stand 2026-10-26): Die **Designer-Ergänzung** ist freigegeben (Brief „Änderungen“, Abschnitt H-14, Commits 011b73c, 1373aba, 8390dfb, 6d31f38, f7fdff7, PE-85). AP-20 und AP-65 sind gemergt. Offen ist nur **AP-71** (Theme-Sync, PE-86): Die Tokens `hud.flash`, `hud.trail`, `hud.danger-dim`, `size.hud-slot` u. a. fehlen in `src/config/theme.ts`, bis AP-71 gemergt ist. Nach dem Merge von AP-71 wechselt der Status auf `bereit`. Das Platzhalter-Layout (Q-37) ist vom Tisch, PE-74 gilt weiter.
 - **Ziel:** Q-34 (PE-70), V-08 als angenommene Anforderung umgesetzt: Der Spieler sieht die gelagerten Kräfte im HUD und aktiviert sie per **Tippen oder Klick** auf das Symbol. Pickups lagern ein, statt zu starten (Logik aus AP-65). Eine Aktivierung per Taste ist nicht geplant (PE-73; Q-38 beantwortet: nur Tippen oder Klick, PE-74).
 - **Platzhalter-Layout statt Warten? Planner-Prüfung:** Vertretbar, ja. Alle Bausteine existieren: Chip-Größe und Rahmen (`FunkPanel`, `PowerIndicators`), Zustände „aktiv“ (Akzentrahmen) und „lädt“ (gepunktet) aus `ArmourIndicator`, die Item-Sprites `item-rapid-fire` und `item-fire-ring`, Tokens für Farben, Abstände, Ziele (Grundsatz 5: mindestens 32 × 32). Ein vorläufiger Lagerplatz in der Chip-Reihe neben den Power-Chips wäre mit vorhandenen Tokens ohne neues Design baubar; ein eigenes Symbol für „leer“ fehlt nur als Zeichnung (leerer Platz als gepunktete Umrandung ersetzt es). Risiken: Der Designer wählt später einen anderen Platz (Umbau nur im Layout, `hudMath.ts` und `PowerSlots.ts`, klein), Kollision mit Stick, Pause- und Ton-Taste (Layoutprüfung nötig), und Brief-Grundsatz „nur der Designer gestaltet“ wird vorläufig umgangen. **Empfehlung:** Auf den Designer warten. AP-66 liegt ohnehin nach AP-20 (M3 W3), das Warten kostet bis dahin nichts. Kommt die Ergänzung nicht rechtzeitig, kann der Nutzer das Platzhalter-Layout freigeben (dann Design-Review durch den Designer nachträglich, Status „vorläufig“ im Bericht). Der Lead fragt den Nutzer (Q-37).
-- **Pflichtlektüre:** PE-70, PE-73, Q-34, Q-37, Q-38, AP-65 (diese Datei oben), AP-33, AP-34, AP-37a, AP-37c (Einbindung von Items und Rüstung), AP-53 (HUD, `funkScale`), **`docs/design/` Brief, `tokens.json` bzw. Exporte und die Designer-Ergänzung (Mockup Lagerplatz) als Pflichtlektüre**, `src/scenes/{GameScene,HudScene}.ts`, `src/scenes/hud/{PowerIndicators,ArmourIndicator,hudMath,FunkPanel}.ts`, `src/logic/{powerStore,armour,items}.ts`, `src/config/{powerStore,theme}.ts`
-- **Abhängigkeiten:** AP-65, AP-20 (gleiche Szenendateien), Designer-Ergänzung
-- **Parallel möglich mit:** M3-DEP ([Mensch], keine Dateien)
-- **Dateien (Eigentum):** `src/scenes/GameScene.ts`, `src/scenes/HudScene.ts`, `src/scenes/hud/{PowerSlots,hudMath}.ts` (neu: `PowerSlots.ts`), `tests/scenes/hud.test.ts`, `src/platform/input.ts` (nur falls das Antippen des Lagerplatzes die Zielrichtung verstellt und eine `contains`-Ausnahme wie beim Stick nötig ist), falls der Designer ein neues Symbol liefert: `public/assets/sprites/ui-icons.png`, `src/config/assets.ts`, `public/assets/.placeholders.json`, `public/assets/LICENSES.md`
+- **Pflichtlektüre:** PE-70, PE-73, PE-85, Q-34, Q-37, Q-38, AP-65 (diese Datei oben), AP-33, AP-34, AP-37a, AP-37c (Einbindung von Items und Rüstung), AP-53 (HUD, `funkScale`), **`docs/design/design-brief.md`, Abschnitt „Änderungen“ (Ergänzung H-14: Entscheidungen 1a bis 4a, Übergabe-Tabelle, Zeile `PowerSlots.ts`), `docs/design/mockups/lagerplatz-und-boss.html` Ansichten 1–4 (Lagerplatz), `docs/design/export/tokens.resolved.json` (Tokens `size.hud-slot`, `size.hud-slot-gap`, `size.hud-slot-icon-scale`, `opacity.ghost`, `opacity.dim`, `color.hud.accent`, `motion.duration.fast`, `.store-flash`)**, `src/scenes/{GameScene,HudScene}.ts`, `src/scenes/hud/{PowerIndicators,ArmourIndicator,hudMath,FunkPanel}.ts`, `src/logic/{powerStore,armour,items}.ts`, `src/config/{powerStore,theme}.ts`
+- **Abhängigkeiten:** AP-65, AP-20 (fertig, gemergt), AP-71 (Theme-Sync, damit die H-14-Tokens in `theme.ts` stehen)
+- **Parallel möglich mit:** M3-DEP ([Mensch], keine Dateien). Nicht parallel mit AP-72 (gleiche Datei `HudScene.ts`)
+- **Dateien (Eigentum):** `src/scenes/GameScene.ts`, `src/scenes/HudScene.ts`, `src/scenes/hud/{PowerSlots,hudMath}.ts` (neu: `PowerSlots.ts`), `tests/scenes/hud.test.ts`, `src/platform/input.ts` (nur falls das Antippen des Lagerplatzes die Zielrichtung verstellt und eine `contains`-Ausnahme wie beim Stick nötig ist). **Kein Asset-Paket:** Die Ergänzung nutzt die Item-Symbole `item-rapid-fire` und `item-fire-ring` sowie das Schloss aus `ui-icons` (vorhanden). Keine Dateien unter `public/assets/` und keine `assets.ts`-Änderung (PE-85)
+- **Nachzieher aus AP-68:** Kommentar in `src/scenes/GameScene.ts` Z. 446 („63 s“ / „60 s“) auf 33 s und 30 s anpassen (Zeile gehört diesem Paket)
 - **Nicht anfassen:** `src/logic/**`, `src/contracts/**`, `src/config/{powerStore,items,armour}.ts` (Verträge liegen in AP-65), `src/scenes/{ResultScene,MenuScene}.ts`, `src/entities/**`, `docs/design/**` (Eigentum des Designers)
 - **Freigegebene Abhängigkeiten:** keine
 - **Umsetzung:**
@@ -2767,6 +2776,7 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
   - Doppelschuss, Schild und Heilung wirken wie bisher sofort
   - Antippen verstellt die Zielrichtung nicht; Stick, Pause- und Ton-Taste bleiben bedienbar
   - Layout: alle Lagerplatz-Rechtecke liegen in der Arena, überschneiden keine andere HUD-Fläche (reine Funktion, Test), bei 1× und bei `funkScale`
+  - Maße wie in der Ergänzung: 40 × 40 · `funkScale`, Abstand links 8 und unten 8, Fach-Abstand 8, Reihenfolge Dauerfeuer, Feuerring (Ansichten 1–4, PE-85)
   - Design-Review durch `ma-designer` bestanden (Platz, Symbol, Zustände wie in der Ergänzung)
   - Checks grün
 - **Tests:** `tests/scenes/hud.test.ts` (Layout-Funktion, Rechtecke, keine Überschneidung). Szene nur im Handtest.
@@ -2777,6 +2787,40 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 - **Opus-Grund:** –
 - **Kürzbar bei Budgetnot:** nein (Nutzerwunsch)
 - **Commit-Typ:** `feat(AP-66): add power slots to the hud and activate on tap`
+
+#### AP-72 – Boss-Lücken aus AP-20: Banner als Funkspruch, Zustände der Boss-Leiste, Ergebnis nach Boss-Sieg (PE-85)
+
+- **Meilenstein, Lane, Welle:** Nachtrag 2 · GAME · N6
+- **Status: offen.** Startet nach AP-66 (gleiche Datei `HudScene.ts`), AP-71 (Tokens) und der Freigabe von V-12 durch den Nutzer (Vertragsfeld). Herkunft: Lücken aus dem Coder-Bericht AP-20, von der Designer-Ergänzung H-14 gestaltet (Entscheidungen 5a bis 7a, Brief „Änderungen“, Abschnitt „Übergabe an den Planner“, Zeilen Banner, Boss-Leiste, `ResultScene.ts`).
+- **Ziel:** Der Boss-Bereich bekommt die freigegebene Gestaltung: Banner „BOSS KOMMT!“ als Funkspruch, Treffer-Blitz und Nachlaufstück an der Boss-Leiste, Zustände kritisch und unverwundbar, Siegel und Faktenzeile im Ergebnis. Die Spiellogik ändert sich nicht.
+- **Befund (Planner hat den Code gelesen):** `src/scenes/HudScene.ts`: `createBossUi` (Z. 200), `showBanner` (Z. 237), Banner-Text „BOSS KOMMT!“ (Z. 215), `drawBossBar` (Z. 245). `src/scenes/ResultScene.ts`: Siegtitel „BOSS BESIEGT!“ (Z. 78), Faktenliste ohne Boss-Zeile. `src/contracts/events.ts` Z. 34: `boss-hp-changed` trägt nur `{ hp, maxHp }`. Der Zustand „unverwundbar“ (`BossBase.isInvulnerable`, `src/entities/bosses/BossBase.ts`) erreicht die HUD also nicht. Das Boss-Namenfeld kommt aus dem Ereignis `boss-spawned` (`bossId`), der Anzeigename aus der Boss-Konfiguration.
+- **Pflichtlektüre:** PE-85, PE-76, `docs/design/design-brief.md` (Abschnitt „Änderungen“, H-14, Übergabe-Tabelle, Zeilen HudScene Banner, HudScene Boss-Leiste, ResultScene), `docs/design/mockups/lagerplatz-und-boss.html` Ansichten 2, 3, 5, 6, 7, `docs/design/export/tokens.resolved.json`, `src/scenes/HudScene.ts`, `src/scenes/ResultScene.ts`, `src/contracts/events.ts`, `src/entities/bosses/BossBase.ts` (nur lesen), `src/config/bosses.ts` (nur lesen)
+- **Abhängigkeiten:** AP-66 (gleiche Datei `HudScene.ts`), AP-71 (Theme), AP-20 (fertig)
+- **Parallel möglich mit:** keine Datei-Konflikte mit anderen offenen Paketen, aber nach AP-66 (Reihenfolge wegen `HudScene.ts`)
+- **Dateien (Eigentum):** `src/scenes/HudScene.ts` (Banner, Boss-Leiste, Boss-Ereignisse), `src/scenes/ResultScene.ts` (Boss-Zeile, Siegel, Niederlage-Zeile), `src/scenes/hud/hudMath.ts` (nur reine Funktionen für Prozentwert und Banner-Blinkfolge, falls nötig), `src/contracts/events.ts` (nur `boss-hp-changed`, additiv: Feld `invulnerable: boolean`), `src/scenes/GameScene.ts` (nur die Stelle, die `boss-hp-changed` auslöst; Feld mitgeben), `tests/scenes/hud.test.ts`, `tests/contracts/contracts.test.ts`
+- **Nicht anfassen:** `src/scenes/hud/PowerSlots.ts` und der Rest des Lagerplatzes (AP-66), `src/logic/**`, `src/entities/**`, `src/config/{bosses,theme}.ts`, `docs/**`, `docs/design/**` (Eigentum des Designers)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **Banner (5a):** Funkspruch mit Zeile „FUNK · WARNUNG“ (Funk 1×, `hud.text-muted`), „BOSS KOMMT!“ (Funk 3×, `hud.danger`), gepunktete Trennlinie, Boss-Name (Funk 1×, `hud.text`). Rahmen `hud.danger` mit Glühen `hud.glow`. Blinkt `motion.banner-blinks` (3) mal mit `duration.blink`, dann ruhig bis zum Ausblenden. Mit `prefers-reduced-motion` kein Blinken. Fehlt der Name im Ereignis `boss-warning`, nimmt der Coder ihn aus der Boss-Konfiguration über `bossId` und meldet das.
+  2. **Boss-Leiste (7a):** Treffer: Füllung `game.hit-flash` für `motion.duration.hit` (120 ms), das verlorene Stück bleibt als Nachlaufstück in `hud.trail` für `motion.duration.trail` (300 ms). Kritisch (≤ 25 %): Tag „SCHWACH!“ in `hud.accent` statt „BOSS“, kein Blinken. Unverwundbar: Rahmen gepunktet, Füllung `hud.danger-dim`, Tag Schloss plus „IMMUN“ in `hud.text-muted`. Ohne Bewegung (`prefers-reduced-motion`) entfällt der weiße Blitz, das Nachlaufstück bleibt.
+  3. **Vertrag:** `boss-hp-changed` bekommt additiv das Feld `invulnerable: boolean`. `GameScene` setzt es aus `boss.isInvulnerable`. Ältere Aufrufer ohne Feld gibt es im Projekt nicht (prüfen). Der Test im Vertragsordner prüft die Form. Die Änderung berührt den Event-Vertrag `boss-hp-changed`, deshalb startet AP-72 erst nach der Freigabe von V-12 durch den Nutzer.
+  4. **Ergebnis (6a):** Bei Boss-Level Faktenzeile „BOSS“ als erste Zeile. Sieg: Stern (`hud.gold`) und „<NAME> · BESIEGT“ (Funk 2×, `hud.accent`), dazu das Siegel „BOSS BESIEGT“ (Stern, Funk 1×, `hud.accent`, Rahmen `hud.accent`) mittig im Logbuch-Kopf. Die Überschrift bleibt „GEWONNEN“. Niederlage: „<NAME> · <n> % ÜBRIG“ (Funk 2×, `hud.danger`), Prozent aufgerundet aus Boss-HP. Untertitel Sieg optional je Boss (z. B. „DER RIESEN-STEIN IST ZERFALLEN.“). Zeilenabstand der Faktenliste 8.
+  5. Keine Farb-Literale in `src/scenes/**` (Lint-Regel AP-55), nur Tokens aus `src/config/theme.ts`.
+- **Akzeptanzkriterien:**
+  - Banner: drei Zeilen wie beschrieben, Blinken genau dreimal, bei `prefers-reduced-motion` kein Blinken (Test der Funktion oder Sichtprüfung)
+  - Boss-Leiste: Zustände normal, kritisch (≤ 25 %), unverwundbar; Treffer-Blitz und Nachlaufstück in den Zeiten aus den Tokens
+  - Ergebnis: Sieg mit Siegel und Faktenzeile „<NAME> · BESIEGT“, Niederlage mit Prozentzeile (Rundung nach oben, Test)
+  - Vertrag: `boss-hp-changed` trägt `invulnerable`, bestehende Aufrufer und Tests grün
+  - Keine Änderung an der Spiellogik, an `src/logic/**` oder an der Boss-Entität
+  - Design-Review durch `ma-designer` bestanden (Ansichten 2, 3, 5, 6, 7)
+  - Checks grün
+- **Tests:** `tests/scenes/hud.test.ts` (Prozentwert, Blinkfolge, Zustandswahl der Leiste, wenn als reine Funktion), `tests/contracts/contracts.test.ts` (Feld `invulnerable`). Szenen nur im Handtest
+- **Review-Schwerpunkte:** Design-Treue, keine Farb-Literale, Vertrag additiv, Boss-Ereignisse einmal angemeldet und abgemeldet (kein Leck nach Rundenende), Ergebnis nur bei Boss-Level
+- **Doku-Pflichten:** keine (Ergänzung nach Handtest über V-12-Hinweis, falls freigegeben)
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja, Punkt 4 (Ergebnis) kann in ein Folgepaket. Banner und Leiste bleiben
+- **Commit-Typ:** `feat(AP-72): add boss banner, bar states and boss result`
 
 ### M3 – Bosse
 
@@ -3009,14 +3053,14 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 - **Kürzbar bei Budgetnot:** nein
 - **Commit-Typ:** `feat(AP-20): integrate bosses into game`
 
-### M3-Nachtrag – Fix-Pakete aus dem Handtest M3-DEP (PE-76 bis PE-80)
+### M3-Nachtrag – Fix-Pakete aus dem Handtest M3-DEP (PE-76 bis PE-80, Theme-Sync PE-86)
 
 Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde: (1) Der Boss soll erst in den letzten 30 s kommen, und wer ihn früh besiegt, gewinnt sofort (PE-76, AP-68). (2) Am PC braucht man den Stick nicht (PE-77, AP-69). (3) Die Goldmünzen in Level 5 sind schlecht zu sehen; sie sind vorhanden (Q-40, PE-78, AP-70). (4) Der Riesen-Stein ist bei Spielerlevel 6 nicht freigeschaltet, das ist kein Fehler; Test über `?level=10` oder `?level=18` (PE-79, kein Paket). Alle drei Pakete laufen in einer Welle, keine gemeinsame Datei.
 
 | Welle | Pakete (parallel) |
 |---|---|
 | W1 | AP-68 Boss-Timing, AP-69 Stick am PC aus, AP-70 Gold besser erkennbar (Untersuchung und Fix) |
-| W2 | M3-DEP-Wiederholung [Mensch] (H-15) |
+| W2 | AP-71 Theme-Sync (Fix, PE-86, vor AP-66), M3-DEP-Wiederholung [Mensch] (H-15). Keine gemeinsame Datei |
 
 #### AP-68 – Fix: Boss-Timing (Warnung bei 33 s, Boss bei 30 s, Sieg sofort bei Boss-Sieg)
 
@@ -3115,6 +3159,34 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 - **Kürzbar bei Budgetnot:** ja, Schritt 2 (Umrandung) weglassen, wenn die Größe reicht. Die Ist-Analyse nicht kürzen
 - **Commit-Typ:** `fix(AP-70): make gold coins readable on the night and elf backgrounds`; Nachtrag Gold-Tempo: `fix(AP-70): keep gold pace with 8 % coin drop`
 
+#### AP-71 – Fix: Theme-Sync, `theme.ts` und `tokens.css` nach den H-14-Tokens neu erzeugen (PE-86)
+
+- **Meilenstein, Lane, Welle:** M3-Nachtrag · CFG · W2
+- **Ziel:** Auf dev sind zwei Tests rot (`tests/config/theme.test.ts`: „theme.ts is up to date with buildTheme(tokens.resolved.json)“ und „src/styles/tokens.css equals the design export“). Der Designer hat die H-14-Tokens committet (1373aba), die generierten Dateien wurden nicht neu erzeugt. Das Paket erzeugt sie neu und ändert sonst nichts. Keine Werte von Hand.
+- **Befund (Planner hat den Code gelesen):** `package.json` Skript `theme:build` = `node scripts/build-theme.mjs`. Das Skript schreibt `src/config/theme.ts` aus `docs/design/export/tokens.resolved.json` und kopiert `docs/design/export/tokens.css` nach `src/styles/tokens.css`. Der Header von `theme.ts` sagt „erzeugt, nicht von Hand ändern“. Das Skript braucht keine neue Abhängigkeit.
+- **Pflichtlektüre:** `scripts/build-theme.mjs`, `README.md` (Abschnitt `theme:build`, Z. 69), `tests/config/theme.test.ts`, `docs/design/design-brief.md` (Abschnitt „Exporte und Zielorte“), `eslint.config.js` (Lint-Regel AP-55 gilt nur für `src/scenes/**` und `src/entities/**`)
+- **Abhängigkeiten:** H-14-Tokens (1373aba, auf dev), AP-70 (fertig, 4287479)
+- **Parallel möglich mit:** H-15 ([Mensch], keine Dateien)
+- **Dateien (Eigentum):** `src/config/theme.ts` und `src/styles/tokens.css`, beide nur durch `npm run theme:build` erzeugt. Sonst nichts
+- **Nicht anfassen:** `scripts/build-theme.mjs`, `tests/config/theme.test.ts`, `docs/design/**`, `src/scenes/**`, `src/entities/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `npm run theme:build` ausführen. Kein `npm install`.
+  2. `git diff` prüfen: Die Änderungen müssen aus den H-14-Tokens stammen (z. B. `hud-slot`, `hud-slot-gap`, `hud-slot-icon-scale`, `hud.flash`, `hud.trail`, `hud.danger-dim`, `motion.duration.hit`, `store-flash`, `banner-blinks`, `opacity.dim`, `opacity.ghost`). Gibt es andere Abweichungen, meldet der Coder sie dem Lead und ändert nichts von Hand.
+  3. `npm test`, `npm run lint`, `npm run typecheck`, `npm run build` und `npm run assets:check` grün.
+- **Akzeptanzkriterien:**
+  - Beide Tests in `tests/config/theme.test.ts` grün
+  - Geändert sind nur `src/config/theme.ts` und `src/styles/tokens.css`
+  - Der Diff entspricht der Generatorausgabe, keine Handedits
+  - Alle Checks grün. Hex-Literale in `theme.ts` sind erlaubt (die Lint-Regel gilt dort nicht), `src/scenes/**` und `src/entities/**` bleiben ohne Farb-Literale
+- **Tests:** bestehende Tests in `tests/config/theme.test.ts`, keine neuen
+- **Review-Schwerpunkte:** Generatorausgabe statt Handedit, keine Datei außerhalb des Eigentums
+- **Doku-Pflichten:** keine
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (blockiert AP-66, dev ist rot)
+- **Commit-Typ:** `fix(AP-71): regenerate theme and tokens from the H-14 export`
+
 ---
 
 ## 13. Menschliche Schritte
@@ -3134,8 +3206,10 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | H-11 | Reihenfolge bestätigen: Design-Umsetzung (M2c) nach M2b-DEP und vor M3 (PE-60) | vor M2c W1 | AP-50, AP-51 | ☑ (bestätigt 2026-10-25) |
 | H-12 | Abnahme M2c: Smoke-Test am PC und auf dem iPhone (M2c-DEP), Wiederholung nach N2, inklusive Lesbarkeit von Funk 1× und Kapsel 1× im Querformat | nach N2 (M2c-Nachtrag) | nichts, blockiert M3 nicht (PE-69); Befunde werden Fix-Pakete | ☐ |
 | H-13 | Optional: die 30 Platzhalter-Sprites (Astronautin, Gegner, Items, Bosse) nach `docs/design/mockups/sprites.html` und der Anleitung `docs/guides/grafik-austauschen.md` neu zeichnen. Reiner Dateiaustausch ohne Code. Kein Paket geplant (Brief, Reihenfolge-Empfehlung 5) | jederzeit nach M2c W1 | – | ☐ |
-| H-14 | Designer-Interview für den Power-up-Lagerplatz: Lagerplatz-Symbol, HUD-Platz, Zustände leer, bereit, gesperrt, Mockup, in `docs/design/` (Q-34, Q-37), dazu die Boss-Lücken aus §18 (AP-20: Banner „BOSS KOMMT!“, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste). Der Nutzer startet den Designer (`start-agent.ps1 … -Role designer`), der Lead nicht | vor AP-66 (spätestens bis Ende M3 W3) | AP-66 | ☐ |
-| H-15 | Wiederholung Handtest M3-DEP (PC und iPhone) nach M3-Nachtrag W1 (AP-68, AP-69, AP-70). Prüfen: Warnung bei 0:33, Boss bei 0:30, Sieg sofort bei Boss-Sieg (PE-76); kein Stick am PC (PE-77); Münzen auf Level 0, 5, 10 (PE-78). Riesen-Stein über `?level=10` oder `?level=18` testen, Spielerlevel 6 reicht nicht (PE-79, kein Fehler) | nach W1 des M3-Nachtrags | M3-DEP-Abnahme | ☐ |
+| H-14 | Designer-Interview für den Power-up-Lagerplatz: Lagerplatz-Symbol, HUD-Platz, Zustände leer, bereit, gesperrt, Mockup, in `docs/design/` (Q-34, Q-37), dazu die Boss-Lücken aus §18 (AP-20: Banner „BOSS KOMMT!“, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste). Der Nutzer startet den Designer (`start-agent.ps1 … -Role designer`), der Lead nicht | vor AP-66 (spätestens bis Ende M3 W3) | AP-66, AP-72 | ☑ Ergänzung freigegeben 2026-10-26 (Commits 011b73c, 1373aba, 8390dfb, 6d31f38, f7fdff7, PE-85). Tokens noch nicht in `theme.ts`, dazu AP-71 |
+| H-15 | Wiederholung Handtest M3-DEP (PC und iPhone) nach M3-Nachtrag W1 (AP-68, AP-69, AP-70). Zusätzlich Q-44 entscheiden: Große Münze 32 px (Ist) oder 16 px (Designer-Empfehlung `bigDisplayScale` 1, Kontur an die Skalierung koppeln). Prüfen: Warnung bei 0:33, Boss bei 0:30, Sieg sofort bei Boss-Sieg (PE-76); kein Stick am PC (PE-77); Münzen auf Level 0, 5, 10 (PE-78). Riesen-Stein über `?level=10` oder `?level=18` testen, Spielerlevel 6 reicht nicht (PE-79, kein Fehler) | nach W1 des M3-Nachtrags | M3-DEP-Abnahme | ☐ |
+| H-16 | Optional: Designer-Nachtrag Münzen. Lücken aus AP-70: Münzgröße und -kontur (nach Q-44), Token `game.pickup-outline` fehlt (AP-70 nutzt `game.hit-flash`), Ebenenordnung Münze über Glühwürmchen und Vignette. Der Nutzer startet den Designer (`start-agent.ps1 … -Role designer`) | vor der nächsten Münzänderung | – | ☐ |
+| H-17 | Release-Abgleich vor dem PR `dev` → `stage`: Die lokale `stage` weicht von `origin/stage` ab (204 vs. 1 Commits, Lead-Befund). PR #3 „new designs new hud new movement“ ist offen und wurde vom Nutzer abgebrochen. Klären, was in `stage` gehört, bevor der Merge läuft | vor dem ersten PR `dev` → `stage` (M3-DEP) | Release nach `stage` | ☐ |
 
 ---
 
@@ -3149,10 +3223,10 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | M2b | 16 | ≈ 23,75 h (+ Review ≈ 30 h) | ≈ 11–12 |
 | M2c | 6 | ≈ 11,25 h (+ Review inkl. 3 Design-Reviews ≈ 15 h) | ≈ 5–6 (bei 45 % Zielwert ≈ 4) |
 | M2c-Nachtrag | 5 (AP-58 bis AP-62) | ≈ 5,25 h (3 × S, 2 × M; + Review ≈ 7 h) | ≈ 2–3 (bei 30 % Team-Budget je Fenster etwa 2 bis 3 Pakete mit Review) |
-| Nachtrag 2 | 4 (AP-63 bis AP-66) | ≈ 6,25 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L; + Review inkl. Design-Review AP-66 ≈ 8 h) | ≈ 3–4 (AP-64 kürzbar, ≈ 0,75 h) |
+| Nachtrag 2 | 5 (AP-63 bis AP-66, AP-72) | ≈ 8,75 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L, AP-72 L; + Review inkl. Design-Review AP-66 und AP-72 ≈ 11 h) | ≈ 4–5 (AP-64 kürzbar, ≈ 0,75 h) |
 | M3 | 6 (AP-16 bis AP-20 und AP-67, Fairness-Fix PE-75, M ≈ 1,5 h) | ≈ 10 h (+ Review ≈ 13 h) | ≈ 5–6 |
-| M3-Nachtrag | 3 (AP-68 S, AP-69 S, AP-70 M; Handtest-Befunde PE-76 bis PE-78) | ≈ 3,5 h (+ Review inkl. Design-Review AP-70 ≈ 4,5 h) | ≈ 1–2 (alle drei in einer Welle) |
-| **Gesamt** | **44** | **≈ 66,5 h (+ Review ≈ 86 h)** | **≈ 30–36** |
+| M3-Nachtrag | 4 (AP-68 S, AP-69 S, AP-70 M, AP-71 S; Handtest-Befunde PE-76 bis PE-78, Theme-Sync PE-86) | ≈ 4,25 h (+ Review inkl. Design-Review AP-70 ≈ 5,5 h) | ≈ 1–2 (AP-68 bis AP-70 in W1, AP-71 in W2) |
+| **Gesamt** | **46** | **≈ 70 h (+ Review ≈ 90 h)** | **≈ 32–38** |
 
 Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h. Die Fensterzahlen oben gelten noch für 30 % Zielwert. Bei 45 % sinkt die Zahl rechnerisch auf etwa zwei Drittel, Neuberechnung nach M2b-DEP (§18). Die M2c-Zeile (PE-59) enthält AP-50 und AP-54 (je M, ca. 1,5 h), AP-51, AP-52 und AP-53 (je L, ca. 2,5 h) und AP-55 (S, ca. 0,75 h), alle angenommen. Dazu kommen drei Design-Reviews durch `ma-designer`, deren Kosten als Review-Zuschlag gerechnet sind. Optional sind die Pakete AP-55 (Regel kann später folgen) und H-13 (Sprites, Mensch). Das Risiko steht in RI-17. Die Gesamtzeile enthält die Zeilen M2c-Nachtrag und Nachtrag 2 nicht: Nachtrag 2 (PE-70 bis PE-72) bringt 4 Pakete, ≈ 6,25 h (+ Review ≈ 8 h) und ≈ 3–4 Fenster zusätzlich, Risiko RI-19.
 
@@ -3199,7 +3273,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | RI-15 | Touch-Stick: Multi-Touch-Konflikte mit der Pause-Taste, Fehlklicks am Bildschirmrand, Safari-Vollbild ändert die Höhe beim Drehen | Eigener Pointer je Stick, Winkelfunktion als reine Funktion getestet, Handtest auf dem iPhone in M2b-DEP | AP-38, AP-39 |
 | RI-17 | Design-Umbau (M2c) berührt fast alle Szenen und Entities. Fehler könnten Funktion brechen, Pakete sind mit L groß, und Schrift (Bitmap), Waffen-Sprite und Lesbarkeit auf dem iPhone sind noch nie am Gerät geprüft | Logik bleibt unverändert, reine Funktionen für die Waffe mit Tests (AP-50), Szenen in drei getrennten Paketen mit Design-Review, Lint-Regel AP-55, Handtest-Punkt „Funktion unverändert“ in M2c-DEP, Fix-Reserve für Schrift 2× | AP-50–AP-55 |
 | RI-18 | M3 startet ohne Abnahme von M2c (PE-69). Befunde der M2c-DEP-Wiederholung können Dateien berühren, die M3 besitzt (z. B. `config/levels.ts` bei Balancing, HUD bei Power-up-Aktivierung V-08) | Lead prüft vor jedem Fix-Paket das Dateieigentum gegen §8 und die M3-Pakete; Befunde mit Eigentumskonflikt werden vor AP-16 geklärt oder nach M3-DEP geplant; Handtest-Liste wird gebündelt | AP-16–AP-20, M2c-DEP |
-| RI-19 | Nachtrag 2: AP-66 (L) hängt am Designer-Interview des Nutzers (H-14) und an AP-20. Kommt die Ergänzung zu spät, wartet das Paket. AP-63 kann die Ursache am iPhone nur rechnerisch eingrenzen, die Bestätigung braucht den Nutzer am Gerät (Manifest-Änderung wirkt erst nach erneutem „Zum Home-Bildschirm“). Beide stören M3 nicht | Wartezeit kostet nichts, solange die Ergänzung bis Ende M3 W3 da ist; Platzhalter-Layout nur mit Freigabe des Nutzers (Q-37); `?layout=1` liefert Messwerte vom Gerät | AP-63, AP-66 |
+| RI-19 | Nachtrag 2: AP-66 (L) hängt an AP-71 (Theme-Sync) und an AP-20. Die Designer-Ergänzung H-14 liegt seit 2026-10-26 vor (PE-85). AP-72 (L) teilt `HudScene.ts` mit AP-66. AP-63 kann die Ursache am iPhone nur rechnerisch eingrenzen, die Bestätigung braucht den Nutzer am Gerät (Manifest-Änderung wirkt erst nach erneutem „Zum Home-Bildschirm“). Beide stören M3 nicht | Wartezeit kostet nichts, solange die Ergänzung bis Ende M3 W3 da ist; Platzhalter-Layout nur mit Freigabe des Nutzers (Q-37); `?layout=1` liefert Messwerte vom Gerät | AP-63, AP-66 |
 | RI-20 | Boss-Fairness bei fester Spielerin (PE-75): Die Astronautin kann nicht ausweichen. AP-67 macht Wurzelstoß, Wurzelring und Geisterkugeln abwehrbar, der Rollangriff des Riesen-Steins bleibt unausweichlich. Die Werte (Knospe 6 Treffer, Ringgeschwindigkeit 60 px/s, Kugeln 90 px/s) sind Startwerte ohne Messung; die Sichtprüfung ist in der Agent-Umgebung nicht möglich | Regel (a) bis (c) als Config-Tests in AP-67, Handtest-Punkt „Fairness“ in M3-DEP, nur Config nachjustieren; Rollangriff im Handtest bewerten | AP-67, AP-20, M3-DEP |
 | RI-16 | AP-33 wird groß (opus, L): Spielszene, Drop, Pickup und Ringschaden in einem Paket, dazu das Rundenende. Ein Fehler in der Szene trifft alle Runden | Feuerring-Logik ist in AP-37a getestet, AP-33 verdrahtet nur. Review-Punkt Rundenende-Reihenfolge. Falls AP-33 zu groß wird, ist eine Aufteilung nur mit Freigabe des Nutzers möglich, weil PE-58 die Einbindung spätestens in W5 verlangt | AP-33, AP-37a, AP-37c |
 
@@ -3293,7 +3367,10 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-80 | **Boss-Sieg vor 0:00 zählt wie Timer-Sieg:** Gold zu 100 % (PE-40), Erfahrung und Freischaltung wie bei jedem Sieg. Folge von PE-76, weil die Runde mit dem Sieg endet | Planner-Annahme aus PE-76 und PE-40 | angenommen vom Planner (2026-10-26), vom Nutzer zu bestätigen (Q-41) |
 | PE-81 | **Münz-Drop-Chance 8 %** je Gegner (`COIN_RULES.dropChance` 0,08). Ersetzt den Planwert 5 % (PE-39) und die offene Frage Q-42 (Code 4,5 %). Folge: Gold je Level steigt auf etwa das 1,8-Fache (Test-Mittel 78,9 statt 44). Der Satz „ändert das Paket nicht (Q-42)“ in PE-78 ist damit überholt. Umsetzung AP-70 (Nachtrag, Gold-Tempo, PE-83) | Entscheidung Nutzer zu Q-42 im Chat | Nutzer am 2026-10-26 (Q-42 entschieden) |
 | PE-82 | **V-11 übernommen:** §2 F-05 Boss-Zeitpunkt: „Er erscheint in den letzten 30 Sekunden (Warnung bei 33 s Restzeit). Wird er besiegt, endet die Runde sofort mit Sieg.“ Lebt er am Timerende, geht die Runde weiter, bis er besiegt ist (PE-18, PE-76). §2 und §17 nachgezogen | Vorschlag V-11, Befund M3-DEP (PE-76) | Nutzer am 2026-10-26 (V-11 freigegeben) |
-| PE-83 | **Gold-Tempo bleibt bei 8 % Drop** (Vorgabe, Nutzer-Default): im Mittel etwa 45 Gold je gewonnenem Level, Stufe 10 eines Upgrades nach 15 bis 20 Leveln (PE-50). Zielbereiche in `balance.test.ts` bleiben unverändert, Tests werden nicht gelockert. Preise (`src/config/upgrades.ts`) bleiben: bei 45 Gold je Level sind es für Stufe 10 etwa 15,5 Levels. Reine Preisskalierung reicht nicht (Gold-Mittel hängt an Drop, Spawns und Münzwert, nicht an Preisen) und bricht `upgrades.test.ts` (Preisreihe 10, 207, Summe 698) sowie die Summe 2700 bis 2900. Welcher Hebel das Gold senkt, ist Q-43 | Vorgabe Nutzer-Default (Pflegeauftrag 2026-10-26), Befund Tests des AP-70-Branches | angenommen vom Planner (2026-10-26), vom Nutzer zu bestätigen (Q-43) |
+| PE-83 | **Gold-Tempo bleibt bei 8 % Drop** (Vorgabe, Nutzer-Default): im Mittel etwa 45 Gold je gewonnenem Level, Stufe 10 eines Upgrades nach 15 bis 20 Leveln (PE-50). Zielbereiche in `balance.test.ts` bleiben unverändert, Tests werden nicht gelockert. Preise (`src/config/upgrades.ts`) bleiben: bei 45 Gold je Level sind es für Stufe 10 etwa 15,5 Levels. Reine Preisskalierung reicht nicht (Gold-Mittel hängt an Drop, Spawns und Münzwert, nicht an Preisen) und bricht `upgrades.test.ts` (Preisreihe 10, 207, Summe 698) sowie die Summe 2700 bis 2900. Welcher Hebel das Gold senkt, ist Q-43 | Vorgabe Nutzer-Default (Pflegeauftrag 2026-10-26), Befund Tests des AP-70-Branches | Nutzer am 2026-10-26 bestätigt (Q-43) |
+| PE-84 | **Q-43 entschieden: Münzwerte senken** (Option a). `coinValue` je Gegner auf ganze Zahlen 1/1/4/4, `BIG_COIN_MIN_VALUE` 4, Preise bleiben (PE-83). Gold-Tempo im Ziel 43 bis 47 je Level. Pins in `tests/config/enemies.test.ts` und `docs/balancing.md` nachgezogen. Umsetzung AP-70 (gemergt 4287479) | Nutzer am 2026-10-26 (Q-43) | Nutzer am 2026-10-26 |
+| PE-85 | **Design übernommen (H-14-Ergänzung, Brief vom 2026-10-26):** Der Lagerplatz (AP-66) braucht nur noch AP-71. Die Boss-Lücken (Banner, Boss-Leiste, Ergebnis) bekommen ein eigenes Paket AP-72 (N6) nach AP-66, weil beide `HudScene.ts` besitzen. AP-72 braucht das additive Feld `invulnerable` in `boss-hp-changed` (V-12, Freigabe nötig). Keine neuen Schriften, Sprites oder Abhängigkeiten | Brief-Status freigegeben (2026-10-26), AP-72 als Planner-Annahme | Nutzer am 2026-10-26 (Brief); AP-72 angenommen vom Planner, vom Nutzer zu bestätigen |
+| PE-86 | **Theme-Sync als Fix (AP-71):** `src/config/theme.ts` und `src/styles/tokens.css` werden nur durch `npm run theme:build` erzeugt, nie von Hand. Dev war nach 1373aba rot (zwei Tests in `tests/config/theme.test.ts`). AP-71 läuft in M3-Nachtrag W2, vor AP-66 | Pflegeauftrag Lead, Befund Testlauf auf dev | angenommen vom Planner (2026-10-26) |
 
 ### Offene Fragen
 
@@ -3334,7 +3411,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-40 | Gold-Münzen: Sind sie gar nicht da oder nur schlecht erkennbar, und auch in anderen Levels? | W | PE-78, AP-70 | Schlecht erkennbar, alle Hintergründe prüfen | beantwortet (PE-78): Münzen sind vorhanden, nur schlecht erkennbar, Level 5 gemeldet. AP-70 prüft alle Hintergründe. Nutzer im Chat, 2026-10-26 |
 | Q-41 | Boss-Sieg vor 0:00 (PE-76): Zählt Gold, Erfahrung und Freischaltung wie bei einem Timer-Sieg? | W | PE-76, PE-80, AP-68 | Ja, wie Timer-Sieg (Gold 100 %) | offen, angenommen (PE-80) |
 | Q-42 | Münz-Drop: Plan PE-39 nennt 5 % je Gegner, der Code (`COIN_RULES.dropChance`) 4,5 % (AP-56 nachgezogen). Welcher Wert gilt? | O | PE-39, AP-56, AP-70 | 4,5 % (Code, bewusst kalibriert), PE-39 dann mit Hinweis ergänzen | entschieden (Nutzer am 2026-10-26): 8 %, PE-81. Die Folge für das Gold-Tempo ist Q-43 |
-| Q-43 | Gold-Tempo bei 8 % Drop: Welcher Hebel senkt das Gold je gewonnenem Level von etwa 79 auf etwa 45? Preise allein reichen nicht (PE-83) | K | PE-81, PE-83, AP-70, `config/enemies.ts` | (a) Münzwert `coinValue` je Gegner um etwa 43 % auf ganze Zahlen senken (Pins in `enemies.test.ts` nachziehen, Große-Münze-Schwelle 5 prüfen); Preise bleiben. (b) Preise erhöhen: verworfen, Gold-Test bliebe rot. (c) Gegnerzahl senken: verworfen, Druckbänder in `balance.test.ts` brächen. Empfehlung (a) | offen (blockiert AP-70) |
+| Q-43 | Gold-Tempo bei 8 % Drop: Welcher Hebel senkt das Gold je gewonnenem Level von etwa 79 auf etwa 45? Preise allein reichen nicht (PE-83) | K | PE-81, PE-83, AP-70, `config/enemies.ts` | (a) Münzwert `coinValue` je Gegner um etwa 43 % auf ganze Zahlen senken (Pins in `enemies.test.ts` nachziehen, Große-Münze-Schwelle 5 prüfen); Preise bleiben. (b) Preise erhöhen: verworfen, Gold-Test bliebe rot. (c) Gegnerzahl senken: verworfen, Druckbänder in `balance.test.ts` brächen. Empfehlung (a) | beantwortet (Nutzer am 2026-10-26): (a) Münzwerte senken, PE-84 |
+| Q-44 | Große Münze: 32 px (Ist, `bigDisplayScale` 2) oder 16 px (Designer-Empfehlung `bigDisplayScale` 1, Umrandung an die Skalierung koppeln)? Die große Münze ist so groß wie die Astronautin (32 px) | W | AP-70, H-15, H-16 | Designer-Empfehlung 16 px, Entscheidung nach Sichtprüfung im Handtest | offen (H-15) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -3361,6 +3439,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | **V-09** Hinweis `docs/balancing.md` (Befunde 3 und 6) | Ein Satz zu `CONTACT_DESPAWN_DAMAGE.cursedTree` (Baum despawnt nach 30 Kontaktschaden, PE-66) und zur Basis-Drehgeschwindigkeit 360 °/s (PE-67). Ein Upgrade-Schritt bringt relativ weniger (4,2 % statt 5,6 % je Stufe). Der Planner darf `docs/balancing.md` nicht ändern. AP-59 hat die Datei im Eigentum: Der Lead prüft, ob der Satz dort steht, sonst im nächsten Paket nachtragen, das die Datei ohnehin anfasst | Lead-Auftrag Wellenabschluss M2c-Nachtrag (PE-66, PE-67) | Planner (Hinweis) |
 | **V-10** §7.2 Freigabe pro Meilenstein (PE-15) | PE-69 ersetzt die Freigabe pro Meilenstein durch den autonomen Modus bis „stop“. Vorschlag: §7.2 und PE-15 entsprechend formulieren. Das ändert die Vorgehensweise, daher Bestätigung durch den Nutzer | Lead-Auftrag Wellenabschluss M2c-Nachtrag, PE-69 | Planner (Pflege) |
 | **V-11** (übernommen am 2026-10-26, siehe PE-82) §2 F-05 Boss-Zeitpunkt | Satz „Er erscheint in der letzten Minute.“ ändern in „Er erscheint in den letzten 30 Sekunden (Warnung bei 33 s Restzeit). Wird er besiegt, endet die Runde sofort mit Sieg. Lebt er am Timerende, geht die Runde weiter, bis er besiegt ist.“ Das ist ein Umfangssatz, der Planner trägt ihn nicht selbst ein. Gilt nach Bestätigung zusammen mit PE-76 | Befund Nutzer (Handtest M3-DEP), PE-76 | Planner (Pflege) |
+| **V-12** (Vorschlag, Freigabe nötig vor AP-72, PE-85) Vertrag `boss-hp-changed` (`src/contracts/events.ts`) | Payload um `invulnerable: boolean` erweitern (additiv, `{ hp, maxHp, invulnerable }`). Grund: Die Boss-Leiste braucht den Zustand „unverwundbar“ (Designer-Ergänzung H-14, Zustand 7a), heute kennt die HUD ihn nicht. Umsetzung in AP-72, Eigentum nur für dieses Feld | Befund AP-72 (Planner, Code gelesen: `src/contracts/events.ts` Z. 34) | Planner (Pflege) |
 
 #### Verbesserungsplan Wellenkonzept (Entwurf, nicht freigegeben)
 
@@ -3436,7 +3515,7 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | F-12 Grafik austauschbar + Anleitung | AP-02, AP-07 |
 | F-13 Sounds austauschbar + Anleitung | AP-02, AP-07, AP-14 |
 | F-14 Querformat | AP-01, AP-13, AP-38 (Darstellung im Querformat) |
-| F-15 Gold-Münzen (PE-39, PE-40, PE-81, PE-83) | AP-25, AP-26, AP-27, AP-29, AP-31, AP-33, AP-35, AP-70 (Drop 8 %, Gold-Tempo, Q-43) |
+| F-15 Gold-Münzen (PE-39, PE-40, PE-81, PE-83, PE-84) | AP-25, AP-26, AP-27, AP-29, AP-31, AP-33, AP-35, AP-70 (Drop 8 %, Gold-Tempo, Münzwerte aus Q-43, PE-84) |
 | F-16 Dauerhafte Upgrades (PE-41, PE-45) | AP-27, AP-28, AP-29, AP-32, AP-33, AP-35 |
 | F-17 Rüstungen mit passiven Effekten (PE-47, PE-52, PE-56, PE-58; Pflicht, V-06 abgelehnt) | AP-37a, AP-37c, AP-34, AP-33, M2b-DEP (Pilot Feuerring fest, Katalog offen) |
 | Rüstung Feuerring: Drop, Aktivierung, Ring-Schaden, Abklingzeit, Pause (PE-52, PE-57) | AP-37a (Logik), AP-37c (Entity, Pickup), AP-33 (Verdrahtung), M2b-DEP (Handtest) |
@@ -3472,14 +3551,18 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | Handtest-Befunde M2c-DEP (PE-65, PE-67): Waffe weich und Drehung (F-01, F-02) | AP-59, M2c-DEP-Wiederholung |
 | Handtest-Befunde M2c-DEP (PE-65): Schuss an der Mündung (F-02, F-12) | AP-58, M2c-DEP-Wiederholung |
 | Handtest-Befunde M2c-DEP (PE-65, PE-66): Baum despawnt nach Kontaktschaden (F-04) | AP-60, M2c-DEP-Wiederholung |
-| Handtest-Befunde M2c-DEP (PE-65, PE-70): zeitbegrenzte Kräfte lagern und manuell aktivieren (F-07, F-17, V-08, Q-34) | AP-65 (Logik), AP-66 (HUD und Szene, Design-Review, blockiert bis Designer-Ergänzung H-14) |
+| Handtest-Befunde M2c-DEP (PE-65, PE-70): zeitbegrenzte Kräfte lagern und manuell aktivieren (F-07, F-17, V-08, Q-34) | AP-65 (Logik), AP-66 (HUD und Szene, Design-Review, Designer-Ergänzung H-14 erfüllt, nach AP-71, PE-85) |
 | Handtest-Befunde M2c-DEP (PE-72): Gold weicher (F-15, Q-36) | AP-64 |
 | Handtest-Befunde M2c-DEP (PE-71): iPhone Homescreen-App, Bild zu groß (F-10, F-14, Q-35) | AP-63 (Folge von AP-61) |
 | Tastatursteuerung am PC (PE-73) | abgelehnt, kein Paket |
 | Design für M3: Boss-Lebensleiste, Timer-Label, Telegraph-Farben | AP-16, AP-20 (Q-31), AP-17–AP-19 (Tokens) |
 | Handtest-Befunde M3-DEP (PE-76): Boss in den letzten 30 s, Sieg sofort (F-03, F-05) | AP-68, H-15 |
 | Handtest-Befunde M3-DEP (PE-77): Stick am PC aus, Touch unverändert (F-01) | AP-69, H-15 |
-| Handtest-Befunde M3-DEP (PE-78): Gold-Münzen besser erkennbar (F-15, Q-40) | AP-70 (Design-Review ja), H-15 |
+| Handtest-Befunde M3-DEP (PE-78): Gold-Münzen besser erkennbar (F-15, Q-40) | AP-70 (Design-Review ja), H-15, Q-44 (Münzgröße), H-16 (Designer-Nachtrag) |
+| Design-Ergänzung H-14 (PE-85): Lagerplatz (Ansichten 1–4) | AP-66 |
+| Design-Ergänzung H-14 (PE-85): Boss-Banner, Boss-Leiste, Ergebnis (Ansichten 2, 3, 5, 6, 7) | AP-72 (N6, nach V-12) |
+| Generierte Tokens synchron mit dem Designer-Export (PE-86) | AP-71 |
+| Zustand „unverwundbar“ in der Boss-Leiste (PE-85, V-12) | AP-72 (Feld `invulnerable` in `boss-hp-changed`) |
 | Handtest-Befunde M3-DEP (PE-79): Riesen-Stein testbar über `?level=10` oder `?level=18` (F-05, F-09) | kein Code, H-15 |
 
 ---
@@ -3661,3 +3744,11 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-26 | Erkenntnis Code (AP-70): Münze `coin-small` 8×8 px, Standardtiefe (Hintergrund bei −100). Nacht-Hintergrund mit `tint`, Vignette 0,6 und 24 Glühwürmchen (`maps.ts`). Drop `COIN_RULES.dropChance` 0,045 gegen PE-39 (5 %), Gold je Gegner 2 bis 8. Ob die Münzen gar nicht oder schlecht erscheinen, misst AP-70 zuerst | Planner (Pflege), Code gelesen | AP-70, Q-42 | Lead (Pflege) |
 | 2026-10-26 | Erkenntnis ?level (PE-79): `parseDebugLevel` nimmt 0 bis 20 an, `resolveStartTarget` startet `GameScene` ohne Freischaltungsprüfung. `?level=10` und `?level=18` sind damit der Testweg für den Riesen-Stein, ohne Code-Änderung | Planner (Pflege), Code gelesen (`src/scenes/debug.ts`, `PreloadScene.ts`) | H-15 | Lead (Pflege) |
 | 2026-10-26 | Pflegeauftrag „Plan-Thema AP-70“ (Nutzer im Chat): V-11 übernommen (§2 F-05 „letzte 30 Sekunden“, §17, PE-82). Q-42 entschieden: Münz-Drop 8 % (PE-81, PE-39 ersetzt). Gold-Tempo als Nutzer-Default (PE-83) angenommen. Befund: Preise allein reichen nicht, der Gold-Test hängt an Drop und Münzwert, Preisänderung bricht `upgrades.test.ts`. Hebel offen (Q-43, K). AP-70 um Balancing erweitert (`balance.test.ts`, `docs/balancing.md`, bedingt `enemies.ts`, `upgrades.ts`). §0 Lagebericht, §10, §11, §12 (AP-68 bis AP-70), §16, §17 nachgezogen. Keine Änderung an §2 außer F-05 und keine an §4, §5 | Pflegeauftrag Lead, Nutzer-Entscheidungen 2026-10-26, Testbefund AP-70-Branch (Gold 78,9, Stufe 10 bei 8,85 Levels) | §0, §2, §10, §11, §12, §16, §17, §18 | Planner (Pflege) |
+| 2026-10-26 | Wellenabschluss M3-Nachtrag W1: AP-68 (merge 9a13b87), AP-69 (merge 12d687a) und AP-70 (merge 4287479, Code-Review R1 und Design-Review R2 bestanden) gemergt, §10 auf `fertig`. Q-43 beantwortet: Münzwerte senken (PE-84), PE-83 vom Nutzer bestätigt. Neue Pakete AP-71 (Theme-Sync, W2, vor AP-66), AP-72 (Boss-Lücken, N6). AP-66 wartet nur noch auf AP-71. §0 Lagebericht, §9 (Nachtrag 2), §10, §11, §12, §13 (H-14 ☑, H-15 mit Q-44, H-16, H-17), §14, §16 (PE-84 bis PE-86, Q-43, Q-44, V-12), §17 nachgezogen | Pflegeauftrag Lead „Wellenabschluss M3-Nachtrag W1“ und „Fix-Paket Theme-Sync“, Nutzer am 2026-10-26 | AP-68–AP-72, H-14–H-17 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis AP-70 (Design-Review, Befund): Die große Münze mit 32 px ist so groß wie die Spielerin. Designer empfiehlt `bigDisplayScale` 1 (16 px) und die Umrandung an die Skalierung zu koppeln. Entscheidung nach Sichtprüfung im Handtest H-15 (Q-44, Nutzer) | Design-Review AP-70 | AP-70, H-15, Q-44 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis AP-68 (Nachzieher): `src/scenes/GameScene.ts` Z. 446 Kommentar nennt noch „63 s“ und „60 s“. Der Nachzieher steht in AP-66 (Eigentum der Szene) | Code gelesen | AP-66 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis Design-Lücken (für den Designer, H-16 optional): Münzgröße und -kontur (Q-44), Token `game.pickup-outline` fehlt (AP-70 nutzt `game.hit-flash`), Ebenenordnung Münze gegen Glühwürmchen und Vignette | Coder-Bericht AP-70, Design-Review | H-16, AP-70 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis Git (Lead-Befund): Die lokale `stage` weicht von `origin/stage` ab (204 vs. 1 Commits). PR #3 „new designs new hud new movement“ ist offen und wurde vom Nutzer abgebrochen. Vor dem PR `dev` → `stage` klären (H-17) | Lead-Befund | H-17 | Planner (Pflege) |
+| 2026-10-26 | Pflegeauftrag „Design übernehmen“ (Ergänzung H-14, Brief-Status freigegeben am 2026-10-26): PE-85. AP-66 bereit nach AP-71, Boss-Lücken als AP-72 (N6, nach AP-66 und V-12), keine neuen Schriften, Sprites oder Abhängigkeiten. Die Ergänzung nutzt vorhandene Symbole, daher entfallen die Asset-Dateien in AP-66. V-12 (Vertragsfeld `invulnerable`) als Vorschlag | Pflegeauftrag Lead, Brief `docs/design/design-brief.md` (Änderungen, H-14), Commits 011b73c bis f7fdff7 | AP-66, AP-72, V-12 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis Theme-Sync (AP-71): Die Tokens aus 1373aba (H-14) stehen in `docs/design/export/tokens.resolved.json`, aber nicht in `src/config/theme.ts` und `src/styles/tokens.css`. Die beiden Tests in `tests/config/theme.test.ts` vergleichen mit dem Generator und sind deshalb rot. Fix per `npm run theme:build`, PE-86 | Testlauf auf dev, `scripts/build-theme.mjs` gelesen | AP-71, PE-86 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis AP-72 (Vertrag): `boss-hp-changed` trägt nur `{ hp, maxHp }` (`src/contracts/events.ts` Z. 34). Der Zustand „unverwundbar“ aus `BossBase.isInvulnerable` erreicht die HUD nicht. Vorschlag V-12 (additives Feld), AP-72 startet erst nach der Freigabe | Code gelesen | AP-72, V-12 | Planner (Pflege) |
