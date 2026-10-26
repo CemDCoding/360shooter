@@ -21,13 +21,13 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 <!-- Übergabe an einen neuen Lead, der den bisherigen Chat nicht kennt. Der Planner ersetzt ihn bei jedem „Wellenabschluss“. Höchstens 10 Zeilen. -->
 
-- **Stand:** 2026-10-26 · Handtest M3-DEP bestanden (H-15, PC und iPhone, ohne Befunde) · M3-Nachtrag W2 und Nachtrag 2 N5 abgeschlossen · `dev` mit AP-71 (45672a5) und AP-66 (7b565f3) gemergt und gepusht · **Autonomer Modus** (PE-69) · V-12, V-13, V-14 vom Nutzer freigegeben (PE-87 bis PE-89).
-- **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-71 (außer AP-72), M0-DEP, M1-DEP, M2-DEP, M2b-DEP, M3-DEP (abgenommen 2026-10-26). AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
+- **Stand:** 2026-10-26 · Handtest M3-DEP bestanden (H-15, PC und iPhone, ohne Befunde) · M3-Nachtrag W2 und Nachtrag 2 N5 abgeschlossen · `dev` mit AP-71 (45672a5), AP-66 (7b565f3) und AP-73 (7857e21) gemergt · **Autonomer Modus** (PE-69) · V-12 bis V-14 freigegeben (PE-87 bis PE-89) · Q-44 beantwortet: große Münze 16 px (PE-90).
+- **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-71 (außer AP-72), AP-73, M0-DEP, M1-DEP, M2-DEP, M2b-DEP, M3-DEP (abgenommen 2026-10-26). AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt.
 - **dev ist grün:** 431/431 Tests, alle Checks (Stand nach AP-66). AP-71 hat den Theme-Sync repariert (`theme.ts` und `tokens.css` per `theme:build`).
-- **Bereit:** AP-72 (Boss-Lücken, N6, L; jetzt mit V-12 und V-14) und AP-73 (CFG, Opacity-Tokens, N6, S). Beide laufen parallel, keine gemeinsame Datei (PE-88). **Offen [Mensch]:** H-12 (M2c-DEP, blockiert M3 nicht), H-16 (Designer-Nachtrag Münzen, optional), H-17 (stage-Abgleich vor dem PR `dev` → `stage`, Release-Schritt).
-- **Erkenntnisse (Details §18):** AP-66: Fächer skalieren mit dem HUD-Faktor k (max 1,4), Item-Symbole ganzzahlig (2× bei k=1, 3× bei 1,4). Token `size.hud-slot-icon-scale` ist auf 10×10 gerechnet, die Sprites sind 16×16 (Designer prüft). `opacity`-Tokens fehlen im Generator (V-13 freigegeben, AP-73). Low-Funde aus AP-66 (V-14) sind in AP-72 aufgenommen. Gold-Tempo unverändert (PE-84). Die große Münze mit 32 px ist so groß wie die Astronautin, der Designer empfiehlt 16 px. Q-44 ist nicht beantwortet, 32 px gilt vorläufig.
-- **Nächster Schritt:** Release-Schritte: Lead prüft zuerst den stage-Abgleich (H-17), danach PR `dev` → `stage` durch den Nutzer und M3-DEP-Release mit Smoke-Test auf stage (§9.2). AP-72 (L, sonnet high) und AP-73 (S, sonnet medium) starten parallel. Die lokalen Opacity-Konstanten in `PowerSlots.ts` stellt der Lead nach AP-72 und AP-73 auf die Tokens um (Eigentum AP-72, PE-88).
-- **Offene Fragen an den Nutzer:** (1) Q-44: Münzgröße 32 px (vorläufig) oder 16 px. (2) H-17: stage-Abgleich und PR #3. (3) Q-45: Hover-Wert 0,18 als Token in den Designer-Export aufnehmen oder als Konstante lassen.
+- **Bereit:** AP-72 (Boss-Lücken, N6, L; mit V-12 und V-14) und AP-74 (Münzgröße 16 px, N6, S, Q-44 und PE-90). Beide laufen parallel, keine gemeinsame Datei (AP-74 besitzt `src/config/coins.ts` und `tests/config/coins.test.ts`). **Offen [Mensch]:** H-12 (M2c-DEP, blockiert M3 nicht), H-16 (Designer-Nachtrag Münzen, optional; die Größe ist mit Q-44 entschieden, offen bleiben Kontur und Ebenenordnung), H-17 (stage-Abgleich vor dem PR `dev` → `stage`, Release-Schritt).
+- **Erkenntnisse (Details §18):** AP-66: Fächer skalieren mit dem HUD-Faktor k (max 1,4), Item-Symbole ganzzahlig (2× bei k=1, 3× bei 1,4). Token `size.hud-slot-icon-scale` ist auf 10×10 gerechnet, die Sprites sind 16×16 (Designer prüft). Low-Funde aus AP-66 (V-14) sind in AP-72 aufgenommen. Gold-Tempo unverändert (PE-84). Q-44 beantwortet: große Münze 16 px (AP-74). Damit sind große und kleine Münze beide 16 px groß, offen als Q-46.
+- **Nächster Schritt:** Release-Schritte: Lead prüft zuerst den stage-Abgleich (H-17), danach PR `dev` → `stage` durch den Nutzer und M3-DEP-Release mit Smoke-Test auf stage (§9.2). AP-72 (L, sonnet high) und AP-74 (S, sonnet medium) starten parallel. Die lokalen Opacity-Konstanten in `PowerSlots.ts` stellt der Lead nach AP-72 auf `OPACITY` um (Eigentum AP-72, PE-88).
+- **Offene Fragen an den Nutzer:** (1) Q-46: Bleibt die kleine Münze bei 16 px (beide gleich groß, Unterschied über Sprite und Umrandung) oder wird sie 8 px? (2) H-17: stage-Abgleich und PR #3. (3) Q-45: Hover-Wert 0,18 als Token in den Designer-Export aufnehmen oder als Konstante lassen.
 
 <!-- Ende Lagebericht -->
 
@@ -510,6 +510,7 @@ flowchart TD
 | N5 | AP-66 (nach AP-71) | `src/scenes/GameScene.ts`, `src/scenes/HudScene.ts`, `src/scenes/hud/{PowerSlots,hudMath}.ts` (neu: `PowerSlots.ts`), `tests/scenes/hud.test.ts`, `src/platform/input.ts` (nur falls nötig). Keine Asset-Dateien: die Ergänzung nutzt vorhandene Symbole (PE-85) |
 | N6 | AP-72 (nach AP-66) | `src/scenes/HudScene.ts` (Banner, Boss-Leiste), `src/scenes/ResultScene.ts`, `src/scenes/hud/hudMath.ts` (Zahlenfunktionen, `powerBlock`, Fachgröße), `src/scenes/hud/PowerSlots.ts` (V-14 b, c, d), `src/contracts/events.ts` (nur `boss-hp-changed`, additiv, PE-85 und V-12/PE-87), `src/scenes/GameScene.ts` (nur die Stelle, die `boss-hp-changed` sendet, und `endRound` für `power-store-changed`, V-14 a), `tests/scenes/hud.test.ts`, `tests/contracts/contracts.test.ts` |
 | N6 | AP-73 (nach AP-71, parallel zu AP-72) | `scripts/build-theme.mjs`, `src/config/theme.ts` und `src/styles/tokens.css` (nur per `npm run theme:build`), `tests/config/theme.test.ts` (V-13, PE-88) |
+| N6 | AP-74 (nach AP-70, parallel zu AP-72 und AP-73) | `src/config/coins.ts` (nur `COIN_VISUAL`), `tests/config/coins.test.ts` (nur der Größentest), `src/entities/Coin.ts` (nur bedingt, falls der Körper den Einsammelradius ändert, Q-44/PE-90) |
 
 ---
 
@@ -729,6 +730,7 @@ flowchart TD
 | N4 | AP-65 Power-up-Lagerplatz, Vertrag und Logik (`bereit`, AP-16 ist fertig; kann neben M3 laufen) |
 | N5 | AP-66 Power-up-Lagerplatz, HUD und Szene (nach AP-71; Designer-Ergänzung, AP-20 und AP-65 erfüllt, PE-85) |
 | N6 | AP-72 Boss-Lücken aus AP-20: Banner, Boss-Leiste, Ergebnis (nach AP-66, PE-85) |
+| N6 | AP-74 Große Münze 16 px (Q-44, PE-90, nach AP-70). Keine Überschneidung mit AP-72 |
 
 - **Prüfpunkte (Handtest, Nutzer):**
   - [ ] iPhone Homescreen-App im Querformat: Bild passt vollständig, nichts zu groß, nach dem Start aus dem Homescreen und nach Drehen (AP-63). Optional: `?layout=1` zeigt die gemessenen Werte
@@ -751,7 +753,7 @@ flowchart TD
 ##### M3-DEP – Abnahme [Mensch]
 
 - Pull Requests `dev` → `stage` → `master`, Test am PC und auf dem iPhone
-- **Erster Handtest (2026-10-26, PC, Nutzer über Lead):** vier Befunde (PE-76 bis PE-79), umgesetzt im M3-Nachtrag (AP-68 bis AP-70). Die Wiederholung (H-15) ist am 2026-10-26 bestanden (PC und iPhone, ohne Befunde, Abnahme durch den Nutzer). Q-44 (Münzgröße) bleibt offen, vorläufig 32 px. Der Riesen-Stein ist für Spielerlevel 6 nicht freigeschaltet, zum Test `?level=10` oder `?level=18` verwenden (PE-79).
+- **Erster Handtest (2026-10-26, PC, Nutzer über Lead):** vier Befunde (PE-76 bis PE-79), umgesetzt im M3-Nachtrag (AP-68 bis AP-70). Die Wiederholung (H-15) ist am 2026-10-26 bestanden (PC und iPhone, ohne Befunde, Abnahme durch den Nutzer). Q-44 (Münzgröße) ist am 2026-10-26 beantwortet: große Münze 16 px (PE-90, Umsetzung AP-74). Der Riesen-Stein ist für Spielerlevel 6 nicht freigeschaltet, zum Test `?level=10` oder `?level=18` verwenden (PE-79).
 - **Smoke-Test:**
   - [ ] In den letzten 30 s erscheint „Boss kommt!“ (Warnung bei 0:33) und der Boss des Batches (0:30, PE-76)
   - [ ] Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00 (PE-76, AP-68). Lebt er am Timerende, läuft die Runde mit „BOSS!“ weiter bis Sieg oder Niederlage
@@ -843,7 +845,8 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-65 | Power-up-Lagerplatz: Vertrag, Config, Logik (PE-70, Q-34) | Nachtrag 2 | SH/LOG | N4 | AP-16, AP-30, AP-37a (alle fertig) | M | sonnet (high) | – (gemergt 4b20704) | fertig (Review Runde 1 bestanden) |
 | AP-66 | Power-up-Lagerplatz: HUD-Platz, Tippen, Einbindung in die Spielszene (PE-70, Q-34, PE-85; Design-Review ja) | Nachtrag 2 | GAME | N5 | AP-65, AP-20 (fertig), **AP-71** (Theme); Designer-Ergänzung H-14 erfüllt (PE-85) | L | sonnet (high) | – (gemergt 7b565f3) | fertig (Code-Review R1 und Design-Review R1 bestanden, 431/431) |
 | AP-72 | Boss-Lücken aus AP-20: Banner „BOSS KOMMT!“ als Funkspruch, Zustände der Boss-Leiste, Ergebnis nach Boss-Sieg (PE-85; Design-Review ja; V-14 aufgenommen, PE-89) | Nachtrag 2 | GAME | N6 | AP-66 und AP-71 (fertig), AP-20 (fertig), V-12 (freigegeben, PE-87) | L | sonnet (high) | – | bereit (V-12 freigegeben am 2026-10-26) |
-| AP-73 | CFG: Opacity-Tokens (`opacity.dim`, `opacity.ghost`) im Theme-Generator (V-13, PE-88) | Nachtrag 2 | CFG | N6 | AP-71 (fertig), V-13 (freigegeben, PE-88) | S | sonnet (medium) | – | bereit (parallel zu AP-72, keine gemeinsame Datei) |
+| AP-73 | CFG: Opacity-Tokens (`opacity.dim`, `opacity.ghost`) im Theme-Generator (V-13, PE-88) | Nachtrag 2 | CFG | N6 | AP-71 (fertig), V-13 (freigegeben, PE-88) | S | sonnet (medium) | – (gemergt 7857e21) | fertig (gemergt 7857e21; Statusnachtrag aus git log, Pflege 2026-10-26) |
+| AP-74 | Große Münze auf 16 px: `bigDisplayScale` 1, Größentest (Q-44, PE-90; Design-Review ja) | Nachtrag 2 | CFG | N6 | AP-70 (fertig), Q-44 (beantwortet, PE-90) | S | sonnet (medium) | – | bereit (parallel zu AP-72, keine gemeinsame Datei) |
 
 ---
 
@@ -916,6 +919,7 @@ flowchart LR
   AP66 --> AP72["AP-72 Boss-Lücken"]
   AP20 --> AP72
   AP71 --> AP73["AP-73 Opacity-Tokens (parallel zu AP-72)"]
+  AP70 --> AP74["AP-74 Große Münze 16 px (parallel zu AP-72)"]
   AP20 --> AP68["AP-68 Boss-Timing"]
   AP62 --> AP69["AP-69 Stick am PC aus"]
   AP31 --> AP70["AP-70 Gold sichtbar"]
@@ -2835,7 +2839,7 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 #### AP-73 – Opacity-Tokens im Theme-Generator (V-13, PE-88)
 
 - **Meilenstein, Lane, Welle:** Nachtrag 2 · CFG · N6
-- **Status: bereit.** V-13 ist am 2026-10-26 vom Nutzer freigegeben (PE-88). AP-71 (45672a5) ist gemergt, der Generator ist per `theme:build` synchron. Der Token-Bestand kommt aus dem Designer-Export, es ist keine Designer-Freigabe nötig.
+- **Status: fertig (gemergt 7857e21).** V-13 ist am 2026-10-26 vom Nutzer freigegeben (PE-88). AP-71 (45672a5) ist gemergt, der Generator ist per `theme:build` synchron. Der Token-Bestand kommt aus dem Designer-Export, es ist keine Designer-Freigabe nötig.
 - **Ziel:** Der Generator übernimmt die Gruppe `opacity` aus `docs/design/export/tokens.resolved.json` (`dim` 0,35 und `ghost` 0,6) in `src/config/theme.ts`. Damit stehen die Deckkraft-Werte im Theme statt als Konstanten im Code. Aussehen und Spielwerte ändern sich nicht. Die Umstellung der Szene folgt nach AP-72 (siehe „Folge“).
 - **Befund (Planner hat den Code gelesen):** `scripts/build-theme.mjs` Z. 58 (`buildTheme(json)`) kennt keine `opacity`-Gruppe, `src/config/theme.ts` hat keinen Export `opacity`. `docs/design/export/tokens.resolved.json` Z. 204 bis 207 enthält `opacity.dim` und `opacity.ghost`. `src/scenes/hud/PowerSlots.ts` Z. 15 bis 19 hält die Werte als lokale Konstanten, der Hover-Wert 0,18 (`HOVER_FILL_ALPHA`) fehlt im Export und bleibt vorerst eine Konstante (Q-45).
 - **Pflichtlektüre:** `scripts/build-theme.mjs`, `tests/config/theme.test.ts`, `docs/design/export/tokens.resolved.json` (nur lesen), `src/config/theme.ts` (nur lesen; Ausgabe per `theme:build`)
@@ -2863,6 +2867,40 @@ Der Nutzer hat Q-34, Q-35 und Q-36 beantwortet (Quelle „Nutzer im Chat“, üb
 - **Kürzbar bei Budgetnot:** ja. Ohne AP-73 bleiben die Konstanten in `PowerSlots.ts` (kein Fehler, nur Schulden)
 - **Folge (nicht in AP-73):** Umstellung der Konstanten in `PowerSlots.ts` auf `OPACITY` nach AP-72 (AP-72 besitzt die Datei). Der Hover-Wert folgt, sobald der Designer ihn als Token liefert (Q-45). Der Lead plant diesen Schritt, sobald AP-72 gemergt ist.
 - **Commit-Typ:** `feat(AP-73): add opacity tokens to the theme generator`
+
+#### AP-74 – Große Münze auf 16 px (Q-44, PE-90)
+
+- **Meilenstein, Lane, Welle:** Nachtrag 2 · CFG · N6
+- **Status: bereit.** Q-44 ist am 2026-10-26 vom Nutzer beantwortet: große Münze 16 px (PE-90). AP-70 (gemergt 4287479) ist fertig. Es ist ein kleiner Fix: ein Wert, ein Test, ein Kommentar.
+- **Ziel:** Die große Münze wird 16 px groß angezeigt statt 32 px. Der Designer empfiehlt `bigDisplayScale` 1, weil die 32 px große Münze so groß wie die Astronautin ist (§18, Design-Review AP-70). Das 16×16-Sprite läuft mit ganzzahliger Skalierung 1 (Pixelraster, Brief-Grundsatz 3). Die Sichtbarkeit bleibt über die Umrandung (Halo) und die Tiefe. Logik, Magnet und Werte bleiben unverändert.
+- **Befund (Planner hat den Code gelesen):** `src/config/coins.ts` Z. 28 (Kommentar „gross 16 px auf 32, Verhaeltnis 1:2 bleibt“) und Z. 32 bis 34: `smallDisplayScale` 2, `bigDisplayScale` 2. `src/entities/Coin.ts` Z. 37 wählt die Skalierung je Textur. Die vier Umrandungs-Kopien übernehmen `scaleX` (Z. 62) und skalieren also mit. Z. 42 setzt den Körper aus der unskalierten Breite (`setCircle(this.width / 2)`). Ob sich der Einsammelradius dadurch ändert, prüft der Coder mit Zahlen. `tests/config/coins.test.ts` Z. 39 bis 48 prüft nur endliche Werte, Ganzzahligkeit und Mindestwert 1, keinen festen Wert. `docs/balancing.md` nennt keine Münzgröße, ist also nicht betroffen. **Folge (Q-46):** Nach dieser Änderung sind große und kleine Münze beide 16 px groß. Das Verhältnis 1:2 aus dem Kommentar entfällt.
+- **Design-Review:** ja (sichtbare Oberfläche; nur vorhandene Tokens, keine Farb-Literale, Lint-Regel AP-55)
+- **Pflichtlektüre:** PE-90, Q-44, Q-46, PE-78, `docs/design/design-brief.md` (nur lesen: Grundsatz 3, Abschnitt zu Münzen), `docs/design/tokens.json` (nur lesen), `docs/design/mockups/runde.html` (nur lesen), `src/config/coins.ts`, `src/entities/Coin.ts`, `src/logic/coins.ts` (nur lesen), `tests/config/coins.test.ts`
+- **Abhängigkeiten:** AP-70 (fertig, gemergt 4287479), AP-64 (fertig), Q-44 (beantwortet, PE-90)
+- **Parallel möglich mit:** AP-72 und AP-73 (N6). Keine gemeinsame Datei: AP-72 fasst weder `src/config/**` noch `src/entities/**` noch `tests/config/**` an. AP-73 ist gemergt.
+- **Dateien (Eigentum):** `src/config/coins.ts` (nur `COIN_VISUAL` und sein Kommentar), `tests/config/coins.test.ts` (nur der Größentest), `src/entities/Coin.ts` (nur bedingt, siehe Umsetzung 3)
+- **Nicht anfassen:** `public/assets/**` (Sprites bleiben, Designer-Aufgabe H-13), `src/logic/**` (Magnet, Einsammelradius 12 px, `COIN_RULES`), `src/config/theme.ts`, `src/config/enemies.ts`, `src/scenes/**` (auch `PowerSlots.ts` und `HudScene.ts`, Eigentum AP-72), `docs/**`, `docs/design/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `src/config/coins.ts`: `COIN_VISUAL.bigDisplayScale` von 2 auf 1 setzen. Den Kommentar Z. 28 auf die neue Größe ändern (große Münze 16 px auf 16, Q-44, PE-90). Die Schreibweise ASCII wie im übrigen Kommentar. Die kleine Münze bleibt bei `smallDisplayScale` 2 (Q-46 offen). Die Angabe „Verhaeltnis 1:2 bleibt“ entfällt.
+  2. `tests/config/coins.test.ts`: Ein Test pinnt `bigDisplayScale` auf 1 und prüft, dass die Anzeige der großen Münze 16 px ist (Sprite 16 px × Skalierung 1). Der Test nennt Q-44 und PE-90. Keine Änderung an den übrigen Tests.
+  3. Einsammeln: Der Coder misst in `Coin.ts` (`setCircle`, Z. 42), ob der Körper in Welt-Pixeln kleiner wird. Wird er kleiner, passt der Coder den Körper so an, dass der Einsammelradius gleich bleibt (Körper, nicht Logik), und meldet die Änderung dem Lead. `src/logic/**` bleibt unverändert, auch wenn die Ursache dort vermutet wird.
+  4. Umrandung: Die Kopien skalieren schon mit (`syncHalo`). Der Coder prüft, dass die Umrandung der 16-px-Münze sichtbar und ganzzahlig bleibt (`outlinePx` 2, Token `game.hit-flash`).
+  5. Checks grün (install, lint, typecheck, Tests, build). `docs/balancing.md` bleibt unverändert.
+- **Akzeptanzkriterien:**
+  - `bigDisplayScale` ist 1, die große Münze wird 16 px angezeigt, der Größentest ist grün (Q-44, PE-90)
+  - Die Umrandung bleibt sichtbar, ganzzahlig, Farbe nur über den Token aus `COIN_VISUAL.outlineColorToken`
+  - Einsammelradius (12 px) und Magnet unverändert (bestehende Tests grün; Messung der Körpergröße im Bericht)
+  - Keine Änderung an `src/logic/**`, `COIN_RULES`, `BIG_COIN_MIN_VALUE`, Werten oder Gold-Tempo (`tests/logic/balance.test.ts` unverändert grün)
+  - Checks grün
+  - Sichtprüfung im Handtest (PC und iPhone): große Münze 16 px, Verhältnis zur Astronautin und zur kleinen Münze (Q-46)
+- **Tests:** `tests/config/coins.test.ts` (Größenpin). Die Lesbarkeit ist eine Sichtprüfung, keine Agent-Prüfung
+- **Review-Schwerpunkte:** Design-Review (Tokens, Pixelraster, Umrandung), Einsammelradius unverändert, nur die erlaubten Dateien geändert
+- **Doku-Pflichten:** Kommentar in `src/config/coins.ts` zu `COIN_VISUAL`. `docs/balancing.md` nicht betroffen
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein. Das Paket ist so klein, dass sich die Kürzung nicht lohnt. Ohne AP-74 bleibt die Münze bei 32 px (Stand vor PE-90, kein Fehler)
+- **Commit-Typ:** `fix(AP-74): show big coin at 16 px`
 
 ### M3 – Bosse
 
@@ -3265,7 +3303,7 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | M2b | 16 | ≈ 23,75 h (+ Review ≈ 30 h) | ≈ 11–12 |
 | M2c | 6 | ≈ 11,25 h (+ Review inkl. 3 Design-Reviews ≈ 15 h) | ≈ 5–6 (bei 45 % Zielwert ≈ 4) |
 | M2c-Nachtrag | 5 (AP-58 bis AP-62) | ≈ 5,25 h (3 × S, 2 × M; + Review ≈ 7 h) | ≈ 2–3 (bei 30 % Team-Budget je Fenster etwa 2 bis 3 Pakete mit Review) |
-| Nachtrag 2 | 6 (AP-63 bis AP-66, AP-72, AP-73) | ≈ 9,5 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L, AP-72 L inkl. V-14 ≈ +0,5 h, AP-73 S ≈ 0,75 h, beides angenommen; + Review inkl. Design-Review AP-66 und AP-72 ≈ 12 h) | ≈ 5 (AP-64 und AP-73 kürzbar, ≈ 1,5 h) |
+| Nachtrag 2 | 7 (AP-63 bis AP-66, AP-72, AP-73, AP-74) | ≈ 10,25 h (AP-63 M, AP-64 S, AP-65 M, AP-66 L, AP-72 L inkl. V-14 ≈ +0,5 h, AP-73 S ≈ 0,75 h, AP-74 S ≈ 0,75 h, angenommen; + Review inkl. Design-Review AP-66, AP-72 und AP-74 ≈ 13 h) | ≈ 5 (AP-64 und AP-73 kürzbar, ≈ 1,5 h; AP-74 nicht kürzen) |
 | M3 | 6 (AP-16 bis AP-20 und AP-67, Fairness-Fix PE-75, M ≈ 1,5 h) | ≈ 10 h (+ Review ≈ 13 h) | ≈ 5–6 |
 | M3-Nachtrag | 4 (AP-68 S, AP-69 S, AP-70 M, AP-71 S; Handtest-Befunde PE-76 bis PE-78, Theme-Sync PE-86) | ≈ 4,25 h (+ Review inkl. Design-Review AP-70 ≈ 5,5 h) | ≈ 1–2 (AP-68 bis AP-70 in W1, AP-71 in W2) |
 | **Gesamt** | **46** | **≈ 70 h (+ Review ≈ 90 h)** | **≈ 32–38** |
@@ -3416,6 +3454,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-87 | **V-12 freigegeben:** Vertrag `boss-hp-changed` bekommt additiv `invulnerable: boolean` (`{ hp, maxHp, invulnerable }`). Umsetzung in AP-72 (N6), AP-72 ist `bereit` | Nutzer im Chat am 2026-10-26 („v 12 v 13 v14 freigeben“) | Nutzer am 2026-10-26 |
 | PE-88 | **V-13 freigegeben:** Opacity-Gruppe (`opacity.dim`, `opacity.ghost`) aus dem Designer-Export in den Theme-Generator aufnehmen. Neues Paket AP-73 (CFG, N6, sonnet medium), parallel zu AP-72, weil keine Datei gemeinsam ist. Die Umstellung der lokalen Konstanten in `PowerSlots.ts` gehört zu AP-72 und folgt nach dessen Merge. Der Hover-Wert 0,18 hat keinen Token im Export (Q-45) | Nutzer im Chat am 2026-10-26; Dateikonflikt-Prüfung AP-72 gegen AP-73 durch den Planner (Pflege) | Nutzer am 2026-10-26; Konfliktprüfung angenommen vom Planner |
 | PE-89 | **V-14 freigegeben:** Low-Funde aus AP-66 (a) bis (e) werden in AP-72 mitgenommen, nicht als Folgepaket. Eigentum: `PowerSlots.ts` (b, d), `hudMath.ts` (c, e, nur reine Funktionen), `GameScene.ts` (a, nur die Stelle in `endRound`), zusätzlich zu den V-12-Dateien | Nutzer im Chat am 2026-10-26; Eigentumsfrage für `hudMath.ts` und `GameScene.ts` nach Auftrag des Lead entschieden | Nutzer am 2026-10-26; Eigentum angenommen vom Planner (Pflege) |
+| PE-90 | **Q-44 entschieden: große Münze 16 px.** `COIN_VISUAL.bigDisplayScale` 1 (Designer-Empfehlung, 16×16-Sprite ganzzahlig). Die kleine Münze bleibt `smallDisplayScale` 2 (16 px). Umsetzung AP-74 (N6, S, sonnet medium, Design-Review ja), parallel zu AP-72 ohne gemeinsame Datei. Folge: beide Münzen 16 px, das Verhältnis 1:2 entfällt (Q-46) | Nutzer im Chat am 2026-10-26 (Q-44) | Nutzer am 2026-10-26; Umsetzung und Konfliktprüfung angenommen vom Planner (Pflege) |
 
 ### Offene Fragen
 
@@ -3457,7 +3496,8 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-41 | Boss-Sieg vor 0:00 (PE-76): Zählt Gold, Erfahrung und Freischaltung wie bei einem Timer-Sieg? | W | PE-76, PE-80, AP-68 | Ja, wie Timer-Sieg (Gold 100 %) | bestätigt durch Handtest M3-DEP (PE-80, 2026-10-26, abgeleitet aus „Handtest bestanden“, keine Einzelaussage) |
 | Q-42 | Münz-Drop: Plan PE-39 nennt 5 % je Gegner, der Code (`COIN_RULES.dropChance`) 4,5 % (AP-56 nachgezogen). Welcher Wert gilt? | O | PE-39, AP-56, AP-70 | 4,5 % (Code, bewusst kalibriert), PE-39 dann mit Hinweis ergänzen | entschieden (Nutzer am 2026-10-26): 8 %, PE-81. Die Folge für das Gold-Tempo ist Q-43 |
 | Q-43 | Gold-Tempo bei 8 % Drop: Welcher Hebel senkt das Gold je gewonnenem Level von etwa 79 auf etwa 45? Preise allein reichen nicht (PE-83) | K | PE-81, PE-83, AP-70, `config/enemies.ts` | (a) Münzwert `coinValue` je Gegner um etwa 43 % auf ganze Zahlen senken (Pins in `enemies.test.ts` nachziehen, Große-Münze-Schwelle 5 prüfen); Preise bleiben. (b) Preise erhöhen: verworfen, Gold-Test bliebe rot. (c) Gegnerzahl senken: verworfen, Druckbänder in `balance.test.ts` brächen. Empfehlung (a) | beantwortet (Nutzer am 2026-10-26): (a) Münzwerte senken, PE-84 |
-| Q-44 | Große Münze: 32 px (Ist, `bigDisplayScale` 2) oder 16 px (Designer-Empfehlung `bigDisplayScale` 1, Umrandung an die Skalierung koppeln)? Die große Münze ist so groß wie die Astronautin (32 px) | W | AP-70, H-15, H-16 | Designer-Empfehlung 16 px, Entscheidung nach Sichtprüfung im Handtest | offen (H-15 abgenommen 2026-10-26, Stand 32 px vorläufig, Nutzer hat noch nicht entschieden) |
+| Q-44 | Große Münze: 32 px (Ist, `bigDisplayScale` 2) oder 16 px (Designer-Empfehlung `bigDisplayScale` 1, Umrandung an die Skalierung koppeln)? Die große Münze ist so groß wie die Astronautin (32 px) | W | AP-70, H-15, H-16 | Designer-Empfehlung 16 px, Entscheidung nach Sichtprüfung im Handtest | beantwortet (Nutzer im Chat am 2026-10-26): 16 px, PE-90, Umsetzung AP-74 |
+| Q-46 | Nach Q-44 sind große und kleine Münze beide 16 px groß (`smallDisplayScale` 2). Soll die kleine Münze auf 8 px (`smallDisplayScale` 1) gehen, oder bleibt die gleiche Größe, und die Unterscheidung kommt nur über Sprite und Umrandung? | W | PE-90, AP-74, PE-78 | Gleiche Größe lassen (AP-70 hat die kleine Münze bewusst vergrößert, 8 px wäre wieder zu klein). Entscheidung nach der Sichtprüfung von AP-74 | offen (Nutzer, nach Sichtprüfung AP-74; AP-74 blockiert nicht) |
 | Q-45 | Hover-Wert der Lagerplatz-Fächer (Akzent 18 % über dem Glas, `HOVER_FILL_ALPHA` in `PowerSlots.ts`) als Token in den Designer-Export aufnehmen (`opacity.hover`)? Der Export hat ihn nicht, das Mockup schon | W | V-13, AP-73, AP-72 (`PowerSlots.ts`) | Ja, bei nächstem Designer-Auftrag als Token ergänzen, dann Umstellung nach AP-72. Bis dahin bleibt die Konstante | offen (Designer-Auftrag, Nutzer entscheidet; AP-73 blockiert nicht) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
@@ -3613,6 +3653,7 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | Zustand „unverwundbar“ in der Boss-Leiste (PE-85, V-12, PE-87) | AP-72 (Feld `invulnerable` in `boss-hp-changed`) |
 | Low-Funde AP-66 (PE-89, V-14): Lager-Ereignis nach Rundenende, Fachzustand, Fachgröße bei k, Pause-Zone, `powerBlock` | AP-72 (Punkte a bis e) |
 | Opacity-Tokens im Theme-Generator (PE-88, V-13) | AP-73 (Hover-Token offen, Q-45) |
+| Große Münze 16 px (Q-44, PE-90, Handtest-Befund M3-DEP PE-78) | AP-74 (N6, Design-Review ja); Größe kleine Münze offen (Q-46) |
 | Handtest-Befunde M3-DEP (PE-79): Riesen-Stein testbar über `?level=10` oder `?level=18` (F-05, F-09) | kein Code, H-15 |
 
 ---
@@ -3813,3 +3854,6 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-26 | Nutzerfreigabe V-12, V-13, V-14 (Chat „v 12 v 13 v14 freigeben“): PE-87 bis PE-89. AP-72 auf `bereit`, V-14 (a) bis (e) als Kriterien und Dateien in AP-72 aufgenommen. AP-73 (CFG, N6, S, sonnet medium) angelegt, `bereit`. Konfliktprüfung AP-72 gegen AP-73: keine gemeinsame Datei, parallel ja. Die Umstellung von `PowerSlots.ts` auf `OPACITY` folgt nach AP-72 | Nutzer im Chat am 2026-10-26, Pflegeauftrag Lead | §0, §9, §10, §11, §12, §14, §16, §17, AP-72, AP-73 | Planner (Pflege) |
 | 2026-10-26 | Erkenntnis AP-72 (V-14 a): `endRound` in `src/scenes/GameScene.ts` (Z. 737 ff.) setzt `powerStore` auf leer, ohne Ereignis `power-store-changed`. Die HUD zeigt bis zur Ergebnisszene ein veraltetes „bereit“ | Code gelesen | AP-72, PE-89 | Planner (Pflege) |
 | 2026-10-26 | Erkenntnis AP-73 (Export): `docs/design/export/tokens.resolved.json` Z. 204 bis 207 hat `opacity.dim` und `opacity.ghost`. Der Hover-Wert 0,18 (`HOVER_FILL_ALPHA` in `PowerSlots.ts`) steht nicht im Export. `scripts/build-theme.mjs` übernimmt die Gruppe bisher nicht | Code und Export gelesen | AP-73, Q-45 | Planner (Pflege) |
+| 2026-10-26 | Statusnachtrag AP-73: `git log` zeigt `merge(AP-73)` (7857e21) auf `dev`. §0, §10 und §12 von `bereit` auf `fertig` gesetzt (Befund aus git, nicht aus dem Wellenabschluss; der Lead bestätigt den Abschluss im nächsten Wellenabschluss) | git log gelesen | AP-73 | Planner (Pflege) |
+| 2026-10-26 | Nutzerantwort Q-44 (Chat): große Münze 16 px (`bigDisplayScale` 1). PE-90, Q-44 beantwortet. AP-74 angelegt (N6, S, sonnet medium, Design-Review ja), `bereit`. Konfliktprüfung AP-74 gegen AP-72: keine gemeinsame Datei, parallel ja (AP-74 besitzt `src/config/coins.ts`, `tests/config/coins.test.ts` und bedingt `src/entities/Coin.ts`; AP-72 besitzt keine davon). Budget N6 in §14 um AP-74 ergänzt | Nutzer im Chat am 2026-10-26, Pflegeauftrag Lead | §0, §8, §9, §10, §11, §12, §14, §16, §17, AP-74 | Planner (Pflege) |
+| 2026-10-26 | Erkenntnis AP-74 (Größen): Nach `bigDisplayScale` 1 sind beide Münzen 16 px groß (`smallDisplayScale` 2). Das Verhältnis 1:2 aus dem Kommentar in `src/config/coins.ts` (Z. 28) entfällt. Offen als Q-46, AP-74 blockiert nicht | Code gelesen (`src/config/coins.ts` Z. 28, 32 bis 34) | AP-74, Q-46 | Planner (Pflege) |
