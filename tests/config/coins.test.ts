@@ -41,8 +41,11 @@ describe('coins', () => {
     }
     expect(v.smallDisplayScale).toBeGreaterThanOrEqual(1);
     expect(v.bigDisplayScale).toBeGreaterThanOrEqual(1);
-    expect(v.depth).toBeGreaterThan(0);
-    expect(v.depth).toBeLessThan(10); // below the player
+    expect(v.depth).toBeGreaterThan(1); // above enemies and telegraphs
+    expect(v.depth).toBeLessThan(2); // below boss hazards
+    for (const n of [v.smallDisplayScale, v.bigDisplayScale, v.outlinePx]) {
+      expect(Number.isInteger(n)).toBe(true); // one pixel grid
+    }
     expect(v.outlinePx).toBeGreaterThan(0);
     expect(v.outlineColorToken in THEME.colors).toBe(true);
   });

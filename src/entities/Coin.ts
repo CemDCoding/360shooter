@@ -5,6 +5,13 @@ import { COIN_VISUAL } from '../config/coins';
 import { themeColor } from '../config/theme';
 import { coinMagnetStep, coinSizeFor } from '../logic/coins';
 
+const OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
 /** Pooled gold coin. No lifetime (Q-17). Lasers pass through it. */
 export class Coin extends Phaser.Physics.Arcade.Sprite {
   value = 0;
@@ -12,8 +19,8 @@ export class Coin extends Phaser.Physics.Arcade.Sprite {
   pullMs = 0;
   /** Called once when collected, with the coin value. */
   onCollected?: (value: number) => void;
-  /** One flat-tinted, slightly larger copy behind the coin: the outline (AP-70). */
-  private halo?: Phaser.GameObjects.Sprite;
+  /** Four flat-tinted copies behind the coin, offset by whole pixels: the outline (AP-70). */
+  private halos?: Phaser.GameObjects.Sprite[];
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'coin-small');
@@ -38,20 +45,23 @@ export class Coin extends Phaser.Physics.Arcade.Sprite {
     this.syncHalo(true);
   }
 
-  /** Keeps the outline copy at position, frame and size of the coin. */
+  /** Keeps the four outline copies at position, frame and scale of the coin (hard whole-pixel outline). */
   private syncHalo(visible: boolean): void {
-    if (!this.halo) {
-      this.halo = this.scene.add
-        .sprite(this.x, this.y, this.texture.key, this.frame.name)
-        .setTintFill(themeColor(COIN_VISUAL.outlineColorToken).num);
+    if (!this.halos) {
+      const color = themeColor(COIN_VISUAL.outlineColorToken).num;
+      this.halos = OFFSETS.map(() =>
+        this.scene.add.sprite(this.x, this.y, this.texture.key, this.frame.name).setTintFill(color),
+      );
     }
-    const h = this.halo;
-    h.setVisible(visible);
-    if (!visible) return;
-    h.setTexture(this.texture.key, this.frame.name);
-    h.setPosition(this.x, this.y);
-    h.setDepth(this.depth - 1);
-    h.setScale(this.scaleX + (2 * COIN_VISUAL.outlinePx) / this.width);
+    const px = COIN_VISUAL.outlinePx;
+    this.halos.forEach((h, i) => {
+      h.setVisible(visible);
+      if (!visible) return;
+      h.setTexture(this.texture.key, this.frame.name);
+      h.setPosition(this.x + OFFSETS[i][0] * px, this.y + OFFSETS[i][1] * px);
+      h.setScale(this.scaleX);
+      h.setDepth(this.depth - 0.1);
+    });
   }
 
   /** Magnet step towards the player; collects when close enough. */
@@ -74,12 +84,12 @@ export class Coin extends Phaser.Physics.Arcade.Sprite {
   despawn(): void {
     this.anims.stop();
     this.disableBody(true, true);
-    this.halo?.setVisible(false);
+    this.halos?.forEach((h) => h.setVisible(false));
   }
 
   override destroy(fromScene?: boolean): void {
-    this.halo?.destroy();
-    this.halo = undefined;
+    this.halos?.forEach((h) => h.destroy());
+    this.halos = undefined;
     super.destroy(fromScene);
   }
 }
