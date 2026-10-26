@@ -4,13 +4,13 @@ import { coinMagnetStep, coinSizeFor, magnetSpeed, rollCoinDrop } from '../../sr
 import { createRng } from '../../src/logic/rng';
 
 describe('rollCoinDrop', () => {
-  it('drops about 5 percent with a fixed seed', () => {
+  it('drops about 8 percent with a fixed seed', () => {
     const rng = createRng(1234);
     let n = 0;
     const total = 20000;
     for (let i = 0; i < total; i++) if (rollCoinDrop(rng, COIN_RULES)) n++;
-    expect(n / total).toBeGreaterThan(0.04);
-    expect(n / total).toBeLessThan(0.06);
+    expect(n / total).toBeGreaterThan(0.07);
+    expect(n / total).toBeLessThan(0.09);
   });
   it('respects extreme chances', () => {
     const rng = createRng(1);

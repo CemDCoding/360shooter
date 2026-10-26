@@ -3,15 +3,17 @@ import {
   BIG_COIN_MIN_VALUE,
   COIN_MAGNET_EASE,
   COIN_RULES,
+  COIN_VISUAL,
   GOLD_KEEP_ON_LOSS,
   GOLD_KEEP_ON_WIN,
 } from '../../src/config';
+import { THEME } from '../../src/config/theme';
 
 describe('coins', () => {
   it('values are positive and drop chance is a probability', () => {
     expect(COIN_RULES.dropChance).toBeGreaterThan(0);
     expect(COIN_RULES.dropChance).toBeLessThan(1);
-    expect(COIN_RULES.dropChance).toBe(0.045);
+    expect(COIN_RULES.dropChance).toBe(0.08);
     expect(COIN_RULES.magnetRadiusPx).toBeGreaterThan(0);
     expect(COIN_RULES.collectRadiusPx).toBeGreaterThan(0);
     expect(COIN_RULES.magnetSpeedPxPerSec).toBeGreaterThan(0);
@@ -30,5 +32,18 @@ describe('coins', () => {
   it('gold keep factors', () => {
     expect(GOLD_KEEP_ON_WIN).toBe(1);
     expect(GOLD_KEEP_ON_LOSS).toBe(0.5);
+  });
+
+  it('visual constants are finite and in range (AP-70)', () => {
+    const v = COIN_VISUAL;
+    for (const n of [v.smallDisplayScale, v.bigDisplayScale, v.depth, v.outlinePx]) {
+      expect(Number.isFinite(n)).toBe(true);
+    }
+    expect(v.smallDisplayScale).toBeGreaterThanOrEqual(1);
+    expect(v.bigDisplayScale).toBeGreaterThanOrEqual(1);
+    expect(v.depth).toBeGreaterThan(0);
+    expect(v.depth).toBeLessThan(10); // below the player
+    expect(v.outlinePx).toBeGreaterThan(0);
+    expect(v.outlineColorToken in THEME.colors).toBe(true);
   });
 });
