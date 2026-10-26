@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** geändert (Ergänzung H-14 in Arbeit; Fassung vom 2026-10-25 bleibt bis zur neuen Freigabe gültig)
-**Stand:** 2026-10-26 Interview H-14 läuft: Runde 1 und 2 beantwortet, Mockup, Tokens und Übergabe fertig. Wartet auf die Freigabe durch den Nutzer (Boss-Lücken: Banner, Ergebnis nach Boss-Sieg, Zustände der Boss-Leiste), dann Mockup `mockups/lagerplatz-und-boss.html`.
+**Status:** freigegeben am 2026-10-26 (Ergänzung H-14; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Freigegeben. Nächster Schritt: Lead beauftragt den Planner mit „Design übernehmen“ für die Ergänzung H-14 (Übergabe unter „Änderungen“), danach ist AP-66 entblockt.
 
 ## Ausgangslage
 
@@ -132,7 +132,7 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 
 ## Änderungen
 
-### 2026-10-26 · Ergänzung H-14 (in Arbeit)
+### 2026-10-26 · Ergänzung H-14 (freigegeben am 2026-10-26)
 
 **Auftrag (Plan §13 H-14, PE-70, Q-34, Q-37, AP-66, Coder-Bericht AP-20):**
 
