@@ -8,3 +8,4 @@
 # Abhaengigkeiten und Build-Ausgabe
 node_modules/
 dist/
+ma-config.json
