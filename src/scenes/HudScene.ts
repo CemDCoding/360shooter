@@ -25,9 +25,11 @@ import {
   formatTime,
   isEnergyLow,
   isTimerWarning,
+  bossBarRect,
   layoutRow,
 } from './hud/hudMath';
 import { PowerIndicators } from './hud/PowerIndicators';
+import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
 import { BATCH_LABELS } from './menu/levelGroups';
 
 export { formatTime };
@@ -53,6 +55,7 @@ export class HudScene extends Phaser.Scene {
   private coinCounter!: CoinCounter;
   private powers!: PowerIndicators;
   private armour!: ArmourIndicator;
+  private slots?: PowerSlots;
   private chipRow: FunkChip[] = [];
   private rowY = 0;
   private k = 1;
@@ -120,7 +123,8 @@ export class HudScene extends Phaser.Scene {
     const btn = Math.round(THEME.sizePx['size.target'] * Math.max(1, k));
     this.createButtons(width, m, btn);
     this.createChips(m, k);
-    this.createBossUi(width, height, m, k);
+    this.createBossUi(width, height, k);
+    this.slots = new PowerSlots(this, k, height, this.onSlotPressed);
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
@@ -140,6 +144,7 @@ export class HudScene extends Phaser.Scene {
     this.gameEvents.on(GameEvents.CoinsChanged, this.onCoins, this);
     this.gameEvents.on(GameEvents.PowersChanged, this.onPowers, this);
     this.gameEvents.on(GameEvents.ArmourChanged, this.onArmour, this);
+    this.gameEvents.on(GameEvents.PowerStoreChanged, this.onPowerStore, this);
     this.gameEvents.on(GameEvents.BossWarning, this.onBossWarning, this);
     this.gameEvents.on(GameEvents.BossSpawned, this.onBossSpawned, this);
     this.gameEvents.on(GameEvents.BossHpChanged, this.onBossHp, this);
@@ -197,12 +202,9 @@ export class HudScene extends Phaser.Scene {
   }
 
   /** Boss bar at the bottom centre and the "Boss kommt!" banner, both hidden until needed (runde.html 3). */
-  private createBossUi(width: number, height: number, m: number, k: number): void {
+  private createBossUi(width: number, height: number, k: number): void {
     const lab = funkScale(1, k);
-    const w = Math.round(BOSS_BAR_W * k);
-    const h = Math.round(BOSS_BAR_H * k);
-    const x = Math.round(width / 2 - w / 2);
-    const y = height - m - h;
+    const { x, y, w, h } = bossBarRect(width, height, k, BOSS_BAR_W, BOSS_BAR_H, MARGIN);
     const panel = new FunkPanel(this, x, y, w, h, false, { line: 'hud.danger' });
     const fill = this.add.graphics();
     const name = funkText(this, x, y - 3, '', lab, 'hud.text').setOrigin(0, 1);
@@ -386,11 +388,23 @@ export class HudScene extends Phaser.Scene {
 
   private onPowers(p: GameEventPayloads['powers-changed']): void {
     this.powers.set(p);
+    this.slots?.setPowers(p);
   }
 
   private onArmour(p: GameEventPayloads['armour-changed']): void {
     this.armour.set(p);
+    this.slots?.setArmour(p);
   }
+
+  private onPowerStore(p: GameEventPayloads['power-store-changed']): void {
+    this.slots?.setStore(p);
+  }
+
+  /** A ready slot was tapped: report it to the GameScene, but never while paused or after the end. */
+  private readonly onSlotPressed = (id: string): void => {
+    if (!this.scene.isActive(GAME_KEY) || this.scene.isPaused(GAME_KEY)) return;
+    this.events.emit(POWER_SLOT_PRESSED, id);
+  };
 
   private setHp(hp: number, maxHp: number): void {
     const ratio = energyRatio(hp, maxHp);
@@ -469,12 +483,15 @@ export class HudScene extends Phaser.Scene {
     for (const t of this.blinks.values()) t.stop();
     this.blinks.clear();
     this.chipRow = [];
+    this.slots?.destroy();
+    this.slots = undefined;
     if (this.gameEvents) {
       this.gameEvents.off(GameEvents.HpChanged, this.onHp, this);
       this.gameEvents.off(GameEvents.TimerTick, this.onTimer, this);
       this.gameEvents.off(GameEvents.CoinsChanged, this.onCoins, this);
       this.gameEvents.off(GameEvents.PowersChanged, this.onPowers, this);
       this.gameEvents.off(GameEvents.ArmourChanged, this.onArmour, this);
+      this.gameEvents.off(GameEvents.PowerStoreChanged, this.onPowerStore, this);
       this.gameEvents.off(GameEvents.BossWarning, this.onBossWarning, this);
       this.gameEvents.off(GameEvents.BossSpawned, this.onBossSpawned, this);
       this.gameEvents.off(GameEvents.BossHpChanged, this.onBossHp, this);

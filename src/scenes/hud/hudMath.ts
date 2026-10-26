@@ -1,5 +1,5 @@
 /** Pure helpers for the HUD indicators (no Phaser). */
-import type { ActiveArmour } from '../../contracts';
+import type { ActiveArmour, ActivePowers } from '../../contracts';
 
 /** Energy at or below this share of the maximum counts as low (warning state). */
 export const ENERGY_LOW_RATIO = 0.25;
@@ -92,3 +92,89 @@ export function layoutRow(widths: readonly (number | null)[], gap: number, start
 
 /** Catch area diameter of the virtual stick in px (finger start zone, independent of the drawn size). */
 export const STICK_CATCH_DIAMETER = 126;
+
+/** Axis-aligned rectangle in arena px (top-left corner, width, height). */
+export interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** True if two rectangles share area (touching edges do not count). */
+export function rectsOverlap(a: Rect, b: Rect): boolean {
+  return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+}
+
+/** True if the rectangle lies completely inside the arena (0..width, 0..height). */
+export function rectInArena(r: Rect, width: number, height: number): boolean {
+  return r.x >= 0 && r.y >= 0 && r.x + r.w <= width && r.y + r.h <= height;
+}
+
+/** Base sizes of the power slots at k = 1 (tokens size.hud-slot, size.hud-slot-gap, margin 8). */
+export interface SlotMetrics {
+  size: number;
+  gap: number;
+  margin: number;
+}
+
+/**
+ * Power slots bottom left (H-14): `count` square slots side by side, order = index
+ * (STORABLE_POWERS). Size, gap and the left and bottom margin scale with the HUD factor k.
+ */
+export function powerSlotRects(count: number, k: number, arenaH: number, base: SlotMetrics): Rect[] {
+  const f = Number.isFinite(k) && k > 0 ? k : 1;
+  const size = Math.round(base.size * f);
+  const gap = Math.round(base.gap * f);
+  const m = Math.round(base.margin * f);
+  const y = arenaH - m - size;
+  const n = Math.max(0, Math.floor(Number.isFinite(count) ? count : 0));
+  return Array.from({ length: n }, (_, i) => ({ x: m + i * (size + gap), y, w: size, h: size }));
+}
+
+/**
+ * Integer icon scale for a slot: at most `maxScale` (token size.hud-slot-icon-scale) and small
+ * enough that the sprite keeps a 4 px inset inside the slot (one pixel grid, Grundsatz 3).
+ */
+export function slotIconScale(slotPx: number, spritePx: number, maxScale: number): number {
+  if (!(spritePx > 0) || !(slotPx > 0)) return 1;
+  const fit = Math.floor((slotPx - 8) / spritePx);
+  return Math.max(1, Math.min(Math.floor(maxScale) || 1, fit));
+}
+
+/** Boss bar track at the bottom centre (without the name line above it). */
+export function bossBarRect(arenaW: number, arenaH: number, k: number, barW: number, barH: number, margin: number): Rect {
+  const w = Math.round(barW * k);
+  const h = Math.round(barH * k);
+  const m = Math.round(margin * k);
+  return { x: Math.round(arenaW / 2 - w / 2), y: arenaH - m - h, w, h };
+}
+
+/** Lock state of a stored power: the same power is running or the armour cools down. */
+export interface PowerBlock {
+  blocked: boolean;
+  /** Seconds of the lock (remaining run time or cooldown), 0 if not blocked. */
+  sec: number;
+}
+
+/**
+ * Whether a storable power is blocked right now. Armour: any armour active or cooling down
+ * (activateArmour refuses then). Items: rapid fire still running (the only timed item today).
+ */
+export function powerBlock(
+  def: { id: string; kind: 'item' | 'armour' },
+  powers: ActivePowers,
+  armour: ActiveArmour,
+): PowerBlock {
+  if (def.kind === 'armour') {
+    if (armour.id !== null && armour.activeMsLeft > 0) {
+      return { blocked: true, sec: secondsLeft(armour.activeMsLeft) };
+    }
+    if (armour.cooldownMsLeft > 0) return { blocked: true, sec: secondsLeft(armour.cooldownMsLeft) };
+    return { blocked: armour.id !== null, sec: 0 };
+  }
+  if (def.id === 'rapidFire' && powers.rapidFireMsLeft > 0) {
+    return { blocked: true, sec: secondsLeft(powers.rapidFireMsLeft) };
+  }
+  return { blocked: false, sec: 0 };
+}

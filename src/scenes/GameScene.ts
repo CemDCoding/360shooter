@@ -9,6 +9,7 @@ import {
   PROGRESSION,
 } from '../config';
 import { ARMOUR_RULES, ARMOURS } from '../config/armour';
+import { STORABLE_POWERS } from '../config/powerStore';
 import {
   GameEvents,
   type ActivePowers,
@@ -16,6 +17,7 @@ import {
   type GameEventPayloads,
   type ItemDef,
   type LevelDef,
+  type PowerStoreState,
   type UpgradeLevels,
 } from '../contracts';
 import type { ActiveArmour, ArmourDef } from '../contracts/armour';
@@ -53,6 +55,14 @@ import { applyRoundGold, goldPayout } from '../logic/economy';
 import { pointOnRing } from '../logic/geometry';
 import { canLaserDestroyBolt } from '../logic/projectiles';
 import { rollDrop } from '../logic/items';
+import {
+  canActivate,
+  createPowerStore,
+  isStorable,
+  resetPowerStore,
+  storePower,
+  takePower,
+} from '../logic/powerStore';
 import { applyRoundResult, roundXp, type RoundResult } from '../logic/progression';
 import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
@@ -64,6 +74,8 @@ import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
 import { VirtualStick } from './controls/VirtualStick';
 import { parseDebugLevel, resolveLevelId } from './debug';
+import { powerBlock } from './hud/hudMath';
+import { POWER_SLOT_PRESSED } from './hud/PowerSlots';
 
 /** Layout only: distance of the spawn ring beyond the visible corners (pixels). */
 const SPAWN_MARGIN_PX = 24;
@@ -177,6 +189,8 @@ export class GameScene extends Phaser.Scene {
   private armour: ActiveArmour = createArmourState();
   /** Definition of the active (or cooling down) armour; needed by tickArmour. */
   private armourDef: ArmourDef | null = null;
+  /** Stored timed powers (round only, never saved, PE-70). */
+  private powerStore: PowerStoreState = createPowerStore();
   private lastPowersKey = '';
   private lastArmourKey = '';
   private lastShieldLeft = 0;
@@ -210,6 +224,7 @@ export class GameScene extends Phaser.Scene {
     this.roundCoins = 0;
     this.armour = resetArmour();
     this.armourDef = null;
+    this.powerStore = resetPowerStore();
     this.lastPowersKey = '';
     this.lastArmourKey = '';
     this.lastShieldLeft = 0;
@@ -278,7 +293,11 @@ export class GameScene extends Phaser.Scene {
       remainingSec: Math.ceil(this.round.remainingMs / 1000),
     };
     // The HUD starts with zeros and reads no state: send start values once it exists (AP-34).
-    this.scene.get(HUD_KEY).events.once(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    const hud = this.scene.get(HUD_KEY);
+    hud.events.once(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    // Taps on a power slot come from the HUD as a scene event (AP-66); removed in cleanup.
+    hud.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
+    hud.events.on(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
     this.scene.launch(HUD_KEY, hudData);
     this.scene.bringToTop(HUD_KEY);
   }
@@ -288,6 +307,7 @@ export class GameScene extends Phaser.Scene {
     emitGameEvent(this.events, GameEvents.CoinsChanged, { roundCoins: this.roundCoins });
     this.emitPowers(true);
     this.emitArmour(true);
+    this.emitPowerStore();
   };
 
   private bindPlayerCallbacks(): void {
@@ -443,7 +463,7 @@ export class GameScene extends Phaser.Scene {
     this.emitArmour();
   }
 
-  /** Boss warning (63 s left) and appearance (60 s left), driven by the round state (PE-18). */
+  /** Boss warning (33 s left) and appearance (30 s left), driven by the round state (PE-18). */
   private updateBossTimeline(): void {
     if (this.ended || this.round.status !== 'running') return;
     const phase = this.round.bossPhase;
@@ -601,6 +621,11 @@ export class GameScene extends Phaser.Scene {
     const item = new ItemPickup(this, x, y, def, ITEM_RULES, this.playTimeMs);
     item.setDepth(5);
     item.onCollected = (collected) => {
+      // Timed powers go into the storage slot instead of starting (PE-70).
+      if (isStorable(collected.id)) {
+        this.storeCollected(collected.id);
+        return;
+      }
       this.sfx.play('sfx-item-pickup');
       this.player.applyItem(collected);
     };
@@ -614,17 +639,61 @@ export class GameScene extends Phaser.Scene {
     this.armourPickups.push(pickup);
   }
 
-  /** Activates only without active armour and outside the cooldown (PE-57). */
+  /** Storable armour goes into the slot; other armour activates directly (PE-57, PE-70). */
   private onArmourCollected(def: ArmourDef): void {
     if (this.ended || this.player.isDead) return;
+    if (isStorable(def.id)) {
+      this.storeCollected(def.id);
+      return;
+    }
+    if (this.startArmour(def)) this.sfx.play('sfx-item-pickup');
+  }
+
+  /** Activates only without active armour and outside the cooldown (PE-57). */
+  private startArmour(def: ArmourDef): boolean {
     const next = activateArmour(this.armour, def);
-    if (next === this.armour) return;
+    if (next === this.armour) return false;
     this.armour = next;
     this.armourDef = def;
-    this.sfx.play('sfx-item-pickup');
     this.armourRing?.show(def);
     this.armourRing?.setCenter(this.player.x, this.player.y);
     this.emitArmour(true);
+    return true;
+  }
+
+  /** Stores a picked-up timed power; a full slot makes the pickup do nothing (PE-70). */
+  private storeCollected(id: string): void {
+    if (this.ended || this.player.isDead) return;
+    const r = storePower(this.powerStore, id);
+    if (!r.accepted) return;
+    this.powerStore = r.state;
+    this.sfx.play('sfx-item-pickup');
+    this.emitPowerStore();
+  }
+
+  /** Tap on a ready slot (HUD scene event): start the stored power via the usual path. */
+  private onPowerSlotPressed(id: unknown): void {
+    if (typeof id !== 'string' || this.ended || this.player.isDead || !this.scene.isActive()) return;
+    const def = STORABLE_POWERS.find((p) => p.id === id);
+    if (!def) return;
+    const { blocked } = powerBlock(def, this.player.powers, this.armour);
+    if (!canActivate(this.powerStore, id, blocked)) return;
+    if (def.kind === 'item') {
+      const item = ITEMS.find((i) => i.id === id);
+      if (!item) return;
+      this.powerStore = takePower(this.powerStore, id).state;
+      this.player.applyItem(item);
+      this.emitPowers(true);
+    } else {
+      const armour = ARMOURS.find((a) => a.id === id);
+      if (!armour || !this.startArmour(armour)) return;
+      this.powerStore = takePower(this.powerStore, id).state;
+    }
+    this.emitPowerStore();
+  }
+
+  private emitPowerStore(): void {
+    emitGameEvent(this.events, GameEvents.PowerStoreChanged, { stored: [...this.powerStore.stored] });
   }
 
   /** Updates pickups and removes expired/collected ones in place (the collider keeps the array). */
@@ -672,6 +741,8 @@ export class GameScene extends Phaser.Scene {
     this.armour = resetArmour();
     this.armourDef = null;
     this.armourRing?.hide();
+    // Round over (win, timeout or death): the storage is emptied, nothing is saved (PE-70).
+    this.powerStore = resetPowerStore();
     this.despawnBoss();
 
     const xpGained = roundXp(this.killXp, result, PROGRESSION);
@@ -708,7 +779,10 @@ export class GameScene extends Phaser.Scene {
 
   private cleanup(): void {
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
-    this.scene.get(HUD_KEY)?.events.off(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    const hud = this.scene.get(HUD_KEY);
+    hud?.events.off(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
+    hud?.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
+    this.powerStore = resetPowerStore();
     this.despawnBoss();
     this.player.callbacks.onHpChange = undefined;
     this.player.callbacks.onStatsChange = undefined;
