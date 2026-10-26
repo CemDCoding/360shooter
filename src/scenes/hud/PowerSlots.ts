@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../../config';
 import { STORABLE_POWERS } from '../../config/powerStore';
-import { THEME, themeColor } from '../../config/theme';
+import { OPACITY, THEME, themeColor } from '../../config/theme';
 import type { ActiveArmour, ActivePowers, PowerStoreState, StorablePowerDef } from '../../contracts';
 import { ARMOUR_PICKUP_SPRITE } from '../../entities/ArmourPickup';
 import { slotStatus, type SlotStatus } from '../../logic/powerStore';
@@ -12,9 +12,6 @@ import { powerBlock, powerSlotRects, secondsText, slotIconScale, slotPanelStyle,
 /** Scene event of the HudScene: a ready slot was tapped (payload: power id). */
 export const POWER_SLOT_PRESSED = 'power-slot-pressed';
 
-/** Opacity tokens opacity.ghost and opacity.dim (tokens.resolved.json; theme.ts has no opacity group yet). */
-const OPACITY_GHOST = 0.6;
-const OPACITY_DIM = 0.35;
 /** Hover fill: accent at 18 % over the glass (mockup lagerplatz-und-boss.html, like FunkButton). */
 const HOVER_FILL_ALPHA = 0.18;
 /** Item sprites are 16x16 (config/assets.ts). */
@@ -149,9 +146,9 @@ class PowerSlot {
     }
 
     if (this.look === 'empty') {
-      this.icon.setTint(themeColor('hud.line').num).setAlpha(OPACITY_GHOST);
+      this.icon.setTint(themeColor('hud.line').num).setAlpha(OPACITY.ghost);
     } else if (this.look === 'blocked') {
-      this.icon.clearTint().setAlpha(OPACITY_DIM);
+      this.icon.clearTint().setAlpha(OPACITY.dim);
     } else if (this.pressed) {
       this.icon.setTint(themeColor('hud.screen').num).setAlpha(1);
     } else {

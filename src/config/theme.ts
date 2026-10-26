@@ -169,6 +169,11 @@ const MOTION_MS = {
   'motion.trail': 300,
 } as const;
 
+/** Bewegung als Anzahl. */
+const MOTION_COUNT = {
+  'motion.banner-blinks': 3,
+} as const;
+
 /** Easing-Angaben (CSS-Schreibweise). */
 const MOTION_EASING = {
   'motion.pixel': 'steps(3)',
@@ -201,6 +206,7 @@ export const THEME = {
   sizePx: SIZE_PX,
   sizeCount: SIZE_COUNT,
   motionMs: MOTION_MS,
+  motionCount: MOTION_COUNT,
   motionEasing: MOTION_EASING,
   font: FONT,
   opacity: OPACITY,

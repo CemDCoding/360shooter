@@ -16,6 +16,8 @@ export interface BossAttackDef {
 
 export interface BossDef {
   id: BossId;
+  /** Display name shown in the HUD and on the result screen. */
+  name: string;
   baseHp: number;
   /** Contact damage per second of the boss body before the variant multiplier. */
   baseDamage: number;
