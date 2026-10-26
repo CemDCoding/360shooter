@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { BOSSES } from '../../src/config/bosses';
 import { STORABLE_POWERS } from '../../src/config/powerStore';
 import { THEME } from '../../src/config/theme';
 import { slotStatus } from '../../src/logic/powerStore';
 import {
   armourDisplay,
   bannerBlink,
-  BOSS_NAMES,
   bossBarLook,
   bossBarRect,
   bossBarState,
@@ -321,7 +321,10 @@ describe('boss HUD (H-14, 5a and 7a)', () => {
     expect(bossDisplayName('giantStone')).toBe('Riesen-Stein');
     expect(bossDisplayName('toString')).toBe('Boss');
     expect(bossDisplayName(undefined)).toBe('Boss');
-    expect(Object.keys(BOSS_NAMES).sort()).toEqual(['forestGhost', 'giantStone', 'rootMonster']);
+    expect(Object.keys(BOSSES).sort()).toEqual(['forestGhost', 'giantStone', 'rootMonster']);
+    for (const def of Object.values(BOSSES)) expect(bossDisplayName(def.id)).toBe(def.name);
+    expect(bossDisplayName('rootMonster')).toBe('Verwurzeltes Baummonster');
+    expect(bossDisplayName('forestGhost')).toBe('Waldgeist');
   });
 
   it('turns pixel patterns into cells', () => {

@@ -20,6 +20,7 @@ export const BOSS_SPAWN_RATE_FACTOR = 0.5;
 export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   rootMonster: {
     id: 'rootMonster',
+    name: 'Verwurzeltes Baummonster',
     baseHp: 500,
     baseDamage: 10,
     spriteKey: 'boss-root-monster',
@@ -34,6 +35,7 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   },
   forestGhost: {
     id: 'forestGhost',
+    name: 'Waldgeist',
     baseHp: 600,
     baseDamage: 8,
     spriteKey: 'boss-forest-ghost',
@@ -48,6 +50,7 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   },
   giantStone: {
     id: 'giantStone',
+    name: 'Riesen-Stein',
     baseHp: 800,
     baseDamage: 12,
     spriteKey: 'boss-giant-stone',

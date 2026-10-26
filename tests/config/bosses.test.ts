@@ -83,3 +83,11 @@ describe('boss config (PE-75)', () => {
     expect(Number.isFinite(MIN_REACTION_MS) && MIN_REACTION_MS > 0).toBe(true);
   });
 });
+
+describe('boss display names', () => {
+  it('has the display names of the bosses', () => {
+    expect(BOSSES.rootMonster.name).toBe('Verwurzeltes Baummonster');
+    expect(BOSSES.forestGhost.name).toBe('Waldgeist');
+    expect(BOSSES.giantStone.name).toBe('Riesen-Stein');
+  });
+});

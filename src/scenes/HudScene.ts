@@ -53,8 +53,6 @@ const PAUSE_DEPTH = 100;
 /** Boss bar width in arena units at k = 1 (runde.html 3: 200 px, bottom centre). */
 const BOSS_BAR_W = 200;
 const BOSS_BAR_H = 8;
-/** Token motion.banner-blinks (3, tokens.resolved.json; theme.ts has no count group for motion yet). */
-const BANNER_BLINKS = 3;
 /** Alpha at the low point of a blink (same as the energy and timer warning). */
 const BLINK_ALPHA = 0.55;
 /** Banner top as a share of the arena height (mockup lagerplatz-und-boss.html: top 92 of 360). */
@@ -305,7 +303,7 @@ export class HudScene extends Phaser.Scene {
     this.bannerTween = undefined;
     for (const p of parts) p.setVisible(on).setAlpha(1);
     if (!on) return;
-    const plan = bannerBlink(BANNER_BLINKS, THEME.motionMs['motion.blink'], prefersReducedMotion());
+    const plan = bannerBlink(THEME.motionCount['motion.banner-blinks'], THEME.motionMs['motion.blink'], prefersReducedMotion());
     if (!plan) return;
     this.bannerTween = this.tweens.add({
       targets: parts,

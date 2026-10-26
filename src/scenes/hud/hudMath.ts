@@ -1,4 +1,5 @@
 /** Pure helpers for the HUD indicators (no Phaser). */
+import { BOSSES } from '../../config/bosses';
 import { ITEMS } from '../../config/items';
 import type { ColorName } from '../../config/theme';
 import type { ActiveArmour, ActivePowers, BossId } from '../../contracts';
@@ -216,16 +217,9 @@ export function slotPanelStyle(s: SlotLookState): PanelStyle {
   return { line: 'hud.accent', glow: true };
 }
 
-/** Display names of the bosses (the boss config has no name field yet). */
-export const BOSS_NAMES: Readonly<Record<BossId, string>> = {
-  rootMonster: 'Verwurzeltes Baummonster',
-  forestGhost: 'Waldgeist',
-  giantStone: 'Riesen-Stein',
-};
-
-/** Display name of a boss; "Boss" for an unknown id. */
+/** Display name of a boss (from the boss config); "Boss" for an unknown id. */
 export function bossDisplayName(id: unknown): string {
-  return typeof id === 'string' && Object.hasOwn(BOSS_NAMES, id) ? BOSS_NAMES[id as BossId] : 'Boss';
+  return typeof id === 'string' && Object.hasOwn(BOSSES, id) ? BOSSES[id as BossId].name : 'Boss';
 }
 
 /** Boss HP at or below this share counts as critical ("SCHWACH!"). */
