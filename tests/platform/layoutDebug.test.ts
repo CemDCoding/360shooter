@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { layoutDebugWanted, layoutReport } from '../../src/platform/layoutDebug';
+import { decideArenaWidth, layoutDebugWanted, layoutReport } from '../../src/platform/layoutDebug';
 
 const base = {
   innerW: 852,
@@ -12,6 +12,8 @@ const base = {
   standaloneMedia: true,
   standaloneNav: true,
   landscape: true,
+  arenaDesiredW: 734,
+  arenaCurrentW: 640,
 };
 
 describe('layoutReport', () => {
@@ -30,6 +32,7 @@ describe('layoutReport', () => {
       'game 656x369',
       'standalone media true nav true',
       'landscape',
+      'arena want 734 now 640',
     ]) {
       expect(t).toContain(s);
     }
@@ -46,5 +49,18 @@ describe('layoutDebugWanted', () => {
     expect(layoutDebugWanted('?layout=1')).toBe(true);
     expect(layoutDebugWanted('')).toBe(false);
     expect(layoutDebugWanted('?layout=0')).toBe(false);
+  });
+});
+
+describe('decideArenaWidth', () => {
+  it('keeps an unchanged width', () => {
+    expect(decideArenaWidth(640, 640, false)).toBe('keep');
+    expect(decideArenaWidth(640, 640, true)).toBe('keep');
+  });
+  it('applies a new width when no round exists', () => {
+    expect(decideArenaWidth(734, 640, false)).toBe('apply');
+  });
+  it('defers a new width while a round exists', () => {
+    expect(decideArenaWidth(734, 640, true)).toBe('defer');
   });
 });
