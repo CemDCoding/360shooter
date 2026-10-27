@@ -24,8 +24,7 @@ export function funkScale(base: number, k: number): number {
 export function measureFunk(scene: Phaser.Scene, text: string, scale: number): number {
   const prepared = funkCase(text);
   const entry = scene.cache.bitmapFont.get(FUNK_FONT) as
-    | { data?: { chars?: Record<number, { xAdvance?: number }> } }
-    | undefined;
+    { data?: { chars?: Record<number, { xAdvance?: number }> } } | undefined;
   const chars = entry?.data?.chars;
   let w = 0;
   for (const ch of prepared) {
@@ -238,7 +237,10 @@ export class FunkChip {
     this.iconW = opts.icon ? Math.round(16 * k) : 0;
     this.panel = new FunkPanel(scene, 0, 0, 10, this.chipH);
     if (opts.icon) {
-      this.icon = scene.add.image(0, 0, opts.icon.key, opts.icon.frame ?? 0).setScale(k * (opts.icon.scale ?? 1)).setOrigin(0, 0.5);
+      this.icon = scene.add
+        .image(0, 0, opts.icon.key, opts.icon.frame ?? 0)
+        .setScale(k * (opts.icon.scale ?? 1))
+        .setOrigin(0, 0.5);
       if (opts.icon.tint) this.icon.setTint(themeColor(opts.icon.tint).num);
     }
     if (this.barW > 0) this.bar = scene.add.graphics();

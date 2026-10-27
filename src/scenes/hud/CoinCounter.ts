@@ -5,7 +5,11 @@ import { FunkChip } from './FunkPanel';
 export class CoinCounter {
   readonly chip: FunkChip;
 
-  constructor(scene: Phaser.Scene, k: number, private readonly onChange: () => void) {
+  constructor(
+    scene: Phaser.Scene,
+    k: number,
+    private readonly onChange: () => void,
+  ) {
     this.chip = new FunkChip(scene, { icon: { key: 'coin-small', frame: 0, scale: 2 }, k });
     this.set(0);
   }

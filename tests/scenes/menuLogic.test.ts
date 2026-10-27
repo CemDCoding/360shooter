@@ -74,13 +74,13 @@ describe('isFreshSave', () => {
   });
 });
 
-describe("centerOffset", () => {
-  it("is 0 at the base width and centres wider arenas", () => {
+describe('centerOffset', () => {
+  it('is 0 at the base width and centres wider arenas', () => {
     expect(centerOffset(640, 640)).toBe(0);
     expect(centerOffset(734, 640)).toBe(47);
     expect(centerOffset(800, 640)).toBe(80);
   });
-  it("never goes negative", () => {
+  it('never goes negative', () => {
     expect(centerOffset(600, 640)).toBe(0);
   });
 });

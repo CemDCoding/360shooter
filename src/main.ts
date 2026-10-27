@@ -5,12 +5,7 @@ import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
 import { HudScene } from './scenes/HudScene';
 import { ResultScene } from './scenes/ResultScene';
-import {
-  arenaWidthFor,
-  clampedArea,
-  fitArena,
-  RELAYOUT_DELAYS_MS,
-} from './platform/layout';
+import { arenaWidthFor, clampedArea, fitArena, RELAYOUT_DELAYS_MS } from './platform/layout';
 import { createLayoutDebug, decideArenaWidth, layoutReport } from './platform/layoutDebug';
 import { ARENA } from './config/arena';
 import { THEME } from './config/theme';
@@ -87,7 +82,8 @@ function layoutArena(): void {
   const availW = Math.max(0, area.width - area.insets.left - area.insets.right);
   const availH = Math.max(0, area.height - area.insets.top - area.insets.bottom);
   wantedW = arenaWidthFor(availW, availH);
-  if (currentW === null) currentW = wantedW; // first layout, before new Phaser.Game
+  if (currentW === null)
+    currentW = wantedW; // first layout, before new Phaser.Game
   else applyWantedWidth();
   const f = fitArena(area.width, area.height, area.insets, currentW, ARENA.height);
   host.style.right = 'auto';

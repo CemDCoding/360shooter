@@ -147,7 +147,8 @@ export class GiantStone extends BossBase {
     } else if (this.phase === 'retreating') {
       this.retreatMs += delta;
       // Safety: a retreat that takes too long ends where the stone is (no soft lock).
-      if (this.advance(delta, T.returnSpeed) || this.retreatMs > T.retreatMaxMs) this.finishRetreat();
+      if (this.advance(delta, T.returnSpeed) || this.retreatMs > T.retreatMaxMs)
+        this.finishRetreat();
     }
     if (this.vulnerableLeftMs > 0) {
       this.vulnerableLeftMs -= delta;

@@ -19,7 +19,11 @@ export class PowerIndicators {
   private readonly maxStacks: number;
   private readonly maxStage: number;
 
-  constructor(scene: Phaser.Scene, k: number, private readonly onChange: () => void) {
+  constructor(
+    scene: Phaser.Scene,
+    k: number,
+    private readonly onChange: () => void,
+  ) {
     const find = (e: string) => ITEMS.find((i) => i.effect === e);
     this.perStack = find('shield')?.perStack ?? 1;
     this.maxStacks = find('shield')?.maxStacks ?? 1;

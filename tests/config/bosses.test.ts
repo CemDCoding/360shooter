@@ -77,7 +77,11 @@ describe('boss config (PE-75)', () => {
     const roll = BOSSES.giantStone.attacks.find((x) => x.id === 'roll');
     expect(roll?.telegraphMs).toBeGreaterThanOrEqual(MIN_REACTION_MS);
     for (const w of [ARENA.baseWidth, ARENA.maxWidth]) {
-      const rim = rimRadii(BOSS_TUNING.giantStone.rim, { width: w, height: ARENA.height, margin: 0 });
+      const rim = rimRadii(BOSS_TUNING.giantStone.rim, {
+        width: w,
+        height: ARENA.height,
+        margin: 0,
+      });
       expect(rim.rx).toBeLessThan(w / 2);
     }
   });

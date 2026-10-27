@@ -9,7 +9,14 @@ import { isValidLevelId, MAX_LEVEL_ID } from './debug';
 import type { ResultSceneData } from './GameScene';
 import { FunkButton } from './hud/FunkButton';
 import { FUNK_GLYPH_H, FunkPanel, funkScale, funkText, measureFunk } from './hud/FunkPanel';
-import { bossDisplayName, bossPercentLeft, formatTime, patternCells, patternWidth, PIXEL_STAR } from './hud/hudMath';
+import {
+  bossDisplayName,
+  bossPercentLeft,
+  formatTime,
+  patternCells,
+  patternWidth,
+  PIXEL_STAR,
+} from './hud/hudMath';
 import { BATCH_LABELS } from './menu/levelGroups';
 import { centerOffset } from './menu/menuLogic';
 
@@ -54,7 +61,13 @@ export class ResultScene extends Phaser.Scene {
     const width = ARENA.baseWidth;
     this.cameras.main.setScroll(-ox, 0);
     this.done = false;
-    this.lab = funkScale(1, Math.min(MAX_K, hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight)));
+    this.lab = funkScale(
+      1,
+      Math.min(
+        MAX_K,
+        hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight),
+      ),
+    );
     const levelId = isValidLevelId(data?.levelId) ? data.levelId : 0;
     const level = getLevel(levelId);
     const won = data?.result === 'won';
@@ -67,18 +80,34 @@ export class ResultScene extends Phaser.Scene {
     this.add.rectangle(-ox, 0, fullWidth, height, themeColor('hud.screen').num).setOrigin(0);
     const batch = level?.batch;
     if (batch) {
-      this.add.rectangle(-ox, 0, fullWidth, BAND_H, themeColor(BIOME_COLOR[batch]).num).setOrigin(0);
+      this.add
+        .rectangle(-ox, 0, fullWidth, BAND_H, themeColor(BIOME_COLOR[batch]).num)
+        .setOrigin(0);
     }
 
     const biome = batch ? BATCH_LABELS[batch] : '';
     const logParts = ['LOG', `LEVEL ${levelId}`];
     if (biome) logParts.push(biome);
     const logY = 20 + BAND_H;
-    const logLeft = funkText(this, SIDE, logY, logParts.join(' · '), this.lab, 'hud.text-muted').setOrigin(0, 0);
+    const logLeft = funkText(
+      this,
+      SIDE,
+      logY,
+      logParts.join(' · '),
+      this.lab,
+      'hud.text-muted',
+    ).setOrigin(0, 0);
     // The survived time is only known for a won round (the full level time).
     let logRightX = width - SIDE;
     if (won && level) {
-      const right = funkText(this, width - SIDE, logY, `${formatTime(level.durationSec)} ÜBERLEBT`, this.lab, 'hud.text-muted').setOrigin(1, 0);
+      const right = funkText(
+        this,
+        width - SIDE,
+        logY,
+        `${formatTime(level.durationSec)} ÜBERLEBT`,
+        this.lab,
+        'hud.text-muted',
+      ).setOrigin(1, 0);
       logRightX = right.x - right.width;
     }
 
@@ -89,8 +118,16 @@ export class ResultScene extends Phaser.Scene {
 
     this.add.image(SIDE + 48, 96, 'astronaut', 0).setScale(3);
     const heroX = SIDE + 96 + 18;
-    funkText(this, heroX, 74, won ? 'GEWONNEN' : 'VERLOREN', 4, won ? 'hud.accent' : 'hud.danger').setOrigin(0, 0.5);
-    const winLine = (bossWon && bossId ? BOSS_WIN_LINES[bossId] : undefined) ?? 'DER WALD IST WIEDER STILL.';
+    funkText(
+      this,
+      heroX,
+      74,
+      won ? 'GEWONNEN' : 'VERLOREN',
+      4,
+      won ? 'hud.accent' : 'hud.danger',
+    ).setOrigin(0, 0.5);
+    const winLine =
+      (bossWon && bossId ? BOSS_WIN_LINES[bossId] : undefined) ?? 'DER WALD IST WIEDER STILL.';
     funkText(
       this,
       heroX,
@@ -101,7 +138,11 @@ export class ResultScene extends Phaser.Scene {
     ).setOrigin(0, 0.5);
 
     const boss = bossId
-      ? { name: bossDisplayName(bossId), defeated: data?.bossDefeated === true, hpLeft: nonNegative(data?.bossHpLeft) }
+      ? {
+          name: bossDisplayName(bossId),
+          defeated: data?.bossDefeated === true,
+          hpLeft: nonNegative(data?.bossHpLeft),
+        }
       : null;
     this.createFacts(width, data, { levelId, xp, playerLevel, leveledUp, boss });
     this.createButtons(width, height, levelId, won);
@@ -123,8 +164,16 @@ export class ResultScene extends Phaser.Scene {
     const star = this.add.graphics();
     star.fillStyle(themeColor('hud.gold').num, 1);
     const sy = top + Math.round((h - PIXEL_STAR.length * scale) / 2);
-    for (const [cx, cy] of patternCells(PIXEL_STAR)) star.fillRect(x + padX + cx * scale, sy + cy * scale, scale, scale);
-    funkText(this, x + padX + patternWidth(PIXEL_STAR) * scale + gap, top + h / 2, 'BOSS BESIEGT', scale, 'hud.accent').setOrigin(0, 0.5);
+    for (const [cx, cy] of patternCells(PIXEL_STAR))
+      star.fillRect(x + padX + cx * scale, sy + cy * scale, scale, scale);
+    funkText(
+      this,
+      x + padX + patternWidth(PIXEL_STAR) * scale + gap,
+      top + h / 2,
+      'BOSS BESIEGT',
+      scale,
+      'hud.accent',
+    ).setOrigin(0, 0.5);
   }
 
   private createFacts(
@@ -165,7 +214,8 @@ export class ResultScene extends Phaser.Scene {
         const star = this.add.graphics();
         star.fillStyle(themeColor('hud.gold').num, 1);
         const sy = by - PIXEL_STAR.length;
-        for (const [cx, cy] of patternCells(PIXEL_STAR)) star.fillRect(FACT_VALUE_X + cx * 2, sy + cy * 2, 2, 2);
+        for (const [cx, cy] of patternCells(PIXEL_STAR))
+          star.fillRect(FACT_VALUE_X + cx * 2, sy + cy * 2, 2, 2);
         funkText(this, FACT_VALUE_X + starW, by, text, scale, 'hud.accent').setOrigin(0, 0.5);
       } else {
         const text = `${f.boss.name} · ${bossPercentLeft(f.boss.hpLeft, 1)} % ÜBRIG`;
@@ -178,14 +228,27 @@ export class ResultScene extends Phaser.Scene {
     funkText(this, FACT_VALUE_X, y, `+${f.xp} XP`, 2, 'hud.text').setOrigin(0, 0.5);
 
     y = row(i0 + 1, 'SPIELERLEVEL');
-    const lv = funkText(this, FACT_VALUE_X, y, String(f.playerLevel), 2, 'hud.text').setOrigin(0, 0.5);
+    const lv = funkText(this, FACT_VALUE_X, y, String(f.playerLevel), 2, 'hud.text').setOrigin(
+      0,
+      0.5,
+    );
     if (f.leveledUp && !debugRound) {
-      funkText(this, FACT_VALUE_X + lv.width + 10, y, 'LEVELAUFSTIEG!', 2, 'hud.accent').setOrigin(0, 0.5);
+      funkText(this, FACT_VALUE_X + lv.width + 10, y, 'LEVELAUFSTIEG!', 2, 'hud.accent').setOrigin(
+        0,
+        0.5,
+      );
     }
 
     y = row(i0 + 2, 'MÜNZEN');
     this.add.image(FACT_VALUE_X + 8, y, 'coin-small', 0).setScale(2);
-    funkText(this, FACT_VALUE_X + 26, y, `${coins} · ANTEIL ${sharePct} % · +${goldGained} GOLD`, 2, 'hud.gold').setOrigin(0, 0.5);
+    funkText(
+      this,
+      FACT_VALUE_X + 26,
+      y,
+      `${coins} · ANTEIL ${sharePct} % · +${goldGained} GOLD`,
+      2,
+      'hud.gold',
+    ).setOrigin(0, 0.5);
 
     y = row(i0 + 3, 'GOLD GESAMT');
     funkText(this, FACT_VALUE_X, y, String(goldTotal), 2, 'hud.gold').setOrigin(0, 0.5);
@@ -196,7 +259,14 @@ export class ResultScene extends Phaser.Scene {
         ? 'FORTSCHRITT KONNTE NICHT GESPEICHERT WERDEN.'
         : '';
     if (note) {
-      funkText(this, FACT_LABEL_X, FACT_TOP + (i0 + 4) * FACT_STEP, note, this.lab, 'hud.danger').setOrigin(0, 0.5);
+      funkText(
+        this,
+        FACT_LABEL_X,
+        FACT_TOP + (i0 + 4) * FACT_STEP,
+        note,
+        this.lab,
+        'hud.danger',
+      ).setOrigin(0, 0.5);
     }
   }
 

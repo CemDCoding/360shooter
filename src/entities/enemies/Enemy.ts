@@ -141,8 +141,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     } else {
       // PE-100: faster only outside the 640 spawn ring (wide arenas), unchanged inside.
       const speed =
-        this.def.speed *
-        approachSpeedFactor(dist, BASE_SPAWN_RADIUS, ARENA.offscreenSpeedFactor);
+        this.def.speed * approachSpeedFactor(dist, BASE_SPAWN_RADIUS, ARENA.offscreenSpeedFactor);
       this.setVelocity((dx / dist) * speed, (dy / dist) * speed);
     }
     this.faceCenter();

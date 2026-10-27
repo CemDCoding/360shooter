@@ -61,7 +61,9 @@ describe('hudMath', () => {
       phase: 'cooldown',
       sec: 3,
     });
-    expect(armourDisplay({ id: 'fire-ring', activeMsLeft: 0, cooldownMsLeft: 0 }).phase).toBe('hidden');
+    expect(armourDisplay({ id: 'fire-ring', activeMsLeft: 0, cooldownMsLeft: 0 }).phase).toBe(
+      'hidden',
+    );
   });
 
   it('builds ten energy segments for 0, 25 and 100 percent', () => {
@@ -177,12 +179,17 @@ describe('powerBlock', () => {
 
   it('blocks rapid fire while it runs and shows the seconds left', () => {
     expect(powerBlock(rapid, idle, noArmour)).toEqual({ blocked: false, sec: 0 });
-    expect(powerBlock(rapid, { ...idle, rapidFireMsLeft: 5200 }, noArmour)).toEqual({ blocked: true, sec: 6 });
+    expect(powerBlock(rapid, { ...idle, rapidFireMsLeft: 5200 }, noArmour)).toEqual({
+      blocked: true,
+      sec: 6,
+    });
   });
 
   it('blocks the fire ring while active and during the cooldown', () => {
     expect(powerBlock(ring, idle, noArmour)).toEqual({ blocked: false, sec: 0 });
-    expect(powerBlock(ring, idle, { id: 'fire-ring', activeMsLeft: 3000, cooldownMsLeft: 0 })).toEqual({
+    expect(
+      powerBlock(ring, idle, { id: 'fire-ring', activeMsLeft: 3000, cooldownMsLeft: 0 }),
+    ).toEqual({
       blocked: true,
       sec: 3,
     });
@@ -195,9 +202,13 @@ describe('powerBlock', () => {
   it('feeds slotStatus: empty, ready and blocked', () => {
     const stored = { stored: ['fire-ring'] };
     const cooling = { id: null, activeMsLeft: 0, cooldownMsLeft: 1000 };
-    expect(slotStatus(stored, 'rapidFire', powerBlock(rapid, idle, noArmour).blocked)).toBe('empty');
+    expect(slotStatus(stored, 'rapidFire', powerBlock(rapid, idle, noArmour).blocked)).toBe(
+      'empty',
+    );
     expect(slotStatus(stored, 'fire-ring', powerBlock(ring, idle, noArmour).blocked)).toBe('ready');
-    expect(slotStatus(stored, 'fire-ring', powerBlock(ring, idle, cooling).blocked)).toBe('blocked');
+    expect(slotStatus(stored, 'fire-ring', powerBlock(ring, idle, cooling).blocked)).toBe(
+      'blocked',
+    );
   });
 
   it('reads the item lock from the power state, not from a fixed id (V-14 e)', () => {
@@ -206,10 +217,18 @@ describe('powerBlock', () => {
     // Items without a timed state field never block.
     expect(itemMsLeft('shield', { ...idle, shieldLeft: 3 })).toBe(0);
     expect(itemMsLeft('unknown', idle)).toBe(0);
-    expect(powerBlock({ id: 'shield', kind: 'item' }, { ...idle, rapidFireMsLeft: 5000 }, noArmour).blocked).toBe(false);
+    expect(
+      powerBlock({ id: 'shield', kind: 'item' }, { ...idle, rapidFireMsLeft: 5000 }, noArmour)
+        .blocked,
+    ).toBe(false);
     // The fire ring follows the armour state, independent of rapid fire.
-    expect(powerBlock(ring, { ...idle, rapidFireMsLeft: 5000 }, noArmour)).toEqual({ blocked: false, sec: 0 });
-    expect(powerBlock(rapid, idle, { id: 'fire-ring', activeMsLeft: 3000, cooldownMsLeft: 0 })).toEqual({
+    expect(powerBlock(ring, { ...idle, rapidFireMsLeft: 5000 }, noArmour)).toEqual({
+      blocked: false,
+      sec: 0,
+    });
+    expect(
+      powerBlock(rapid, idle, { id: 'fire-ring', activeMsLeft: 3000, cooldownMsLeft: 0 }),
+    ).toEqual({
       blocked: false,
       sec: 0,
     });
@@ -241,13 +260,16 @@ describe('power slot size at odd k (V-14 c)', () => {
     margin: THEME.spacePx['space.2'],
   };
 
-  it.each([1, 1.125, 1.2, 1.375, 1.4])('uses whole pixels and a whole-pixel centre at k = %s', (k) => {
-    for (const r of powerSlotRects(2, k, 360, base)) {
-      for (const v of [r.x, r.y, r.w, r.h]) expect(Number.isInteger(v)).toBe(true);
-      expect(Number.isInteger(r.x + r.w / 2)).toBe(true);
-      expect(Number.isInteger(r.y + r.h / 2)).toBe(true);
-    }
-  });
+  it.each([1, 1.125, 1.2, 1.375, 1.4])(
+    'uses whole pixels and a whole-pixel centre at k = %s',
+    (k) => {
+      for (const r of powerSlotRects(2, k, 360, base)) {
+        for (const v of [r.x, r.y, r.w, r.h]) expect(Number.isInteger(v)).toBe(true);
+        expect(Number.isInteger(r.x + r.w / 2)).toBe(true);
+        expect(Number.isInteger(r.y + r.h / 2)).toBe(true);
+      }
+    },
+  );
 
   it('rounds the size to an even value at k = 1.125', () => {
     const [a, b] = powerSlotRects(2, 1.125, 360, base);
@@ -288,7 +310,13 @@ describe('boss HUD (H-14, 5a and 7a)', () => {
   });
 
   it('maps each state to tag, colours and frame', () => {
-    expect(bossBarLook('normal')).toEqual({ tag: 'BOSS', tagColor: 'hud.danger', fill: 'hud.danger', dotted: false, lock: false });
+    expect(bossBarLook('normal')).toEqual({
+      tag: 'BOSS',
+      tagColor: 'hud.danger',
+      fill: 'hud.danger',
+      dotted: false,
+      lock: false,
+    });
     expect(bossBarLook('critical')).toEqual({
       tag: 'SCHWACH!',
       tagColor: 'hud.accent',

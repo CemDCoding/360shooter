@@ -47,7 +47,9 @@ export class FunkButton extends Phaser.GameObjects.Container {
     this.bw = Math.max(FUNK_MIN_BUTTON, opts.width ?? Math.round(labelW + PAD_X * 2));
     this.bh = Math.max(FUNK_MIN_BUTTON, opts.height ?? Math.round(FUNK_GLYPH_H * scale + 16));
     this.gfx = scene.add.graphics();
-    this.hit = scene.add.rectangle(0, 0, this.bw, this.bh, themeColor('hud.screen').num, 0).setInteractive({ useHandCursor: true });
+    this.hit = scene.add
+      .rectangle(0, 0, this.bw, this.bh, themeColor('hud.screen').num, 0)
+      .setInteractive({ useHandCursor: true });
     this.add([this.gfx, this.hit]);
     if (opts.icon) {
       this.icon = scene.add.image(0, 0, opts.icon.key, opts.icon.frame);
