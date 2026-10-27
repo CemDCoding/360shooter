@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { ARENA } from '../config/arena';
 import { getLevel } from '../config/levels';
 import { themeColor, type ColorName } from '../config/theme';
 import type { BatchId, BossId } from '../contracts';
@@ -10,6 +11,7 @@ import { FunkButton } from './hud/FunkButton';
 import { FUNK_GLYPH_H, FunkPanel, funkScale, funkText, measureFunk } from './hud/FunkPanel';
 import { bossDisplayName, bossPercentLeft, formatTime, patternCells, patternWidth, PIXEL_STAR } from './hud/hudMath';
 import { BATCH_LABELS } from './menu/levelGroups';
+import { centerOffset } from './menu/menuLogic';
 
 const SIDE = 32;
 const BAND_H = 6;
@@ -46,7 +48,11 @@ export class ResultScene extends Phaser.Scene {
   }
 
   create(data: ResultSceneData): void {
-    const { width, height } = this.scale;
+    const { width: fullWidth, height } = this.scale;
+    // PE-102: keep the 640 layout and centre it by shifting the camera; the background covers the full width.
+    const ox = centerOffset(fullWidth, ARENA.baseWidth);
+    const width = ARENA.baseWidth;
+    this.cameras.main.setScroll(-ox, 0);
     this.done = false;
     this.lab = funkScale(1, Math.min(MAX_K, hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight)));
     const levelId = isValidLevelId(data?.levelId) ? data.levelId : 0;
@@ -58,10 +64,10 @@ export class ResultScene extends Phaser.Scene {
       Number.isFinite(data?.previousPlayerLevel) && playerLevel > data.previousPlayerLevel;
     getSoundService(this.game).play(won ? 'sfx-round-won' : 'sfx-round-lost');
 
-    this.add.rectangle(0, 0, width, height, themeColor('hud.screen').num).setOrigin(0);
+    this.add.rectangle(-ox, 0, fullWidth, height, themeColor('hud.screen').num).setOrigin(0);
     const batch = level?.batch;
     if (batch) {
-      this.add.rectangle(0, 0, width, BAND_H, themeColor(BIOME_COLOR[batch]).num).setOrigin(0);
+      this.add.rectangle(-ox, 0, fullWidth, BAND_H, themeColor(BIOME_COLOR[batch]).num).setOrigin(0);
     }
 
     const biome = batch ? BATCH_LABELS[batch] : '';

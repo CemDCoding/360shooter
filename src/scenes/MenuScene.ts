@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PROGRESSION } from '../config';
+import { ARENA } from '../config/arena';
 import { THEME } from '../config/theme';
 import { WEAPON_MOUNT } from '../config/weaponMount';
 import type { SaveGame } from '../contracts';
@@ -15,7 +16,7 @@ import { UpgradePanel } from './menu/UpgradePanel';
 import { LevelGrid } from './menu/LevelGrid';
 import { drawBar, drawBevel, drawDashedRule, kText, textWidth, type KText } from './menu/kassette';
 import { isLevelUnlocked, xpFraction } from './menu/levelGroups';
-import { isFreshSave } from './menu/menuLogic';
+import { centerOffset, isFreshSave } from './menu/menuLogic';
 
 const IDLE_ANIM = 'astronaut-idle';
 const MAX_SUM = 20;
@@ -45,6 +46,8 @@ export class MenuScene extends Phaser.Scene {
   private suitText: KText | null = null;
   private weaponIcon: Phaser.GameObjects.Image | null = null;
   private starting = false;
+  /** Horizontal shift that centres the 640 layout (PE-102). */
+  private ox = 0;
 
   constructor() {
     super('MenuScene');
@@ -56,19 +59,21 @@ export class MenuScene extends Phaser.Scene {
     this.starting = false;
     getSoundService(this.game).reload();
     const save = loadSave();
-    const { width } = this.scale;
+    this.ox = centerOffset(this.scale.width, ARENA.baseWidth);
+    const ox = this.ox;
+    const right = ox + ARENA.baseWidth;
 
     this.drawBackground();
     this.drawLogo();
     this.drawProfile(save);
 
-    new LevelGrid(this, GRID.x, GRID.y, save.highestUnlockedLevel, (id) =>
+    new LevelGrid(this, ox + GRID.x, GRID.y, save.highestUnlockedLevel, (id) =>
       this.startLevel(id, save.highestUnlockedLevel),
     );
 
     new Button(
       this,
-      PROFILE.x + PROFILE.w / 2,
+      ox + PROFILE.x + PROFILE.w / 2,
       332,
       'Fortschritt zurücksetzen',
       () => this.askReset(),
@@ -82,7 +87,7 @@ export class MenuScene extends Phaser.Scene {
     const fresh = isFreshSave(save);
     kText(
       this,
-      width - 16,
+      right - 16,
       328,
       fresh ? 'Willkommen! Starte mit Level 0.' : 'Tippe auf ein freies Level.',
       1,
@@ -91,7 +96,7 @@ export class MenuScene extends Phaser.Scene {
       0,
     );
 
-    addMuteButton(this, width - 32, 26, 'menu');
+    addMuteButton(this, right - 32, 26, 'menu');
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.tweens.killAll();
@@ -110,7 +115,7 @@ export class MenuScene extends Phaser.Scene {
   private drawBackground(): void {
     const { width, height } = this.scale;
     const g = this.add.graphics();
-    const planet = { x: 600, y: 430, r: 180 };
+    const planet = { x: this.ox + 600, y: 430, r: 180 };
     g.fillStyle(THEME.colors['plum.600'].num).fillCircle(planet.x, planet.y, planet.r);
     g.fillStyle(THEME.colors['plum.550'].num).fillCircle(planet.x - 72, planet.y - 90, 70);
     const star = (sx: number, sy: number, color: 'cream.50' | 'coral.300'): void => {
@@ -128,7 +133,7 @@ export class MenuScene extends Phaser.Scene {
       ['360', 'menu.action-bg'],
       ['SHOOTER', 'menu.text'],
     ];
-    let x = 16;
+    let x = this.ox + 16;
     for (const [text, color] of parts) {
       kText(this, x + shadow, 14 + shadow, text, 3, 'menu.outline');
       const t = kText(this, x, 14, text, 3, color);
@@ -137,7 +142,8 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private drawProfile(save: SaveGame): void {
-    const { x, y, w, h, pad } = PROFILE;
+    const { y, w, h, pad } = PROFILE;
+    const x = this.ox + PROFILE.x;
     const g = this.add.graphics();
     drawBevel(g, x, y, w, h, {
       fill: 'menu.surface',
