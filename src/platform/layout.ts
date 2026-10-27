@@ -1,4 +1,5 @@
 /** Pure layout helpers (no Phaser): fit the arena into the safe area, scale the HUD. */
+import { ARENA } from '../config/arena';
 
 export interface Insets {
   top: number;
@@ -23,7 +24,7 @@ export const MIN_HUD_FONT_CSS = 14;
 /** Base HUD font in arena units (desktop look). */
 export const BASE_HUD_FONT = 10;
 const MAX_HUD_SCALE = 2.5;
-const ARENA_H = 360;
+const ARENA_H = ARENA.height;
 
 function safe(n: number): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
@@ -51,6 +52,18 @@ export function fitArena(
     offsetX: left + (availW - width) / 2,
     offsetY: top + (availH - height) / 2,
   };
+}
+
+/**
+ * Arena width for the safe area: height * availW / availH, rounded and limited to
+ * minWidth..maxWidth. Invalid input (0, NaN, negative) gives minWidth (PE-99).
+ */
+export function arenaWidthFor(availW: number, availH: number): number {
+  const w = safe(availW);
+  const h = safe(availH);
+  if (w <= 0 || h <= 0) return ARENA.minWidth;
+  const raw = Math.round((ARENA.height * w) / h);
+  return Math.min(ARENA.maxWidth, Math.max(ARENA.minWidth, raw));
 }
 
 /** Multiplier (>= 1) for HUD sizes in arena units so text stays >= MIN_HUD_FONT_CSS on screen. */
