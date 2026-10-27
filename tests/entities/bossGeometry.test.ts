@@ -11,13 +11,16 @@ import {
   treePositions,
 } from '../../src/entities/bosses/bossGeometry';
 
-const arena = BOSS_TUNING.arena;
-const center = { x: arena.width / 2, y: arena.height / 2 };
-const inArena = (p: { x: number; y: number }): boolean =>
-  p.x >= arena.margin &&
-  p.x <= arena.width - arena.margin &&
-  p.y >= arena.margin &&
-  p.y <= arena.height - arena.margin;
+import { ARENA } from '../../src/config/arena';
+import { rimRadii } from '../../src/entities/bosses/rim';
+
+// Every arena test runs for the base width and the widest arena (PE-101).
+const WIDTHS = [ARENA.baseWidth, ARENA.maxWidth];
+const arenaOf = (width: number) => ({ width, height: ARENA.height, margin: BOSS_TUNING.arena.margin });
+const inArenaOf =
+  (a: { width: number; height: number; margin: number }) =>
+  (p: { x: number; y: number }): boolean =>
+    p.x >= a.margin && p.x <= a.width - a.margin && p.y >= a.margin && p.y <= a.height - a.margin;
 const TURN = Math.PI * 2;
 
 describe('stepToward', () => {
@@ -38,10 +41,23 @@ describe('stepToward', () => {
   });
 });
 
-describe('clampToArena', () => {
+describe.each(WIDTHS)('clampToArena at width %i', (w) => {
   it('keeps every point inside the margin', () => {
-    const pts = [{ x: -50, y: -50 }, { x: 9999, y: 9999 }, { x: 320, y: 180 }, { x: 0, y: 400 }];
-    for (const p of pts) expect(inArena(clampToArena(p, arena))).toBe(true);
+    const a = arenaOf(w);
+    const pts = [{ x: -50, y: -50 }, { x: 9999, y: 9999 }, { x: w / 2, y: 180 }, { x: 0, y: 400 }];
+    for (const p of pts) expect(inArenaOf(a)(clampToArena(p, a))).toBe(true);
+  });
+});
+
+describe('rimRadii', () => {
+  const rim = BOSS_TUNING.giantStone.rim;
+  it('is unchanged for the base arena', () => {
+    expect(rimRadii(rim, arenaOf(ARENA.baseWidth))).toEqual(rim);
+  });
+  it.each(WIDTHS)('keeps the rim as far from the edge as before at width %i', (w) => {
+    const r = rimRadii(rim, arenaOf(w));
+    expect(w / 2 - r.rx).toBeCloseTo(ARENA.baseWidth / 2 - rim.rx);
+    expect(ARENA.height / 2 - r.ry).toBeCloseTo(ARENA.height / 2 - rim.ry);
   });
 });
 
@@ -66,32 +82,35 @@ describe('ringSpikeAngles', () => {
   });
 });
 
-describe('treePositions', () => {
+describe.each(WIDTHS)('treePositions at width %i', (w) => {
   it('stays inside the arena even next to the edge', () => {
-    for (const origin of [center, { x: 0, y: 0 }, { x: 640, y: 360 }, { x: 600, y: 20 }]) {
+    const a = arenaOf(w);
+    for (const origin of [{ x: w / 2, y: 180 }, { x: 0, y: 0 }, { x: w, y: 360 }, { x: w - 40, y: 20 }]) {
       for (const base of [0, 1, 2.5, 5]) {
-        const out = treePositions(origin, 5, base, 56, arena);
+        const out = treePositions(origin, 5, base, 56, a);
         expect(out).toHaveLength(5);
-        out.forEach((p) => expect(inArena(p)).toBe(true));
+        out.forEach((p) => expect(inArenaOf(a)(p)).toBe(true));
       }
     }
   });
 });
 
-describe('fragmentPositions', () => {
+describe.each(WIDTHS)('fragmentPositions at width %i', (w) => {
   const { fragmentOffset: off, fragmentMinCenterDist: min } = BOSS_TUNING.giantStone;
+  const a = arenaOf(w);
+  const c = { x: w / 2, y: 180 };
   it('keeps the distance to the centre and the arena, also on the centre', () => {
-    const origins = [center, { x: 330, y: 190 }, { x: 170, y: 180 }, { x: 320, y: 65 }, { x: 600, y: 340 }];
+    const origins = [c, { x: c.x + 10, y: 190 }, { x: c.x - 150, y: 180 }, { x: c.x, y: 65 }, { x: w - 40, y: 340 }];
     for (const o of origins) {
-      for (const p of fragmentPositions(o, center, off, min, arena)) {
-        expect(Math.hypot(p.x - center.x, p.y - center.y)).toBeGreaterThanOrEqual(min - 1e-6);
-        expect(inArena(p)).toBe(true);
+      for (const p of fragmentPositions(o, c, off, min, a)) {
+        expect(Math.hypot(p.x - c.x, p.y - c.y)).toBeGreaterThanOrEqual(min - 1e-6);
+        expect(inArenaOf(a)(p)).toBe(true);
       }
     }
   });
   it('spreads the two fragments apart', () => {
-    const [a, b] = fragmentPositions({ x: 170, y: 180 }, center, off, min, arena);
-    expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(10);
+    const [p, q] = fragmentPositions({ x: c.x - 150, y: 180 }, c, off, min, a);
+    expect(Math.hypot(p.x - q.x, p.y - q.y)).toBeGreaterThan(10);
   });
 });
 

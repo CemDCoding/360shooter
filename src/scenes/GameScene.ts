@@ -21,9 +21,11 @@ import {
   type UpgradeLevels,
 } from '../contracts';
 import type { ActiveArmour, ArmourDef } from '../contracts/armour';
+import { spawnRadiusFor } from '../config/arena';
 import { BOSS_TUNING } from '../config/bosses';
 import { ArmourPickup } from '../entities/ArmourPickup';
 import { BossBase } from '../entities/bosses/BossBase';
+import { rimRadii } from '../entities/bosses/rim';
 import { createBoss } from '../entities/bosses/createBoss';
 import { ForestGhost } from '../entities/bosses/ForestGhost';
 import { GhostOrb } from '../entities/bosses/GhostOrb';
@@ -77,8 +79,6 @@ import { parseDebugLevel, resolveLevelId } from './debug';
 import { energyRatio, powerBlock } from './hud/hudMath';
 import { POWER_SLOT_PRESSED } from './hud/PowerSlots';
 
-/** Layout only: distance of the spawn ring beyond the visible corners (pixels). */
-const SPAWN_MARGIN_PX = 24;
 /** Upper bound for one frame step, avoids huge jumps after a stall (ms). */
 const MAX_FRAME_MS = 100;
 /** Contact damage hits every frame: play the hurt sound at most this often (ms). */
@@ -281,7 +281,7 @@ export class GameScene extends Phaser.Scene {
     this.armourRing = new ArmourRing(this);
 
     this.round = new RoundState(this.level);
-    const spawnRadius = Math.hypot(width, height) / 2 + SPAWN_MARGIN_PX;
+    const spawnRadius = spawnRadiusFor(this.scale);
     this.spawner = new SpawnDirector(this.level, this.rng, spawnRadius);
 
     this.bindPlayerCallbacks();
@@ -488,6 +488,7 @@ export class GameScene extends Phaser.Scene {
     this.bossSpawned = true;
     this.bossInvulnerable = false;
     const boss = createBoss(this, bossId, this.level.id, {
+      arena: { width: this.scale.width, height: this.scale.height, margin: BOSS_TUNING.arena.margin },
       center: this.center,
       rng: this.rng,
       onHpChanged: (hp, maxHp) => this.emitBossHp(hp, maxHp),
@@ -504,7 +505,11 @@ export class GameScene extends Phaser.Scene {
     this.boss = boss;
     emitGameEvent(this.events, GameEvents.BossSpawned, { bossId, hp: boss.maxHp, maxHp: boss.maxHp });
     // Appears from a random direction on the rim around the player.
-    const rim = BOSS_TUNING.giantStone.rim;
+    const rim = rimRadii(BOSS_TUNING.giantStone.rim, {
+      width: this.scale.width,
+      height: this.scale.height,
+      margin: BOSS_TUNING.arena.margin,
+    });
     const angle = this.rng.next() * Math.PI * 2;
     boss.spawn(this.center.x + Math.cos(angle) * rim.rx, this.center.y + Math.sin(angle) * rim.ry);
   }

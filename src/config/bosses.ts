@@ -73,7 +73,8 @@ export const MIN_REACTION_MS = 1000;
  * Purely visual constants (depth, colours from THEME) may stay in the entity files.
  */
 export const BOSS_TUNING = {
-  arena: { width: 640, height: 360, margin: 16 },
+  /** Inner margin to the arena edge. The arena size itself comes from the scene (BossContext.arena, PE-101). */
+  arena: { margin: 16 },
   /** Hit radius of the player used for fairness calculations and the stone roll. */
   playerHitRadius: 14,
   rootMonster: {

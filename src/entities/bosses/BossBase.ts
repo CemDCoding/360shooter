@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { animKey } from '../../config/assets';
-import { BOSSES } from '../../config/bosses';
+import { ARENA } from '../../config/arena';
+import { BOSSES, BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
-import type { BossAttackDef, BossDef, BossId, BossVariant } from '../../contracts';
+import type { ArenaRect, BossAttackDef, BossDef, BossId, BossVariant } from '../../contracts';
 import {
   AttackScheduler,
   NO_TINT,
@@ -16,9 +17,20 @@ import { applyDamage, auraDamage, isDead } from '../../logic/health';
 
 const FLASH_MS = 120;
 const FLASH_TINT = THEME.colors['game.hit-flash'].num;
-const ARENA_CENTER = { x: 320, y: 180 } as const;
+
+/** Arena used when the context gives none: the base arena (PE-101). */
+const FALLBACK_ARENA: ArenaRect = {
+  width: ARENA.baseWidth,
+  height: ARENA.height,
+  margin: BOSS_TUNING.arena.margin,
+};
 
 export interface BossContext {
+  /**
+   * Real arena size plus the inner margin (PE-101). Bosses, trees and warnings stay inside it.
+   * Default: base arena (ARENA.baseWidth x ARENA.height), so 640 x 360 behaves as before.
+   */
+  arena?: ArenaRect;
   /** Fixed arena centre (player position). */
   center?: { x: number; y: number };
   /** Random source for the attack choice. */
@@ -50,6 +62,8 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
   /** Multiplier on incoming damage (stone: 0.5). */
   protected damageFactor = 1;
   protected readonly center: { x: number; y: number };
+  /** Arena of this boss (from the context or the base arena). */
+  protected readonly arena: ArenaRect;
   private readonly scheduler: AttackScheduler;
   private readonly ctx: BossContext;
   private flashLeftMs = 0;
@@ -63,7 +77,8 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     this.hp = this.maxHp;
     this.contactDps = scaledDamage(def.baseDamage, this.variant);
     this.ctx = ctx;
-    this.center = ctx.center ?? ARENA_CENTER;
+    this.arena = ctx.arena ?? FALLBACK_ARENA;
+    this.center = ctx.center ?? { x: this.arena.width / 2, y: this.arena.height / 2 };
     this.scheduler = new AttackScheduler(def, this.variant, ctx.rng ?? { next: Math.random });
     scene.add.existing(this);
     scene.physics.add.existing(this);
