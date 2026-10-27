@@ -81,7 +81,10 @@ export class RootMonster extends BossBase {
       const x = this.center.x;
       const y = this.center.y;
       this.spikes?.push(
-        new RootSpike(this.scene, x, y, this.attackDamage('rootThrust'), { mode: 'sprout', sproutMs: ms }),
+        new RootSpike(this.scene, x, y, this.attackDamage('rootThrust'), {
+          mode: 'sprout',
+          sproutMs: ms,
+        }),
       );
       this.track(Telegraph.circle(this.scene, x, y, TUNING.sprout.hitRadius, ms));
     } else if (attack.id === 'forestCall') {

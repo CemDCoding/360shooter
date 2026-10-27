@@ -26,7 +26,12 @@ export interface StepResult extends Point {
 }
 
 /** Moves toward a target. Never overshoots: if the frame path covers the rest, the target is returned. */
-export function stepToward(from: Point, to: Point, speedPxPerSec: number, dtMs: number): StepResult {
+export function stepToward(
+  from: Point,
+  to: Point,
+  speedPxPerSec: number,
+  dtMs: number,
+): StepResult {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const dist = Math.hypot(dx, dy);

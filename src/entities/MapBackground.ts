@@ -91,7 +91,14 @@ export class MapBackground {
       const ctx = canvas?.getContext();
       if (!canvas || !ctx) return;
       const r = Math.hypot(width, height) / 2;
-      const grad = ctx.createRadialGradient(width / 2, height / 2, r * 0.45, width / 2, height / 2, r);
+      const grad = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        r * 0.45,
+        width / 2,
+        height / 2,
+        r,
+      );
       grad.addColorStop(0, 'rgba(0,0,0,0)');
       grad.addColorStop(1, `rgba(0,0,0,${def.vignette})`);
       ctx.fillStyle = grad;

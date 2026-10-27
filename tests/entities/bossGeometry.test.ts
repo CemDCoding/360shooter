@@ -16,7 +16,11 @@ import { rimRadii } from '../../src/entities/bosses/rim';
 
 // Every arena test runs for the base width and the widest arena (PE-101).
 const WIDTHS = [ARENA.baseWidth, ARENA.maxWidth];
-const arenaOf = (width: number) => ({ width, height: ARENA.height, margin: BOSS_TUNING.arena.margin });
+const arenaOf = (width: number) => ({
+  width,
+  height: ARENA.height,
+  margin: BOSS_TUNING.arena.margin,
+});
 const inArenaOf =
   (a: { width: number; height: number; margin: number }) =>
   (p: { x: number; y: number }): boolean =>
@@ -44,7 +48,12 @@ describe('stepToward', () => {
 describe.each(WIDTHS)('clampToArena at width %i', (w) => {
   it('keeps every point inside the margin', () => {
     const a = arenaOf(w);
-    const pts = [{ x: -50, y: -50 }, { x: 9999, y: 9999 }, { x: w / 2, y: 180 }, { x: 0, y: 400 }];
+    const pts = [
+      { x: -50, y: -50 },
+      { x: 9999, y: 9999 },
+      { x: w / 2, y: 180 },
+      { x: 0, y: 400 },
+    ];
     for (const p of pts) expect(inArenaOf(a)(clampToArena(p, a))).toBe(true);
   });
 });
@@ -85,7 +94,12 @@ describe('ringSpikeAngles', () => {
 describe.each(WIDTHS)('treePositions at width %i', (w) => {
   it('stays inside the arena even next to the edge', () => {
     const a = arenaOf(w);
-    for (const origin of [{ x: w / 2, y: 180 }, { x: 0, y: 0 }, { x: w, y: 360 }, { x: w - 40, y: 20 }]) {
+    for (const origin of [
+      { x: w / 2, y: 180 },
+      { x: 0, y: 0 },
+      { x: w, y: 360 },
+      { x: w - 40, y: 20 },
+    ]) {
       for (const base of [0, 1, 2.5, 5]) {
         const out = treePositions(origin, 5, base, 56, a);
         expect(out).toHaveLength(5);
@@ -100,7 +114,13 @@ describe.each(WIDTHS)('fragmentPositions at width %i', (w) => {
   const a = arenaOf(w);
   const c = { x: w / 2, y: 180 };
   it('keeps the distance to the centre and the arena, also on the centre', () => {
-    const origins = [c, { x: c.x + 10, y: 190 }, { x: c.x - 150, y: 180 }, { x: c.x, y: 65 }, { x: w - 40, y: 340 }];
+    const origins = [
+      c,
+      { x: c.x + 10, y: 190 },
+      { x: c.x - 150, y: 180 },
+      { x: c.x, y: 65 },
+      { x: w - 40, y: 340 },
+    ];
     for (const o of origins) {
       for (const p of fragmentPositions(o, c, off, min, a)) {
         expect(Math.hypot(p.x - c.x, p.y - c.y)).toBeGreaterThanOrEqual(min - 1e-6);

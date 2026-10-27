@@ -85,29 +85,50 @@ describe('contracts', () => {
     };
     const payload: GameEventPayloads['round-ended'] = { result: 'won', xpGained: 10 };
 
-    expect([
-      enemy,
-      aura,
-      level,
-      item,
-      rules,
-      weapon,
-      player,
-      prog,
-      save,
-      asset,
-    ]).toHaveLength(10);
+    expect([enemy, aura, level, item, rules, weapon, player, prog, save, asset]).toHaveLength(10);
     expect(payload.result).toBe('won');
     expect(GameEvents.RoundEnded).toBe('round-ended');
   });
 
   it('accepts example objects for coin, upgrade and power contracts', () => {
-    const coin: CoinRules = { dropChance: 0.05, magnetRadiusPx: 80, collectRadiusPx: 16, magnetSpeedPxPerSec: 300 };
-    const levels: UpgradeLevels = { weaponFireRate: 0, weaponDamage: 1, playerMaxHp: 2, playerTurnSpeed: MAX_UPGRADE_LEVEL };
+    const coin: CoinRules = {
+      dropChance: 0.05,
+      magnetRadiusPx: 80,
+      collectRadiusPx: 16,
+      magnetSpeedPxPerSec: 300,
+    };
+    const levels: UpgradeLevels = {
+      weaponFireRate: 0,
+      weaponDamage: 1,
+      playerMaxHp: 2,
+      playerTurnSpeed: MAX_UPGRADE_LEVEL,
+    };
     const powers: ActivePowers = { doubleShotStage: 1, shieldLeft: 2, rapidFireMsLeft: 5000 };
-    const item: ItemDef = { id: 'rapid', effect: 'rapidFire', perStack: 1, maxStacks: 1, dropWeight: 1, spriteKey: 'r', durationMs: 5000 };
-    const save: SaveGame = { version: 2, playerXp: 0, playerLevel: 1, highestUnlockedLevel: 0, muted: false, gold: 10, upgrades: levels };
-    const old: SaveGame = { version: 1, playerXp: 0, playerLevel: 1, highestUnlockedLevel: 0, muted: false };
+    const item: ItemDef = {
+      id: 'rapid',
+      effect: 'rapidFire',
+      perStack: 1,
+      maxStacks: 1,
+      dropWeight: 1,
+      spriteKey: 'r',
+      durationMs: 5000,
+    };
+    const save: SaveGame = {
+      version: 2,
+      playerXp: 0,
+      playerLevel: 1,
+      highestUnlockedLevel: 0,
+      muted: false,
+      gold: 10,
+      upgrades: levels,
+    };
+    const old: SaveGame = {
+      version: 1,
+      playerXp: 0,
+      playerLevel: 1,
+      highestUnlockedLevel: 0,
+      muted: false,
+    };
     const coins: GameEventPayloads['coins-changed'] = { roundCoins: 3 };
     const p: GameEventPayloads['powers-changed'] = powers;
     expect(GameEvents.CoinsChanged).toBe('coins-changed');

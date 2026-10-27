@@ -108,7 +108,14 @@ export class ForestGhost extends BossBase {
     if (attackId === 'orbFan') {
       const base = this.angleToCenter();
       for (let i = 0; i < T.fanCount; i++) {
-        this.takeOrb().fire(this.x, this.y, base + this.fanOffset(i), T.orbSpeedPxPerSec, damage, T.orbLifeMs);
+        this.takeOrb().fire(
+          this.x,
+          this.y,
+          base + this.fanOffset(i),
+          T.orbSpeedPxPerSec,
+          damage,
+          T.orbLifeMs,
+        );
       }
       this.holdMovement = false;
     } else if (attackId === 'fade') {
@@ -147,7 +154,10 @@ export class ForestGhost extends BossBase {
   private placeDecoys(): void {
     this.decoys.forEach((d, i) => {
       const a = this.orbitAngle + ((i + 1) * Math.PI * 2) / (T.decoyCount + 1);
-      d.setPosition(this.center.x + Math.cos(a) * T.orbitRadius, this.center.y + Math.sin(a) * T.orbitRadius);
+      d.setPosition(
+        this.center.x + Math.cos(a) * T.orbitRadius,
+        this.center.y + Math.sin(a) * T.orbitRadius,
+      );
     });
   }
 
