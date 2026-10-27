@@ -141,6 +141,6 @@ export class RootMonster extends BossBase {
     const call = TUNING.call;
     const count = call.minTrees + Math.floor(this.random() * (call.maxTrees - call.minTrees + 1));
     const base = this.random() * FULL_TURN;
-    return treePositions({ x: this.x, y: this.y }, count, base, call.distance, BOSS_TUNING.arena);
+    return treePositions({ x: this.x, y: this.y }, count, base, call.distance, this.arena);
   }
 }
