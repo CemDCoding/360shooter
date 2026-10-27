@@ -85,7 +85,11 @@ export function funkCase(text: string): string {
 }
 
 /** Left edges of chips laid out in a row; hidden entries (null width) take no space. */
-export function layoutRow(widths: readonly (number | null)[], gap: number, startX = 0): (number | null)[] {
+export function layoutRow(
+  widths: readonly (number | null)[],
+  gap: number,
+  startX = 0,
+): (number | null)[] {
   let x = startX;
   return widths.map((w) => {
     if (w === null) return null;
@@ -129,7 +133,12 @@ export interface SlotMetrics {
  * All values are whole pixels; the size is rounded to an even number so the slot centre
  * (icon, seconds) is a whole pixel too, also for an odd k like 1.125 (V-14 c).
  */
-export function powerSlotRects(count: number, k: number, arenaH: number, base: SlotMetrics): Rect[] {
+export function powerSlotRects(
+  count: number,
+  k: number,
+  arenaH: number,
+  base: SlotMetrics,
+): Rect[] {
   const f = Number.isFinite(k) && k > 0 ? k : 1;
   const size = 2 * Math.round((base.size * f) / 2);
   const gap = Math.round(base.gap * f);
@@ -150,7 +159,14 @@ export function slotIconScale(slotPx: number, spritePx: number, maxScale: number
 }
 
 /** Boss bar track at the bottom centre (without the name line above it). */
-export function bossBarRect(arenaW: number, arenaH: number, k: number, barW: number, barH: number, margin: number): Rect {
+export function bossBarRect(
+  arenaW: number,
+  arenaH: number,
+  k: number,
+  barW: number,
+  barH: number,
+  margin: number,
+): Rect {
   const w = Math.round(barW * k);
   const h = Math.round(barH * k);
   const m = Math.round(margin * k);
@@ -189,7 +205,8 @@ export function powerBlock(
     if (armour.id !== null && armour.activeMsLeft > 0) {
       return { blocked: true, sec: secondsLeft(armour.activeMsLeft) };
     }
-    if (armour.cooldownMsLeft > 0) return { blocked: true, sec: secondsLeft(armour.cooldownMsLeft) };
+    if (armour.cooldownMsLeft > 0)
+      return { blocked: true, sec: secondsLeft(armour.cooldownMsLeft) };
     return { blocked: armour.id !== null, sec: 0 };
   }
   const ms = itemMsLeft(def.id, powers);
@@ -244,10 +261,22 @@ export interface BossBarLook {
 
 export function bossBarLook(state: BossBarState): BossBarLook {
   if (state === 'immune') {
-    return { tag: 'IMMUN', tagColor: 'hud.text-muted', fill: 'hud.danger-dim', dotted: true, lock: true };
+    return {
+      tag: 'IMMUN',
+      tagColor: 'hud.text-muted',
+      fill: 'hud.danger-dim',
+      dotted: true,
+      lock: true,
+    };
   }
   if (state === 'critical') {
-    return { tag: 'SCHWACH!', tagColor: 'hud.accent', fill: 'hud.danger', dotted: false, lock: false };
+    return {
+      tag: 'SCHWACH!',
+      tagColor: 'hud.accent',
+      fill: 'hud.danger',
+      dotted: false,
+      lock: false,
+    };
   }
   return { tag: 'BOSS', tagColor: 'hud.danger', fill: 'hud.danger', dotted: false, lock: false };
 }
@@ -257,7 +286,11 @@ export function bossBarLook(state: BossBarState): BossBarLook {
  * new fill up to the old fill (or the still visible trail top, whichever is higher).
  * null: no loss (no new hit; a still running trail stays as it is).
  */
-export function bossTrailTop(prevRatio: number, nextRatio: number, currentTop: number | null): number | null {
+export function bossTrailTop(
+  prevRatio: number,
+  nextRatio: number,
+  currentTop: number | null,
+): number | null {
   if (!(nextRatio < prevRatio - 1e-9)) return null;
   return Math.max(prevRatio, currentTop ?? 0);
 }
@@ -276,14 +309,26 @@ export interface BlinkPlan {
   durationMs: number;
 }
 
-export function bannerBlink(count: number, blinkMs: number, reducedMotion: boolean): BlinkPlan | null {
+export function bannerBlink(
+  count: number,
+  blinkMs: number,
+  reducedMotion: boolean,
+): BlinkPlan | null {
   const n = Number.isFinite(count) ? Math.floor(count) : 0;
   if (reducedMotion || n <= 0 || !(blinkMs > 0)) return null;
   return { repeat: n - 1, durationMs: blinkMs };
 }
 
 /** Pixel patterns ('#' = pixel) for small symbols drawn with Graphics (no sprite at 1x). */
-export const PIXEL_LOCK: readonly string[] = [' ### ', '#   #', '#   #', '#####', '## ##', '## ##', '#####'];
+export const PIXEL_LOCK: readonly string[] = [
+  ' ### ',
+  '#   #',
+  '#   #',
+  '#####',
+  '## ##',
+  '## ##',
+  '#####',
+];
 export const PIXEL_STAR: readonly string[] = [
   '   #   ',
   '   #   ',

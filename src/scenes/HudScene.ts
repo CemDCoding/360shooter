@@ -142,7 +142,10 @@ export class HudScene extends Phaser.Scene {
     this.energyLow = false;
     this.levelId = Number.isFinite(data?.levelId) ? data.levelId : 0;
 
-    const k = Math.min(MAX_K, hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight));
+    const k = Math.min(
+      MAX_K,
+      hudScale(this.game.canvas.getBoundingClientRect().height || window.innerHeight),
+    );
     this.k = k;
     const m = Math.round(MARGIN * k);
 
@@ -184,7 +187,8 @@ export class HudScene extends Phaser.Scene {
   }
 
   update(): void {
-    if (this.fpsText) setFunk(this.fpsText, `${Math.round(this.game.loop.actualFps)} FPS`, 'hud.accent');
+    if (this.fpsText)
+      setFunk(this.fpsText, `${Math.round(this.game.loop.actualFps)} FPS`, 'hud.accent');
   }
 
   /** Boss overtime: the timer shows "BOSS!" (on while the timer is over and the boss lives, AP-20). */
@@ -209,7 +213,10 @@ export class HudScene extends Phaser.Scene {
     const w = pad * 2 + numW + gap + Math.max(segsW, labW);
     const h = FUNK_GLYPH_H * numScale + pad * 2;
     this.energyPanel = new FunkPanel(this, m, m, w, h, true);
-    this.energyNum = funkText(this, m + pad, m + h / 2, '0', numScale, 'hud.text').setOrigin(0, 0.5);
+    this.energyNum = funkText(this, m + pad, m + h / 2, '0', numScale, 'hud.text').setOrigin(
+      0,
+      0.5,
+    );
     const blockH = FUNK_GLYPH_H * labScale + Math.round(4 * k) + this.segH;
     const top = m + (h - blockH) / 2;
     const bx = m + pad + numW + gap;
@@ -223,7 +230,8 @@ export class HudScene extends Phaser.Scene {
   private createTimer(width: number, m: number, k: number): void {
     const scale = HUD_NUMBER_SCALE;
     const pad = Math.round(8 * k);
-    const w = Math.max(measureFunk(this, '10:00', scale), measureFunk(this, 'BOSS!', scale)) + pad * 2;
+    const w =
+      Math.max(measureFunk(this, '10:00', scale), measureFunk(this, 'BOSS!', scale)) + pad * 2;
     const h = FUNK_GLYPH_H * scale + pad * 2;
     this.timerPanel = new FunkPanel(this, Math.round(width / 2 - w / 2), m, w, h);
     this.timerText = funkText(this, width / 2, m + h / 2, '0:00', scale, 'hud.text').setOrigin(0.5);
@@ -244,7 +252,10 @@ export class HudScene extends Phaser.Scene {
     // Banner as a radio message (H-14, 5a): head line, title, dotted rule, boss name.
     const bannerPanel = new FunkPanel(this, 0, 0, 10, 10, true, { line: 'hud.danger', glow: true });
     const head = funkText(this, 0, 0, 'FUNK · WARNUNG', lab, 'hud.text-muted').setOrigin(0.5, 0);
-    const title = funkText(this, 0, 0, 'BOSS KOMMT!', funkScale(3, k), 'hud.danger').setOrigin(0.5, 0);
+    const title = funkText(this, 0, 0, 'BOSS KOMMT!', funkScale(3, k), 'hud.danger').setOrigin(
+      0.5,
+      0,
+    );
     const rule = this.add.graphics();
     const bannerName = funkText(this, 0, 0, '', lab, 'hud.text').setOrigin(0.5, 0);
     this.bossBanner = { panel: bannerPanel, head, title, rule, name: bannerName };
@@ -270,7 +281,16 @@ export class HudScene extends Phaser.Scene {
       measureFunk(this, name, lab),
     );
     const bw = innerW + padX * 2;
-    const bh = padTop + FUNK_GLYPH_H * lab + gap + FUNK_GLYPH_H * big + gap + 1 + gap + FUNK_GLYPH_H * lab + padBottom;
+    const bh =
+      padTop +
+      FUNK_GLYPH_H * lab +
+      gap +
+      FUNK_GLYPH_H * big +
+      gap +
+      1 +
+      gap +
+      FUNK_GLYPH_H * lab +
+      padBottom;
     const bx = Math.round(width / 2 - bw / 2);
     const by = Math.round(height * BANNER_TOP);
     const cx = Math.round(width / 2);
@@ -305,7 +325,11 @@ export class HudScene extends Phaser.Scene {
     this.bannerTween = undefined;
     for (const p of parts) p.setVisible(on).setAlpha(1);
     if (!on) return;
-    const plan = bannerBlink(THEME.motionCount['motion.banner-blinks'], THEME.motionMs['motion.blink'], prefersReducedMotion());
+    const plan = bannerBlink(
+      THEME.motionCount['motion.banner-blinks'],
+      THEME.motionMs['motion.blink'],
+      prefersReducedMotion(),
+    );
     if (!plan) return;
     this.bannerTween = this.tweens.add({
       targets: parts,
@@ -355,9 +379,11 @@ export class HudScene extends Phaser.Scene {
       const s = b.tagScale;
       const tagW = measureFunk(this, look.tag, s);
       const lx = b.x + b.w - tagW - (patternWidth(PIXEL_LOCK) + 3) * s;
-      const ly = b.y - 3 - FUNK_GLYPH_H * s + Math.round((FUNK_GLYPH_H - PIXEL_LOCK.length) * s / 2);
+      const ly =
+        b.y - 3 - FUNK_GLYPH_H * s + Math.round(((FUNK_GLYPH_H - PIXEL_LOCK.length) * s) / 2);
       b.lock.fillStyle(themeColor(look.tagColor).num, 1);
-      for (const [cx, cy] of patternCells(PIXEL_LOCK)) b.lock.fillRect(lx + cx * s, ly + cy * s, s, s);
+      for (const [cx, cy] of patternCells(PIXEL_LOCK))
+        b.lock.fillRect(lx + cx * s, ly + cy * s, s, s);
     }
   }
 
@@ -393,7 +419,8 @@ export class HudScene extends Phaser.Scene {
       const fits = measureFunk(this, label, lab) + this.bossTagWidth(lab) + gap <= bar.w;
       const nameScale = fits ? lab : 1;
       bar.name.setFontSize(FUNK_GLYPH_H * nameScale);
-      bar.tagScale = !fits && measureFunk(this, label, 1) + this.bossTagWidth(1) + gap > bar.w ? 1 : lab;
+      bar.tagScale =
+        !fits && measureFunk(this, label, 1) + this.bossTagWidth(1) + gap > bar.w ? 1 : lab;
       bar.tag.setFontSize(FUNK_GLYPH_H * bar.tagScale);
     }
     this.drawBossBar();
@@ -475,7 +502,11 @@ export class HudScene extends Phaser.Scene {
     });
   }
 
-  private createPauseOverlay(width: number, height: number, k: number): Phaser.GameObjects.Container {
+  private createPauseOverlay(
+    width: number,
+    height: number,
+    k: number,
+  ): Phaser.GameObjects.Container {
     const scrim = themeColor('hud.scrim');
     const dim = this.add
       .rectangle(0, 0, width, height, scrim.num, scrim.alpha ?? 1)
@@ -483,9 +514,18 @@ export class HudScene extends Phaser.Scene {
       .setInteractive();
     dim.on('pointerup', this.togglePause, this);
     const cy = Math.round(height * 0.33);
-    const title = funkText(this, width / 2, cy, '— PAUSE —', funkScale(4, k), 'hud.text').setOrigin(0.5);
+    const title = funkText(this, width / 2, cy, '— PAUSE —', funkScale(4, k), 'hud.text').setOrigin(
+      0.5,
+    );
     const lab = funkScale(1, k);
-    this.pauseInfo = funkText(this, width / 2, cy + Math.round(36 * k), '', lab, 'hud.text-muted').setOrigin(0.5);
+    this.pauseInfo = funkText(
+      this,
+      width / 2,
+      cy + Math.round(36 * k),
+      '',
+      lab,
+      'hud.text-muted',
+    ).setOrigin(0.5);
     const hint = funkText(
       this,
       width / 2,
@@ -494,7 +534,10 @@ export class HudScene extends Phaser.Scene {
       lab,
       'hud.accent',
     ).setOrigin(0.5);
-    return this.add.container(0, 0, [dim, title, this.pauseInfo, hint]).setDepth(PAUSE_DEPTH).setVisible(false);
+    return this.add
+      .container(0, 0, [dim, title, this.pauseInfo, hint])
+      .setDepth(PAUSE_DEPTH)
+      .setVisible(false);
   }
 
   private togglePause(): void {
@@ -558,10 +601,19 @@ export class HudScene extends Phaser.Scene {
     const color: ColorName = low ? 'hud.energy-low' : 'hud.text';
     const shown = Number.isFinite(hp) ? Math.max(0, Math.ceil(hp)) : 0;
     setFunk(this.energyNum, String(shown), color);
-    setFunk(this.energyLabel, low ? 'ENERGIE!' : 'ENERGIE', low ? 'hud.energy-low' : 'hud.text-muted');
+    setFunk(
+      this.energyLabel,
+      low ? 'ENERGIE!' : 'ENERGIE',
+      low ? 'hud.energy-low' : 'hud.text-muted',
+    );
     this.energyPanel.setStyle({ line: low ? 'hud.energy-low' : 'hud.line' });
     this.drawSegments(ratio, low);
-    this.setBlink('energy', low, [this.energyPanel.gfx, this.energyNum, this.energyLabel, this.segGfx]);
+    this.setBlink('energy', low, [
+      this.energyPanel.gfx,
+      this.energyNum,
+      this.energyLabel,
+      this.segGfx,
+    ]);
   }
 
   private drawSegments(ratio: number, low: boolean): void {
