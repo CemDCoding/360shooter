@@ -36,7 +36,6 @@ export const MAPS: Readonly<Record<BatchId, MapDef>> = {
   forestNight: {
     tilesetKey: 'tiles-forest-night',
     baseColor: themeColor('biome.night-ground').num,
-    tint: themeColor('biome.night').num,
     decoDensity: 0.14,
     effect: 'fireflies',
     effectColor: themeColor('game.firefly').num,
@@ -46,7 +45,6 @@ export const MAPS: Readonly<Record<BatchId, MapDef>> = {
   elfForest: {
     tilesetKey: 'tiles-elf-forest',
     baseColor: themeColor('biome.elf-ground').num,
-    tint: themeColor('biome.elf').num,
     decoDensity: 0.18,
     effect: 'spores',
     effectColor: themeColor('game.spore').num,

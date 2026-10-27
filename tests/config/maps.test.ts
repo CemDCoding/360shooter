@@ -18,6 +18,10 @@ describe('maps', () => {
     }
   });
 
+  it('has no tint on any map (the tiles bring their own colors)', () => {
+    for (const b of BATCHES) expect(MAPS[b].tint).toBeUndefined();
+  });
+
   it('keeps values in range and particles light', () => {
     for (const b of BATCHES) {
       const m = MAPS[b];

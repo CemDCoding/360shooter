@@ -1,4 +1,5 @@
-// Erzeugt Platzhalter-PNGs und -WAVs fuer das Asset-Manifest (nur Node-Bordmittel).
+// Erzeugt Platzhalter-WAVs (Toene) fuer das Asset-Manifest (nur Node-Bordmittel).
+// Sprites entstehen nur mit "npm run sprites:build", Schriften mit "npm run fonts:build".
 // Schreibt nur fehlende Dateien. Mit --force werden nur Dateien ersetzt, die der Generator
 // selbst erzeugt hat und die seither nicht veraendert wurden (Hash in .placeholders.json).
 /* global console, process */
@@ -7,193 +8,12 @@ import { Buffer } from 'node:buffer';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deflateSync } from 'node:zlib';
 import { ASSETS } from '../src/config/assets.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = join(root, 'public');
 const markerPath = join(publicDir, 'assets', '.placeholders.json');
 const force = process.argv.includes('--force');
-
-// ---------- PNG ----------
-const crcTable = Array.from({ length: 256 }, (_, n) => {
-  let c = n;
-  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-  return c >>> 0;
-});
-function crc32(buf) {
-  let c = 0xffffffff;
-  for (const b of buf) c = crcTable[(c ^ b) & 0xff] ^ (c >>> 8);
-  return (c ^ 0xffffffff) >>> 0;
-}
-function chunk(type, data) {
-  const len = Buffer.alloc(4);
-  len.writeUInt32BE(data.length);
-  const td = Buffer.concat([Buffer.from(type, 'ascii'), data]);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(td));
-  return Buffer.concat([len, td, crc]);
-}
-function encodePng(width, height, rgba) {
-  const stride = width * 4 + 1;
-  const raw = Buffer.alloc(stride * height);
-  for (let y = 0; y < height; y++) {
-    raw[y * stride] = 0;
-    rgba.copy(raw, y * stride + 1, y * width * 4, (y + 1) * width * 4);
-  }
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(width, 0);
-  ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 6; // RGBA
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', ihdr),
-    chunk('IDAT', deflateSync(raw)),
-    chunk('IEND', Buffer.alloc(0)),
-  ]);
-}
-
-// ---------- Formen ----------
-const SHAPES = ['circle', 'square', 'diamond', 'triangle'];
-
-function drawFrame(px, sheetW, ox, fw, fh, key, frame, frames) {
-  const h = createHash('sha256').update(key).digest();
-  const color = [80 + (h[0] % 160), 80 + (h[1] % 160), 80 + (h[2] % 160)];
-  const shape = SHAPES[h[3] % SHAPES.length];
-  const isTiles = key.startsWith('tiles-');
-  const wobble = frame % 2; // Frames leicht verschieden
-  const cx = (fw - 1) / 2;
-  const cy = (fh - 1) / 2 - wobble;
-  const rx = Math.max(1, fw / 2 - 1 - wobble);
-  const ry = Math.max(1, fh / 2 - 1 - wobble);
-  const shade = 1 - 0.12 * (frame % frames);
-  for (let y = 0; y < fh; y++) {
-    for (let x = 0; x < fw; x++) {
-      const dx = (x - cx) / rx;
-      const dy = (y - cy) / ry;
-      let inside;
-      if (isTiles) inside = true;
-      else if (shape === 'circle') inside = dx * dx + dy * dy <= 1;
-      else if (shape === 'square') inside = Math.abs(dx) <= 1 && Math.abs(dy) <= 1;
-      else if (shape === 'diamond') inside = Math.abs(dx) + Math.abs(dy) <= 1;
-      else inside = Math.abs(dx) <= (dy + 1) / 2 && dy >= -1 && dy <= 1;
-      if (!inside) continue;
-      let c = color.map((v) => Math.round(v * shade));
-      if (isTiles && ((x + y) % 8 === 0 || x === 0 || y === 0)) {
-        c = c.map((v) => Math.round(v * 0.7));
-      }
-      // Weisse Markierung rechts zeigt die Blickrichtung
-      const ex = cx + rx / 2;
-      const ey = cy - ry / 3;
-      if (!isTiles && fw >= 16 && fh >= 8 && Math.abs(x - ex) < 1.5 && Math.abs(y - ey) < 1.5) {
-        c = [255, 255, 255];
-      }
-      const i = (y * sheetW + ox + x) * 4;
-      px[i] = c[0];
-      px[i + 1] = c[1];
-      px[i + 2] = c[2];
-      px[i + 3] = 255;
-    }
-  }
-}
-
-// ---------- Design-Vorlagen (docs/design/assets/pixel.js, mockups/sprites.html) ----------
-// Die Vorlagen werden ganzzahlig 2x vergroessert (12x8 -> 24x16, 8x8 -> 16x16).
-const hex = (s) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16));
-const RAYGUN_PALETTE = {
-  o: '#0b0610', // Tinte (Umriss der Waffe, Sprite-Styleguide)
-  w: '#f4f1f8',
-  l: '#c9c2d6',
-  a: '#ff6b8a',
-  x: '#ff8fae',
-  y: '#fff3b0', // Muendungsleuchten im Schuss-Frame
-};
-const RAYGUN = [
-  [
-    '.ooo........',
-    'owwwo.......',
-    'owwwoooooo..',
-    'owlwwwwwwoxo',
-    'owwwoooooo..',
-    '.owwo.......',
-    '..owo.......',
-    '..ooo.......',
-  ],
-  [
-    '.oaao.......',
-    'owwwo.......',
-    'owwwoooooo..',
-    'owlwawawaoxo',
-    'owwwoooooo..',
-    '.owwo.......',
-    '..owo.......',
-    '..ooo.......',
-  ],
-  [
-    '.oaao.......',
-    'owxwo.......',
-    'owxwooooooxo',
-    'owlwawawaoxo',
-    'owwwooooooxo',
-    '.owwo.......',
-    '..owo.......',
-    '..ooo.......',
-  ],
-];
-const ICON_PALETTE = { o: '#14101c', k: '#e8ecf2' }; // Linie + Fuellung, Farben per Tint
-const UI_ICONS = [
-  // 0 Ton an
-  ['....o...', '...oo..o', 'oooko.o.', 'okkko.o.', 'okkko.o.', 'oooko.o.', '...oo..o', '....o...'],
-  // 1 Ton aus
-  ['....o...', '...oo...', 'oookoo.o', 'okkko.o.', 'okkko.o.', 'oookoo.o', '...oo...', '....o...'],
-  // 2 Pause
-  ['ooo..ooo', 'oko..oko', 'oko..oko', 'oko..oko', 'oko..oko', 'oko..oko', 'oko..oko', 'ooo..ooo'],
-  // 3 Schloss
-  ['..oooo..', '.o....o.', '.o....o.', 'oooooooo', 'okkkkkko', 'okkookko', 'okkkkkko', 'oooooooo'],
-];
-
-/** Zeichnet Vorlagen (Zeichenraster) 2x vergroessert nebeneinander in ein Spritesheet. */
-function makeFromTemplates(frames, palette, fw, fh) {
-  const w = fw * frames.length;
-  const px = Buffer.alloc(w * fh * 4);
-  frames.forEach((rows, f) => {
-    rows.forEach((row, ty) => {
-      [...row].forEach((k, tx) => {
-        if (k === '.') return;
-        const c = hex(palette[k]);
-        for (let dy = 0; dy < 2; dy++) {
-          for (let dx = 0; dx < 2; dx++) {
-            const i = ((ty * 2 + dy) * w + f * fw + tx * 2 + dx) * 4;
-            px[i] = c[0];
-            px[i + 1] = c[1];
-            px[i + 2] = c[2];
-            px[i + 3] = 255;
-          }
-        }
-      });
-    });
-  });
-  return encodePng(w, fh, px);
-}
-function makeRaygun(def) {
-  // Je Ausbaustufe: Ruhe, Schuss (Muendung 'x' leuchtet im Schuss-Frame)
-  const frames = RAYGUN.flatMap((rows) => [rows, rows.map((r) => r.replaceAll('x', 'y'))]);
-  return makeFromTemplates(frames, RAYGUN_PALETTE, def.frameWidth, def.frameHeight);
-}
-function makeUiIcons(def) {
-  return makeFromTemplates(UI_ICONS, ICON_PALETTE, def.frameWidth, def.frameHeight);
-}
-const SPECIAL = { 'weapon-raygun': makeRaygun, 'ui-icons': makeUiIcons };
-
-function makeSprite(def) {
-  if (SPECIAL[def.key]) return SPECIAL[def.key](def);
-  const { frameWidth: fw, frameHeight: fh, frames } = def;
-  const w = fw * frames;
-  const px = Buffer.alloc(w * fh * 4);
-  for (let f = 0; f < frames; f++) drawFrame(px, w, f * fw, fw, fh, def.key, f, frames);
-  return encodePng(w, fh, px);
-}
 
 // ---------- WAV ----------
 const SOUNDS = {
@@ -242,12 +62,18 @@ function makeWav(spec) {
 
 // ---------- Hauptlauf ----------
 const sha = (buf) => createHash('sha256').update(buf).digest('hex');
-const marker = existsSync(markerPath) ? JSON.parse(readFileSync(markerPath, 'utf8')) : {};
+const audioPaths = new Set(ASSETS.filter((a) => a.kind === 'audio').map((a) => a.path));
+// Nur Toene werden gefuehrt; alte Sprite-Eintraege fallen heraus.
+const marker = Object.fromEntries(
+  Object.entries(existsSync(markerPath) ? JSON.parse(readFileSync(markerPath, 'utf8')) : {}).filter(
+    ([p]) => audioPaths.has(p),
+  ),
+);
 let written = 0;
 for (const def of ASSETS) {
-  if (def.kind === 'bitmapFont') continue; // Schriften entstehen nur mit "npm run fonts:build"
+  if (def.kind !== 'audio') continue; // Sprites: "npm run sprites:build", Schriften: "npm run fonts:build"
   const file = join(publicDir, def.path);
-  const content = def.kind === 'audio' ? makeWav(SOUNDS[def.key]) : makeSprite(def);
+  const content = makeWav(SOUNDS[def.key]);
   let write = false;
   if (!existsSync(file)) write = true;
   // --force: nur Dateien, die der Generator erzeugt hat und die unveraendert sind
@@ -264,4 +90,6 @@ if (!existsSync(markerPath) || readFileSync(markerPath, 'utf8') !== markerText) 
   mkdirSync(dirname(markerPath), { recursive: true });
   writeFileSync(markerPath, markerText);
 }
-console.log(`Placeholders written: ${written} of ${ASSETS.length}`);
+console.log(
+  `Placeholders written: ${written} of ${ASSETS.filter((a) => a.kind === 'audio').length}`,
+);
