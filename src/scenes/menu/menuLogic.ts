@@ -91,3 +91,8 @@ export function bevelRects(x: number, y: number, w: number, h: number, shadow = 
 export function motionMs(reduced: boolean, ms: number): number {
   return reduced ? 0 : ms;
 }
+
+/** Horizontal offset that centres the base-width layout in a wider arena (PE-102); never negative. */
+export function centerOffset(width: number, baseWidth: number): number {
+  return Math.max(0, Math.round((width - baseWidth) / 2));
+}
