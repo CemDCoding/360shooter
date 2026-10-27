@@ -23,10 +23,10 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 
 - **Stand:** 2026-10-27 · Wellenabschluss M4 W3 (autonomer Modus, PE-69): AP-85 gemergt (7767845, gepusht; Tests 491/491, lint, typecheck, `assets:check`, build grün; Review und Design-Review Runde 1 bestanden). Davor N9, M4 W1/W2 (AP-79 bis AP-84) fertig. Nachtrag 4 (Ingame-Sprites) baulich fertig, Abnahme über H-22 [Mensch]. M4 „Breites Spielfeld“: nur AP-86 (grob) und H-24 offen.
 - **Fertig:** AP-01–AP-20, AP-21–AP-36, AP-37a, AP-37c, AP-38, AP-39, AP-50–AP-85, M0-DEP, M1-DEP, M2-DEP, M2b-DEP, M3-DEP (abgenommen 2026-10-26). AP-63 ist gemergt, der Fix ist am Gerät noch nicht bestätigt. AP-76 ist am Gerät nur rechnerisch belegt (Sichtprüfung in H-18).
-- **Laufende Arbeit:** keine. **Bereit: keine.** **AP-86** bleibt grob (wartet auf H-23 und „Design übernehmen“). H-24 (M4-DEP) danach. **Offen [Mensch]:** H-22 (Sichtprüfung Sprites inkl. Boss, Laser, Münzen groß/klein, Waffenstufen 2 und 3, Links-Zielen; Q-46 bestätigen) ist jetzt fällig, H-23 (Designer-Interview „HUD am Handy“), H-18 (Handtest N6 und N8, zurückgestellt), H-12, H-16 (optional).
+- **Laufende Arbeit:** keine. **Bereit: AP-87** (Nachtrag 5, N10, Lane OPS, S, sonnet medium, Prettier-Aufräumen, PE-110, keine Abhängigkeit, kein Konflikt mit M4). **AP-86** bleibt grob (wartet auf H-23 und „Design übernehmen“). H-24 (M4-DEP) danach. **Offen [Mensch]:** H-22 (Sichtprüfung Sprites inkl. Boss, Laser, Münzen groß/klein, Waffenstufen 2 und 3, Links-Zielen; Q-46 bestätigen) ist jetzt fällig, H-23 (Designer-Interview „HUD am Handy“), H-18 (Handtest N6 und N8, zurückgestellt), H-12, H-16 (optional).
 - **Erkenntnisse (Details §18):** Wer `docs/design/assets/sprites*.js` ändert, führt `npm run sprites:build` aus und committet die PNGs (`tests/scripts/build-sprites.test.ts` fängt veraltete PNGs). `src/entities/bosses/rim.ts` (`rimRadii`) ist eine reine Funktion außerhalb der Eigentumsliste; AP-86 liest Breite und Mitte aus `this.scale` (ArenaSize), nicht aus Konstanten. Breite fest pro Runde (`decideArenaWidth`); Menü und Ergebnis starten bei Breitenänderung neu (offene Dialoge gehen verloren, kleines Race beim `startLevel`; Prüfpunkt für H-24). AP-85: `centerOffset(width, baseWidth)` in `menuLogic.ts`; Menü verschiebt per Offset, Ergebnis per Kamera-Scroll, Overlays zentrieren über `scale.width`; Design-Review nur headless bei 640/734/800, Sichtprüfung am Gerät in H-24; Mockup und Brief beschreiben das Verhalten bei breiter Arena nicht (Designer-Hinweis). `src/main.ts` weicht an Z. 8–13 und Z. 90 von Prettier ab. Offen: V-16 (Laser `setTintFill`), V-18 (PowerSlots „leer“ färbt mehrfarbige Symbole monochrom), Token `game.aura` fehlt (Waldgeist-Aura 0x9b59b6 ton in ton auf Elfenwald). Chips mit aktiven Kräften (`FunkChip`, `FunkPanel.ts`) skalieren weiter mit k (Text 2 auf 3, Höhe 24·k nicht ganzzahlig): bei weiterer Klage „Power-ups zu groß“ sind das die Chips (Teil der Planung Variante B). Banner und Pause-Titel nutzen `funkScale` mit k (am Handy Stufe 4/5, nicht bemängelt, im Smoke mitbeobachten). Design-System-Lücke: Der Brief regelt das HUD nur bei k = 1, die Tabelle „HUD am Handy“ fehlt (Variante-B-Planung, Designer). Slot-Rand 8 gegen Panel-Rand round(8k) = 11 (niedrig). Designer-Commits an `docs/design/export/` brauchen danach `npm run theme:build` (V-15 entschieden, PE-98: Der Lead legt nach Designer-Commits am Export selbst ein Theme-Sync-Paket an). `HOVER_FILL_ALPHA` 0,18 und `BLINK_ALPHA` 0,55 bleiben Konstanten ohne Token (Q-45). Sprites: Alle 24 Designer-Sprites passen zum Manifest, Code bleibt bis auf `maps.ts` (Tint) unverändert; offen sind `Laser.ts` `setTintFill` (V-16), Sprite-Sync (V-17, RI-21), mehrfarbige Item-Symbole im HUD (V-18).
-- **Nächster Schritt:** Kein Paket startbar. [Mensch] H-22 (Sichtprüfung, Release `dev` → `stage`) und H-23 (Designer-Interview „HUD am Handy“); danach „Design übernehmen“ für AP-86, dann H-24 (M4-DEP, Smoke-Test nach PE-106). Vorschläge V-16, V-17, V-18 und der Token `game.aura` warten auf den Nutzer.
-- **Offene Fragen an den Nutzer:** (1) Q-46 (angenommen, PE-108): Beide Münzen bleiben 16 px, der Unterschied kommt aus den Sprites (Stern auf der großen Münze) und der Kontur; Bestätigung in H-22, sonst Mini-Paket für 8 px. (2) Q-45: Hover-Wert 0,18 und `BLINK_ALPHA` 0,55 als Token in den Designer-Export aufnehmen oder als Konstanten lassen. (3) Niederlage-Text „5:00 · BOSS NICHT BESIEGT“: nur im Mockup, Designer klärt, ob die ResultScene ihn bekommt. (4) Neu: Format-Aufräumen (Prettier an `src/main.ts`, Zeilenenden) als kleines Fix-Paket? (5) Neu: Token `game.aura` sowie V-16 und V-18 an den Designer geben?
+- **Nächster Schritt:** AP-87 startbar (Nutzer hat freigegeben, PE-110). [Mensch] H-22 (Sichtprüfung, Release `dev` → `stage`) und H-23 (Designer-Interview „HUD am Handy“); danach „Design übernehmen“ für AP-86, dann H-24 (M4-DEP, Smoke-Test nach PE-106). Vorschläge V-16, V-17, V-18 und der Token `game.aura` warten auf den Nutzer.
+- **Offene Fragen an den Nutzer:** (1) Q-46 (angenommen, PE-108): Beide Münzen bleiben 16 px, der Unterschied kommt aus den Sprites (Stern auf der großen Münze) und der Kontur; Bestätigung in H-22, sonst Mini-Paket für 8 px. (2) Q-45: Hover-Wert 0,18 und `BLINK_ALPHA` 0,55 als Token in den Designer-Export aufnehmen oder als Konstanten lassen. (3) Niederlage-Text „5:00 · BOSS NICHT BESIEGT“: nur im Mockup, Designer klärt, ob die ResultScene ihn bekommt. (4) Erledigt: Format-Aufräumen läuft als AP-87 (PE-110). (5) Neu: Token `game.aura` sowie V-16 und V-18 an den Designer geben?
 
 <!-- Ende Lagebericht -->
 
@@ -524,6 +524,7 @@ flowchart TD
 | M4 W2 | AP-84 (Boss-Arena, Spielszene) | `src/entities/bosses/{BossBase,GiantStone,RootMonster}.ts`, `src/config/bosses.ts` (nur `BOSS_TUNING.arena`), `src/scenes/GameScene.ts`, `tests/config/bosses.test.ts`, `tests/entities/bossGeometry.test.ts`, `tests/logic/boss.test.ts` (nur falls nötig) |
 | M4 W3 | AP-85 (Menü und Ergebnis zentrieren) | `src/scenes/MenuScene.ts`, `src/scenes/ResultScene.ts`, `src/scenes/menu/*.ts` (nur falls nötig) |
 | M4 W3 | AP-86 (HUD am Handy, grob, nach H-23) | `src/scenes/HudScene.ts`, `src/scenes/hud/*.ts` (inklusive `PowerSlots.ts`, V-18 abstimmen), `tests/scenes/hud.test.ts` (endgültig nach „Design übernehmen“) |
+| N10 | AP-87 (Prettier-Aufräumen, PE-110) | `.prettierrc.json` (nur Zeile `endOfLine`), ggf. `.gitattributes` (neu, nur mit Beleg), `src/main.ts` (nur Formatierung) und weitere Dateien nur, wenn `npx prettier --check .` sie nach der Zeilenende-Lösung noch meldet (Liste im Bericht). Nicht: `docs/**`, `package-lock.json`, `.prettierignore` (nur lesen), `src/scenes/HudScene.ts` und `src/scenes/hud/**` (AP-86), `public/assets/sprites/**`. Läuft unabhängig von M4; ist AP-86 schon in Arbeit, fasst AP-87 dessen Dateien nicht an |
 | M4 (Regel) | Hinweis zur Variante B (PE-96, Schnitt PE-109) | Die Pakete von M4 dürfen `public/assets/sprites/**`, `src/config/assets.ts`, den Tint in `src/config/maps.ts` und die Dateien von AP-79 und AP-80 nicht anfassen. `src/scenes/MapBackground.ts`, `src/main.ts`, `src/platform/layout.ts`, `src/scenes/GameScene.ts`, `HudScene.ts`, Gegner- und Boss-Dateien gehören dem Sprite-Einbau nicht und bleiben für M4 frei |
 
 ---
@@ -545,6 +546,7 @@ flowchart TD
 | Nachtrag 2 | Antworten Handtest M2c-DEP (Q-34 bis Q-36, PE-70 bis PE-72) | iPhone Homescreen-App (AP-63), Gold-Magnet weicher (AP-64), Lagerplatz für zeitbegrenzte Kräfte (AP-65 Logik, AP-66 HUD und Szene, nach AP-71; Designer-Ergänzung liegt vor, PE-85; AP-72 Boss-Lücken danach, AP-75 Aufräumen als N7, PE-91). Läuft neben M3, ohne ihn zu blockieren (PE-69) | iPhone-Homescreen-App passt ins Bild, Gold fliegt weich zur Spielerin, Dauerfeuer und Feuerring liegen im Lagerplatz und starten per Tippen |
 | M3 | Bosse | Boss-Rahmen, drei Bosse mit Varianten je Level, Einbindung (PE-18, PE-33, PE-34) | jedes Level endet mit seinem Boss |
 | Nachtrag 4 | Einbau der Ingame-Sprites (Brief vom 2026-10-26, PE-107, PE-108) | Sprite-Pipeline `sprites:build` mit allen 24 Sprites des Designers (AP-79), Doku und Lizenzen (AP-80). Läuft neben M4 (Variante B), ohne ihn zu blockieren oder von ihm abzuhängen | Astronautin, Strahlenpistole, Laser, Gegner, Bosse, Items, Münzen, Kacheln und Symbole erscheinen im Spiel in den Pixeln des Designers, `assets:placeholders` erzeugt nur noch Töne |
+| Nachtrag 5 | Prettier-Aufräumen (Lead-Befund 2026-10-27, PE-110) | AP-87: `npx prettier --check .` wird grün (Zeilenenden-Einstellung, echte Stilabweichungen wie in `src/main.ts`). Läuft neben M4, ohne ihn zu blockieren | `npx prettier --check .` meldet keine Datei, Git-Diff ohne reine Zeilenenden-Änderungen |
 
 ### 9.1 Ablauf einer Welle
 
@@ -796,6 +798,18 @@ Der Nutzer hat die Sprite-Entwürfe am 2026-10-26 freigegeben („sprites sind f
   - [ ] Treffer-Blitz bleibt weiß; die Hitboxen fühlen sich fair an (unverändert)
   - [ ] Vergleich mit `docs/design/screenshots/sprites-ingame-desktop.png` und `sprites-welt-desktop.png`
 
+#### Nachtrag 5 – Prettier-Aufräumen (Lead-Befund 2026-10-27, PE-110)
+
+Der Lead maß: `npx prettier --check src tests scripts` meldet 172 Dateien, `npx prettier --check .` (das Skript `format` ist `prettier --write .`) 182 Dateien. Ursache fast aller Meldungen sind Zeilenenden (Windows-Checkout CRLF, im Index LF, Prettier-Standard `endOfLine: lf`); echte Stilabweichungen gibt es mindestens in `src/main.ts`. Das Paket ist unabhängig von M4 und Nachtrag 4.
+
+| Welle | Pakete |
+|---|---|
+| N10 | **AP-87** Prettier-Aufräumen (ein Paket, Design-Review nein) |
+
+- **Prüfpunkte:**
+  - [ ] `npx prettier --check .` meldet keine Datei (AP-87, Akzeptanz)
+  - [ ] `git diff --stat` des Pakets zeigt nur wenige Dateien, keine reinen Zeilenenden-Änderungen
+
 #### M4 – Breites Spielfeld (Variante B, PE-96, PE-99 bis PE-106, PE-109)
 
 Ziel: Das Spielfeld wird am Handy breiter (Breite 640..800 bei Höhe 360), damit das Spiel auf jedem Handy gut aussieht. Auf dem iPhone 15 quer bleibt links und rechts nur der Bereich von Notch und Home-Bar frei (je 47 pt statt bisher je 95 pt Rand, Foto `IMG_6372.PNG`, PE-97). Die Spielbalance hängt nicht von der Breite ab (PE-100).
@@ -939,6 +953,7 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-85 | M4: Menü und Ergebnis zentrieren (PE-102; Design-Review ja) | M4 | GAME | M4 W3 | AP-81, AP-82 (fertig) | S | sonnet (medium) | – (gemergt 7767845) | fertig |
 | AP-86 | M4: HUD am Handy nach Designer-Tabelle (PE-103; grob, Design-Review ja) | M4 | GAME | M4 W3 | AP-82, H-23, „Design übernehmen“ | S–M | sonnet (medium) | – | offen (grob, G2 nach H-23) |
 | H-24 | M4-DEP: `dev` nach `stage`, Smoke-Test nach PE-106 | M4 | HUM | M4 W4 | AP-81 bis AP-86 | H | – | – | offen |
+| AP-87 | Prettier-Aufräumen: `npx prettier --check .` grün (Zeilenenden-Einstellung, Stilabweichungen wie `src/main.ts`; PE-110; Design-Review nein) | Nachtrag 5 | OPS | N10 | – (kein Konflikt mit M4) | S | sonnet (medium) | – | bereit |
 
 ---
 
@@ -3421,6 +3436,44 @@ Gemeinsame Pflichtlektüre für alle M4-Pakete: §4 „Arena-Größe“, PE-96, 
 - **Kürzbar bei Budgetnot:** ja, wenn die Designer-Tabelle keine Codeänderung verlangt
 - **Commit-Typ:** `feat(AP-86): apply the phone HUD table`
 
+### Nachtrag 5 – Prettier-Aufräumen (PE-110)
+
+#### AP-87 – Prettier-Aufräumen
+
+- **Meilenstein, Lane, Welle:** Nachtrag 5 · OPS · N10
+- **Status: bereit**
+- **Ziel:** `npx prettier --check .` (der Umfang des Skripts `format`, ohne `.prettierignore`) meldet keine Datei mehr, ohne dass im Git-Diff reine Zeilenenden-Änderungen entstehen. Danach können Coder und Reviewer `prettier --check` als Werkzeug nutzen, ohne an 180 fremden Dateien zu scheitern.
+- **Befund (Planner, lesend; Zahlen des Lead):** `npx prettier --check src tests scripts` meldet 172 Dateien, `npx prettier --check .` 182. Im Index liegen 209 Dateien als LF, im Arbeitsordner als CRLF (Windows-Checkout); Prettier erwartet standardmäßig LF (`endOfLine: lf`). Die Konfiguration steht in `.prettierrc.json` (`singleQuote`, `semi`, `trailingComma: all`, `printWidth: 100`, kein `endOfLine`). `.prettierignore` schließt `node_modules/`, `dist/`, `package-lock.json`, `docs/`, `idee.txt`, `.claude/` aus (also auch den Plan und `docs/design/**`). Echte Stilabweichung nachgewiesen in `src/main.ts` (Import-Block Z. 8–13, Kommentar am `if` Z. 90).
+- **Pflichtlektüre:** PE-110, `package.json` (Skript `format`, nur lesen), `.prettierrc.json`, `.prettierignore` (nur lesen), `src/main.ts`
+- **Abhängigkeiten:** keine. Kein Konflikt mit M4: `src/main.ts` gehörte AP-82 (fertig, gemergt), kein offenes Paket besitzt eine der genannten Dateien
+- **Parallel möglich mit:** AP-86 (nur falls AP-86 `HudScene.ts` und `src/scenes/hud/**` nicht an AP-87 abgeben muss, siehe Dateien), jedes andere Paket
+- **Dateien (Eigentum):**
+  - `.prettierrc.json`: nur die neue Zeile `"endOfLine": "auto"`
+  - `.gitattributes` (neu, nur falls der Coder belegt, dass `* text=auto eol=lf` ohne Massendiff geht, Beleg im Bericht; erwartet: nicht nötig)
+  - `src/main.ts`: nur Formatierung (Import-Block, Kommentar)
+  - weitere Dateien nur, wenn `npx prettier --check .` sie nach der Zeilenende-Lösung noch meldet; die Liste steht im Bericht. Eigentum an diesen Dateien gilt nur für Formatierung, nie für Inhalt
+- **Nicht anfassen:** `docs/**` (auch `docs/design/**` und der Plan), `package-lock.json`, `package.json`, `.prettierignore` (nur lesen), `.claude/`, `public/assets/sprites/**` und `public/assets/fonts/**` (erzeugte PNGs), `src/scenes/HudScene.ts` und `src/scenes/hud/**` (AP-86; meldet Prettier dort etwas, steht es im Bericht und der Lead plant es nach AP-86 ein), `src/config/theme.ts` und `src/styles/tokens.css` (erzeugt durch `theme:build`; meldet Prettier dort etwas, im Bericht nennen, nicht von Hand ändern)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Vorher messen: `npx prettier --check .` (Anzahl und Liste notieren). Prüfen, ob die Meldungen bei einer Datei mit LF-Kopie verschwinden, um die Ursache Zeilenenden zu belegen (zum Beispiel `npx prettier --end-of-line auto --check src/main.ts`).
+  2. In `.prettierrc.json` `"endOfLine": "auto"` ergänzen. Erneut `npx prettier --check .` ausführen. `.gitattributes` nur erwägen, wenn `auto` nicht genügt, und dann belegen, dass `git diff --stat` und `git status` danach keinen Massendiff zeigen (Index ist schon LF).
+  3. Die verbliebenen, echten Stilabweichungen (mindestens `src/main.ts`) mit `npx prettier --write <Datei>` auf genau den gemeldeten Dateien beheben. Nie `npm run format` oder `prettier --write .` ausführen (das berührt Dateien außerhalb des Eigentums). Nie Prettier in Pipes.
+  4. `git diff --stat` prüfen: nur `.prettierrc.json`, `src/main.ts` und höchstens die wenigen weiteren gemeldeten Dateien; kein Massendiff. Prüfen, dass kein Inhalt außer Formatierung geändert ist (`git diff -w` bleibt ohne Logikänderung).
+  5. `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` ausführen. Bericht: Messung vorher und nachher, gewählte Lösung mit Begründung, Liste der zusätzlich formatierten Dateien.
+- **Akzeptanzkriterien:**
+  - `npx prettier --check .` meldet keine Datei (alle Pfade, die `format` abdeckt)
+  - `git diff --stat` zeigt keine reinen Zeilenenden-Massenänderungen (kleine Dateizahl, nur Formatierung)
+  - Kein Spielverhalten geändert; `npm run lint`, `typecheck`, `test`, `build` grün
+  - Die Lösung für die Zeilenenden ist im Bericht begründet (`auto` oder `.gitattributes` mit Beleg)
+- **Tests:** keine neuen. Vorhandene Tests bleiben grün
+- **Review-Schwerpunkte:** kein Massendiff, nur Formatierung (`git diff -w` ohne Logik), keine Datei außerhalb des Eigentums, keine erzeugte Datei (Sprites, Schriften, Theme) von Hand geändert, `.prettierrc.json` sonst unverändert
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine (der Bericht nennt die Lösung)
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja (reine Hygiene, kein Meilenstein hängt davon ab)
+- **Commit-Typ:** `chore(AP-87): make prettier check pass`
+
 ### M3 – Bosse
 
 #### AP-16 – Boss-Rahmen
@@ -3836,6 +3889,7 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | M3 | 6 (AP-16 bis AP-20 und AP-67, Fairness-Fix PE-75, M ≈ 1,5 h) | ≈ 10 h (+ Review ≈ 13 h) | ≈ 5–6 |
 | M3-Nachtrag | 4 (AP-68 S, AP-69 S, AP-70 M, AP-71 S; Handtest-Befunde PE-76 bis PE-78, Theme-Sync PE-86) | ≈ 4,25 h (+ Review inkl. Design-Review AP-70 ≈ 5,5 h) | ≈ 1–2 (AP-68 bis AP-70 in W1, AP-71 in W2) |
 | M4 Breites Spielfeld (PE-99 bis PE-106, PE-109) | 6 (AP-81 S, AP-82 M, AP-83 M, AP-84 M, AP-85 S, AP-86 S–M grob) | ≈ 7,25 h (angenommen; + Review inkl. Design-Review AP-85 und AP-86 ≈ 9,5 h) | ≈ 3–4 (W2 mit drei M-Paketen füllt etwa ein Fenster allein; AP-81 kann im Fenster von N9 mitlaufen; Zeile nicht in der Gesamtzeile, wie die Nachträge) |
+| Nachtrag 5 (Prettier-Aufräumen, PE-110) | 1 (AP-87 S) | ≈ 0,75 h (angenommen; + Review ≈ 1 h) | ≈ 0,5 (passt in ein Fenster neben anderer Arbeit; Zeile nicht in der Gesamtzeile, wie die Nachträge) |
 | **Gesamt** | **46** | **≈ 70 h (+ Review ≈ 90 h)** | **≈ 32–38** |
 
 Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h. Die Fensterzahlen oben gelten noch für 30 % Zielwert. Bei 45 % sinkt die Zahl rechnerisch auf etwa zwei Drittel, Neuberechnung nach M2b-DEP (§18). Die M2c-Zeile (PE-59) enthält AP-50 und AP-54 (je M, ca. 1,5 h), AP-51, AP-52 und AP-53 (je L, ca. 2,5 h) und AP-55 (S, ca. 0,75 h), alle angenommen. Dazu kommen drei Design-Reviews durch `ma-designer`, deren Kosten als Review-Zuschlag gerechnet sind. Optional sind die Pakete AP-55 (Regel kann später folgen) und H-13 (Sprites, Mensch). Das Risiko steht in RI-17. Die Gesamtzeile enthält die Zeilen M2c-Nachtrag und Nachtrag 2 nicht: Nachtrag 2 (PE-70 bis PE-72) bringt 4 Pakete, ≈ 6,25 h (+ Review ≈ 8 h) und ≈ 3–4 Fenster zusätzlich, Risiko RI-19.
@@ -4006,6 +4060,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-107 | **Design übernommen (Brief vom 2026-10-26, Ergänzung „Ingame-Sprites“).** Der Nutzer hat die Sprites freigegeben (H-19 ☑, Designer-Commits 57573d8, 7740338, 8c7b88b `design: approve in-game sprites`). Paketschnitt als Nachtrag 4, Welle N9: **AP-79** (Sprite-Pipeline `sprites:build` aus `docs/design/assets/sprites.js` und `sprites-world.js`, 24 PNGs, Platzhalter-Generator nur noch für Töne, `.placeholders.json` ohne Sprites, Tint bei Nacht und Elfenwald entfernt, `astronaut`-Beschreibung; Design-Review ja) und **AP-80** (Doku: `LICENSES.md`, `grafik-austauschen.md`, `README.md`). Die Kacheln ohne Tint gehören in AP-79, weil dieselben PNGs die Doppeltönung auslösen und ein eigenes Paket eine weitere Review-Runde kostete. Befund (Code gelesen, Sprites gegen `assets.ts` geprüft): alle 24 Maße, Framezahlen und Paletten stimmen mit dem Manifest überein, `Player.ts`, `weaponMount.ts` (Griff 7\|12, Mündung), Körper und Hitboxen brauchen keine Änderung. Keine neue Abhängigkeit, keine neuen Tokens (`color.sprite.*` sind seit AP-78 im Theme). Reihenfolge zu M4 (Variante B): unabhängig, Sprite-Einbau zuerst. H-13 bleibt durch H-19 ersetzt und ist damit erledigt; H-19 ☑; H-22 neu (Sichtprüfung) | Brief-Status `freigegeben`, Nutzer im Chat „sprites sind freigegeben“ am 2026-10-26, Pflegeauftrag „Design übernehmen“ des Lead | Nutzer am 2026-10-26 (Freigabe der Sprites); Paketschnitt angenommen vom Planner (Pflege) |
 | PE-108 | **Q-46 über die Sprite-Gestaltung gelöst (angenommen).** Beide Münzen bleiben 16 px groß: kleine Münze 8×8 mit `smallDisplayScale` 2, große 16×16 mit `bigDisplayScale` 1 (`COIN_VISUAL`, PE-90, unverändert). Unterscheidung: Sprite (große Münze mit Stern-Prägung in Frame 0, kleine schlicht), 2 px Kontur (`game.hit-flash`) wie in `Coin.ts` und im Designer-Mockup `sprites-welt.html`. Kein Code-Paket nötig. Bestätigung durch den Nutzer in der Sichtprüfung H-22. Will der Nutzer die kleine Münze auf 8 px, entsteht ein Mini-Paket (`smallDisplayScale` 1, dazu `setScale(2)` an den Stellen, die `coin-small` als Symbol zeigen: `CoinCounter`, `ResultScene`, `MenuScene`, `UpgradePanel`) | Planner (Pflege) aus Brief, Mockup `sprites-welt.html` und `src/config/coins.ts` | Planner (Pflege) angenommen; Nutzer bestätigt in H-22 |
 | PE-109 | **Variante B, Größenwechsel (9a) und Schnitt M4.** Während einer Runde (GameScene aktiv, pausiert oder schlafend) bleibt die Arena-Breite fest; nur die Skalierung passt sich an (höchstens kurz Balken). Die neue Breite gilt ab dem nächsten Menü oder der nächsten Runde. Verworfen: 9b (sofort anpassen, alle Szenen neu aufbauen). Der vorgelegte Schnitt M4 ist bestätigt; wegen paralleler Vergabe im Nachtrag 4 umnummeriert (vorgelegt als AP-79 bis AP-84, H-22, H-23; jetzt AP-81 bis AP-86, H-23, H-24). Annahmen des Planners: Anlauf-Faktor 4 und Toleranz 5 % (AP-83), iPhone-15-Breite 734 (gerundet) | Nutzer am 2026-10-26 (Planner-Interview, Antwort 9a, Schnitt vorgelegt) | Nutzer am 2026-10-26; Faktor 4 und Toleranz 5 % angenommen vom Planner |
+| PE-110 | **Fix-Paket AP-87 „Prettier-Aufräumen“ (Nachtrag 5, Welle N10).** Der Lead maß `npx prettier --check` mit 172 Meldungen in `src tests scripts` (182 mit `.`, dem Umfang des Skripts `format`). Befund des Planners (lesend): Der Index hat LF, der Arbeitsordner CRLF (209 Dateien `i/lf w/crlf`), `.prettierrc.json` (nicht `.prettierrc`) setzt kein `endOfLine`. Empfohlene Lösung: `"endOfLine": "auto"` in `.prettierrc.json` (Prettier behält dann die vorhandenen Zeilenenden, kein Massendiff); `.gitattributes` mit `eol=lf` nur, wenn der Coder belegt, dass es ohne Massendiff geht. Danach nur echte Stilabweichungen mit `prettier --write` auf den gemeldeten Dateien beheben (mindestens `src/main.ts`, Import-Block Z. 8–13, Kommentar Z. 90). Kein Dokument unter `docs/**` (`.prettierignore` schließt `docs/` aus), kein Lockfile. Keine neue Abhängigkeit | Nutzer am 2026-10-27 („mach das Fix-Paket und setz direkt um“, über den Lead), Befund des Lead | Nutzer am 2026-10-27; Lösungsweg angenommen vom Planner, Coder entscheidet nach Messung |
 
 ### Offene Fragen
 
@@ -4220,6 +4275,7 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | Design-Grundsatz 3 „Ein Pixelraster, ganzzahlig skaliert“ (Sprites nicht skaliert, Ausnahme Boss 2×, kleine Münze ×2) | AP-79 (Akzeptanz, Design-Review); Beobachtung Riesen-Stein-Teilsteine (§16) |
 | Design-Grundsatz 1 „Nur Tokens“ für die Sprites (Kacheln ohne `tint`, keine Farb-Literale) | AP-79 (`maps.ts`, Lint-Regel AP-55 bleibt) |
 | Q-46 Münzen-Unterschied über Sprite und Kontur (PE-108) | AP-79 (Design-Review), H-22 (Bestätigung) |
+| Format-Befund des Lead (Prettier-Check meldet 182 Dateien, Zeilenenden und `src/main.ts`; PE-110) | AP-87 (N10) |
 | F-12 Grafik: Herkunft der Sprites „eigene Arbeit des Projekts“ und Anleitung `sprites:build` (R1 Asset-Lizenzen) | AP-80 (`LICENSES.md`, `grafik-austauschen.md`, `README.md`) |
 
 ---
@@ -4465,4 +4521,5 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-27 | Erkenntnis AP-85: `centerOffset(width, baseWidth)` in `src/scenes/menu/menuLogic.ts`. Das Menü verschiebt seine Inhalte per Offset, das Ergebnis per Kamera-Scroll (`setScroll(-ox, 0)`), Overlays zentrieren selbst über `scale.width`. Hintergrund-Sterne des Ergebnisses sind nicht um den Versatz verschoben (unauffällig) | Wellenabschluss M4 W3 | AP-85 | Lead (Pflege) |
 | 2026-10-27 | Erkenntnis Design-Review AP-85: nur per headless Chrome bei 640/734/800 ausgeführt; 640 nicht per Pixeldiff, sondern über `centerOffset` = 0 belegt. Sichtprüfung am Gerät in H-24 | Wellenabschluss M4 W3 | AP-85, H-24 | Lead (Pflege) |
 | 2026-10-27 | Design-Hinweis an den Designer: Mockup und `design-brief.md` beschreiben nur das 640er-Feld. Das Verhalten bei breiter Arena (Inhalt mittig, Hintergrund voll) steht nicht im Design; ggf. im Interview „HUD am Handy“ (H-23) mit festhalten | Wellenabschluss M4 W3 | AP-85, H-23 | Lead (Pflege); Designer offen |
+| 2026-10-27 | Fix-Paket AP-87 „Prettier-Aufräumen“ angelegt (Nachtrag 5, N10, OPS, S, sonnet medium, Status `bereit`, Design-Review nein): §8, §9, §10, §12, §14, §16 (PE-110), §17, Lagebericht. Die Frage 4 im Lagebericht ist damit beantwortet. Hinweis: die Prettier-Konfiguration heißt `.prettierrc.json`, `format` ist `prettier --write .` | Pflegeauftrag „Fix-Paket anlegen“ (Nutzer: „mach das Fix-Paket und setz direkt um“) | AP-87, PE-110 | Lead (Pflege) |
 | 2026-10-27 | Erkenntnis Design-Review AP-79: Offen bleiben V-16 (Laser `setTintFill`), V-18 (PowerSlots „leer“ färbt mehrfarbige Symbole monochrom) und der fehlende Token `game.aura` (Waldgeist-Aura 0x9b59b6 ton in ton auf Elfenwald). Im Handtest H-22 sind Boss, Laser, Münzen groß/klein, Waffenstufen 2 und 3 und Links-Zielen noch nicht im Spiel verifiziert | Wellenabschluss N9 | AP-79, H-22, V-16, V-18 | Lead (Pflege) |
