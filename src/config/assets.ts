@@ -1,7 +1,7 @@
 import type { AssetDef } from '../contracts/assets';
 
 const SPRITE_NOTE =
-  'PNG mit Transparenz, Blickrichtung nach rechts, Frames waagerecht nebeneinander.';
+  'PNG mit Transparenz, Blickrichtung nach rechts, Frames waagerecht nebeneinander. Entsteht mit "npm run sprites:build" aus dem Design, nicht von Hand ersetzen.';
 
 function sprite(
   key: string,
@@ -43,7 +43,7 @@ function sound(name: string, description: string): AssetDef {
 
 /** Festes Asset-Manifest. Designer ersetzen nur die Dateien unter public/assets. */
 export const ASSETS: readonly AssetDef[] = [
-  sprite('astronaut', 32, 32, 4, 'Astronautin: 2 Frames Idle, 2 Frames Schuss.'),
+  sprite('astronaut', 32, 32, 4, 'Astronautin: Frame 0 bis 1 Ruhe, Frame 2 bis 3 Rückstoß.'),
   sprite('boss-root-monster', 64, 64, 4, 'Boss: verwurzeltes Baummonster (Wald).'),
   sprite('boss-root-spike', 16, 32, 3, 'Boss-Angriff: Wurzelspitze des Baummonsters.'),
   sprite('boss-forest-ghost', 48, 48, 4, 'Boss: Waldgeist (Wald bei Nacht).'),
