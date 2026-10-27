@@ -55,13 +55,27 @@ Beispiel: `astronaut.png` hat 4 Frames mit je 32 x 32 Pixel. Die Datei ist also 
 | item-fire-ring.png         | 16 x 16             | 2      | 32 x 16                       | Rüstung: Feuerring (Pickup)               | Frame 1 und 2: zwei Bilder der Animation                                      |
 | coin-small.png            | 8 x 8               | 4      | 32 x 8                        | Kleine Münze                              | Frame 1 bis 4: Drehung der Münze der Reihe nach                               |
 | coin-big.png              | 16 x 16             | 4      | 64 x 16                       | Große Münze                               | Frame 1 bis 4: Drehung der Münze der Reihe nach                               |
-| tiles-forest.png          | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald"                    | Vier Kachel-Varianten. Reihenfolge wie in der Platzhalter-Datei lassen        |
-| tiles-forest-night.png    | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald bei Nacht"          | Vier Kachel-Varianten. Reihenfolge wie in der Platzhalter-Datei lassen        |
-| tiles-elf-forest.png      | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Elfenwald"               | Vier Kachel-Varianten. Reihenfolge wie in der Platzhalter-Datei lassen        |
+| tiles-forest.png          | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald"                    | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
+| tiles-forest-night.png    | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald bei Nacht"          | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
+| tiles-elf-forest.png      | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Elfenwald"               | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
 | weapon-raygun.png         | 24 x 16             | 6      | 144 x 16                      | Die Strahlenpistole, nach rechts zeigend  | Je Ausbaustufe 2 Frames (Ruhe, Schuss): Frame 1 und 2 Stufe 1, 3 und 4 Stufe 2, 5 und 6 Stufe 3 |
 | ui-icons.png              | 16 x 16             | 4      | 64 x 16                       | Symbole der Oberfläche                    | Frame 1: Ton an. Frame 2: Ton aus. Frame 3: Pause. Frame 4: Schloss           |
 
-Tipp: Öffne zuerst die vorhandene Platzhalter-Datei. So siehst du, wie die Frames angeordnet sind.
+Tipp: Öffne zuerst die vorhandene Datei. So siehst du, wie die Frames angeordnet sind.
+
+### So entstehen die Sprites
+
+Die 24 Sprites sind **keine Platzhalter**. Sie entstehen aus den Pixeldaten des Designers: `docs/design/assets/sprites.js` (Figuren, Waffe, Symbole) und `docs/design/assets/sprites-world.js` (Welt, Kacheln). Zum Ändern bearbeitest du diese Dateien und tippst dann:
+
+```
+npm run sprites:build
+```
+
+Der Befehl schreibt alle PNG-Dateien in `public/assets/sprites/` neu. Die Vorschau siehst du, indem du `docs/design/mockups/sprites-ingame.html` und `docs/design/mockups/sprites-welt.html` im Browser öffnest. Danach prüfst du mit `npm run assets:check`.
+
+Alternativ kannst du eine einzelne PNG von Hand zeichnen und mit gleichem Namen ablegen (Schritte unten). Beachte: `npm run sprites:build` überschreibt sie wieder. Ändere dann auch die Pixeldaten oder baue nicht neu.
+
+Nur die **Töne** sind Platzhalter (`npm run assets:placeholders`).
 
 ### Strahlenpistole (`weapon-raygun.png`)
 
@@ -98,11 +112,13 @@ Der Befehl schreibt je Schrift eine PNG (weiße Zeichen, transparent) und eine X
 
 Die Icons `icon-180.png`, `icon-192.png` und `icon-512.png` entstehen aus `docs/design/assets/app-icon.svg` (Helm der Astronautin) und werden scharf (ohne Glättung) hochgerechnet. Nach einer Änderung an der SVG tippst du `npm run icons`. Es werden nur Rechtecke, Gruppen mit Verschiebung und Deckkraft unterstützt, alles andere meldet das Skript als Fehler.
 
-## Schritt für Schritt
+## Schritt für Schritt (eigene PNG von Hand)
 
-1. **Datei öffnen.** Öffne die Platzhalter-Datei aus dem Ordner `public/assets/sprites/` in deinem Zeichenprogramm. Zum Beispiel `astronaut.png`.
+Dieser Weg ist die Alternative zu `npm run sprites:build`. Für Änderungen an den 24 Sprites ist der Weg über die Pixeldaten (siehe oben) der vorgesehene.
+
+1. **Datei öffnen.** Öffne die vorhandene Datei aus dem Ordner `public/assets/sprites/` in deinem Zeichenprogramm. Zum Beispiel `astronaut.png`.
 2. **Zeichnen.** Male die Frames nebeneinander. Halte dich an die Regeln oben. Die Leinwand muss genau die Gesamtgröße aus der Tabelle haben. Die Breite ist Frame-Breite mal Anzahl der Frames, die Höhe ist die Frame-Höhe. Beispiel `astronaut.png`: 32 mal 4 = 128 Pixel breit, 32 Pixel hoch.
-   - **LibreSprite:** Öffnest du die Platzhalter-Datei, stimmt die Größe schon. Bei einer neuen Datei wählst du `Datei > Neu` und trägst Breite und Höhe ein. Später änderst du sie unter `Sprite > Leinwandgröße`.
+   - **LibreSprite:** Öffnest du die vorhandene Datei, stimmt die Größe schon. Bei einer neuen Datei wählst du `Datei > Neu` und trägst Breite und Höhe ein. Später änderst du sie unter `Sprite > Leinwandgröße`.
    - **Piskel:** Beim Start oder unter dem Werkzeug "Größe ändern" Breite und Höhe eintragen. Entferne den Haken bei "Seitenverhältnis beibehalten", sonst ändert sich die Höhe mit. Beim Export (PNG) wähle Skalierung 1x.
 3. **Speichern.** Speichere als **PNG** mit **demselben Namen** im **selben Ordner** `public/assets/sprites/`. Die alte Datei wird dabei ersetzt.
 4. **Terminal öffnen.** Öffne den Projektordner im Datei-Explorer. Klicke oben in die Adresszeile, tippe `powershell` und drücke Enter. Es öffnet sich ein Fenster, in dem du Befehle eintippst.
