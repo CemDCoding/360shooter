@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** geändert am 2026-10-28 (Ergänzung H-23 „HUD am Handy“, noch nicht freigegeben; zuletzt freigegeben am 2026-10-26: „Ingame-Sprites“ und H-14; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Ergänzung H-23 ausgearbeitet (Tabelle „HUD am Handy“, V-16, V-18, `game.aura`, Q-45, Niederlage-Text „BESIEGT“), Tokens und Exporte neu gebaut, Kontrast grün. Nächster Schritt: Freigabe durch den Nutzer, danach legt der Lead das Theme-Sync-Paket an und beauftragt den Planner mit „Design übernehmen“ für AP-86 (Übergabe unter „Änderungen“, H-23).
+**Status:** freigegeben am 2026-10-28 (Ergänzung H-23 „HUD am Handy“; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Ergänzung H-23 freigegeben (Tabelle „HUD am Handy“, V-16, V-18, `game.aura`, Q-45, Niederlage-Text „BESIEGT“), Tokens und Exporte neu gebaut, Kontrast grün. Nächster Schritt: Der Lead legt das Theme-Sync-Paket an und beauftragt den Planner mit „Design übernehmen“ für AP-86 (Übergabe unter „Änderungen“, H-23).
 
 ## Ausgangslage
 
@@ -208,7 +208,7 @@ Keine neuen Abhängigkeiten. Ein Paket ohne Design-Review (keine UI), aber mit H
 
 **Paketierung (Vorschlag):** Lagerplatz in AP-66 (Pflichtlektüre: Ansichten 1–4). Die Boss-Lücken betreffen `HudScene.ts` und `ResultScene.ts` und kollidieren deshalb mit AP-66 bei `HudScene.ts`. Entweder in AP-66 mitnehmen oder als eigenes Paket danach. Beide mit Design-Review.
 
-### 2026-10-28 · Ergänzung H-23 „HUD am Handy“ (geändert, Freigabe offen)
+### 2026-10-28 · Ergänzung H-23 „HUD am Handy“ (freigegeben am 2026-10-28)
 
 **Auftrag (Nutzer, H-23, PE-103):** Der Brief regelte das HUD nur bei k = 1. Gesucht: Größen bei k über 1, Verhalten bei Arena-Breite 640 bis 800, Slot-Rand (8) gegen Panel-Rand (round(8k) = 11). Dazu V-16 (Laser), V-18 (Item-Symbole im Lagerplatz), Token `game.aura`, Q-45 und der Niederlage-Text.
 
