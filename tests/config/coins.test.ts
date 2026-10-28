@@ -50,9 +50,12 @@ describe('coins', () => {
     expect(v.outlineColorToken in THEME.colors).toBe(true);
   });
 
-  it('big coin is shown at 16 px: 16 px sprite at scale 1 (Q-44, PE-90)', () => {
-    const BIG_SPRITE_PX = 16;
+  it('both field coins are shown at 12 px: 6 px sprite at scale 2, 12 px sprite at scale 1 (H-25, PE-121)', () => {
+    const FIELD_SPRITE_PX = 6;
+    const BIG_SPRITE_PX = 12;
+    expect(COIN_VISUAL.smallDisplayScale).toBe(2);
     expect(COIN_VISUAL.bigDisplayScale).toBe(1);
-    expect(BIG_SPRITE_PX * COIN_VISUAL.bigDisplayScale).toBe(16);
+    expect(FIELD_SPRITE_PX * COIN_VISUAL.smallDisplayScale).toBe(12);
+    expect(BIG_SPRITE_PX * COIN_VISUAL.bigDisplayScale).toBe(12);
   });
 });

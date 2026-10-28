@@ -51,7 +51,8 @@ describe('asset manifest', () => {
       'item-rapid-fire': [16, 16, 2],
       'item-fire-ring': [16, 16, 2],
       'coin-small': [8, 8, 4],
-      'coin-big': [16, 16, 4],
+      'coin-field': [6, 6, 4],
+      'coin-big': [12, 12, 4],
     };
     for (const [key, [w, h, n]] of Object.entries(expected)) {
       const a = ASSETS.find((x) => x.key === key);
