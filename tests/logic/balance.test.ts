@@ -254,6 +254,36 @@ describe('balance: difficulty curve', () => {
     }
   });
 
+  it('level 5 to 20 have about 1.3 times the spawns per minute of after AP-91 (AP-95)', () => {
+    // Stand nach AP-91 (Spawns pro Minute, Level 5 bis 20).
+    const before = [
+      69.7, 72.0, 75.0, 77.8, 81.0, 98.3, 99.3, 100.7, 102.0, 103.3, 104.7, 106.4, 107.8, 109.4,
+      111.0, 112.4,
+    ];
+    for (let i = 5; i < 21; i++) {
+      const ratio = M[i].spawnsPerMin / before[i - 5];
+      expect(ratio, `level ${i}`).toBeGreaterThanOrEqual(1.27);
+      expect(ratio, `level ${i}`).toBeLessThanOrEqual(1.35);
+    }
+  });
+
+  it('gold and xp per level of level 5 to 20 stay at the pace after AP-91 despite the denser spawns (AP-95, Q-51)', () => {
+    const before = [
+      69.7, 72.0, 75.0, 77.8, 81.0, 98.3, 99.3, 100.7, 102.0, 103.3, 104.7, 106.4, 107.8, 109.4,
+      111.0, 112.4,
+    ];
+    for (let i = 5; i < 21; i++) {
+      const oldCount = (before[i - 5] * LEVELS[i].durationSec) / 60;
+      const ratioGold = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].coin) / oldCount;
+      const ratioXp = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].xp) / oldCount;
+      const ratioContact = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / oldCount;
+      for (const r of [ratioGold, ratioXp, ratioContact]) {
+        expect(r, `level ${i}`).toBeGreaterThan(0.96);
+        expect(r, `level ${i}`).toBeLessThan(1.04);
+      }
+    }
+  });
+
   it('level 0 to 4 are denser than before but stay below level 5 (jump 4 -> 5 stays)', () => {
     expect(M[4].spawnsPerMin).toBeLessThan(M[5].spawnsPerMin);
   });

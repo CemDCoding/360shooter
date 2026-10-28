@@ -244,6 +244,11 @@ describe('EnemyPool.spawn hit point scaling (AP-90, AP-91)', () => {
       expect(hp, `level ${id}`).toBeLessThan(ENEMIES.cursedTree.hp);
       prev = hp;
     }
-    expect(pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[5]).hp).toBe(ENEMIES.cursedTree.hp);
+    // Ab Level 5 (AP-95) ebenfalls skaliert, gerundet mit Minimum 1.
+    for (let id = 5; id <= 20; id++) {
+      const expected = Math.max(1, Math.round(ENEMIES.cursedTree.hp * LEVEL_SCALING[id].hp));
+      expect(pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[id]).hp, `level ${id}`).toBe(expected);
+    }
+    expect(pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[5]).hp).toBeGreaterThan(prev);
   });
 });
