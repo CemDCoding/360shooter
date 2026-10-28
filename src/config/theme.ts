@@ -126,6 +126,7 @@ const COLORS = {
   'game.hit-flash': { num: 0xfff4e8, css: '#fff4e8' },
   'game.firefly': { num: 0xf3f07a, css: '#f3f07a' },
   'game.spore': { num: 0x9ff5ec, css: '#9ff5ec' },
+  'game.aura': { num: 0x5fe0c0, css: '#5fe0c0' },
 } as const satisfies Record<string, ThemeColor>;
 
 /** Abstände in px. */
@@ -190,6 +191,9 @@ const MOTION_EASING = {
 const OPACITY = {
   'dim': 0.35,
   'ghost': 0.6,
+  'hover': 0.18,
+  'blink': 0.55,
+  'aura': 0.25,
 } as const;
 
 /** Schrift: Familien (Fallback-Reihenfolge), Skalierungsstufen, Zeichenabstand und Zeilenabstand in px. */
