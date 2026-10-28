@@ -32,6 +32,7 @@ Schwierigkeit nicht mehr stetig steigt.
   ueber 1 braucht man Items. Mit Doppelschuss Stufe 2 (drei Schuesse) ist der Schaden 3-mal so hoch (120 pro Sekunde).
   In der Praxis trifft man nicht immer, deshalb ist Level 0 mit 0,50 bewusst unter 1.
   Die Eroeffnungswelle (AP-56) zaehlt bei Spawns/Min mit.
+- **Skalierung (AP-91)**: `LEVEL_SCALING` in `scaling.ts` mit den Faktoren `hp`, `xp`, `coin`, `contact` je Level. Die Kennzahlen rechnen sie ein (Lebenspunkte gerundet wie im Spiel).
 - **Schaden ohne Abschuss/Min**: Schaden pro Minute an der Astronautin, wenn sie gar nichts trifft und
   alle Gegner ungestoert ankommen. Sie ist nur zum Vergleichen der Level gedacht (die Zahl waechst mit
   der Rundendauer, daher sind 5-Minuten-Level hoeher). Annahme: Gegner starten 380 px vom Zentrum.
@@ -40,11 +41,11 @@ Schwierigkeit nicht mehr stetig steigt.
 
 | Level | Batch | Minuten | Spawn-Abstand (ms) | Max. Gegner | Spawns/Min | Gegner-HP/Min | Druck | Schaden ohne Abschuss/Min |
 |---|---|---|---|---|---|---|---|---|
-| 0 | forest | 3 | 3320 | 25 | 24 | 1200 | 0,50 | 10551 |
-| 1 | forest | 3 | 3020 | 28 | 26 | 1317 | 0,55 | 11767 |
-| 2 | forest | 3 | 2800 | 31 | 29 | 1433 | 0,60 | 12937 |
-| 3 | forest | 5 | 2410 | 34 | 33 | 1630 | 0,68 | 16770 |
-| 4 | forest | 5 | 2170 | 37 | 36 | 1820 | 0,76 | 18315 |
+| 0 | forest | 3 | 1500 | 25 | 52 | 1196 | 0,50 | 5687 |
+| 1 | forest | 3 | 1450 | 28 | 54 | 1296 | 0,54 | 6718 |
+| 2 | forest | 3 | 1400 | 31 | 56 | 1456 | 0,61 | 7674 |
+| 3 | forest | 5 | 1360 | 34 | 57 | 1602 | 0,67 | 10233 |
+| 4 | forest | 5 | 1330 | 37 | 59 | 1817 | 0,76 | 12048 |
 | 5 | forestNight | 3 | 1130 | 40 | 70 | 2011 | 0,84 | 13661 |
 | 6 | forestNight | 3 | 1090 | 42 | 72 | 2079 | 0,87 | 14320 |
 | 7 | forestNight | 3 | 1050 | 44 | 75 | 2165 | 0,90 | 14983 |
@@ -137,9 +138,29 @@ oder einer Doppelschuss-Salve.
   bringt es auf etwa 44,4 (Test: 43 bis 47). Eine Upgrade-Spur auf Stufe 10 (698 Gold) braucht damit etwa 15,7 Level.
 - Alle neuen Startwerte (Baum-HP 50, Radius 0,65, Zielwerte) sind angenommen und werden im Handtest geprueft.
 
+## Skalierung je Level (AP-91, B5)
+
+Handtest H-22: In Level 0 bis 4 kam der naechste Gegner teils erst nach 3,3 s, die Runde wirkte leer. Jetzt:
+
+- **Dichte:** Spawn-Abstand in Level 0 bis 4 von 3320 / 3020 / 2800 / 2410 / 2170 ms auf 1500 / 1450 / 1400 / 1360 / 1330 ms. Die groesste Luecke ist damit 1,5 s (vorher 3,3 s), im Lauf der Runde sinkt sie auf 60 %. `MAX_ENEMIES` bleibt (25 bis 37, unter dem Wert 40 von Level 5).
+- **Schwaechere Einzelgegner:** In Level 0 bis 4 hat jeder Baum weniger Lebenspunkte, bringt weniger Erfahrung, laesst seltener eine Muenze fallen und macht weniger Kontaktschaden, im Verhaeltnis alte zu neue Gegnerzahl. Druck, Gold-Tempo (Q-51), Erfahrung je Level und Gesamt-Kontaktschaden bleiben dadurch gleich.
+- **Level 5 bis 20 unveraendert** (Faktor 1,0): dort ist die groesste Luecke schon 1,13 s oder kleiner, die Spawns pro Minute steigen bereits mit jedem Level (der Plan erlaubt, diese Level auf eine zweite Runde zu verschieben).
+
+| Level | Abstand vorher / nachher (ms) | Spawns/Min vorher / nachher | Faktor | `hp` (Baum-HP) | `xp` und `coin` | `contact` | Druck vorher / nachher | Gold je Level |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 3320 / 1500 | 24,0 / 52,0 | 2,17 | 0,46 (23) | 0,462 | 0,46 | 0,50 / 0,50 | 5,8 / 5,8 |
+| 1 | 3020 / 1450 | 26,3 / 54,0 | 2,05 | 0,48 (24) | 0,488 | 0,49 | 0,55 / 0,54 | 6,3 / 6,3 |
+| 2 | 2800 / 1400 | 28,7 / 56,0 | 1,95 | 0,52 (26) | 0,512 | 0,51 | 0,60 / 0,61 | 6,9 / 6,9 |
+| 3 | 2410 / 1360 | 32,6 / 57,2 | 1,75 | 0,56 (28) | 0,570 | 0,57 | 0,68 / 0,67 | 13,0 / 13,0 |
+| 4 | 2170 / 1330 | 36,4 / 58,6 | 1,61 | 0,62 (31) | 0,621 | 0,62 | 0,76 / 0,76 | 14,6 / 14,6 |
+
+Der Faktor ist die Gegnerzahl pro Minute nachher geteilt durch vorher (mindestens 1,5, Ziel erreicht). Der Sprung 4 zu 5 bleibt bei +10 %.
+Bekannte Folge: Der Verfluchte Baum hat in Level 0 bis 4 nur 23 bis 31 statt 50 Lebenspunkte (Gegenstueck zu AP-56 (e)): eine Doppelschuss-Salve (Stufe 2, 3 mal 10 Schaden) toetet ihn in Level 0 bis 3. Das ist die Kehrseite von doppelt so vielen Gegnern bei gleichem Druck und im Handtest zu pruefen.
+Nachjustieren: zuerst `hp` in `scaling.ts` (Baum-HP = 50 mal `hp`, ganzzahlig halten), die Tests der Kurve bleiben der Massstab.
+
 ## Nachjustieren: Beispiele
 
-- Level 0 zu schwer: in `levels.ts` den ersten Eintrag von `SPAWN_INTERVAL_MS` erhoehen (z. B. 3600; Druck-Untergrenze 0,45 beachten).
+- Level 0 zu schwer: in `scaling.ts` `hp` von Level 0 senken oder in `levels.ts` `SPAWN_INTERVAL_MS[0]` erhoehen (hoechstens 1500, groesste Luecke); Druck-Untergrenze 0,45 beachten.
 - Rundenstart zu hektisch oder zu leer: `OPENING_RADIUS_FACTOR` (Abstand der Eroeffnungswelle, 0,65) oder den Anteil in `openingCount` (15 %, 3 bis 8) in `spawn.ts` aendern.
   Dann stimmt eventuell der Abstand zu Level 1 nicht mehr, der Test sagt es dir.
 - Items zu stark: `perStack` oder `maxStacks` in `items.ts` senken, bei Dauerfeuer `durationMs`.
