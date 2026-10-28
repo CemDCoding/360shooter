@@ -40,7 +40,7 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - **Plan-Bezug:** Abnahmekriterium für AP-91 (B5 Zahlen) oder ein kleines eigenes Paket davor. `spawn.ts` gehört laut §8 AP-91 nicht, deshalb ist ein Eigentumseintrag nötig.
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: Vertrag `LevelDef` additiv erweitert
-- **Status:** entwurf
+- **Status:** freigegeben (2026-10-28)
 
 ### RS-01.2 – Spannungskurve in Phasen statt linearer Rampe
 - **Vorschlag:** Der Director arbeitet in Zyklen: *Aufbau* (Intervall sinkt), *Spitze* (5–8 s, höchste Rate, oft mit Ereignis aus RS-01.3), *Atempause* (8–12 s, Rate etwa 25 %, nur Mindestbelegung). Bei 3 min etwa 3 Zyklen, bei 5 min etwa 5. Jeder Zyklus liegt etwas höher als der vorige, der letzte endet in der Boss-Warnung (33 s). Die Kurve ist pro Level als Daten beschrieben (z. B. `pacing: { cycleSec, peakSec, relaxSec, relaxRate }`). Die lineare Rampe bleibt als Grundtrend.
@@ -48,7 +48,7 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - **Plan-Bezug:** §4 (`LevelDef`, `SpawnDirector`), neues Paket nach AP-91.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: Vertrag `LevelDef`, Logik `SpawnDirector`; Balance-Tests (Druck-Bänder) neu einstellen
-- **Status:** entwurf
+- **Status:** freigegeben (2026-10-28)
 
 ### RS-01.3 – Angekündigte Spawn-Ereignisse (Schwarm, Ring, Zange)
 - **Vorschlag:** Drei datengetriebene Ereignisse für Spitzen: **Schwarm** (8–15 Eichhörnchen aus einem Sektor von etwa 30°), **Ring** (Bäume gleichmäßig auf dem ganzen Ring, ähnlich der Eröffnungswelle), **Zange** (zwei Gruppen aus gegenüberliegenden Sektoren, prüft die Drehgeschwindigkeit). Jedes Ereignis kündigt sich etwa 1 s vorher an, mit Richtungsmarker am Rand und Ton. Ereignisse liegen zeitlich fest je Level und sind dadurch lernbar. Neue Ereignisarten erst ab bestimmten Leveln.
@@ -56,7 +56,7 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - **Plan-Bezug:** neues Paket (Logik plus Szene). Der Randmarker braucht den Designer.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: `SpawnRequest` um Gruppe und Ankündigung erweitert; Design: Ankündigungs-Marker und Ton
-- **Status:** entwurf
+- **Status:** freigegeben (2026-10-28)
 
 ### RS-01.4 – Mischung über Bedrohungsbudget und Rollen-Caps
 - **Vorschlag:** Jeder Gegnertyp erhält `threatCost` (z. B. Eichhörnchen 1, Baum 2, Spirit 3, Hexe 3). Das Budget wächst pro Sekunde und je Level. Der Director wählt per Gewicht, aber nur, was bezahlbar ist. Je Rolle gibt es eine Höchstzahl gleichzeitig (z. B. Hexen ≤ 3, Spirits ≤ 4). In der Spitze darf er angespartes Budget ausgeben.
@@ -64,7 +64,7 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - **Plan-Bezug:** §4 (`EnemyDef` + `LevelDef`), neues Paket. Lässt sich mit RS-01.2 zusammenlegen.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: Verträge `EnemyDef`/`LevelDef`, Spawn-Logik
-- **Status:** entwurf
+- **Status:** freigegeben (2026-10-28)
 
 ### RS-01.5 – Elite-Varianten bestehender Gegner
 - **Vorschlag:** Eine Elite-Stufe für die vier Gegner: HP ×3, Schaden ×1,5, gleiche Geschwindigkeit, etwas größer bzw. getönt, garantierter Münz- oder Item-Drop. Eliten erscheinen ab Level 3 vereinzelt (ab Batch „Nacht“ öfter), bevorzugt in Spitzen, und kosten im Budget das 6-fache. Die Faktoren stehen in `src/config/scaling.ts` aus AP-90.
@@ -72,7 +72,7 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - **Plan-Bezug:** neues Paket nach AP-90/AP-91. Die Optik ist eine Designer-Frage.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: Elite-Flag am Gegner; Design: Elite-Darstellung (Tönung/Größe); Ökonomie: Gold-Tempo (Q-51)
-- **Status:** entwurf
+- **Status:** freigegeben (2026-10-28)
 
 ### RS-01.6 – Regel für die Stärke-Skalierung in AP-91
 - **Vorschlag:** In AP-91 gelten drei Regeln: (1) HP steigt linear je Level innerhalb eines Batches und springt beim Batch-Wechsel, (2) die Geschwindigkeit bleibt fest, (3) Druck entsteht vor allem über Anzahl, Rhythmus und Eliten, nicht über HP. Prüfgröße: Die Zeit pro Kill bei Upgrade-Stufe „erwartet“ bleibt je Gegnertyp in einem Band.
@@ -80,7 +80,7 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - **Plan-Bezug:** Abnahmekriterium für AP-91, Ergänzung in `docs/balancing.md`.
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-10-28)
 
 ### RS-01.7 – Sanfte Anpassung über die Atempause (optional)
 - **Vorschlag:** Liegt die HP der Spielerin länger als 5 s unter 30 %, verlängert sich die nächste Atempause aus RS-01.2 (z. B. ×1,5). Ist sie über einen ganzen Zyklus hinweg ohne Schaden geblieben, wird die Pause kürzer. Gegnerwerte ändern sich nie, der Boss ist ausgenommen.
@@ -88,7 +88,7 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - **Plan-Bezug:** Erweiterung des Pakets aus RS-01.2. Empfehlung: erst nach einem Handtest von RS-01.2 entscheiden.
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein (nur der Spawn-Director liest die HP)
-- **Status:** entwurf
+- **Status:** verworfen (2026-10-28)
 
 ## Vertrauen und Lücken
 - **Gut belegt:** Die Pacing-Phasen und das Prinzip „Frequenz statt Amplitude“ kommen aus Valves eigenen Vortragsfolien (Booth, AIIDE 2009). Gelesen habe ich sie über einen Spiegel [Q1], weil Valves Original-URL 404 lieferte und das Valve-Developer-Wiki 403. Die Inhalte sind konsistent mit mehreren Erwähnungen. Die Angriffs-Tokens von DOOM kommen aus einem Fachartikel über einen GDC-Vortrag [Q6].
@@ -108,4 +108,5 @@ Ein gleichmäßig dichter werdender Strom ermüdet. Spannung entsteht durch **Rh
 - [Q8] Flow (video game) / J. Chen, Flow in Games (USC, 2006), https://en.wikipedia.org/wiki/Flow_(video_game), abgerufen 2026-10-28 – Sekundärquelle (Lexikon)
 
 ## Entscheidungen
-- (noch keine)
+- Nutzer am 2026-10-28: RS-01.1, RS-01.2, RS-01.3, RS-01.4, RS-01.5 und RS-01.6 freigegeben
+- Nutzer am 2026-10-28: RS-01.7 verworfen

@@ -4,4 +4,4 @@ Berichte des Researchers (ma-researcher). Freigegebene Vorschläge übernimmt de
 
 | Bericht | Thema | Datum | Vorschläge (Status) |
 |---|---|---|---|
-| [RS-01](RS-01-wellen-design.md) | Wellen-Design: Spawn-Verhalten und Gegnerstärke | 2026-10-28 | .1 bis .7 entwurf |
+| [RS-01](RS-01-wellen-design.md) | Wellen-Design: Spawn-Verhalten und Gegnerstärke | 2026-10-28 | .1 bis .6 freigegeben · .7 verworfen |
