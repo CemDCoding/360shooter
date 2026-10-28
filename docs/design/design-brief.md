@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** geändert am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119); der Status „geändert“ ist auf Wunsch des Nutzers gesetzt, damit der Planner sie übernimmt. Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
+**Status:** freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
 ## Ausgangslage
 
@@ -269,7 +269,7 @@ Ein Chip mit lädendem Feuerring (`ArmourIndicator`) zeigt wie ein leeres Fach e
 
 **Paketierung (Vorschlag):** Zuerst das Theme-Sync-Paket. Danach AP-86 (HUD: `HudScene`, `hud/**`, Test) mit Design-Review. Für ResultScene, Laser und Aura ein kleines Paket mit Design-Review; es teilt keine Datei mit AP-86 und kann parallel laufen. Keine neuen Abhängigkeiten, keine neuen Sprites oder Schriften. Handtest in H-24: leeres und gesperrtes Fach, Laser in allen drei Biomen, Waldgeist-Aura auf Elfenwald, Niederlage-Ergebnis.
 
-### 2026-10-28 · Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ (Status: geändert, wartet auf Übernahme)
+### 2026-10-28 · Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ (freigegeben am 2026-10-28)
 
 **Auftrag (Nutzer, Handtest-Antworten Q-50, Q-53, Q-54, PE-113, PE-119):** (1) Münzen auf dem Feld 12×12 statt 16×16, Münzen im Menü und das Symbol im Münzzähler bleiben 16 px. (2) Münzzähler, Doppelschuss- und Schild-Chip 15 % kleiner, Maße in die HUD-Tabelle, Ausrichtung gemischt hoher Chips festlegen. (3) Niederlage-Text „NIEDERLAGE“ statt „BESIEGT“.
 
