@@ -2,7 +2,8 @@
 // Index = Level-ID (0 bis 20). Level 0 bis 4 haben seit AP-91 etwa doppelt so viele, dafuer schwaechere Gegner:
 // Die Faktoren sind das Verhaeltnis alte zu neue Gegnerzahl, sodass Druck, Gold, Erfahrung und
 // Kontaktschaden je Level gleich bleiben (Q-51). Der Baum hat 50 Lebenspunkte, hp * 50 ist ganzzahlig.
-// Level 5 bis 20 sind unveraendert (Faktor 1,0). Erklaerung in docs/balancing.md.
+// Level 5 bis 20 (AP-95): etwa 1,3-mal so viele Gegner, hp und contact 0,77, xp und coin = alte durch neue Gegnerzahl.
+// Erklaerung in docs/balancing.md.
 export interface LevelScaling {
   hp: number;
   xp: number;
@@ -18,6 +19,14 @@ const DENSE: readonly LevelScaling[] = [
   { hp: 0.62, xp: 0.621, coin: 0.621, contact: 0.62 },
 ];
 
+/** Level 5 bis 20 (AP-95), Index 0 = Level 5: xp und coin sind das Verhaeltnis alte zu neue Gegnerzahl. */
+const DENSE_LATE_XP: readonly number[] = [
+  0.771, 0.769, 0.773, 0.77, 0.771, 0.774, 0.776, 0.774, 0.771, 0.775, 0.771, 0.77, 0.772, 0.77, 0.774,
+  0.77,
+];
+
 export const LEVEL_SCALING: readonly LevelScaling[] = Array.from({ length: 21 }, (_, id) =>
-  id < DENSE.length ? { ...DENSE[id] } : { hp: 1, xp: 1, coin: 1, contact: 1 },
+  id < DENSE.length
+    ? { ...DENSE[id] }
+    : { hp: 0.77, xp: DENSE_LATE_XP[id - 5], coin: DENSE_LATE_XP[id - 5], contact: 0.77 },
 );

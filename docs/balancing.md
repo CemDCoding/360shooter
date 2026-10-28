@@ -46,31 +46,31 @@ Schwierigkeit nicht mehr stetig steigt.
 | 2 | forest | 3 | 1400 | 31 | 56 | 1456 | 0,61 | 7674 |
 | 3 | forest | 5 | 1360 | 34 | 57 | 1602 | 0,67 | 10233 |
 | 4 | forest | 5 | 1330 | 37 | 59 | 1817 | 0,76 | 12048 |
-| 5 | forestNight | 3 | 1130 | 40 | 70 | 2011 | 0,84 | 13661 |
-| 6 | forestNight | 3 | 1090 | 42 | 72 | 2079 | 0,87 | 14320 |
-| 7 | forestNight | 3 | 1050 | 44 | 75 | 2165 | 0,90 | 14983 |
-| 8 | forestNight | 5 | 1000 | 46 | 78 | 2246 | 0,94 | 17067 |
-| 9 | forestNight | 5 | 960 | 48 | 81 | 2338 | 0,97 | 17808 |
-| 10 | elfForest | 3 | 800 | 60 | 98 | 2564 | 1,07 | 22657 |
-| 11 | elfForest | 3 | 790 | 64 | 99 | 2590 | 1,08 | 23973 |
-| 12 | elfForest | 3 | 780 | 68 | 101 | 2625 | 1,09 | 25271 |
-| 13 | elfForest | 3 | 770 | 72 | 102 | 2660 | 1,11 | 26554 |
-| 14 | elfForest | 3 | 760 | 76 | 103 | 2694 | 1,12 | 27822 |
-| 15 | elfForest | 3 | 750 | 80 | 105 | 2729 | 1,14 | 29076 |
-| 16 | elfForest | 5 | 730 | 84 | 106 | 2774 | 1,16 | 33704 |
-| 17 | elfForest | 5 | 720 | 88 | 108 | 2811 | 1,17 | 35178 |
-| 18 | elfForest | 5 | 710 | 92 | 109 | 2853 | 1,19 | 36647 |
-| 19 | elfForest | 5 | 700 | 96 | 111 | 2894 | 1,21 | 38110 |
-| 20 | elfForest | 5 | 690 | 100 | 112 | 2931 | 1,22 | 39568 |
+| 5 | forestNight | 3 | 870 | 52 | 90 | 2015 | 0,84 | 14199 |
+| 6 | forestNight | 3 | 840 | 55 | 94 | 2089 | 0,87 | 14974 |
+| 7 | forestNight | 3 | 810 | 57 | 97 | 2164 | 0,90 | 15521 |
+| 8 | forestNight | 5 | 770 | 60 | 101 | 2253 | 0,94 | 17784 |
+| 9 | forestNight | 5 | 740 | 62 | 105 | 2342 | 0,98 | 18389 |
+| 10 | elfForest | 3 | 615 | 78 | 127 | 2564 | 1,07 | 24944 |
+| 11 | elfForest | 3 | 610 | 83 | 128 | 2584 | 1,08 | 26321 |
+| 12 | elfForest | 3 | 600 | 88 | 130 | 2624 | 1,09 | 27716 |
+| 13 | elfForest | 3 | 590 | 94 | 132 | 2671 | 1,11 | 29356 |
+| 14 | elfForest | 3 | 585 | 99 | 133 | 2691 | 1,12 | 30675 |
+| 15 | elfForest | 3 | 575 | 104 | 136 | 2738 | 1,14 | 32030 |
+| 16 | elfForest | 5 | 560 | 109 | 138 | 2790 | 1,16 | 37022 |
+| 17 | elfForest | 5 | 555 | 114 | 140 | 2818 | 1,17 | 38564 |
+| 18 | elfForest | 5 | 545 | 120 | 142 | 2866 | 1,19 | 40437 |
+| 19 | elfForest | 5 | 540 | 125 | 143 | 2895 | 1,21 | 41961 |
+| 20 | elfForest | 5 | 530 | 130 | 146 | 2947 | 1,23 | 43529 |
 
 ## Was die Tests sichern
 
 - Der Druck steigt mit jedem Level, auch ueber Batch-Grenzen (Spawns/Min ebenso).
-- Die Spruenge 4 zu 5 (Ist +10 %, erlaubt 8 bis 12 %) und 9 zu 10 (Ist +10 %, erlaubt 8 bis 10 %) sind spuerbar (mindestens 8 %)
+- Die Spruenge 4 zu 5 (Ist +11 %, erlaubt 8 bis 12 %) und 9 zu 10 (Ist +9 %, erlaubt 8 bis 10 %) sind spuerbar (mindestens 8 %)
   und groesser als jeder normale Schritt im neuen Batch.
 - Ab Level 5 waechst der Druck je Level um hoechstens 10 %.
 - 5-Minuten-Level sind in ihrem Batch fordernder als die 3-Minuten-Level.
-- Level 0 hat Druck 0,45 bis 0,55 (Ist 0,50), Level 4 0,72 bis 0,80 (Ist 0,76). Level 20 liegt bei 0,95 bis 1,25 (Ist 1,22):
+- Level 0 hat Druck 0,45 bis 0,55 (Ist 0,50), Level 4 0,72 bis 0,80 (Ist 0,76). Level 20 liegt bei 0,95 bis 1,25 (Ist 1,23):
   die Grundwaffe reicht nicht, schon Doppelschuss Stufe 1 (80 pro Sekunde) reicht rechnerisch aus.
 - Gold im Mittel etwa 45 je gewonnenem Level, Stufe 10 eines Upgrades nach 15 bis 20 Leveln (siehe unten).
 - Doppelschuss, Schild und Dauerfeuer bleiben spuerbar, aber nicht uebermaechtig (siehe unten).
@@ -144,7 +144,7 @@ Handtest H-22: In Level 0 bis 4 kam der naechste Gegner teils erst nach 3,3 s, d
 
 - **Dichte:** Spawn-Abstand in Level 0 bis 4 von 3320 / 3020 / 2800 / 2410 / 2170 ms auf 1500 / 1450 / 1400 / 1360 / 1330 ms. Die groesste Luecke ist damit 1,5 s (vorher 3,3 s), im Lauf der Runde sinkt sie auf 60 %. `MAX_ENEMIES` bleibt (25 bis 37, unter dem Wert 40 von Level 5).
 - **Schwaechere Einzelgegner:** In Level 0 bis 4 hat jeder Baum weniger Lebenspunkte, bringt weniger Erfahrung, laesst seltener eine Muenze fallen und macht weniger Kontaktschaden, im Verhaeltnis alte zu neue Gegnerzahl. Druck, Gold-Tempo (Q-51), Erfahrung je Level und Gesamt-Kontaktschaden bleiben dadurch gleich.
-- **Level 5 bis 20 unveraendert** (Faktor 1,0): dort ist die groesste Luecke schon 1,13 s oder kleiner, die Spawns pro Minute steigen bereits mit jedem Level (der Plan erlaubt, diese Level auf eine zweite Runde zu verschieben).
+- **Level 5 bis 20:** in AP-91 unveraendert, seit AP-95 dichter (siehe unten).
 
 | Level | Abstand vorher / nachher (ms) | Spawns/Min vorher / nachher | Faktor | `hp` (Baum-HP) | `xp` und `coin` | `contact` | Druck vorher / nachher | Gold je Level |
 |---|---|---|---|---|---|---|---|---|
@@ -157,6 +157,39 @@ Handtest H-22: In Level 0 bis 4 kam der naechste Gegner teils erst nach 3,3 s, d
 Der Faktor ist die Gegnerzahl pro Minute nachher geteilt durch vorher (mindestens 1,5, Ziel erreicht). Der Sprung 4 zu 5 bleibt bei +10 %.
 Bekannte Folge: Der Verfluchte Baum hat in Level 0 bis 4 nur 23 bis 31 statt 50 Lebenspunkte (Gegenstueck zu AP-56 (e)): eine Doppelschuss-Salve (Stufe 2, 3 mal 10 Schaden) toetet ihn in Level 0 bis 3. Das ist die Kehrseite von doppelt so vielen Gegnern bei gleichem Druck und im Handtest zu pruefen.
 Nachjustieren: zuerst `hp` in `scaling.ts` (Baum-HP = 50 mal `hp`, ganzzahlig halten), die Tests der Kurve bleiben der Massstab.
+
+## Dichte und Skalierung Level 5 bis 20 (AP-95, B5 Teil 3)
+
+Handtest H-22: Auch Level 5 bis 20 sollen dichter werden. Ziel: Gegner je Minute mindestens etwa x1,3 gegenueber dem Stand nach AP-91.
+Begruendung des Faktors: Level 5 bis 20 hatten schon Luecken von hoechstens 1,13 s, deshalb reicht ein kleinerer Faktor als die x1,5 fuer Level 0 bis 4 (die aus 3,3 s kamen). Mehr als x1,3 treibt `MAX_ENEMIES` und die Last am Handy (RI-6).
+
+- **Dichte:** `SPAWN_INTERVAL_MS` in Level 5 bis 20 durch 1,3 (auf 5 ms gerundet, jeder Eintrag kleiner als der vorige). Ergebnis: x1,29 bis x1,30 Spawns/Min (inklusive Eroeffnungswelle).
+- **`MAX_ENEMIES`:** je Level x1,3 (Level 5: 40 auf 52, Level 20: 100 auf 130). Der Hoechstwert 130 ist +30 % ueber dem Hoechstwert nach AP-91 (100), das ist die Obergrenze aus RI-6; mehr wird nicht gebraucht. Level 0 bis 4 unveraendert (25 bis 37).
+- **Schwaechere Einzelgegner:** `hp` und `contact` 0,77 in allen Level 5 bis 20 (Baum 39, Hexe 15, Eichhoernchen 6, Waldgeist 8 Lebenspunkte, gerundet wie im Spiel), `xp` und `coin` 0,767 bis 0,776 (alte durch neue Gegnerzahl je Level, damit Gold und Erfahrung je Level gleich bleiben).
+- **Ergebnis:** Druck je Level aendert sich um hoechstens +0,01 (Level 20: 1,22 auf 1,23, Band 0,95 bis 1,25). Sprung 4 zu 5: +10,9 % (erlaubt bis 12 %), 9 zu 10: +9,5 % (erlaubt 8 bis 10 %), Schritte ab Level 6 hoechstens +9,5 %. Gold-Mittel ueber alle Level 46,0 (Band 43 bis 47), Stufe 10 einer Upgrade-Spur nach etwa 15,2 Leveln. Gesamt-Kontaktschaden je Level bleibt (Gegnerzahl mal `contact`).
+- **Boss-Fairness:** `BOSS_SPAWN_RATE_FACTOR` und die Boss-Konfiguration sind unveraendert; die Spawnrate in Boss-Phasen wird weiter halbiert (der Abstand ist aber kuerzer, die Phase hat also mehr normale Gegner als vor AP-95, immer begrenzt durch `maxEnemies`).
+
+| Level | Spawns/Min vorher / nachher | Faktor | Abstand vorher / nachher (ms) | Max. Gegner vorher / nachher |
+|---|---|---|---|---|
+| 5 | 69,7 / 90,3 | 1,3 | 1130 / 870 | 40 / 52 |
+| 6 | 72,0 / 93,7 | 1,3 | 1090 / 840 | 42 / 55 |
+| 7 | 75,0 / 97,0 | 1,29 | 1050 / 810 | 44 / 57 |
+| 8 | 77,8 / 101,0 | 1,3 | 1000 / 770 | 46 / 60 |
+| 9 | 81,0 / 105,0 | 1,3 | 960 / 740 | 48 / 62 |
+| 10 | 98,3 / 127,0 | 1,29 | 800 / 615 | 60 / 78 |
+| 11 | 99,3 / 128,0 | 1,29 | 790 / 610 | 64 / 83 |
+| 12 | 100,7 / 130,0 | 1,29 | 780 / 600 | 68 / 88 |
+| 13 | 102,0 / 132,3 | 1,3 | 770 / 590 | 72 / 94 |
+| 14 | 103,3 / 133,3 | 1,29 | 760 / 585 | 76 / 99 |
+| 15 | 104,7 / 135,7 | 1,3 | 750 / 575 | 80 / 104 |
+| 16 | 106,4 / 138,2 | 1,3 | 730 / 560 | 84 / 109 |
+| 17 | 107,8 / 139,6 | 1,29 | 720 / 555 | 88 / 114 |
+| 18 | 109,4 / 142,0 | 1,3 | 710 / 545 | 92 / 120 |
+| 19 | 111,0 / 143,4 | 1,29 | 700 / 540 | 96 / 125 |
+| 20 | 112,4 / 146,0 | 1,3 | 690 / 530 | 100 / 130 |
+
+**Baum-HP und Anschluss Level 4 nach 5:** Der Verfluchte Baum hat in Level 0 bis 4 23 / 24 / 26 / 28 / 31 Lebenspunkte (statt 50), ab Level 5 jetzt 39. Der Sprung 31 auf 39 ist gewollt: Level 5 bringt zusaetzlich Hexe und Eichhoernchen, der Druck steigt stetig (0,76 auf 0,84), die Gegnerzahl je Minute springt aber von 59 auf 90 (Level 0 bis 4 wurden in AP-91 nur auf etwa x1,6 bis x2,2 angehoben). AP-95 aendert Level 0 bis 4 nicht. Eine Doppelschuss-Salve (Stufe 2, 3 mal 10 Schaden) toetet den Baum in Level 0 bis 3 in einem Zug, in Level 4 und ab Level 5 nicht (Handtest steht aus, H-24).
+Nachjustieren: `hp` und `contact` in `scaling.ts`, bei der Dichte `SPAWN_INTERVAL_MS`; `xp` und `coin` danach neu als alte durch neue Gegnerzahl setzen.
 
 ## Nachjustieren: Beispiele
 

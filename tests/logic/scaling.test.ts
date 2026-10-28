@@ -18,12 +18,11 @@ describe('enemyScaleFor', () => {
     }
   });
 
-  it('returns the configured factors: weaker enemies in level 0 to 4, default from level 5 (AP-91)', () => {
-    for (let id = 0; id <= 4; id += 1) {
+  it('returns the configured factors: weaker enemies in level 0 to 20 (AP-91, AP-95)', () => {
+    for (let id = 0; id <= 20; id += 1) {
       expect(enemyScaleFor(id)).toEqual(LEVEL_SCALING[id]);
       expect(enemyScaleFor(id).hp).toBeLessThan(1);
     }
-    for (let id = 5; id <= 20; id += 1) expect(enemyScaleFor(id)).toEqual(DEFAULT_ENEMY_SCALE);
   });
 
   it('falls back to the default for unknown levels', () => {
@@ -32,8 +31,8 @@ describe('enemyScaleFor', () => {
     }
   });
 
-  it('leaves hp, xp and drop chance identical with factor 1 (level 5 and the default)', () => {
-    const s = enemyScaleFor(5);
+  it('leaves hp, xp and drop chance identical with factor 1 (the default)', () => {
+    const s = DEFAULT_ENEMY_SCALE;
     expect(Math.max(1, Math.round(50 * s.hp))).toBe(50);
     expect(7 * s.xp).toBe(7);
     expect(scaledDropChance(COIN_RULES.dropChance, s)).toBe(COIN_RULES.dropChance);

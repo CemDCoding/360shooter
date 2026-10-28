@@ -32,9 +32,16 @@ describe('LEVEL_SCALING', () => {
     }
   });
 
-  it('leaves level 5 to 20 unchanged', () => {
+  it('weakens the single enemies of level 5 to 20 by about the density factor 1.3 (AP-95)', () => {
     for (let i = 5; i < LEVEL_COUNT; i++) {
-      expect(LEVEL_SCALING[i], `level ${i}`).toEqual({ hp: 1, xp: 1, coin: 1, contact: 1 });
+      const s = LEVEL_SCALING[i];
+      expect(s.hp, `level ${i}`).toBeGreaterThanOrEqual(0.7);
+      expect(s.hp, `level ${i}`).toBeLessThanOrEqual(0.85);
+      expect(s.contact, `level ${i}`).toBeGreaterThanOrEqual(0.7);
+      expect(s.contact, `level ${i}`).toBeLessThanOrEqual(0.85);
+      expect(s.xp, `level ${i}`).toBeGreaterThanOrEqual(0.7);
+      expect(s.xp, `level ${i}`).toBeLessThanOrEqual(0.85);
+      expect(s.coin, `level ${i}`).toBe(s.xp);
     }
   });
 });

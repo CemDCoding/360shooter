@@ -56,4 +56,10 @@ describe('levels', () => {
       expect(step, `level ${i}`).toBeLessThanOrEqual(1.1);
     }
   });
+
+  it('max enemies of level 5 to 20 grow at most 30 percent over the peak after AP-91 (100), phone performance RI-6 (AP-95)', () => {
+    for (let i = 5; i < LEVELS.length; i++) {
+      expect(LEVELS[i].maxEnemies, `level ${i}`).toBeLessThanOrEqual(130);
+    }
+  });
 });
