@@ -22,9 +22,11 @@ const SHORT_LEVELS: readonly number[] = [0, 1, 2, 5, 6, 7, 10, 11, 12, 13, 14, 1
 /**
  * Spawn-Abstand pro Level in ms (Anfang der Runde, sinkt im Lauf der Runde auf 60 %).
  * Kleiner = mehr Gegner. Index = Level-ID.
+ * Level 0 bis 4 (AP-91): dichter, groesste Luecke hoechstens 1,5 s. Die einzelnen Gegner sind dafuer
+ * schwaecher (LEVEL_SCALING), sodass Druck, Gold und Erfahrung gleich bleiben.
  */
 const SPAWN_INTERVAL_MS: readonly number[] = [
-  3320, 3020, 2800, 2410, 2170, 1130, 1090, 1050, 1000, 960, 800, 790, 780, 770, 760, 750, 730, 720,
+  1500, 1450, 1400, 1360, 1330, 1130, 1090, 1050, 1000, 960, 800, 790, 780, 770, 760, 750, 730, 720,
   710, 700, 690,
 ];
 

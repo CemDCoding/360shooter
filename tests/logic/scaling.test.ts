@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { COIN_RULES } from '../../src/config';
+import { COIN_RULES, LEVEL_SCALING } from '../../src/config';
 import {
   DEFAULT_ENEMY_SCALE,
   ScaleRegistry,
@@ -18,8 +18,12 @@ describe('enemyScaleFor', () => {
     }
   });
 
-  it('keeps all factors at 1 (behavior unchanged, AP-90)', () => {
-    for (let id = 0; id <= 20; id += 1) expect(enemyScaleFor(id)).toEqual(DEFAULT_ENEMY_SCALE);
+  it('returns the configured factors: weaker enemies in level 0 to 4, default from level 5 (AP-91)', () => {
+    for (let id = 0; id <= 4; id += 1) {
+      expect(enemyScaleFor(id)).toEqual(LEVEL_SCALING[id]);
+      expect(enemyScaleFor(id).hp).toBeLessThan(1);
+    }
+    for (let id = 5; id <= 20; id += 1) expect(enemyScaleFor(id)).toEqual(DEFAULT_ENEMY_SCALE);
   });
 
   it('falls back to the default for unknown levels', () => {
@@ -28,8 +32,8 @@ describe('enemyScaleFor', () => {
     }
   });
 
-  it('leaves hp, xp and drop chance identical with factor 1', () => {
-    const s = enemyScaleFor(0);
+  it('leaves hp, xp and drop chance identical with factor 1 (level 5 and the default)', () => {
+    const s = enemyScaleFor(5);
     expect(Math.max(1, Math.round(50 * s.hp))).toBe(50);
     expect(7 * s.xp).toBe(7);
     expect(scaledDropChance(COIN_RULES.dropChance, s)).toBe(COIN_RULES.dropChance);

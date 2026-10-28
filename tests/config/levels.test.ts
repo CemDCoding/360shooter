@@ -34,11 +34,26 @@ describe('levels', () => {
     expect(getLevel(21)).toBeUndefined();
   });
 
-  it('max enemies never fall from level to level and level 0 starts near 3300 ms (AP-56)', () => {
+  it('max enemies never fall from level to level and level 0 starts at 1.5 s (AP-91)', () => {
     for (let i = 1; i < LEVELS.length; i++) {
       expect(LEVELS[i].maxEnemies).toBeGreaterThan(LEVELS[i - 1].maxEnemies);
     }
-    expect(LEVELS[0].spawnIntervalMs).toBeGreaterThanOrEqual(3200);
-    expect(LEVELS[0].spawnIntervalMs).toBeLessThanOrEqual(3400);
+    expect(LEVELS[0].spawnIntervalMs).toBeGreaterThanOrEqual(1000);
+    expect(LEVELS[0].spawnIntervalMs).toBeLessThanOrEqual(1500);
+  });
+
+  it('level 0 to 4 never wait longer than 1.5 s for a spawn and stay at the max enemies of level 5 or below (AP-91)', () => {
+    for (let i = 0; i <= 4; i++) {
+      expect(LEVELS[i].spawnIntervalMs, `level ${i}`).toBeLessThanOrEqual(1500);
+      expect(LEVELS[i].maxEnemies, `level ${i}`).toBeLessThanOrEqual(LEVELS[5].maxEnemies);
+    }
+  });
+
+  it('the interval step from level 5 on is at most 10 percent (AP-91)', () => {
+    for (let i = 6; i < LEVELS.length; i++) {
+      if (i === 10) continue; // Batch-Sprung 9 -> 10 bleibt gross (AP-91)
+      const step = LEVELS[i - 1].spawnIntervalMs / LEVELS[i].spawnIntervalMs;
+      expect(step, `level ${i}`).toBeLessThanOrEqual(1.1);
+    }
   });
 });

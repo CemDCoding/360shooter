@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { getLevel } from '../../src/config';
+import { describe, expect, it, vi } from 'vitest';
+import { ENEMIES, LEVEL_SCALING, getLevel } from '../../src/config';
+import { EnemyPool } from '../../src/entities/enemies/createEnemy';
 import type { EnemyId, LevelDef } from '../../src/contracts';
 import {
   OPENING_RADIUS_FACTOR,
@@ -21,6 +22,27 @@ function testRng(seed: number): { next(): number } {
     },
   };
 }
+
+// Minimal stand-ins for the enemy classes: EnemyPool.spawn only needs spawn(), hp, active and def.
+const { FakeEnemy, defs } = vi.hoisted(() => {
+  const defs: Record<string, { id: string; hp: number }> = {};
+  class FakeEnemy {
+    active = false;
+    hp = 0;
+    readonly def: { id: string; hp: number };
+    constructor(_scene: unknown, id: string) {
+      this.def = defs[id];
+    }
+    spawn(): void {
+      this.active = true;
+      this.hp = this.def.hp;
+    }
+  }
+  return { FakeEnemy, defs };
+});
+vi.mock('../../src/entities/enemies/ChaseEnemy', () => ({ ChaseEnemy: FakeEnemy }));
+vi.mock('../../src/entities/enemies/AuraEnemy', () => ({ AuraEnemy: FakeEnemy }));
+vi.mock('../../src/entities/enemies/ForestWitch', () => ({ ForestWitch: FakeEnemy }));
 
 function lvl(id: number): LevelDef {
   const l = getLevel(id);
@@ -150,5 +172,78 @@ describe('SpawnDirector', () => {
     const withBoss = count(true);
     expect(withBoss / normal).toBeGreaterThan(0.45);
     expect(withBoss / normal).toBeLessThan(0.55);
+  });
+});
+
+describe('spawn density of level 0 to 4 (AP-91)', () => {
+  /** Zeitpunkte aller Spawns einer Runde, Schritt 20 ms. */
+  function spawnTimes(level: LevelDef, seed: number): number[] {
+    const d = new SpawnDirector(level, testRng(seed), 600);
+    const times: number[] = [];
+    for (let t = 0; t < level.durationSec * 1000; t += 20) {
+      for (let k = d.tick(20, 0).length; k > 0; k--) times.push(t);
+    }
+    return times;
+  }
+
+  it('has no gap longer than 1.6 s between two spawns in level 0 to 4', () => {
+    for (let id = 0; id <= 4; id++) {
+      const times = spawnTimes(lvl(id), 11);
+      let last = 0;
+      let maxGap = 0;
+      for (const t of times) {
+        maxGap = Math.max(maxGap, t - last);
+        last = t;
+      }
+      // 1,5 s Spawn-Abstand plus eine Tick-Breite Messfehler.
+      expect(maxGap, `level ${id}`).toBeLessThanOrEqual(1600);
+    }
+  });
+
+  it('spawns more enemies per minute with every level (0 to 20)', () => {
+    let prev = 0;
+    for (let id = 0; id <= 20; id++) {
+      const level = lvl(id);
+      const perMin = spawnTimes(level, 5).length / (level.durationSec / 60);
+      expect(perMin, `level ${id}`).toBeGreaterThan(prev);
+      prev = perMin;
+    }
+  });
+});
+
+describe('EnemyPool.spawn hit point scaling (AP-90, AP-91)', () => {
+  Object.assign(defs, ENEMIES);
+  const pool = (): EnemyPool => new EnemyPool({} as never, {});
+
+  it('keeps the base hit points without a scale', () => {
+    expect(pool().spawn('cursedTree', 0, 0).hp).toBe(ENEMIES.cursedTree.hp);
+  });
+
+  it('multiplies and rounds the hit points, never below 1', () => {
+    const p = pool();
+    expect(p.spawn('cursedTree', 0, 0, { hp: 0.46 }).hp).toBe(23);
+    expect(p.spawn('zombieSquirrel', 0, 0, { hp: 0.8 }).hp).toBe(6); // 6,4 rounds down
+    expect(p.spawn('forestSpirit', 0, 0, { hp: 0.001 }).hp).toBe(1);
+  });
+
+  it('a reused enemy does not keep the scale of its last life', () => {
+    const p = pool();
+    const first = p.spawn('cursedTree', 0, 0, { hp: 0.5 });
+    expect(first.hp).toBe(25);
+    first.active = false;
+    const again = p.spawn('cursedTree', 0, 0);
+    expect(again).toBe(first);
+    expect(again.hp).toBe(ENEMIES.cursedTree.hp);
+  });
+
+  it('gives the cursed tree whole, falling hit points in level 0 to 4 and the base value from level 5', () => {
+    let prev = 0;
+    for (let id = 0; id <= 4; id++) {
+      const hp = pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[id]).hp;
+      expect(hp, `level ${id}`).toBeGreaterThan(prev);
+      expect(hp, `level ${id}`).toBeLessThan(ENEMIES.cursedTree.hp);
+      prev = hp;
+    }
+    expect(pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[5]).hp).toBe(ENEMIES.cursedTree.hp);
   });
 });
