@@ -10,7 +10,7 @@ export class Laser extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'laser');
-    this.setTintFill(THEME.colors['game.laser-raygun'].num);
+    this.setTint(THEME.colors['game.laser-raygun'].num);
   }
 
   fire(

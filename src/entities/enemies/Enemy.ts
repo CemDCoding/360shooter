@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { animKey } from '../../config/assets';
-import { THEME } from '../../config/theme';
+import { OPACITY, THEME } from '../../config/theme';
 import { CONTACT_DESPAWN_DAMAGE, ENEMIES } from '../../config/enemies';
 import { addContact, isContactSpent } from '../../logic/contactBudget';
 import type { EnemyDef, EnemyId } from '../../contracts';
@@ -12,6 +12,7 @@ import { applyDamage, auraDamage, isDead } from '../../logic/health';
 /** Fallback target point (base arena center). */
 const FALLBACK_CENTER = { x: ARENA.baseWidth / 2, y: ARENA.height / 2 } as const;
 const FLASH_MS = 120;
+const AURA_COLOR = THEME.colors['game.aura'].num;
 const FLASH_TINT = THEME.colors['game.hit-flash'].num;
 
 export interface EnemyContext {
@@ -43,8 +44,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     if (def.aura) {
       this.auraGfx = scene.add
-        // eslint-disable-next-line no-restricted-syntax -- design system has no token game.aura yet (reported in AP-55)
-        .circle(0, 0, def.aura.radius, 0x9b59b6, 0.25)
+        .circle(0, 0, def.aura.radius, AURA_COLOR, OPACITY.aura)
+        .setStrokeStyle(1, AURA_COLOR, 1)
         .setDepth(this.depth - 1)
         .setVisible(false);
     }
