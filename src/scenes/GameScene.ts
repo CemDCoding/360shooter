@@ -53,6 +53,7 @@ import {
   tickArmour,
 } from '../logic/armour';
 import { rollCoinDrop } from '../logic/coins';
+import { DEFAULT_ENEMY_SCALE, enemyScaleFor, type EnemyScale } from '../logic/scaling';
 import { settleRound } from '../logic/economy';
 import { pointOnRing } from '../logic/geometry';
 import { canLaserDestroyBolt } from '../logic/projectiles';
@@ -165,6 +166,7 @@ interface PendingDrop {
   x: number;
   y: number;
   coinValue: number;
+  coinChance: number;
 }
 
 /** One round: player in the center, enemies from the ring, timer, items, coins, armour. */
@@ -187,6 +189,9 @@ export class GameScene extends Phaser.Scene {
   private armourPickups: ArmourPickup[] = [];
   private pendingDrops: PendingDrop[] = [];
   private killXp = 0;
+  /** Scale of each normally spawned enemy (AP-90). Summons and boss spawns are not in here: default. */
+  private enemyScales = new WeakMap<Enemy, EnemyScale>();
+  private levelScale: EnemyScale = DEFAULT_ENEMY_SCALE;
   private roundCoins = 0;
   private armour: ActiveArmour = createArmourState();
   /** Definition of the active (or cooling down) armour; needed by tickArmour. */
@@ -225,6 +230,8 @@ export class GameScene extends Phaser.Scene {
     this.armourPickups = [];
     this.pendingDrops = [];
     this.killXp = 0;
+    this.levelScale = enemyScaleFor(this.level.id);
+    this.enemyScales = new WeakMap();
     this.roundCoins = 0;
     this.armour = resetArmour();
     this.armourDef = null;
@@ -389,7 +396,17 @@ export class GameScene extends Phaser.Scene {
   private damageEnemy(enemy: Enemy, amount: number): boolean {
     const { x, y } = enemy;
     const killed = enemy.takeDamage(amount);
-    if (killed) this.pendingDrops.push({ x, y, coinValue: enemy.def.coinValue ?? 0 });
+    if (killed) {
+      const scale = this.enemyScales.get(enemy) ?? DEFAULT_ENEMY_SCALE;
+      // onDeath already added def.xp: add the difference to the scaled value.
+      if (scale.xp !== 1) this.killXp += enemy.def.xp * (scale.xp - 1);
+      this.pendingDrops.push({
+        x,
+        y,
+        coinValue: enemy.def.coinValue ?? 0,
+        coinChance: Math.min(1, COIN_RULES.dropChance * scale.coin),
+      });
+    }
     return killed;
   }
 
@@ -426,7 +443,8 @@ export class GameScene extends Phaser.Scene {
     const bossAlive = this.boss !== undefined && !this.bossDefeatedFlag;
     for (const req of this.spawner.tick(dt, alive, bossAlive)) {
       const p = pointOnRing(req.angle, req.radius, this.center.x, this.center.y);
-      this.enemyPool.spawn(req.enemyId, p.x, p.y);
+      const e = this.enemyPool.spawn(req.enemyId, p.x, p.y, this.levelScale);
+      this.enemyScales.set(e, this.levelScale);
     }
   }
 
@@ -436,7 +454,8 @@ export class GameScene extends Phaser.Scene {
     let damage = 0;
     this.physics.overlap(this.player, this.enemyPool.enemies, (a, b) => {
       const enemy = pick(a, b, Enemy);
-      if (enemy?.active) damage += enemy.contactDamageFor(dt);
+      if (enemy?.active)
+        damage += enemy.contactDamageFor(dt) * (this.enemyScales.get(enemy)?.contact ?? 1);
     });
     for (const e of this.enemyPool.enemies) {
       if (e.active) damage += e.auraDamageAt(this.player.x, this.player.y, dt);
@@ -633,10 +652,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnDrops(): void {
-    for (const { x, y, coinValue } of this.pendingDrops) {
+    for (const { x, y, coinValue, coinChance } of this.pendingDrops) {
       const def = rollDrop(this.rng, ITEM_RULES, ITEMS);
       if (def) this.spawnItem(x, y, def);
-      if (coinValue > 0 && rollCoinDrop(this.rng, COIN_RULES))
+      if (coinValue > 0 && rollCoinDrop(this.rng, { ...COIN_RULES, dropChance: coinChance }))
         this.coinPool?.spawn(x, y, coinValue);
       if (ARMOURS.length > 0 && rollArmourDrop(this.rng, ARMOUR_RULES)) {
         const armourDef = ARMOURS[Math.floor(this.rng.next() * ARMOURS.length)] ?? ARMOURS[0];
