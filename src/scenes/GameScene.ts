@@ -13,6 +13,7 @@ import { STORABLE_POWERS } from '../config/powerStore';
 import {
   GameEvents,
   type ActivePowers,
+  type EnemyId,
   type GameEventName,
   type GameEventPayloads,
   type ItemDef,
@@ -53,7 +54,14 @@ import {
   tickArmour,
 } from '../logic/armour';
 import { rollCoinDrop } from '../logic/coins';
-import { DEFAULT_ENEMY_SCALE, enemyScaleFor, type EnemyScale } from '../logic/scaling';
+import {
+  DEFAULT_ENEMY_SCALE,
+  ScaleRegistry,
+  enemyScaleFor,
+  scaledDropChance,
+  xpBonus,
+  type EnemyScale,
+} from '../logic/scaling';
 import { settleRound } from '../logic/economy';
 import { pointOnRing } from '../logic/geometry';
 import { canLaserDestroyBolt } from '../logic/projectiles';
@@ -190,7 +198,7 @@ export class GameScene extends Phaser.Scene {
   private pendingDrops: PendingDrop[] = [];
   private killXp = 0;
   /** Scale of each normally spawned enemy (AP-90). Summons and boss spawns are not in here: default. */
-  private enemyScales = new WeakMap<Enemy, EnemyScale>();
+  private enemyScales = new ScaleRegistry<Enemy>();
   private levelScale: EnemyScale = DEFAULT_ENEMY_SCALE;
   private roundCoins = 0;
   private armour: ActiveArmour = createArmourState();
@@ -231,7 +239,7 @@ export class GameScene extends Phaser.Scene {
     this.pendingDrops = [];
     this.killXp = 0;
     this.levelScale = enemyScaleFor(this.level.id);
-    this.enemyScales = new WeakMap();
+    this.enemyScales = new ScaleRegistry<Enemy>();
     this.roundCoins = 0;
     this.armour = resetArmour();
     this.armourDef = null;
@@ -397,14 +405,14 @@ export class GameScene extends Phaser.Scene {
     const { x, y } = enemy;
     const killed = enemy.takeDamage(amount);
     if (killed) {
-      const scale = this.enemyScales.get(enemy) ?? DEFAULT_ENEMY_SCALE;
+      const scale = this.enemyScales.get(enemy);
       // onDeath already added def.xp: add the difference to the scaled value.
-      if (scale.xp !== 1) this.killXp += enemy.def.xp * (scale.xp - 1);
+      this.killXp += xpBonus(enemy.def.xp, scale);
       this.pendingDrops.push({
         x,
         y,
         coinValue: enemy.def.coinValue ?? 0,
-        coinChance: Math.min(1, COIN_RULES.dropChance * scale.coin),
+        coinChance: scaledDropChance(COIN_RULES.dropChance, scale),
       });
     }
     return killed;
@@ -437,14 +445,20 @@ export class GameScene extends Phaser.Scene {
     if (this.round.status !== 'running') this.endRound(this.round.status);
   }
 
+  /** Single spawn path: always records the scale (default for summons), pooled enemies never keep an old one. */
+  private spawnScaled(id: EnemyId, x: number, y: number, scale?: EnemyScale): Enemy {
+    const e = this.enemyPool.spawn(id, x, y, scale);
+    this.enemyScales.assign(e, scale);
+    return e;
+  }
+
   private spawnEnemies(dt: number): void {
     let alive = 0;
     for (const e of this.enemyPool.enemies) if (e.active) alive += 1;
     const bossAlive = this.boss !== undefined && !this.bossDefeatedFlag;
     for (const req of this.spawner.tick(dt, alive, bossAlive)) {
       const p = pointOnRing(req.angle, req.radius, this.center.x, this.center.y);
-      const e = this.enemyPool.spawn(req.enemyId, p.x, p.y, this.levelScale);
-      this.enemyScales.set(e, this.levelScale);
+      this.spawnScaled(req.enemyId, p.x, p.y, this.levelScale);
     }
   }
 
@@ -454,8 +468,7 @@ export class GameScene extends Phaser.Scene {
     let damage = 0;
     this.physics.overlap(this.player, this.enemyPool.enemies, (a, b) => {
       const enemy = pick(a, b, Enemy);
-      if (enemy?.active)
-        damage += enemy.contactDamageFor(dt) * (this.enemyScales.get(enemy)?.contact ?? 1);
+      if (enemy?.active) damage += enemy.contactDamageFor(dt) * this.enemyScales.get(enemy).contact;
     });
     for (const e of this.enemyPool.enemies) {
       if (e.active) damage += e.auraDamageAt(this.player.x, this.player.y, dt);
@@ -518,7 +531,7 @@ export class GameScene extends Phaser.Scene {
       onDefeated: () => this.onBossDefeated(bossId),
       onSummonTrees: (positions) => {
         if (this.ended) return;
-        for (const p of positions) this.enemyPool.spawn('cursedTree', p.x, p.y);
+        for (const p of positions) this.spawnScaled('cursedTree', p.x, p.y);
       },
       getPlayerPos: () => ({ x: this.player.x, y: this.player.y }),
       onPlayerHit: (damage) => {

@@ -24,3 +24,31 @@ export function enemyScaleFor(levelId: number): EnemyScale {
   if (!s) return { ...DEFAULT_ENEMY_SCALE };
   return { hp: factor(s.hp), xp: factor(s.xp), coin: factor(s.coin), contact: factor(s.contact) };
 }
+
+/** Remembers the scale of each live enemy. Every spawn writes the entry, so pooled enemies never keep an old one. */
+export class ScaleRegistry<T extends object> {
+  private scales = new WeakMap<T, EnemyScale>();
+
+  /** Record the scale for a (re)spawned enemy. Without a scale the default applies. */
+  assign(enemy: T, scale: EnemyScale = DEFAULT_ENEMY_SCALE): void {
+    this.scales.set(enemy, scale);
+  }
+
+  get(enemy: T): EnemyScale {
+    return this.scales.get(enemy) ?? DEFAULT_ENEMY_SCALE;
+  }
+
+  clear(): void {
+    this.scales = new WeakMap();
+  }
+}
+
+/** Extra XP on top of the base XP that the pool already credited (0 at factor 1). */
+export function xpBonus(baseXp: number, scale: EnemyScale): number {
+  return baseXp * (scale.xp - 1);
+}
+
+/** Coin drop probability for a scaled enemy, capped at 1. */
+export function scaledDropChance(baseChance: number, scale: EnemyScale): number {
+  return Math.min(1, baseChance * scale.coin);
+}
