@@ -274,9 +274,9 @@ describe('balance: difficulty curve', () => {
     ];
     for (let i = 5; i < 21; i++) {
       const oldCount = (before[i - 5] * LEVELS[i].durationSec) / 60;
-      const ratioGold = spawnCount(LEVELS[i]) * LEVEL_SCALING[i].coin / oldCount;
-      const ratioXp = spawnCount(LEVELS[i]) * LEVEL_SCALING[i].xp / oldCount;
-      const ratioContact = spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact / oldCount;
+      const ratioGold = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].coin) / oldCount;
+      const ratioXp = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].xp) / oldCount;
+      const ratioContact = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / oldCount;
       for (const r of [ratioGold, ratioXp, ratioContact]) {
         expect(r, `level ${i}`).toBeGreaterThan(0.96);
         expect(r, `level ${i}`).toBeLessThan(1.04);

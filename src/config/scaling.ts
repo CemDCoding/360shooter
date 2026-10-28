@@ -21,8 +21,8 @@ const DENSE: readonly LevelScaling[] = [
 
 /** Level 5 bis 20 (AP-95), Index 0 = Level 5: xp und coin sind das Verhaeltnis alte zu neue Gegnerzahl. */
 const DENSE_LATE_XP: readonly number[] = [
-  0.771, 0.769, 0.773, 0.77, 0.771, 0.774, 0.776, 0.774, 0.771, 0.775, 0.771, 0.77, 0.772, 0.77, 0.774,
-  0.77,
+  0.771, 0.769, 0.773, 0.77, 0.771, 0.774, 0.776, 0.774, 0.771, 0.775, 0.771, 0.77, 0.772, 0.77,
+  0.774, 0.77,
 ];
 
 export const LEVEL_SCALING: readonly LevelScaling[] = Array.from({ length: 21 }, (_, id) =>

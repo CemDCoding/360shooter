@@ -27,8 +27,8 @@ const SHORT_LEVELS: readonly number[] = [0, 1, 2, 5, 6, 7, 10, 11, 12, 13, 14, 1
  * und Erfahrung gleich bleiben.
  */
 const SPAWN_INTERVAL_MS: readonly number[] = [
-  1500, 1450, 1400, 1360, 1330, 870, 840, 810, 770, 740, 615, 610, 600, 590, 585, 575, 560, 555, 545,
-  540, 530,
+  1500, 1450, 1400, 1360, 1330, 870, 840, 810, 770, 740, 615, 610, 600, 590, 585, 575, 560, 555,
+  545, 540, 530,
 ];
 
 /** Maximal gleichzeitig lebende Gegner pro Level (Obergrenze 150; Level 5 bis 20 seit AP-95 hoechstens +30 %, RI-6). Index = Level-ID. */
