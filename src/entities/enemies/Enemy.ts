@@ -4,10 +4,13 @@ import { THEME } from '../../config/theme';
 import { CONTACT_DESPAWN_DAMAGE, ENEMIES } from '../../config/enemies';
 import { addContact, isContactSpent } from '../../logic/contactBudget';
 import type { EnemyDef, EnemyId } from '../../contracts';
+import { ARENA, BASE_SPAWN_RADIUS } from '../../config/arena';
+import { approachSpeedFactor } from '../../logic/approach';
 import { distance } from '../../logic/geometry';
 import { applyDamage, auraDamage, isDead } from '../../logic/health';
 
-export const ARENA_CENTER = { x: 320, y: 180 } as const;
+/** Fallback target point (base arena center). */
+const FALLBACK_CENTER = { x: ARENA.baseWidth / 2, y: ARENA.height / 2 } as const;
 const FLASH_MS = 120;
 const FLASH_TINT = THEME.colors['game.hit-flash'].num;
 
@@ -35,7 +38,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.def = def;
     this.hp = def.hp;
     this.ctx = ctx;
-    this.center = ctx.center ?? ARENA_CENTER;
+    this.center = ctx.center ?? FALLBACK_CENTER;
     scene.add.existing(this);
     scene.physics.add.existing(this);
     if (def.aura) {
@@ -136,7 +139,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (dist < 1) {
       this.setVelocity(0, 0);
     } else {
-      this.setVelocity((dx / dist) * this.def.speed, (dy / dist) * this.def.speed);
+      // PE-100: faster only outside the 640 spawn ring (wide arenas), unchanged inside.
+      const speed =
+        this.def.speed * approachSpeedFactor(dist, BASE_SPAWN_RADIUS, ARENA.offscreenSpeedFactor);
+      this.setVelocity((dx / dist) * speed, (dy / dist) * speed);
     }
     this.faceCenter();
     return dist;

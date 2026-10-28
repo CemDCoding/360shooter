@@ -21,9 +21,11 @@ import {
   type UpgradeLevels,
 } from '../contracts';
 import type { ActiveArmour, ArmourDef } from '../contracts/armour';
+import { spawnRadiusFor } from '../config/arena';
 import { BOSS_TUNING } from '../config/bosses';
 import { ArmourPickup } from '../entities/ArmourPickup';
 import { BossBase } from '../entities/bosses/BossBase';
+import { rimRadii } from '../entities/bosses/rim';
 import { createBoss } from '../entities/bosses/createBoss';
 import { ForestGhost } from '../entities/bosses/ForestGhost';
 import { GhostOrb } from '../entities/bosses/GhostOrb';
@@ -77,8 +79,6 @@ import { parseDebugLevel, resolveLevelId } from './debug';
 import { energyRatio, powerBlock } from './hud/hudMath';
 import { POWER_SLOT_PRESSED } from './hud/PowerSlots';
 
-/** Layout only: distance of the spawn ring beyond the visible corners (pixels). */
-const SPAWN_MARGIN_PX = 24;
 /** Upper bound for one frame step, avoids huge jumps after a stall (ms). */
 const MAX_FRAME_MS = 100;
 /** Contact damage hits every frame: play the hurt sound at most this often (ms). */
@@ -281,7 +281,7 @@ export class GameScene extends Phaser.Scene {
     this.armourRing = new ArmourRing(this);
 
     this.round = new RoundState(this.level);
-    const spawnRadius = Math.hypot(width, height) / 2 + SPAWN_MARGIN_PX;
+    const spawnRadius = spawnRadiusFor(this.scale);
     this.spawner = new SpawnDirector(this.level, this.rng, spawnRadius);
 
     this.bindPlayerCallbacks();
@@ -488,6 +488,11 @@ export class GameScene extends Phaser.Scene {
     this.bossSpawned = true;
     this.bossInvulnerable = false;
     const boss = createBoss(this, bossId, this.level.id, {
+      arena: {
+        width: this.scale.width,
+        height: this.scale.height,
+        margin: BOSS_TUNING.arena.margin,
+      },
       center: this.center,
       rng: this.rng,
       onHpChanged: (hp, maxHp) => this.emitBossHp(hp, maxHp),
@@ -502,9 +507,17 @@ export class GameScene extends Phaser.Scene {
       },
     });
     this.boss = boss;
-    emitGameEvent(this.events, GameEvents.BossSpawned, { bossId, hp: boss.maxHp, maxHp: boss.maxHp });
+    emitGameEvent(this.events, GameEvents.BossSpawned, {
+      bossId,
+      hp: boss.maxHp,
+      maxHp: boss.maxHp,
+    });
     // Appears from a random direction on the rim around the player.
-    const rim = BOSS_TUNING.giantStone.rim;
+    const rim = rimRadii(BOSS_TUNING.giantStone.rim, {
+      width: this.scale.width,
+      height: this.scale.height,
+      margin: BOSS_TUNING.arena.margin,
+    });
     const angle = this.rng.next() * Math.PI * 2;
     boss.spawn(this.center.x + Math.cos(angle) * rim.rx, this.center.y + Math.sin(angle) * rim.ry);
   }
@@ -513,7 +526,11 @@ export class GameScene extends Phaser.Scene {
   private emitBossHp(hp: number, maxHp: number): void {
     if (this.ended) return;
     this.bossInvulnerable = this.boss?.isInvulnerable === true;
-    emitGameEvent(this.events, GameEvents.BossHpChanged, { hp, maxHp, invulnerable: this.bossInvulnerable });
+    emitGameEvent(this.events, GameEvents.BossHpChanged, {
+      hp,
+      maxHp,
+      invulnerable: this.bossInvulnerable,
+    });
   }
 
   private onBossDefeated(bossId: NonNullable<LevelDef['bossId']>): void {
@@ -685,7 +702,8 @@ export class GameScene extends Phaser.Scene {
 
   /** Tap on a ready slot (HUD scene event): start the stored power via the usual path. */
   private onPowerSlotPressed(id: unknown): void {
-    if (typeof id !== 'string' || this.ended || this.player.isDead || !this.scene.isActive()) return;
+    if (typeof id !== 'string' || this.ended || this.player.isDead || !this.scene.isActive())
+      return;
     const def = STORABLE_POWERS.find((p) => p.id === id);
     if (!def) return;
     const { blocked } = powerBlock(def, this.player.powers, this.armour);
@@ -705,7 +723,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private emitPowerStore(): void {
-    emitGameEvent(this.events, GameEvents.PowerStoreChanged, { stored: [...this.powerStore.stored] });
+    emitGameEvent(this.events, GameEvents.PowerStoreChanged, {
+      stored: [...this.powerStore.stored],
+    });
   }
 
   /** Updates pickups and removes expired/collected ones in place (the collider keeps the array). */
@@ -759,11 +779,15 @@ export class GameScene extends Phaser.Scene {
     this.emitPowerStore();
     // Boss HP share left for the result screen (boss level only; not yet appeared = full).
     const boss = this.boss;
-    const bossParts: BossBase[] = boss instanceof GiantStone ? boss.parts : boss?.active ? [boss] : [];
+    const bossParts: BossBase[] =
+      boss instanceof GiantStone ? boss.parts : boss?.active ? [boss] : [];
     const bossHpLeft = !this.level.bossId
       ? undefined
       : boss
-        ? energyRatio(bossParts.reduce((s, p) => s + Math.max(0, p.hp), 0), boss.maxHp)
+        ? energyRatio(
+            bossParts.reduce((s, p) => s + Math.max(0, p.hp), 0),
+            boss.maxHp,
+          )
         : 1;
     this.despawnBoss();
 

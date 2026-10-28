@@ -1,3 +1,5 @@
+import { ARENA } from '../../src/config/arena';
+import { rimRadii } from '../../src/entities/bosses/rim';
 import { describe, expect, it } from 'vitest';
 import {
   BOSS_SPAWN_REMAINING_MS,
@@ -68,6 +70,20 @@ describe('boss config (PE-75)', () => {
       r.speedPxPerSec,
     );
     expect(ms).toBeGreaterThanOrEqual(MIN_REACTION_MS);
+  });
+
+  it('warns the stone roll at least MIN_REACTION_MS, whatever the arena width (PE-75, PE-101)', () => {
+    // The warning time is fixed; a longer roll (800 wide) only lengthens the roll after the warning.
+    const roll = BOSSES.giantStone.attacks.find((x) => x.id === 'roll');
+    expect(roll?.telegraphMs).toBeGreaterThanOrEqual(MIN_REACTION_MS);
+    for (const w of [ARENA.baseWidth, ARENA.maxWidth]) {
+      const rim = rimRadii(BOSS_TUNING.giantStone.rim, {
+        width: w,
+        height: ARENA.height,
+        margin: 0,
+      });
+      expect(rim.rx).toBeLessThan(w / 2);
+    }
   });
 
   it('caps the ring damage without counterplay at 3 times the attack damage', () => {

@@ -10,7 +10,11 @@ import { armourDisplay, secondsText } from './hudMath';
 export class ArmourIndicator {
   readonly chip: FunkChip;
 
-  constructor(scene: Phaser.Scene, k: number, private readonly onChange: () => void) {
+  constructor(
+    scene: Phaser.Scene,
+    k: number,
+    private readonly onChange: () => void,
+  ) {
     this.chip = new FunkChip(scene, { icon: { key: 'item-fire-ring', frame: 0 }, k });
     this.set({ id: null, activeMsLeft: 0, cooldownMsLeft: 0 });
   }
@@ -23,9 +27,7 @@ export class ArmourIndicator {
       const active = d.phase === 'active';
       this.chip.setContent(secondsText(d.sec), active ? 'hud.text' : 'hud.text-muted');
       this.chip.setStyle(
-        active
-          ? { line: 'hud.accent', glow: true }
-          : { line: 'hud.line', dotted: true },
+        active ? { line: 'hud.accent', glow: true } : { line: 'hud.line', dotted: true },
       );
       this.chip.setIconTint(active ? null : 'hud.line');
     }

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingame-Sprites · Astronautin und Strahlenpistole · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .sg { max-width: 1280px; margin: 0 auto 28px; }
+  .sg h2 { font-size: 1rem; color: var(--page-fg); margin-bottom: 6px; }
+  .sg p { color: var(--page-muted); font-size: .875rem; max-width: 95ch; margin-bottom: 10px; }
+  code { color: var(--color-coral-300); }
+  canvas { image-rendering: pixelated; display: block; }
+  .sheet { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-end; background: var(--color-menu-surface); padding: 18px; }
+  .sheet figure { margin: 0; }
+  .sheet figcaption, .cap { color: var(--page-muted); font: 500 12px/1.4 var(--font-text); margin-top: 6px; }
+  .grid { background-image: linear-gradient(#ffffff12 1px, transparent 1px), linear-gradient(90deg, #ffffff12 1px, transparent 1px); }
+  .biomes { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .biomes { grid-template-columns: 1fr 1fr 1fr; } }
+  .biome { position: relative; height: 260px; overflow: hidden; }
+  .biome .lab { position: absolute; left: 10px; top: 8px; font: 600 12px/1 var(--font-text); color: var(--color-hud-text); background: #0008; padding: 3px 6px; z-index: 2; }
+  .biome .scene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 18px; z-index: 1; }
+  .biome .one { position: absolute; right: 12px; bottom: 10px; z-index: 1; }
+  .wheel { display: flex; gap: 10px; flex-wrap: wrap; background: var(--color-menu-surface); padding: 14px; }
+  .wheel figure { margin: 0; text-align: center; }
+  .err { background: var(--color-red-700, #5a2236); color: #fff; padding: 8px 12px; font: 600 13px var(--font-text); display: none; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Ingame-Sprites · Astronautin und Strahlenpistole</h1>
+  <p>Finale Pixelgrafik nach Porträt, App-Icon und Sprite-Styleguide. Quelle: <code>docs/design/assets/sprites.js</code> (<code>window.PX_SPRITES</code>), Ziel: <code>public/assets/sprites/&lt;key&gt;.png</code>. Alle Bilder hier stammen aus genau diesen Daten.</p>
+</header>
+<div class="err" id="err"></div>
+
+<section class="sg">
+  <h2>1 · Spritesheets (6×, Raster = 1 Pixel)</h2>
+  <div class="sheet" id="sheets"></div>
+</section>
+
+<section class="sg">
+  <h2>2 · Im Spiel (3× und Originalgröße 1× unten rechts)</h2>
+  <p>Ausbaustufe 1, 2 und 3 nacheinander. Die Figur ist das Hellste im Bild, die Strahlenpistole liegt auf dem Handpunkt 26|25.</p>
+  <div class="biomes">
+    <div class="biome"><div class="w-ground forest"></div><div class="w-vignette"></div><span class="lab">WALD · STUFE 1</span><div class="scene" data-stage="1" data-angles="20,160"></div><div class="one" data-stage="1" data-angles="20"></div></div>
+    <div class="biome"><div class="w-ground night"></div><div class="w-vignette"></div><span class="lab">WALD BEI NACHT · STUFE 2</span><div class="scene" data-stage="2" data-angles="-45,200" data-shot="1"></div><div class="one" data-stage="2" data-angles="-45"></div></div>
+    <div class="biome"><div class="w-ground elf"></div><div class="w-vignette"></div><span class="lab">ELFENWALD · STUFE 3</span><div class="scene" data-stage="3" data-angles="0,-110" data-shot="1"></div><div class="one" data-stage="3" data-angles="0"></div></div>
+  </div>
+</section>
+
+<section class="sg">
+  <h2>3 · Zielrad (4×): Spiegeln und Tiefe</h2>
+  <p>|Winkel| &gt; 90°: Figur <code>flipX</code>, Waffe <code>flipY</code>. −160° bis −20°: Waffe hinter der Figur. Gelber Punkt = Mündung (Laserstart).</p>
+  <div class="wheel" id="wheel"></div>
+</section>
+
+<script src="../assets/sprites.js"></script>
+<script>
+(function () {
+  const S = window.PX_SPRITES;
+  const errs = [];
+  for (const [k, d] of Object.entries(S))
+    d.frames.forEach((rows, f) => {
+      if (rows.length !== d.frameHeight) errs.push(`${k} Frame ${f}: ${rows.length} Zeilen statt ${d.frameHeight}`);
+      rows.forEach((r, y) => {
+        if (r.length !== d.frameWidth) errs.push(`${k} Frame ${f} Zeile ${y}: Breite ${r.length}`);
+        for (const ch of r) if (ch !== '.' && !d.palette[ch]) errs.push(`${k} Frame ${f} Zeile ${y}: Farbe '${ch}' fehlt`);
+      });
+    });
+  if (errs.length) { const e = document.getElementById('err'); e.style.display = 'block'; e.textContent = errs.slice(0, 6).join(' · '); }
+
+  function frameCanvas(key, f) {
+    const d = S[key], c = document.createElement('canvas');
+    c.width = d.frameWidth; c.height = d.frameHeight;
+    const x = c.getContext('2d');
+    d.frames[f].forEach((r, y) => [...r].forEach((ch, i) => { if (ch !== '.') { x.fillStyle = d.palette[ch]; x.fillRect(i, y, 1, 1); } }));
+    return c;
+  }
+  function scaled(src, k, grid) {
+    const c = document.createElement('canvas');
+    c.width = src.width; c.height = src.height;
+    c.getContext('2d').drawImage(src, 0, 0);
+    c.style.width = src.width * k + 'px'; c.style.height = src.height * k + 'px';
+    if (grid) { c.classList.add('grid'); c.style.backgroundSize = k + 'px ' + k + 'px'; }
+    return c;
+  }
+  function fig(el, cap) { const f = document.createElement('figure'); f.appendChild(el); const fc = document.createElement('figcaption'); fc.textContent = cap; f.appendChild(fc); return f; }
+
+  // 1 sheets
+  const sheets = document.getElementById('sheets');
+  const names = { astronaut: ['Ruhe 0', 'Ruhe 1', 'Rückstoß 2', 'Rückstoß 3'], 'weapon-raygun': ['S1 Ruhe', 'S1 Schuss', 'S2 Ruhe', 'S2 Schuss', 'S3 Ruhe', 'S3 Schuss'], laser: ['Laser'] };
+  for (const key of Object.keys(S)) {
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex'; wrap.style.gap = '10px'; wrap.style.alignItems = 'flex-end';
+    S[key].frames.forEach((_, f) => wrap.appendChild(fig(scaled(frameCanvas(key, f), 6, true), names[key][f])));
+    sheets.appendChild(fig(wrap, `${key}.png · ${S[key].frameWidth}×${S[key].frameHeight} · ${S[key].frames.length} Frame(s)`));
+  }
+
+  // composite: same maths as Player.ts (hand point, grip origin, flip, depth)
+  const A = S.astronaut.anchors.handPoint, G = S['weapon-raygun'].anchors;
+  function compose(deg, stage, shot, markMuzzle) {
+    const N = 64, cx = 32, cy = 32;
+    const c = document.createElement('canvas'); c.width = N; c.height = N;
+    const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+    const flip = Math.abs(((deg + 540) % 360) - 180) > 90;
+    const rad = deg * Math.PI / 180;
+    const behind = deg > -160 && deg < -20;
+    const hx = cx + (flip ? -(A.x - 16) : (A.x - 16)), hy = cy + (A.y - 16);
+    const body = frameCanvas('astronaut', shot ? 2 : 0);
+    const gun = frameCanvas('weapon-raygun', (stage - 1) * 2 + (shot ? 1 : 0));
+    const drawBody = () => { x.save(); x.translate(cx, cy); if (flip) x.scale(-1, 1); x.drawImage(body, -16, -16); x.restore(); };
+    const drawGun = () => { x.save(); x.translate(hx, hy); x.rotate(rad); if (flip) x.scale(1, -1); x.drawImage(gun, -G.grip.x, -G.grip.y); x.restore(); };
+    if (behind) { drawGun(); drawBody(); } else { drawBody(); drawGun(); }
+    if (markMuzzle) {
+      const mx = G.muzzle.x - G.grip.x, my = (G.muzzle.y - G.grip.y) * (flip ? -1 : 1);
+      const px = hx + mx * Math.cos(rad) - my * Math.sin(rad), py = hy + mx * Math.sin(rad) + my * Math.cos(rad);
+      x.fillStyle = '#ffcf4a'; x.fillRect(Math.round(px), Math.round(py), 1, 1);
+    }
+    return c;
+  }
+  document.querySelectorAll('.scene,.one').forEach((el) => {
+    const k = el.classList.contains('one') ? 1 : 3;
+    el.dataset.angles.split(',').forEach((a, i) => el.appendChild(scaled(compose(+a, +el.dataset.stage, el.dataset.shot && i === 0), k)));
+  });
+  const wheel = document.getElementById('wheel');
+  [0, 45, 90, 135, 180, -135, -90, -45, -20, -160].forEach((a) => wheel.appendChild(fig(scaled(compose(a, 3, false, true), 4), a + '°')));
+})();
+</script>
+</body>
+</html>

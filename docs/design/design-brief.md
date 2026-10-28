@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-26 (Ergänzung H-14; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Freigegeben. Nächster Schritt: Lead beauftragt den Planner mit „Design übernehmen“ für die Ergänzung H-14 (Übergabe unter „Änderungen“), danach ist AP-66 entblockt.
+**Status:** freigegeben am 2026-10-26 (Ergänzung „Ingame-Sprites“; H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Alle 24 Ingame-Sprites gezeichnet: Astronautin, Strahlenpistole, Laser (`assets/sprites.js`, `mockups/sprites-ingame.html`) sowie Gegner, Bosse, Geschosse, Items, Münzen, Kacheln und UI-Icons (`assets/sprites-world.js`, `mockups/sprites-welt.html`). Freigegeben. Nächster Schritt: Der Lead beauftragt den Planner mit „Design übernehmen“ für die Ergänzung „Ingame-Sprites“ (Übergabe unter „Änderungen“).
 
 ## Ausgangslage
 
@@ -54,6 +54,8 @@ Coder und Reviewer prüfen diese Regeln:
 | Astro Kapsel (eigene Bitmap-Schrift) | Menü, Titel, große Zahlen | eigene Arbeit des Projekts | Glyphen in `docs/design/assets/fonts.js` → `public/assets/fonts/astro-kapsel.png` + `.xml` |
 | Astro Funk (eigene Bitmap-Schrift) | HUD, Pause, Ergebnis, Labels | eigene Arbeit des Projekts | Glyphen in `docs/design/assets/fonts.js` → `public/assets/fonts/astro-funk.png` + `.xml` |
 | Sprite-Vorlagen (Astronautin, Strahlenpistole 1–3, Gegner, Items, Icons) | Silhouette und Palette für die finalen Sprites | eigene Arbeit | `docs/design/assets/pixel.js`, `mockups/sprites.html` |
+| Finale Ingame-Sprites (Astronautin 32×32×4, Strahlenpistole 24×16×6, Laser 16×4) | Pixelquelle für `public/assets/sprites/` | eigene Arbeit | `docs/design/assets/sprites.js`, `mockups/sprites-ingame.html` |
+| Finale Ingame-Sprites der Welt (Gegner, Bosse, Geschosse, Items, Münzen, Kacheln, UI-Icons) | Pixelquelle für `public/assets/sprites/` | eigene Arbeit | `docs/design/assets/sprites-world.js`, `mockups/sprites-welt.html` |
 | App-Icon (Helm mit Visier) | `public/icons/icon-180/192/512.png` | eigene Arbeit | `docs/design/assets/app-icon.svg` |
 | Silkscreen, Press Start 2P, Pixelify Sans, Atkinson Hyperlegible Next | nur in den Richtungs-Entwürfen geprüft, **nicht verwendet** | OFL-1.1 | – |
 
@@ -131,6 +133,42 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
 - Tastatur-Navigation im Menü (Fokus-Ring ist gestaltet) ist heute keine Funktion. Kandidat für den Backlog.
 
 ## Änderungen
+
+### 2026-10-26 · Ergänzung „Ingame-Sprites“ (freigegeben am 2026-10-26)
+
+**Auftrag (Nutzer):** Ingame-Sprites passend zu den Astronautin-Designs (Porträt im Menü, App-Icon, Vorlage in `pixel.js`). Heute ist `astronaut.png` ein Platzhalter (lila Dreiecke), und `weapon-raygun.png` ist die 12×8-Vorlage, nur 2× vergrößert.
+
+**Ergebnis:**
+
+- `docs/design/assets/sprites.js` (`window.PX_SPRITES`) ist die Quelle der finalen Pixel, im Format wie `fonts.js`: reine Daten plus kleine, reine Hilfsfunktionen, ohne DOM und ohne Netz, also im leeren vm-Kontext auswertbar. Schlüssel = Asset-Key, ein Zeichen = ein Pixel, Frames liegen nebeneinander.
+  - `astronaut` 32×32, 4 Frames: 0–1 Ruhe (Kopf sinkt 1 px, Visier-Glanz wandert), 2–3 Rückstoß (Kopf weicht 1 px zurück, Augen kneifen, Antenne wippt). Die rechte Hand liegt in allen Frames auf dem Handpunkt 26|25 (= +10|+9 von der Mitte). Ohrstücke, Antenne, Kragen, Gürtelschnalle und Stiefel in Koralle, Augen in Mint, Wangen in Rosa, wie im Porträt.
+  - `weapon-raygun` 24×16, 6 Frames, nativ gezeichnet statt hochskaliert: Stufe 1 Kolben mit Koralle-Lampe · Stufe 2 Flosse, Spule am Lauf, Energiezelle wird mint · Stufe 3 zusätzlich längerer Emitter und Mint-Spulen. Schuss-Frame: Mündung `muzzle-flash`, Emitterringe glühen. Die Ankerpunkte bleiben unverändert: Griff 7|12, Mündung 22|7.
+  - `laser` 16×4: weißer Kopf, ausfransender Schweif, Farbe per Tint.
+- `mockups/sprites-ingame.html`: Spritesheets (6×), Szenen in allen drei Biomen (3× und 1×), Zielrad mit Spiegeln, Tiefe und Mündung. Die Vorschau prüft Breite, Höhe und Palette jedes Frames und zeigt Fehler oben rot an. Screenshot: `screenshots/sprites-ingame-desktop.png`.
+- Neue Tokens `color.sprite.highlight`, `suit-deep`, `accent-shade`, `eyes-hi`, `eyes-shade`, `muzzle-flash`. Kontrastprüfung grün, Exporte neu gebaut.
+- **Nachtrag (Nutzer: „erstelle die nicht enthaltenen auch“):** `docs/design/assets/sprites-world.js` ergänzt `PX_SPRITES` um alle übrigen Sprites, in den Größen und Frame-Zahlen aus `src/config/assets.ts`:
+  - Gegner: `enemy-cursed-tree` (Baum mit Wurzelfüßen, rote Augen), `enemy-forest-witch` (Hut, grünes Gesicht, Zauberstab mit Glühen), `enemy-zombie-squirrel` 24×24 (Hüpfzyklus, Narbe, rotes Auge), `enemy-forest-spirit` (Mint-Geist mit Spross, Magenta-Augen, wogender Saum). Alle schauen nach rechts, das Spiel spiegelt sie. Umriss Nachtschwarz.
+  - Bosse: `boss-root-monster` 64×64 (Stumpf mit Kronenästen, Wurzelarmen und Zähnen), `boss-root-spike` 16×32 (dornige Wurzel mit roten Adern), `boss-forest-ghost` 48×48 (Geist mit Geweih), `boss-giant-stone` 64×64 (Fels mit Kristallen und Moos; beim Rollen wandern die Oberflächenflecken). Die Varianten-Tönung im Code bleibt nutzbar.
+  - Geschosse: `witch-bolt` (Magenta), `boss-ghost-orb` (hell, wird im Spiel mint getönt).
+  - Items 16×16 × 2 (Frame 1 = Glanz oder Bewegung): Heilung (Mint-Kreuz), Doppelschuss (zwei Koralle-Bolzen), Schild (blau), Schnellfeuer (Blitz), Feuerring (Orange mit Flammen). Umriss Tinte, den hellen Rand fügt das Spiel hinzu.
+  - Münzen: `coin-small` 8×8 und `coin-big` 16×16 (laut Code, nicht 12×12 wie im alten Styleguide), je 4 Frames Drehung, große Münze mit Stern-Prägung.
+  - Kacheln je Biom: Frame 0 ist der Boden (transparent mit ruhigen Tupfen in `*-ground-hi/lo`, Kontrast ≤ 1,5:1), Frames 1–3 sind Deko (Gras, Blumen bzw. Leuchtpilze, Kiesel bzw. Kristalle). Die Farben sind je Biom fertig gesetzt.
+  - `ui-icons` nativ 16×16: Ton an, Ton aus, Pause, Schloss. Linie und Füllung, im Spiel getönt.
+- Vorschau `mockups/sprites-welt.html` (drei Spielszenen und alle Sheets), Screenshot `screenshots/sprites-welt-desktop.png`.
+
+**Übergabe an den Planner:**
+
+| Datei | Änderung |
+|---|---|
+| `src/config/maps.ts` | `tint` bei `forestNight` und `elfForest` entfernen, weil die Kacheln ihre Farben schon mitbringen. Sonst färbt die Tönung sie doppelt und dunkelt sie ab. |
+| `scripts/build-sprites.mjs` (neu), `package.json` | Skript `sprites:build` nach dem Muster von `build-fonts.mjs`: `docs/design/assets/sprites.js` und danach `sprites-world.js` im selben leeren vm-Kontext auswerten, je Schlüssel ein PNG `public/assets/sprites/<key>.png` (Frames nebeneinander, `.` transparent, sonst deckend). Es prüft Framegröße und Framezahl gegen `src/config/assets.ts` und bricht bei Abweichung ab. |
+| `scripts/generate-placeholders.mjs` | `makeRaygun` und die `RAYGUN`-Vorlage entfernen. Für Schlüssel aus `PX_SPRITES` keine Platzhalter mehr erzeugen (sonst überschreibt `assets:placeholders` die finalen Bilder). |
+| `public/assets/.placeholders.json`, `scripts/check-assets.mjs`, `scripts/generate-placeholders.mjs` | Keines der 24 Sprites gilt mehr als Platzhalter, die Töne bleiben Platzhalter. Der Generator erzeugt nur noch Töne; `makeRaygun`, `makeUiIcons` und die Sprite-Zeichnung entfallen. |
+| `public/assets/LICENSES.md` | alle Zeilen unter `sprites/`: „eigene Arbeit des Projekts (Pixel `docs/design/assets/sprites.js` und `sprites-world.js`, `npm run sprites:build`)“. |
+| `src/entities/Player.ts`, `src/config/assets.ts` | keine Logik-Änderung. Prüfen, dass die Beschreibung von `astronaut` lautet: 0–1 Ruhe, 2–3 Rückstoß. |
+| `docs/guides/grafik-austauschen.md` | Abschnitt: Sprites in `sprites.js` ändern, `npm run sprites:build`, Vorschau `mockups/sprites-ingame.html`. |
+
+Keine neuen Abhängigkeiten. Ein Paket ohne Design-Review (keine UI), aber mit Handtest: alle drei Biome mit Boss spielen, Figur und Waffe in allen Ausbaustufen ansehen, nach links zielen, dazu Items, Münzen sowie die Ton- und Pause-Icons prüfen. Vergleich: `screenshots/sprites-ingame-desktop.png` und `screenshots/sprites-welt-desktop.png`.
 
 ### 2026-10-26 · Ergänzung H-14 (freigegeben am 2026-10-26)
 

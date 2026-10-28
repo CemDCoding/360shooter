@@ -21,7 +21,8 @@
 | `npm run preview:lan`         | Build und Vorschau im WLAN (für das iPhone) |
 | `npm run icons`               | Platzhalter-Icons neu erzeugen              |
 | `npm run assets:check`        | Prüft Sprites in `public/assets/`           |
-| `npm run assets:placeholders` | Erzeugt Platzhalter-Grafiken                |
+| `npm run sprites:build`       | Sprites aus dem Designer-Quelltext erzeugen |
+| `npm run assets:placeholders` | Erzeugt nur die Platzhalter-Töne            |
 
 ## Am PC spielen
 
@@ -60,7 +61,8 @@ An die Adresse anhängen, z. B. `http://localhost:5173/?level=5`:
 - Grafiken: [docs/guides/grafik-austauschen.md](docs/guides/grafik-austauschen.md)
 - Sounds: [docs/guides/sound-austauschen.md](docs/guides/sound-austauschen.md)
 - `npm run assets:check` prüft, ob alle erwarteten Sprites vorhanden und gültig sind.
-- `npm run assets:placeholders` erzeugt die Platzhalter-Grafiken neu (überschreibt eigene Dateien, vorher sichern).
+- `npm run sprites:build` erzeugt die Sprites aus den Pixeldaten des Designers (`docs/design/assets/sprites.js` und `sprites-world.js`) und überschreibt die PNG-Dateien in `public/assets/sprites/`.
+- `npm run assets:placeholders` erzeugt nur noch die Platzhalter-Töne neu (überschreibt eigene Dateien, vorher sichern).
 
 ## Design
 

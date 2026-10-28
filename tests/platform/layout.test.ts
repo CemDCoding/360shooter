@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  arenaWidthFor,
   BASE_HUD_FONT,
   clampedArea,
   fitArena,
@@ -190,5 +191,110 @@ describe('RELAYOUT_DELAYS_MS', () => {
       expect(Number.isFinite(d) && d > 0).toBe(true);
       if (i > 0) expect(d).toBeGreaterThan(RELAYOUT_DELAYS_MS[i - 1]!);
     });
+  });
+});
+
+describe('fitArena evidence: phone landscape side margins (AP-77, PE-94)', () => {
+  // ASSUMPTION (not measured on the device, see Q-48): insets top 0, left/right 47, bottom 21.
+  // The window is about 2.2:1, the arena is 16:9, so the height limits and side bars appear.
+  const ins = { top: 0, right: 47, bottom: 21, left: 47 };
+
+  it('iPhone 15 852x393: height limits, ~95 px each side, 21 px bottom, 0 px top', () => {
+    const f = fitArena(852, 393, ins, 640, 360);
+    // available 758 x 372 -> scale min(758/640, 372/360) = 372/360
+    expect(f.scale).toBeCloseTo(372 / 360, 6);
+    expect(f.scale).toBeCloseTo(1.033, 3);
+    expect(f.width).toBeCloseTo(661.33, 2);
+    expect(f.height).toBeCloseTo(372, 6);
+    expect(f.width / f.height).toBeCloseTo(16 / 9, 6);
+    // side margin = 47 inset + (758 - 661.33) / 2 = 47 + 48.33
+    expect(f.offsetX).toBeCloseTo(95.33, 2);
+    expect(852 - (f.offsetX + f.width)).toBeCloseTo(95.33, 2);
+    expect(f.offsetY).toBeCloseTo(0, 6);
+    expect(393 - (f.offsetY + f.height)).toBeCloseTo(21, 6);
+  });
+
+  it('iPhone 15 Pro Max 932x430 with the same insets (comparison)', () => {
+    const f = fitArena(932, 430, ins, 640, 360);
+    // available 838 x 409 -> scale 409/360
+    expect(f.scale).toBeCloseTo(409 / 360, 6);
+    expect(f.width).toBeCloseTo(727.11, 2);
+    expect(f.height).toBeCloseTo(409, 6);
+    expect(f.offsetX).toBeCloseTo(102.44, 2);
+    expect(f.offsetY).toBeCloseTo(0, 6);
+    expect(430 - (f.offsetY + f.height)).toBeCloseTo(21, 6);
+  });
+
+  it('667x375 without insets: height limits, side bars only ~0.17 px', () => {
+    const f = fitArena(667, 375, none, 640, 360);
+    expect(f.scale).toBeCloseTo(375 / 360, 6);
+    expect(f.width).toBeCloseTo(666.67, 2);
+    expect(f.height).toBeCloseTo(375, 6);
+    expect(f.offsetX).toBeCloseTo(0.17, 2);
+    expect(f.offsetY).toBeCloseTo(0, 6);
+  });
+
+  it('PC 1280x720 and 1920x1080 without insets: arena fills the window, no bars', () => {
+    for (const [w, h, s] of [
+      [1280, 720, 2],
+      [1920, 1080, 3],
+    ] as const) {
+      const f = fitArena(w, h, none, 640, 360);
+      expect(f).toMatchObject({ scale: s, width: w, height: h, offsetX: 0, offsetY: 0 });
+    }
+  });
+});
+
+describe('arenaWidthFor (PE-99, PE-106)', () => {
+  const fit = (w: number, h: number, ins = none) => {
+    const availW = w - ins.left - ins.right;
+    const availH = h - ins.top - ins.bottom;
+    const aw = arenaWidthFor(availW, availH);
+    return { aw, f: fitArena(w, h, ins, aw, 360), availW };
+  };
+
+  it('iPhone 15 landscape with insets: 734 wide, no side bars', () => {
+    const { aw, f, availW } = fit(852, 393, { top: 0, right: 47, bottom: 21, left: 47 });
+    expect(Math.abs(aw - 734)).toBeLessThanOrEqual(1);
+    expect(Math.abs(f.offsetX - 47)).toBeLessThanOrEqual(1);
+    expect(Math.abs(f.width - availW)).toBeLessThanOrEqual(1);
+    expect(f.scale).toBeCloseTo(1.033, 2);
+  });
+
+  it('16:9 gives 640 without bars', () => {
+    const { aw, f } = fit(1280, 720);
+    expect(aw).toBe(640);
+    expect(f.offsetX).toBeCloseTo(0);
+    expect(f.offsetY).toBeCloseTo(0);
+  });
+
+  it('19.5:9 gives about 779', () => {
+    expect(Math.abs(fit(844, 390).aw - 779)).toBeLessThanOrEqual(1);
+  });
+
+  it('20:9 gives 800', () => {
+    expect(fit(800, 360).aw).toBe(800);
+  });
+
+  it('21:9 is capped at 800 with small side bars', () => {
+    const { aw, f } = fit(2520, 1080);
+    expect(aw).toBe(800);
+    expect(f.offsetX).toBeGreaterThan(0);
+    expect(f.offsetY).toBeCloseTo(0);
+  });
+
+  it('4:3 gives 640 with bars top and bottom', () => {
+    const { aw, f } = fit(1024, 768);
+    expect(aw).toBe(640);
+    expect(f.offsetY).toBeGreaterThan(0);
+    expect(f.offsetX).toBeCloseTo(0);
+  });
+
+  it('invalid input falls back to the minimum width', () => {
+    expect(arenaWidthFor(0, 360)).toBe(640);
+    expect(arenaWidthFor(800, 0)).toBe(640);
+    expect(arenaWidthFor(Number.NaN, 360)).toBe(640);
+    expect(arenaWidthFor(-5, -5)).toBe(640);
+    expect(arenaWidthFor(Infinity, 360)).toBe(640);
   });
 });

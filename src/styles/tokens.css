@@ -54,6 +54,12 @@
   --color-sprite-cheeks: var(--color-coral-300);
   --color-sprite-accent: var(--color-coral-400);
   --color-sprite-raygun-glow: #ff8fae;
+  --color-sprite-highlight: #ffffff;
+  --color-sprite-suit-deep: #ac90b0;
+  --color-sprite-accent-shade: var(--color-coral-600);
+  --color-sprite-eyes-hi: var(--color-mint-200);
+  --color-sprite-eyes-shade: var(--color-mint-600);
+  --color-sprite-muzzle-flash: #fff3b0;
   --color-sprite-coin: var(--color-gold-400);
   --color-sprite-coin-hi: var(--color-gold-200);
   --color-sprite-coin-lo: var(--color-gold-600);

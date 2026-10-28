@@ -3,14 +3,11 @@ import { BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
 import type { BossAttackDef } from '../../contracts';
 import { BossBase, type BossContext } from './BossBase';
+import { rimRadii } from './rim';
 import { clampToArena, fragmentPositions, stepToward } from './bossGeometry';
 import { Telegraph } from './Telegraph';
 
 const T = BOSS_TUNING.giantStone;
-const CENTER_DEFAULT = {
-  x: BOSS_TUNING.arena.width / 2,
-  y: BOSS_TUNING.arena.height / 2,
-} as const;
 const GLOW_COLOR = THEME.colors['game.fire-ring'].num;
 const CRACK_COLOR = THEME.colors['game.hit-flash'].num;
 
@@ -84,7 +81,7 @@ export class GiantStone extends BossBase {
   }
 
   private get middle(): { x: number; y: number } {
-    return this.center ?? CENTER_DEFAULT;
+    return this.center;
   }
 
   protected override onSpawn(): void {
@@ -150,7 +147,8 @@ export class GiantStone extends BossBase {
     } else if (this.phase === 'retreating') {
       this.retreatMs += delta;
       // Safety: a retreat that takes too long ends where the stone is (no soft lock).
-      if (this.advance(delta, T.returnSpeed) || this.retreatMs > T.retreatMaxMs) this.finishRetreat();
+      if (this.advance(delta, T.returnSpeed) || this.retreatMs > T.retreatMaxMs)
+        this.finishRetreat();
     }
     if (this.vulnerableLeftMs > 0) {
       this.vulnerableLeftMs -= delta;
@@ -169,8 +167,9 @@ export class GiantStone extends BossBase {
     this.damageFactor = 1;
     const m = this.middle;
     const angle = this.rand() * Math.PI * 2;
-    this.target = { x: m.x + Math.cos(angle) * T.rim.rx, y: m.y + Math.sin(angle) * T.rim.ry };
-    this.target = clampToArena(this.target, BOSS_TUNING.arena);
+    const rim = rimRadii(T.rim, this.arena);
+    this.target = { x: m.x + Math.cos(angle) * rim.rx, y: m.y + Math.sin(angle) * rim.ry };
+    this.target = clampToArena(this.target, this.arena);
     this.phase = 'retreating';
     this.retreatMs = 0;
   }
@@ -187,7 +186,7 @@ export class GiantStone extends BossBase {
    */
   private advance(delta: number, speed: number): boolean {
     const next = stepToward({ x: this.x, y: this.y }, this.target, speed, delta);
-    const p = clampToArena(next, BOSS_TUNING.arena);
+    const p = clampToArena(next, this.arena);
     this.setPosition(p.x, p.y);
     this.body?.updateFromGameObject();
     const left = Phaser.Math.Distance.Between(p.x, p.y, this.target.x, this.target.y);
@@ -253,13 +252,14 @@ export class GiantStone extends BossBase {
       this.middle,
       T.fragmentOffset,
       T.fragmentMinCenterDist,
-      BOSS_TUNING.arena,
+      this.arena,
     );
     for (let i = 0; i < 2; i++) {
       const frag: GiantStone = new GiantStone(
         this.scene,
         this.levelId,
         {
+          arena: this.userCtx.arena,
           center: this.userCtx.center,
           rng: this.userCtx.rng,
           onHpChanged: () => this.reportSum(),

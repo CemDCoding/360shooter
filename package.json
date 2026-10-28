@@ -17,6 +17,7 @@
     "icons": "node scripts/generate-icons.mjs",
     "theme:build": "node scripts/build-theme.mjs",
     "fonts:build": "node scripts/build-fonts.mjs",
+    "sprites:build": "node scripts/build-sprites.mjs",
     "preview:lan": "npm run build && vite preview --host"
   },
   "type": "module",

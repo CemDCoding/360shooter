@@ -18,13 +18,24 @@ export class GhostOrb extends Phaser.Physics.Arcade.Sprite {
     this.kill();
   }
 
-  fire(x: number, y: number, angleRad: number, speed: number, damage: number, lifeMs: number): void {
+  fire(
+    x: number,
+    y: number,
+    angleRad: number,
+    speed: number,
+    damage: number,
+    lifeMs: number,
+  ): void {
     this.enableBody(true, x, y, true, true);
     this.setActive(true).setVisible(true);
     this.damage = damage;
     this.lifeMs = lifeMs;
     this.setRotation(angleRad);
-    this.scene.physics.velocityFromRotation(angleRad, speed, (this.body as Phaser.Physics.Arcade.Body).velocity);
+    this.scene.physics.velocityFromRotation(
+      angleRad,
+      speed,
+      (this.body as Phaser.Physics.Arcade.Body).velocity,
+    );
   }
 
   /** Counts the lifetime down; returns false once the orb expired and was removed. */

@@ -81,7 +81,10 @@ export class RootMonster extends BossBase {
       const x = this.center.x;
       const y = this.center.y;
       this.spikes?.push(
-        new RootSpike(this.scene, x, y, this.attackDamage('rootThrust'), { mode: 'sprout', sproutMs: ms }),
+        new RootSpike(this.scene, x, y, this.attackDamage('rootThrust'), {
+          mode: 'sprout',
+          sproutMs: ms,
+        }),
       );
       this.track(Telegraph.circle(this.scene, x, y, TUNING.sprout.hitRadius, ms));
     } else if (attack.id === 'forestCall') {
@@ -141,6 +144,6 @@ export class RootMonster extends BossBase {
     const call = TUNING.call;
     const count = call.minTrees + Math.floor(this.random() * (call.maxTrees - call.minTrees + 1));
     const base = this.random() * FULL_TURN;
-    return treePositions({ x: this.x, y: this.y }, count, base, call.distance, BOSS_TUNING.arena);
+    return treePositions({ x: this.x, y: this.y }, count, base, call.distance, this.arena);
   }
 }

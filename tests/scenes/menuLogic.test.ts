@@ -3,6 +3,7 @@ import { LEVELS } from '../../src/config';
 import { groupLevels } from '../../src/scenes/menu/levelGroups';
 import {
   buyCaption,
+  centerOffset,
   groupRange,
   isFreshSave,
   nextWeaponStage,
@@ -70,5 +71,16 @@ describe('isFreshSave', () => {
     expect(isFreshSave({ playerXp: 5, highestUnlockedLevel: 0 })).toBe(false);
     expect(isFreshSave({ playerXp: 0, highestUnlockedLevel: 1 })).toBe(false);
     expect(isFreshSave({ playerXp: 0, highestUnlockedLevel: 0, gold: 3 })).toBe(false);
+  });
+});
+
+describe('centerOffset', () => {
+  it('is 0 at the base width and centres wider arenas', () => {
+    expect(centerOffset(640, 640)).toBe(0);
+    expect(centerOffset(734, 640)).toBe(47);
+    expect(centerOffset(800, 640)).toBe(80);
+  });
+  it('never goes negative', () => {
+    expect(centerOffset(600, 640)).toBe(0);
   });
 });

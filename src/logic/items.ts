@@ -21,7 +21,11 @@ export function applyPowerItem(state: ActivePowers, def: ItemDef): ActivePowers 
     case 'doubleShot':
       return {
         ...state,
-        doubleShotStage: Math.min(def.maxStacks, MAX_DOUBLE_SHOT_STAGE, Math.max(0, state.doubleShotStage) + 1),
+        doubleShotStage: Math.min(
+          def.maxStacks,
+          MAX_DOUBLE_SHOT_STAGE,
+          Math.max(0, state.doubleShotStage) + 1,
+        ),
       };
     case 'shield':
       // No stage field in ActivePowers: stage = ceil(shieldLeft / perStack), capped via maxStacks.

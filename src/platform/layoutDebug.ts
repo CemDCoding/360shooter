@@ -19,6 +19,9 @@ export interface LayoutReportInput {
   standaloneMedia: boolean;
   standaloneNav: boolean | undefined;
   landscape: boolean;
+  /** Arena width the safe area asks for, and the width the game currently runs with. */
+  arenaDesiredW: number;
+  arenaCurrentW: number;
 }
 
 const r = (n: number): string => (Number.isFinite(n) ? String(Math.round(n * 100) / 100) : '?');
@@ -35,6 +38,7 @@ export function layoutReport(i: LayoutReportInput): string[] {
     `probe ${r(i.probe.width)}x${r(i.probe.height)} ins t${r(i.probe.top)} r${r(i.probe.right)} b${r(i.probe.bottom)} l${r(i.probe.left)}`,
     `game ${r(i.game.width)}x${r(i.game.height)} @${r(i.game.x)},${r(i.game.y)}`,
     `standalone media ${i.standaloneMedia} nav ${String(i.standaloneNav)}`,
+    `arena want ${r(i.arenaDesiredW)} now ${r(i.arenaCurrentW)}`,
     `orientation ${i.landscape ? 'landscape' : 'portrait'}`,
   ];
 }
@@ -65,4 +69,19 @@ export function createLayoutDebug(): ((lines: string[]) => void) | null {
   return (lines) => {
     el.textContent = lines.join('\n');
   };
+}
+
+export type ArenaWidthAction = 'keep' | 'apply' | 'defer';
+
+/**
+ * Decides what to do with a newly wanted arena width (PE-109): the width never changes while a
+ * round (GameScene active, paused or sleeping) exists; the change waits until the round ends.
+ */
+export function decideArenaWidth(
+  desired: number,
+  current: number,
+  gameSceneRunning: boolean,
+): ArenaWidthAction {
+  if (desired === current) return 'keep';
+  return gameSceneRunning ? 'defer' : 'apply';
 }
