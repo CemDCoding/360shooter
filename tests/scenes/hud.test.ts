@@ -12,6 +12,8 @@ import {
   bossDisplayName,
   bossPercentLeft,
   bossTrailTop,
+  CHIP_SHRINK,
+  chipMetrics,
   itemMsLeft,
   patternCells,
   patternWidth,
@@ -29,6 +31,7 @@ import {
   powerSlotRects,
   rectInArena,
   rectsOverlap,
+  type Rect,
   secondsLeft,
   secondsText,
   shieldRatio,
@@ -364,5 +367,89 @@ describe('boss HUD (H-14, 5a and 7a)', () => {
     expect(patternWidth(PIXEL_STAR)).toBe(7);
     expect(PIXEL_LOCK.length).toBeLessThanOrEqual(8);
     expect(PIXEL_STAR.length).toBeLessThanOrEqual(8);
+  });
+});
+
+describe('phone HUD layout (H-23, AP-86)', () => {
+  const H = 360;
+  const ADV = 6; // font advance fallback per glyph at scale 1
+  const textW = (n: number, scale: number) => n * ADV * scale;
+  const base = {
+    size: THEME.sizePx['size.hud-slot'],
+    gap: THEME.sizePx['size.hud-slot-gap'],
+    margin: THEME.spacePx['space.2'],
+  };
+
+  /** Mirror of HudScene.create with wide chip content (three glyphs) and all chips visible. */
+  function layout(W: number, k: number) {
+    const m = Math.round(8 * k);
+    const pad = Math.round(8 * k);
+    const numW = textW(3, 3);
+    const segsW = 10 * Math.round(8 * k) + 9 * Math.max(2, Math.round(2 * k));
+    const lab = k <= 1 ? 1 : Math.max(2, Math.ceil(k));
+    const eh = 24 + pad * 2;
+    const ew = pad * 2 + numW + Math.round(8 * k) + Math.max(segsW, textW(8, lab));
+    const energy = { x: m, y: m, w: ew, h: eh };
+    const tw = textW(5, 3) + pad * 2;
+    const timer = { x: Math.round(W / 2 - tw / 2), y: m, w: tw, h: eh };
+    const btn = Math.round(THEME.sizePx['size.target'] * Math.max(1, k));
+    const pause = { x: W - m - btn, y: m, w: btn, h: btn };
+    const mute = { x: pause.x - m - btn, y: m, w: btn, h: btn };
+    const rowY = m + eh + Math.round(4 * k);
+    const chips: Rect[] = [];
+    let x = m;
+    // [bar width at k = 1, small chip]: coin, double shot, shield (with bar), rapid fire, fire ring
+    const specs: [number, boolean][] = [
+      [0, true],
+      [0, true],
+      [24, true],
+      [0, false],
+      [0, false],
+    ];
+    for (const [bar, small] of specs) {
+      const mt = chipMetrics(k, small ? CHIP_SHRINK : 1);
+      const bw = Math.round(bar * mt.iconFactor);
+      const w = Math.round(
+        mt.padX * 2 + textW(3, mt.textScale) + mt.iconW + mt.gap + (bw ? bw + 2 + mt.gap : 0),
+      );
+      chips.push({ x, y: rowY, w, h: mt.height });
+      x += w + Math.round(4 * k);
+    }
+    const slots = powerSlotRects(2, 1, H, base, m);
+    const bar = bossBarRect(W, H, k, 200, 8, 8);
+    return { m, energy, timer, pause, mute, chips, slots, bar };
+  }
+
+  const combos: [number, number][] = [];
+  for (const W of [640, 734, 800]) for (const k of [1, 1.36, 1.4]) combos.push([W, k]);
+
+  it.each(combos)('has no overlaps and stays in the arena at width %s, k = %s', (W, k) => {
+    const l = layout(W, k);
+    const rects = [l.energy, l.timer, l.pause, l.mute, ...l.chips, ...l.slots, l.bar];
+    for (const r of rects) expect(rectInArena(r, W, H)).toBe(true);
+    for (let i = 0; i < rects.length; i++)
+      for (let j = i + 1; j < rects.length; j++)
+        expect(rectsOverlap(rects[i], rects[j])).toBe(false);
+  });
+
+  it.each(combos)('keeps the margin m on all edges at width %s, k = %s', (W, k) => {
+    const l = layout(W, k);
+    expect(l.energy.x).toBe(l.m);
+    expect(l.energy.y).toBe(l.m);
+    expect(l.chips[0].x).toBe(l.m);
+    expect(l.slots[0].x).toBe(l.m);
+    expect(W - (l.pause.x + l.pause.w)).toBe(l.m);
+    expect(l.mute.x + l.mute.w + l.m).toBe(l.pause.x);
+    expect(H - (l.slots[0].y + l.slots[0].h)).toBe(l.m);
+    expect(H - (l.bar.y + l.bar.h)).toBe(l.m);
+    expect(l.slots[0].w).toBe(40);
+    expect(l.slots[1].x - (l.slots[0].x + 40)).toBe(8);
+  });
+
+  it('takes the slot margin separately from size and gap', () => {
+    expect(powerSlotRects(2, 1, H, base, 11)).toEqual([
+      { x: 11, y: 309, w: 40, h: 40 },
+      { x: 59, y: 309, w: 40, h: 40 },
+    ]);
   });
 });

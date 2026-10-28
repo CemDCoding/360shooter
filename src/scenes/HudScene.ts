@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { getLevel } from '../config/levels';
-import { THEME, themeColor, type ColorName } from '../config/theme';
+import { OPACITY, THEME, themeColor, type ColorName } from '../config/theme';
 import { GameEvents, type GameEventPayloads } from '../contracts';
 import { addMuteButton } from '../platform/audio';
 import { hudScale } from '../platform/layout';
@@ -55,8 +55,6 @@ const PAUSE_DEPTH = 100;
 /** Boss bar width in arena units at k = 1 (runde.html 3: 200 px, bottom centre). */
 const BOSS_BAR_W = 200;
 const BOSS_BAR_H = 8;
-/** Alpha at the low point of a blink (same as the energy and timer warning). */
-const BLINK_ALPHA = 0.55;
 /** Banner top as a share of the arena height (mockup lagerplatz-und-boss.html: top 92 of 360). */
 const BANNER_TOP = 92 / 360;
 
@@ -155,7 +153,7 @@ export class HudScene extends Phaser.Scene {
     this.createButtons(width, m, btn);
     this.createChips(m, k);
     this.createBossUi(width, height, k);
-    this.slots = new PowerSlots(this, height, this.onSlotPressed);
+    this.slots = new PowerSlots(this, height, m, this.onSlotPressed);
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
@@ -333,7 +331,7 @@ export class HudScene extends Phaser.Scene {
     if (!plan) return;
     this.bannerTween = this.tweens.add({
       targets: parts,
-      alpha: BLINK_ALPHA,
+      alpha: OPACITY.blink,
       duration: plan.durationMs,
       yoyo: true,
       repeat: plan.repeat,
@@ -476,7 +474,7 @@ export class HudScene extends Phaser.Scene {
       height: size,
       onClick: () => this.togglePause(),
     });
-    addMuteButton(this, px - size - 8, y, 'hud');
+    addMuteButton(this, px - size - m, y, 'hud');
   }
 
   /** Chip row: coins always, power chips and the fire ring only while active. */
@@ -666,7 +664,7 @@ export class HudScene extends Phaser.Scene {
       id,
       this.tweens.add({
         targets,
-        alpha: BLINK_ALPHA,
+        alpha: OPACITY.blink,
         duration: THEME.motionMs['motion.blink'],
         yoyo: true,
         repeat: -1,

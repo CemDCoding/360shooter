@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { ITEMS } from '../../config';
 import type { ActivePowers } from '../../contracts';
 import { FunkChip } from './FunkPanel';
-import { secondsLeft, secondsText, shieldRatio } from './hudMath';
+import { chipShrink, secondsLeft, secondsText, shieldRatio } from './hudMath';
 
 /** Layout value (shield bar width at k = 1), candidate for the config. */
 const SHIELD_BAR_W = 24;
@@ -29,8 +29,17 @@ export class PowerIndicators {
     this.maxStacks = find('shield')?.maxStacks ?? 1;
     this.maxStage = find('doubleShot')?.maxStacks ?? 2;
     const key = (e: string): string => find(e)?.spriteKey ?? '';
-    this.doubleShot = new FunkChip(scene, { icon: { key: key('doubleShot') }, k });
-    this.shield = new FunkChip(scene, { icon: { key: key('shield') }, barW: SHIELD_BAR_W, k });
+    this.doubleShot = new FunkChip(scene, {
+      icon: { key: key('doubleShot') },
+      k,
+      shrink: chipShrink('doubleShot'),
+    });
+    this.shield = new FunkChip(scene, {
+      icon: { key: key('shield') },
+      barW: SHIELD_BAR_W,
+      k,
+      shrink: chipShrink('shield'),
+    });
     this.rapidFire = new FunkChip(scene, { icon: { key: key('rapidFire') }, k });
     this.set({ doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 });
   }

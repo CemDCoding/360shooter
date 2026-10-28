@@ -24,8 +24,6 @@ import {
 /** Scene event of the HudScene: a ready slot was tapped (payload: power id). */
 export const POWER_SLOT_PRESSED = 'power-slot-pressed';
 
-/** Hover fill: accent at 18 % over the glass (mockup lagerplatz-und-boss.html, like FunkButton). */
-const HOVER_FILL_ALPHA = 0.18;
 /** Item sprites are 16x16 (config/assets.ts). */
 const SPRITE_PX = 16;
 /** Seconds text scale in a slot: fixed desktop step 2, independent of the HUD factor (PE-94). */
@@ -157,7 +155,7 @@ class PowerSlot {
     // Mouse over a ready slot: accent fill at 18 % on top of the glass.
     this.overlay.clear();
     if (ready && this.hover && !this.pressed && !this.flashing) {
-      this.overlay.fillStyle(themeColor('hud.accent').num, HOVER_FILL_ALPHA);
+      this.overlay.fillStyle(themeColor('hud.accent').num, OPACITY.hover);
       this.overlay.fillRect(this.r.x + 1, this.r.y + 1, this.r.w - 2, this.r.h - 2);
     }
 
@@ -200,13 +198,20 @@ export class PowerSlots {
   private powers: ActivePowers = { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 };
   private armour: ActiveArmour = { id: null, activeMsLeft: 0, cooldownMsLeft: 0 };
 
-  constructor(scene: Phaser.Scene, arenaH: number, onPress: (id: string) => void) {
-    // PE-94: slots keep desktop size (k = 1, edge 40) on phones; no scaling with the HUD factor.
-    const rects = powerSlotRects(STORABLE_POWERS.length, 1, arenaH, {
-      size: THEME.sizePx['size.hud-slot'],
-      gap: THEME.sizePx['size.hud-slot-gap'],
-      margin: THEME.spacePx['space.2'],
-    });
+  constructor(scene: Phaser.Scene, arenaH: number, edge: number, onPress: (id: string) => void) {
+    // PE-94: slots keep desktop size (edge 40, gap 8) on phones; only the outer margin is the
+    // HUD margin m = round(8k) (H-23), the same as every other HUD element.
+    const rects = powerSlotRects(
+      STORABLE_POWERS.length,
+      1,
+      arenaH,
+      {
+        size: THEME.sizePx['size.hud-slot'],
+        gap: THEME.sizePx['size.hud-slot-gap'],
+        margin: THEME.spacePx['space.2'],
+      },
+      edge,
+    );
     const iconScale = slotIconScale(
       rects[0]?.w ?? 0,
       SPRITE_PX,
