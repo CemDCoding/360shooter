@@ -102,10 +102,13 @@ describe('THEME other tokens', () => {
 describe('OPACITY', () => {
   const exported = (json as { base: { opacity: Record<string, number> } }).base.opacity;
 
-  it('has dim 0.35 and ghost 0.6', () => {
+  it('has dim 0.35, ghost 0.6, hover 0.18, blink 0.55 and aura 0.25', () => {
     expect(OPACITY.dim).toBe(0.35);
     expect(OPACITY.ghost).toBe(0.6);
-    expect(Object.keys(OPACITY).sort()).toEqual(['dim', 'ghost']);
+    expect(OPACITY.hover).toBe(0.18);
+    expect(OPACITY.blink).toBe(0.55);
+    expect(OPACITY.aura).toBe(0.25);
+    expect(Object.keys(OPACITY).sort()).toEqual(['aura', 'blink', 'dim', 'ghost', 'hover']);
   });
 
   it('matches the design export', () => {
