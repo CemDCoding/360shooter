@@ -9,3 +9,4 @@ export * from './player';
 export * from './progression';
 export * from './powerStore';
 export * from './arena';
+export * from './scaling';

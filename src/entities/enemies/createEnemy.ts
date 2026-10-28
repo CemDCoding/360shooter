@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import type { EnemyId } from '../../contracts';
 import { ENEMIES } from '../../config/enemies';
+import type { EnemyScale } from '../../logic/scaling';
 import { AuraEnemy } from './AuraEnemy';
 import { ChaseEnemy } from './ChaseEnemy';
 import type { Enemy, EnemyContext } from './Enemy';
@@ -34,13 +35,15 @@ export class EnemyPool {
     private readonly ctx: CreateEnemyContext,
   ) {}
 
-  spawn(id: EnemyId, x: number, y: number): Enemy {
+  /** `scale` is optional: without it the enemy keeps the hp of its definition. */
+  spawn(id: EnemyId, x: number, y: number, scale?: Pick<EnemyScale, 'hp'>): Enemy {
     let e = this.enemies.find((en) => !en.active && en.def.id === id);
     if (!e) {
       e = createEnemy(this.scene, id, this.ctx);
       this.enemies.push(e);
     }
     e.spawn(x, y);
+    if (scale) e.hp = Math.max(1, Math.round(e.def.hp * scale.hp));
     return e;
   }
 
