@@ -5,8 +5,9 @@ import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
 import { HudScene } from './scenes/HudScene';
 import { ResultScene } from './scenes/ResultScene';
-import { arenaWidthFor, clampedArea, fitArena, RELAYOUT_DELAYS_MS } from './platform/layout';
-import { createLayoutDebug, decideArenaWidth, layoutReport } from './platform/layoutDebug';
+import { RELAYOUT_DELAYS_MS } from './platform/layout';
+import { ArenaWidthController, hostBoxFor, measureArena } from './platform/arenaLayout';
+import { createLayoutDebug, layoutReport } from './platform/layoutDebug';
 import { ARENA } from './config/arena';
 import { THEME } from './config/theme';
 
@@ -14,30 +15,19 @@ const debugUpdate = createLayoutDebug();
 
 /*
  * PE-109: the arena width follows the safe area's aspect ratio (arenaWidthFor), but stays fixed
- * while a round exists (GameScene active, paused or sleeping). A width wanted meanwhile is only
- * remembered (`wantedW`) and applied when the GameScene shuts down. Menu and result scenes are
- * restarted after a change so that their layout matches the new width.
+ * while a round exists. The controller applies a wanted width at once outside a round, when a
+ * round starts (also "Nochmal") and when it ends; menu and result scenes restart after a change.
  */
-let currentW: number | null = null; // null until the Phaser game exists
-let wantedW: number = ARENA.baseWidth;
-// Assigned once below; declared early because the helpers above need it (they run only later).
+const widths = new ArenaWidthController();
+// Assigned once below; declared early because the helpers need it (they run only later).
 // eslint-disable-next-line prefer-const
 let game: Phaser.Game | undefined;
-let shutdownHooked = false;
+let hooked = false;
 
-const roundRunning = (): boolean =>
-  !!game &&
-  (game.scene.isActive('GameScene') ||
-    game.scene.isPaused('GameScene') ||
-    game.scene.isSleeping('GameScene'));
-
-/** Applies the wanted width if no round exists; restarts open menu or result scenes. */
-function applyWantedWidth(): void {
-  if (!game || currentW === null) return;
-  const action = decideArenaWidth(wantedW, currentW, roundRunning());
-  if (action !== 'apply') return;
-  currentW = wantedW;
-  game.scale.setGameSize(currentW, ARENA.height);
+/** Sets a new game width (if the controller returned one); restarts open menu or result scenes. */
+function applyWidth(w: number | null): void {
+  if (w === null || !game) return;
+  game.scale.setGameSize(w, ARENA.height);
   for (const key of ['MenuScene', 'ResultScene']) {
     if (!game.scene.isActive(key)) continue;
     const scene = game.scene.getScene(key);
@@ -45,18 +35,20 @@ function applyWantedWidth(): void {
   }
 }
 
-/** Registers (once) the listener that applies a deferred width when the round ends. */
-function hookGameSceneEnd(): void {
-  if (shutdownHooked || !game) return;
+/** Registers (once) the GameScene listeners: the width is applied at round start and round end. */
+function hookGameScene(): void {
+  if (hooked || !game) return;
   const scene = game.scene.getScene('GameScene');
   if (!scene) return;
-  shutdownHooked = true;
+  hooked = true;
+  // START comes before init/create, so the new round already sees the final width.
+  scene.events.on(Phaser.Scenes.Events.START, () => {
+    applyWidth(widths.roundStart());
+    relayout();
+  });
   scene.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
-    // After the current scene switch, so a restarted round counts as running again.
-    window.setTimeout(() => {
-      applyWantedWidth();
-      relayout();
-    }, 0);
+    applyWidth(widths.roundEnd());
+    relayout();
   });
 }
 
@@ -75,23 +67,21 @@ function layoutArena(): void {
   };
   // visualViewport is the truth on iOS (toolbar, rotation); 100dvh alone can be stale.
   const vv = window.visualViewport;
-  const area = clampedArea(probe.clientWidth, probe.clientHeight, insets, vv, {
-    width: window.innerWidth,
-    height: window.innerHeight,
+  const m = measureArena({
+    probeW: probe.clientWidth,
+    probeH: probe.clientHeight,
+    insets,
+    vv,
+    win: { width: window.innerWidth, height: window.innerHeight },
   });
-  const availW = Math.max(0, area.width - area.insets.left - area.insets.right);
-  const availH = Math.max(0, area.height - area.insets.top - area.insets.bottom);
-  wantedW = arenaWidthFor(availW, availH);
-  if (currentW === null)
-    currentW = wantedW; // first layout, before new Phaser.Game
-  else applyWantedWidth();
-  const f = fitArena(area.width, area.height, area.insets, currentW, ARENA.height);
+  applyWidth(widths.want(m.wantedW));
+  const box = hostBoxFor(m.area, widths.currentW ?? m.wantedW);
   host.style.right = 'auto';
   host.style.bottom = 'auto';
-  host.style.left = `${area.x + f.offsetX}px`;
-  host.style.top = `${area.y + f.offsetY}px`;
-  host.style.width = `${Math.floor(f.width)}px`;
-  host.style.height = `${Math.floor(f.height)}px`;
+  host.style.left = `${box.left}px`;
+  host.style.top = `${box.top}px`;
+  host.style.width = `${box.width}px`;
+  host.style.height = `${box.height}px`;
   debugUpdate?.(
     layoutReport({
       innerW: window.innerWidth,
@@ -105,8 +95,8 @@ function layoutArena(): void {
       standaloneMedia: window.matchMedia?.('(display-mode: standalone)').matches ?? false,
       standaloneNav: (navigator as Navigator & { standalone?: boolean }).standalone,
       landscape: window.innerWidth >= window.innerHeight,
-      arenaDesiredW: wantedW,
-      arenaCurrentW: currentW,
+      arenaDesiredW: widths.wantedW,
+      arenaCurrentW: widths.currentW ?? m.wantedW,
     }),
   );
 }
@@ -116,7 +106,7 @@ layoutArena();
 game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
-  width: currentW ?? ARENA.baseWidth,
+  width: widths.currentW ?? ARENA.baseWidth,
   height: ARENA.height,
   pixelArt: true,
   backgroundColor: THEME.colors['menu.bg'].css,
@@ -132,11 +122,11 @@ game = new Phaser.Game({
 });
 
 function relayout(): void {
-  hookGameSceneEnd();
+  hookGameScene();
   layoutArena();
   game?.scale.refresh();
 }
-game.events.once(Phaser.Core.Events.READY, hookGameSceneEnd);
+game.events.once(Phaser.Core.Events.READY, hookGameScene);
 
 // Debounced: every trigger re-measures now-ish and again after RELAYOUT_DELAYS_MS, because the
 // iOS home screen app can report stale sizes at start and fires no event once they settle.
