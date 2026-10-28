@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-26 (Ergänzung „Ingame-Sprites“; H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Alle 24 Ingame-Sprites gezeichnet: Astronautin, Strahlenpistole, Laser (`assets/sprites.js`, `mockups/sprites-ingame.html`) sowie Gegner, Bosse, Geschosse, Items, Münzen, Kacheln und UI-Icons (`assets/sprites-world.js`, `mockups/sprites-welt.html`). Freigegeben. Nächster Schritt: Der Lead beauftragt den Planner mit „Design übernehmen“ für die Ergänzung „Ingame-Sprites“ (Übergabe unter „Änderungen“).
+**Status:** geändert am 2026-10-28 (Ergänzung H-23 „HUD am Handy“, noch nicht freigegeben; zuletzt freigegeben am 2026-10-26: „Ingame-Sprites“ und H-14; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Ergänzung H-23 ausgearbeitet (Tabelle „HUD am Handy“, V-16, V-18, `game.aura`, Q-45, Niederlage-Text „BESIEGT“), Tokens und Exporte neu gebaut, Kontrast grün. Nächster Schritt: Freigabe durch den Nutzer, danach legt der Lead das Theme-Sync-Paket an und beauftragt den Planner mit „Design übernehmen“ für AP-86 (Übergabe unter „Änderungen“, H-23).
 
 ## Ausgangslage
 
@@ -207,5 +207,64 @@ Keine neuen Abhängigkeiten. Ein Paket ohne Design-Review (keine UI), aber mit H
 | `src/scenes/ResultScene.ts` | Bei Boss-Level: Faktenzeile „BOSS“ als erste Zeile. Sieg: Stern (`hud.gold`) + „<NAME> · BESIEGT“ Funk 2× `hud.accent`, dazu Siegel „BOSS BESIEGT“ (Stern + Funk 1× `hud.accent`, Rahmen `hud.accent`) mittig im Logbuch-Kopf. Niederlage: „<NAME> · <n> % ÜBRIG“ Funk 2× `hud.danger`, Prozent aufgerundet aus Boss-HP. Untertitel Sieg optional je Boss (z. B. „DER RIESEN-STEIN IST ZERFALLEN.“). Zeilenabstand der Faktenliste 8. | Ansichten 6, 7 |
 
 **Paketierung (Vorschlag):** Lagerplatz in AP-66 (Pflichtlektüre: Ansichten 1–4). Die Boss-Lücken betreffen `HudScene.ts` und `ResultScene.ts` und kollidieren deshalb mit AP-66 bei `HudScene.ts`. Entweder in AP-66 mitnehmen oder als eigenes Paket danach. Beide mit Design-Review.
+
+### 2026-10-28 · Ergänzung H-23 „HUD am Handy“ (geändert, Freigabe offen)
+
+**Auftrag (Nutzer, H-23, PE-103):** Der Brief regelte das HUD nur bei k = 1. Gesucht: Größen bei k über 1, Verhalten bei Arena-Breite 640 bis 800, Slot-Rand (8) gegen Panel-Rand (round(8k) = 11). Dazu V-16 (Laser), V-18 (Item-Symbole im Lagerplatz), Token `game.aura`, Q-45 und der Niederlage-Text.
+
+**Entscheidungen:**
+
+- **Q-45 (Nutzer, 2026-10-28):** `HOVER_FILL_ALPHA` und `BLINK_ALPHA` werden Tokens: `opacity.hover` (0,18) und `opacity.blink` (0,55).
+- **Niederlage-Text (Nutzer, 2026-10-28):** Rechts im Logbuch-Kopf steht bei jeder Niederlage nur „BESIEGT“, mit oder ohne Boss. Das ersetzt „5:00 · BOSS NICHT BESIEGT“.
+- **HUD-Rand (Designer):** Alle HUD-Elemente halten denselben Außenrand `m = round(8·k)`. Das gilt auch für den Lagerplatz, das Fach selbst bleibt 40 (PE-94). Ein Rand für alle Elemente lässt Lagerplatz, Energie und Chips auf derselben linken Kante stehen. Damit ist der Befund „Slot-Rand 8 gegen Panel-Rand 11“ erledigt.
+- **V-18 (Designer):** Die Item-Symbole sind mehrfarbig. Deshalb werden sie **nie multiplikativ getönt** (`setTint`). Sie zeigen entweder ihre eigenen Farben (`clearTint`) oder eine flache Silhouette (`setTintFill`). Die H-14-Vorgabe „Dauerfeuer Füllung `hud.accent`, Feuerring `game.fire-ring`“ entfällt, weil das Sprite seine Farben selbst mitbringt.
+- **V-16 (Designer):** Der Laser wird multiplikativ getönt (`setTint` statt `setTintFill`). So bleibt der Verlauf erhalten, vom hellen Kopf (`#ff8fae`) bis zum dunkleren, ausfransenden Schweif (etwa `#b86186`). Der Kopf trägt den Kontrast (Paare `game.laser-raygun` grün), der Schweif ist Dekor. Auch das Mockup `sprites-welt.html` multipliziert jetzt.
+- **`game.aura` (Designer):** Mint `{color.mint.400}` `#5fe0c0` statt `0x9b59b6`, das auf Elfenwald nur 2,6:1 erreichte. Jetzt sind es 4,7:1 (Wald), 10,4:1 (Nacht) und 7,5:1 (Elfenwald). Mint ist die Farbe des Waldgeists selbst. Gezeichnet werden eine Fläche mit `opacity.aura` (0,25) und ein 1-px-Ring in voller Deckkraft. So ist die Gefahrenzone auch über ihre Form erkennbar und nicht nur über die Farbe.
+
+**Tabelle „HUD am Handy“** (Arena-Einheiten; k = `hudScale`, begrenzt auf `MAX_K` = 1,4; typisches iPhone im Querformat k ≈ 1,36; Zahlen nach den Formeln im Code):
+
+| Element | Regel | k = 1 (PC) | k ≈ 1,36 | k = 1,4 | Anker bei Breite 640–800 |
+|---|---|---|---|---|---|
+| HUD-Rand `m` | `round(8·k)` (`space.2`), gilt für **alle** Ränder | 8 | 11 | 11 | – |
+| Energie-Panel | Zahl Funk 3× fest (PE-94) · Label `funkScale(1,k)` · Innenabstand `round(8k)` · Segmente `round(8k)`×`round(6k)`, Lücke `max(2, round(2k))` | Label 1×, Seg. 8×6, Lücke 2, Höhe 40 | Label 2×, Seg. 11×8, Lücke 3, Höhe 46 | wie 1,36 | links oben (m, m) |
+| Timer | Zahl Funk 3× fest · Innenabstand `round(8k)` | Höhe 40 | Höhe 46 | Höhe 46 | Mitte oben (`width/2`) |
+| Pause, Ton | Kante `round(32k)` · **Abstand dazwischen `m`** (heute fest 8) | 32, Abstand 8 | 44, Abstand 11 | 45, Abstand 11 | rechts oben, rechte Kante `width − m` |
+| Chips (Gold, Kräfte) | bleiben wie heute (PE-104): Höhe `round(24k)`, Text `funkScale(2,k)`, Abstand `round(4k)` | 24 · 2× · 4 | 33 · 3× · 5 | 34 · 3× · 6 | links, unter dem Energie-Panel |
+| Lagerplatz | Fach 40 fest, Abstand 8 fest, Symbol 2× (`slotIconScale`), Sekunden Funk 2× fest · **Rand links und unten `m`** (heute 8) | x 8–96 | x 11–99 | x 11–99 | links unten |
+| Boss-Leiste | `round(200k)` × `round(8k)`, Rand unten `m`, Name/Tag `funkScale(1,k)` | 200×8 | 272×11 | 280×11 | Mitte unten |
+| Banner „BOSS KOMMT!“, Pause-Titel | `funkScale(3,k)` bleibt (PE-105) | 3× | 4× | 4× | Mitte, Banner-Oberkante 92/360 der Höhe |
+| Stick | unverändert (Fangfläche 126) | – | – | – | rechts unten (an `width`) |
+| Pause-Overlay, Scrims | ganze Arena | – | – | – | volle Breite `width` |
+
+**Verhalten bei Arena-Breite 640–800:** Nichts im HUD wird breiter oder gestreckt. Jedes Element hängt an seinem Anker: links an `m`, rechts an `width − m`, Mitte an `width/2`. Die zusätzliche Breite bleibt freies Spielfeld zwischen den Ecken. Die Höhe ist immer 360. Sicherheitsbereiche (Notch, Home-Balken) sind schon durch `fitArena` aus der Arena genommen, das HUD braucht deshalb keinen eigenen Inset. Die engste Stelle ist Breite 640 bei k = 1,4. Oben liegt das Energie-Panel etwa bei x 11–235, der Timer etwa bei 264–376 und die Buttons ab etwa 529. Unten liegen der Lagerplatz bis x 99, die Boss-Leiste bei 180–460 und die Stick-Fangfläche ab etwa 490. Die genauen Breiten (`measureFunk`) prüft ein Test für die Breiten 640, 734 und 800 bei k = 1, 1,36 und 1,4: Kein Rechteck überlappt ein anderes (`rectsOverlap`), alle liegen in der Arena (`rectInArena`).
+
+**Lagerplatz-Zustände mit mehrfarbigen Symbolen (ersetzt in der H-14-Zeile `PowerSlots.ts` die Symbol-Regeln):**
+
+| Zustand | Rahmen (unverändert) | Symbol |
+|---|---|---|
+| leer | gepunktet `hud.line` | `setTintFill(hud.line)`, Alpha `opacity.ghost`: flache Silhouette |
+| bereit | `hud.accent` mit Glühen | `clearTint()`, Alpha 1: eigene Farben |
+| gesperrt | `hud.line-dim`, Sekunden darüber | `clearTint()`, Alpha `opacity.dim` |
+| Maus darüber | Akzent, Fläche `hud.accent` mit `opacity.hover` | wie bereit |
+| gedrückt | Fläche `hud.accent` | `setTintFill(hud.screen)`: dunkle Silhouette |
+
+Ein Chip mit lädendem Feuerring (`ArmourIndicator`) zeigt wie ein leeres Fach eine Silhouette in `hud.line` (`setTintFill`), der aktive Feuerring seine eigenen Farben.
+
+**Ergebnis:** Neue Tokens `color.game.aura`, `opacity.hover`, `opacity.blink`, `opacity.aura` mit drei Kontrastpaaren (Aura auf den drei Böden). Die Beschreibungen von `size.hud-slot` und `size.hud-slot-icon-scale` sind aktualisiert. `contrast.js --tokens` ist grün, die Exporte sind neu gebaut (css, ts, json). Mockups: `lagerplatz-und-boss.html` zeigt die echten Item-Sprites in den Fächern (Ansichten 1–4) und „BESIEGT“ in Ansicht 7, `ergebnis.html` Ansicht 2 „BESIEGT“, `sprites-welt.html` den multiplikativ getönten Laser. Screenshot: `screenshots/lagerplatz-und-boss-desktop.png`. Ein eigenes Mockup bei k = 1,36 gibt es nicht. Prüfgrundlage für AP-86 ist die Tabelle oben.
+
+**Übergabe H-23 an den Planner:**
+
+| Datei | Änderung |
+|---|---|
+| Theme-Sync (Lead, PE-98) | `npm run theme:build` nach dem Designer-Commit am Export. Neu in `src/config/theme.ts`: `color game.aura`, `OPACITY.hover`, `OPACITY.blink`, `OPACITY.aura`. |
+| `src/scenes/HudScene.ts` | `BLINK_ALPHA` entfällt, stattdessen `OPACITY.blink`. Abstand Ton- zu Pause-Button `m` statt fest 8. Rest nach der Tabelle „HUD am Handy“. |
+| `src/scenes/hud/PowerSlots.ts`, `hudMath.ts` | `HOVER_FILL_ALPHA` entfällt, stattdessen `OPACITY.hover`. Rand von `powerSlotRects` ist `round(8·k)`, Fach und Abstand bleiben 40 und 8 (z. B. Rand getrennt von Größe übergeben). Symbol-Zustände nach der Tabelle oben (V-18). |
+| `src/scenes/hud/FunkPanel.ts` (`FunkChip.setIconTint`), `ArmourIndicator.ts` | Icon-Tönung als `setTintFill` statt `setTint` (Silhouette für „lädt“). |
+| `tests/scenes/hud.test.ts` | Layout-Test: Breiten 640, 734, 800 × k 1, 1,36, 1,4, keine Überlappung, alles in der Arena, linke Kante von Lagerplatz, Energie und Chips gleich (`m`). |
+| `src/scenes/ResultScene.ts` | Bei Niederlage rechts im Logbuch-Kopf „BESIEGT“ (Funk `this.lab`, `hud.text-muted`), an derselben Stelle wie „m:ss ÜBERLEBT“ beim Sieg. Gilt für jede Niederlage. Die Boss-Zeile „<NAME> · n % ÜBRIG“ bleibt. |
+| `src/entities/Laser.ts` | `setTint` statt `setTintFill` (V-16). |
+| `src/entities/enemies/Enemy.ts` | Aura: Farbe `game.aura`, Füllung `OPACITY.aura`, dazu 1-px-Ring `game.aura` in voller Deckkraft (`setStrokeStyle(1, …, 1)`). `0x9b59b6` und das `eslint-disable` entfallen. |
+
+**Paketierung (Vorschlag):** Zuerst das Theme-Sync-Paket. Danach AP-86 (HUD: `HudScene`, `hud/**`, Test) mit Design-Review. Für ResultScene, Laser und Aura ein kleines Paket mit Design-Review; es teilt keine Datei mit AP-86 und kann parallel laufen. Keine neuen Abhängigkeiten, keine neuen Sprites oder Schriften. Handtest in H-24: leeres und gesperrtes Fach, Laser in allen drei Biomen, Waldgeist-Aura auf Elfenwald, Niederlage-Ergebnis.
 
 - keine weiteren (erste Fassung vom 2026-10-25)

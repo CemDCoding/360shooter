@@ -75,6 +75,13 @@
     const x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
     return c;
   }
+  function multiplyTint(src, color) {
+    const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+    const x = c.getContext('2d'); x.drawImage(src, 0, 0);
+    x.globalCompositeOperation = 'multiply'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+    x.globalCompositeOperation = 'destination-in'; x.drawImage(src, 0, 0);
+    return c;
+  }
   function scaled(src, k, grid) {
     const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
     c.getContext('2d').drawImage(src, 0, 0);
@@ -140,7 +147,8 @@
     // laser from the muzzle
     const mx = G.muzzle.x - G.grip.x, my = (G.muzzle.y - G.grip.y) * (flip ? -1 : 1);
     const lx = hx + mx * Math.cos(ang) - my * Math.sin(ang), ly = hy + mx * Math.sin(ang) + my * Math.cos(ang);
-    const las = silhouette(fc('laser', 0), '#ff8fae');
+    // V-16 (H-23): multiply tint like Phaser setTint, keeps the head-to-tail gradient (not setTintFill)
+    const las = multiplyTint(fc('laser', 0), '#ff8fae');
     x.save(); x.translate(lx + Math.cos(ang) * 22, ly + Math.sin(ang) * 22); x.rotate(ang); x.drawImage(las, -8, -2); x.restore();
     // vignette
     const v = x.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.62);
