@@ -160,11 +160,11 @@ class PowerSlot {
     }
 
     if (this.look === 'empty') {
-      this.icon.setTint(themeColor('hud.line').num).setAlpha(OPACITY.ghost);
+      this.icon.setTintFill(themeColor('hud.line').num).setAlpha(OPACITY.ghost);
     } else if (this.look === 'blocked') {
       this.icon.clearTint().setAlpha(OPACITY.dim);
     } else if (this.pressed) {
-      this.icon.setTint(themeColor('hud.screen').num).setAlpha(1);
+      this.icon.setTintFill(themeColor('hud.screen').num).setAlpha(1);
     } else {
       this.icon.clearTint().setAlpha(1);
     }

@@ -191,7 +191,10 @@ export function powerSlotRects(
   const size = 2 * Math.round((base.size * f) / 2);
   const gap = Math.round(base.gap * f);
   // `edge`: outer margin given separately (m = round(8k), H-23) while size and gap stay fixed.
-  const m = edge !== undefined && Number.isFinite(edge) && edge >= 0 ? Math.round(edge) : Math.round(base.margin * f);
+  const m =
+    edge !== undefined && Number.isFinite(edge) && edge >= 0
+      ? Math.round(edge)
+      : Math.round(base.margin * f);
   const y = Math.round(arenaH) - m - size;
   const n = Math.max(0, Math.floor(Number.isFinite(count) ? count : 0));
   return Array.from({ length: n }, (_, i) => ({ x: m + i * (size + gap), y, w: size, h: size }));

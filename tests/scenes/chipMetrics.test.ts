@@ -10,6 +10,23 @@ import { funkScale } from '../../src/scenes/hud/FunkPanel';
 
 const KS = [1, 1.36, 1.4];
 
+// No @types/node in the project: minimal types for node:fs (variable avoids type resolution).
+interface Fs {
+  readFileSync(p: URL, enc: string): string;
+}
+const fsName = 'node:fs';
+const fs = (await import(/* @vite-ignore */ fsName)) as Fs;
+
+describe('flat icon silhouettes (V-18)', () => {
+  it('never tints slot or chip icons multiplicatively', () => {
+    for (const f of ['PowerSlots.ts', 'FunkPanel.ts']) {
+      const src = fs.readFileSync(new URL(`../../src/scenes/hud/${f}`, import.meta.url), 'utf8');
+      expect(src).not.toMatch(/icon\s*\??\.setTint\(/);
+      expect(src).not.toMatch(/\.setTint\([^)]*\)\.setAlpha/);
+    }
+  });
+});
+
 describe('chipMetrics (B3, PE-119)', () => {
   it.each(KS)('shrink 1 gives the old measures at k = %s', (k) => {
     const m = chipMetrics(k, 1);

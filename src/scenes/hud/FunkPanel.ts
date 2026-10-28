@@ -251,7 +251,7 @@ export class FunkChip {
           opts.icon.fixedScale ? (opts.icon.scale ?? 1) : mt.iconFactor * (opts.icon.scale ?? 1),
         )
         .setOrigin(0, 0.5);
-      if (opts.icon.tint) this.icon.setTint(themeColor(opts.icon.tint).num);
+      if (opts.icon.tint) this.icon.setTintFill(themeColor(opts.icon.tint).num);
     }
     if (this.barW > 0) this.bar = scene.add.graphics();
     this.text = funkText(scene, 0, 0, '', this.textScale, 'hud.text').setOrigin(0, 0.5);
@@ -293,7 +293,7 @@ export class FunkChip {
 
   setIconTint(color: ColorName | null): void {
     if (!this.icon) return;
-    if (color) this.icon.setTint(themeColor(color).num);
+    if (color) this.icon.setTintFill(themeColor(color).num);
     else this.icon.clearTint();
   }
 
