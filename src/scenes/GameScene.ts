@@ -53,7 +53,7 @@ import {
   tickArmour,
 } from '../logic/armour';
 import { rollCoinDrop } from '../logic/coins';
-import { applyRoundGold, goldPayout } from '../logic/economy';
+import { settleRound } from '../logic/economy';
 import { pointOnRing } from '../logic/geometry';
 import { canLaserDestroyBolt } from '../logic/projectiles';
 import { rollDrop } from '../logic/items';
@@ -65,7 +65,7 @@ import {
   storePower,
   takePower,
 } from '../logic/powerStore';
-import { applyRoundResult, roundXp, type RoundResult } from '../logic/progression';
+import type { RoundResult } from '../logic/progression';
 import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
 import { SpawnDirector } from '../logic/spawn';
@@ -791,25 +791,32 @@ export class GameScene extends Phaser.Scene {
         : 1;
     this.despawnBoss();
 
-    const xpGained = roundXp(this.killXp, result, PROGRESSION);
     const before = loadSave();
-    const withResult = applyRoundResult(before, this.level.id, result, xpGained, PROGRESSION);
-    const after = applyRoundGold(withResult, this.roundCoins, result);
+    const settled = settleRound(
+      before,
+      this.level.id,
+      result,
+      this.killXp,
+      this.roundCoins,
+      this.debugRound,
+      PROGRESSION,
+    );
+    const xpGained = settled.xpGained;
     // Exactly one write per round; a debug round writes nothing (PE-40, PE-49).
-    const saved = this.debugRound ? false : writeSave(after);
-    const stored = this.debugRound ? before : after;
+    const saved = settled.shouldWrite ? writeSave(settled.next) : false;
+    const stored = settled.shown;
 
     emitGameEvent(this.events, GameEvents.RoundEnded, { result, xpGained });
     const data: ResultSceneData = {
       levelId: this.level.id,
       result,
-      xpGained: this.debugRound ? 0 : xpGained,
+      xpGained,
       playerLevel: stored.playerLevel,
       previousPlayerLevel: before.playerLevel,
       saved,
       roundCoins: this.roundCoins,
       goldShare: result === 'won' ? GOLD_KEEP_ON_WIN : GOLD_KEEP_ON_LOSS,
-      goldGained: this.debugRound ? 0 : goldPayout(this.roundCoins, result),
+      goldGained: settled.goldGained,
       goldTotal: stored.gold ?? 0,
       debugRound: this.debugRound,
       bossDefeated: this.bossDefeatedFlag,
