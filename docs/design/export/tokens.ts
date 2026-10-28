@@ -140,7 +140,8 @@ export const tokens = {
       "fire-ring": "var(--color-game-fire-ring)",
       "hit-flash": "var(--color-game-hit-flash)",
       "firefly": "var(--color-game-firefly)",
-      "spore": "var(--color-game-spore)"
+      "spore": "var(--color-game-spore)",
+      "aura": "var(--color-game-aura)"
     }
   },
   "font": {
@@ -206,7 +207,10 @@ export const tokens = {
   },
   "opacity": {
     "dim": "var(--opacity-dim)",
-    "ghost": "var(--opacity-ghost)"
+    "ghost": "var(--opacity-ghost)",
+    "hover": "var(--opacity-hover)",
+    "blink": "var(--opacity-blink)",
+    "aura": "var(--opacity-aura)"
   }
 } as const;
 
