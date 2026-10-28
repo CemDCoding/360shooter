@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-28 (Ergänzung H-23 „HUD am Handy“; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Ergänzung H-23 freigegeben (Tabelle „HUD am Handy“, V-16, V-18, `game.aura`, Q-45, Niederlage-Text „BESIEGT“), Tokens und Exporte neu gebaut, Kontrast grün. Nächster Schritt: Der Lead legt das Theme-Sync-Paket an und beauftragt den Planner mit „Design übernehmen“ für AP-86 (Übergabe unter „Änderungen“, H-23).
+**Status:** geändert am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119); der Status „geändert“ ist auf Wunsch des Nutzers gesetzt, damit der Planner sie übernimmt. Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
 ## Ausgangslage
 
@@ -151,7 +151,7 @@ Pakete 2 bis 4 hängen nur von Paket 1 ab und berühren verschiedene Dateien, au
   - Bosse: `boss-root-monster` 64×64 (Stumpf mit Kronenästen, Wurzelarmen und Zähnen), `boss-root-spike` 16×32 (dornige Wurzel mit roten Adern), `boss-forest-ghost` 48×48 (Geist mit Geweih), `boss-giant-stone` 64×64 (Fels mit Kristallen und Moos; beim Rollen wandern die Oberflächenflecken). Die Varianten-Tönung im Code bleibt nutzbar.
   - Geschosse: `witch-bolt` (Magenta), `boss-ghost-orb` (hell, wird im Spiel mint getönt).
   - Items 16×16 × 2 (Frame 1 = Glanz oder Bewegung): Heilung (Mint-Kreuz), Doppelschuss (zwei Koralle-Bolzen), Schild (blau), Schnellfeuer (Blitz), Feuerring (Orange mit Flammen). Umriss Tinte, den hellen Rand fügt das Spiel hinzu.
-  - Münzen: `coin-small` 8×8 und `coin-big` 16×16 (laut Code, nicht 12×12 wie im alten Styleguide), je 4 Frames Drehung, große Münze mit Stern-Prägung.
+  - Münzen: `coin-small` 8×8 und `coin-big` 16×16 (laut Code, nicht 12×12 wie im alten Styleguide), je 4 Frames Drehung, große Münze mit Stern-Prägung. **Überholt durch H-25:** Auf dem Feld `coin-field` 6×6 und `coin-big` 12×12; `coin-small` bleibt nur für Menüsymbole und den Münzzähler.
   - Kacheln je Biom: Frame 0 ist der Boden (transparent mit ruhigen Tupfen in `*-ground-hi/lo`, Kontrast ≤ 1,5:1), Frames 1–3 sind Deko (Gras, Blumen bzw. Leuchtpilze, Kiesel bzw. Kristalle). Die Farben sind je Biom fertig gesetzt.
   - `ui-icons` nativ 16×16: Ton an, Ton aus, Pause, Schloss. Linie und Füllung, im Spiel getönt.
 - Vorschau `mockups/sprites-welt.html` (drei Spielszenen und alle Sheets), Screenshot `screenshots/sprites-welt-desktop.png`.
@@ -215,7 +215,7 @@ Keine neuen Abhängigkeiten. Ein Paket ohne Design-Review (keine UI), aber mit H
 **Entscheidungen:**
 
 - **Q-45 (Nutzer, 2026-10-28):** `HOVER_FILL_ALPHA` und `BLINK_ALPHA` werden Tokens: `opacity.hover` (0,18) und `opacity.blink` (0,55).
-- **Niederlage-Text (Nutzer, 2026-10-28):** Rechts im Logbuch-Kopf steht bei jeder Niederlage nur „BESIEGT“, mit oder ohne Boss. Das ersetzt „5:00 · BOSS NICHT BESIEGT“.
+- **Niederlage-Text (Nutzer, 2026-10-28):** Rechts im Logbuch-Kopf steht bei jeder Niederlage nur ein Wort, mit oder ohne Boss. Das ersetzt „5:00 · BOSS NICHT BESIEGT“. **Geändert in H-25 (Q-54):** Das Wort lautet „NIEDERLAGE“, nicht „BESIEGT“.
 - **HUD-Rand (Designer):** Alle HUD-Elemente halten denselben Außenrand `m = round(8·k)`. Das gilt auch für den Lagerplatz, das Fach selbst bleibt 40 (PE-94). Ein Rand für alle Elemente lässt Lagerplatz, Energie und Chips auf derselben linken Kante stehen. Damit ist der Befund „Slot-Rand 8 gegen Panel-Rand 11“ erledigt.
 - **V-18 (Designer):** Die Item-Symbole sind mehrfarbig. Deshalb werden sie **nie multiplikativ getönt** (`setTint`). Sie zeigen entweder ihre eigenen Farben (`clearTint`) oder eine flache Silhouette (`setTintFill`). Die H-14-Vorgabe „Dauerfeuer Füllung `hud.accent`, Feuerring `game.fire-ring`“ entfällt, weil das Sprite seine Farben selbst mitbringt.
 - **V-16 (Designer):** Der Laser wird multiplikativ getönt (`setTint` statt `setTintFill`). So bleibt der Verlauf erhalten, vom hellen Kopf (`#ff8fae`) bis zum dunkleren, ausfransenden Schweif (etwa `#b86186`). Der Kopf trägt den Kontrast (Paare `game.laser-raygun` grün), der Schweif ist Dekor. Auch das Mockup `sprites-welt.html` multipliziert jetzt.
@@ -229,7 +229,9 @@ Keine neuen Abhängigkeiten. Ein Paket ohne Design-Review (keine UI), aber mit H
 | Energie-Panel | Zahl Funk 3× fest (PE-94) · Label `funkScale(1,k)` · Innenabstand `round(8k)` · Segmente `round(8k)`×`round(6k)`, Lücke `max(2, round(2k))` | Label 1×, Seg. 8×6, Lücke 2, Höhe 40 | Label 2×, Seg. 11×8, Lücke 3, Höhe 46 | wie 1,36 | links oben (m, m) |
 | Timer | Zahl Funk 3× fest · Innenabstand `round(8k)` | Höhe 40 | Höhe 46 | Höhe 46 | Mitte oben (`width/2`) |
 | Pause, Ton | Kante `round(32k)` · **Abstand dazwischen `m`** (heute fest 8) | 32, Abstand 8 | 44, Abstand 11 | 45, Abstand 11 | rechts oben, rechte Kante `width − m` |
-| Chips (Gold, Kräfte) | bleiben wie heute (PE-104): Höhe `round(24k)`, Text `funkScale(2,k)`, Abstand `round(4k)` | 24 · 2× · 4 | 33 · 3× · 5 | 34 · 3× · 6 | links, unter dem Energie-Panel |
+| Chips (übrige Kräfte: Dauerfeuer, Feuerring) | unverändert (PE-104): Höhe `round(24k)`, Text `funkScale(2,k)`, Innenabstand `round(6k)`, Symbol–Text `round(4k)` | 24 · 2× · 6 · 4 | 33 · 3× · 8 · 5 | 34 · 3× · 8 · 6 | links, unter dem Energie-Panel |
+| Kleine Chips (Münzzähler, Doppelschuss, Schild; **H-25**, ersetzt „bleiben wie heute“) | `chipMetrics(k, 0,85)`: Kasten `round(24·k·0,85)`, Text **2× fest**, Innenabstand `round(6·k·0,85)`, Symbol–Text `round(4·k·0,85)`, Symbolspalte `round(16·k·0,85)`; Münzsymbol **16 px fest** (`coin-small` ×2) | Kasten 20 · 2× · 5 · 3 · Symbol 14 | 28 · 2× · 7 · 5 · 18 | 29 · 2× · 7 · 5 · 19 | wie oben, **oben ausgerichtet** |
+| Chip-Reihe | Abstand zwischen Chips `round(4k)`, alle Chips mit der **Oberkante** auf derselben Linie (`rowY`) | 4 | 5 | 6 | links, `rowY = m + Panelhöhe + round(4k)` |
 | Lagerplatz | Fach 40 fest, Abstand 8 fest, Symbol 2× (`slotIconScale`), Sekunden Funk 2× fest · **Rand links und unten `m`** (heute 8) | x 8–96 | x 11–99 | x 11–99 | links unten |
 | Boss-Leiste | `round(200k)` × `round(8k)`, Rand unten `m`, Name/Tag `funkScale(1,k)` | 200×8 | 272×11 | 280×11 | Mitte unten |
 | Banner „BOSS KOMMT!“, Pause-Titel | `funkScale(3,k)` bleibt (PE-105) | 3× | 4× | 4× | Mitte, Banner-Oberkante 92/360 der Höhe |
@@ -250,7 +252,7 @@ Keine neuen Abhängigkeiten. Ein Paket ohne Design-Review (keine UI), aber mit H
 
 Ein Chip mit lädendem Feuerring (`ArmourIndicator`) zeigt wie ein leeres Fach eine Silhouette in `hud.line` (`setTintFill`), der aktive Feuerring seine eigenen Farben.
 
-**Ergebnis:** Neue Tokens `color.game.aura`, `opacity.hover`, `opacity.blink`, `opacity.aura` mit drei Kontrastpaaren (Aura auf den drei Böden). Die Beschreibungen von `size.hud-slot` und `size.hud-slot-icon-scale` sind aktualisiert. `contrast.js --tokens` ist grün, die Exporte sind neu gebaut (css, ts, json). Mockups: `lagerplatz-und-boss.html` zeigt die echten Item-Sprites in den Fächern (Ansichten 1–4) und „BESIEGT“ in Ansicht 7, `ergebnis.html` Ansicht 2 „BESIEGT“, `sprites-welt.html` den multiplikativ getönten Laser. Screenshot: `screenshots/lagerplatz-und-boss-desktop.png`. Ein eigenes Mockup bei k = 1,36 gibt es nicht. Prüfgrundlage für AP-86 ist die Tabelle oben.
+**Ergebnis:** Neue Tokens `color.game.aura`, `opacity.hover`, `opacity.blink`, `opacity.aura` mit drei Kontrastpaaren (Aura auf den drei Böden). Die Beschreibungen von `size.hud-slot` und `size.hud-slot-icon-scale` sind aktualisiert. `contrast.js --tokens` ist grün, die Exporte sind neu gebaut (css, ts, json). Mockups: `lagerplatz-und-boss.html` zeigt die echten Item-Sprites in den Fächern (Ansichten 1–4) und den Niederlage-Text in Ansicht 7, `ergebnis.html` Ansicht 2 den Niederlage-Text (seit H-25 „NIEDERLAGE“), `sprites-welt.html` den multiplikativ getönten Laser. Screenshot: `screenshots/lagerplatz-und-boss-desktop.png`. Ein eigenes Mockup bei k = 1,36 gibt es nicht. Prüfgrundlage für AP-86 ist die Tabelle oben.
 
 **Übergabe H-23 an den Planner:**
 
@@ -261,10 +263,46 @@ Ein Chip mit lädendem Feuerring (`ArmourIndicator`) zeigt wie ein leeres Fach e
 | `src/scenes/hud/PowerSlots.ts`, `hudMath.ts` | `HOVER_FILL_ALPHA` entfällt, stattdessen `OPACITY.hover`. Rand von `powerSlotRects` ist `round(8·k)`, Fach und Abstand bleiben 40 und 8 (z. B. Rand getrennt von Größe übergeben). Symbol-Zustände nach der Tabelle oben (V-18). |
 | `src/scenes/hud/FunkPanel.ts` (`FunkChip.setIconTint`), `ArmourIndicator.ts` | Icon-Tönung als `setTintFill` statt `setTint` (Silhouette für „lädt“). |
 | `tests/scenes/hud.test.ts` | Layout-Test: Breiten 640, 734, 800 × k 1, 1,36, 1,4, keine Überlappung, alles in der Arena, linke Kante von Lagerplatz, Energie und Chips gleich (`m`). |
-| `src/scenes/ResultScene.ts` | Bei Niederlage rechts im Logbuch-Kopf „BESIEGT“ (Funk `this.lab`, `hud.text-muted`), an derselben Stelle wie „m:ss ÜBERLEBT“ beim Sieg. Gilt für jede Niederlage. Die Boss-Zeile „<NAME> · n % ÜBRIG“ bleibt. |
+| `src/scenes/ResultScene.ts` | Bei Niederlage rechts im Logbuch-Kopf „NIEDERLAGE“ (H-25; ursprünglich „BESIEGT“) (Funk `this.lab`, `hud.text-muted`), an derselben Stelle wie „m:ss ÜBERLEBT“ beim Sieg. Gilt für jede Niederlage. Die Boss-Zeile „<NAME> · n % ÜBRIG“ bleibt. |
 | `src/entities/Laser.ts` | `setTint` statt `setTintFill` (V-16). |
 | `src/entities/enemies/Enemy.ts` | Aura: Farbe `game.aura`, Füllung `OPACITY.aura`, dazu 1-px-Ring `game.aura` in voller Deckkraft (`setStrokeStyle(1, …, 1)`). `0x9b59b6` und das `eslint-disable` entfallen. |
 
 **Paketierung (Vorschlag):** Zuerst das Theme-Sync-Paket. Danach AP-86 (HUD: `HudScene`, `hud/**`, Test) mit Design-Review. Für ResultScene, Laser und Aura ein kleines Paket mit Design-Review; es teilt keine Datei mit AP-86 und kann parallel laufen. Keine neuen Abhängigkeiten, keine neuen Sprites oder Schriften. Handtest in H-24: leeres und gesperrtes Fach, Laser in allen drei Biomen, Waldgeist-Aura auf Elfenwald, Niederlage-Ergebnis.
+
+### 2026-10-28 · Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ (Status: geändert, wartet auf Übernahme)
+
+**Auftrag (Nutzer, Handtest-Antworten Q-50, Q-53, Q-54, PE-113, PE-119):** (1) Münzen auf dem Feld 12×12 statt 16×16, Münzen im Menü und das Symbol im Münzzähler bleiben 16 px. (2) Münzzähler, Doppelschuss- und Schild-Chip 15 % kleiner, Maße in die HUD-Tabelle, Ausrichtung gemischt hoher Chips festlegen. (3) Niederlage-Text „NIEDERLAGE“ statt „BESIEGT“.
+
+**Münzen:**
+
+| Verwendung | Schlüssel | Pixel | Skalierung | Anzeige | Frames |
+|---|---|---|---|---|---|
+| Feld, normale Münze (Wert < `BIG_COIN_MIN_VALUE`) | `coin-field` (**neu**) | 6×6 | 2 | 12×12 | 4: Vorderseite, Dreiviertel, Kante, Dreiviertel gespiegelt |
+| Feld, große Münze (Wert ≥ 4) | `coin-big` (**geändert**, vorher 16×16) | 12×12 | 1 | 12×12 | 4, Stern-Prägung auf Frame 0 bleibt |
+| Menü, Upgrade-Panel, Ergebnis, **Münzzähler im HUD** | `coin-small` (unverändert) | 8×8 | 2 | 16×16 | 4 |
+
+- Die Feldmünze ist rund gezeichnet (Zeilen 2-2-4-4-2-2 statt Kasten mit gekappten Ecken), sonst wirkt sie bei 6 px wie ein Kästchen. Die große Münze unterscheidet sich weiter über Stern und Fläche, nicht über die Größe. Beide behalten die 2-px-Kontur `game.hit-flash` (`COIN_VISUAL.outlinePx`).
+- Pixel: `docs/design/assets/sprites-world.js` (`coin-field`, `coinBig`). Vorschau `mockups/sprites-welt.html` (Szenen nutzen `coin-field` ×2 und `coin-big` ×1), Screenshot `screenshots/sprites-welt-desktop.png`.
+- Das weicht von Q-50 in einem Punkt ab: Laut Nutzer (H-25) bleibt das **Münzsymbol im Münzzähler 16 px**, nur der Kasten schrumpft. `CoinCounter.ts` behält `coin-small`.
+
+**Kleine Chips:** Maße stehen in der Tabelle „HUD am Handy“ (H-23, Zeile „Kleine Chips“) und entsprechen `chipMetrics(k, 0,85)` aus AP-86: Kasten 20 / 28 / 29 bei k = 1 / 1,36 / 1,4, Text 2× fest, Innenabstand 5 / 7 / 7, Symbol–Text 3 / 5 / 5. Das 16-px-Münzsymbol passt bei k = 1 mit 2 px Luft oben und unten in den 20-px-Kasten.
+
+**Ausrichtung (Designer):** Gemischt hohe Chips stehen **oben ausgerichtet**, alle Oberkanten auf `rowY`. Begründung: Der Abstand zum Energie-Panel bleibt für jeden Chip gleich (`round(4k)`), die Reihe hängt wie ein Etikettenstreifen unter dem Panel, und es entstehen keine halben Pixel (20 gegen 24 wäre mittig 2 px, 28 gegen 33 aber 2,5 px). Innerhalb eines Chips bleiben Symbol und Text senkrecht mittig. Das entspricht dem heutigen Code (`relayoutChips` setzt alle auf `rowY`), deshalb ist keine Änderung nötig.
+
+**Niederlage-Text:** „NIEDERLAGE“ rechts im Logbuch-Kopf bei jeder Niederlage (Funk `this.lab`, `hud.text-muted`). Mockups `ergebnis.html` Ansicht 2 und `lagerplatz-und-boss.html` Ansicht 7 sind angepasst, Screenshots `screenshots/ergebnis-desktop.png` und `screenshots/lagerplatz-und-boss-desktop.png`. AP-94 hat das schon umgesetzt.
+
+**Übergabe H-25 an den Planner:**
+
+| Datei | Änderung |
+|---|---|
+| `npm run sprites:build` → `public/assets/sprites/coin-field.png` (neu), `coin-big.png` (12×12×4) | aus `docs/design/assets/sprites-world.js`; `coin-small.png` bleibt byte-gleich |
+| `src/config/assets.ts` | neu `sprite('coin-field', 6, 6, 4, …)`, `coin-big` auf 12×12×4, `coin-small` unverändert |
+| `src/config/coins.ts` (`COIN_VISUAL`) | `smallDisplayScale` 2 (für `coin-field`), `bigDisplayScale` 1, Kommentar: beide Feldmünzen 12 px (ersetzt Q-46); Kontur 2 bleibt |
+| `src/entities/Coin.ts` | kleine Feldmünze `coin-field` statt `coin-small`; Körper aus der neuen Größe. Einsammeln bleibt `collectRadiusPx` 12 |
+| `src/scenes/hud/CoinCounter.ts` | **keine Änderung** (bleibt `coin-small`, `scale: 2`, `fixedScale`) |
+| `src/scenes/hud/hudMath.ts`, `HudScene.ts` | keine Änderung; die Tabelle beschreibt den Stand nach AP-86. Ausrichtung oben ist bestätigt |
+| `public/assets/LICENSES.md`, `docs/guides/grafik-austauschen.md`, Tests zu Manifest und Münzen | neue Zeile `coin-field`, Größe `coin-big` |
+
+Keine neuen Tokens, Schriften oder Abhängigkeiten. AP-92 mit Design-Review: Vergleich mit `screenshots/sprites-welt-desktop.png`, im Handtest die Münzen im Gedränge prüfen (beide Größen unterscheidbar).
 
 - keine weiteren (erste Fassung vom 2026-10-25)

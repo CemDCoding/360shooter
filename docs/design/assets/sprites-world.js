@@ -368,15 +368,28 @@
       mirror(COIN_S1),
     ],
   };
+  // H-25: coin-small stays 8x8 for the menu symbols (16 px at 2x). In the field: coin-field 6x6 (2x = 12 px)
+  // for values below BIG_COIN_MIN_VALUE, coin-big 12x12 (1x = 12 px) with the star.
+  // Round at 6 px: rows 2-2-4-4-2-2 instead of a box with clipped corners (reads as a coin, not a chip).
+  const COIN_F1 = ['..oo..', '.oyDo.', 'oyYDo.', 'oYYDo.', '.oDDo.', '..oo..'];
+  S['coin-field'] = {
+    frameWidth: 6, frameHeight: 6, palette: COIN_PAL,
+    frames: [
+      ['..oo..', '.oyYo.', 'oyYYDo', 'oYYYDo', '.oYDo.', '..oo..'],
+      COIN_F1,
+      ['...o..', '..oDo.', '..oDo.', '..oDo.', '..oDo.', '...o..'],
+      mirror(COIN_F1),
+    ],
+  };
   function coinBig(f) {
-    const g = grid(16, 16), rx = [6.5, 4.5, 1.5][f];
-    g.ell(8, 8, rx, 6.5, 'Y', 'y', 'D');
-    if (f === 0) g.stamp(['..D..', '.DDD.', 'DDyDD', '.DDD.', '.D.D.'], 6, 5);
-    if (f === 1) g.stamp(['D', 'D', 'D', 'D'], 8, 6);
+    const g = grid(12, 12), rx = [4.6, 3, 1][f];
+    g.ell(6, 6, rx, 4.6, 'Y', 'y', 'D');
+    if (f === 0) g.stamp(['..D..', '.DDD.', 'DDyDD', '.DDD.', '.D.D.'], 4, 3);
+    if (f === 1) g.stamp(['D', 'D', 'D', 'D'], 6, 4);
     return g.outline().rows();
   }
   const BIG = frames(3, coinBig);
-  S['coin-big'] = { frameWidth: 16, frameHeight: 16, palette: COIN_PAL, frames: [...BIG, mirror(BIG[1])] };
+  S['coin-big'] = { frameWidth: 12, frameHeight: 12, palette: COIN_PAL, frames: [...BIG, mirror(BIG[1])] };
 
   // ---------- map tiles 32x32: frame 0 ground (transparent with calm specks), 1-3 decoration ----------
   // Colours are final per biome, so MapDef.tint must be removed for tiles (see brief).
