@@ -25,7 +25,7 @@ export const GOLD_KEEP_ON_LOSS = 0.5;
  * Darstellung der Muenze in der Runde (AP-70, PE-78, Q-40): reine Optik, Logik und Einsammelradius bleiben.
  * Startwerte angenommen, Sichtpruefung H-15. Die Platzhalter-Sprites sind nicht goldfarben (H-13), darum
  * hebt eine helle Umrandung die Muenze ab. Farbe nur ueber den Token aus theme.ts.
- * - smallDisplayScale / bigDisplayScale: Anzeigegroesse, nur ganzzahlig (Pixelraster, Brief-Grundsatz 3); klein 8 px auf 16 (Skalierung 2), gross 16 px auf 16 (Skalierung 1; Q-44, PE-90). Beide Muenzen sind damit 16 px gross (Q-46).
+ * - smallDisplayScale / bigDisplayScale: Anzeigegroesse, nur ganzzahlig (Pixelraster, Brief-Grundsatz 3); klein (coin-field) 6 px auf 12 (Skalierung 2), gross (coin-big) 12 px auf 12 (Skalierung 1; H-25, PE-121). Beide Muenzen sind damit 12 px gross. Die Menue-Symbole (coin-small, 8 px, Skalierung 2) bleiben 16 px.
  * - depth: ueber Gegnern (0) und Hintergrund samt Gluehwuermchen (-100), unter Boss-Gefahren (1,5 bis 2: Telegraph 1, Stacheln/Orbs 2), Items (5) und Spielerin (10).
  * - outlinePx: Staerke der Umrandung in ganzen Bildschirm-Pixeln (vier versetzte Kopien je Muenze, im Pool).
  */

@@ -24,6 +24,7 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sprites/item-rapid-fire.png       | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/item-fire-ring.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/coin-small.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/coin-field.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/coin-big.png              | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/tiles-forest.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/tiles-forest-night.png    | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |

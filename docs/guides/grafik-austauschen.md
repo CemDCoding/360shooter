@@ -53,8 +53,9 @@ Beispiel: `astronaut.png` hat 4 Frames mit je 32 x 32 Pixel. Die Datei ist also 
 | item-shield.png           | 16 x 16             | 2      | 32 x 16                       | Item: Schutzschild                        | Frame 1 und 2: zwei Bilder der Animation                                      |
 | item-rapid-fire.png       | 16 x 16             | 2      | 32 x 16                       | Item: Schnellfeuer                        | Frame 1 und 2: zwei Bilder der Animation                                      |
 | item-fire-ring.png         | 16 x 16             | 2      | 32 x 16                       | Rüstung: Feuerring (Pickup)               | Frame 1 und 2: zwei Bilder der Animation                                      |
-| coin-small.png            | 8 x 8               | 4      | 32 x 8                        | Kleine Münze                              | Frame 1 bis 4: Drehung der Münze der Reihe nach                               |
-| coin-big.png              | 16 x 16             | 4      | 64 x 16                       | Große Münze                               | Frame 1 bis 4: Drehung der Münze der Reihe nach                               |
+| coin-small.png            | 8 x 8               | 4      | 32 x 8                        | Münzsymbol in Menü, Ergebnis, Zähler (16 px) | Frame 1 bis 4: Drehung der Münze der Reihe nach                               |
+| coin-field.png            | 6 x 6               | 4      | 24 x 6                        | Kleine Münze auf dem Feld (12 px)         |
+| coin-big.png              | 12 x 12             | 4      | 48 x 12                       | Große Münze auf dem Feld (12 px)          | Frame 1 bis 4: Drehung der Münze der Reihe nach                               |
 | tiles-forest.png          | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald"                    | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
 | tiles-forest-night.png    | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wald bei Nacht"          | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
 | tiles-elf-forest.png      | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Elfenwald"               | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
