@@ -20,6 +20,8 @@ import {
 import { BATCH_LABELS } from './menu/levelGroups';
 import { centerOffset } from './menu/menuLogic';
 
+/** Right-hand log head text after a lost round (Q-54, PE-118). */
+export const DEFEAT_TEXT = 'NIEDERLAGE';
 const SIDE = 32;
 const BAND_H = 6;
 /** Same cap as the HUD so labels stay readable on phones without overflowing. */
@@ -105,6 +107,16 @@ export class ResultScene extends Phaser.Scene {
         width - SIDE,
         logY,
         `${formatTime(level.durationSec)} ÜBERLEBT`,
+        this.lab,
+        'hud.text-muted',
+      ).setOrigin(1, 0);
+      logRightX = right.x - right.width;
+    } else if (!won) {
+      const right = funkText(
+        this,
+        width - SIDE,
+        logY,
+        DEFEAT_TEXT,
         this.lab,
         'hud.text-muted',
       ).setOrigin(1, 0);
