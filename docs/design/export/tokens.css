@@ -114,6 +114,7 @@
   --color-game-hit-flash: var(--color-cream-50);
   --color-game-firefly: #f3f07a;
   --color-game-spore: #9ff5ec;
+  --color-game-aura: var(--color-mint-400);
   --font-family-menu: "Astro Kapsel";
   --font-family-hud: "Astro Funk";
   --font-scale-1: 1;
@@ -157,4 +158,7 @@
   --motion-easing-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --opacity-dim: 0.35;
   --opacity-ghost: 0.6;
+  --opacity-hover: 0.18;
+  --opacity-blink: 0.55;
+  --opacity-aura: 0.25;
 }

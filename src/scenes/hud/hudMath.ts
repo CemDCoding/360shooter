@@ -1,7 +1,7 @@
 /** Pure helpers for the HUD indicators (no Phaser). */
 import { BOSSES } from '../../config/bosses';
 import { ITEMS } from '../../config/items';
-import type { ColorName } from '../../config/theme';
+import { THEME, type ColorName } from '../../config/theme';
 import type { ActiveArmour, ActivePowers, BossId } from '../../contracts';
 import type { SlotStatus } from '../../logic/powerStore';
 import type { PanelStyle } from './FunkPanel';
@@ -84,6 +84,53 @@ export function funkCase(text: string): string {
     .replace(/ß/g, 'SS');
 }
 
+/** Shrink factor of the chips in SHRUNK_CHIPS (B3, PE-119: about 15 % smaller). */
+export const CHIP_SHRINK = 0.85;
+/** Chips that are built smaller: coin counter, double shot chip and shield chip ("1/2" with bar). */
+export const SHRUNK_CHIPS = ['coin', 'doubleShot', 'shield'] as const;
+export type ChipId = 'coin' | 'doubleShot' | 'shield' | 'rapidFire' | 'armour';
+
+/** Shrink factor of a chip: CHIP_SHRINK for the chips in SHRUNK_CHIPS, else 1 (unchanged). */
+export function chipShrink(id: ChipId): number {
+  return (SHRUNK_CHIPS as readonly string[]).includes(id) ? CHIP_SHRINK : 1;
+}
+
+/** Measures of a HUD chip for the HUD factor k and a shrink factor (1 = unchanged). */
+export interface ChipMetrics {
+  height: number;
+  padX: number;
+  gap: number;
+  iconW: number;
+  /** Integer Funk text scale. */
+  textScale: number;
+  /** Factor for the icon sprite scale (k * shrink). */
+  iconFactor: number;
+}
+
+/**
+ * Chip measures. Shrink 1 gives the old values (text step like funkScale(2, k)). Below 1 the box,
+ * padding, gap and icon shrink and the text takes the nearest whole step, at least 2 (option A):
+ * text stays on the pixel grid, so it cannot shrink by exactly 15 %.
+ */
+export function chipMetrics(k: number, shrink = 1): ChipMetrics {
+  const f = Number.isFinite(k) && k > 0 ? k : 1;
+  const s = Number.isFinite(shrink) && shrink > 0 ? Math.min(1, shrink) : 1;
+  const text =
+    s >= 1
+      ? f <= 1
+        ? 2
+        : Math.min(8, Math.max(2, Math.round(2 * f)))
+      : Math.min(8, Math.max(2, Math.round(2 * f * s)));
+  return {
+    height: Math.round(THEME.sizePx['size.hud-chip-h'] * f * s),
+    padX: Math.round(6 * f * s),
+    gap: Math.round(4 * f * s),
+    iconW: Math.round(16 * f * s),
+    textScale: text,
+    iconFactor: f * s,
+  };
+}
+
 /** Left edges of chips laid out in a row; hidden entries (null width) take no space. */
 export function layoutRow(
   widths: readonly (number | null)[],
@@ -138,11 +185,16 @@ export function powerSlotRects(
   k: number,
   arenaH: number,
   base: SlotMetrics,
+  edge?: number,
 ): Rect[] {
   const f = Number.isFinite(k) && k > 0 ? k : 1;
   const size = 2 * Math.round((base.size * f) / 2);
   const gap = Math.round(base.gap * f);
-  const m = Math.round(base.margin * f);
+  // `edge`: outer margin given separately (m = round(8k), H-23) while size and gap stay fixed.
+  const m =
+    edge !== undefined && Number.isFinite(edge) && edge >= 0
+      ? Math.round(edge)
+      : Math.round(base.margin * f);
   const y = Math.round(arenaH) - m - size;
   const n = Math.max(0, Math.floor(Number.isFinite(count) ? count : 0));
   return Array.from({ length: n }, (_, i) => ({ x: m + i * (size + gap), y, w: size, h: size }));

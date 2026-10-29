@@ -20,6 +20,8 @@ import {
 import { BATCH_LABELS } from './menu/levelGroups';
 import { centerOffset } from './menu/menuLogic';
 
+/** Right-hand log head text after a lost round (Q-54, PE-118). */
+export const DEFEAT_TEXT = 'NIEDERLAGE';
 const SIDE = 32;
 const BAND_H = 6;
 /** Same cap as the HUD so labels stay readable on phones without overflowing. */
@@ -105,6 +107,16 @@ export class ResultScene extends Phaser.Scene {
         width - SIDE,
         logY,
         `${formatTime(level.durationSec)} ÜBERLEBT`,
+        this.lab,
+        'hud.text-muted',
+      ).setOrigin(1, 0);
+      logRightX = right.x - right.width;
+    } else if (!won) {
+      const right = funkText(
+        this,
+        width - SIDE,
+        logY,
+        DEFEAT_TEXT,
         this.lab,
         'hud.text-muted',
       ).setOrigin(1, 0);
@@ -253,17 +265,23 @@ export class ResultScene extends Phaser.Scene {
     y = row(i0 + 3, 'GOLD GESAMT');
     funkText(this, FACT_VALUE_X, y, String(goldTotal), 2, 'hud.gold').setOrigin(0, 0.5);
 
-    const note = debugRound
-      ? 'DEBUG-RUNDE: SPIELSTAND WIRD NICHT GESPEICHERT.'
-      : data?.saved === false
-        ? 'FORTSCHRITT KONNTE NICHT GESPEICHERT WERDEN.'
-        : '';
-    if (note) {
+    const noteY = FACT_TOP + (i0 + 4) * FACT_STEP;
+    if (debugRound) {
+      // Unmissable (AP-88, Q-49): a filled banner, the round was a ?level= debug round and saved nothing.
+      const text = 'DEBUG-RUNDE: GOLD UND SPIELSTAND WERDEN NICHT GESPEICHERT';
+      const maxW = width - SIDE * 2 - 16;
+      const scale = measureFunk(this, text, 2) <= maxW ? 2 : 1;
+      const h = FUNK_GLYPH_H * scale + 12;
+      this.add
+        .rectangle(SIDE, noteY, width - SIDE * 2, h, themeColor('hud.danger').num)
+        .setOrigin(0, 0.5);
+      funkText(this, SIDE + 8, noteY, text, scale, 'hud.screen').setOrigin(0, 0.5);
+    } else if (data?.saved === false) {
       funkText(
         this,
         FACT_LABEL_X,
-        FACT_TOP + (i0 + 4) * FACT_STEP,
-        note,
+        noteY,
+        'FORTSCHRITT KONNTE NICHT GESPEICHERT WERDEN.',
         this.lab,
         'hud.danger',
       ).setOrigin(0, 0.5);

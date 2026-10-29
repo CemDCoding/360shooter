@@ -5,6 +5,7 @@ import {
   ITEMS,
   ITEM_RULES,
   LEVELS,
+  LEVEL_SCALING,
   PLAYER,
   RAPID_FIRE_MAX_PER_SEC,
   WEAPON_BASE,
@@ -38,12 +39,16 @@ const BASE_DPS = dps(0);
 const itemDef = (id: string) => ITEMS.find((i) => i.id === id)!;
 
 /** Gegnerschaden pro Sekunde, wenn er die Astronautin erreicht hat. */
-function threatDps(enemyId: keyof typeof ENEMIES): number {
+function threatDps(enemyId: keyof typeof ENEMIES, contactScale = 1): number {
   const e = ENEMIES[enemyId];
   if (e.aura) return e.aura.dps;
   if (e.projectile) return (e.projectile.damage * 1000) / e.projectile.intervalMs;
-  return e.contactDamage;
+  return e.contactDamage * contactScale;
 }
+
+/** Lebenspunkte eines Gegners im Level, gerundet wie in `EnemyPool.spawn` (AP-90, AP-91). */
+const scaledHp = (enemyId: keyof typeof ENEMIES, levelId: number): number =>
+  Math.max(1, Math.round(ENEMIES[enemyId].hp * LEVEL_SCALING[levelId].hp));
 
 interface Metrics {
   /** Durchschnittliche Spawns pro Minute (Intervall sinkt ueber die Runde auf 60 %). */
@@ -61,7 +66,7 @@ interface Metrics {
 function metrics(level: LevelDef): Metrics {
   const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
   const meanHp = level.enemyPool.reduce(
-    (s, e) => s + (e.weight / total) * ENEMIES[e.enemyId].hp,
+    (s, e) => s + (e.weight / total) * scaledHp(e.enemyId, level.id),
     0,
   );
 
@@ -78,7 +83,8 @@ function metrics(level: LevelDef): Metrics {
       for (const entry of level.enemyPool) {
         const arrive = (SPAWN_RADIUS / ENEMIES[entry.enemyId].speed) * 1000;
         const left = Math.max(0, durMs - t - arrive) / 1000;
-        freeDamage += (entry.weight / total) * threatDps(entry.enemyId) * left;
+        freeDamage +=
+          (entry.weight / total) * threatDps(entry.enemyId, LEVEL_SCALING[level.id].contact) * left;
       }
     }
     const progress = Math.min(1, t / durMs);
@@ -116,7 +122,17 @@ function goldOf(level: LevelDef): number {
     (s, e) => s + (e.weight / total) * (ENEMIES[e.enemyId].coinValue ?? 0),
     0,
   );
-  return spawnCount(level) * COIN_RULES.dropChance * meanCoin;
+  return spawnCount(level) * COIN_RULES.dropChance * LEVEL_SCALING[level.id].coin * meanCoin;
+}
+
+/** Erfahrung je gewonnenem Level = Gegnerzahl x mittlere Erfahrung x Faktor (AP-91). */
+function xpOf(level: LevelDef): number {
+  const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
+  const meanXp = level.enemyPool.reduce(
+    (s, e) => s + (e.weight / total) * ENEMIES[e.enemyId].xp,
+    0,
+  );
+  return spawnCount(level) * meanXp * LEVEL_SCALING[level.id].xp;
 }
 
 /** Anteil der Rundenzeit mit Dauerfeuer, wenn jedes Item aufgesammelt wird und nichts ueberlappt. */
@@ -168,6 +184,18 @@ describe('balance: gold and upgrades', () => {
     expect(GOLD_MEAN).toBeLessThanOrEqual(47);
   });
 
+  it('gold and xp per level of level 0 to 4 stay at the old pace despite the denser spawns (AP-91, Q-51)', () => {
+    // Werte vor AP-91: Gold = 72, 79, 86, 163, 182 Gegner x 0,08, Erfahrung = Gegner x 5.
+    const goldBefore = [5.76, 6.32, 6.88, 13.04, 14.56];
+    const xpBefore = [360, 395, 430, 815, 910];
+    for (let i = 0; i < 5; i++) {
+      expect(GOLD[i] / goldBefore[i], `gold ${i}`).toBeGreaterThan(0.97);
+      expect(GOLD[i] / goldBefore[i], `gold ${i}`).toBeLessThan(1.03);
+      expect(xpOf(LEVELS[i]) / xpBefore[i], `xp ${i}`).toBeGreaterThan(0.95);
+      expect(xpOf(LEVELS[i]) / xpBefore[i], `xp ${i}`).toBeLessThan(1.05);
+    }
+  });
+
   it('late levels pay more gold than early levels (5-minute levels pay more than 3-minute ones)', () => {
     expect(GOLD[20]).toBeGreaterThan(GOLD[0] * 5);
     expect(Math.min(...GOLD)).toBeGreaterThan(5);
@@ -215,6 +243,58 @@ describe('balance: difficulty curve', () => {
   it('spawn density rises with every level', () => {
     for (let i = 1; i < M.length; i++) {
       expect(M[i].spawnsPerMin, `level ${i}`).toBeGreaterThan(M[i - 1].spawnsPerMin);
+    }
+  });
+
+  it('level 0 to 4 have at least 1.5 times the spawns per minute of before AP-91', () => {
+    // Vorher (AP-56): 24,0 / 26,3 / 28,7 / 32,6 / 36,4 Spawns pro Minute. Zielwert jetzt etwa das Doppelte.
+    const before = [24.0, 26.3, 28.7, 32.6, 36.4];
+    for (let i = 0; i < 5; i++) {
+      expect(M[i].spawnsPerMin / before[i], `level ${i}`).toBeGreaterThanOrEqual(1.5);
+    }
+  });
+
+  it('level 5 to 20 have about 1.3 times the spawns per minute of after AP-91 (AP-95)', () => {
+    // Stand nach AP-91 (Spawns pro Minute, Level 5 bis 20).
+    const before = [
+      69.7, 72.0, 75.0, 77.8, 81.0, 98.3, 99.3, 100.7, 102.0, 103.3, 104.7, 106.4, 107.8, 109.4,
+      111.0, 112.4,
+    ];
+    for (let i = 5; i < 21; i++) {
+      const ratio = M[i].spawnsPerMin / before[i - 5];
+      expect(ratio, `level ${i}`).toBeGreaterThanOrEqual(1.27);
+      expect(ratio, `level ${i}`).toBeLessThanOrEqual(1.35);
+    }
+  });
+
+  it('gold and xp per level of level 5 to 20 stay at the pace after AP-91 despite the denser spawns (AP-95, Q-51)', () => {
+    const before = [
+      69.7, 72.0, 75.0, 77.8, 81.0, 98.3, 99.3, 100.7, 102.0, 103.3, 104.7, 106.4, 107.8, 109.4,
+      111.0, 112.4,
+    ];
+    for (let i = 5; i < 21; i++) {
+      const oldCount = (before[i - 5] * LEVELS[i].durationSec) / 60;
+      const ratioGold = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].coin) / oldCount;
+      const ratioXp = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].xp) / oldCount;
+      const ratioContact = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / oldCount;
+      for (const r of [ratioGold, ratioXp, ratioContact]) {
+        expect(r, `level ${i}`).toBeGreaterThan(0.96);
+        expect(r, `level ${i}`).toBeLessThan(1.04);
+      }
+    }
+  });
+
+  it('level 0 to 4 are denser than before but stay below level 5 (jump 4 -> 5 stays)', () => {
+    expect(M[4].spawnsPerMin).toBeLessThan(M[5].spawnsPerMin);
+  });
+
+  it('total contact damage of level 0 to 4 (enemy count x contact factor) stays within 5 percent of before AP-91', () => {
+    // Gegnerzahl vor AP-91: 72 / 79 / 86 / 163 / 182, Kontaktfaktor damals 1.
+    const before = [72, 79, 86, 163, 182];
+    for (let i = 0; i < 5; i++) {
+      const ratio = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / before[i];
+      expect(ratio, `level ${i}`).toBeGreaterThan(0.95);
+      expect(ratio, `level ${i}`).toBeLessThanOrEqual(1.05);
     }
   });
 

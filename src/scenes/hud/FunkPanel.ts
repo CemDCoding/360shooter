@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { THEME, themeColor, type ColorName } from '../../config/theme';
-import { funkCase } from './hudMath';
+import { chipMetrics, funkCase } from './hudMath';
 
 /** Key of the HUD bitmap font (Astro Funk, 8 px, upper case only plus a small "s"). */
 export const FUNK_FONT = 'astro-funk';
@@ -8,6 +8,8 @@ export const FUNK_FONT = 'astro-funk';
 export const FUNK_GLYPH_H = 8;
 const FALLBACK_ADVANCE = 6;
 const CHAMFER = 4;
+/** Icon column of a chip icon with a fixed whole scale (coin 8 px at 2x = 16 px). */
+const FIXED_ICON_W = 16;
 
 /**
  * Integer font scale for a base scale (1..4) and the HUD factor k (never below the base).
@@ -193,6 +195,8 @@ export interface ChipIcon {
   frame?: number;
   /** Extra scale factor for sprites smaller than 16 px (default 1). */
   scale?: number;
+  /** Keep `scale` whole (no k, no shrink): the box is sized for the sprite at that scale. */
+  fixedScale?: boolean;
   /** Optional token colour for the icon (e.g. the dim fire ring). */
   tint?: ColorName;
 }
@@ -203,6 +207,8 @@ export interface ChipOptions {
   barW?: number;
   /** HUD factor (hudScale). */
   k: number;
+  /** Shrink factor (1 = unchanged, CHIP_SHRINK for the small chips, B3). */
+  shrink?: number;
 }
 
 /** Chip in the HUD row: glass panel with icon, optional bar and a Funk text. */
@@ -229,19 +235,23 @@ export class FunkChip {
     opts: ChipOptions,
   ) {
     const k = opts.k;
-    this.textScale = funkScale(2, k);
-    this.padX = Math.round(6 * k);
-    this.gap = Math.round(4 * k);
-    this.chipH = Math.round(THEME.sizePx['size.hud-chip-h'] * k);
-    this.barW = Math.round((opts.barW ?? 0) * k);
-    this.iconW = opts.icon ? Math.round(16 * k) : 0;
+    const mt = chipMetrics(k, opts.shrink ?? 1);
+    this.textScale = mt.textScale;
+    this.padX = mt.padX;
+    this.gap = mt.gap;
+    this.chipH = mt.height;
+    this.barW = Math.round((opts.barW ?? 0) * mt.iconFactor);
+    const fixed = opts.icon?.fixedScale === true;
+    this.iconW = opts.icon ? (fixed ? FIXED_ICON_W : mt.iconW) : 0;
     this.panel = new FunkPanel(scene, 0, 0, 10, this.chipH);
     if (opts.icon) {
       this.icon = scene.add
         .image(0, 0, opts.icon.key, opts.icon.frame ?? 0)
-        .setScale(k * (opts.icon.scale ?? 1))
+        .setScale(
+          opts.icon.fixedScale ? (opts.icon.scale ?? 1) : mt.iconFactor * (opts.icon.scale ?? 1),
+        )
         .setOrigin(0, 0.5);
-      if (opts.icon.tint) this.icon.setTint(themeColor(opts.icon.tint).num);
+      if (opts.icon.tint) this.icon.setTintFill(themeColor(opts.icon.tint).num);
     }
     if (this.barW > 0) this.bar = scene.add.graphics();
     this.text = funkText(scene, 0, 0, '', this.textScale, 'hud.text').setOrigin(0, 0.5);
@@ -249,6 +259,10 @@ export class FunkChip {
 
   get width(): number {
     return this.panel.width;
+  }
+
+  get height(): number {
+    return this.chipH;
   }
 
   get visible(): boolean {
@@ -279,7 +293,7 @@ export class FunkChip {
 
   setIconTint(color: ColorName | null): void {
     if (!this.icon) return;
-    if (color) this.icon.setTint(themeColor(color).num);
+    if (color) this.icon.setTintFill(themeColor(color).num);
     else this.icon.clearTint();
   }
 

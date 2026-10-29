@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { FunkChip } from './FunkPanel';
+import { chipShrink } from './hudMath';
 
 /** Chip with the coin icon and the number of coins collected this round ("+4"). */
 export class CoinCounter {
@@ -10,7 +11,12 @@ export class CoinCounter {
     k: number,
     private readonly onChange: () => void,
   ) {
-    this.chip = new FunkChip(scene, { icon: { key: 'coin-small', frame: 0, scale: 2 }, k });
+    this.chip = new FunkChip(scene, {
+      // The coin stays on a whole scale (AP-92 sets the 12 px coin); box and text shrink.
+      icon: { key: 'coin-small', frame: 0, scale: 2, fixedScale: true },
+      k,
+      shrink: chipShrink('coin'),
+    });
     this.set(0);
   }
 

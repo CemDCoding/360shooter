@@ -21,12 +21,13 @@
   .slot { position: absolute; width: var(--size-hud-slot); height: var(--size-hud-slot); display: grid; place-items: center;
     background: var(--color-hud-glass); border: var(--border-hud) solid var(--color-hud-line); cursor: pointer; }
   .slot > * { grid-area: 1 / 1; }
-  .slot .ico { --px-o: var(--color-hud-screen); }
-  .slot.rapid .ico { --px-Y: var(--color-hud-accent); }
-  .slot.ring .ico { --px-F: var(--color-game-fire-ring); }
-  /* empty: dotted frame, outline icon only */
+  /* V-18 (H-23): the icon is the real multi-coloured item sprite (sprites-world.js) at 2x (slotIconScale).
+     ready / blocked / hover: own colours (clearTint). empty: flat silhouette in hud.line (setTintFill) at
+     opacity.ghost. pressed: flat silhouette in hud.screen on the accent fill. Never a multiply tint. */
+  .slot .ico { image-rendering: pixelated; width: 32px; height: 32px; }
+  /* empty: dotted frame, silhouette icon */
   .slot.empty { border-style: dotted; cursor: default; }
-  .slot.empty .ico { --px-o: var(--color-hud-line); --px-Y: transparent; --px-F: transparent; opacity: var(--opacity-ghost); }
+  .slot.empty .ico { opacity: var(--opacity-ghost); }
   /* ready: solid accent frame with glow, full icon */
   .slot.ready { border-color: var(--color-hud-accent); box-shadow: 0 0 6px var(--color-hud-glow); }
   /* stored right now: lights up once (store-flash 200 ms) */
@@ -37,7 +38,6 @@
   /* mouse states */
   .slot.is-hover { border-color: var(--color-hud-accent); background: color-mix(in srgb, var(--color-hud-accent) 18%, var(--color-hud-glass)); }
   .slot.is-active { background: var(--color-hud-accent); }
-  .slot.is-active .ico { --px-Y: var(--color-hud-screen); --px-o: var(--color-hud-screen); }
 
   /* ---------- Boss bar states (H-14) ---------- */
   .bbar { position: absolute; width: 200px; }
@@ -78,8 +78,8 @@
   <h1>Lagerplatz und Boss · Ergänzung H-14</h1>
   <p>Funkgerät-Stil wie <code>runde.html</code>. Neu: zwei Lagerplätze unten links für zeitbegrenzte Kräfte (Dauerfeuer, Feuerring), Banner „BOSS KOMMT!“ als Funkspruch, Zustände der Boss-Leiste und das Ergebnis nach einem Boss-Kampf. Alle Maße in logischen px bei 1×, im Spiel mal <code>funkScale</code>.</p>
   <dl>
-    <dt>Lagerplatz</dt><dd>40×40 (<code>size.hud-slot</code>), Abstand 8, links 8, unten 8. Reihenfolge wie <code>STORABLE_POWERS</code>. Symbol = Item-Sprite 10×10 in 3×. Immer sichtbar, kein Text-Label.</dd>
-    <dt>Zustände</dt><dd>leer: gepunktet, nur Umriss · bereit: Akzentrahmen mit Glühen · gesperrt: gedimmt, Sekunden der Sperre darüber · eingelagert: leuchtet einmal 200 ms auf (ohne bei reduzierter Bewegung).</dd>
+    <dt>Lagerplatz</dt><dd>40×40 (<code>size.hud-slot</code>), Abstand 8, links und unten der HUD-Rand <code>round(8·k)</code> (H-23). Reihenfolge wie <code>STORABLE_POWERS</code>. Symbol = mehrfarbiges Item-Sprite 16×16 in 2× (V-18). Immer sichtbar, kein Text-Label.</dd>
+    <dt>Zustände</dt><dd>leer: gepunktet, Symbol als flache Silhouette in <code>hud.line</code> (setTintFill) · bereit: Akzentrahmen mit Glühen · gesperrt: gedimmt, Sekunden der Sperre darüber · eingelagert: leuchtet einmal 200 ms auf (ohne bei reduzierter Bewegung).</dd>
     <dt>Boss</dt><dd>Banner Funk 3× mit Funk-Kopf und Namen, blinkt 3×, dann ruhig · Leiste: Treffer, SCHWACH! ab 25 %, IMMUN · Ergebnis: Siegel und Faktenzeile BOSS.</dd>
   </dl>
 </header>
@@ -106,12 +106,13 @@
 
   // ---- power slot ----
   const NAMES = { rapid: 'Dauerfeuer', ring: 'Feuerring' };
+  const ITEM_KEY = { rapid: 'item-rapid-fire', ring: 'item-fire-ring' };
   function slot(kind, state, x, y, sec, extra) {
     const label = { empty: 'leer', ready: 'bereit, tippen zum Starten', flash: 'eingelagert', blocked: `gesperrt, ${sec} Sekunden` }[state] || state;
     const st = state === 'hover' || state === 'press' ? 'ready ' + (state === 'hover' ? 'is-hover' : 'is-active') : state;
     const num = state === 'blocked' ? P(sec + 's', 2, '--color-hud-text', '--color-hud-screen') : '';
     return `<div class="slot ${kind} ${st} ${extra || ''}" style="left:${x}px;top:${y}px" role="button" aria-label="Lagerplatz ${NAMES[kind]}: ${label}" data-component="PowerSlots.${kind}">
-      <span class="spr ico" data-n="${kind}" data-s="3"></span>${num}</div>`;
+      <canvas class="ico" data-k="${ITEM_KEY[kind]}" data-fill="${state === 'empty' ? '--color-hud-line' : state === 'press' ? '--color-hud-screen' : ''}"></canvas>${num}</div>`;
   }
   const slots = (a, b) => slot('rapid', a.s, 8, 312, a.sec) + slot('ring', b.s, 56, 312, b.sec);
 
@@ -239,10 +240,25 @@
   const btn = (label, primary, focus) => `<div class="f-btn ${primary ? 'primary' : ''} ${focus ? 'is-focus' : ''}" role="button">${P(label, 2, primary ? '--color-hud-accent' : '--color-hud-text')}</div>`;
   result('s6', { won: true, boss: true, level: 10, biome: 'elf', biomeName: 'ELFENWALD', time: '4:41 ÜBERLEBT', bossName: 'RIESEN-STEIN', xp: 180, plevel: 11, levelUp: true, coins: 38, share: 100, gold: 38, total: 212,
     actions: btn('NOCHMAL') + btn('NÄCHSTES LEVEL', true, true) + btn('MENÜ') });
-  result('s7', { won: false, boss: true, level: 18, biome: 'elf', biomeName: 'ELFENWALD', time: '5:00 · BOSS NICHT BESIEGT', bossName: 'RIESEN-STEIN', bossLeft: 38, xp: 60, plevel: 11, levelUp: false, coins: 27, share: 50, gold: 13, total: 225,
+  result('s7', { won: false, boss: true, level: 18, biome: 'elf', biomeName: 'ELFENWALD', time: 'NIEDERLAGE', bossName: 'RIESEN-STEIN', bossLeft: 38, xp: 60, plevel: 11, levelUp: false, coins: 27, share: 50, gold: 13, total: 225,
     actions: btn('NOCHMAL', true, true) + btn('MENÜ') });
 </script>
 <script src="../assets/fonts.js"></script>
 <script src="../assets/pixel.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script>
+  // V-18: draw the real item sprites into the slots; data-fill = flat silhouette (Phaser setTintFill).
+  (function () {
+    const S = window.PX_SPRITES, css = getComputedStyle(document.documentElement);
+    document.querySelectorAll('canvas.ico[data-k]').forEach((c) => {
+      const d = S[c.dataset.k]; if (!d) return;
+      c.width = d.frameWidth; c.height = d.frameHeight;
+      const x = c.getContext('2d');
+      d.frames[0].forEach((r, y) => [...r].forEach((ch, i) => { if (ch !== '.') { x.fillStyle = d.palette[ch]; x.fillRect(i, y, 1, 1); } }));
+      if (c.dataset.fill) { x.globalCompositeOperation = 'source-in'; x.fillStyle = css.getPropertyValue(c.dataset.fill).trim(); x.fillRect(0, 0, c.width, c.height); }
+    });
+  })();
+</script>
 </body>
 </html>

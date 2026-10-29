@@ -75,6 +75,13 @@
     const x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
     return c;
   }
+  function multiplyTint(src, color) {
+    const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+    const x = c.getContext('2d'); x.drawImage(src, 0, 0);
+    x.globalCompositeOperation = 'multiply'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+    x.globalCompositeOperation = 'destination-in'; x.drawImage(src, 0, 0);
+    return c;
+  }
   function scaled(src, k, grid) {
     const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
     c.getContext('2d').drawImage(src, 0, 0);
@@ -90,7 +97,7 @@
     ['BOSSE UND ANGRIFFE', ['boss-root-monster', 'boss-root-spike', 'boss-forest-ghost', 'boss-giant-stone'], 2],
     ['GESCHOSSE', ['witch-bolt', 'boss-ghost-orb', 'laser'], 6],
     ['ITEMS', ['item-heal', 'item-double-shot', 'item-shield', 'item-rapid-fire', 'item-fire-ring'], 4],
-    ['MÜNZEN', ['coin-small', 'coin-big'], 5],
+    ['MÜNZEN (Feld: coin-field ×2 und coin-big ×1 = 12 px · Menü: coin-small ×2 = 16 px)', ['coin-field', 'coin-big', 'coin-small'], 6],
     ['KACHELN (0 = Boden, 1–3 = Deko, auf Biom-Grundfarbe)', ['tiles-forest', 'tiles-forest-night', 'tiles-elf-forest'], 2],
     ['UI-ICONS (Ton an, Ton aus, Pause, Schloss; im Spiel getönt)', ['ui-icons'], 4],
   ];
@@ -140,7 +147,8 @@
     // laser from the muzzle
     const mx = G.muzzle.x - G.grip.x, my = (G.muzzle.y - G.grip.y) * (flip ? -1 : 1);
     const lx = hx + mx * Math.cos(ang) - my * Math.sin(ang), ly = hy + mx * Math.sin(ang) + my * Math.cos(ang);
-    const las = silhouette(fc('laser', 0), '#ff8fae');
+    // V-16 (H-23): multiply tint like Phaser setTint, keeps the head-to-tail gradient (not setTintFill)
+    const las = multiplyTint(fc('laser', 0), '#ff8fae');
     x.save(); x.translate(lx + Math.cos(ang) * 22, ly + Math.sin(ang) * 22); x.rotate(ang); x.drawImage(las, -8, -2); x.restore();
     // vignette
     const v = x.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.62);
@@ -155,7 +163,7 @@
     items: [
       ['boss-root-monster', 0, 268, 58, { flip: true }], ['boss-root-spike', 1, 110, 140, {}],
       ['enemy-cursed-tree', 1, 236, 128, { flip: true }], ['enemy-cursed-tree', 2, 64, 70, {}], ['enemy-cursed-tree', 0, 120, 30, {}],
-      ['coin-small', 0, 190, 140, { scale: 2, halo: 2 }], ['coin-big', 0, 96, 104, { halo: 2 }], ['item-heal', 0, 200, 40, { halo: 1 }], ['item-double-shot', 0, 40, 140, { halo: 1 }],
+      ['coin-field', 0, 190, 140, { scale: 2, halo: 2 }], ['coin-big', 0, 96, 104, { halo: 2 }], ['item-heal', 0, 200, 40, { halo: 1 }], ['item-double-shot', 0, 40, 140, { halo: 1 }],
     ],
   }));
   sc.appendChild(scene({
@@ -163,14 +171,14 @@
     items: [
       ['boss-forest-ghost', 1, 56, 52, {}], ['boss-ghost-orb', 0, 96, 92, {}], ['boss-ghost-orb', 1, 110, 108, {}],
       ['enemy-forest-witch', 0, 252, 60, { flip: true }], ['witch-bolt', 1, 222, 74, {}], ['enemy-zombie-squirrel', 1, 232, 132, { flip: true }], ['enemy-cursed-tree', 3, 150, 150, {}],
-      ['coin-small', 1, 200, 104, { scale: 2, halo: 2 }], ['item-shield', 0, 290, 150, { halo: 1 }], ['item-rapid-fire', 0, 40, 150, { halo: 1 }],
+      ['coin-field', 1, 200, 104, { scale: 2, halo: 2 }], ['item-shield', 0, 290, 150, { halo: 1 }], ['item-rapid-fire', 0, 40, 150, { halo: 1 }],
     ],
   }));
   sc.appendChild(scene({
     label: 'Elfenwald 10–20 · Boss Riesen-Stein · Waldgeist, Eichhörnchen · Stufe 3', base: '#3b2a6b', tiles: 'tiles-elf-forest', seed: 23, deco: 0.2, vig: 0.45, stage: 3, aim: [250, 120], dots: '#9ff5ec',
     items: [
       ['boss-giant-stone', 2, 262, 120, { flip: true }], ['enemy-forest-spirit', 1, 70, 64, {}], ['enemy-zombie-squirrel', 2, 100, 140, {}], ['enemy-cursed-tree', 0, 200, 34, { flip: true }],
-      ['coin-big', 1, 140, 140, { halo: 2 }], ['coin-small', 0, 40, 110, { scale: 2, halo: 2 }], ['item-fire-ring', 0, 220, 76, { halo: 1 }], ['item-heal', 1, 30, 30, { halo: 1 }],
+      ['coin-big', 1, 140, 140, { halo: 2 }], ['coin-field', 0, 40, 110, { scale: 2, halo: 2 }], ['item-fire-ring', 0, 220, 76, { halo: 1 }], ['item-heal', 1, 30, 30, { halo: 1 }],
     ],
   }));
 })();

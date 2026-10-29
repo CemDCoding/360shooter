@@ -55,7 +55,7 @@
   const btn = (label, primary, focus) => `<div class="f-btn ${primary ? 'primary' : ''} ${focus ? 'is-focus' : ''}" role="button">${P(label, 2, primary ? '--color-hud-accent' : '--color-hud-text')}</div>`;
   result('e1', { won: true, level: 7, biome: 'night', biomeName: 'WALD BEI NACHT', time: '5:00 ÜBERLEBT', xp: 120, plevel: 8, levelUp: true, coins: 23, share: 100, gold: 23, total: 109,
     actions: btn('NOCHMAL') + btn('NÄCHSTES LEVEL', true, true) + btn('MENÜ') });
-  result('e2', { won: false, level: 16, biome: 'elf', biomeName: 'ELFENWALD', time: '3:12 ÜBERLEBT', xp: 40, plevel: 8, levelUp: false, coins: 18, share: 50, gold: 9, total: 118,
+  result('e2', { won: false, level: 16, biome: 'elf', biomeName: 'ELFENWALD', time: 'NIEDERLAGE', xp: 40, plevel: 8, levelUp: false, coins: 18, share: 50, gold: 9, total: 118,
     actions: btn('NOCHMAL', true, true) + btn('MENÜ') });
   document.getElementById('e3').innerHTML = `
     <div class="k-stars"></div>

@@ -139,7 +139,8 @@
         "fire-ring": "#ff8a3a",
         "hit-flash": "#fff4e8",
         "firefly": "#f3f07a",
-        "spore": "#9ff5ec"
+        "spore": "#9ff5ec",
+        "aura": "#5fe0c0"
       }
     },
     "font": {
@@ -209,7 +210,10 @@
     },
     "opacity": {
       "dim": 0.35,
-      "ghost": 0.6
+      "ghost": 0.6,
+      "hover": 0.18,
+      "blink": 0.55,
+      "aura": 0.25
     }
   }
 }
