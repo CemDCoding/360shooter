@@ -95,6 +95,7 @@ function layoutArena(): void {
   host.style.width = `${box.width}px`;
   host.style.height = `${box.height}px`;
   if (!debug.active) return;
+  const sm = game?.scale;
   debug.update(
     layoutReport({
       innerW: window.innerWidth,
@@ -110,6 +111,15 @@ function layoutArena(): void {
       landscape: window.innerWidth >= window.innerHeight,
       arenaDesiredW: widths.wantedW,
       arenaCurrentW: widths.currentW ?? m.wantedW,
+      area: m.area,
+      availW: m.availW,
+      availH: m.availH,
+      host: box,
+      canvas: game?.canvas ? game.canvas.getBoundingClientRect() : null,
+      scale: sm ? { game: sm.gameSize, display: sm.displaySize, parent: sm.parentSize } : null,
+      roundRunning: widths.roundRunning,
+      widthChanges: widths.changeCount,
+      lastChange: widths.lastChange,
     }),
   );
 }

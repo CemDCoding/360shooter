@@ -60,10 +60,25 @@ export function hostBoxFor(area: VisibleArea, currentW: number): HostBox {
  * exists, and at the latest when a round starts (also "Nochmal"); while a round runs (also paused)
  * it is only remembered and applied when the round ends.
  */
+/** Why a width was applied: round start, round end, or a new measurement outside a round. */
+export type WidthChangeReason = 'start' | 'end' | 'want';
+
 export class ArenaWidthController {
   private current: number | null = null;
   private wanted: number = ARENA.baseWidth;
   private running = false;
+  private changes = 0;
+  private reason: WidthChangeReason | null = null;
+
+  /** Number of applied width changes (for the layout overlay). */
+  get changeCount(): number {
+    return this.changes;
+  }
+
+  /** Reason of the last applied change, null before the first one. */
+  get lastChange(): WidthChangeReason | null {
+    return this.reason;
+  }
 
   /** Width the game runs with; null until the first measurement. */
   get currentW(): number | null {
@@ -85,13 +100,13 @@ export class ArenaWidthController {
       this.current = w; // first layout, before the game exists
       return null;
     }
-    return this.sync();
+    return this.sync('want');
   }
 
   /** A round starts (GameScene start or restart): apply the wanted width first, then freeze. */
   roundStart(): number | null {
     this.running = false;
-    const w = this.sync();
+    const w = this.sync('start');
     this.running = true;
     return w;
   }
@@ -99,12 +114,14 @@ export class ArenaWidthController {
   /** The round ended (GameScene shutdown): apply a deferred width. */
   roundEnd(): number | null {
     this.running = false;
-    return this.sync();
+    return this.sync('end');
   }
 
-  private sync(): number | null {
+  private sync(reason: WidthChangeReason): number | null {
     if (this.current === null || this.wanted === this.current || this.running) return null;
     this.current = this.wanted;
+    this.changes += 1;
+    this.reason = reason;
     return this.current;
   }
 }

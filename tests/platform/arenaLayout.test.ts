@@ -100,6 +100,22 @@ describe('ArenaWidthController', () => {
     expect(c.currentW).toBe(734);
     expect(c.want(734)).toBeNull();
   });
+  it('counts applied changes and remembers the reason of the last one', () => {
+    const c = new ArenaWidthController();
+    c.want(640);
+    expect(c.changeCount).toBe(0);
+    expect(c.lastChange).toBeNull();
+    c.want(734);
+    expect([c.changeCount, c.lastChange]).toEqual([1, 'want']);
+    c.roundStart();
+    c.want(800);
+    expect(c.changeCount).toBe(1);
+    c.roundEnd();
+    expect([c.changeCount, c.lastChange]).toEqual([2, 'end']);
+    c.want(734);
+    c.roundStart();
+    expect([c.changeCount, c.lastChange]).toEqual([3, 'want']);
+  });
   it('a round started with a stale width gets the wanted width at its start', () => {
     const c = new ArenaWidthController();
     c.want(640);

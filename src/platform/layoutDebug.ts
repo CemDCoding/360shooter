@@ -25,23 +25,62 @@ export interface LayoutReportInput {
   /** Arena width the safe area asks for, and the width the game currently runs with. */
   arenaDesiredW: number;
   arenaCurrentW: number;
+  /** Visible safe area (clampedArea) and the room left inside its insets. */
+  area: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    insets: { top: number; right: number; bottom: number; left: number };
+  };
+  availW: number;
+  availH: number;
+  /** Computed box of #game (hostBoxFor), before the browser applies it. */
+  host: { left: number; top: number; width: number; height: number };
+  /** Real canvas box (getBoundingClientRect), null before the game exists. */
+  canvas: { x: number; y: number; width: number; height: number } | null;
+  /** Phaser scale manager sizes, null before the game exists. */
+  scale: {
+    game: { width: number; height: number };
+    display: { width: number; height: number };
+    parent: { width: number; height: number };
+  } | null;
+  roundRunning: boolean;
+  widthChanges: number;
+  lastChange: string | null;
 }
 
 const r = (n: number): string => (Number.isFinite(n) ? String(Math.round(n * 100) / 100) : '?');
+const size = (s: { width: number; height: number }): string => `${r(s.width)}x${r(s.height)}`;
 
-/** Text lines for the overlay; tolerates a missing visualViewport. */
+/** Text lines for the overlay; tolerates a missing visualViewport, canvas or scale manager. */
 export function layoutReport(i: LayoutReportInput): string[] {
   const vv = i.vv
     ? `vv ${r(i.vv.width)}x${r(i.vv.height)} @${r(i.vv.offsetLeft)},${r(i.vv.offsetTop)}`
     : 'vv none';
+  const a = i.area;
+  const c = i.canvas;
+  // Rest = window edge to canvas edge, left and right (CSS px).
+  const canvas = c
+    ? `canvas ${size(c)} @${r(c.x)},${r(c.y)} rest l${r(c.x)} r${r(i.innerW - c.x - c.width)}`
+    : 'canvas none';
+  const scale = i.scale
+    ? `phaser game ${size(i.scale.game)} disp ${size(i.scale.display)} par ${size(i.scale.parent)}`
+    : 'phaser none';
   return [
     `inner ${r(i.innerW)}x${r(i.innerH)}`,
     vv,
     `screen ${r(i.screenW)}x${r(i.screenH)} dpr ${r(i.dpr)}`,
     `probe ${r(i.probe.width)}x${r(i.probe.height)} ins t${r(i.probe.top)} r${r(i.probe.right)} b${r(i.probe.bottom)} l${r(i.probe.left)}`,
+    `area ${size(a)} @${r(a.x)},${r(a.y)} ins t${r(a.insets.top)} r${r(a.insets.right)} b${r(a.insets.bottom)} l${r(a.insets.left)}`,
+    `avail ${r(i.availW)}x${r(i.availH)}`,
+    `host ${size(i.host)} @${r(i.host.left)},${r(i.host.top)}`,
     `game ${r(i.game.width)}x${r(i.game.height)} @${r(i.game.x)},${r(i.game.y)}`,
+    canvas,
+    scale,
+    `arena want ${r(i.arenaDesiredW)} now ${r(i.arenaCurrentW)} round ${i.roundRunning}`,
+    `width changes ${r(i.widthChanges)} last ${i.lastChange ?? 'none'}`,
     `standalone media ${i.standaloneMedia} nav ${String(i.standaloneNav)}`,
-    `arena want ${r(i.arenaDesiredW)} now ${r(i.arenaCurrentW)}`,
     `orientation ${i.landscape ? 'landscape' : 'portrait'}`,
   ];
 }
