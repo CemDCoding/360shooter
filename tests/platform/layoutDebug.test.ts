@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { decideArenaWidth, layoutDebugWanted, layoutReport } from '../../src/platform/layoutDebug';
+import {
+  decideArenaWidth,
+  LAYOUT_FLAG_KEY,
+  layoutDebugWanted,
+  layoutFlagStorage,
+  layoutReport,
+  readLayoutFlag,
+  writeLayoutFlag,
+} from '../../src/platform/layoutDebug';
 
 const base = {
   innerW: 852,
@@ -49,6 +57,55 @@ describe('layoutDebugWanted', () => {
     expect(layoutDebugWanted('?layout=1')).toBe(true);
     expect(layoutDebugWanted('')).toBe(false);
     expect(layoutDebugWanted('?layout=0')).toBe(false);
+  });
+});
+
+/** In-memory storage; `fail` makes every call throw (like Safari private mode). */
+function memoryStorage(fail = false) {
+  const data = new Map<string, string>();
+  const guard = (): void => {
+    if (fail) throw new Error('QuotaExceededError');
+  };
+  return {
+    data,
+    getItem: (k: string) => (guard(), data.get(k) ?? null),
+    setItem: (k: string, v: string) => (guard(), void data.set(k, v)),
+    removeItem: (k: string) => (guard(), void data.delete(k)),
+  };
+}
+
+describe('layout flag', () => {
+  it('is off by default and survives a write/read round trip', () => {
+    const s = memoryStorage();
+    expect(readLayoutFlag(s)).toBe(false);
+    expect(writeLayoutFlag(s, true)).toBe(true);
+    expect(s.data.get(LAYOUT_FLAG_KEY)).toBe('1');
+    expect(readLayoutFlag(s)).toBe(true);
+    expect(writeLayoutFlag(s, false)).toBe(true);
+    expect(s.data.has(LAYOUT_FLAG_KEY)).toBe(false);
+    expect(readLayoutFlag(s)).toBe(false);
+  });
+  it('stores only "on", nothing else', () => {
+    const s = memoryStorage();
+    writeLayoutFlag(s, true);
+    expect([...s.data.entries()]).toEqual([[LAYOUT_FLAG_KEY, '1']]);
+  });
+  it('missing or throwing storage means off, without an error', () => {
+    expect(readLayoutFlag(null)).toBe(false);
+    expect(readLayoutFlag(undefined)).toBe(false);
+    expect(writeLayoutFlag(null, true)).toBe(false);
+    const broken = memoryStorage(true);
+    expect(() => readLayoutFlag(broken)).not.toThrow();
+    expect(readLayoutFlag(broken)).toBe(false);
+    expect(writeLayoutFlag(broken, true)).toBe(false);
+  });
+  it('other values do not count as on', () => {
+    const s = memoryStorage();
+    s.data.set(LAYOUT_FLAG_KEY, 'true');
+    expect(readLayoutFlag(s)).toBe(false);
+  });
+  it('without localStorage (node) the accessor returns null', () => {
+    expect(layoutFlagStorage()).toBeNull();
   });
 });
 

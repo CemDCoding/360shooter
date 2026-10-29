@@ -7,11 +7,23 @@ import { HudScene } from './scenes/HudScene';
 import { ResultScene } from './scenes/ResultScene';
 import { RELAYOUT_DELAYS_MS } from './platform/layout';
 import { ArenaWidthController, hostBoxFor, measureArena } from './platform/arenaLayout';
-import { createLayoutDebug, layoutReport } from './platform/layoutDebug';
+import {
+  createLayoutDebug,
+  layoutDebugWanted,
+  layoutFlagStorage,
+  layoutReport,
+  readLayoutFlag,
+  writeLayoutFlag,
+} from './platform/layoutDebug';
+import { HoldGesture } from './platform/layoutGesture';
 import { ARENA } from './config/arena';
 import { THEME } from './config/theme';
 
-const debugUpdate = createLayoutDebug();
+// Layout overlay: `?layout=1` or the stored flag; the flag is toggled by the gesture below.
+const flagStorage = layoutFlagStorage();
+const debug = createLayoutDebug(
+  layoutDebugWanted(window.location.search) || readLayoutFlag(flagStorage),
+);
 
 /*
  * PE-109: the arena width follows the safe area's aspect ratio (arenaWidthFor), but stays fixed
@@ -82,7 +94,8 @@ function layoutArena(): void {
   host.style.top = `${box.top}px`;
   host.style.width = `${box.width}px`;
   host.style.height = `${box.height}px`;
-  debugUpdate?.(
+  if (!debug.active) return;
+  debug.update(
     layoutReport({
       innerW: window.innerWidth,
       innerH: window.innerHeight,
@@ -152,3 +165,40 @@ window.visualViewport?.addEventListener('resize', relayout);
 window.visualViewport?.addEventListener('scroll', relayout);
 // Covers a start where `load` already fired before this module ran.
 scheduleRelayout();
+
+/** True while a round exists (GameScene starting, running, paused or sleeping). */
+function roundAlive(): boolean {
+  const scene = game?.scene.getScene('GameScene');
+  if (!scene) return false;
+  const status = scene.sys.settings.status;
+  return status >= Phaser.Scenes.START && status <= Phaser.Scenes.SLEEPING;
+}
+
+/*
+ * Gesture for the overlay: three fingers held for 2 s outside a round toggles the stored flag.
+ * Passive capture listeners only count fingers; they never cancel or stop an event, so Phaser
+ * input (buttons, joystick) is not affected.
+ */
+const gesture = new HoldGesture();
+let gestureTimer: number | undefined;
+const onTouches = (e: TouchEvent): void => {
+  const now = performance.now();
+  if (gestureTimer !== undefined) window.clearTimeout(gestureTimer);
+  gestureTimer = undefined;
+  const due = gesture.touches(e.touches.length, now, roundAlive());
+  if (due === null) return;
+  gestureTimer = window.setTimeout(
+    () => {
+      gestureTimer = undefined;
+      if (!gesture.check(performance.now(), roundAlive())) return;
+      const on = !debug.active;
+      writeLayoutFlag(flagStorage, on);
+      debug.setActive(on);
+      relayout();
+    },
+    due - now + 20,
+  );
+};
+for (const type of ['touchstart', 'touchend', 'touchcancel'] as const) {
+  window.addEventListener(type, onTouches, { passive: true, capture: true });
+}
