@@ -298,3 +298,37 @@ describe('arenaWidthFor (PE-99, PE-106)', () => {
     expect(arenaWidthFor(Infinity, 360)).toBe(640);
   });
 });
+
+describe('AP-96: iPhone 15 photo values and Safari bar (clampedArea, visualViewport)', () => {
+  const ins = { top: 0, right: 47, bottom: 21, left: 47 };
+  const avail = (a: ReturnType<typeof clampedArea>): [number, number] => [
+    a.width - a.insets.left - a.insets.right,
+    a.height - a.insets.top - a.insets.bottom,
+  ];
+  it('photo 852x393: safe area 758x372 gives 734', () => {
+    const a = clampedArea(
+      852,
+      393,
+      ins,
+      { width: 852, height: 393, offsetLeft: 0, offsetTop: 0 },
+      {
+        width: 852,
+        height: 393,
+      },
+    );
+    expect(avail(a)).toEqual([758, 372]);
+    expect(arenaWidthFor(...avail(a))).toBe(734);
+  });
+  it('Safari bar: smaller window height wins over a stale 100dvh probe', () => {
+    const a = clampedArea(852, 393, ins, null, { width: 852, height: 342 });
+    expect(avail(a)).toEqual([758, 321]);
+    expect(arenaWidthFor(...avail(a))).toBe(800);
+  });
+  it('bar hidden again: back to 734 (want rises and falls with the bar)', () => {
+    const vv = (h: number) => ({ width: 852, height: h, offsetLeft: 0, offsetTop: 0 });
+    const ws = [393, 342, 393].map((h) =>
+      arenaWidthFor(...avail(clampedArea(852, h, ins, vv(h), { width: 852, height: h }))),
+    );
+    expect(ws).toEqual([734, 800, 734]);
+  });
+});

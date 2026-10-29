@@ -117,6 +117,20 @@ export class ArenaWidthController {
     return this.sync('end');
   }
 
+  /**
+   * Safety net against a missed scene event: `alive` is the real GameScene state (starting,
+   * running, paused or sleeping). A round that no longer exists ends here (applies a deferred
+   * width); a round that exists without a seen start is frozen without changing the width.
+   */
+  syncRound(alive: boolean): number | null {
+    if (alive && !this.running) {
+      this.running = true;
+      return null;
+    }
+    if (!alive && this.running) return this.roundEnd();
+    return null;
+  }
+
   private sync(reason: WidthChangeReason): number | null {
     if (this.current === null || this.wanted === this.current || this.running) return null;
     this.current = this.wanted;

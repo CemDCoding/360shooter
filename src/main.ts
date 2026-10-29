@@ -36,15 +36,22 @@ const widths = new ArenaWidthController();
 let game: Phaser.Game | undefined;
 let hooked = false;
 
-/** Sets a new game width (if the controller returned one); restarts open menu or result scenes. */
-function applyWidth(w: number | null): void {
-  if (w === null || !game) return;
-  game.scale.setGameSize(w, ARENA.height);
+/** Restarts open menu or result scenes so that their layout matches a new width. */
+function restartMenus(): void {
+  if (!game) return;
   for (const key of ['MenuScene', 'ResultScene']) {
     if (!game.scene.isActive(key)) continue;
     const scene = game.scene.getScene(key);
     scene.scene.restart(scene.sys.settings.data);
   }
+}
+
+/** True while a round exists (GameScene starting, running, paused or sleeping). */
+function roundAlive(): boolean {
+  const scene = game?.scene.getScene('GameScene');
+  if (!scene) return false;
+  const status = scene.sys.settings.status;
+  return status >= Phaser.Scenes.START && status <= Phaser.Scenes.SLEEPING;
 }
 
 /** Registers (once) the GameScene listeners: the width is applied at round start and round end. */
@@ -55,17 +62,20 @@ function hookGameScene(): void {
   hooked = true;
   // START comes before init/create, so the new round already sees the final width.
   scene.events.on(Phaser.Scenes.Events.START, () => {
-    applyWidth(widths.roundStart());
-    relayout();
+    relayoutWith(widths.roundStart() !== null);
   });
   scene.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
-    applyWidth(widths.roundEnd());
-    relayout();
+    relayoutWith(widths.roundEnd() !== null);
   });
 }
 
-/** Sizes #game to the arena fitted into the safe area (notch, home bar), centred there. */
-function layoutArena(): void {
+/**
+ * Sizes #game to the arena fitted into the safe area (notch, home bar), centred there. Order
+ * (AP-96, H-c): 1. game width, 2. #game box, 3. Phaser reads the new #game box, then fits the
+ * canvas. Phaser's refresh() alone fits into the cached parent size and would keep the canvas
+ * sized for the previous #game box. `widthChanged` is true when a round event applied a width.
+ */
+function layoutArena(widthChanged = false): void {
   const host = document.getElementById('game');
   const probe = document.getElementById('safe');
   if (!host || !probe) return;
@@ -86,14 +96,24 @@ function layoutArena(): void {
     vv,
     win: { width: window.innerWidth, height: window.innerHeight },
   });
-  applyWidth(widths.want(m.wantedW));
-  const box = hostBoxFor(m.area, widths.currentW ?? m.wantedW);
+  // A round that ended without a seen SHUTDOWN releases its width here (H-b safety net).
+  const ended = game ? widths.syncRound(roundAlive()) !== null : false;
+  const wanted = widths.want(m.wantedW) !== null;
+  const changed = widthChanged || ended || wanted;
+  const width = widths.currentW ?? m.wantedW;
+  if (changed && game) game.scale.setGameSize(width, ARENA.height);
+  const box = hostBoxFor(m.area, width);
   host.style.right = 'auto';
   host.style.bottom = 'auto';
   host.style.left = `${box.left}px`;
   host.style.top = `${box.top}px`;
   host.style.width = `${box.width}px`;
   host.style.height = `${box.height}px`;
+  if (game) {
+    game.scale.getParentBounds();
+    game.scale.refresh();
+  }
+  if (changed) restartMenus();
   if (!debug.active) return;
   const sm = game?.scale;
   debug.update(
@@ -144,10 +164,13 @@ game = new Phaser.Game({
   scene: [BootScene, PreloadScene, MenuScene, GameScene, HudScene, ResultScene],
 });
 
-function relayout(): void {
+/** Re-measures and lays out; `widthChanged` only from the round events (never an Event object). */
+function relayoutWith(widthChanged: boolean): void {
   hookGameScene();
-  layoutArena();
-  game?.scale.refresh();
+  layoutArena(widthChanged);
+}
+function relayout(): void {
+  relayoutWith(false);
 }
 game.events.once(Phaser.Core.Events.READY, hookGameScene);
 
@@ -175,14 +198,6 @@ window.visualViewport?.addEventListener('resize', relayout);
 window.visualViewport?.addEventListener('scroll', relayout);
 // Covers a start where `load` already fired before this module ran.
 scheduleRelayout();
-
-/** True while a round exists (GameScene starting, running, paused or sleeping). */
-function roundAlive(): boolean {
-  const scene = game?.scene.getScene('GameScene');
-  if (!scene) return false;
-  const status = scene.sys.settings.status;
-  return status >= Phaser.Scenes.START && status <= Phaser.Scenes.SLEEPING;
-}
 
 /*
  * Gesture for the overlay: three fingers held for 2 s outside a round toggles the stored flag.
