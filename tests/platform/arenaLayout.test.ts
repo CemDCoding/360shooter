@@ -60,7 +60,113 @@ describe('measureArena', () => {
   });
 });
 
+/*
+ * AP-96 diagnosis states, iPhone 15 landscape 852x393, insets t0 r47 b21 l47. Safari with toolbar:
+ * the bar takes the top of the layout viewport; 51 pt is an assumed bar height (no device at hand),
+ * every bar taller than 31 pt gives the same result (availH < 341 hits maxWidth 800).
+ */
+const phone = (h: number) => ({
+  probeW: 852,
+  probeH: h,
+  insets: { top: 0, right: 47, bottom: 21, left: 47 },
+  vv: { width: 852, height: h, offsetLeft: 0, offsetTop: 0 },
+  win: { width: 852, height: h },
+});
+const restLeft = (h: number, w: number): number => hostBoxFor(measureArena(phone(h)).area, w).left;
+
+describe('AP-96 diagnosis states', () => {
+  it('home screen app / Safari without bar (393): want 734, rest = inset 47 per side (H-e)', () => {
+    const m = measureArena(phone(393));
+    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 372, 734]);
+    const box = hostBoxFor(m.area, m.wantedW);
+    expect(box.width).toBe(758);
+    expect(box.height).toBe(371);
+    expect(box.left).toBeCloseTo(47, 5);
+  });
+  it('Safari with bar (342): want is capped at 800, rest = inset + about 22 px', () => {
+    const m = measureArena(phone(342));
+    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 321, 800]);
+    const box = hostBoxFor(m.area, m.wantedW);
+    expect(box.height).toBe(321);
+    expect(box.width).toBe(713);
+    expect(restLeft(342, 800)).toBeCloseTo(69.3, 1);
+  });
+  it('the cap starts below an available height of 341 (bar taller than 31 pt)', () => {
+    expect(measureArena(phone(363)).wantedW).toBe(798);
+    expect(measureArena(phone(362)).wantedW).toBe(800);
+    expect(restLeft(363, 798)).toBeLessThan(48);
+  });
+  it('want can never exceed 800: "want 900" is not reachable', () => {
+    for (let h = 100; h <= 393; h += 1)
+      expect(measureArena(phone(h)).wantedW).toBeLessThanOrEqual(800);
+  });
+  it('PC 1280x720: 640, no bars', () => {
+    const m = measureArena({
+      probeW: 1280,
+      probeH: 720,
+      insets: { top: 0, right: 0, bottom: 0, left: 0 },
+      vv: { width: 1280, height: 720, offsetLeft: 0, offsetTop: 0 },
+      win: { width: 1280, height: 720 },
+    });
+    expect(m.wantedW).toBe(640);
+    expect(hostBoxFor(m.area, 640)).toEqual({ left: 0, top: 0, width: 1280, height: 720 });
+  });
+  it('bar only in visualViewport (probe still 393): covered home bar inset dropped, 798', () => {
+    const m = measureArena({
+      ...phone(393),
+      vv: { width: 852, height: 342, offsetLeft: 0, offsetTop: 0 },
+    });
+    expect(m.area.insets.bottom).toBe(0);
+    expect(m.availH).toBe(342);
+    expect(m.wantedW).toBe(798);
+  });
+});
+
 describe('ArenaWidthController', () => {
+  it('round end without SHUTDOWN (H-b): the width is applied once no round exists', () => {
+    const c = new ArenaWidthController();
+    c.want(734);
+    c.roundStart();
+    expect(c.want(800)).toBeNull(); // bar shown during the round
+    expect(c.syncRound(true)).toBeNull(); // still running (or paused)
+    expect(c.currentW).toBe(734);
+    expect(c.syncRound(false)).toBe(800); // round gone, no SHUTDOWN seen
+    expect([c.currentW, c.roundRunning, c.lastChange]).toEqual([800, false, 'end']);
+    expect(c.syncRound(false)).toBeNull();
+  });
+  it('a round seen without START is frozen without changing the width', () => {
+    const c = new ArenaWidthController();
+    c.want(734);
+    expect(c.syncRound(true)).toBeNull();
+    expect(c.roundRunning).toBe(true);
+    expect(c.want(800)).toBeNull();
+    expect(c.currentW).toBe(734);
+  });
+  it('Safari bar on and off between rounds: want = now after each change, no repeat', () => {
+    const c = new ArenaWidthController();
+    c.want(measureArena(phone(393)).wantedW);
+    const seq = [342, 393, 342, 393];
+    for (const h of seq) {
+      const w = measureArena(phone(h)).wantedW;
+      expect(c.want(w)).toBe(w);
+      expect(c.currentW).toBe(c.wantedW);
+      // A relayout caused by setGameSize measures the same size: nothing to apply again.
+      expect(c.want(w)).toBeNull();
+      expect(c.syncRound(false)).toBeNull();
+    }
+    expect(c.changeCount).toBe(seq.length);
+  });
+  it('bar toggled during a round: fixed until the end, then want = now', () => {
+    const c = new ArenaWidthController();
+    c.want(734);
+    c.roundStart();
+    c.want(800);
+    c.want(734);
+    c.want(800);
+    expect(c.currentW).toBe(734);
+    expect(c.roundEnd()).toBe(800);
+    expect(c.currentW).toBe(c.wantedW);
+  });
   it('first measurement sets the width without an action', () => {
     const c = new ArenaWidthController();
     expect(c.want(734)).toBeNull();
@@ -99,6 +205,22 @@ describe('ArenaWidthController', () => {
     expect(c.roundStart()).toBeNull();
     expect(c.currentW).toBe(734);
     expect(c.want(734)).toBeNull();
+  });
+  it('counts applied changes and remembers the reason of the last one', () => {
+    const c = new ArenaWidthController();
+    c.want(640);
+    expect(c.changeCount).toBe(0);
+    expect(c.lastChange).toBeNull();
+    c.want(734);
+    expect([c.changeCount, c.lastChange]).toEqual([1, 'want']);
+    c.roundStart();
+    c.want(800);
+    expect(c.changeCount).toBe(1);
+    c.roundEnd();
+    expect([c.changeCount, c.lastChange]).toEqual([2, 'end']);
+    c.want(734);
+    c.roundStart();
+    expect([c.changeCount, c.lastChange]).toEqual([3, 'want']);
   });
   it('a round started with a stale width gets the wanted width at its start', () => {
     const c = new ArenaWidthController();

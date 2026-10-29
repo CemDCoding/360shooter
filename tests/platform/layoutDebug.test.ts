@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { decideArenaWidth, layoutDebugWanted, layoutReport } from '../../src/platform/layoutDebug';
+import {
+  decideArenaWidth,
+  LAYOUT_FLAG_KEY,
+  layoutDebugWanted,
+  layoutFlagStorage,
+  layoutReport,
+  readLayoutFlag,
+  writeLayoutFlag,
+} from '../../src/platform/layoutDebug';
 
 const base = {
   innerW: 852,
@@ -14,6 +22,25 @@ const base = {
   landscape: true,
   arenaDesiredW: 734,
   arenaCurrentW: 640,
+  area: {
+    x: 0,
+    y: 0,
+    width: 852,
+    height: 393,
+    insets: { top: 0, right: 47, bottom: 21, left: 47 },
+  },
+  availW: 758,
+  availH: 372,
+  host: { left: 47, top: 0, width: 758, height: 371 },
+  canvas: { x: 98, y: 0, width: 656, height: 369 },
+  scale: {
+    game: { width: 640, height: 360 },
+    display: { width: 656, height: 369 },
+    parent: { width: 758, height: 371 },
+  },
+  roundRunning: false,
+  widthChanges: 2,
+  lastChange: 'end',
 };
 
 describe('layoutReport', () => {
@@ -32,14 +59,39 @@ describe('layoutReport', () => {
       'game 656x369',
       'standalone media true nav true',
       'landscape',
-      'arena want 734 now 640',
+      'arena want 734 now 640 round false',
+      'area 852x393 @0,0 ins t0 r47 b21 l47',
+      'avail 758x372',
+      'host 758x371 @47,0',
+      'canvas 656x369 @98,0 rest l98 r98',
+      'phaser game 640x360 disp 656x369 par 758x371',
+      'width changes 2 last end',
     ]) {
       expect(t).toContain(s);
     }
   });
-  it('does not crash without visualViewport or with NaN', () => {
-    const t = layoutReport({ ...base, vv: null, innerW: NaN, standaloneNav: undefined });
-    expect(t.join('\n')).toContain('vv none');
+  it('stays short enough for the phone (at most 16 lines of at most 64 chars)', () => {
+    const lines = layoutReport({
+      ...base,
+      vv: { width: 852, height: 393, offsetLeft: 0, offsetTop: 0 },
+    });
+    expect(lines.length).toBeLessThanOrEqual(16);
+    for (const l of lines) expect(l.length).toBeLessThanOrEqual(64);
+  });
+  it('does not crash without visualViewport, canvas, scale manager or with NaN', () => {
+    const t = layoutReport({
+      ...base,
+      vv: null,
+      innerW: NaN,
+      standaloneNav: undefined,
+      canvas: null,
+      scale: null,
+      lastChange: null,
+    }).join('\n');
+    expect(t).toContain('vv none');
+    expect(t).toContain('canvas none');
+    expect(t).toContain('phaser none');
+    expect(t).toContain('last none');
     expect(() => layoutReport(base)).not.toThrow();
   });
 });
@@ -49,6 +101,55 @@ describe('layoutDebugWanted', () => {
     expect(layoutDebugWanted('?layout=1')).toBe(true);
     expect(layoutDebugWanted('')).toBe(false);
     expect(layoutDebugWanted('?layout=0')).toBe(false);
+  });
+});
+
+/** In-memory storage; `fail` makes every call throw (like Safari private mode). */
+function memoryStorage(fail = false) {
+  const data = new Map<string, string>();
+  const guard = (): void => {
+    if (fail) throw new Error('QuotaExceededError');
+  };
+  return {
+    data,
+    getItem: (k: string) => (guard(), data.get(k) ?? null),
+    setItem: (k: string, v: string) => (guard(), void data.set(k, v)),
+    removeItem: (k: string) => (guard(), void data.delete(k)),
+  };
+}
+
+describe('layout flag', () => {
+  it('is off by default and survives a write/read round trip', () => {
+    const s = memoryStorage();
+    expect(readLayoutFlag(s)).toBe(false);
+    expect(writeLayoutFlag(s, true)).toBe(true);
+    expect(s.data.get(LAYOUT_FLAG_KEY)).toBe('1');
+    expect(readLayoutFlag(s)).toBe(true);
+    expect(writeLayoutFlag(s, false)).toBe(true);
+    expect(s.data.has(LAYOUT_FLAG_KEY)).toBe(false);
+    expect(readLayoutFlag(s)).toBe(false);
+  });
+  it('stores only "on", nothing else', () => {
+    const s = memoryStorage();
+    writeLayoutFlag(s, true);
+    expect([...s.data.entries()]).toEqual([[LAYOUT_FLAG_KEY, '1']]);
+  });
+  it('missing or throwing storage means off, without an error', () => {
+    expect(readLayoutFlag(null)).toBe(false);
+    expect(readLayoutFlag(undefined)).toBe(false);
+    expect(writeLayoutFlag(null, true)).toBe(false);
+    const broken = memoryStorage(true);
+    expect(() => readLayoutFlag(broken)).not.toThrow();
+    expect(readLayoutFlag(broken)).toBe(false);
+    expect(writeLayoutFlag(broken, true)).toBe(false);
+  });
+  it('other values do not count as on', () => {
+    const s = memoryStorage();
+    s.data.set(LAYOUT_FLAG_KEY, 'true');
+    expect(readLayoutFlag(s)).toBe(false);
+  });
+  it('without localStorage (node) the accessor returns null', () => {
+    expect(layoutFlagStorage()).toBeNull();
   });
 });
 
