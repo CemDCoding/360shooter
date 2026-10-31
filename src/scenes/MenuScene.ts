@@ -68,6 +68,7 @@ export class MenuScene extends Phaser.Scene {
   private grid: LevelGrid | null = null;
   private pager: LevelPager | null = null;
   private noteText: KText | null = null;
+  private maskShape: Phaser.GameObjects.Graphics | null = null;
   private page = 0;
   private pageTotal = 1;
   private highest = 0;
@@ -143,6 +144,8 @@ export class MenuScene extends Phaser.Scene {
       this.weaponIcon = null;
       this.grid = null;
       this.pager = null;
+      this.maskShape?.destroy();
+      this.maskShape = null;
       this.noteText = null;
       this.input.off('pointerup', this.onPointerUp, this);
       this.input.keyboard?.off('keydown', this.onKeyDown, this);
@@ -186,8 +189,9 @@ export class MenuScene extends Phaser.Scene {
 
   private readonly onKeyDown = (e: KeyboardEvent): void => {
     if (this.dialog || this.panel) return;
-    if (e.code === 'ArrowLeft') this.goToPage(stepPage(this.page, -1, this.pageTotal));
-    else if (e.code === 'ArrowRight') this.goToPage(stepPage(this.page, 1, this.pageTotal));
+    if (e.code !== 'ArrowLeft' && e.code !== 'ArrowRight') return;
+    this.pager?.showFocus();
+    this.goToPage(stepPage(this.page, e.code === 'ArrowLeft' ? -1 : 1, this.pageTotal));
   };
 
   /** Shows the hint line for the current page (locked page note, welcome or tap hint). */
@@ -219,10 +223,12 @@ export class MenuScene extends Phaser.Scene {
       return;
     }
     this.sliding = true;
+    // panel plus its 4 px shadow and 2 px outline: 6 px margin
     const shape = this.make.graphics({}, false);
+    this.maskShape = shape;
     shape
       .fillStyle(THEME.colors['menu.text'].num)
-      .fillRect(baseX - 4, GRID.y - 4, GRID_WIDTH + 8, GRID_HEIGHT + 8);
+      .fillRect(baseX - 6, GRID.y - 6, GRID_WIDTH + 12, GRID_HEIGHT + 12);
     const mask = shape.createGeometryMask();
     old.setMask(mask);
     fresh.setMask(mask);
@@ -240,6 +246,7 @@ export class MenuScene extends Phaser.Scene {
           fresh.clearMask();
           mask.destroy();
           shape.destroy();
+          this.maskShape = null;
           this.sliding = false;
         }
       });
