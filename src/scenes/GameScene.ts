@@ -342,6 +342,8 @@ export class GameScene extends Phaser.Scene {
       this.emitPowers();
     };
     this.player.callbacks.onStatsChange = () => this.emitPowers();
+    this.player.callbacks.onStatusChange = (effects) =>
+      emitGameEvent(this.events, GameEvents.PlayerStatus, { effects });
   }
 
   private addColliders(): void {
@@ -392,6 +394,7 @@ export class GameScene extends Phaser.Scene {
       if (!bolt || !bolt.active || this.ended) return;
       bolt.despawn();
       this.player.takeDamage(bolt.damage);
+      this.player.applyStatus(bolt.onHit);
     });
   }
 
@@ -464,14 +467,20 @@ export class GameScene extends Phaser.Scene {
   private applyAreaDamage(dt: number): void {
     if (this.player.isDead) return;
     let damage = 0;
+    const statuses: StatusOnHit[] = [];
     this.physics.overlap(this.player, this.enemyPool.enemies, (a, b) => {
       const enemy = pick(a, b, Enemy);
-      if (enemy?.active) damage += enemy.contactDamageFor(dt) * this.enemyScales.get(enemy).contact;
+      if (!enemy?.active) return;
+      const dealt = enemy.contactDamageFor(dt) * this.enemyScales.get(enemy).contact;
+      damage += dealt;
+      // Contact status (snake poison): applied while the enemy touches the player.
+      if (dealt > 0 && enemy.onHit) statuses.push(enemy.onHit);
     });
     for (const e of this.enemyPool.enemies) {
       if (e.active) damage += e.auraDamageAt(this.player.x, this.player.y, dt);
     }
     if (damage > 0) this.player.takeDamage(damage);
+    for (const s of statuses) this.player.applyStatus(s);
   }
 
   /**
@@ -650,10 +659,10 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  /** A boss hazard hit the player. AP-102 applies `onHit` (poison, slow) here. */
+  /** A boss hazard hit the player: damage first (shield first), then the status effect (poison, slow). */
   private hitPlayerByBoss(damage: number, onHit: StatusOnHit | undefined): void {
-    void onHit;
     this.player.takeDamage(damage);
+    this.player.applyStatus(onHit);
   }
 
   private despawnBoss(): void {
@@ -799,6 +808,8 @@ export class GameScene extends Phaser.Scene {
     if (this.ended) return;
     this.ended = true;
     this.physics.pause();
+    // Status effects end with the round (win, timeout or death); the HUD is told before it stops.
+    this.player.clearStatus();
     this.armour = resetArmour();
     this.armourDef = null;
     this.armourRing?.hide();
@@ -872,6 +883,7 @@ export class GameScene extends Phaser.Scene {
     this.player.callbacks.onShieldChange = undefined;
     this.player.callbacks.onShoot = undefined;
     this.player.callbacks.onHurt = undefined;
+    this.player.callbacks.onStatusChange = undefined;
     for (const item of this.items) item.onCollected = undefined;
     for (const pickup of this.armourPickups) pickup.onCollected = undefined;
     this.items = [];

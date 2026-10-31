@@ -1,5 +1,12 @@
 import Phaser from 'phaser';
-import type { ActivePowers, ItemDef, WeaponStats } from '../contracts';
+import type {
+  ActivePlayerStatus,
+  ActivePowers,
+  ItemDef,
+  StatusOnHit,
+  WeaponStats,
+} from '../contracts';
+import { PlayerStatusState } from '../logic/status';
 import { WEAPON_BASE } from '../config';
 import { animKey } from '../config/assets';
 import { applyDamage, applyHeal, isDead } from '../logic/health';
@@ -41,6 +48,8 @@ export interface PlayerCallbacks {
   onShoot?: () => void;
   onHurt?: () => void;
   onDeath?: () => void;
+  /** Active status effects changed (start, end or shown seconds). */
+  onStatusChange?: (effects: ActivePlayerStatus[]) => void;
 }
 
 /** Player in the screen center: delayed turning, auto-fire. No scene imports. */
@@ -60,6 +69,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private readonly shieldRing: Phaser.GameObjects.Arc;
   private weapon: Phaser.GameObjects.Sprite | null;
   private dead = false;
+  private readonly status = new PlayerStatusState();
+  private lastStatusKey = '';
+
+  /** Ends all status effects (round end, death). */
+  clearStatus(): void {
+    this.status.clear();
+    this.emitStatus(false);
+  }
 
   constructor(
     scene: Phaser.Scene,
@@ -125,10 +142,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   update(dt: number, targetAngle: number): void {
     if (this.dead) return;
     this.updatePowers(dt);
+    this.updateStatus(dt);
+    if (this.dead) return;
     this.facingDeg = stepRotation(
       this.facingDeg,
       Phaser.Math.RadToDeg(targetAngle),
-      this.config.turnSpeedDegPerSec,
+      this.config.turnSpeedDegPerSec * this.status.turnFactor(),
       dt,
     );
     const rad = Phaser.Math.DegToRad(this.facingDeg);
@@ -191,7 +210,36 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  takeDamage(amount: number): void {
+  /** Applies the status effects of a hit (poison, slow). No effect once dead. */
+  applyStatus(effects: StatusOnHit | undefined): void {
+    if (this.dead || !effects) return;
+    this.status.apply(effects);
+    this.emitStatus(true);
+  }
+
+  /** Active effects with remaining time (copy). */
+  get activeStatus(): ActivePlayerStatus[] {
+    return this.status.active();
+  }
+
+  /** Pause-safe: runs only from update(dt). Poison goes through the shield like any damage. */
+  private updateStatus(dt: number): void {
+    const poison = this.status.tick(dt);
+    if (poison > 0) this.takeDamage(poison, true);
+    this.emitStatus(false);
+  }
+
+  /** player-status only when an effect starts or ends or the shown seconds change. */
+  private emitStatus(force: boolean): void {
+    const list = this.status.active();
+    const key = list.map((e) => `${e.kind}:${Math.ceil(e.remainingMs / 1000)}`).join('|');
+    if (!force && key === this.lastStatusKey) return;
+    this.lastStatusKey = key;
+    this.callbacks.onStatusChange?.(list);
+  }
+
+  /** `overTime`: damage over time (poison), no hit flash and no hurt sound each frame. */
+  takeDamage(amount: number, overTime = false): void {
     if (this.dead) return;
     const absorbed = absorbDamage(this.powers, amount);
     const shieldChanged = absorbed.state.shieldLeft !== this.powers.shieldLeft;
@@ -200,15 +248,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.shieldRing.setVisible(this.powers.shieldLeft > 0);
       this.callbacks.onShieldChange?.(this.powers.shieldLeft);
     }
-    this.setTintFill(HIT_TINT);
-    this.weapon?.setTintFill(HIT_TINT);
-    this.hitTintLeft = HIT_TINT_MS;
-    this.callbacks.onHurt?.();
+    if (!overTime) {
+      this.setTintFill(HIT_TINT);
+      this.weapon?.setTintFill(HIT_TINT);
+      this.hitTintLeft = HIT_TINT_MS;
+      this.callbacks.onHurt?.();
+    }
     if (absorbed.remainingDamage <= 0) return;
     this.hp = applyDamage(this.hp, absorbed.remainingDamage);
     this.callbacks.onHpChange?.(this.hp, this.config.maxHp);
     if (isDead(this.hp)) {
       this.dead = true;
+      this.status.clear();
+      this.emitStatus(false);
       this.shieldRing.setVisible(false);
       this.weapon?.setVisible(false);
       this.callbacks.onDeath?.();

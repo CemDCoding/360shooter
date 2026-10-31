@@ -39,6 +39,7 @@ import {
 } from './hud/hudMath';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
+import { StatusIndicator } from './hud/StatusIndicator';
 import { BATCH_LABELS } from './menu/levelGroups';
 
 export { formatTime };
@@ -63,6 +64,7 @@ export class HudScene extends Phaser.Scene {
   private coinCounter!: CoinCounter;
   private powers!: PowerIndicators;
   private armour!: ArmourIndicator;
+  private status!: StatusIndicator;
   private slots?: PowerSlots;
   private chipRow: FunkChip[] = [];
   private rowY = 0;
@@ -174,6 +176,7 @@ export class HudScene extends Phaser.Scene {
     this.gameEvents.on(GameEvents.PowersChanged, this.onPowers, this);
     this.gameEvents.on(GameEvents.ArmourChanged, this.onArmour, this);
     this.gameEvents.on(GameEvents.PowerStoreChanged, this.onPowerStore, this);
+    this.gameEvents.on(GameEvents.PlayerStatus, this.onPlayerStatus, this);
     this.gameEvents.on(GameEvents.BossWarning, this.onBossWarning, this);
     this.gameEvents.on(GameEvents.BossSpawned, this.onBossSpawned, this);
     this.gameEvents.on(GameEvents.BossHpChanged, this.onBossHp, this);
@@ -483,7 +486,13 @@ export class HudScene extends Phaser.Scene {
     this.coinCounter = new CoinCounter(this, k, relayout);
     this.powers = new PowerIndicators(this, k, relayout);
     this.armour = new ArmourIndicator(this, k, relayout);
-    this.chipRow = [this.coinCounter.chip, ...this.powers.chips, this.armour.chip];
+    this.status = new StatusIndicator(this, k, relayout);
+    this.chipRow = [
+      this.coinCounter.chip,
+      ...this.powers.chips,
+      this.armour.chip,
+      ...this.status.chips,
+    ];
     this.relayoutChips(m);
   }
 
@@ -580,6 +589,10 @@ export class HudScene extends Phaser.Scene {
   private onArmour(p: GameEventPayloads['armour-changed']): void {
     this.armour.set(p);
     this.slots?.setArmour(p);
+  }
+
+  private onPlayerStatus(p: GameEventPayloads['player-status']): void {
+    this.status.set(p.effects);
   }
 
   private onPowerStore(p: GameEventPayloads['power-store-changed']): void {
@@ -690,6 +703,7 @@ export class HudScene extends Phaser.Scene {
       this.gameEvents.off(GameEvents.PowersChanged, this.onPowers, this);
       this.gameEvents.off(GameEvents.ArmourChanged, this.onArmour, this);
       this.gameEvents.off(GameEvents.PowerStoreChanged, this.onPowerStore, this);
+      this.gameEvents.off(GameEvents.PlayerStatus, this.onPlayerStatus, this);
       this.gameEvents.off(GameEvents.BossWarning, this.onBossWarning, this);
       this.gameEvents.off(GameEvents.BossSpawned, this.onBossSpawned, this);
       this.gameEvents.off(GameEvents.BossHpChanged, this.onBossHp, this);
