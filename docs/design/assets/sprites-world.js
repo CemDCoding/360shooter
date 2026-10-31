@@ -55,6 +55,8 @@
   }
   const mirror = (rows) => rows.map((r) => [...r].reverse().join(''));
   const frames = (n, fn) => Array.from({ length: n }, (_, f) => fn(f));
+  // shared with sprites-desert.js (no sprite key, so sprites:build ignores it)
+  root.PX_TOOLKIT = { grid, mirror, frames };
 
   // ---------- shared palettes ----------
   const NIGHT_BLACK = '#070a14'; // enemy outline

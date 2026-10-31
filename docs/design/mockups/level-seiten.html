@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Level-Auswahl mit Seiten · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .k-panel.col { display: flex; flex-direction: column; }
+  .legend { margin-top: auto; display: flex; gap: 14px; align-items: center; }
+  .legend .row { gap: 4px; }
+  .group { margin-bottom: 10px; }
+  .group-head { height: 14px; margin-bottom: 13px; display: flex; gap: 6px; align-items: center; }
+  /* Pager (new): row below the level panel, same row as the reset button */
+  .pager { position: absolute; left: 216px; top: 316px; width: 408px; height: 32px; display: flex; gap: 8px; align-items: center; }
+  .pager .k-btn.icon { height: 32px; }
+  .side { flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; gap: 6px; position: relative; }
+  .side.on { background: var(--color-menu-surface); box-shadow: inset 2px 2px 0 var(--color-menu-surface-hi), inset -2px -2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline), 4px 4px 0 2px var(--color-menu-outline); }
+  .side.off { background: var(--color-menu-surface-sunken); box-shadow: inset 2px 2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline); }
+  .side .reel { width: 8px; height: 8px; border-radius: 0; background: var(--color-menu-outline); box-shadow: inset 0 0 0 2px var(--color-menu-text-muted); }
+  .side.on .reel { background: var(--color-menu-action-bg); box-shadow: 0 0 0 1px var(--color-menu-outline); }
+  .side.on::after { content: ""; position: absolute; left: 50%; top: -14px; margin-left: -5px; border: 5px solid transparent; border-bottom: 6px solid var(--color-menu-focus); }
+  .side.is-focus, .k-btn.is-focus { outline: 2px solid var(--color-menu-focus); outline-offset: 4px; }
+  .side.is-hover { filter: brightness(1.12); }
+  .strip { position: absolute; left: 24px; display: flex; gap: 22px; align-items: center; }
+  .cap { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Level-Auswahl mit Seiten · Kassette „Seite A / Seite B“</h1>
+  <p>LevelGrid mit Seiten zu je drei Maps. Seite A: Wald, Wald bei Nacht, Elfenwald (0–20). Seite B: Wüste, Pyramiden, Pyramiden-Oase (21–40). Blättern über Pfeile, die Seiten-Tasten oder Wischen auf dem Panel. Der Hinweis wandert in die Kopfzeile. Positionen in logischen Pixeln (640×360).</p>
+</header>
+
+<section><h2>1 · SEITE A (Spielerlevel 7, Level 7 aktuell, Start auf der Seite des aktuellen Levels)</h2><div class="stage-wrap"><div class="stage" id="s1" data-component="MenuScene" data-font="kapsel"></div></div></section>
+<section><h2>2 · SEITE B (Level 0–26 geschafft, Level 27 aktuell)</h2><div class="stage-wrap"><div class="stage" id="s2" data-component="MenuScene" data-font="kapsel"></div></div></section>
+<section><h2>3 · SEITE B NOCH GESPERRT (Spielerlevel 7 blättert vor; Pfeil rechts deaktiviert, Fokus auf „B“)</h2><div class="stage-wrap"><div class="stage" id="s3" data-component="MenuScene" data-font="kapsel"></div></div></section>
+<section><h2>4 · ZUSTÄNDE DER BLÄTTER-LEISTE</h2><div class="stage-wrap"><div class="stage" id="s4" data-component="LevelPager" data-font="kapsel"></div></div></section>
+
+<script>
+  const P = (t, s, c, extra) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"${extra || ''}></span>`;
+  const lockSpr = '<span class="spr" data-n="lock" data-s="2" style="--px-o:var(--color-menu-locked-fg);--px-k:var(--color-menu-locked-bg)"></span>';
+  const PAGES = [
+    [['WALD', 0, 4, 'forest'], ['WALD BEI NACHT', 5, 9, 'night'], ['ELFENWALD', 10, 20, 'elf']],
+    [['WÜSTE', 21, 25, 'desert'], ['PYRAMIDEN', 26, 30, 'pyramid'], ['PYRAMIDEN-OASE', 31, 40, 'oasis']],
+  ];
+  function tile(i, st) {
+    if (i < st.current) return `<div class="k-tile done" aria-label="Level ${i} geschafft">${P(i, 2, '--color-menu-done-fg')}<span class="badge spr" data-n="star"></span></div>`;
+    if (i === st.current) return `<div class="k-tile current" aria-current="true" aria-label="Level ${i}, aktuell">${P(i, 2, '--color-menu-action-fg')}</div>`;
+    return `<div class="k-tile locked" aria-label="Level ${i} gesperrt">${lockSpr}</div>`;
+  }
+  function group([name, from, to, biome], st) {
+    let tiles = '';
+    for (let i = from; i <= to; i++) tiles += tile(i, st);
+    return `<div class="group"><div class="group-head"><span class="k-sticker"><i class="k-swatch" style="background:var(--color-biome-${biome})"></i>${P(name, 0, '--color-menu-sticker-fg')}</span>${P(from + '–' + to, 0, '--color-menu-text-muted')}</div><div class="tiles">${tiles}</div></div>`;
+  }
+  const arrow = (dir, cls) => `<div class="k-btn icon ${cls || ''}" role="button" aria-label="${dir === '<' ? 'Vorherige Seite' : 'Nächste Seite'}"${(cls || '').includes('is-disabled') ? ' aria-disabled="true"' : ''}>${P(dir, 2, (cls || '').includes('is-disabled') ? '--color-menu-text-disabled' : '--color-menu-text')}</div>`;
+  const side = (letter, range, on, cls) => `<div class="side ${on ? 'on' : 'off'} ${cls || ''}" role="tab" aria-selected="${on}" aria-label="Seite ${letter}, Level ${range}"><i class="reel"></i>${P('SEITE ' + letter, 2, on ? '--color-menu-text' : '--color-menu-text-muted')}${P(range, 0, '--color-menu-text-muted')}<i class="reel"></i></div>`;
+  function pager(page, opt = {}) {
+    return `<div class="pager" role="tablist" data-component="LevelPager">
+      ${arrow('<', page === 0 ? 'is-disabled' : '')}
+      ${side('A', '0–20', page === 0, opt.focusA)}${side('B', '21–40', page === 1, opt.focusB)}
+      ${arrow('>', page === 1 ? 'is-disabled' : '')}
+    </div>`;
+  }
+  function menu(id, st) {
+    const el = document.getElementById(id);
+    el.innerHTML = `
+      <div class="k-scene"></div><div class="k-stars"></div><div class="k-planet"></div>
+      <span class="abs row" style="left:16px;top:14px;gap:6px">${P('360', 3, '--color-menu-action-bg', ' data-sh="--color-menu-outline"')}${P('SHOOTER', 3, '--color-menu-text', ' data-sh="--color-menu-outline"')}</span>
+      <span class="abs" style="right:56px;top:22px">${P(st.hint, 0, st.hintColor || '--color-menu-text-muted')}</span>
+      <div class="abs k-btn icon" style="left:592px;top:10px" data-component="MuteButton" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text);--px-k:var(--color-menu-surface)"></span></div>
+      <div class="abs m-profile k-panel col" data-component="PlayerCard">
+        <div class="row" style="gap:10px">
+          <div class="portrait k-sunken"><span class="spr" data-n="astronaut" data-s="3" aria-label="Astronautin"></span></div>
+          <div>${P('SPIELERLEVEL', 0, '--color-menu-text-muted')}<div style="margin-top:8px">${P(st.level, 4, '--color-menu-text', ' data-sh="--color-menu-outline"')}</div></div>
+        </div>
+        <div class="k-bar" style="margin-top:10px" role="img" aria-label="Erfahrung"><i style="width:${st.xpPct}%"></i></div>
+        <div class="row" style="justify-content:space-between;margin-top:6px">${P('XP', 0, '--color-menu-text-muted')}${P(st.xpText, 0, '--color-menu-text-muted')}</div>
+        <hr class="k-rule" style="margin:10px 0 8px">
+        <div class="row" style="gap:6px"><span class="spr" data-n="coin" data-s="2"></span>${P(st.gold, 2, '--color-menu-gold', ' data-sh="--color-menu-outline"')}${P('GOLD', 0, '--color-menu-text-muted')}</div>
+        <div class="row" style="justify-content:space-between;margin-top:10px"><span class="row" style="gap:5px"><span class="spr" data-n="raygun${st.tier}"></span>${P('WAFFE', 0, '--color-menu-text-muted')}</span>${P(st.weapon + ' / 20', 0, '--color-menu-text')}</div>
+        <div class="row" style="justify-content:space-between;margin-top:6px">${P('ANZUG', 0, '--color-menu-text-muted')}${P(st.suit + ' / 20', 0, '--color-menu-text')}</div>
+        <div class="k-btn primary" style="margin-top:auto" role="button">${P('UPGRADES', 2, '--color-menu-action-fg')}</div>
+      </div>
+      <div class="abs m-levels k-panel col" style="padding-top:14px" data-component="LevelGrid" role="tabpanel" aria-label="Seite ${st.page ? 'B' : 'A'}">
+        ${PAGES[st.page].map((gr) => group(gr, st)).join('')}
+        <div class="legend">
+          <span class="row"><span class="spr" data-n="star"></span>${P('GESCHAFFT', 0, '--color-menu-text-muted')}</span>
+          <span class="row"><i class="k-swatch" style="background:var(--color-menu-action-bg);outline-color:var(--color-menu-focus)"></i>${P('AKTUELL', 0, '--color-menu-text-muted')}</span>
+          <span class="row"><span class="spr" data-n="lock" style="--px-o:var(--color-menu-text-muted);--px-k:var(--color-menu-locked-bg)"></span>${P('GESPERRT', 0, '--color-menu-text-muted')}</span>
+        </div>
+      </div>
+      <div class="abs m-reset k-btn danger" style="position:absolute" role="button">${P('FORTSCHRITT ZURÜCKSETZEN', 0, '--color-menu-danger-fg')}</div>
+      ${pager(st.page, st.pagerOpt)}`;
+    return el;
+  }
+  const early = { level: 7, xpPct: 71, xpText: '640 / 900', gold: 86, weapon: 5, suit: 17, tier: 1, current: 7 };
+  menu('s1', { ...early, page: 0, hint: 'TIPPE AUF EIN FREIES LEVEL.' });
+  menu('s2', { level: 31, xpPct: 40, xpText: '2400 / 6000', gold: 412, weapon: 16, suit: 19, tier: 3, current: 27, page: 1, hint: 'TIPPE AUF EIN FREIES LEVEL.' });
+  menu('s3', { ...early, page: 1, hint: 'SEITE B ÖFFNET SICH AB LEVEL 21.', pagerOpt: { focusB: 'is-focus' } });
+
+  document.getElementById('s4').innerHTML = `
+    <div class="k-scene"></div>
+    <div class="strip" style="top:24px">
+      <div class="cap">${P('PFEIL NORMAL', 0, '--color-menu-text-muted')}${arrow('>')}</div>
+      <div class="cap">${P('HOVER', 0, '--color-menu-text-muted')}${arrow('>', 'is-hover')}</div>
+      <div class="cap">${P('FOKUS', 0, '--color-menu-text-muted')}${arrow('>', 'is-focus')}</div>
+      <div class="cap">${P('GEDRÜCKT', 0, '--color-menu-text-muted')}${arrow('>', 'is-active')}</div>
+      <div class="cap">${P('RANDSEITE (AUS)', 0, '--color-menu-text-muted')}${arrow('>', 'is-disabled')}</div>
+    </div>
+    <div class="strip" style="top:104px;width:592px">
+      <div class="cap" style="width:180px">${P('SEITE AKTIV', 0, '--color-menu-text-muted')}<div style="display:flex;width:170px">${side('A', '0–20', true)}</div></div>
+      <div class="cap" style="width:180px">${P('SEITE INAKTIV', 0, '--color-menu-text-muted')}<div style="display:flex;width:170px">${side('B', '21–40', false)}</div></div>
+      <div class="cap" style="width:180px">${P('INAKTIV + HOVER/FOKUS', 0, '--color-menu-text-muted')}<div style="display:flex;width:170px">${side('B', '21–40', false, 'is-hover is-focus')}</div></div>
+    </div>
+    <div class="abs" style="left:24px;top:184px;width:592px">${P('BLÄTTERN: SEITE GLEITET IN 4 STUFEN (200 MS) SEITLICH.', 0, '--color-menu-text-muted')}</div>
+    <div class="abs" style="left:24px;top:200px;width:592px">${P('OHNE BEWEGUNG (REDUCED MOTION): SOFORTIGER WECHSEL.', 0, '--color-menu-text-muted')}</div>
+    <div class="abs" style="left:24px;top:216px;width:592px">${P('WISCHEN AUF DEM PANEL: AB 48 PX WAAGRECHT: BLÄTTERN.', 0, '--color-menu-text-muted')}</div>`;
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>

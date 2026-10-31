@@ -1,7 +1,8 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
+**Status:** geändert am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“ wartet auf Freigabe durch den Nutzer). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist entworfen (siehe „Änderungen“). Es fehlt nur die Freigabe des Nutzers. Danach folgt der Planner-Auftrag „Design übernehmen“.
+**Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
 ## Ausgangslage
 
@@ -304,5 +305,106 @@ Ein Chip mit lädendem Feuerring (`ArmourIndicator`) zeigt wie ein leeres Fach e
 | `public/assets/LICENSES.md`, `docs/guides/grafik-austauschen.md`, Tests zu Manifest und Münzen | neue Zeile `coin-field`, Größe `coin-big` |
 
 Keine neuen Tokens, Schriften oder Abhängigkeiten. AP-92 mit Design-Review: Vergleich mit `screenshots/sprites-welt-desktop.png`, im Handtest die Münzen im Gedränge prüfen (beide Größen unterscheidbar).
+
+### 2026-10-31 · Ergänzung „Wüste und Level-Seiten“ (wartet auf Freigabe)
+
+**Auftrag (Nutzer, 2026-10-31, an Planner und Designer):**
+
+- Die Level-Auswahl wird blätterbar, mit 3 Maps pro Seite.
+- Drei neue Maps: Wüste 21–25, Pyramiden 26–30, Pyramiden-Oase 31–40.
+- Drei neue Bosse: Riesen-Sandwurm, Antiker Wächter-Hund, Pharao.
+- Sieben neue Wüstengegner: Mumie, Sandwurm, Armadillo, Kamel, Schlange, Archäologe, Sphinx.
+- Drei neue Waldgegner: Wildschwein, Bär, Fee.
+
+**Annahmen (angenommen):**
+
+- Der Auftrag nennt als dritten neuen Boss einmal „Archäologe“, beschreibt aber den **Pharao** und setzt ihn als Boss der Pyramiden-Oase. Gestaltet ist der Pharao als Boss, der Archäologe als normaler Gegner (er steht doppelt in der Gegnerliste).
+- Das „Horn“ des Wildschweins ist als nach oben gebogener Hauer gezeichnet.
+- Der Riesen-Sandwurm („lang“) besteht aus einem Kopf und einer Kette von Körpergliedern, die das Spiel aneinanderhängt.
+
+**Level-Auswahl mit Seiten** (`mockups/level-seiten.html`, Ansichten 1–4, Screenshots `screenshots/level-seiten-desktop.png` und `-mobile.png`):
+
+- **Leitidee:** Die Seiten sind die **Seiten einer Kassette**. „SEITE A“ zeigt die Wälder 0–20, „SEITE B“ die Wüste 21–40. Weitere Seiten heißen C, D usw. Das passt zur Kassetten-Richtung des Menüs.
+- **Panel:** Das Level-Panel bleibt unverändert (408×252, drei Gruppen mit Aufkleber, Bereich und Legende). Pyramiden-Oase hat 10 Kacheln, das passt wie die 11 des Elfenwalds.
+- **Blätter-Leiste `LevelPager`** (neu): Sie liegt unter dem Panel in derselben Zeile wie „FORTSCHRITT ZURÜCKSETZEN“, bei x 216–624, y 316, Höhe 32. Von links nach rechts:
+  - Pfeil-Knopf „<“, Icon-Button 32×32
+  - zwei Seiten-Tasten mit je Kapsel 2× „SEITE A“, Kapsel 1× Bereich „0–20“ und zwei kleinen „Spulen“ (8×8)
+  - Pfeil-Knopf „>“
+  - Abstand zwischen allen Teilen: 8
+- **Zustände der Seiten-Taste:**
+  - **aktiv:** erhabene Fläche wie `k-btn` (`menu.surface`, Fase, 4-px-Schatten), Text `menu.text`, Spulen gefüllt in `menu.action-bg` und ein kleines Dreieck in `menu.focus`, das nach oben auf das Panel zeigt. So ist die aktive Seite nicht nur an der Farbe erkennbar (Grundsatz 4).
+  - **inaktiv:** versenkt (`k-sunken`), Text `menu.text-muted`, Spulen hohl.
+  - hover, Fokus und gedrückt wie `k-btn`.
+- **Zustände der Pfeil-Knöpfe:** Auf der ersten bzw. letzten Seite ist der Pfeil deaktiviert (`is-disabled`, Glyphe `menu.text-disabled`).
+- **Hinweiszeile:** Sie wandert von unten rechts in die Kopfzeile, rechtsbündig bis x 584, y 22, links neben dem Ton-Knopf.
+- **Gesperrte Seite:** Seite B lässt sich auch ohne Freischaltung anschauen, alle Kacheln zeigen dann das Schloss. Der Hinweis lautet in diesem Fall „SEITE B ÖFFNET SICH AB LEVEL 21.“ Gibt es mehr als 9 Seiten, kommt statt der Tasten eine Anzeige „SEITE x / n“.
+- **Startseite:** Das Menü öffnet die Seite mit dem aktuellen Level (`highestUnlockedLevel`).
+- **Blättern:**
+  - Auslöser: Pfeil, Seiten-Taste oder Wischen auf dem Panel (ab 48 px waagrecht).
+  - Bewegung: Die Seite gleitet in 4 Stufen über 200 ms (`motion.duration.base`, Pixel-Easing) zur Seite. Mit `prefers-reduced-motion` wechselt sie sofort.
+  - Tastatur, falls vorhanden: ←/→.
+- **Aufkleber-Farbfelder:** neu `biome.desert` (Sandgold), `biome.pyramid` (Terrakotta), `biome.oasis` (Türkis). Sie sind Dekor neben dem Namen, deshalb gibt es wie bei den Wäldern kein Kontrastpaar dafür.
+- **Nebenbefund:** In den Mockups überschreibt `.k-btn { position: relative }` die Klasse `.abs`. Deshalb stand „FORTSCHRITT ZURÜCKSETZEN“ in `hauptmenue.html` versetzt. In `level-seiten.html` ist das behoben. Das Spiel betrifft das nicht.
+
+**Maps** (`assets/sprites-desert.js`, Vorschau `mockups/sprites-wueste.html`, Screenshot `screenshots/sprites-wueste-desktop.png`). Die Maps werden von Wald zu Oase immer geheimnisvoller und bleiben dunkel genug für Laser und HUD:
+
+| Map | Stimmung | Boden-Token | Kachel-Deko (Frames 1–3) | Partikel | Vorschlag Deko / Vignette |
+|---|---|---|---|---|---|
+| Wüste 21–25 | Dünen in der Dämmerung, warmes Sandbraun | `biome.desert-ground` `#755428` (hi/lo `#84603a`/`#664824`) | Dünenrippen, Kaktus mit Blüte, Knochen | Sandkörner `game.sand`, als waagrechte 3×1-Striche, die seitlich treiben | 14 % / 0,40 |
+| Pyramiden 26–30 | Tempelhof bei Nacht, Terrakotta, Feuerschalen | `biome.pyramid-ground` `#5e3424` (hi/lo `#6c3e2c`/`#4e2a1c`) | Frame 0 mit Plattenfugen, zerbrochener Block, Hieroglyphen-Tafel, Feuerschale | aufsteigende Glut `game.ember` | 18 % / 0,55 |
+| Pyramiden-Oase 31–40 | tiefgrünes Wasserparadies mit Gold | `biome.oasis-ground` `#1c4a3c` (hi/lo `#245a48`/`#123a2e`) | Teich mit Lotus, Palme mit Datteln, Papyrus | Glühfalter `game.oasis-mote` | 20 % / 0,45 |
+
+Kontrast: Laser 3,2 / 4,9 / 4,7:1, HUD-Text 5,9 / 9,1 / 8,6:1, Aura 4,2 / 6,5 / 6,2:1 (Wüste / Pyramiden / Oase). `contrast.js --tokens` ist grün.
+
+**Gegner** (alle Umriss Nachtschwarz, schauen nach rechts, 4 Frames bei 4 fps):
+
+| Schlüssel | Größe | Gestaltung (Nutzer-Merkmale) | Map |
+|---|---|---|---|
+| `enemy-mummy` | 32×32 | eingewickelt mit schrägen Binden, ein rotes Auge, Arme nach vorn, loses Bandende; schlurft | Pyramiden, Oase |
+| `mummy-wrap` | 16×8 ×2 | geworfener Wickel (Geschoss) | – |
+| `enemy-sand-worm` | 24×24 | lustig: Glupschaugen, grinst, wackelt aus einem Sandhügel, Sandkrümel | Wüste, Pyramiden |
+| `enemy-armadillo` | 32×32 | süß, eingerollt: Panzerbänder wandern (dreht sich), Gesicht und Öhrchen schauen heraus | Wüste |
+| `enemy-camel` | 32×32 | goofy: zwei Höcker, Hängelippe, Schlafzimmerblick, bunte Satteldecke; Frame 3 mit vollen Backen vor dem Spucken | Wüste |
+| `camel-spit` | 8×8 ×2 | grüner Spuckeklecks (Geschoss) | – |
+| `enemy-snake` | 24×24 | Hornviper im Wüstenstil, Rautenmuster, giftgrünes Auge, Gifttropfen, Zunge | Wüste, Oase |
+| `enemy-archaeologist` | 32×32 | Mensch mit Tropenhelm, Brille, Schnurrbart, riesige Lupe als Waffe | Pyramiden, Oase |
+| `enemy-sphinx` | **48×48** | mächtig, groß, aus Sand: Löwenkörper, gestreiftes Nemes-Tuch, glühende Türkis-Augen, Risse, Sand rieselt beim Gehen | Pyramiden, Oase |
+| `enemy-boar` | 32×32 | wild: Borstenmähne, Hauer, rotes Auge, böse Braue | Wald, Wald bei Nacht |
+| `enemy-bear` | 32×32 | süßer brauner Bär mit Honigtopf, Honig tropft | Wald, Wald bei Nacht |
+| `enemy-fairy` | 24×24 | sehr süß, mystisch: rosa Haar, Flügel schlagen, Sternstab, Funken | Wald bei Nacht, Elfenwald |
+
+**Bosse:**
+
+| Schlüssel | Größe | Gestaltung |
+|---|---|---|
+| `boss-sand-worm` | 64×64 ×4 | Riesen-Sandwurm-Kopf: Stachelkrone, piksige Haut, runder Schlund mit Zahnring (öffnet und schließt sich), drei Bernstein-Augen, Sandhügel |
+| `boss-sand-worm-body` | 32×32 ×3 | Frames 0–1 Glied mit Stacheln (Stacheln wippen), Frame 2 Schwanzspitze. Das Spiel hängt die Glieder in Abständen von etwa 22 px an den Kopf, jedes folgt dem vorigen. |
+| `boss-guardian-dog` | 64×64 ×4 | antiker Wächter-Hund (Schakal): Obsidian mit Goldkragen, Goldohren und Fußreifen, Risse, glühendes Ankh auf der Flanke, pulsierende Augen. Sein Schutzzauber („Tank-Magie“) ist ein Kreis: Fläche `game.ward` mit `opacity.aura` plus ein **gepunkteter** 1-px-Ring. Der Ring ist auch über die Form erkennbar. |
+| `boss-pharaoh` | 64×64 ×4 | Pharao: schwebt, Goldmaske mit Türkis-Augen, Nemes in Gold und Lapis, Uräus, Usech-Kragen, Krummstab und Geißel, der Saum löst sich in Goldfunken auf |
+| `boss-pharaoh-orb` | 8×8 ×2 | goldene Skarabäus-Kugel (Geschoss) |
+
+Die Angriffe der Bosse sind Sache von Planner und Balancing. Braucht ein Angriff ein eigenes Sprite, das hier fehlt, ist das eine Design-Lücke für den Designer.
+
+**Neue Tokens:** `color.biome.desert`, `pyramid`, `oasis`, `*-ground`, `*-ground-hi/lo`, `color.game.sand`, `ember`, `oasis-mote`, `ward`. Dazu 10 neue `$pairs`. Die Exporte (css, ts, json) sind neu gebaut.
+
+**Übergabe an den Planner:**
+
+| Datei | Änderung |
+|---|---|
+| Theme-Sync (`npm run theme:build`) | neue Tokens nach `src/config/theme.ts` |
+| `scripts/build-sprites.mjs` | lädt nach `sprites-world.js` zusätzlich `docs/design/assets/sprites-desert.js` im selben vm-Kontext. `PX_TOOLKIT` ist kein Sprite-Schlüssel und wird ignoriert. |
+| `src/config/assets.ts`, `public/assets/LICENSES.md`, `docs/guides/grafik-austauschen.md` | 22 neue Sprites mit Größen und Frames laut den Tabellen oben, dazu `tiles-desert`, `tiles-pyramids`, `tiles-oasis` (32×32×4). Lizenz: eigene Arbeit. |
+| `src/config/maps.ts` | drei Maps mit Boden-Token, Kacheln, Partikel-Token, Deko und Vignette laut Tabelle; ohne `tint` |
+| `src/scenes/menu/LevelGrid.ts`, `levelGroups.ts`, `menuLogic.ts`, `MenuScene.ts` | Seiten zu je 3 Batches; `BIOME_COLOR` erweitern; neue Komponente `LevelPager` (z. B. `src/scenes/menu/LevelPager.ts`); Hinweis in die Kopfzeile; Startseite = Seite des aktuellen Levels; Wischen; reine Seitenlogik testbar in `menuLogic.ts` |
+| `src/entities/enemies/**`, `src/config/enemies.ts`, `bosses.ts`, `levels.ts` | Verhalten und Werte legt der Planner fest. Design-Bezug: Wächter-Hund-Zauber als Kreis aus `game.ward` mit gepunktetem Ring, Sandwurm aus Kopf und Gliederkette, Sphinx mit 48er-Körper |
+| `docs/gegner-und-maps.md` | erweitert der Planner um die neuen Maps, Gegner und Bosse (Auftrag des Nutzers). Der Designer darf diese Datei nicht ändern. |
+
+**Paketierung (Vorschlag):**
+
+1. Sprites und Maps (Build-Skript, Assets, `maps.ts`), ohne Design-Review, mit Handtest gegen `screenshots/sprites-wueste-desktop.png`.
+2. Level-Seiten (`LevelGrid`, `LevelPager`, `MenuScene`) mit Design-Review gegen `screenshots/level-seiten-desktop.png`.
+3. Gegner und Bosse (Logik) nach dem Plan.
+
+Keine neuen Abhängigkeiten, Schriften oder Fremd-Assets.
 
 - keine weiteren (erste Fassung vom 2026-10-25)

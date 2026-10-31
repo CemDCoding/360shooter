@@ -63,7 +63,19 @@ export const tokens = {
       "night-ground-hi": "var(--color-biome-night-ground-hi)",
       "night-ground-lo": "var(--color-biome-night-ground-lo)",
       "elf-ground-hi": "var(--color-biome-elf-ground-hi)",
-      "elf-ground-lo": "var(--color-biome-elf-ground-lo)"
+      "elf-ground-lo": "var(--color-biome-elf-ground-lo)",
+      "desert": "var(--color-biome-desert)",
+      "pyramid": "var(--color-biome-pyramid)",
+      "oasis": "var(--color-biome-oasis)",
+      "desert-ground": "var(--color-biome-desert-ground)",
+      "pyramid-ground": "var(--color-biome-pyramid-ground)",
+      "oasis-ground": "var(--color-biome-oasis-ground)",
+      "desert-ground-hi": "var(--color-biome-desert-ground-hi)",
+      "desert-ground-lo": "var(--color-biome-desert-ground-lo)",
+      "pyramid-ground-hi": "var(--color-biome-pyramid-ground-hi)",
+      "pyramid-ground-lo": "var(--color-biome-pyramid-ground-lo)",
+      "oasis-ground-hi": "var(--color-biome-oasis-ground-hi)",
+      "oasis-ground-lo": "var(--color-biome-oasis-ground-lo)"
     },
     "sprite": {
       "outline": "var(--color-sprite-outline)",
@@ -141,6 +153,10 @@ export const tokens = {
       "hit-flash": "var(--color-game-hit-flash)",
       "firefly": "var(--color-game-firefly)",
       "spore": "var(--color-game-spore)",
+      "sand": "var(--color-game-sand)",
+      "ember": "var(--color-game-ember)",
+      "oasis-mote": "var(--color-game-oasis-mote)",
+      "ward": "var(--color-game-ward)",
       "aura": "var(--color-game-aura)"
     }
   },

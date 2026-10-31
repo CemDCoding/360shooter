@@ -62,7 +62,19 @@
         "night-ground-hi": "#1c2d58",
         "night-ground-lo": "#0a142c",
         "elf-ground-hi": "#4a3880",
-        "elf-ground-lo": "#30215a"
+        "elf-ground-lo": "#30215a",
+        "desert": "#f0c060",
+        "pyramid": "#e8784a",
+        "oasis": "#4ad8b8",
+        "desert-ground": "#755428",
+        "pyramid-ground": "#5e3424",
+        "oasis-ground": "#1c4a3c",
+        "desert-ground-hi": "#84603a",
+        "desert-ground-lo": "#664824",
+        "pyramid-ground-hi": "#6c3e2c",
+        "pyramid-ground-lo": "#4e2a1c",
+        "oasis-ground-hi": "#245a48",
+        "oasis-ground-lo": "#123a2e"
       },
       "sprite": {
         "outline": "#0b0610",
@@ -140,6 +152,10 @@
         "hit-flash": "#fff4e8",
         "firefly": "#f3f07a",
         "spore": "#9ff5ec",
+        "sand": "#f0c878",
+        "ember": "#ffb04a",
+        "oasis-mote": "#d8ff8a",
+        "ward": "#7ad8ff",
         "aura": "#5fe0c0"
       }
     },
