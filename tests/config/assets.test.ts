@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ASSETS, PLACEHOLDER_KEYS } from '../../src/config/assets';
+import { ASSETS } from '../../src/config/assets';
 
 // Kein @types/node im Projekt: minimale Typen fuer node:fs (Variable verhindert Typaufloesung).
 interface Bytes {
@@ -20,46 +20,41 @@ const readFileSync = (rel: string): Bytes =>
   fs.readFileSync(new URL(`../../public/${rel}`, import.meta.url));
 
 describe('asset manifest', () => {
-  it('has unique keys and unique paths apart from the placeholders', () => {
+  it('has unique keys and unique paths', () => {
     expect(new Set(ASSETS.map((a) => a.key)).size).toBe(ASSETS.length);
-    const own = ASSETS.filter((a) => !PLACEHOLDER_KEYS.includes(a.key));
-    expect(new Set(own.map((a) => a.path)).size).toBe(own.length);
+    expect(new Set(ASSETS.map((a) => a.path)).size).toBe(ASSETS.length);
   });
 
-  it('points every M5 placeholder at an existing sprite with the same geometry (AP-97)', () => {
-    const expected = [
-      'enemy-mummy',
-      'enemy-sand-worm',
-      'enemy-armadillo',
-      'enemy-camel',
-      'enemy-snake',
-      'enemy-archaeologist',
-      'enemy-sphinx',
-      'enemy-boar',
-      'enemy-bear',
-      'enemy-fairy',
-      'boss-sand-worm',
-      'boss-sand-worm-body',
-      'boss-guardian-dog',
-      'boss-pharaoh',
-      'boss-pharaoh-orb',
-      'tiles-desert',
-      'tiles-pyramids',
-      'tiles-oasis',
-    ];
-    expect([...PLACEHOLDER_KEYS].sort()).toEqual([...expected].sort());
-    for (const key of PLACEHOLDER_KEYS) {
-      const p = ASSETS.find((a) => a.key === key);
-      expect(p?.kind, key).toBe('spritesheet');
-      // The path belongs to an own sprite (never a file of its own) with the same frames.
-      const src = ASSETS.find((a) => a.path === p?.path && !PLACEHOLDER_KEYS.includes(a.key));
-      expect(src, key).toBeDefined();
-      expect([p?.frameWidth, p?.frameHeight, p?.frames], key).toEqual([
-        src?.frameWidth,
-        src?.frameHeight,
-        src?.frames,
-      ]);
-      expect(p?.description, key).toContain('Platzhalter');
+  it('has 45 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
+    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(45);
+    const expected: Record<string, [number, number, number]> = {
+      'enemy-mummy': [32, 32, 4],
+      'mummy-wrap': [16, 8, 2],
+      'enemy-sand-worm': [24, 24, 4],
+      'enemy-armadillo': [32, 32, 4],
+      'enemy-camel': [32, 32, 4],
+      'camel-spit': [8, 8, 2],
+      'enemy-snake': [24, 24, 4],
+      'enemy-archaeologist': [32, 32, 4],
+      'enemy-sphinx': [48, 48, 4],
+      'enemy-boar': [32, 32, 4],
+      'enemy-bear': [32, 32, 4],
+      'enemy-fairy': [24, 24, 4],
+      'boss-sand-worm': [64, 64, 4],
+      'boss-sand-worm-body': [32, 32, 3],
+      'boss-guardian-dog': [64, 64, 4],
+      'boss-pharaoh': [64, 64, 4],
+      'boss-pharaoh-orb': [8, 8, 2],
+      'tiles-desert': [32, 32, 4],
+      'tiles-pyramids': [32, 32, 4],
+      'tiles-oasis': [32, 32, 4],
+    };
+    for (const [key, [w, h, n]] of Object.entries(expected)) {
+      const a = ASSETS.find((x) => x.key === key);
+      expect(a?.kind, key).toBe('spritesheet');
+      expect(a?.path, key).toBe(`assets/sprites/${key}.png`);
+      expect(a?.description, key).not.toContain('Platzhalter');
+      expect([a?.frameWidth, a?.frameHeight, a?.frames], key).toEqual([w, h, n]);
     }
   });
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ASSETS, PLACEHOLDER_KEYS } from '../../src/config/assets';
+import { ASSETS } from '../../src/config/assets';
 
 // Kein @types/node im Projekt: minimale Typen (Variable verhindert Typaufloesung).
 interface Bytes {
@@ -38,10 +38,7 @@ const { SPRITE_KEYS, loadSprites, buildSprite } = (await imp(
   '../../scripts/build-sprites.mjs',
 )) as Mod;
 
-// Platzhalter (AP-97) haben kein eigenes Design-Sprite und werden nicht gebaut.
-const defs = ASSETS.filter(
-  (a) => a.kind === 'spritesheet' && !PLACEHOLDER_KEYS.includes(a.key),
-) as unknown as Def[];
+const defs = ASSETS.filter((a) => a.kind === 'spritesheet') as unknown as Def[];
 
 /** Maße und dekodierte RGBA-Pixel einer PNG (Filter 0, RGBA 8 Bit, ein IDAT-Block). */
 function decode(png: Bytes): { width: number; height: number; rgba: number[] } {
@@ -62,7 +59,7 @@ describe('build-sprites', () => {
   const sprites = loadSprites();
 
   it('loads exactly the sprites of the manifest with matching geometry', () => {
-    expect(defs).toHaveLength(25);
+    expect(defs).toHaveLength(45);
     expect([...SPRITE_KEYS].sort()).toEqual(defs.map((d) => d.key).sort());
     for (const def of defs) {
       const s = sprites[def.key] as Sprite;
