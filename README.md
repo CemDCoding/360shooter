@@ -52,7 +52,7 @@ Hinweis: Der Server darf **nur im Heimnetz** laufen. Keine Portweiterleitung im 
 
 An die Adresse anhängen, z. B. `http://localhost:5173/?level=5`:
 
-- `?level=0` bis `?level=20`: startet direkt dieses Level (ungültig ergibt Level 0)
+- `?level=0` bis `?level=40`: startet direkt dieses Level (ungültig ergibt Level 0)
 - `?fps=1`: zeigt die FPS-Anzeige
 - `?assets=1`: zeigt alle Sprites mit Animation
 
