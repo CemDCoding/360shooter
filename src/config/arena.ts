@@ -7,12 +7,12 @@ import type { ArenaSize } from '../contracts';
 export const ARENA = {
   height: 360,
   minWidth: 640,
-  maxWidth: 800,
+  maxWidth: 900,
   baseWidth: 640,
   /** Distance outside the visible arena at which enemies spawn (px). */
   spawnMarginPx: 24,
   /** Speed multiplier while an enemy is still off-screen (PE-100). */
-  offscreenSpeedFactor: 4,
+  offscreenSpeedFactor: 7,
 } as const;
 
 /** Spawn ring radius for an arena: half diagonal plus the spawn margin. */

@@ -276,9 +276,9 @@ describe('arenaWidthFor (PE-99, PE-106)', () => {
     expect(fit(800, 360).aw).toBe(800);
   });
 
-  it('21:9 is capped at 800 with small side bars', () => {
-    const { aw, f } = fit(2520, 1080);
-    expect(aw).toBe(800);
+  it('wider than 21:9 is capped at 900 with side bars', () => {
+    const { aw, f } = fit(3000, 1080);
+    expect(aw).toBe(900);
     expect(f.offsetX).toBeGreaterThan(0);
     expect(f.offsetY).toBeCloseTo(0);
   });
@@ -322,13 +322,13 @@ describe('AP-96: iPhone 15 photo values and Safari bar (clampedArea, visualViewp
   it('Safari bar: smaller window height wins over a stale 100dvh probe', () => {
     const a = clampedArea(852, 393, ins, null, { width: 852, height: 342 });
     expect(avail(a)).toEqual([758, 321]);
-    expect(arenaWidthFor(...avail(a))).toBe(800);
+    expect(arenaWidthFor(...avail(a))).toBe(850);
   });
   it('bar hidden again: back to 734 (want rises and falls with the bar)', () => {
     const vv = (h: number) => ({ width: 852, height: h, offsetLeft: 0, offsetTop: 0 });
     const ws = [393, 342, 393].map((h) =>
       arenaWidthFor(...avail(clampedArea(852, h, ins, vv(h), { width: 852, height: h }))),
     );
-    expect(ws).toEqual([734, 800, 734]);
+    expect(ws).toEqual([734, 850, 734]);
   });
 });

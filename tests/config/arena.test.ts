@@ -11,7 +11,7 @@ describe('arena config', () => {
   });
 
   it('a wider arena has a larger spawn radius', () => {
-    expect(spawnRadiusFor({ width: 800, height: 360 })).toBeGreaterThan(BASE_SPAWN_RADIUS);
+    expect(spawnRadiusFor({ width: 900, height: 360 })).toBeGreaterThan(BASE_SPAWN_RADIUS);
   });
 
   it('widths are ordered', () => {

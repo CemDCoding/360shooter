@@ -421,7 +421,7 @@ describe('phone HUD layout (H-23, AP-86)', () => {
   }
 
   const combos: [number, number][] = [];
-  for (const W of [640, 734, 800]) for (const k of [1, 1.36, 1.4]) combos.push([W, k]);
+  for (const W of [640, 734, 800, 900]) for (const k of [1, 1.36, 1.4]) combos.push([W, k]);
 
   it.each(combos)('has no overlaps and stays in the arena at width %s, k = %s', (W, k) => {
     const l = layout(W, k);
