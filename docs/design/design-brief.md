@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** geändert am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“ wartet auf Freigabe durch den Nutzer). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist entworfen (siehe „Änderungen“). Es fehlt nur die Freigabe des Nutzers. Danach folgt der Planner-Auftrag „Design übernehmen“.
+**Status:** freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
 **Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
 ## Ausgangslage
@@ -306,7 +306,7 @@ Ein Chip mit lädendem Feuerring (`ArmourIndicator`) zeigt wie ein leeres Fach e
 
 Keine neuen Tokens, Schriften oder Abhängigkeiten. AP-92 mit Design-Review: Vergleich mit `screenshots/sprites-welt-desktop.png`, im Handtest die Münzen im Gedränge prüfen (beide Größen unterscheidbar).
 
-### 2026-10-31 · Ergänzung „Wüste und Level-Seiten“ (wartet auf Freigabe)
+### 2026-10-31 · Ergänzung „Wüste und Level-Seiten“ (freigegeben am 2026-10-31, inklusive der Annahmen)
 
 **Auftrag (Nutzer, 2026-10-31, an Planner und Designer):**
 
