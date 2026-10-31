@@ -188,11 +188,10 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
 };
 
 /**
- * Contact damage after which an enemy despawns by itself (AP-60).
- * Balancing, Startwert angenommen (PE-66): 3 s Kontakt bei 10 Schaden je Sekunde,
- * ein Drittel der HP der Spielerin. Enemies without an entry never despawn this way.
+ * Seconds of the former per-second contact damage that one contact hit deals (AP-112, PE-135).
+ * Chasers, chargers and burrowers hit once and despawn without coin and xp.
  */
-export const CONTACT_DESPAWN_DAMAGE: Partial<Record<EnemyId, number>> = { cursedTree: 30 };
+export const CONTACT_HIT_SECONDS = 0.5;
 
 /**
  * Distance to the player (pixels) at which a charger (behavior 'charge') stops and starts its announcement

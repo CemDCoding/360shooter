@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   CHARGE_TRIGGER_DISTANCE,
-  CONTACT_DESPAWN_DAMAGE,
+  CONTACT_HIT_SECONDS,
   ENEMIES,
-  PLAYER,
   WEAPON_BASE,
 } from '../../src/config';
 import { ASSETS } from '../../src/config/assets';
@@ -33,14 +32,8 @@ describe('enemies', () => {
     expect(Math.ceil(hp / WEAPON_BASE.damage)).toBe(5);
   });
 
-  it('only the cursed tree despawns after contact damage (AP-60)', () => {
-    const limit = CONTACT_DESPAWN_DAMAGE.cursedTree;
-    expect(Number.isFinite(limit)).toBe(true);
-    expect(limit).toBeGreaterThan(0);
-    expect(limit).toBeLessThanOrEqual(PLAYER.maxHp / 2);
-    expect(CONTACT_DESPAWN_DAMAGE.forestWitch).toBeUndefined();
-    expect(CONTACT_DESPAWN_DAMAGE.zombieSquirrel).toBeUndefined();
-    expect(CONTACT_DESPAWN_DAMAGE.forestSpirit).toBeUndefined();
+  it('one contact hit deals half a second of contact damage (AP-112)', () => {
+    expect(CONTACT_HIT_SECONDS).toBe(0.5);
   });
 
   it('zombie squirrel is slowed down (AP-23)', () => {

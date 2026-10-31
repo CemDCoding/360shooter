@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import { animKey } from '../../config/assets';
 import { OPACITY, THEME } from '../../config/theme';
-import { CONTACT_DESPAWN_DAMAGE, ENEMIES, ENEMY_BODY_SIZE } from '../../config/enemies';
-import { addContact, isContactSpent } from '../../logic/contactBudget';
+import { ENEMIES, ENEMY_BODY_SIZE } from '../../config/enemies';
+import { contactHitDamage, dealsContactHit } from '../../logic/contactHit';
 import type { EnemyDef, EnemyId, StatusOnHit } from '../../contracts';
 import { ARENA, BASE_SPAWN_RADIUS } from '../../config/arena';
 import { approachSpeedFactor } from '../../logic/approach';
@@ -29,7 +29,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected readonly center: { x: number; y: number };
   private readonly ctx: EnemyContext;
   private flashLeftMs = 0;
-  private contactDealt = 0;
   private contactSpent = false;
   private auraGfx?: Phaser.GameObjects.Arc;
 
@@ -58,7 +57,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   spawn(x: number, y: number): void {
     this.hp = this.def.hp;
     this.flashLeftMs = 0;
-    this.contactDealt = 0;
     this.contactSpent = false;
     this.clearTint();
     this.enableBody(true, x, y, true, true);
@@ -99,7 +97,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   /** Returns true if the hit killed the enemy. No damage numbers (PE-31). */
   takeDamage(amount: number): boolean {
-    if (!this.active || this.isInvulnerable) return false;
+    // After the contact hit the enemy only plays its flash: no kill, no coin, no xp (AP-112).
+    if (!this.active || this.isInvulnerable || this.contactSpent) return false;
     this.hp = applyDamage(this.hp, amount * this.damageFactor());
     if (isDead(this.hp)) {
       const { x, y } = this;
@@ -112,14 +111,21 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return false;
   }
 
-  /** Contact damage for dtMs of ongoing contact with the player (config value is per second). */
+  /**
+   * Contact damage for dtMs of contact with the player (unscaled). Chasers, chargers and burrowers hit once
+   * (contactDamage x CONTACT_HIT_SECONDS), switch their body off and vanish after the flash, without
+   * onDeath (AP-112). Aura enemies and shooters keep the damage per second (Q-57).
+   */
   contactDamageFor(dtMs: number): number {
-    const dmg = auraDamage(this.def.contactDamage, dtMs);
-    this.contactDealt = addContact(this.contactDealt, dmg);
-    if (isContactSpent(this.contactDealt, CONTACT_DESPAWN_DAMAGE[this.def.id])) {
-      this.contactSpent = true;
-    }
-    return dmg;
+    const cd = this.def.contactDamage;
+    if (!dealsContactHit(this.def.behavior, cd)) return auraDamage(cd, dtMs);
+    if (!this.active || this.isInvulnerable || this.contactSpent) return 0;
+    this.contactSpent = true;
+    this.setVelocity(0, 0);
+    this.setHittable(false);
+    this.flashLeftMs = FLASH_MS;
+    this.setTintFill(FLASH_TINT);
+    return contactHitDamage(cd);
   }
 
   /** Aura damage dealt to a target at (tx, ty) during dtMs; 0 if no aura or out of range. */
@@ -133,8 +139,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   update(_time: number, delta: number): void {
     if (!this.active) return;
     if (this.contactSpent) {
-      // No onDeath: no coin, item, xp or kill count (AP-60). Runs here, not in the physics callback.
-      this.despawn();
+      // Flash, then vanish. No onDeath: no coin, item, xp or kill count. Returns before behave, so a
+      // burrowing worm cannot switch its body on again (AP-112).
+      this.flashLeftMs -= delta;
+      if (this.flashLeftMs <= 0) this.despawn();
       return;
     }
     if (this.flashLeftMs > 0) {

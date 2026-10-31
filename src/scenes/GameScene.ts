@@ -472,7 +472,7 @@ export class GameScene extends Phaser.Scene {
       if (!enemy?.active) return;
       const dealt = enemy.contactDamageFor(dt) * this.enemyScales.get(enemy).contact;
       damage += dealt;
-      // Contact status (snake poison): applied while the enemy touches the player.
+      // One hit per hitting enemy (AP-112); status (snake poison) comes with the hit.
       if (dealt > 0) this.contactStatus.add(enemy.onHit);
     });
     for (const e of this.enemyPool.enemies) {
