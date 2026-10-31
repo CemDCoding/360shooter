@@ -20,14 +20,20 @@ const TINTS: readonly number[] = [
   THEME.colors['phos.300'].num,
 ];
 
-/** Position of a level inside its batch, starting with 0 (Wald 0-4, Nacht 5-9, Elfenwald 10-20). */
+/**
+ * Position of a level inside its batch, starting with 0
+ * (Wald 0-4, Nacht 5-9, Elfenwald 10-20, Wueste 21-25, Pyramiden 26-30, Oase 31-40).
+ */
 export function indexInBatch(levelId: number): number {
-  if (!Number.isInteger(levelId) || levelId < 0 || levelId > 20) {
+  if (!Number.isInteger(levelId) || levelId < 0 || levelId > 40) {
     throw new RangeError(`unknown level ${levelId}`);
   }
   if (levelId <= 4) return levelId;
   if (levelId <= 9) return levelId - 5;
-  return levelId - 10;
+  if (levelId <= 20) return levelId - 10;
+  if (levelId <= 25) return levelId - 21;
+  if (levelId <= 30) return levelId - 26;
+  return levelId - 31;
 }
 
 /** HP +15 %, damage +10 % per index, tint per index, extra attack from index 2 (PE-33). */

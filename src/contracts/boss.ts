@@ -1,4 +1,11 @@
-export type BossId = 'rootMonster' | 'forestGhost' | 'giantStone';
+export type BossId =
+  | 'rootMonster'
+  | 'forestGhost'
+  | 'giantStone'
+  // M5 (PE-123, PE-128): desert, pyramids, oasis
+  | 'giantSandWorm'
+  | 'guardianDog'
+  | 'pharaoh';
 
 /** One boss attack. Every attack is shown as a warning for telegraphMs before it hits (fairness). */
 export interface BossAttackDef {

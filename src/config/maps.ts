@@ -51,6 +51,35 @@ export const MAPS: Readonly<Record<BatchId, MapDef>> = {
     effectCount: 30,
     vignette: 0.45,
   },
+  // M5 (AP-97): placeholders with existing tokens and effects until the design (H-27) lands in AP-106.
+  // The tilesets are placeholder entries in ASSETS (same PNG as the named old map).
+  desert: {
+    tilesetKey: 'tiles-desert',
+    baseColor: themeColor('biome.forest-ground').num,
+    decoDensity: 0.1,
+    effect: 'none',
+    effectColor: themeColor('game.hit-flash').num,
+    effectCount: 0,
+    vignette: 0.3,
+  },
+  pyramids: {
+    tilesetKey: 'tiles-pyramids',
+    baseColor: themeColor('biome.elf-ground').num,
+    decoDensity: 0.12,
+    effect: 'none',
+    effectColor: themeColor('game.hit-flash').num,
+    effectCount: 0,
+    vignette: 0.4,
+  },
+  oasis: {
+    tilesetKey: 'tiles-oasis',
+    baseColor: themeColor('biome.night-ground').num,
+    decoDensity: 0.14,
+    effect: 'spores',
+    effectColor: themeColor('game.spore').num,
+    effectCount: 24,
+    vignette: 0.45,
+  },
 };
 
 export function getMap(batch: BatchId): MapDef {

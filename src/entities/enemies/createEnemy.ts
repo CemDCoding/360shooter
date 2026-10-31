@@ -13,10 +13,15 @@ export interface CreateEnemyContext extends EnemyContext {
   boltPool?: WitchBoltPool;
 }
 
-/** Factory: picks the behavior class via EnemyDef.behavior. A new enemy with a known behavior needs only a config entry. */
+/**
+ * Factory: picks the behavior class via EnemyDef.behavior. A new enemy with a known behavior needs only a config entry.
+ * Fallbacks until AP-101 (AP-97): `charge` and `burrow` run as `chase`, `movement: 'zigzag'` walks straight.
+ */
 export function createEnemy(scene: Phaser.Scene, id: EnemyId, ctx: CreateEnemyContext = {}): Enemy {
   switch (ENEMIES[id].behavior) {
     case 'chase':
+    case 'charge':
+    case 'burrow':
       return new ChaseEnemy(scene, id, ctx);
     case 'aura':
       return new AuraEnemy(scene, id, ctx);

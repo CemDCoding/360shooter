@@ -3,7 +3,7 @@ import { animKey } from '../../config/assets';
 import { OPACITY, THEME } from '../../config/theme';
 import { CONTACT_DESPAWN_DAMAGE, ENEMIES } from '../../config/enemies';
 import { addContact, isContactSpent } from '../../logic/contactBudget';
-import type { EnemyDef, EnemyId } from '../../contracts';
+import type { EnemyDef, EnemyId, StatusOnHit } from '../../contracts';
 import { ARENA, BASE_SPAWN_RADIUS } from '../../config/arena';
 import { approachSpeedFactor } from '../../logic/approach';
 import { distance } from '../../logic/geometry';
@@ -74,6 +74,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   protected onSpawn(): void {}
+
+  /** Status effect of the contact with the player, from the config (AP-97). Applied by the scene from AP-102 on. */
+  get onHit(): StatusOnHit | undefined {
+    return this.def.onHit;
+  }
 
   /** Returns true if the hit killed the enemy. No damage numbers (PE-31). */
   takeDamage(amount: number): boolean {

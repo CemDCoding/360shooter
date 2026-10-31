@@ -6,7 +6,11 @@ import {
   type CoinRules,
   type UpgradeLevels,
   type AssetDef,
+  type BatchId,
+  type BossId,
   type EnemyDef,
+  type EnemyProjectileDef,
+  type StatusOnHit,
   type GameEventPayloads,
   type ItemDef,
   type ItemRules,
@@ -154,5 +158,80 @@ describe('contracts', () => {
     expect(Object.keys(hit).sort()).toEqual(['hp', 'invulnerable', 'maxHp']);
     expect(fade.invulnerable).toBe(true);
     expect(missing.hp).toBe(1);
+  });
+
+  it('accepts the M5 contracts: batches, enemies, behaviours, status effects, bosses (AP-97)', () => {
+    const batches: BatchId[] = ['desert', 'pyramids', 'oasis'];
+    const bosses: BossId[] = ['giantSandWorm', 'guardianDog', 'pharaoh'];
+    const poison: StatusOnHit = { poison: { dps: 3, durationMs: 3000 } };
+    const slow: StatusOnHit = { slow: { turnFactor: 0.5, durationMs: 2000 } };
+    const charge: EnemyDef = {
+      id: 'armadillo',
+      hp: 90,
+      speed: 20,
+      contactDamage: 10,
+      behavior: 'charge',
+      xp: 8,
+      spriteKey: 'enemy-armadillo',
+      charge: {
+        telegraphMs: 900,
+        dashSpeed: 140,
+        dashMs: 1200,
+        cooldownMs: 3500,
+        dashDamageFactor: 0.5,
+      },
+    };
+    const burrow: EnemyDef = {
+      id: 'sandWorm',
+      hp: 16,
+      speed: 70,
+      contactDamage: 8,
+      behavior: 'burrow',
+      xp: 6,
+      spriteKey: 'enemy-sand-worm',
+      burrow: { underMs: 1800, surfaceMs: 2500, surfaceDistance: 90, telegraphMs: 800 },
+    };
+    const zigzag: EnemyDef = {
+      id: 'fairy',
+      hp: 6,
+      speed: 75,
+      contactDamage: 12,
+      behavior: 'chase',
+      movement: 'zigzag',
+      xp: 4,
+      spriteKey: 'enemy-fairy',
+      onHit: poison,
+    };
+    const shot: EnemyProjectileDef = {
+      damage: 10,
+      speed: 100,
+      intervalMs: 2600,
+      keepDistance: 150,
+      spriteKey: 'witch-bolt',
+      onHit: slow,
+    };
+    const status: GameEventPayloads['player-status'] = {
+      effects: [
+        { kind: 'poison', remainingMs: 1200 },
+        { kind: 'slow', remainingMs: 300 },
+      ],
+    };
+    expect(GameEvents.PlayerStatus).toBe('player-status');
+    expect(status.effects.map((e) => e.kind)).toEqual(['poison', 'slow']);
+    expect([batches, bosses, charge, burrow, zigzag, shot].length).toBe(6);
+  });
+
+  it('keeps the old enemy definitions valid without the new optional fields (additive)', () => {
+    const old: EnemyDef = {
+      id: 'cursedTree',
+      hp: 50,
+      speed: 30,
+      contactDamage: 10,
+      behavior: 'chase',
+      xp: 5,
+      spriteKey: 'enemy-cursed-tree',
+    };
+    expect(old.movement).toBeUndefined();
+    expect(old.onHit).toBeUndefined();
   });
 });

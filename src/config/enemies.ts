@@ -1,4 +1,4 @@
-// Balancing (AP-15), Erklaerung in docs/balancing.md.
+// Balancing (AP-15), Erklaerung in docs/balancing.md. M5-Gegner seit AP-97 mit vorlaeufigen Werten (AP-105).
 import type { EnemyDef, EnemyId } from '../contracts';
 
 export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
@@ -43,6 +43,140 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     coinValue: 4,
     spriteKey: 'enemy-forest-spirit',
     aura: { radius: 48, dps: 12 },
+  },
+  // M5 (AP-97): starting values after PE-127, fine tuning in AP-105.
+  // Old maps (F-19): boar and bear from level 0, fairy from level 5. Their HP keep the mean HP of the old
+  // pools almost unchanged (Level 0-20 stay as they were, PE-125); tank values follow with AP-105.
+  boar: {
+    id: 'boar',
+    hp: 55,
+    speed: 30,
+    contactDamage: 10,
+    behavior: 'charge',
+    xp: 5,
+    coinValue: 1,
+    spriteKey: 'enemy-boar',
+    charge: {
+      telegraphMs: 800,
+      dashSpeed: 150,
+      dashMs: 900,
+      cooldownMs: 3500,
+      dashDamageFactor: 1,
+    },
+  },
+  bear: {
+    id: 'bear',
+    hp: 45,
+    speed: 36,
+    contactDamage: 10,
+    behavior: 'chase',
+    xp: 5,
+    coinValue: 1,
+    spriteKey: 'enemy-bear',
+  },
+  fairy: {
+    id: 'fairy',
+    hp: 6,
+    speed: 75,
+    contactDamage: 12,
+    behavior: 'chase',
+    movement: 'zigzag',
+    xp: 4,
+    coinValue: 1,
+    spriteKey: 'enemy-fairy',
+  },
+  // Desert, pyramids, oasis (PE-123, PE-127).
+  mummy: {
+    id: 'mummy',
+    hp: 60,
+    speed: 22,
+    contactDamage: 15,
+    behavior: 'shooter',
+    xp: 10,
+    coinValue: 4,
+    spriteKey: 'enemy-mummy',
+    // Wrap: slows the turning of the player for 2 s (PE-127).
+    projectile: {
+      damage: 10,
+      speed: 100,
+      intervalMs: 2600,
+      keepDistance: 150,
+      onHit: { slow: { turnFactor: 0.5, durationMs: 2000 } },
+    },
+  },
+  sandWorm: {
+    id: 'sandWorm',
+    hp: 16,
+    speed: 70,
+    contactDamage: 8,
+    behavior: 'burrow',
+    xp: 6,
+    coinValue: 2,
+    spriteKey: 'enemy-sand-worm',
+    burrow: { underMs: 1800, surfaceMs: 2500, surfaceDistance: 90, telegraphMs: 800 },
+  },
+  armadillo: {
+    id: 'armadillo',
+    hp: 90,
+    speed: 20,
+    contactDamage: 10,
+    behavior: 'charge',
+    xp: 8,
+    coinValue: 3,
+    spriteKey: 'enemy-armadillo',
+    // Rolls: half damage while dashing (PE-127).
+    charge: {
+      telegraphMs: 900,
+      dashSpeed: 140,
+      dashMs: 1200,
+      cooldownMs: 3500,
+      dashDamageFactor: 0.5,
+    },
+  },
+  camel: {
+    id: 'camel',
+    hp: 35,
+    speed: 30,
+    contactDamage: 6,
+    behavior: 'shooter',
+    xp: 10,
+    coinValue: 4,
+    spriteKey: 'enemy-camel',
+    projectile: { damage: 8, speed: 110, intervalMs: 2200, keepDistance: 160 },
+  },
+  snake: {
+    id: 'snake',
+    hp: 10,
+    speed: 85,
+    contactDamage: 5,
+    behavior: 'chase',
+    xp: 5,
+    coinValue: 2,
+    spriteKey: 'enemy-snake',
+    // Poison: 3 s damage over time (PE-127).
+    onHit: { poison: { dps: 3, durationMs: 3000 } },
+  },
+  archaeologist: {
+    id: 'archaeologist',
+    // Standard values like the forest witch (PE-127), magnifier light beam as projectile.
+    hp: 20,
+    speed: 40,
+    contactDamage: 5,
+    behavior: 'shooter',
+    xp: 10,
+    coinValue: 4,
+    spriteKey: 'enemy-archaeologist',
+    projectile: { damage: 8, speed: 120, intervalMs: 2000, keepDistance: 140 },
+  },
+  sphinx: {
+    id: 'sphinx',
+    hp: 160,
+    speed: 18,
+    contactDamage: 18,
+    behavior: 'chase',
+    xp: 15,
+    coinValue: 5,
+    spriteKey: 'enemy-sphinx',
   },
 };
 

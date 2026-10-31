@@ -102,7 +102,12 @@ function metrics(level: LevelDef): Metrics {
   };
 }
 
-const M = LEVELS.map(metrics);
+/**
+ * Eingestellte Level 0 bis 20. Level 21 bis 40 sind vorlaeufig (AP-97) und haben noch keine
+ * LEVEL_SCALING-Eintraege; AP-105 nimmt sie in die Kurve auf.
+ */
+const TUNED = LEVELS.slice(0, LEVEL_SCALING.length);
+const M = TUNED.map(metrics);
 /** Gewonnenes Level: alle Gegner besiegt. Anzahl Spawns wie in `metrics`. */
 function spawnCount(level: LevelDef): number {
   const durMs = level.durationSec * 1000;
@@ -142,7 +147,7 @@ function rapidFireUptime(level: LevelDef): number {
   return Math.min(1, (drops * (itemDef('rapidFire').durationMs ?? 0)) / (level.durationSec * 1000));
 }
 
-const GOLD = LEVELS.map(goldOf);
+const GOLD = TUNED.map(goldOf);
 const GOLD_MEAN = GOLD.reduce((a, b) => a + b, 0) / GOLD.length;
 const TRACKS = ['weaponFireRate', 'weaponDamage', 'playerMaxHp', 'playerTurnSpeed'] as const;
 const trackCost = (track: (typeof TRACKS)[number]): number => {
@@ -326,8 +331,8 @@ describe('balance: difficulty curve', () => {
   });
 
   it('5-minute levels are more demanding than 3-minute levels of the same batch', () => {
-    for (const a of LEVELS) {
-      for (const b of LEVELS) {
+    for (const a of TUNED) {
+      for (const b of TUNED) {
         if (a.batch === b.batch && a.durationSec === 180 && b.durationSec === 300) {
           expect(M[b.id].pressure, `${b.id} vs ${a.id}`).toBeGreaterThan(M[a.id].pressure);
           expect(M[b.id].freeRunDamagePerMin).toBeGreaterThan(M[a.id].freeRunDamagePerMin);
@@ -336,7 +341,8 @@ describe('balance: difficulty curve', () => {
     }
   });
 
-  it('covers all 21 levels', () => {
+  it('covers the 21 tuned levels 0 to 20 (21 to 40 provisional until AP-105)', () => {
     expect(M).toHaveLength(21);
+    expect(LEVELS.length).toBeGreaterThanOrEqual(M.length);
   });
 });

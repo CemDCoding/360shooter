@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 import { deflateSync } from 'node:zlib';
-import { ASSETS } from '../src/config/assets.ts';
+import { ASSETS, PLACEHOLDER_KEYS } from '../src/config/assets.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 // Reihenfolge ist wichtig: sprites-world.js ergaenzt window.PX_SPRITES aus sprites.js.
@@ -21,8 +21,16 @@ const SOURCES = [
 ];
 const OUT_DIR = join(root, 'public', 'assets', 'sprites');
 
-/** Schluessel aller Sprites im Manifest. */
-export const SPRITE_KEYS = ASSETS.filter((a) => a.kind === 'spritesheet').map((a) => a.key);
+/**
+ * Spritesheets mit eigenem Design-Sprite. Platzhalter (PLACEHOLDER_KEYS, AP-97) teilen sich die PNG eines
+ * vorhandenen Sprites und werden nicht gebaut, sonst wuerde die Original-PNG ueberschrieben.
+ */
+const BUILT_DEFS = ASSETS.filter(
+  (a) => a.kind === 'spritesheet' && !PLACEHOLDER_KEYS.includes(a.key),
+);
+
+/** Schluessel aller gebauten Sprites im Manifest. */
+export const SPRITE_KEYS = BUILT_DEFS.map((a) => a.key);
 
 // ---------- PNG ----------
 const crcTable = Array.from({ length: 256 }, (_, n) => {
@@ -124,7 +132,7 @@ export function buildSprite(sprite, def) {
 function main() {
   const sprites = loadSprites();
   mkdirSync(OUT_DIR, { recursive: true });
-  for (const def of ASSETS.filter((a) => a.kind === 'spritesheet')) {
+  for (const def of BUILT_DEFS) {
     const { png, width, height } = buildSprite(sprites[def.key], def);
     writeFileSync(join(root, 'public', def.path), png);
     console.log(`wrote public/${def.path} (${width}x${height})`);
