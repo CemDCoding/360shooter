@@ -1,12 +1,42 @@
 import Phaser from 'phaser';
 import type { BatchId } from '../contracts';
-import { getMap, MAX_MAP_PARTICLES, type MapDef } from '../config/maps';
+import { getMap, MAX_MAP_PARTICLES, type MapDef, type MapEffect } from '../config/maps';
 import { themeColor } from '../config/theme';
 import { createRng, type Rng } from '../logic/rng';
+import { prefersReducedMotion } from '../platform/motion';
 
 const TILE_PX = 32;
 const DEPTH = -100;
 const DOT_KEY = 'map-dot';
+const STREAK_KEY = 'map-streak';
+const STILL_ALPHA = 0.35;
+
+export interface ParticleMotion {
+  dx: number;
+  dy: number;
+  alpha: number;
+  duration: number;
+  delay: number;
+}
+
+/** Drift of one particle (pure; consumes four rng values, order fixed so old maps stay unchanged). */
+export function particleMotion(effect: MapEffect, rng: Rng): ParticleMotion {
+  const dx0 = rng.next();
+  const dy0 = rng.next();
+  const duration = 1500 + rng.next() * 2000;
+  const delay = rng.next() * 1500;
+  switch (effect) {
+    case 'sand': // sideways drift, no falling
+      return { dx: 40 + dx0 * 50, dy: (dy0 - 0.5) * 6, alpha: 0.5, duration, delay };
+    case 'embers': // rising glow
+      return { dx: (dx0 - 0.5) * 40, dy: -40 - dy0 * 40, alpha: 0.6, duration, delay };
+    case 'fireflies':
+    case 'motes': // hovering
+      return { dx: (dx0 - 0.5) * 60, dy: (dy0 - 0.5) * 40, alpha: 0.8, duration, delay };
+    default: // spores
+      return { dx: (dx0 - 0.5) * 60, dy: -30 - dy0 * 30, alpha: 0.55, duration, delay };
+  }
+}
 
 type Depthable = Phaser.GameObjects.GameObject & { setDepth(d: number): unknown };
 
@@ -56,26 +86,34 @@ export class MapBackground {
 
   private addParticles(def: MapDef, rng: Rng, width: number, height: number): void {
     if (def.effect === 'none') return;
-    if (!this.scene.textures.exists(DOT_KEY)) {
+    const tex = this.scene.textures;
+    const sand = def.effect === 'sand';
+    const key = sand ? STREAK_KEY : DOT_KEY;
+    if (!tex.exists(key)) {
       const g = this.scene.make.graphics({ x: 0, y: 0 }, false);
-      g.fillStyle(themeColor('game.hit-flash').num, 1).fillCircle(2, 2, 2);
-      g.generateTexture(DOT_KEY, 4, 4);
+      const white = themeColor('game.hit-flash').num;
+      if (sand) g.fillStyle(white, 1).fillRect(0, 0, 3, 1);
+      else g.fillStyle(white, 1).fillCircle(2, 2, 2);
+      g.generateTexture(key, sand ? 3 : 4, sand ? 1 : 4);
       g.destroy();
     }
+    const still = prefersReducedMotion();
     const count = Math.min(def.effectCount, MAX_MAP_PARTICLES);
-    const fireflies = def.effect === 'fireflies';
     for (let i = 0; i < count; i++) {
       const x = rng.next() * width;
       const y = rng.next() * height;
-      const dot = this.scene.add.image(x, y, DOT_KEY).setTint(def.effectColor).setAlpha(0.15);
+      const m = particleMotion(def.effect, rng);
+      const dot = this.scene.add.image(x, y, key).setTint(def.effectColor);
+      dot.setAlpha(still ? STILL_ALPHA : 0.15);
       this.add(dot);
+      if (still) continue; // reduced motion: static, no tween
       this.scene.tweens.add({
         targets: dot,
-        x: x + (rng.next() - 0.5) * 60,
-        y: y + (fireflies ? (rng.next() - 0.5) * 40 : -30 - rng.next() * 30),
-        alpha: fireflies ? 0.8 : 0.55,
-        duration: 1500 + rng.next() * 2000,
-        delay: rng.next() * 1500,
+        x: x + m.dx,
+        y: y + m.dy,
+        alpha: m.alpha,
+        duration: m.duration,
+        delay: m.delay,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut',
