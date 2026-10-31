@@ -98,6 +98,20 @@ describe('boss config (PE-75)', () => {
     expect(BOSS_TUNING.giantSandWorm.orbit).toEqual(BOSS_TUNING.giantStone.rim);
   });
 
+  it('announces the guardian dog attacks fairly and never shields it endlessly (AP-103)', () => {
+    const at = (id: string) => BOSSES.guardianDog.attacks.find((x) => x.id === id);
+    for (const id of ['runeShield', 'guardBark', 'summonMummies']) {
+      expect(at(id)?.telegraphMs, id).toBeGreaterThanOrEqual(MIN_TELEGRAPH_MS);
+    }
+    expect(at('summonMummies')?.extraOnly).toBe(true);
+    // The shield ends before the next one can come (the cooldown starts when the shield goes up).
+    const dog = BOSS_TUNING.guardianDog;
+    expect(dog.runeShield.maxMs).toBeLessThan(at('runeShield')?.cooldownMs ?? 0);
+    expect(dog.runeShield.runeCount).toBe(3);
+    expect(dog.summonMummies.count).toBe(3);
+    expect(dog.orbit).toEqual(BOSS_TUNING.giantStone.rim);
+  });
+
   it('caps the ring damage without counterplay at 3 times the attack damage', () => {
     const r = BOSS_TUNING.rootMonster.ring;
     expect(r.damageShare * r.spikeCount).toBeLessThanOrEqual(3);

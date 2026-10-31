@@ -4,12 +4,14 @@ import {
   clampToArena,
   coilAngles,
   coilRadius,
+  edgePoint,
   ellipseAngle,
   ellipsePoint,
   emergePoint,
   flightTimeMs,
   followChain,
   fragmentPositions,
+  ringPositions,
   ringSpikeAngles,
   sproutDamage,
   sproutHitsLeft,
@@ -17,6 +19,7 @@ import {
   straightChain,
   treePositions,
   volleySpeed,
+  waveArcs,
   weakenedShare,
 } from '../../src/entities/bosses/bossGeometry';
 import { angleInGap } from '../../src/entities/bosses/hazards';
@@ -276,5 +279,79 @@ describe('giant sand worm geometry and fairness (AP-100, PE-75, PE-128)', () => 
     for (const a of [0, 1, 2, -2]) {
       expect(ellipseAngle(c, rim, ellipsePoint(c, rim, a))).toBeCloseTo(a);
     }
+  });
+});
+
+// --- Antiker Wächter-Hund (AP-103) ---
+
+describe('guardian dog geometry and fairness (AP-103, PE-75, PE-128)', () => {
+  const D = BOSS_TUNING.guardianDog;
+  const S = D.runeShield;
+  const B = D.guardBark;
+  const PR = BOSS_TUNING.playerHitRadius;
+
+  it('spaces ring positions evenly at the radius', () => {
+    const pts = ringPositions({ x: 10, y: 20 }, 3, 0.5, 40);
+    expect(pts).toHaveLength(3);
+    for (const p of pts) expect(Math.hypot(p.x - 10, p.y - 20)).toBeCloseTo(40);
+    expect(Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)).toBeCloseTo(
+      Math.hypot(pts[1].x - pts[2].x, pts[1].y - pts[2].y),
+    );
+  });
+
+  it.each(WIDTHS)('marks the screen edge in the direction of the summon at width %i', (w) => {
+    const a = arenaOf(w);
+    const center = { x: w / 2, y: 180 };
+    for (const angle of [0, 0.7, 1.6, 3, 4.2, 5.5]) {
+      const p = edgePoint(center, angle, a);
+      expect(inArenaOf(a)(p)).toBe(true);
+      // On the edge (minus the margin) and in the same direction.
+      const onEdge =
+        Math.abs(p.x - a.margin) < 1e-6 ||
+        Math.abs(p.x - (w - a.margin)) < 1e-6 ||
+        Math.abs(p.y - a.margin) < 1e-6 ||
+        Math.abs(p.y - (a.height - a.margin)) < 1e-6;
+      expect(onEdge).toBe(true);
+      expect(Math.cos(Math.atan2(p.y - center.y, p.x - center.x) - angle)).toBeCloseTo(1);
+    }
+  });
+
+  it('splits the bark wave into arcs that leave exactly the gap open', () => {
+    for (const start of [0, 1, 3, 6]) {
+      const arcs = waveArcs(B.arcCount, start, B.gapRad);
+      expect(arcs).toHaveLength(B.arcCount);
+      const total = arcs.reduce((s, x) => s + x.size, 0);
+      expect(total + B.gapRad).toBeCloseTo(TURN);
+      for (const arc of arcs) {
+        expect(angleInGap(arc.start + arc.size / 2, start, B.gapRad)).toBe(false);
+      }
+    }
+  });
+
+  it('opens the bark gap at least as wide as the root ring gap', () => {
+    expect(B.gapRad).toBeGreaterThanOrEqual(BOSS_TUNING.rootMonster.ring.gapRad);
+  });
+
+  it.each(WIDTHS)(
+    'gives the player MIN_REACTION_MS before the bark reaches her at width %i',
+    (w) => {
+      const center = { x: w / 2, y: 180 };
+      const rim = rimRadii(D.orbit, arenaOf(w));
+      for (const a of [0, 1, Math.PI / 2, 2.5, 4, 5.5]) {
+        const dog = ellipsePoint(center, rim, a);
+        const dist = Math.hypot(dog.x - center.x, dog.y - center.y);
+        const path = dist - B.startRadius - B.thickness / 2;
+        const speed = volleySpeed(path, B.speedPxPerSec, B.minSpeedPxPerSec, PR, MIN_REACTION_MS);
+        expect(speed).toBeLessThanOrEqual(B.speedPxPerSec);
+        expect(flightTimeMs(path - PR, speed)).toBeGreaterThanOrEqual(MIN_REACTION_MS - 1e-6);
+      }
+    },
+  );
+
+  it('keeps the runes outside the shield and the shield and runes away from the player', () => {
+    expect(S.runeOrbit - S.runeRadius).toBeGreaterThan(S.radius);
+    expect(S.runeOrbit + S.runeRadius + PR).toBeLessThan(D.orbit.ry);
+    // The dog body (64 x 64) never touches the player on its path.
+    expect(D.size / 2 + PR).toBeLessThan(D.orbit.ry);
   });
 });

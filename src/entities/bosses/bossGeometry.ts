@@ -245,3 +245,59 @@ export function weakenedShare(hits: number, maxHits: number): number {
   if (!(maxHits > 0)) return 1;
   return Math.max(0, 1 - Math.max(0, hits) / maxHits);
 }
+
+// --- Antiker Wächter-Hund (AP-103) ---
+
+/** `count` points evenly spaced on a circle around `center`, the first at `baseAngle`. */
+export function ringPositions(
+  center: Point,
+  count: number,
+  baseAngle: number,
+  radius: number,
+): Point[] {
+  const out: Point[] = [];
+  for (let i = 0; i < count; i++) {
+    const a = baseAngle + (i / count) * FULL_TURN;
+    out.push({ x: center.x + Math.cos(a) * radius, y: center.y + Math.sin(a) * radius });
+  }
+  return out;
+}
+
+/**
+ * Point where the ray from `center` in direction `angle` leaves the arena (minus the margin). Used to mark
+ * at the visible edge where summoned enemies come in from outside the screen.
+ */
+export function edgePoint(center: Point, angle: number, arena: ArenaRect): Point {
+  const dx = Math.cos(angle);
+  const dy = Math.sin(angle);
+  const lo = arena.margin;
+  const hiX = arena.width - arena.margin;
+  const hiY = arena.height - arena.margin;
+  let t = Infinity;
+  if (dx > 1e-9) t = Math.min(t, (hiX - center.x) / dx);
+  if (dx < -1e-9) t = Math.min(t, (lo - center.x) / dx);
+  if (dy > 1e-9) t = Math.min(t, (hiY - center.y) / dy);
+  if (dy < -1e-9) t = Math.min(t, (lo - center.y) / dy);
+  if (!Number.isFinite(t)) t = 0;
+  return clampToArena(
+    { x: center.x + dx * Math.max(0, t), y: center.y + dy * Math.max(0, t) },
+    arena,
+  );
+}
+
+/**
+ * Arcs of the bark shock wave: the ring without the gap [gapStart, gapStart + gapSize), split into `count`
+ * equal arcs. Each arc starts at `start` and covers `size` radians; together they leave exactly the gap open.
+ */
+export function waveArcs(
+  count: number,
+  gapStart: number,
+  gapSize: number,
+): { start: number; size: number }[] {
+  const out: { start: number; size: number }[] = [];
+  if (count <= 0) return out;
+  const gap = Math.min(FULL_TURN, Math.max(0, gapSize));
+  const size = (FULL_TURN - gap) / count;
+  for (let i = 0; i < count; i++) out.push({ start: gapStart + gap + i * size, size });
+  return out;
+}
