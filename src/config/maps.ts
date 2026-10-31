@@ -1,7 +1,7 @@
 import type { BatchId } from '../contracts';
 import { themeColor } from './theme';
 
-export type MapEffect = 'none' | 'fireflies' | 'spores';
+export type MapEffect = 'none' | 'fireflies' | 'spores' | 'sand' | 'embers' | 'motes';
 
 export interface MapDef {
   /** Asset key of the tileset spritesheet (see ASSETS). Frame 0 = ground, further frames = decoration. */
@@ -51,33 +51,32 @@ export const MAPS: Readonly<Record<BatchId, MapDef>> = {
     effectCount: 30,
     vignette: 0.45,
   },
-  // M5 (AP-97): placeholders with existing tokens and effects until the design (H-27) lands in AP-106.
-  // The tilesets are placeholder entries in ASSETS (same PNG as the named old map).
+  // M5 (AP-111): tiles carry the hi/lo ground tones, baseColor is the base tone. Tilesets are placeholders until AP-106.
   desert: {
     tilesetKey: 'tiles-desert',
-    baseColor: themeColor('biome.forest-ground').num,
-    decoDensity: 0.1,
-    effect: 'none',
-    effectColor: themeColor('game.hit-flash').num,
-    effectCount: 0,
-    vignette: 0.3,
+    baseColor: themeColor('biome.desert-ground').num,
+    decoDensity: 0.14,
+    effect: 'sand',
+    effectColor: themeColor('game.sand').num,
+    effectCount: 28,
+    vignette: 0.4,
   },
   pyramids: {
     tilesetKey: 'tiles-pyramids',
-    baseColor: themeColor('biome.elf-ground').num,
-    decoDensity: 0.12,
-    effect: 'none',
-    effectColor: themeColor('game.hit-flash').num,
-    effectCount: 0,
-    vignette: 0.4,
+    baseColor: themeColor('biome.pyramid-ground').num,
+    decoDensity: 0.18,
+    effect: 'embers',
+    effectColor: themeColor('game.ember').num,
+    effectCount: 26,
+    vignette: 0.55,
   },
   oasis: {
     tilesetKey: 'tiles-oasis',
-    baseColor: themeColor('biome.night-ground').num,
-    decoDensity: 0.14,
-    effect: 'spores',
-    effectColor: themeColor('game.spore').num,
-    effectCount: 24,
+    baseColor: themeColor('biome.oasis-ground').num,
+    decoDensity: 0.2,
+    effect: 'motes',
+    effectColor: themeColor('game.oasis-mote').num,
+    effectCount: 26,
     vignette: 0.45,
   },
 };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ASSETS, PLACEHOLDER_KEYS } from '../../src/config/assets';
+import { ASSETS } from '../../src/config/assets';
 import { LEVELS } from '../../src/config/levels';
 import { MAPS, MAX_MAP_PARTICLES } from '../../src/config/maps';
 import { themeColor } from '../../src/config/theme';
@@ -42,22 +42,27 @@ describe('maps', () => {
     expect(MAPS.elfForest.effect).toBe('spores');
   });
 
-  it('has placeholder maps for desert, pyramids and oasis with their own tileset keys (AP-97)', () => {
-    const NEW: BatchId[] = ['desert', 'pyramids', 'oasis'];
-    expect(Object.keys(MAPS).sort()).toEqual([...BATCHES, ...NEW].sort());
-    for (const b of NEW) {
-      const m = MAPS[b];
-      expect(m.tilesetKey).toBe(`tiles-${b}`);
-      expect(PLACEHOLDER_KEYS).toContain(m.tilesetKey);
-      expect(['none', 'spores']).toContain(m.effect);
+  it('has complete desert, pyramid and oasis maps with design tokens (AP-111)', () => {
+    const EXPECTED = {
+      desert: ['biome.desert-ground', 0.14, 0.4, 'sand', 'game.sand'],
+      pyramids: ['biome.pyramid-ground', 0.18, 0.55, 'embers', 'game.ember'],
+      oasis: ['biome.oasis-ground', 0.2, 0.45, 'motes', 'game.oasis-mote'],
+    } as const;
+    expect(Object.keys(MAPS).sort()).toEqual([...BATCHES, ...Object.keys(EXPECTED)].sort());
+    for (const [b, [ground, density, vignette, effect, color]] of Object.entries(EXPECTED)) {
+      const m = MAPS[b as BatchId];
+      expect(m.tilesetKey).toBe('tiles-' + b);
+      expect(ASSETS.find((a) => a.key === m.tilesetKey)?.kind).toBe('spritesheet');
       expect(m.tint).toBeUndefined();
-      expect(m.decoDensity).toBeGreaterThanOrEqual(0);
-      expect(m.decoDensity).toBeLessThanOrEqual(1);
-      expect(m.vignette).toBeGreaterThanOrEqual(0);
-      expect(m.vignette).toBeLessThanOrEqual(1);
+      expect(m.baseColor).toBe(themeColor(ground).num);
+      expect(m.decoDensity).toBe(density);
+      expect(m.vignette).toBe(vignette);
+      expect(m.effect).toBe(effect);
+      expect(m.effectColor).toBe(themeColor(color).num);
+      expect(m.effectCount).toBeGreaterThan(0);
       expect(m.effectCount).toBeLessThanOrEqual(MAX_MAP_PARTICLES);
-      if (m.effect === 'none') expect(m.effectCount).toBe(0);
     }
+    expect(new Set(Object.values(MAPS).map((m) => m.baseColor)).size).toBe(6);
   });
 
   it('takes ground and particle colours from the design tokens', () => {
