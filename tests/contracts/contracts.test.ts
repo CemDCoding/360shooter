@@ -137,7 +137,7 @@ describe('contracts', () => {
     const p: GameEventPayloads['powers-changed'] = powers;
     expect(GameEvents.CoinsChanged).toBe('coins-changed');
     expect(GameEvents.PowersChanged).toBe('powers-changed');
-    expect(MAX_UPGRADE_LEVEL).toBe(10);
+    expect(MAX_UPGRADE_LEVEL).toBe(15);
     expect([coin, item, save, old, coins, p].length).toBe(6);
   });
 

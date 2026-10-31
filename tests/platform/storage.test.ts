@@ -125,12 +125,24 @@ describe('save v1/v2', () => {
     }
   });
   it('broken upgrade level becomes 0 only for that track', () => {
-    for (const bad of [11, -1, 1.5, 'x']) {
+    for (const bad of [16, -1, 1.5, 'x']) {
       const l = loadSave(
         memory(JSON.stringify({ ...valid, upgrades: { ...valid.upgrades, weaponDamage: bad } })),
       );
       expect(l).toEqual({ ...valid, upgrades: { ...valid.upgrades, weaponDamage: 0 } });
     }
+  });
+  it('keeps levels 11 to 15 and old saves with 0 to 10 unchanged', () => {
+    const high = { ...valid.upgrades, weaponDamage: 15, playerMaxHp: 11 };
+    expect(loadSave(memory(JSON.stringify({ ...valid, upgrades: high })))).toEqual({
+      ...valid,
+      upgrades: high,
+    });
+    const old = { ...valid.upgrades, weaponFireRate: 10 };
+    expect(loadSave(memory(JSON.stringify({ ...valid, upgrades: old })))).toEqual({
+      ...valid,
+      upgrades: old,
+    });
   });
   it('non-object upgrades become zeros', () => {
     const l = loadSave(memory(JSON.stringify({ ...valid, upgrades: 5 })));
