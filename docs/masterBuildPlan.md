@@ -26,7 +26,8 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 - **AP-96 (B4):** Reihenfolge Breite → `#game` → `getParentBounds()` → `scale.refresh()` (Phaser nutzte die zwischengespeicherte `parentSize`); `syncRound` mit echtem Szenenstatus (H-b per Code widerlegt). Layout-Anzeige per Geste: drei Finger (innerhalb 600 ms) 2 s halten, nur außerhalb einer Runde, Flag `localStorage` `360shooter.layoutDebug.v1`=„1“, Finger auf eine freie Fläche; Anzeige ca. 16 Zeilen/190 px, verdeckt das Menü links oben. Gerechnet (iPhone 15 852×393, Insets 47/47/21): Homescreen und Safari ohne Leiste want=now=734, Rest je Seite 47 (H-e, gewollt nach PE-97, wirkt wie ein Rand); Safari mit Leiste want=now=800 (`maxWidth`-Deckel, ungedeckelt 850), Rest je Seite ca. 69; PC 640 ohne Balken. `want 900` aus H-24 ist mit keinem Commit erreichbar (`maxWidth` 800 seit aea17e1): H-24 testete vermutlich einen älteren oder gecachten stage-Stand (nicht verifiziert).
 - **Laufende Arbeit:** keine. **Bereit:** keine Pakete. **Offen [Mensch]:** (a) Release `dev` → `stage` (PE-119), (b) **H-26** Handtest B4: Homescreen-App neu anlegen, Anzeige per Geste abschreiben, Fotos je Zustand (Safari mit/ohne Leiste, Homescreen-App, nach Rundenende); Erwartung ohne Leiste canvas rest 47/47, want = now, phaser disp = host. Außerdem H-24 (Rest, M4-DEP: Gold ohne `?level=`, Boss-Phasen, Baum-HP, Leistung mit `?fps=1`, Sichtprüfung AP-86/AP-94), H-22 (Rest), H-18, H-12, H-16. **Fallback bei Ruckeln:** `MAX_ENEMIES` Level 10 bis 20 senken, dann Intervall anheben (`balancing.md` „Nachjustieren“).
 - **Erkenntnisse (Details §18):** AP-96: (1) Ursache nur aus Code belegt, Gerätemessung steht aus. (2) niedrig: `decideArenaWidth` in `layoutDebug.ts` seit AP-89 ungenutzt, bei Gelegenheit entfernen. (3) Commit-Trailer nennt Opus, Paket sagte sonnet: Modellangabe im Paket an `ma-config` angleichen. (4) Der role-guard blockiert Bash-Befehle mit dem Wort „shutdown“ (auch grep). Dauerhaft: Frische Coder-Worktrees brauchen `npm ci` durch den Lead, Coder installieren nie; `?level=` macht die Sitzung zur Debug-Runde ohne Speichern (PE-49); Designer-Commits an `docs/design/export/` brauchen `npm run theme:build`, an `sprites*.js` `npm run sprites:build` (PNGs committen); Coder führen nie `npm run format` oder `prettier --write .` aus; der Wächter blockiert Merge-Befehle mit Semikolon im Commit-Text; `build-sprites.test.ts` trägt die Sprite-Anzahl fest ein (25); Design-Review kann keine Szene im Bild prüfen (Proxy), Sichtprüfung im Handtest; Banner und Pause-Titel nutzen `funkScale` mit k.
-- **Nächster Schritt:** Release `dev` → `stage` (Schritt-für-Schritt-Anleitung, PE-119), dann H-26 und H-24 durch den Nutzer; Befunde kommen als Fix-Pakete über den Planner. Vorschlag V-17 (Sprite-Sync) wartet auf den Nutzer.
+- **M5 neu (2026-10-31, PE-123 bis PE-130):** Level 21–40 Wüste, Pyramiden, Pyramiden-Oase, AP-97 bis AP-108. **AP-97 `bereit`** (W1). Parallel H-27 (Designer, blockiert nur W5). Handtests und Fix-Pakete haben Vorrang (PE-130).
+- **Nächster Schritt:** M5 W1 (AP-97) starten. Unabhängig davon Release `dev` → `stage` (Schritt-für-Schritt-Anleitung, PE-119), dann H-26 und H-24 durch den Nutzer; Befunde kommen als Fix-Pakete über den Planner. Vorschlag V-17 (Sprite-Sync) wartet auf den Nutzer.
 - **Offene Fragen an den Nutzer:** (1) **Q-55** (B4, nach H-26): Insets (47 pt je Seite) (a) mit Spielfarbe statt Menüfarbe füllen, (b) `maxWidth` auf ca. 850 bis 900 anheben (Balance, PE-99, PE-100; die Zahlen sind Nutzerentscheidung) oder (c) so lassen. (2) Q-49 (B1): Debug-Runden speichern nicht (PE-49 bleibt); Gold einmal ohne `?level=` prüfen. (3) Q-52 (optional): Foto von `?layout=1`, jetzt per Geste (H-26).
 
 <!-- Ende Lagebericht -->
@@ -64,7 +65,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | fertig | – | G1 |
-| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) durch Handtest M3-DEP bestätigt (2026-10-26); F-07, F-15 bis F-17 und Backlog freigegeben (H-07); F-01 mit Stick übernommen (V-05, 2026-10-25); F-17 bleibt Pflicht (V-06 abgelehnt, PE-56) | G1 |
+| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) durch Handtest M3-DEP bestätigt (2026-10-26); F-07, F-15 bis F-17 und Backlog freigegeben (H-07); F-01 mit Stick übernommen (V-05, 2026-10-25); F-17 bleibt Pflicht (V-06 abgelehnt, PE-56); M5: F-18 bis F-22 (PE-123), Boss-Verhalten PE-128 angenommen (Bestätigung in H-28) | G1 |
 | 3 | Tech-Stack | angenommen | Werkzeuge (Vitest, ESLint, Prettier) angenommen | G1 |
 | 4 | Architektur, Datenmodell, Verträge | fertig | – | G1 |
 | 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | – | G1 |
@@ -74,7 +75,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 bestätigt 2026-10-25; M2b-Nachtrag AP-56 neu; M2c-Nachtrag AP-58–AP-62 (PE-65), AP-16 hängt nach PE-69 am Nachtrag) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de); Nachtrag 3 N8 AP-76 (HUD-Größe Handy), AP-77 (Seitenverhältnis, Beleg) und AP-78 (Theme-Sync, PE-95) fertig (gemergt da5ead9, 665b843, 95418ac, 2026-10-26); **Nachtrag 4 N9 AP-79 (Sprite-Pipeline, 24 PNGs) und AP-80 (Doku, Lizenzen) neu (PE-107, 2026-10-26), fertig (gemergt 2c0dd76, ab1e4ba; 2026-10-27)**; M4 W1/W2 AP-81 bis AP-84 fertig (gemergt 9267542, 675afef, 0bd0ed0, 9383e4a; 2026-10-27); **Nachtrag 5 N10 AP-87 (Prettier-Aufräumen, PE-110) fertig (gemergt b0182b9, 2026-10-27)**; Folgepakete Seitenverhältnis Teil 2 (Variante B, M4, PE-96 bis PE-106, Planner-Interview) sind M4 (AP-81 bis AP-86); **Nachtrag 6 N11 AP-88 bis AP-94 neu (Fix-Pakete Handtest H-22 und Design H-23, PE-111 bis PE-118, 2026-10-28), AP-86 verfeinert; Folgepaket AP-95 (B5 Teil 3, Level 5 bis 20, PE-120); Design H-25 übernommen (PE-121), AP-92 bereit** | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de); Nachtrag 3 N8 AP-76 (HUD-Größe Handy), AP-77 (Seitenverhältnis, Beleg) und AP-78 (Theme-Sync, PE-95) fertig (gemergt da5ead9, 665b843, 95418ac, 2026-10-26); **Nachtrag 4 N9 AP-79 (Sprite-Pipeline, 24 PNGs) und AP-80 (Doku, Lizenzen) neu (PE-107, 2026-10-26), fertig (gemergt 2c0dd76, ab1e4ba; 2026-10-27)**; M4 W1/W2 AP-81 bis AP-84 fertig (gemergt 9267542, 675afef, 0bd0ed0, 9383e4a; 2026-10-27); **Nachtrag 5 N10 AP-87 (Prettier-Aufräumen, PE-110) fertig (gemergt b0182b9, 2026-10-27)**; Folgepakete Seitenverhältnis Teil 2 (Variante B, M4, PE-96 bis PE-106, Planner-Interview) sind M4 (AP-81 bis AP-86); **Nachtrag 6 N11 AP-88 bis AP-94 neu (Fix-Pakete Handtest H-22 und Design H-23, PE-111 bis PE-118, 2026-10-28), AP-86 verfeinert; Folgepaket AP-95 (B5 Teil 3, Level 5 bis 20, PE-120); Design H-25 übernommen (PE-121), AP-92 bereit**; **M5 AP-97 bis AP-108 neu (2026-10-31, PE-123 bis PE-130), AP-106 und AP-107 warten auf H-27** | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
@@ -82,7 +83,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig). M3-Nachtrag W1 (AP-68, AP-69, AP-70) abgeschlossen am 2026-10-26, alle `fertig`. M3-Nachtrag W2 (AP-71) und Nachtrag 2 N5 (AP-66) abgeschlossen am 2026-10-26, beide `fertig`. H-15 [Mensch] abgenommen und M3-DEP abgenommen (Handtest 2026-10-26, PC und iPhone, ohne Befunde); Release nach `stage` offen (H-17). Q-44 beantwortet (16 px, PE-90). N6 (AP-72, AP-73, AP-74) abgeschlossen am 2026-10-26, alle `fertig`; Abnahme des Nachtrags 2 über den Handtest H-18 offen, Q-46 offen. N7 (AP-75) abgeschlossen am 2026-10-26, `fertig` (gemergt 59f53de, Code-Review Runde 1 bestanden). Smoke-Punkt in H-18 offen, blockiert kein Folgepaket. N8 (AP-76, AP-77, AP-78) abgeschlossen am 2026-10-26, alle `fertig` (Reviews Runde 1 bestanden, AP-76 auch Design-Review, 458/458). H-17 erledigt (stage auf dev-Stand). Q-47 Variante B (PE-96): Planung im Planner-Interview läuft. Mechanik, Fairness, Boss-Arena und Menü entschieden (PE-99 bis PE-102), §4 um „Arena-Größe“ ergänzt (freigegeben). HUD-Tabelle durch den Designer (PE-103), Chips und Banner unverändert (PE-104, PE-105), Abnahme (PE-106), Breite während der Runde fest (PE-109). **G2(M4 „Breites Spielfeld“) erfüllt** für AP-81 bis AP-85 (Schnitt vom Nutzer bestätigt, 2026-10-26, PE-109); M4 W1 (AP-81) `fertig` (2026-10-27). AP-86 ist grob und wird nach H-23 per „Design übernehmen“ verfeinert (G2 für AP-86 offen). G2(Nachtrag 4 „Einbau der Ingame-Sprites“) erfüllt (2026-10-26): H-19 ☑ (Nutzer: „sprites sind freigegeben“), AP-79 und AP-80 vollständig, Abhängigkeiten erfüllt (Designer-Commits 57573d8, 7740338, 8c7b88b und AP-78 auf dev), Abdeckungsmatrix ergänzt, [Mensch]-Schritt H-22 steht; N9 (AP-79, AP-80) abgeschlossen am 2026-10-27, beide `fertig` (gemergt 2c0dd76, ab1e4ba; Reviews Runde 1 bestanden, AP-79 auch Design-Review; Tests 489/489); Abnahme H-22 [Mensch] fällig. M4 W1 (AP-81, 9267542) und W2 (AP-83 675afef, AP-82 0bd0ed0, AP-84 9383e4a) abgeschlossen am 2026-10-27, alle `fertig` (Reviews Runde 1 bestanden). **M4 W3:** AP-85 abgeschlossen am 2026-10-27, `fertig` (gemergt 7767845, Review und Design-Review Runde 1 bestanden, Tests 491/491). AP-86 weiter grob (G2 offen bis H-23 und „Design übernehmen“); H-24 (M4-DEP) folgt danach. **N10:** AP-87 abgeschlossen am 2026-10-27, `fertig` (gemergt b0182b9, Review Runde 1 bestanden, `prettier --check .` grün, Tests 491/491). **G2(Nachtrag 6 „Fix-Pakete H-22 und H-23“) erfüllt (2026-10-28):** AP-88, AP-89, AP-93 (W1), AP-86 (verfeinert), AP-90, AP-94 (W2), AP-91 (W3) vollständig; Brief-Ergänzung H-23 vom Nutzer freigegeben (Designer-Commits fca6486, ae5fb1a, e88a624), Theme-Sync AP-93 liegt vor allen Paketen, die `theme.ts` lesen. **AP-92 (Münzen 12 px): G2 erfüllt am 2026-10-28** (Brief-Ergänzung H-25 vom Nutzer freigegeben, Designer-Commits dcb2861 und 01c085b, Übernahme PE-121; H-25 erledigt). **AP-95 (B5 Teil 3, Level 5 bis 20, N11 W4): G2 erfüllt** (Paket vollständig, PE-120), Status `bereit` seit dem AP-91-Merge. AP-86 `bereit` nach AP-93 (G2 erfüllt). Reihenfolge und Dateieigentum siehe §12 „Nachtrag 6“. **N11 W1 (AP-88, AP-89, AP-93) abgeschlossen am 2026-10-28, alle `fertig`** (gemergt ae7d3ac, f31fbec, 4057ecd; Reviews AP-88 und AP-89 Runde 1, AP-93 Runde 2 bestanden; Tests 506/506). W2 (AP-86, AP-90, AP-94) `bereit`, G2 erfüllt; AP-91 `bereit` nach AP-90; AP-92 `bereit` (H-25 übernommen, hängt nicht mehr an AP-86, da `CoinCounter.ts` unberührt bleibt). **N11 W3 (AP-91, AP-92) abgeschlossen am 2026-10-28, beide `fertig`** (gemergt b8e625a, 4a017fa; Reviews Runde 1 bestanden, AP-92 auch Design-Review; Tests 559/559). AP-95 (W4) `bereit`.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig). M3-Nachtrag W1 (AP-68, AP-69, AP-70) abgeschlossen am 2026-10-26, alle `fertig`. M3-Nachtrag W2 (AP-71) und Nachtrag 2 N5 (AP-66) abgeschlossen am 2026-10-26, beide `fertig`. H-15 [Mensch] abgenommen und M3-DEP abgenommen (Handtest 2026-10-26, PC und iPhone, ohne Befunde); Release nach `stage` offen (H-17). Q-44 beantwortet (16 px, PE-90). N6 (AP-72, AP-73, AP-74) abgeschlossen am 2026-10-26, alle `fertig`; Abnahme des Nachtrags 2 über den Handtest H-18 offen, Q-46 offen. N7 (AP-75) abgeschlossen am 2026-10-26, `fertig` (gemergt 59f53de, Code-Review Runde 1 bestanden). Smoke-Punkt in H-18 offen, blockiert kein Folgepaket. N8 (AP-76, AP-77, AP-78) abgeschlossen am 2026-10-26, alle `fertig` (Reviews Runde 1 bestanden, AP-76 auch Design-Review, 458/458). H-17 erledigt (stage auf dev-Stand). Q-47 Variante B (PE-96): Planung im Planner-Interview läuft. Mechanik, Fairness, Boss-Arena und Menü entschieden (PE-99 bis PE-102), §4 um „Arena-Größe“ ergänzt (freigegeben). HUD-Tabelle durch den Designer (PE-103), Chips und Banner unverändert (PE-104, PE-105), Abnahme (PE-106), Breite während der Runde fest (PE-109). **G2(M4 „Breites Spielfeld“) erfüllt** für AP-81 bis AP-85 (Schnitt vom Nutzer bestätigt, 2026-10-26, PE-109); M4 W1 (AP-81) `fertig` (2026-10-27). AP-86 ist grob und wird nach H-23 per „Design übernehmen“ verfeinert (G2 für AP-86 offen). G2(Nachtrag 4 „Einbau der Ingame-Sprites“) erfüllt (2026-10-26): H-19 ☑ (Nutzer: „sprites sind freigegeben“), AP-79 und AP-80 vollständig, Abhängigkeiten erfüllt (Designer-Commits 57573d8, 7740338, 8c7b88b und AP-78 auf dev), Abdeckungsmatrix ergänzt, [Mensch]-Schritt H-22 steht; N9 (AP-79, AP-80) abgeschlossen am 2026-10-27, beide `fertig` (gemergt 2c0dd76, ab1e4ba; Reviews Runde 1 bestanden, AP-79 auch Design-Review; Tests 489/489); Abnahme H-22 [Mensch] fällig. M4 W1 (AP-81, 9267542) und W2 (AP-83 675afef, AP-82 0bd0ed0, AP-84 9383e4a) abgeschlossen am 2026-10-27, alle `fertig` (Reviews Runde 1 bestanden). **M4 W3:** AP-85 abgeschlossen am 2026-10-27, `fertig` (gemergt 7767845, Review und Design-Review Runde 1 bestanden, Tests 491/491). AP-86 weiter grob (G2 offen bis H-23 und „Design übernehmen“); H-24 (M4-DEP) folgt danach. **N10:** AP-87 abgeschlossen am 2026-10-27, `fertig` (gemergt b0182b9, Review Runde 1 bestanden, `prettier --check .` grün, Tests 491/491). **G2(Nachtrag 6 „Fix-Pakete H-22 und H-23“) erfüllt (2026-10-28):** AP-88, AP-89, AP-93 (W1), AP-86 (verfeinert), AP-90, AP-94 (W2), AP-91 (W3) vollständig; Brief-Ergänzung H-23 vom Nutzer freigegeben (Designer-Commits fca6486, ae5fb1a, e88a624), Theme-Sync AP-93 liegt vor allen Paketen, die `theme.ts` lesen. **AP-92 (Münzen 12 px): G2 erfüllt am 2026-10-28** (Brief-Ergänzung H-25 vom Nutzer freigegeben, Designer-Commits dcb2861 und 01c085b, Übernahme PE-121; H-25 erledigt). **AP-95 (B5 Teil 3, Level 5 bis 20, N11 W4): G2 erfüllt** (Paket vollständig, PE-120), Status `bereit` seit dem AP-91-Merge. AP-86 `bereit` nach AP-93 (G2 erfüllt). Reihenfolge und Dateieigentum siehe §12 „Nachtrag 6“. **N11 W1 (AP-88, AP-89, AP-93) abgeschlossen am 2026-10-28, alle `fertig`** (gemergt ae7d3ac, f31fbec, 4057ecd; Reviews AP-88 und AP-89 Runde 1, AP-93 Runde 2 bestanden; Tests 506/506). W2 (AP-86, AP-90, AP-94) `bereit`, G2 erfüllt; AP-91 `bereit` nach AP-90; AP-92 `bereit` (H-25 übernommen, hängt nicht mehr an AP-86, da `CoinCounter.ts` unberührt bleibt). **N11 W3 (AP-91, AP-92) abgeschlossen am 2026-10-28, beide `fertig`** (gemergt b8e625a, 4a017fa; Reviews Runde 1 bestanden, AP-92 auch Design-Review; Tests 559/559). AP-95 (W4) `bereit`. **G2(M5 „Wüste und Pyramiden“) erfüllt für W1 bis W4 und W6 (2026-10-31):** AP-97 bis AP-105 und AP-108 vollständig, Schnitt vom Nutzer bestätigt, [Mensch]-Schritte H-27 und H-28 stehen, Abdeckungsmatrix ergänzt. AP-97 `bereit`. **W5 (AP-106, AP-107): G2 offen** bis H-27 (Designer-Freigabe) und Pflegeauftrag „Design übernehmen“.
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -904,6 +905,33 @@ Ziel: Das Spielfeld wird am Handy breiter (Breite 640..800 bei Höhe 360), damit
   - [ ] Design: Boss-Lebensleiste und Timer-Label im Funk-Stil (Brief `runde.html` 3, Text „BOSS!“ laut Q-31), Warnanzeigen in Warnrot, keine Farb-Literale in den Boss-Dateien (Design-Review AP-20)
   - [ ] Handtest AP-20 (Coder-Bericht, Details §18): Warnung bei 0:33 (vorher 1:03), Boss bei 0:30 (vorher 1:00, PE-76), Leiste unten mittig, Overtime „BOSS!“, Baummonster-Knospe und Ring, Waldgeist-Kugeln und Fade, Stein-Roll und Teilsteine, Niederlage und „Nochmal“ ohne Reste, Pause, Feuerring trifft Bosse nicht, halbe Gegner-Spawnrate bei lebendem Boss
 
+#### M5 – Wüste und Pyramiden (Level 21–40, PE-123 bis PE-130)
+
+Ziel: Drei neue Maps mit je einem Boss (Wüste 21–25, Pyramiden 26–30, Pyramiden-Oase 31–40), neun neue Gegner, dazu Wildschwein, Bär und Fee auf den alten Maps. Die Level-Auswahl lässt sich blättern, die Upgrades gehen bis Stufe 15. Logik und Konfig laufen ab sofort mit Platzhalter-Sprites (PE-130). Grafik und Menü folgen nach der Freigabe des Designs (H-27, PE-124).
+
+| Welle | Pakete (parallel, höchstens drei, PE-15) |
+|---|---|
+| M5 W1 | **AP-97** Gerüst und Verträge M5 (alle IDs, Konfig-Einträge, Platzhalter-Sprites, Boss-Stubs, generischer Ruf, Level 21–40 vorläufig). Parallel [Mensch] **H-27** Designer-Abgleich und Lücken (blockiert nur W5) |
+| M5 W2 | **AP-98** Logik der Gegner-Bausteine. **AP-99** Upgrades bis Stufe 15 und Spielstand. **AP-100** Boss Riesen-Sand-Wurm |
+| M5 W3 | **AP-101** Gegner-Entities (Ansturm, Eingraben, Zickzack, Geschosse). **AP-102** Status-Effekte in der Runde (Gift, Verlangsamung, Lebensleiste). **AP-103** Boss Antiker Wächter-Hund |
+| M5 W4 | **AP-104** Boss Pharao. **AP-105** Balancing Level 0–40 und Upgrade-Preise |
+| M5 W5 | nach H-27 und „Design übernehmen“: **AP-106** Sprites, Tilesets und Map-Effekte einbauen. **AP-107** Level-Auswahl blätterbar und Upgrade-Panel mit 15 Stufen |
+| M5 W6 | **AP-108** Doku `docs/gegner-und-maps.md` und Anleitungen (F-22) |
+| M5 W7 | **H-28** [Mensch] M5-DEP: `dev` nach `stage`, Handtest |
+
+##### M5-DEP – Abnahme [Mensch] (H-28)
+
+- **Prüfpunkte:**
+  - [ ] Level-Auswahl: Seite 1 Wald, Wald bei Nacht, Elfenwald, Seite 2 Wüste, Pyramiden, Pyramiden-Oase. Blättern per Maus und Touch, Ziele mindestens 32 px, der Freischaltstand stimmt auf beiden Seiten
+  - [ ] Level 20 geschafft → Level 21 frei. Level 21–40 nacheinander spielbar (Stichprobe 21, 26, 31, 40), alter Spielstand bleibt erhalten
+  - [ ] Wüste, Pyramiden, Oase: eigene Map mit Tileset und Effekt, Gegner laut F-19, Boss laut F-18
+  - [ ] Wildschwein und Bär ab Level 0, Fee ab Level 5. Die Level 0–20 fühlen sich nicht schwerer an als vorher (PE-125)
+  - [ ] Gift (Schlange): Schaden über Zeit, Lebensleiste mit zweitem Merkmal. Wickel (Mumie): Drehung spürbar langsamer, 2 s. Ansturm angekündigt. Sandwurm abgetaucht sichtbar und unverwundbar
+  - [ ] Bosse: Angriffe nach PE-128 angekündigt und fair, Zusatzangriff ab dem 3. Level des Batches. **Bestätigung PE-128** durch den Nutzer
+  - [ ] Upgrades bis 15/15 kaufbar, Preise steigen, das Panel ist lesbar
+  - [ ] Leistung mit `?fps=1` am iPhone in Level 25, 30 und 40 (höchstens 150 Gegner)
+  - [ ] Design (Sichtprüfung): Sprites, Tilesets und Menü wie im freigegebenen Brief, `prefers-reduced-motion` ohne Sandsturm-Flackern
+
 ---
 
 ## 10. Statusübersicht
@@ -1012,6 +1040,20 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-96 | Fix B4 Folge aus H-24: Diagnose-Anzeige per Geste auch in der Homescreen-App, Ursache für `arena want` ≠ `now` und die Seitenränder aus Messwerten belegen, beheben; Safari-Browser und Homescreen-App, Leiste ein und aus (PE-122; Priorität 1; Design-Review nein) | Nachtrag 7 | GAME | N12 W1 | AP-89 (fertig) | L | sonnet (high) | – (gemergt d6e9c0b) | fertig (gemergt d6e9c0b; Review Runde 1 bestanden; Ursache nur am Code belegt, Beleg am Gerät in H-26) |
 | H-26 | Handtest B4 erneut auf stage nach Release von AP-96 (Safari-Browser und Homescreen-App quer, Leiste ein und aus, Anzeige per Geste, PC 16:9; Prüfpunkte §9.2 „Nachtrag 7“). Hinweis: H-25 ist der erledigte Designer-Auftrag | Nachtrag 7 | HUM | N12 W2 | AP-96 (fertig) | H | – | – | offen (Release dev → stage nötig; Homescreen-App neu anlegen; Fotos je Zustand) |
 | H-25 | Designer-Auftrag (erweitert am 2026-10-28): (1) Münzen im Spiel 12 px (neue Feldmünze 6×6 ×2, große 12×12 ×1, Stern bleibt), `coin-small` 8×8 für die Menüsymbole bleibt (Q-50); (2) Chip-Zeile der Tabelle: drei Anzeigen (Doppelschuss, Schild, Münzzähler) links oben 15 % kleiner auf iPhone und PC, übrige Chips unverändert (B3, Q-53, PE-119); (3) Brief und Mockup `ergebnis.html`: Niederlage-Text „NIEDERLAGE“ statt „BESIEGT“ (Q-54, PE-118); blockiert AP-92, nicht AP-94 und nicht AP-86 | Nachtrag 6 | HUM | vor AP-92 | – | H | – | – | erledigt (Designer-Commits dcb2861 und 01c085b, Brief freigegeben 2026-10-28; Übernahme PE-121) |
+| AP-97 | M5 Gerüst und Verträge: IDs für Batches, Gegner, Bosse, Verhalten, Status-Effekte, Ruf-Callback, Konfig-Einträge mit Platzhalter-Sprites, Boss-Stubs, Level 21–40 vorläufig (PE-123 bis PE-129; Design-Review nein) | M5 | SH/GAME | M5 W1 | – | L | sonnet (high) | – | bereit |
+| AP-98 | Logik der Gegner-Bausteine: Gift, Verlangsamung, Ansturm, Eingraben, Zickzack (PE-127) | M5 | LOG | M5 W2 | AP-97 | M | sonnet (high) | – | offen |
+| AP-99 | Upgrades bis Stufe 15, Spielstand abwärtskompatibel, Pips im Panel passend (PE-129; Design-Review ja) | M5 | SH/LOG/GAME | M5 W2 | AP-97 | S | sonnet (medium) | – | offen |
+| AP-100 | Boss Riesen-Sand-Wurm: `burrow`, `spikeVolley`, `coil` (PE-128) | M5 | GAME/SH | M5 W2 | AP-97 | L | sonnet (high) | – | offen |
+| AP-101 | Gegner-Entities: Ansturm, Eingraben, Zickzack, Geschosse Spucke, Wickel, Lupenstrahl (PE-127) | M5 | GAME | M5 W3 | AP-98 | L | sonnet (high) | – | offen |
+| AP-102 | Status-Effekte in der Runde: Gift und Verlangsamung an der Spielerin, Anzeige an der Lebensleiste (PE-127; Design-Review ja) | M5 | GAME | M5 W3 | AP-98 | M | sonnet (high) | – | offen |
+| AP-103 | Boss Antiker Wächter-Hund: `runeShield`, `guardBark`, `summonMummies` (PE-128) | M5 | GAME/SH | M5 W3 | AP-100 | L | sonnet (high) | – | offen |
+| AP-104 | Boss Pharao: `goldCurse`, `sarcophagus`, `sandstorm` (PE-128) | M5 | GAME/SH | M5 W4 | AP-103 | L | sonnet (high) | – | offen |
+| AP-105 | Balancing Level 0–40 und Upgrade-Preise 11–15, `balancing.md` (PE-125, PE-129) | M5 | SH/LOG | M5 W4 | AP-99, AP-101, AP-102 | L | sonnet (high) | – | offen |
+| AP-106 | Sprites, Tilesets und Map-Effekte aus dem Design einbauen (PE-124; Design-Review ja) | M5 | ASSET/GAME | M5 W5 | H-27, „Design übernehmen“, AP-104, AP-105 | M | sonnet (medium) | – | blockiert (H-27) |
+| AP-107 | Level-Auswahl blätterbar, Upgrade-Panel mit 15 Stufen nach Design (F-21, PE-129; Design-Review ja) | M5 | GAME | M5 W5 | H-27, „Design übernehmen“, AP-99, AP-105 | M | sonnet (high) | – | blockiert (H-27) |
+| AP-108 | Doku: `docs/gegner-und-maps.md` (Maps, Gegner, Bosse, Spawns) und Anleitungen (F-22) | M5 | ASSET | M5 W6 | AP-106, AP-107 | S | sonnet (medium) | – | offen |
+| H-27 | Designer-Auftrag M5: erst Abgleich, was schon gestaltet ist, dann die Lücken designen, Brief ergänzen, Freigabe durch den Nutzer (Text §13) | M5 | HUM | parallel M5 W1 | – | H | – | – | offen (Designer arbeitet, Dateien noch nicht committet) |
+| H-28 | M5-DEP: `dev` nach `stage`, Handtest nach §9.2 „M5-DEP“, Bestätigung PE-128 | M5 | HUM | M5 W7 | AP-108 | H | – | – | offen |
 
 ---
 
@@ -1114,7 +1156,19 @@ flowchart LR
     AP89 --> AP96["AP-96 B4 Folge (N12)"] --> H26["H-26 Handtest B4"]
     AP86 & AP88 --> H24
   end
+  subgraph M5["M5 Wüste und Pyramiden"]
+    AP97["AP-97 Gerüst M5"] --> AP98["AP-98 Logik Bausteine"] & AP99["AP-99 Upgrades 15"] & AP100["AP-100 Boss Sand-Wurm"]
+    AP98 --> AP101["AP-101 Gegner-Entities"] & AP102["AP-102 Status in der Runde"]
+    AP100 --> AP103["AP-103 Boss Wächter-Hund"] --> AP104["AP-104 Boss Pharao"]
+    AP101 & AP102 & AP99 --> AP105["AP-105 Balancing 0 bis 40"]
+    H27["H-27 Designer M5"] --> AP106["AP-106 Sprites, Tilesets"] & AP107["AP-107 Level-Seiten, Panel 15"]
+    AP105 & AP104 --> AP106
+    AP99 & AP105 --> AP107
+    AP106 & AP107 --> AP108["AP-108 Doku"] --> H28["H-28 M5-DEP"]
+  end
 ```
+
+**M5 (PE-123 bis PE-130):** AP-97 ist das Gerüst. Es erweitert alle Verträge (`BatchId`, `EnemyId`, `EnemyBehavior`, `BossId`, Status-Effekte, Ruf-Callback), legt alle Konfig-Einträge an und macht die neuen Inhalte mit vorhandenen Sprites lauffähig. Danach nutzt kein Paket einen Vertrag aus derselben Welle. W2: AP-98 (nur `src/logic/` neue Dateien), AP-99 (`contracts/upgrade.ts`, `logic/upgrades.ts`, `platform/storage.ts`, Pips im Upgrade-Panel) und AP-100 (`BossBase.ts`, Sand-Wurm, `config/bosses.ts`) teilen keine Datei. W3: AP-101 (`entities/enemies/**`), AP-102 (`GameScene.ts`, `HudScene.ts`, `Player.ts`, `scenes/hud/**`) und AP-103 (Boss-Dateien, `config/bosses.ts` eine Welle nach AP-100) teilen keine Datei. AP-101 und AP-102 brauchen beide AP-98, nicht einander: Die Felder `onHit` an Gegnern und Geschossen legt AP-97 an. W4: AP-104 (Boss-Dateien, eine Welle nach AP-103) und AP-105 (`levels.ts`, `enemies.ts`, `scaling.ts`, `upgrades.ts`, Balance-Tests, `balancing.md`) teilen keine Datei. W5 wartet auf H-27: AP-106 (`assets.ts`, `maps.ts`, `MapBackground.ts`, `public/assets/sprites/**`, `theme.ts`) und AP-107 (`menu/**`, `MenuScene.ts`) teilen keine Datei. AP-106 kommt nach AP-104 und AP-105, damit Sprite-Schlüssel und Konfig-Werte feststehen. AP-108 dokumentiert den Endstand.
 
 **M2b:** Die Reihenfolgekante M2-DEP → AP-25/AP-26 (PE-46) ist mit der Abnahme vom 2026-10-25 erfüllt und entfernt. W1 und W2 sind je ein Paket pro Datei. AP-38 (W1) und AP-39 (W2) teilen `GameScene.ts`, daher nacheinander. AP-34 (HUD, W4) und AP-33 (GameScene, W5) starten erst nach AP-38 bzw. AP-39. W5 läuft mit AP-35 (Config) und AP-32 (Menü) parallel, ohne gemeinsame Datei. AP-36 folgt, weil es die Item-Typen erst entfernt, wenn niemand sie mehr nutzt. Rüstungen (PE-58): AP-37a (W3) liefert Vertrag und Logik, AP-37c (W4) Entity und Sprite, AP-34 (W4) die Anzeige, AP-33 (W5) die Einbindung in `GameScene`. Die Einbindung steckt in AP-33, weil `GameScene.ts` in W5 schon AP-33 gehört. Ein eigenes Einbindungspaket wäre erst in W6 möglich und verletzte „spätestens W5“ (PE-58).
 
@@ -4220,6 +4274,329 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 - **Kürzbar bei Budgetnot:** nein (blockiert AP-66, dev ist rot)
 - **Commit-Typ:** `fix(AP-71): regenerate theme and tokens from the H-14 export`
 
+### M5 – Wüste und Pyramiden (Level 21–40, PE-123 bis PE-130)
+
+**Gemeinsame Vorgaben für alle M5-Pakete:**
+
+- **IDs (verbindlich, an die Sprite-Schlüssel des Designers angelehnt):** Batches `desert` („Wüste“, 21–25), `pyramids` („Pyramiden“, 26–30), `oasis` („Pyramiden-Oase“, 31–40). Gegner `mummy`, `sandWorm`, `armadillo`, `camel`, `snake`, `archaeologist`, `sphinx`, `boar`, `bear`, `fairy`, Sprite-Schlüssel `enemy-<kebab>` (`enemy-sand-worm` usw.). Bosse `giantSandWorm` (Anzeigename „Riesen-Sand-Wurm“, Sprite `boss-sand-worm`, Körper `boss-sand-worm-body`), `guardianDog` („Antiker Wächter-Hund“, `boss-guardian-dog`), `pharaoh` („Pharao“, `boss-pharaoh`, Kugel `boss-pharaoh-orb`). Tilesets `tiles-desert`, `tiles-pyramids`, `tiles-oasis`. Weicht der freigegebene Brief (H-27) bei einem Sprite-Schlüssel ab, gilt der Brief, und AP-106 passt nur `assets.ts` an.
+- **Spawn-Zuordnung (F-19, PE-125):** Wald `cursedTree`, `boar`, `bear`. Wald bei Nacht zusätzlich `forestWitch`, `zombieSquirrel`, `fairy`. Elfenwald wie bisher plus `fairy` (ohne `boar` und `bear`, F-19). Wüste `sandWorm`, `armadillo`, `camel`, `snake`. Pyramiden `mummy`, `sandWorm`, `archaeologist`, `sphinx`. Oase `mummy`, `snake`, `archaeologist`, `sphinx`. Der Pool hängt künftig am Batch, nicht mehr an Level-Schwellen.
+- **Rundendauer (PE-129):** 180 s für 21–23, 26–28, 31–35, 300 s für 24–25, 29–30, 36–40.
+- **Fairness:** Jeder neue Angriff und jeder Ansturm wird mindestens 700 ms angekündigt (`MIN_TELEGRAPH_MS`), Reaktionszeit mindestens 1000 ms, Trefferradius der Spielerin 14 (PE-75). Gegner erscheinen außerhalb des Bildes (AP-83).
+- **Design:** Bis W5 nutzen die neuen Inhalte vorhandene Sprites als Platzhalter (siehe AP-97). Nur Tokens, keine Farb-Literale in `src/scenes/**` und `src/entities/**` (Brief, Grundsatz 1). Zustände nie nur über Farbe (Grundsatz 4).
+- **Pflichtlektüre für alle:** `docs/gegner-und-maps.md`, `docs/balancing.md`, PE-123 bis PE-130, F-18 bis F-22.
+
+**Eigentum je Welle (M5):**
+
+| Welle | Paket | Dateien |
+|---|---|---|
+| W1 | AP-97 | `src/contracts/{level,enemy,boss,events,index}.ts`, `src/config/{levels,enemies,bosses,maps,assets}.ts`, `src/entities/enemies/createEnemy.ts`, `src/entities/bosses/{createBoss,GiantSandWorm,GuardianDog,Pharaoh}.ts` (neu als Stubs), `src/entities/bosses/BossBase.ts` (nur Kontext-Typ), `src/entities/enemies/{Enemy,WitchBolt}.ts` (nur Feld `onHit`), `src/scenes/GameScene.ts` (nur generischer Ruf und `onHit` durchreichen), `src/scenes/menu/levelGroups.ts`, `src/logic/spawn.ts` (nur falls nötig), Tests dazu |
+| W2 | AP-98 | neu `src/logic/{status,charge,burrow,zigzag}.ts`, `tests/logic/{status,charge,burrow,zigzag}.test.ts` |
+| W2 | AP-99 | `src/contracts/upgrade.ts`, `src/logic/upgrades.ts`, `src/platform/storage.ts`, `src/scenes/menu/{UpgradePanel,menuLogic}.ts` (nur Pips), Tests dazu |
+| W2 | AP-100 | `src/entities/bosses/{BossBase,GiantSandWorm,bossGeometry}.ts`, neue Hilfsdateien des Wurms unter `src/entities/bosses/`, `src/config/bosses.ts`, `tests/config/bosses.test.ts`, `tests/entities/bossGeometry.test.ts`, neue Tests des Wurms |
+| W3 | AP-101 | `src/entities/enemies/**`, `tests/entities/**` (nur Gegner-Tests) |
+| W3 | AP-102 | `src/scenes/{GameScene,HudScene}.ts`, `src/entities/Player.ts`, `src/scenes/hud/**`, `tests/scenes/**` (HUD) |
+| W3 | AP-103 | `src/entities/bosses/{BossBase,GuardianDog,bossGeometry}.ts`, neue Hilfsdateien des Hundes, `src/config/bosses.ts`, Boss-Tests |
+| W4 | AP-104 | `src/entities/bosses/{BossBase,Pharaoh,bossGeometry}.ts`, neue Hilfsdateien des Pharao, `src/config/bosses.ts`, Boss-Tests |
+| W4 | AP-105 | `src/config/{levels,enemies,scaling,upgrades}.ts`, `tests/logic/balance.test.ts`, `tests/config/{levels,scaling,enemies,upgrades}.test.ts`, `docs/balancing.md` |
+| W5 | AP-106 | `src/config/{assets,maps,theme}.ts`, `src/styles/tokens.css`, `src/entities/MapBackground.ts`, `public/assets/sprites/**`, `tests/scripts/build-sprites.test.ts`, Asset- und Map-Tests |
+| W5 | AP-107 | `src/scenes/MenuScene.ts`, `src/scenes/menu/**`, `tests/scenes/menu*.test.ts` |
+| W6 | AP-108 | `docs/gegner-und-maps.md`, `docs/guides/grafik-austauschen.md`, `README.md` (nur Inhaltsangabe) |
+
+#### AP-97 – M5 Gerüst und Verträge
+
+- **Meilenstein, Lane, Welle:** M5 · SH/GAME · M5 W1
+- **Status: bereit**
+- **Ziel:** Alle neuen IDs, Verträge und Konfig-Einträge für Level 21–40 und die neuen Gegner und Bosse existieren. Das Spiel baut, alle Tests sind grün, und die neuen Inhalte sind schon spielbar (mit Platzhalter-Sprites und Grundverhalten). Danach braucht kein M5-Paket mehr eine Vertragsänderung.
+- **Pflichtlektüre:** gemeinsame Vorgaben M5 (oben), `src/contracts/*`, `src/config/{levels,enemies,bosses,maps,assets}.ts`, `src/entities/enemies/createEnemy.ts`, `src/entities/bosses/{createBoss,BossBase,RootMonster}.ts`, `src/scenes/GameScene.ts` (Ruf `onSummonTrees`, Überlappung Geschoss gegen Spielerin), `src/scenes/menu/levelGroups.ts`, `src/platform/storage.ts`, PE-33, PE-49, PE-79, PE-127 bis PE-129
+- **Abhängigkeiten:** keine (AP-96 fertig)
+- **Parallel möglich mit:** H-27 (Designer)
+- **Dateien (Eigentum):** siehe Tabelle „Eigentum je Welle“, W1
+- **Nicht anfassen:** `docs/design/**`, `public/assets/**`, `src/config/{scaling,upgrades,theme}.ts`, `src/contracts/upgrade.ts` (AP-99), `src/scenes/hud/**`, `src/scenes/menu/{LevelGrid,UpgradePanel}.ts`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **Verträge:** `BatchId` um `desert`, `pyramids`, `oasis`. `EnemyId` um die zehn IDs. `EnemyBehavior` um `charge` und `burrow`. Neue optionale Felder an `EnemyDef`: `movement?: 'straight' | 'zigzag'`, `charge?` (Ankündigung, Anlauf-Tempo, Dauer, Abklingzeit, Schadensfaktor beim Rollen, der Armadillo nimmt halben Schaden), `burrow?` (Zeit unter dem Sand, Zeit oben, Auftauch-Abstand zur Spielerin, Ankündigung) und `onHit?: StatusOnHit` für den Kontakt. `EnemyProjectileDef` bekommt `spriteKey?` und `onHit?`. `StatusOnHit = { poison?: { dps, durationMs }, slow?: { turnFactor, durationMs } }`. `BossId` um `giantSandWorm`, `guardianDog`, `pharaoh`. `BossContext` bekommt einen generischen Ruf `onSummon?: (enemyId, positions) => void`, `onSummonTrees` bleibt kompatibel. Event `player-status` (aktive Effekte mit Restzeit) für das HUD. Alles additiv.
+  2. **Konfig:** `ENEMIES` mit allen zehn Gegnern und Startwerten nach PE-127 (Feinwerte in AP-105). Fehlende Verhalten bekommen vorerst eine Fallback-Klasse: `charge` und `burrow` laufen als `chase`, `zigzag` als gerade Bewegung, und zwar nur in `createEnemy.ts`. `BOSSES` mit den drei Bossen und den Angriffen aus PE-128 (IDs `burrow`, `spikeVolley`, `coil`, `runeShield`, `guardBark`, `summonMummies`, `goldCurse`, `sarcophagus`, `sandstorm`, Zusatz jeweils `extraOnly: true`) und Startwerten im Rahmen der bisherigen Bosse (Basis-HP etwa 1000, 1300 und 1700, Feinwerte in den Boss-Paketen). `LEVEL_COUNT` = 41, Batch-Grenzen, Rundendauer, Pools je Batch (gemeinsame Vorgaben) und `BOSS_OF_BATCH`. Spawn-Abstand und `MAX_ENEMIES` für 21–40 setzen die Kurve vorläufig fort (höchstens 150, AP-105 stellt sie ein). Wildschwein, Bär und Fee kommen mit kleinen Gewichten in die alten Pools. **Level 0–20 bleiben vorerst in Abstand und `MAX_ENEMIES` unverändert, PE-125 löst AP-105 ein.**
+  3. **Platzhalter-Sprites:** In `assets.ts` bekommen alle neuen Schlüssel einen Eintrag, dessen `path` auf eine vorhandene PNG mit gleicher Frame-Größe zeigt (zum Beispiel `enemy-mummy` → `enemy-cursed-tree.png`, `tiles-desert` → `tiles-forest.png`, `boss-*` → vorhandener Boss). Kurz begründen, `assets:check` bleibt grün. `MAPS` für die drei neuen Batches mit vorhandenen Tokens und Effekten (`none` oder `spores`) als Platzhalter.
+  4. **Boss-Stubs:** `GiantSandWorm.ts`, `GuardianDog.ts`, `Pharaoh.ts` erweitern `BossBase` ohne eigene Angriffe (der Boss steht in der Mitte des Rings und hat nur Kontaktschaden). Registrierung in `createBoss.ts`.
+  5. **Szene:** Der generische Ruf erzeugt Gegner beliebiger ID über den vorhandenen Spawn-Pfad. `onHit` von Gegner und Geschoss wird an `Enemy` und `WitchBolt` als öffentliches, nur lesbares Feld geführt (aus der Konfig). Die Szene wendet es noch **nicht** an (das macht AP-102).
+  6. **Menü:** `groupLevels` bekommt einen Seiten-Parameter (`page`, 3 Batches pro Seite, Standard Seite 0) und eine reine Funktion `pageCount`. `BATCH_LABELS` und `BATCH_ORDER` werden erweitert. Das Menü zeigt weiter nur Seite 0. Level ab 21 sind bis AP-107 nur per `?level=` spielbar (Debug ohne Speichern, PE-49). Der Spielstand akzeptiert `highestUnlockedLevel` bis 40.
+  7. Tests: Verträge, Konfig (alle IDs vollständig, Pools je Batch, Dauer, Boss je Batch, `MAX_ENEMIES` höchstens 150), `groupLevels` mit Seiten, `createEnemy` und `createBoss` für alle IDs, Spielstand mit Level 40 und mit altem Stand. `lint`, `typecheck`, `test`, `build`, `assets:check`.
+- **Akzeptanzkriterien:** Alle Verträge sind additiv. Ein Spielstand vor M5 lädt unverändert. `?level=21`, `?level=26`, `?level=31` und `?level=40` starten eine Runde mit den Gegnern des Batches und dem richtigen Boss (Platzhalter). Level 0–20 haben die alten Abstände und Grenzen, nur die Pools sind ergänzt. Alle Checks grün.
+- **Tests:** `tests/contracts/*`, `tests/config/{levels,enemies,bosses,maps,assets}.test.ts`, `tests/scenes/levelGroups.test.ts` (oder bestehende Menü-Logik-Tests), `tests/platform/storage.test.ts` (nur lesend erweitern, falls nötig, sonst Kante an AP-99 melden)
+- **Review-Schwerpunkte:** Verträge vollständig für W2 bis W5, keine Verhaltensänderung in Level 0–20 außer den Pools, Platzhalter-Pfade sauber begründet, Spielstand abwärtskompatibel
+- **Design-Review:** nein
+- **Doku-Pflichten:** kurze Notiz in `docs/balancing.md`, dass 21–40 vorläufig sind (eine Zeile)
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Gerüst)
+- **Commit-Typ:** `feat(AP-97): add contracts and config for levels 21 to 40`
+
+#### AP-98 – Logik der Gegner-Bausteine
+
+- **Meilenstein, Lane, Welle:** M5 · LOG · M5 W2
+- **Status: offen**
+- **Ziel:** Reine, getestete Logik ohne Phaser für Gift, Verlangsamung, Ansturm, Eingraben und Zickzack (PE-127).
+- **Pflichtlektüre:** AP-97 (Verträge `StatusOnHit`, `charge`, `burrow`, `movement`), `src/logic/{approach,health,rotation}.ts`, PE-75, PE-127
+- **Abhängigkeiten:** AP-97
+- **Parallel möglich mit:** AP-99, AP-100
+- **Dateien (Eigentum):** siehe Tabelle, W2
+- **Nicht anfassen:** alles außerhalb der neuen Dateien
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `status.ts`: Zustand der Effekte an der Spielerin. Gift: Schaden je Sekunde über eine Dauer, ein neuer Treffer frischt die Dauer auf und stapelt nicht. Verlangsamung: Drehfaktor über eine Dauer, mehrere Effekte nehmen den stärksten, keine Multiplikation. Funktionen `apply`, `tick(dt)` → Schaden in diesem Schritt, `turnFactor()`, `active()` mit Restzeiten für das Event `player-status`.
+  2. `charge.ts`: Zustandsmaschine `approach` → `telegraph` (mindestens 700 ms) → `dash` (gerade Linie auf den Punkt bei Ankündigungsbeginn) → `recover`. Schadensfaktor während `dash`.
+  3. `burrow.ts`: `surface` → `under` (unverwundbar, Hügel wandert) → `emerge` (Ankündigung, Auftauchpunkt mit Mindestabstand zur Spielerin aus der Konfig, nie direkt auf ihr).
+  4. `zigzag.ts`: seitlicher Versatz zur Laufrichtung (Sinus), Nettogeschwindigkeit zur Spielerin bleibt gleich (Fairness der Anlaufzeit, AP-83).
+  5. Tests je Datei mit Randfällen (Auffrischen, Überlappen, Ende genau bei 0, große `dt`).
+- **Akzeptanzkriterien:** 100 % der neuen Funktionen getestet, keine Phaser-Importe, Ankündigung nie unter 700 ms
+- **Tests:** `tests/logic/{status,charge,burrow,zigzag}.test.ts`
+- **Review-Schwerpunkte:** Fairness (Ankündigung, Auftauchabstand, Netto-Tempo), keine Stapel-Explosion beim Gift
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-98): add status, charge, burrow and zigzag logic`
+
+#### AP-99 – Upgrades bis Stufe 15 und Spielstand
+
+- **Meilenstein, Lane, Welle:** M5 · SH/LOG/GAME · M5 W2
+- **Status: offen**
+- **Ziel:** Jede Upgrade-Spur hat 15 Stufen (PE-129). Alte Spielstände (Stufen 0–10) bleiben gültig. Das Upgrade-Panel zeigt 15 Pips lesbar, bis AP-107 das Design umsetzt.
+- **Pflichtlektüre:** `src/contracts/upgrade.ts`, `src/logic/upgrades.ts`, `src/platform/storage.ts`, `src/scenes/menu/{UpgradePanel,menuLogic}.ts`, `src/config/upgrades.ts` (nur lesen), Brief Grundsätze 3 und 5, PE-41, PE-45, PE-129
+- **Abhängigkeiten:** AP-97
+- **Parallel möglich mit:** AP-98, AP-100
+- **Dateien (Eigentum):** siehe Tabelle, W2
+- **Nicht anfassen:** `src/config/upgrades.ts` (Preise macht AP-105), `src/scenes/MenuScene.ts`, `LevelGrid.ts`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `MAX_UPGRADE_LEVEL` = 15. Die Wirkung je Stufe bleibt linear wie bisher (Konfig unverändert).
+  2. Spielstand: Stufen 0–15 gültig, ein Stand mit 0–10 lädt unverändert, keine Versionsänderung nötig (falls doch nötig: Migration mit Test).
+  3. Panel: Die 15 Pips passen in die vorhandene Panelbreite (zum Beispiel kleinerer Pip-Abstand oder zwei Reihen, nur mit vorhandenen Tokens, ganzzahlige Pixel). Text „x/15“ und „MAX“ bleiben.
+  4. Tests: Kaufen bis 15, Kauf über 15 abgewiesen, alter Stand lädt, Pips-Zustände für 15.
+- **Akzeptanzkriterien:** 15/15 kaufbar, alter Spielstand bleibt erhalten, Panel ohne Überlauf am PC und bei 640 × 360
+- **Tests:** `tests/logic/upgrades.test.ts`, `tests/platform/storage.test.ts`, `tests/scenes/menuLogic.test.ts`
+- **Review-Schwerpunkte:** Abwärtskompatibilität des Spielstands, keine Preisänderung, nur Tokens
+- **Design-Review:** ja (nur Pips, Übergang bis AP-107)
+- **Doku-Pflichten:** keine
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-99): raise upgrade tracks to 15 levels`
+
+#### AP-100 – Boss Riesen-Sand-Wurm
+
+- **Meilenstein, Lane, Welle:** M5 · GAME/SH · M5 W2
+- **Status: offen**
+- **Ziel:** Der Riesen-Sand-Wurm (Wüste, 21–25) kämpft nach PE-128: lang, stachelige Haut, Stachelkopf.
+- **Pflichtlektüre:** `src/entities/bosses/{BossBase,RootMonster,GiantStone,Telegraph,bossGeometry,rim}.ts`, `src/config/bosses.ts`, AP-67 (Fairness), AP-84 (Boss-Arena), PE-34, PE-75, PE-76, PE-101, PE-128
+- **Abhängigkeiten:** AP-97
+- **Parallel möglich mit:** AP-98, AP-99
+- **Dateien (Eigentum):** siehe Tabelle, W2
+- **Nicht anfassen:** `createBoss.ts` (Registrierung macht AP-97), `GameScene.ts`, andere Bosse (nur lesen; Änderungen an `BossBase` dürfen bestehende Bosse nicht verändern)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **`burrow`:** Der Wurm taucht ab (unverwundbar, sichtbar als Sandspur), die Spur wandert zur Spielerin und endet mit einer Ring-Ankündigung im Abstand neben ihr. Der Wurm bricht dort hervor, Schaden nur im angekündigten Bereich.
+  2. **`spikeVolley`:** Fächer aus Hautstacheln (wie `orbFan`, eigene Geschosse, abschießbar wie die übrigen Boss-Geschosse, falls diese es sind).
+  3. **`coil` (Zusatz):** Körpersegmente (`boss-sand-worm-body`) bilden einen Ring mit sichtbarer Lücke um die Spielerin, der sich zusammenzieht. Nur der Kopf ist verwundbar, Treffer auf Segmente machen keinen Schaden und sind sichtbar abgeprallt (kein Blitz).
+  4. Feinwerte in `config/bosses.ts` (Abschnitt Riesen-Sand-Wurm), Fairness-Tests in `bossGeometry.test.ts` (Lücke mindestens so breit wie beim `rootRing`, Reaktionszeit mindestens 1000 ms).
+- **Akzeptanzkriterien:** Alle drei Angriffe angekündigt (mindestens 700 ms), Varianten nach PE-33, `?level=21` und `?level=23` zeigen Grund- und Zusatzangriff, bestehende Bosse unverändert (Tests grün)
+- **Tests:** Boss-Tests, `bossGeometry.test.ts`
+- **Review-Schwerpunkte:** Fairness, Unverwundbarkeit sichtbar (nie nur Farbe), keine Änderung an anderen Bossen
+- **Design-Review:** nein (Sprites folgen in AP-106)
+- **Doku-Pflichten:** keine (AP-108)
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja, Zusatz `coil` kann durch einen zweiten `spikeVolley` ersetzt werden (nur nach Rückfrage beim Nutzer)
+- **Commit-Typ:** `feat(AP-100): add giant sand worm boss`
+
+#### AP-101 – Gegner-Entities
+
+- **Meilenstein, Lane, Welle:** M5 · GAME · M5 W3
+- **Status: offen**
+- **Ziel:** Die neuen Gegner verhalten sich nach PE-127: Ansturm (Wildschwein, Armadillo mit halbem Schaden beim Rollen), Eingraben (Sandwurm), Zickzack (Fee), Schützen mit eigenem Geschoss (Kamel-Spucke, Mumien-Wickel, Lupenstrahl des Archäologen).
+- **Pflichtlektüre:** AP-97, AP-98 (Logik), `src/entities/enemies/**`, `src/logic/approach.ts`, AP-83, PE-127
+- **Abhängigkeiten:** AP-98
+- **Parallel möglich mit:** AP-102, AP-103
+- **Dateien (Eigentum):** siehe Tabelle, W3
+- **Nicht anfassen:** `GameScene.ts` (Effekte wendet AP-102 an), Konfig-Werte (AP-105), Felder `onHit` (nur nutzen, nicht umbenennen)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Neue Klassen `ChargeEnemy`, `BurrowEnemy`. Zickzack in `ChaseEnemy` über `movement`. `createEnemy` ohne Fallbacks aus AP-97.
+  2. Die Schützen-Klasse (heute `ForestWitch`) ist generisch: Geschoss-Sprite aus `projectile.spriteKey`, `onHit` am Geschoss aus der Konfig.
+  3. Ankündigung des Ansturms sichtbar (Blinken oder Aufbäumen, mit `prefers-reduced-motion` als Umriss statt Blinken). Abgetauchter Sandwurm: Hügel sichtbar, Laser treffen nicht.
+  4. Tests: Fabrik für alle IDs, Zustände von Ansturm und Eingraben, Armadillo-Schadensfaktor, Geschoss trägt `onHit`.
+- **Akzeptanzkriterien:** Jeder neue Gegner zeigt sein Verhalten mit `?level=` (21, 26, 31 und 5 für Fee), Ankündigung mindestens 700 ms, alte Gegner unverändert
+- **Tests:** `tests/entities/*` der Gegner
+- **Review-Schwerpunkte:** Fairness, Pool-Wiederverwendung (kein Zustand bleibt beim Wiederbeleben), Leistung
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-101): add charge, burrow, zigzag and new shooter enemies`
+
+#### AP-102 – Status-Effekte in der Runde
+
+- **Meilenstein, Lane, Welle:** M5 · GAME · M5 W3
+- **Status: offen**
+- **Ziel:** Gift und Verlangsamung wirken an der Spielerin und sind im HUD erkennbar, nie nur über Farbe (PE-127, Brief Grundsatz 4).
+- **Pflichtlektüre:** AP-97 (`onHit`, Event `player-status`), AP-98 (`status.ts`), `src/scenes/{GameScene,HudScene}.ts`, `src/entities/Player.ts`, `src/scenes/hud/**`, Brief (HUD, Funk-Welt), PE-127
+- **Abhängigkeiten:** AP-98
+- **Parallel möglich mit:** AP-101, AP-103
+- **Dateien (Eigentum):** siehe Tabelle, W3
+- **Nicht anfassen:** `src/entities/enemies/**`, Konfig-Werte
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Treffer durch Gegner-Kontakt oder Geschoss mit `onHit` → `status.apply`. Pro Frame `tick`: Giftschaden geht über `Player.takeDamage` (Schild zuerst, wie bisher), die Drehgeschwindigkeit der Spielerin wird mit `turnFactor()` multipliziert.
+  2. HUD: An der Lebensleiste je aktivem Effekt ein zweites Merkmal (Rand plus kurzes Label, zum Beispiel „GIFT“ und „LAHM“, nur vorhandene Tokens). Liefert H-27 eine Gestaltung, setzt AP-106 oder AP-107 sie nach. Bis dahin gilt dieser Übergang.
+  3. Effekte enden beim Rundenende, Pause hält sie an.
+  4. Tests: Anwendung, Schild-Reihenfolge, Pause, Rundenende, HUD-Zustände.
+- **Akzeptanzkriterien:** Schlange vergiftet, Mumien-Wickel verlangsamt 2 s, Anzeige mit Text, keine Farb-Literale
+- **Tests:** `tests/scenes/hud.test.ts`, Szenen- oder Player-Tests
+- **Review-Schwerpunkte:** Schild-Reihenfolge, Pause, keine doppelte Schadenszählung
+- **Design-Review:** ja
+- **Doku-Pflichten:** keine
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-102): apply poison and slow to the player and show them in the HUD`
+
+#### AP-103 – Boss Antiker Wächter-Hund
+
+- **Meilenstein, Lane, Welle:** M5 · GAME/SH · M5 W3
+- **Status: offen**
+- **Ziel:** Der Antike Wächter-Hund (Pyramiden, 26–30) kämpft als Tank mit Magie nach PE-128.
+- **Pflichtlektüre:** wie AP-100, dazu der Bericht und Code von AP-100, generischer Ruf aus AP-97
+- **Abhängigkeiten:** AP-100
+- **Parallel möglich mit:** AP-101, AP-102
+- **Dateien (Eigentum):** siehe Tabelle, W3
+- **Nicht anfassen:** `createBoss.ts`, `GameScene.ts`, andere Bosse
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **`runeShield`:** 3 schwebende Runen kreisen um den Hund, solange auch nur eine lebt, ist er unverwundbar (sichtbarer Schild, Treffer prallen ab). Runen sind abschießbar.
+  2. **`guardBark`:** Schockwellen-Ring mit sichtbarer Lücke, der sich ausbreitet.
+  3. **`summonMummies` (Zusatz):** ruft 3 Mumien über `onSummon('mummy', …)` außerhalb des 640er-Rings oder nach AP-83.
+  4. Feinwerte in `config/bosses.ts`, Fairness-Tests.
+- **Akzeptanzkriterien:** wie AP-100, `?level=26` und `?level=28`
+- **Tests:** Boss-Tests, `bossGeometry.test.ts`
+- **Review-Schwerpunkte:** Schild nie endlos (Runen kommen nach Abklingzeit wieder, Zeitlimit für die Unverwundbarkeit), Fairness
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-103): add ancient guardian dog boss`
+
+#### AP-104 – Boss Pharao
+
+- **Meilenstein, Lane, Welle:** M5 · GAME/SH · M5 W4
+- **Status: offen**
+- **Ziel:** Der Pharao (Pyramiden-Oase, 31–40) wirkt golden, mystisch und eindrucksvoll und kämpft nach PE-128.
+- **Pflichtlektüre:** wie AP-103, dazu der Code von AP-103
+- **Abhängigkeiten:** AP-103
+- **Parallel möglich mit:** AP-105
+- **Dateien (Eigentum):** siehe Tabelle, W4
+- **Nicht anfassen:** wie AP-103
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. **`goldCurse`:** Spirale aus Goldkugeln (`boss-pharaoh-orb`), langsam drehend, mit Lücken.
+  2. **`sarcophagus`:** verschwindet (unverwundbar), die Stelle des Wiederauftauchens wird angekündigt.
+  3. **`sandstorm` (Zusatz):** Der Rand wird dunkler (Token, keine Literale), einzelne Geschosse kommen angekündigt von außen. HUD und Ankündigungen bleiben voll lesbar, mit `prefers-reduced-motion` kein Flackern.
+  4. Feinwerte, Fairness-Tests. Level 31–40: die HP-Kurve nach PE-33 über 10 Level prüfen (Index 9 ergibt +135 %), sonst dem Lead melden.
+- **Akzeptanzkriterien:** wie AP-100, `?level=31`, `?level=33`, `?level=40`
+- **Tests:** Boss-Tests, `bossGeometry.test.ts`
+- **Review-Schwerpunkte:** Lesbarkeit im Sandsturm, Fairness, Leistung
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** ja, `sandstorm` als reine Verdunklung ohne Geschosse (nur nach Rückfrage beim Nutzer)
+- **Commit-Typ:** `feat(AP-104): add pharaoh boss`
+
+#### AP-105 – Balancing Level 0–40 und Upgrade-Preise
+
+- **Meilenstein, Lane, Welle:** M5 · SH/LOG · M5 W4
+- **Status: offen**
+- **Ziel:** (1) Level 0–20 mit Wildschwein, Bär und Fee bei etwa gleichem Druck, Gold- und XP-Tempo (PE-125). (2) Level 21–40 setzen die Kurve fort, stärkere statt mehr Gegner, `MAX_ENEMIES` höchstens 150 (PE-129). (3) Upgrade-Preise und Wirkung für die Stufen 11–15.
+- **Pflichtlektüre:** AP-91, AP-95 (Methode, Bänder), `docs/balancing.md`, `src/config/{levels,enemies,scaling,upgrades}.ts`, `tests/logic/balance.test.ts`, PE-83, PE-84, PE-120, PE-125, PE-129, RI-6
+- **Abhängigkeiten:** AP-99, AP-101, AP-102 (Verhalten und Effekte stehen fest)
+- **Parallel möglich mit:** AP-104
+- **Dateien (Eigentum):** siehe Tabelle, W4
+- **Nicht anfassen:** `src/config/bosses.ts`, `src/entities/**`, `src/logic/**` (nur lesen)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Gegnerwerte der zehn neuen Gegner nach ihren Stichworten (F-19): Fee sehr wenig HP und viel Schaden, Bär und Wildschwein viel HP, Sphinx Tank, Schlange schnell mit wenig HP, Archäologe Standardwerte, Mumie langsam mit viel Schaden. Gift, Wickel, Ansturm und Eingraben gehen in die Pressure-Rechnung ein (Annahmen im Bericht begründen).
+  2. Level 0–20: Gewichte so, dass Pressure, Gold und XP je Level in den Bändern von `balance.test.ts` bleiben (Toleranz wie AP-95).
+  3. Level 21–40: Pressure steigt weiter streng (höchstens +10 % je Level, Sprünge an den Batch-Grenzen wie 4 → 5 und 9 → 10). Skalierung über 0,77 hinaus, `MAX_ENEMIES` höchstens 150. Annahme: Spieler mit etwa Stufe 10 auf allen Spuren bei Level 21 und 15 bei Level 40 (begründen). Gold-Tempo so, dass Stufe 15 bis etwa Level 35 erreichbar ist.
+  4. Preise 11–15 aus der bestehenden Formel oder angepasst, mit Test.
+  5. `docs/balancing.md` um Level 21–40, die neuen Gegner und die Upgrades ergänzen.
+- **Akzeptanzkriterien:** Bänder für 0–20 unverändert eingehalten, 21–40 streng steigend und begründet, `MAX_ENEMIES` ≤ 150, Tests grün, Doku stimmt mit der Konfig
+- **Tests:** `balance.test.ts`, `levels.test.ts`, `scaling.test.ts`, `upgrades.test.ts`
+- **Review-Schwerpunkte:** keine aufgeweichten Bänder, Leistungsgrenze, Doku gleich Konfig
+- **Design-Review:** nein
+- **Doku-Pflichten:** `docs/balancing.md`
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-105): balance levels 0 to 40 and upgrade levels 11 to 15`
+- **Handtest-Punkt [Mensch]:** Gefühl Level 0–20 unverändert, Leistung Level 25, 30, 40 mit `?fps=1` (H-28)
+
+#### AP-106 – Sprites, Tilesets und Map-Effekte aus dem Design einbauen
+
+- **Meilenstein, Lane, Welle:** M5 · ASSET/GAME · M5 W5
+- **Status: blockiert** (H-27, danach Pflegeauftrag „Design übernehmen“, der dieses Paket verfeinert)
+- **Ziel:** Alle M5-Sprites, Geschosse, Tilesets, Boden-Tokens und Map-Effekte aus dem freigegebenen Brief sind eingebaut, die Platzhalter-Pfade aus AP-97 sind ersetzt.
+- **Pflichtlektüre:** `docs/design/design-brief.md` (Abschnitt M5), `docs/design/assets/sprites-desert.js`, `docs/design/mockups/sprites-wueste.html`, `docs/design/export/tokens.resolved.json`, AP-79 (Sprite-Pipeline), §18 (Theme-Sync, `sprites:build`)
+- **Abhängigkeiten:** H-27, „Design übernehmen“, AP-104, AP-105
+- **Parallel möglich mit:** AP-107
+- **Dateien (Eigentum):** siehe Tabelle, W5
+- **Nicht anfassen:** `docs/design/**`, Konfig-Werte außer Sprite-Schlüsseln, `menu/**`
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:** `npm run theme:build` und `npm run sprites:build` (PNGs committen), `assets.ts` auf echte Pfade und Frame-Größen, `maps.ts` mit neuen Tokens und Effekten (neue `MapEffect`-Werte nur, wenn der Brief sie fordert, dann in `MapBackground.ts`), Sprite-Anzahl in `build-sprites.test.ts` anpassen. Details setzt „Design übernehmen“.
+- **Akzeptanzkriterien:** `assets:check` grün, keine Platzhalter-Pfade mehr für M5-Schlüssel, Sichtprüfung im Handtest
+- **Design-Review:** ja
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-106): add desert and pyramid sprites, tilesets and map effects`
+
+#### AP-107 – Level-Auswahl blätterbar und Upgrade-Panel mit 15 Stufen
+
+- **Meilenstein, Lane, Welle:** M5 · GAME · M5 W5
+- **Status: blockiert** (H-27, danach „Design übernehmen“)
+- **Ziel:** Die Level-Auswahl zeigt 3 Maps pro Seite und lässt sich blättern (F-21). Das Upgrade-Panel zeigt 15 Stufen nach Design. Gift- und Verlangsamungs-Anzeige nach Brief, falls der Brief sie ändert und AP-102 nicht schon passt (Datei dann mit `scenes/hud/**`, nur nach Absprache mit dem Lead).
+- **Pflichtlektüre:** Brief Abschnitt M5, `docs/design/mockups/level-seiten.html`, `src/scenes/menu/**`, `src/scenes/MenuScene.ts`, AP-97 (`groupLevels` mit Seiten), AP-99
+- **Abhängigkeiten:** H-27, „Design übernehmen“, AP-99, AP-105
+- **Parallel möglich mit:** AP-106
+- **Dateien (Eigentum):** siehe Tabelle, W5
+- **Nicht anfassen:** `docs/design/**`, Konfig
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:** Seitenwechsel per Pfeil-Buttons (mindestens 32 px), Tastatur und Wischen, falls der Brief es vorsieht. Beim Öffnen zeigt das Menü die Seite des höchsten freien Levels. Fokus-Ring bleibt bedienbar. Panel nach Brief. Details setzt „Design übernehmen“.
+- **Akzeptanzkriterien:** Seite 1 und Seite 2 wie §9.2 M5-DEP, Freischaltung stimmt, PC und Touch, nur Tokens
+- **Design-Review:** ja
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-107): page the level select and show 15 upgrade levels`
+
+#### AP-108 – Doku Gegner und Maps (F-22)
+
+- **Meilenstein, Lane, Welle:** M5 · ASSET · M5 W6
+- **Status: offen**
+- **Ziel:** `docs/gegner-und-maps.md` beschreibt alle sechs Maps, alle 14 normalen Gegner, alle sechs Bosse und die Spawn-Tabellen für Level 0–40, aus dem Code gelesen (Wunsch des Nutzers: „Bosse und Maps md erweitern“).
+- **Pflichtlektüre:** `docs/gegner-und-maps.md` (bestehende Struktur beibehalten), `src/config/{enemies,levels,maps,scaling,bosses,upgrades}.ts`, `docs/balancing.md`
+- **Abhängigkeiten:** AP-106, AP-107
+- **Dateien (Eigentum):** siehe Tabelle, W6
+- **Nicht anfassen:** Code
+- **Umsetzung:** Teil 1 (Maps, Spawn-Pools, Spawn-Gewichte, Level-Tabelle 0–40), Teil 2 (Gegner-Tabellen mit den neuen Verhalten Gift, Wickel, Ansturm, Eingraben, Zickzack, Skalierung bis 40, Boss-Tabellen mit Angriffen und Feineinstellung), Datum „Stand“. `grafik-austauschen.md` um die neuen Sprite-Schlüssel ergänzen, README-Inhaltsangabe „Level 0–40“.
+- **Akzeptanzkriterien:** Jede Zahl stimmt mit der Konfig (Stichprobe im Review), alle IDs genannt
+- **Design-Review:** nein
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (Wunsch des Nutzers)
+- **Commit-Typ:** `docs(AP-108): document desert and pyramid maps, enemies and bosses`
+
 ---
 
 ## 13. Menschliche Schritte
@@ -4252,6 +4629,8 @@ Erster Handtest M3-DEP am PC (Nutzer, über den Lead, 2026-10-26). Vier Befunde:
 | H-24 | M4-DEP: `dev` nach `stage`, Smoke-Test nach PE-106 (iPhone 15 Homescreen-App quer, PC, Entwicklertools 16:9, 19,5:9, 20:9, 4:3), Prüfpunkte in §9.2 „M4“ und „Nachtrag 6“. Zusätzlich H-23: leeres und gesperrtes Fach, Laser in allen drei Biomen, Waldgeist-Aura auf Elfenwald, Niederlage-Ergebnis; Gold steigt nach einer normalen Runde (B1). **B4 (AP-89):** iPhone Homescreen-App quer mit `?layout=1`, Erwartung `arena want 734 now 734` und keine Balken; zeigt die Anzeige `want 640`, liegt es an der Messung (C1) und es folgt ein Folgepaket mit dem Foto aus Q-52. **Nach AP-91 und AP-92 zusätzlich (Sichtprüfung, Design-Review kann keine Szene im Bild prüfen):** (a) Boss-Phasen in Level 0 bis 4: etwa doppelt so viele schwächere Gegner als vorher (Intervall sinkt, `BOSS_SPAWN_RATE_FACTOR` unverändert), fühlt sich das fair an; (b) Baum in Level 0 bis 3 hat 23 bis 31 statt 50 Lebenspunkte, die Doppelschuss-Salve Stufe 2 kann ihn in einem Zug töten, zu weich oder passend (Stellschraube `hp` in `scaling.ts`, Alternative Pressure am oberen Bandrand); (c) Stern der großen Münze (D auf Y) am Handy gut erkennbar, große und kleine Münze im Gedränge unterscheidbar (schwacher Kontrast, Hebel beim Designer); (d) Leistung mit `?fps=1` in späteren Leveln (etwa 5, 10, 20) am Handy, Bildrate stabil bei der höheren Gegnerzahl | nach M4 W3 und N11 W2 (AP-86, AP-88, AP-89 gemergt) | Abnahme M4 | ☐ |
 | H-25 | Designer-Auftrag (Nutzer startet den Designer; erweitert am 2026-10-28 nach den Antworten auf Q-50, Q-53, Q-54): (1) **Münzen im Spiel 12 px (Q-50):** neue Feldmünze 6×6 mit ×2 (neuer Schlüssel, Vorschlag `coin-field`, 4 Frames; Name legt der Designer fest), große Münze 12×12 mit ×1 (`coin-big`, wird nur auf dem Feld benutzt), Stern auf der großen bleibt, Unterscheidbarkeit mit 2 px Kontur. **`coin-small` (8×8, ×2 = 16 px) bleibt unverändert für die Münzsymbole in Menü, Upgrade-Panel und Ergebnisszene**; Quelle `docs/design/assets/sprites-world.js`, Mockup `sprites-welt.html`, Brief aktualisieren (ersetzt „16 px“ für die Münzen im Spiel, Q-46, PE-108, PE-90). (2) **Chip-Zeile der Tabelle „HUD am Handy“ (Q-53, PE-119, Nutzer bestätigt):** **drei Anzeigen** links oben (Doppelschuss-Chip, Schild-Chip „1/2“ und Münzzähler) werden auf iPhone und PC etwa 15 % kleiner (Faktor 0,85 auf Kasten, Innenabstand, Abstand; Text ganzzahlig, am PC bleibt die Textstufe 2×, am Handy 2× statt 3×; das Münzsymbol im Zähler bleibt ganzzahlig und misst im Spiel 12 px, siehe Punkt 1); die übrigen Power-up-Chips bleiben wie heute (PE-104). Hinweis des Planners: Im Foto `IMG_6372.PNG` sind der Doppelschuss-Chip und der Schild-Chip zu sehen; der Münzzähler erscheint erst ab dem ersten Gold. Der Designer prüft die Zuordnung mit dem Nutzer. (3) **Niederlage-Text (Q-54, PE-118):** Brief und Mockup `ergebnis.html` ersetzen „BESIEGT“ bei Niederlage durch „NIEDERLAGE“ (rechts im Logbuch-Kopf, ersetzt „5:00 · BOSS NICHT BESIEGT“ im Mockup); die Siegtexte mit „BESIEGT“ bleiben. Start: `start-agent.ps1 … -Role designer`. Danach legt der Lead AP-92 frei (Sprite-Sync gehört in AP-92, `npm run sprites:build`, V-17) | vor AP-92 (N11 W3); AP-86 und AP-94 starten ohne H-25 (AP-86 nach Annahme Q-53, AP-94 nach Q-54) | AP-92 (blockiert), AP-86 und AP-94 (nur Brief-Nachzug, nicht blockierend) | ☑ (2026-10-28) |
 | H-26 | Handtest **B4 erneut** auf `stage` nach dem Release von AP-96 (Nachtrag 7; H-25 ist der erledigte Designer-Auftrag). Der Nutzer prüft auf dem iPhone 15 quer **vier Zustände**: Safari-Browser und Homescreen-App, je mit und ohne eingeblendete Safari-Leiste. Pro Zustand: (a) Layout-Anzeige per Geste einschalten (AP-96-Bericht nennt die Geste), Foto oder Abschrift der Zeile `arena want X now Y` und der Zeilen `canvas` und `game`, (b) füllt das Spielfeld die Breite bis auf Notch und Home-Bar? (c) PC 16:9: 640 × 360 ohne Balken. Erwartung: `want = now` im Menü, bei 758 × 372 `want 734 now 734`. Bleibt ein Rest je Seite von etwa 47 pt bei `want = now`, ist das PE-97 und es folgt Q-55. Danach Anzeige per Geste wieder ausschalten | nach AP-96 und Release `dev` → `stage` | – | ☐ |
+| H-27 | **Designer-Auftrag M5 (Abgleich zuerst, dann Lücken; PE-124).** Der Nutzer gibt den Text im Chat (§0 und Antwort des Planners vom 2026-10-31) an den laufenden Designer weiter. **Schritt 1, Abgleich:** Der Designer prüft in `docs/design/` (auch die noch nicht committeten Dateien `assets/sprites-desert.js`, `mockups/sprites-wueste.html`, `mockups/level-seiten.html`, `tokens.json`) jeden Punkt der Liste und schreibt eine Tabelle „vorhanden / teilweise / fehlt“ in den Brief. **Schritt 2:** Er gestaltet, was fehlt oder nur teilweise da ist. **Schritt 3:** Er ergänzt den Brief um einen Abschnitt „M5 Wüste und Pyramiden“ mit der Übergabe an den Planner (Schlüssel, Frame-Größe, Frames, Skalierung, Tokens, Effekte, Zustände), setzt den Status auf „geändert“ und holt die Freigabe des Nutzers. **Liste:** (A) 10 Gegner `enemy-mummy`, `-sand-worm`, `-armadillo`, `-camel`, `-snake`, `-archaeologist`, `-sphinx`, `-boar`, `-bear`, `-fairy`, mit Frames für Ansturm (Wildschwein, Armadillo eingerollt), abgetauchten Sandwurm (Sandhügel) und Fee. (B) 3 Bosse `boss-sand-worm` mit Körpersegment, `boss-guardian-dog`, `boss-pharaoh`, dazu Runen (3) für den Runenschild und der Sarkophag. (C) Geschosse und Effekte: Kamel-Spucke, Mumien-Wickel, Lupenstrahl, Hautstacheln des Wurms, Goldkugel des Pharao, Bellen-Schockwelle, Sandspur, Sandsturm-Rand (Token). (D) Maps: `tiles-desert`, `tiles-pyramids`, `tiles-oasis`, Boden-Tokens, Effekt und Partikelfarbe je Map, Farbband auf dem Ergebnis-Screen. (E) Level-Auswahl blätterbar, 3 Maps pro Seite, Seitenanzeige, Pfeile mindestens 32 px, Biom-Aufkleber für die drei neuen Batches, Oase mit 10 Level-Kacheln. (F) Upgrade-Panel mit 15 Stufen. (G) HUD: Gift und Verlangsamung an der Lebensleiste, nie nur Farbe. Charakter nach F-19 und F-20 (Kamel goofy, Armadillo und Bär süß, Fee sehr süß und mystisch, Pharao golden und eindrucksvoll, Wächter-Hund antik, Wurm stachelig und lang) | sofort (parallel zu M5 W1) | AP-106, AP-107 | ☐ |
+| H-28 | M5-DEP: `dev` nach `stage`, Handtest nach §9.2 „M5-DEP“, Bestätigung der Boss-Angriffe (PE-128) | nach AP-108 | Abnahme M5 | ☐ |
 
 ---
 
@@ -4699,6 +5078,14 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | Handtest H-22 B2 Münzen im Spiel 12 px, Menüsymbole bleiben 16 px (PE-113, Q-50; ändert Q-46, PE-90, PE-108) | AP-92 (N11 W3, nach AP-88; H-25 erledigt, PE-121), H-25 |
 | Handtest H-24 B4 Folge: Arena-Breite und Seitenränder am iPhone (Safari und Homescreen-App, Leiste ein und aus), Layout-Anzeige per Geste (PE-122; PE-97, PE-109, PE-115; Q-55) | AP-96 (N12 W1), H-26 |
 | F-12 Grafik: Herkunft der Sprites „eigene Arbeit des Projekts“ und Anleitung `sprites:build` (R1 Asset-Lizenzen) | AP-80 (`LICENSES.md`, `grafik-austauschen.md`, `README.md`) |
+| F-18 Maps Wüste, Pyramiden, Pyramiden-Oase (PE-123, PE-126) | AP-97, AP-105, AP-106, H-27, H-28 |
+| F-19 Neue normale Gegner, Bausteine Gift, Wickel, Ansturm, Eingraben, Zickzack (PE-125, PE-127) | AP-97, AP-98, AP-101, AP-102, AP-105, AP-106 |
+| F-20 Neue Bosse Riesen-Sand-Wurm, Antiker Wächter-Hund, Pharao (PE-128) | AP-97, AP-100, AP-103, AP-104, AP-106, H-28 (Bestätigung) |
+| F-21 Level-Auswahl blätterbar (3 Maps pro Seite) | AP-97 (Seiten-Logik), AP-107 |
+| F-22 Doku `gegner-und-maps.md` und `balancing.md` | AP-105, AP-108 |
+| PE-129 Upgrades bis Stufe 15, Kurve ab Level 21, Spielstand abwärtskompatibel (R2: keine neuen Daten, nur lokale Stufen) | AP-99, AP-105, AP-107 |
+| M5 Design (PE-124, Brief-Grundsätze 1, 4, 5, 7) | H-27, AP-102, AP-106, AP-107 (Design-Review ja) |
+| M5 R1–R6: keine neuen Abhängigkeiten, keine externen Requests, keine personenbezogenen Daten, eigene Grafiken (R1 Lizenzen in AP-108 über `grafik-austauschen.md`, `LICENSES.md` bleibt „eigene Arbeit“) | alle M5-Pakete (Review-Checkliste), AP-108 |
 
 ---
 
@@ -4974,3 +5361,4 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-10-29 | Wellenabschluss N12 W1: AP-96 gemergt (merge d6e9c0b, Review Runde 1 bestanden, dev 590/590 Tests, lint, typecheck, build, assets:check grün, gepusht). AP-96 `fertig`, H-26 weiter offen ([Mensch], Release dev → stage nötig). Lagebericht ersetzt, §10, AP-96-Paketkopf, Q-55 nachgezogen. Keine Pakete `bereit`. Keine Änderung an §2, §4, §5 | Wellenabschluss N12 W1 (Auftrag des Leads) | §0, §10, AP-96, Q-55, §18 | Planner (Pflege) |
 | 2026-10-29 | Erkenntnisse AP-96: (1) Fix: Reihenfolge Breite → `#game` → `getParentBounds()` → `scale.refresh()` (Phaser `ScaleManager.refresh` nutzte die zwischengespeicherte `parentSize`); Ursache H-c nur aus Phaser-Code und gerechneten Werten belegt, nicht am Gerät gemessen (Headless Chrome fehlt). `syncRound` mit echtem Szenenstatus; H-b per Code widerlegt (Rundenende läuft über `scene.start('ResultScene')` mit SHUTDOWN). (2) Layout-Anzeige per Geste: drei Finger innerhalb 600 ms, 2 s halten, nur außerhalb einer Runde, Flag `localStorage` `360shooter.layoutDebug.v1`=„1“, Finger auf eine freie Fläche; Anzeige ca. 16 Zeilen/190 px verdeckt das Menü links oben. (3) Gerechnet iPhone 15 852×393, Insets 47/47/21: Homescreen und Safari ohne Leiste avail 758×372, want=now=734, Rest je Seite 47 (H-e); Safari mit Leiste (51 pt angenommen) want=now=800 durch `maxWidth` gedeckelt (ungedeckelt 850), Rest ca. 69; PC 1280×720: 640. (4) `want 900` aus H-24 mit keinem Commit erreichbar (`maxWidth` 800 seit aea17e1), H-24 testete vermutlich älteren oder gecachten stage-Stand (nicht verifiziert, Lead hat kein fetch); Nutzer soll Homescreen-App neu anlegen und Anzeige erneut abschreiben. (5) Offen für den Nutzer: Q-55 (a) Insets mit Spielfarbe, (b) `maxWidth` 850 bis 900 (PE-99, PE-100), (c) so lassen. (6) Niedrig: `decideArenaWidth` in `layoutDebug.ts` seit AP-89 ungenutzt (bei Gelegenheit entfernen); Commit-Trailer nennt Opus, Paket sagte sonnet (Paket-Modellangabe an `ma-config` angleichen); role-guard blockiert Bash-Befehle mit dem Wort „shutdown“ (auch grep). H-26 erwartet ohne Leiste canvas rest 47/47, want = now, phaser disp = host | Wellenabschluss N12 W1 | AP-96, H-26, Q-55 | Lead (Pflege); Nutzer offen |
 | 2026-10-31 | Interview Erweiterung Level 21–40: §2 um F-18 bis F-22 erweitert, „Bewusst nicht im Umfang“ angepasst, PE-123 bis PE-126 | Anforderung des Nutzers (Maps, Gegner, Bosse, Blättern) | M5 (neu, Pakete folgen) | Nutzer |
+| 2026-10-31 | PE-127 bis PE-130 (Bausteine, Bosse angenommen, Upgrades 15, Reihenfolge). M5 geschnitten (Schnitt vom Nutzer bestätigt, 9a): §9.2 M5 mit M5-DEP, §10, §11, §12 AP-97 bis AP-108, §13 H-27 (Designer-Abgleich und Lücken, Nutzerwunsch 10) und H-28, §17. Der Designer arbeitet bereits (nicht committete Dateien `sprites-desert.js`, `level-seiten.html`, Tokens), Sprite-Schlüssel daran angelehnt | Interview | AP-97 bis AP-108 | Nutzer |
