@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { PROGRESSION } from '../config';
+import { LEVELS, PROGRESSION } from '../config';
 import { ARENA } from '../config/arena';
 import { THEME } from '../config/theme';
 import { WEAPON_MOUNT } from '../config/weaponMount';
@@ -13,10 +13,24 @@ import { isValidLevelId } from './debug';
 import { Button } from './menu/Button';
 import { ConfirmDialog } from './menu/ConfirmDialog';
 import { UpgradePanel } from './menu/UpgradePanel';
-import { LevelGrid } from './menu/LevelGrid';
+import { GRID_HEIGHT, GRID_WIDTH, LevelGrid } from './menu/LevelGrid';
+import { LevelPager } from './menu/LevelPager';
 import { drawBar, drawBevel, drawDashedRule, kText, textWidth, type KText } from './menu/kassette';
-import { isLevelUnlocked, xpFraction } from './menu/levelGroups';
-import { centerOffset, isFreshSave } from './menu/menuLogic';
+import { isLevelUnlocked, pageCount, xpFraction } from './menu/levelGroups';
+import {
+  PAGE_SLIDE_MS,
+  PAGE_SLIDE_STEPS,
+  centerOffset,
+  clampPage,
+  isFreshSave,
+  pageLabel,
+  pageNote,
+  pageRange,
+  slideOffsets,
+  startPage,
+  stepPage,
+  swipeDirection,
+} from './menu/menuLogic';
 
 const IDLE_ANIM = 'astronaut-idle';
 const MAX_SUM = 20;
@@ -24,6 +38,11 @@ const MAX_SUM = 20;
 // Layout nach docs/design/mockups/hauptmenue.html (logische Pixel 640x360)
 const PROFILE = { x: 16, y: 52, w: 184, h: 252, pad: 12 };
 const GRID = { x: 216, y: 52 };
+/** Pager bar under the panel, same row as the reset button. */
+const PAGER_Y = 316;
+/** Hint line in the header: right aligned up to x 584 (56 px left of the edge), y 22. */
+const NOTE_RIGHT = 56;
+const NOTE_Y = 22;
 
 /** Alle Waffen- und Anzug-Stufen als Summen für die Porträt-Karte. */
 function upgradeSums(save: SaveGame): { weapon: number; suit: number; stage: number } {
@@ -46,6 +65,15 @@ export class MenuScene extends Phaser.Scene {
   private suitText: KText | null = null;
   private weaponIcon: Phaser.GameObjects.Image | null = null;
   private starting = false;
+  private grid: LevelGrid | null = null;
+  private pager: LevelPager | null = null;
+  private noteText: KText | null = null;
+  private maskShape: Phaser.GameObjects.Graphics | null = null;
+  private page = 0;
+  private pageTotal = 1;
+  private highest = 0;
+  private fresh = false;
+  private sliding = false;
   /** Horizontal shift that centres the 640 layout (PE-102). */
   private ox = 0;
 
@@ -67,9 +95,24 @@ export class MenuScene extends Phaser.Scene {
     this.drawLogo();
     this.drawProfile(save);
 
-    new LevelGrid(this, ox + GRID.x, GRID.y, save.highestUnlockedLevel, (id) =>
-      this.startLevel(id, save.highestUnlockedLevel),
+    this.highest = save.highestUnlockedLevel;
+    this.fresh = isFreshSave(save);
+    this.pageTotal = pageCount(LEVELS);
+    this.page = clampPage(startPage(LEVELS, this.highest), this.pageTotal);
+    this.sliding = false;
+    this.grid = this.makeGrid(this.page);
+    this.pager = new LevelPager(
+      this,
+      ox + GRID.x,
+      PAGER_Y,
+      Array.from({ length: this.pageTotal }, (_, p) => ({
+        label: pageLabel(p),
+        range: pageRange(LEVELS, p),
+      })),
+      this.page,
+      (p) => this.goToPage(p),
     );
+    this.setupPageInput();
 
     new Button(
       this,
@@ -84,17 +127,8 @@ export class MenuScene extends Phaser.Scene {
       },
     );
 
-    const fresh = isFreshSave(save);
-    kText(
-      this,
-      right - 16,
-      328,
-      fresh ? 'Willkommen! Starte mit Level 0.' : 'Tippe auf ein freies Level.',
-      1,
-      fresh ? 'menu.text' : 'menu.text-muted',
-      1,
-      0,
-    );
+    this.noteText = kText(this, right - NOTE_RIGHT, NOTE_Y, '', 1, 'menu.text-muted', 1, 0);
+    this.updateNote();
 
     addMuteButton(this, right - 32, 26, 'menu');
 
@@ -108,6 +142,114 @@ export class MenuScene extends Phaser.Scene {
       this.weaponText = null;
       this.suitText = null;
       this.weaponIcon = null;
+      this.grid = null;
+      this.pager = null;
+      this.maskShape?.destroy();
+      this.maskShape = null;
+      this.noteText = null;
+      this.input.off('pointerup', this.onPointerUp, this);
+      this.input.keyboard?.off('keydown', this.onKeyDown, this);
+    });
+  }
+
+  private makeGrid(page: number): LevelGrid {
+    return new LevelGrid(
+      this,
+      this.ox + GRID.x,
+      GRID.y,
+      this.highest,
+      (id) => this.pickLevel(id),
+      page,
+    );
+  }
+
+  /** A tile tap only counts if the pointer did not travel like a swipe. */
+  private pickLevel(id: number): void {
+    const p = this.input.activePointer;
+    if (swipeDirection(p.x - p.downX) !== 0) return;
+    this.startLevel(id, this.highest);
+  }
+
+  private setupPageInput(): void {
+    this.input.on('pointerup', this.onPointerUp, this);
+    this.input.keyboard?.on('keydown', this.onKeyDown, this);
+  }
+
+  private readonly onPointerUp = (pointer: Phaser.Input.Pointer): void => {
+    const x = this.ox + GRID.x;
+    const inside =
+      pointer.downX >= x &&
+      pointer.downX <= x + GRID_WIDTH &&
+      pointer.downY >= GRID.y &&
+      pointer.downY <= GRID.y + GRID_HEIGHT;
+    if (!inside || this.dialog || this.panel) return;
+    const dir = swipeDirection(pointer.upX - pointer.downX);
+    if (dir !== 0) this.goToPage(stepPage(this.page, dir, this.pageTotal));
+  };
+
+  private readonly onKeyDown = (e: KeyboardEvent): void => {
+    if (this.dialog || this.panel) return;
+    if (e.code !== 'ArrowLeft' && e.code !== 'ArrowRight') return;
+    this.pager?.showFocus();
+    this.goToPage(stepPage(this.page, e.code === 'ArrowLeft' ? -1 : 1, this.pageTotal));
+  };
+
+  /** Shows the hint line for the current page (locked page note, welcome or tap hint). */
+  private updateNote(): void {
+    const note = pageNote(LEVELS, this.page, this.highest, this.fresh);
+    this.noteText?.setText(note.text.toUpperCase());
+    if (this.noteText instanceof Phaser.GameObjects.BitmapText) {
+      this.noteText.setTint(THEME.colors[note.strong ? 'menu.text' : 'menu.text-muted'].num);
+    }
+    this.noteText?.setX(this.ox + ARENA.baseWidth - NOTE_RIGHT);
+  }
+
+  /** Turns to a page: 4 steps over 200 ms, instantly with reduced motion. */
+  private goToPage(target: number): void {
+    const next = clampPage(target, this.pageTotal);
+    if (this.sliding || next === this.page || this.dialog || this.panel || !this.grid) return;
+    const dir: 1 | -1 = next > this.page ? 1 : -1;
+    const old = this.grid;
+    const baseX = this.ox + GRID.x;
+    this.page = next;
+    this.pager?.setPage(next);
+    this.updateNote();
+    this.grid = this.makeGrid(next);
+    const fresh = this.grid;
+    const distance = GRID_WIDTH + 16;
+    const offsets = slideOffsets(distance, dir, prefersReducedMotion());
+    if (offsets.length <= 1) {
+      old.destroy();
+      return;
+    }
+    this.sliding = true;
+    // panel plus its 4 px shadow and 2 px outline: 6 px margin
+    const shape = this.make.graphics({}, false);
+    this.maskShape = shape;
+    shape
+      .fillStyle(THEME.colors['menu.text'].num)
+      .fillRect(baseX - 6, GRID.y - 6, GRID_WIDTH + 12, GRID_HEIGHT + 12);
+    const mask = shape.createGeometryMask();
+    old.setMask(mask);
+    fresh.setMask(mask);
+    const stepMs = PAGE_SLIDE_MS / PAGE_SLIDE_STEPS;
+    const place = (offset: number): void => {
+      fresh.setX(baseX + offset);
+      old.setX(baseX + offset - dir * distance);
+    };
+    place(dir * distance);
+    offsets.forEach((offset, i) => {
+      this.time.delayedCall(stepMs * (i + 1), () => {
+        place(offset);
+        if (i === offsets.length - 1) {
+          old.destroy();
+          fresh.clearMask();
+          mask.destroy();
+          shape.destroy();
+          this.maskShape = null;
+          this.sliding = false;
+        }
+      });
     });
   }
 

@@ -21,10 +21,9 @@ const BIOME_COLOR: Record<BatchId, ColorName> = {
   forest: 'biome.forest',
   forestNight: 'biome.night',
   elfForest: 'biome.elf',
-  // M5 placeholders (AP-97) until the design tokens come in AP-106/AP-107.
-  desert: 'biome.forest',
-  pyramids: 'biome.elf',
-  oasis: 'biome.night',
+  desert: 'biome.desert',
+  pyramids: 'biome.pyramid',
+  oasis: 'biome.oasis',
 };
 
 interface TileStyle {
@@ -62,6 +61,7 @@ export class LevelGrid extends Phaser.GameObjects.Container {
     y: number,
     highestUnlockedLevel: number,
     onSelect: (levelId: number) => void,
+    page = 0,
   ) {
     super(scene, x, y);
     const g = scene.add.graphics();
@@ -73,7 +73,7 @@ export class LevelGrid extends Phaser.GameObjects.Container {
     });
 
     let top = PAD_Y;
-    for (const group of groupLevels(LEVELS, highestUnlockedLevel)) {
+    for (const group of groupLevels(LEVELS, highestUnlockedLevel, page)) {
       this.addGroupHead(
         scene,
         g,
