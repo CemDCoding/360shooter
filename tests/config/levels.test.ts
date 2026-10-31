@@ -158,6 +158,31 @@ describe('levels', () => {
     }
   });
 
+  it('level 21 to 40 lower the spawn interval only by 5 ms per level, 525 to 430 ms (AP-105, PE-129)', () => {
+    expect(LEVELS[21].spawnIntervalMs).toBe(525);
+    expect(LEVELS[40].spawnIntervalMs).toBe(430);
+    for (let i = 22; i < LEVELS.length; i++) {
+      expect(LEVELS[i - 1].spawnIntervalMs - LEVELS[i].spawnIntervalMs, `level ${i}`).toBe(5);
+    }
+  });
+
+  it('keeps the tanks rare in the desert pools (armadillo, sphinx at most 10 percent, AP-105)', () => {
+    for (const l of LEVELS.filter((x) => x.id >= 21)) {
+      const total = l.enemyPool.reduce((s, e) => s + e.weight, 0);
+      for (const e of l.enemyPool) {
+        if (e.enemyId === 'armadillo' || e.enemyId === 'sphinx') {
+          expect(e.weight / total, `${e.enemyId} level ${l.id}`).toBeLessThanOrEqual(0.1);
+        }
+      }
+    }
+  });
+
+  it('max enemies of level 21 to 40 rise by 1 from 131 to 150 (AP-105)', () => {
+    expect(LEVELS.slice(21).map((l) => l.maxEnemies)).toEqual(
+      Array.from({ length: 20 }, (_, i) => 131 + i),
+    );
+  });
+
   it('max enemies of level 21 to 40 stay at 150 or below, level 40 at the cap (PE-129)', () => {
     for (let i = 21; i < LEVELS.length; i++) {
       expect(LEVELS[i].maxEnemies, `level ${i}`).toBeLessThanOrEqual(150);

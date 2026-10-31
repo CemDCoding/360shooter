@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { CONTACT_DESPAWN_DAMAGE, ENEMIES, PLAYER, WEAPON_BASE } from '../../src/config';
+import {
+  CHARGE_TRIGGER_DISTANCE,
+  CONTACT_DESPAWN_DAMAGE,
+  ENEMIES,
+  PLAYER,
+  WEAPON_BASE,
+} from '../../src/config';
 import { ASSETS } from '../../src/config/assets';
 import { BOSS_TUNING, MIN_TELEGRAPH_MS } from '../../src/config/bosses';
 import type { EnemyId } from '../../src/contracts';
@@ -131,6 +137,42 @@ describe('enemies M5 (AP-97, PE-127)', () => {
     expect(slow?.durationMs).toBe(2000);
     expect(slow?.turnFactor).toBeGreaterThan(0);
     expect(slow?.turnFactor).toBeLessThan(1);
+  });
+
+  it('follows the keywords of F-19 (AP-105)', () => {
+    const e = ENEMIES;
+    // Fee: sehr wenig HP, viel Schaden.
+    expect(e.fairy.hp).toBeLessThan(e.zombieSquirrel.hp);
+    expect(e.fairy.contactDamage).toBeGreaterThan(e.cursedTree.contactDamage);
+    // Wildschwein und Baer: viel HP, mehr als der Baum.
+    expect(e.boar.hp).toBeGreaterThan(e.cursedTree.hp);
+    expect(e.bear.hp).toBeGreaterThan(e.cursedTree.hp);
+    // Sphinx: Tank, die meisten HP aller normalen Gegner, langsam.
+    for (const other of Object.values(e)) {
+      if (other.id !== 'sphinx') expect(e.sphinx.hp, other.id).toBeGreaterThan(other.hp);
+    }
+    expect(e.sphinx.speed).toBeLessThan(e.cursedTree.speed);
+    // Armadillo: viel HP, langsam.
+    expect(e.armadillo.hp).toBeGreaterThan(e.cursedTree.hp);
+    expect(e.armadillo.speed).toBeLessThan(e.cursedTree.speed);
+    // Schlange: schnell, wenig HP.
+    expect(e.snake.speed).toBeGreaterThan(e.zombieSquirrel.speed);
+    expect(e.snake.hp).toBeLessThan(e.cursedTree.hp / 2);
+    // Mumie: langsam, viel Schaden (staerkstes Geschoss der Schuetzen).
+    expect(e.mummy.speed).toBeLessThan(e.cursedTree.speed);
+    for (const id of ['forestWitch', 'camel', 'archaeologist'] as const) {
+      expect(e.mummy.projectile!.damage, id).toBeGreaterThan(e[id].projectile!.damage);
+    }
+  });
+
+  it('gives chargers a reaction time of at least 1000 ms (PE-75, AP-101)', () => {
+    for (const e of Object.values(ENEMIES)) {
+      if (e.charge) {
+        const reactionMs =
+          e.charge.telegraphMs + (CHARGE_TRIGGER_DISTANCE / e.charge.dashSpeed) * 1000;
+        expect(reactionMs, e.id).toBeGreaterThanOrEqual(1000);
+      }
+    }
   });
 
   it('gives the archaeologist the standard shooter values of the witch', () => {

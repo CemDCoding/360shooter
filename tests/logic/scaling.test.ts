@@ -26,7 +26,7 @@ describe('enemyScaleFor', () => {
   });
 
   it('falls back to the default for unknown levels', () => {
-    for (const id of [-1, 21, 1.5, Number.NaN, Infinity]) {
+    for (const id of [-1, LEVEL_SCALING.length, 1.5, Number.NaN, Infinity]) {
       expect(enemyScaleFor(id)).toEqual({ hp: 1, xp: 1, coin: 1, contact: 1 });
     }
   });
