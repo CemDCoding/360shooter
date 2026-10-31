@@ -21,6 +21,9 @@ import {
   type SchedulerRng,
 } from '../../logic/boss';
 import { applyDamage, auraDamage, isDead } from '../../logic/health';
+import type { BossHazard } from './hazards';
+
+export type { BossHazard, HazardShape, LaserProbe } from './hazards';
 
 const FLASH_MS = 120;
 const FLASH_TINT = THEME.colors['game.hit-flash'].num;
@@ -59,7 +62,8 @@ export interface BossContext {
  * - onTelegraph(attack): show the warning (use Telegraph) - runs when an attack is announced,
  * - onAttack(attackId): the attack hits now (after telegraphMs),
  * - behave(delta): movement,
- * - invulnerable / damageFactor: ghost phase, half damage of the stone.
+ * - invulnerable / damageFactor: ghost phase, half damage of the stone,
+ * - getHazards(): projectiles and danger zones for the generic hit path of the scene (PE-134).
  * Pool friendly like Enemy: spawn() and despawn().
  */
 export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
@@ -140,6 +144,14 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
   /** Movement hook, runs every frame while the boss lives. */
   protected behave(delta: number): void {
     void delta;
+  }
+
+  /**
+   * Projectiles and danger zones of this boss that can hit the player (PE-134). The scene checks them every
+   * frame on one generic path (lasers first, then the player). Default: none.
+   */
+  getHazards(): readonly BossHazard[] {
+    return [];
   }
 
   /** Damage of an attack of this boss after the variant multiplier. */

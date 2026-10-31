@@ -19,6 +19,7 @@ import {
   type ItemDef,
   type LevelDef,
   type PowerStoreState,
+  type StatusOnHit,
   type UpgradeLevels,
 } from '../contracts';
 import type { ActiveArmour, ArmourDef } from '../contracts/armour';
@@ -28,11 +29,8 @@ import { ArmourPickup } from '../entities/ArmourPickup';
 import { BossBase } from '../entities/bosses/BossBase';
 import { rimRadii } from '../entities/bosses/rim';
 import { createBoss } from '../entities/bosses/createBoss';
-import { ForestGhost } from '../entities/bosses/ForestGhost';
-import { GhostOrb } from '../entities/bosses/GhostOrb';
 import { GiantStone } from '../entities/bosses/GiantStone';
-import { RootMonster } from '../entities/bosses/RootMonster';
-import { RootSpike } from '../entities/bosses/RootSpike';
+import { bodyCircle, resolveHazardHits, type LaserProbe } from '../entities/bosses/hazards';
 import { ArmourRing } from '../entities/ArmourRing';
 import { CoinPool } from '../entities/CoinPool';
 import { ItemPickup } from '../entities/ItemPickup';
@@ -612,56 +610,50 @@ export class GameScene extends Phaser.Scene {
     }
     if (damage > 0) this.player.takeDamage(damage);
 
-    if (boss instanceof RootMonster) this.updateRootSpikes(boss);
-    else if (boss instanceof ForestGhost) this.updateGhostOrbs(boss);
+    this.updateBossHazards(boss);
   }
 
-  private updateRootSpikes(boss: RootMonster): void {
-    const spikes = [...boss.activeSpikes];
-    if (spikes.length === 0) return;
-    this.physics.overlap(this.lasers.group, spikes, (a, b) => {
-      const laser = pick(a, b, Laser);
-      const spike = pick(a, b, RootSpike);
-      if (!laser || !spike || !laser.active || !spike.active || this.ended) return;
-      if (spike.laserHit()) {
-        this.lasers.release(laser);
-        this.sfx.play('sfx-hit');
-      }
-    });
-    this.physics.overlap(this.player, spikes, (a, b) => {
-      const spike = pick(a, b, RootSpike);
-      if (!spike || !spike.active || this.ended) return;
-      const dmg = spike.tryHit();
-      if (dmg > 0) this.player.takeDamage(dmg);
+  /**
+   * Treffer von Boss-Geschossen (PE-134): one generic path for every boss, no `instanceof`. The boss reports
+   * its projectiles and danger zones via getHazards(); lasers first (one laser hits one hazard), then the
+   * player (damage through Player.takeDamage, shield first, onHit passed on).
+   */
+  private updateBossHazards(boss: BossBase): void {
+    if (this.ended) return;
+    const hazards = boss.getHazards();
+    if (hazards.length === 0) return;
+    const lasers: {
+      readonly active: boolean;
+      readonly probe: LaserProbe;
+      readonly laser: Laser;
+    }[] = [];
+    for (const child of this.lasers.group.getChildren()) {
+      const laser = child as Laser;
+      const body = laser.body as Phaser.Physics.Arcade.Body | null;
+      if (!laser.active || !body) continue;
+      lasers.push({
+        get active() {
+          return laser.active;
+        },
+        probe: {
+          rect: { left: body.left, top: body.top, right: body.right, bottom: body.bottom },
+          circle: bodyCircle(body),
+        },
+        laser,
+      });
+    }
+    const pb = this.player.body as Phaser.Physics.Arcade.Body;
+    resolveHazardHits(hazards, lasers, bodyCircle(pb), {
+      releaseLaser: (l) => this.lasers.release(l.laser),
+      onLaserUsed: () => this.sfx.play('sfx-hit'),
+      hitPlayer: (damage, onHit) => this.hitPlayerByBoss(damage, onHit),
     });
   }
 
-  private updateGhostOrbs(boss: ForestGhost): void {
-    const orbs = boss.orbs.filter((o) => o.active);
-    if (orbs.length === 0) return;
-    // Laser vs orb: same circle rule as the witch bolt, one laser destroys one orb (PE-37).
-    this.physics.overlap(this.lasers.group, orbs, (a, b) => {
-      const laser = pick(a, b, Laser);
-      const orb = pick(a, b, GhostOrb);
-      if (!laser || !orb || !laser.active || !orb.active || this.ended) return;
-      const lb = laser.body as Phaser.Physics.Arcade.Body;
-      const ob = orb.body as Phaser.Physics.Arcade.Body;
-      const hit = canLaserDestroyBolt(
-        { active: laser.active, x: lb.center.x, y: lb.center.y, radius: lb.halfWidth },
-        { active: orb.active, x: ob.center.x, y: ob.center.y, radius: ob.halfWidth },
-      );
-      if (!hit) return;
-      this.lasers.release(laser);
-      orb.kill();
-      this.sfx.play('sfx-hit');
-    });
-    this.physics.overlap(this.player, orbs, (a, b) => {
-      const orb = pick(a, b, GhostOrb);
-      if (!orb || !orb.active || this.ended) return;
-      const dmg = orb.damage;
-      orb.kill();
-      this.player.takeDamage(dmg);
-    });
+  /** A boss hazard hit the player. AP-102 applies `onHit` (poison, slow) here. */
+  private hitPlayerByBoss(damage: number, onHit: StatusOnHit | undefined): void {
+    void onHit;
+    this.player.takeDamage(damage);
   }
 
   private despawnBoss(): void {

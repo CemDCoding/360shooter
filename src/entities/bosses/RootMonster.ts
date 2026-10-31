@@ -3,6 +3,7 @@ import { BOSS_TUNING } from '../../config/bosses';
 import type { BossAttackDef } from '../../contracts';
 import { ringSpikeAngles, treePositions } from './bossGeometry';
 import { BossBase, type BossContext } from './BossBase';
+import { bodyShape, type BossHazard } from './hazards';
 import { RootSpike } from './RootSpike';
 import { Telegraph } from './Telegraph';
 
@@ -21,8 +22,8 @@ export interface RootMonsterContext extends BossContext {
  *   Every laser hit weakens it (spike.laserHit()); afterwards the root hurts once with the reduced damage.
  * - forestCall: summons 3-5 cursed trees inside the arena.
  * - rootRing (extra attack): ring of roots with one gap, the roots creep toward the player; a laser removes a root.
- * Scene contract: `activeSpikes` holds buds, roots and ring roots. Player overlap: spike.tryHit(); laser overlap:
- * if (spike.laserHit()) recycle the laser.
+ * Scene contract: `activeSpikes` holds buds, roots and ring roots; getHazards() hands them to the generic hit
+ * path (PE-134). Player overlap: spike.tryHit(); laser overlap: if (spike.laserHit()) recycle the laser.
  */
 export class RootMonster extends BossBase {
   private spikes: RootSpike[] | undefined;
@@ -44,6 +45,25 @@ export class RootMonster extends BossBase {
   /** Spikes that are up right now. */
   get activeSpikes(): readonly RootSpike[] {
     return this.spikes ?? [];
+  }
+
+  /** Buds, roots and ring roots for the generic hit path (PE-134); rules unchanged (laserHit, tryHit). */
+  override getHazards(): readonly BossHazard[] {
+    const out: BossHazard[] = [];
+    for (const spike of this.spikes ?? []) {
+      const body = spike.body as Phaser.Physics.Arcade.Body | null;
+      if (!body) continue;
+      out.push({
+        get active() {
+          return spike.active;
+        },
+        shape: bodyShape(body),
+        shootable: true,
+        laserHit: () => spike.laserHit(),
+        playerHit: () => spike.tryHit(),
+      });
+    }
+    return out;
   }
 
   override despawn(): void {

@@ -2,8 +2,10 @@ import Phaser from 'phaser';
 import { BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
 import type { BossAttackDef } from '../../contracts';
+import { canLaserDestroyBolt } from '../../logic/projectiles';
 import { BossBase, type BossContext } from './BossBase';
 import { GhostOrb } from './GhostOrb';
+import { bodyCircle, bodyShape, type BossHazard } from './hazards';
 import { Telegraph } from './Telegraph';
 
 const T = BOSS_TUNING.forestGhost;
@@ -15,8 +17,8 @@ const SHIELD_COLOR = THEME.colors['mint.200'].num;
  * - fade: half transparent and invulnerable for a short time (announced by blinking, shield ring while it lasts).
  * - orbFan: warning lines, then 5 GhostOrbs in a fan towards the middle.
  * - decoys (extra attack): 2 decoys for a few seconds. They do not shoot and have no body; only the real one takes damage.
- * The scene reads `orbs` for the overlap with the player (orb.damage, orb.kill()) and destroys orbs with
- * lasers like the witch projectile (PE-37, one laser hits one orb, orb.kill()). Orbs need at least MIN_REACTION_MS
+ * The scene reads the orbs via getHazards() (generic hit path, PE-134) for the overlap with the player
+ * (orb.damage, orb.kill()) and destroys orbs with lasers like the witch projectile (PE-37, one laser hits one orb). Orbs need at least MIN_REACTION_MS
  * (PE-75) from the orbit to the player.
  * While invulnerable takeDamage does nothing, so lasers pass through; the scene still recycles them.
  */
@@ -32,6 +34,39 @@ export class ForestGhost extends BossBase {
 
   constructor(scene: Phaser.Scene, levelId: number, ctx: BossContext = {}) {
     super(scene, 'forestGhost', levelId, ctx);
+  }
+
+  /**
+   * Flying orbs for the generic hit path (PE-134), rules unchanged: a laser destroys one orb with the same
+   * circle rule as the witch bolt (PE-37), the orb hurts the player once and vanishes.
+   */
+  override getHazards(): readonly BossHazard[] {
+    const out: BossHazard[] = [];
+    for (const orb of this.orbs) {
+      const body = orb.body as Phaser.Physics.Arcade.Body | null;
+      if (!orb.active || !body) continue;
+      out.push({
+        get active() {
+          return orb.active;
+        },
+        shape: bodyShape(body),
+        shootable: true,
+        laserHit: (laser) => {
+          const hit = canLaserDestroyBolt(
+            { active: true, ...laser.circle },
+            { active: orb.active, ...bodyCircle(body) },
+          );
+          if (hit) orb.kill();
+          return hit;
+        },
+        playerHit: () => {
+          const dmg = orb.damage;
+          orb.kill();
+          return dmg;
+        },
+      });
+    }
+    return out;
   }
 
   protected onSpawn(): void {

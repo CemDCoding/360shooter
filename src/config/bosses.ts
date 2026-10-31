@@ -60,6 +60,7 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
     ],
   },
   // M5 (AP-97, PE-128): starting values, behaviour and fine tuning in AP-100, AP-103 and AP-104.
+  // Riesen-Sand-Wurm (AP-100): behaviour values in BOSS_TUNING.giantSandWorm.
   giantSandWorm: {
     id: 'giantSandWorm',
     name: 'Riesen-Sand-Wurm',
@@ -67,11 +68,12 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
     baseDamage: 12,
     spriteKey: 'boss-sand-worm',
     attacks: [
-      // Sand trail wanders to the player, the worm breaks out next to her inside the ring.
+      // Dives (invulnerable), a sand trail wanders to the player, the worm breaks out next to her
+      // inside the announced circle. The mound at the end of the trail can be shot to weaken it.
       { id: 'burrow', cooldownMs: 7000, telegraphMs: 1200, damage: 18, extraOnly: false },
-      // Fan of skin spikes.
+      // Fan of skin spikes (shootable like the ghost orbs).
       { id: 'spikeVolley', cooldownMs: 4000, telegraphMs: 900, damage: 10, extraOnly: false },
-      // Body circles the player as a ring with a gap, only the head is vulnerable.
+      // Body circles the player as a ring with a gap and squeezes; only the head is vulnerable.
       { id: 'coil', cooldownMs: 12_000, telegraphMs: 1500, damage: 15, extraOnly: true },
     ],
   },
@@ -168,5 +170,66 @@ export const BOSS_TUNING = {
     retreatMaxMs: 4000,
     fragmentOffset: 36,
     fragmentMinCenterDist: 80,
+  },
+  /** Riesen-Sand-Wurm (AP-100, PE-128, PE-133). Starting values, balancing in the manual test M5-DEP. */
+  giantSandWorm: {
+    /** Path of the head while it roams (base arena; wider arenas grow like the stone rim, PE-101). */
+    orbit: { rx: 150, ry: 115 },
+    orbitSpeedRadPerSec: 0.35,
+    /** Speed of the head back to its path after an attack (px/s). */
+    returnSpeed: 140,
+    /** Head sprite size and body chain (brief: links about 22 px apart, the last link is the tail). */
+    headSize: 64,
+    segmentCount: 10,
+    segmentSpacing: 22,
+    segmentSize: 32,
+    /** Hit radius of a body link (lasers bounce off, the coil squeezes with it). */
+    segmentRadius: 10,
+    /** Frame time of the wiggling body links (ms). */
+    segmentFrameMs: 250,
+    /** Visible spark when a laser bounces off a link (ms). */
+    sparkMs: 120,
+    burrow: {
+      /** Distance of the break-out point from the player (beside her, PE-128). */
+      emergeDistance: 64,
+      /** Radius of the announced break-out circle; it reaches the player. Damage only inside it. */
+      eruptRadius: 60,
+      /** How long the break-out hurts (ms, hits once). */
+      eruptMs: 300,
+      /** Time the worm stays at the break-out point before it returns (ms). */
+      surfaceMs: 1200,
+      /** Sand mound at the end of the trail: hit radius and laser hits until the break-out is harmless. */
+      moundRadius: 16,
+      moundHits: 5,
+      /** Spacing of the sand strokes of the trail (px). */
+      trailStep: 10,
+    },
+    volley: {
+      count: 5,
+      spreadDeg: 60,
+      /** Top speed; closer to the player the spikes get slower so they keep MIN_REACTION_MS. */
+      speedPxPerSec: 90,
+      minSpeedPxPerSec: 30,
+      spikeRadius: 4,
+      lifeMs: 4000,
+      warnLineWidth: 8,
+    },
+    coil: {
+      /** Start radius of the ring around the player. */
+      radius: 100,
+      /** Gap of the ring (radians), at least as wide as the root ring. */
+      gapRad: 1.2,
+      /** Squeeze speed toward the player (px/s). */
+      speedPxPerSec: 60,
+      /** Speed of the links into the ring during the announcement (px/s). */
+      formSpeedPxPerSec: 260,
+      /** Share of the attack damage per link that reaches the player. */
+      damageShare: 0.2,
+      /** Head hits during the coil until it breaks up (each hit weakens it). */
+      breakHits: 6,
+      /** The ring stays closed this long before it opens again (ms). */
+      holdMs: 200,
+      thickness: 20,
+    },
   },
 } as const;

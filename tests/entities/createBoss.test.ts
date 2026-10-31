@@ -30,6 +30,9 @@ vi.mock('../../src/entities/bosses/BossBase', () => ({ BossBase: FakeBase }));
 vi.mock('../../src/entities/bosses/RootMonster', () => ({ RootMonster: make('rootMonster') }));
 vi.mock('../../src/entities/bosses/ForestGhost', () => ({ ForestGhost: make('forestGhost') }));
 vi.mock('../../src/entities/bosses/GiantStone', () => ({ GiantStone: make('giantStone') }));
+vi.mock('../../src/entities/bosses/GiantSandWorm', () => ({
+  GiantSandWorm: make('giantSandWorm'),
+}));
 
 const scene = {} as never;
 const LEVEL_OF: Record<BossId, number> = {
