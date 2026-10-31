@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { ENEMIES, LEVEL_COUNT, LEVEL_SCALING } from '../../src/config';
 
 describe('LEVEL_SCALING', () => {
-  it('has one entry per level', () => {
+  it('has one entry per level 0 to 20 (21 to 40 use the default factor 1 until AP-105)', () => {
     expect(LEVEL_SCALING).toHaveLength(21);
-    expect(LEVEL_SCALING).toHaveLength(LEVEL_COUNT);
+    expect(LEVEL_SCALING.length).toBeLessThanOrEqual(LEVEL_COUNT);
   });
 
   it('has finite positive factors that never exceed 1', () => {
@@ -33,7 +33,7 @@ describe('LEVEL_SCALING', () => {
   });
 
   it('weakens the single enemies of level 5 to 20 by about the density factor 1.3 (AP-95)', () => {
-    for (let i = 5; i < LEVEL_COUNT; i++) {
+    for (let i = 5; i < LEVEL_SCALING.length; i++) {
       const s = LEVEL_SCALING[i];
       expect(s.hp, `level ${i}`).toBeGreaterThanOrEqual(0.7);
       expect(s.hp, `level ${i}`).toBeLessThanOrEqual(0.85);

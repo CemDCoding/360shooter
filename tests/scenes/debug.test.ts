@@ -20,10 +20,10 @@ describe('parseDebugLevel', () => {
     expect(parseDebugLevel('?fps=1&level=20')).toBe(20);
   });
 
-  it('clamps out-of-range numbers to 0..20', () => {
-    expect(MAX_LEVEL_ID).toBe(20);
-    expect(parseDebugLevel('?level=21')).toBe(20);
-    expect(parseDebugLevel('?level=99999999999999999999')).toBe(20);
+  it('clamps out-of-range numbers to 0..40', () => {
+    expect(MAX_LEVEL_ID).toBe(40);
+    expect(parseDebugLevel('?level=41')).toBe(40);
+    expect(parseDebugLevel('?level=99999999999999999999')).toBe(40);
     expect(parseDebugLevel('?level=-3')).toBe(0);
   });
 
@@ -45,10 +45,10 @@ describe('parseDebugFps', () => {
 });
 
 describe('isValidLevelId', () => {
-  it('accepts integers 0..20 only', () => {
+  it('accepts integers 0..40 only', () => {
     expect(isValidLevelId(0)).toBe(true);
-    expect(isValidLevelId(20)).toBe(true);
-    expect(isValidLevelId(21)).toBe(false);
+    expect(isValidLevelId(40)).toBe(true);
+    expect(isValidLevelId(41)).toBe(false);
     expect(isValidLevelId(-1)).toBe(false);
     expect(isValidLevelId(1.5)).toBe(false);
     expect(isValidLevelId('3')).toBe(false);
@@ -81,7 +81,9 @@ describe('resolveStartTarget', () => {
   it('starts GameScene with the clamped level', () => {
     expect(resolveStartTarget('?level=12')).toEqual(game(12));
     expect(resolveStartTarget('?level=20')).toEqual(game(20));
-    expect(resolveStartTarget('?level=99')).toEqual(game(20));
+    expect(resolveStartTarget('?level=21')).toEqual(game(21));
+    expect(resolveStartTarget('?level=40')).toEqual(game(40));
+    expect(resolveStartTarget('?level=99')).toEqual(game(40));
     expect(resolveStartTarget('?level=-3')).toEqual(game(0));
     expect(resolveStartTarget('?level=abc')).toEqual(game(0));
     expect(resolveStartTarget('?level=1.5')).toEqual(game(0));

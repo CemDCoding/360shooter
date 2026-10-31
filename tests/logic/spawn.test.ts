@@ -58,15 +58,18 @@ function run(level: LevelDef, seconds: number, alive = 0, seed = 1): SpawnReques
 }
 
 describe('SpawnDirector', () => {
-  it('level 0 spawns only trees', () => {
+  it('level 0 spawns only the forest pool, mostly trees (AP-97: boar and bear added)', () => {
     const spawns = run(lvl(0), 180);
     expect(spawns.length).toBeGreaterThan(50);
-    expect(spawns.every((s) => s.enemyId === 'cursedTree')).toBe(true);
+    const allowed = new Set<EnemyId>(['cursedTree', 'boar', 'bear']);
+    expect(spawns.every((s) => allowed.has(s.enemyId))).toBe(true);
+    const trees = spawns.filter((s) => s.enemyId === 'cursedTree').length;
+    expect(trees / spawns.length).toBeGreaterThan(0.6);
   });
 
-  it('level 12 spawns all four enemy types', () => {
+  it('level 12 spawns all enemy types of its pool', () => {
     const ids = new Set<EnemyId>(run(lvl(12), 180).map((s) => s.enemyId));
-    expect(ids.size).toBe(4);
+    expect(ids).toEqual(new Set(lvl(12).enemyPool.map((e) => e.enemyId)));
   });
 
   it('respects maxEnemies', () => {

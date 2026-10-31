@@ -191,6 +191,8 @@ Begruendung des Faktors: Level 5 bis 20 hatten schon Luecken von hoechstens 1,13
 **Baum-HP und Anschluss Level 4 nach 5:** Der Verfluchte Baum hat in Level 0 bis 4 23 / 24 / 26 / 28 / 31 Lebenspunkte (statt 50), ab Level 5 jetzt 39. Der Sprung 31 auf 39 ist gewollt: Level 5 bringt zusaetzlich Hexe und Eichhoernchen, der Druck steigt stetig (0,76 auf 0,84), die Gegnerzahl je Minute springt aber von 59 auf 90 (Level 0 bis 4 wurden in AP-91 nur auf etwa x1,6 bis x2,2 angehoben). AP-95 aendert Level 0 bis 4 nicht. Eine Doppelschuss-Salve (Stufe 2, 3 mal 10 Schaden) toetet den Baum in Level 0 bis 3 in einem Zug, in Level 4 und ab Level 5 nicht (Handtest steht aus, H-24).
 Nachjustieren: `hp` und `contact` in `scaling.ts`, bei der Dichte `SPAWN_INTERVAL_MS`; `xp` und `coin` danach neu als alte durch neue Gegnerzahl setzen.
 
+**Level 21 bis 40 (M5, AP-97):** alle Werte (Abstand, `MAX_ENEMIES` bis 150, Gegner- und Boss-Werte, Pools inklusive Wildschwein, Baer und Fee in Level 0 bis 20) sind vorlaeufig und ohne `LEVEL_SCALING`; AP-105 stellt sie ein (PE-125, PE-129).
+
 ## Nachjustieren: Beispiele
 
 - Level 0 zu schwer: in `scaling.ts` `hp` von Level 0 senken oder in `levels.ts` `SPAWN_INTERVAL_MS[0]` erhoehen (hoechstens 1500, groesste Luecke); Druck-Untergrenze 0,45 beachten.

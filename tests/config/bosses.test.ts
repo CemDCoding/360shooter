@@ -1,4 +1,5 @@
 import { ARENA } from '../../src/config/arena';
+import { ASSETS } from '../../src/config/assets';
 import { rimRadii } from '../../src/entities/bosses/rim';
 import { describe, expect, it } from 'vitest';
 import {
@@ -105,5 +106,60 @@ describe('boss display names', () => {
     expect(BOSSES.rootMonster.name).toBe('Verwurzeltes Baummonster');
     expect(BOSSES.forestGhost.name).toBe('Waldgeist');
     expect(BOSSES.giantStone.name).toBe('Riesen-Stein');
+    expect(BOSSES.giantSandWorm.name).toBe('Riesen-Sand-Wurm');
+    expect(BOSSES.guardianDog.name).toBe('Antiker Wächter-Hund');
+    expect(BOSSES.pharaoh.name).toBe('Pharao');
+  });
+});
+
+describe('M5 bosses (AP-97, PE-128)', () => {
+  const expected = {
+    giantSandWorm: { sprite: 'boss-sand-worm', base: ['burrow', 'spikeVolley'], extra: ['coil'] },
+    guardianDog: {
+      sprite: 'boss-guardian-dog',
+      base: ['runeShield', 'guardBark'],
+      extra: ['summonMummies'],
+    },
+    pharaoh: { sprite: 'boss-pharaoh', base: ['goldCurse', 'sarcophagus'], extra: ['sandstorm'] },
+  } as const;
+
+  it('has six bosses, each keyed by its own id', () => {
+    expect(Object.keys(BOSSES).sort()).toEqual([
+      'forestGhost',
+      'giantSandWorm',
+      'giantStone',
+      'guardianDog',
+      'pharaoh',
+      'rootMonster',
+    ]);
+    for (const [id, def] of Object.entries(BOSSES)) expect(def.id).toBe(id);
+  });
+
+  it.each(Object.entries(expected))('%s has the attacks of PE-128', (id, e) => {
+    const def = BOSSES[id as keyof typeof expected];
+    expect(def.spriteKey).toBe(e.sprite);
+    expect(def.attacks.filter((a) => !a.extraOnly).map((a) => a.id)).toEqual(e.base);
+    expect(def.attacks.filter((a) => a.extraOnly).map((a) => a.id)).toEqual(e.extra);
+  });
+
+  it('starts in the range of the old bosses and grows from batch to batch', () => {
+    expect(BOSSES.giantSandWorm.baseHp).toBe(1000);
+    expect(BOSSES.guardianDog.baseHp).toBe(1300);
+    expect(BOSSES.pharaoh.baseHp).toBe(1700);
+    for (const id of Object.keys(expected) as (keyof typeof expected)[]) {
+      expect(BOSSES[id].baseDamage, id).toBeGreaterThan(0);
+      expect(BOSSES[id].baseDamage, id).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it('has a sprite in the asset manifest for every boss and the extra boss sprites', () => {
+    const keys = [
+      ...Object.values(BOSSES).map((b) => b.spriteKey),
+      'boss-sand-worm-body',
+      'boss-pharaoh-orb',
+    ];
+    for (const key of keys) {
+      expect(ASSETS.find((a) => a.key === key)?.kind, key).toBe('spritesheet');
+    }
   });
 });

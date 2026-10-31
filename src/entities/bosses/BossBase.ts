@@ -3,7 +3,14 @@ import { animKey } from '../../config/assets';
 import { ARENA } from '../../config/arena';
 import { BOSSES, BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
-import type { ArenaRect, BossAttackDef, BossDef, BossId, BossVariant } from '../../contracts';
+import type {
+  ArenaRect,
+  BossAttackDef,
+  BossDef,
+  BossId,
+  BossVariant,
+  EnemyId,
+} from '../../contracts';
 import {
   AttackScheduler,
   NO_TINT,
@@ -39,6 +46,11 @@ export interface BossContext {
   onHpChanged?: (hp: number, maxHp: number) => void;
   /** Boss died. The scene turns this into boss-defeated and RoundState.bossDefeated(). */
   onDefeated?: (x: number, y: number) => void;
+  /**
+   * Generic summon (M5, AP-97): the scene spawns one enemy of `enemyId` per position over the normal
+   * spawn path (e.g. the guardian dog calls mummies). `onSummonTrees` of the root monster stays as it is.
+   */
+  onSummon?: (enemyId: EnemyId, positions: { x: number; y: number }[]) => void;
 }
 
 /**

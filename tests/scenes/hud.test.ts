@@ -352,7 +352,14 @@ describe('boss HUD (H-14, 5a and 7a)', () => {
     expect(bossDisplayName('giantStone')).toBe('Riesen-Stein');
     expect(bossDisplayName('toString')).toBe('Boss');
     expect(bossDisplayName(undefined)).toBe('Boss');
-    expect(Object.keys(BOSSES).sort()).toEqual(['forestGhost', 'giantStone', 'rootMonster']);
+    expect(Object.keys(BOSSES).sort()).toEqual([
+      'forestGhost',
+      'giantSandWorm',
+      'giantStone',
+      'guardianDog',
+      'pharaoh',
+      'rootMonster',
+    ]);
     for (const def of Object.values(BOSSES)) expect(bossDisplayName(def.id)).toBe(def.name);
     expect(bossDisplayName('rootMonster')).toBe('Verwurzeltes Baummonster');
     expect(bossDisplayName('forestGhost')).toBe('Waldgeist');

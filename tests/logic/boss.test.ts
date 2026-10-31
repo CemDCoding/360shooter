@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BOSSES, MIN_TELEGRAPH_MS } from '../../src/config/bosses';
-import { LEVELS } from '../../src/config/levels';
+import { LEVELS, LEVEL_COUNT } from '../../src/config/levels';
 import {
   AttackScheduler,
   NO_TINT,
@@ -17,6 +17,9 @@ const BATCHES: readonly (readonly number[])[] = [
   [0, 1, 2, 3, 4],
   [5, 6, 7, 8, 9],
   [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  [21, 22, 23, 24, 25],
+  [26, 27, 28, 29, 30],
+  [31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
 ];
 
 function fixedRng(value = 0): { next(): number } {
@@ -26,7 +29,8 @@ function fixedRng(value = 0): { next(): number } {
 describe('variantForLevel', () => {
   it('uses the index inside the batch', () => {
     expect([0, 4, 5, 9, 10, 20].map(indexInBatch)).toEqual([0, 4, 0, 4, 0, 10]);
-    expect(() => indexInBatch(21)).toThrow(RangeError);
+    expect([21, 25, 26, 30, 31, 40].map(indexInBatch)).toEqual([0, 4, 0, 4, 0, 9]);
+    expect(() => indexInBatch(41)).toThrow(RangeError);
     expect(() => indexInBatch(-1)).toThrow(RangeError);
   });
 
@@ -77,11 +81,14 @@ describe('variantForLevel', () => {
 });
 
 describe('boss data', () => {
-  it('gives all 21 levels a boss of their batch', () => {
-    expect(LEVELS).toHaveLength(21);
+  it('gives all LEVEL_COUNT levels a boss of their batch', () => {
+    expect(LEVELS).toHaveLength(LEVEL_COUNT);
     expect(BATCHES[0].map((id) => bossForLevel(id)?.id)).toEqual(Array(5).fill('rootMonster'));
     expect(BATCHES[1].map((id) => bossForLevel(id)?.id)).toEqual(Array(5).fill('forestGhost'));
     expect(BATCHES[2].map((id) => bossForLevel(id)?.id)).toEqual(Array(11).fill('giantStone'));
+    expect(BATCHES[3].map((id) => bossForLevel(id)?.id)).toEqual(Array(5).fill('giantSandWorm'));
+    expect(BATCHES[4].map((id) => bossForLevel(id)?.id)).toEqual(Array(5).fill('guardianDog'));
+    expect(BATCHES[5].map((id) => bossForLevel(id)?.id)).toEqual(Array(10).fill('pharaoh'));
     expect(bossForLevel(99)).toBeUndefined();
   });
 

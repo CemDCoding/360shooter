@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ASSETS } from '../../src/config/assets';
+import { ASSETS, PLACEHOLDER_KEYS } from '../../src/config/assets';
 
 // Kein @types/node im Projekt: minimale Typen fuer node:fs (Variable verhindert Typaufloesung).
 interface Bytes {
@@ -20,9 +20,47 @@ const readFileSync = (rel: string): Bytes =>
   fs.readFileSync(new URL(`../../public/${rel}`, import.meta.url));
 
 describe('asset manifest', () => {
-  it('has unique keys and paths', () => {
+  it('has unique keys and unique paths apart from the placeholders', () => {
     expect(new Set(ASSETS.map((a) => a.key)).size).toBe(ASSETS.length);
-    expect(new Set(ASSETS.map((a) => a.path)).size).toBe(ASSETS.length);
+    const own = ASSETS.filter((a) => !PLACEHOLDER_KEYS.includes(a.key));
+    expect(new Set(own.map((a) => a.path)).size).toBe(own.length);
+  });
+
+  it('points every M5 placeholder at an existing sprite with the same geometry (AP-97)', () => {
+    const expected = [
+      'enemy-mummy',
+      'enemy-sand-worm',
+      'enemy-armadillo',
+      'enemy-camel',
+      'enemy-snake',
+      'enemy-archaeologist',
+      'enemy-sphinx',
+      'enemy-boar',
+      'enemy-bear',
+      'enemy-fairy',
+      'boss-sand-worm',
+      'boss-sand-worm-body',
+      'boss-guardian-dog',
+      'boss-pharaoh',
+      'boss-pharaoh-orb',
+      'tiles-desert',
+      'tiles-pyramids',
+      'tiles-oasis',
+    ];
+    expect([...PLACEHOLDER_KEYS].sort()).toEqual([...expected].sort());
+    for (const key of PLACEHOLDER_KEYS) {
+      const p = ASSETS.find((a) => a.key === key);
+      expect(p?.kind, key).toBe('spritesheet');
+      // The path belongs to an own sprite (never a file of its own) with the same frames.
+      const src = ASSETS.find((a) => a.path === p?.path && !PLACEHOLDER_KEYS.includes(a.key));
+      expect(src, key).toBeDefined();
+      expect([p?.frameWidth, p?.frameHeight, p?.frames], key).toEqual([
+        src?.frameWidth,
+        src?.frameHeight,
+        src?.frames,
+      ]);
+      expect(p?.description, key).toContain('Platzhalter');
+    }
   });
 
   it('has a description for every entry', () => {

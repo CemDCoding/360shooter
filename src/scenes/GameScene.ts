@@ -533,6 +533,11 @@ export class GameScene extends Phaser.Scene {
         if (this.ended) return;
         for (const p of positions) this.spawnScaled('cursedTree', p.x, p.y);
       },
+      // Generic summon (AP-97): any enemy id over the same spawn path as the tree call.
+      onSummon: (enemyId, positions) => {
+        if (this.ended) return;
+        for (const p of positions) this.spawnScaled(enemyId, p.x, p.y);
+      },
       getPlayerPos: () => ({ x: this.player.x, y: this.player.y }),
       onPlayerHit: (damage) => {
         if (!this.ended && !this.player.isDead) this.player.takeDamage(damage);

@@ -59,6 +59,52 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
       { id: 'roll', cooldownMs: 6000, telegraphMs: 1200, damage: 20, extraOnly: false },
     ],
   },
+  // M5 (AP-97, PE-128): starting values, behaviour and fine tuning in AP-100, AP-103 and AP-104.
+  giantSandWorm: {
+    id: 'giantSandWorm',
+    name: 'Riesen-Sand-Wurm',
+    baseHp: 1000,
+    baseDamage: 12,
+    spriteKey: 'boss-sand-worm',
+    attacks: [
+      // Sand trail wanders to the player, the worm breaks out next to her inside the ring.
+      { id: 'burrow', cooldownMs: 7000, telegraphMs: 1200, damage: 18, extraOnly: false },
+      // Fan of skin spikes.
+      { id: 'spikeVolley', cooldownMs: 4000, telegraphMs: 900, damage: 10, extraOnly: false },
+      // Body circles the player as a ring with a gap, only the head is vulnerable.
+      { id: 'coil', cooldownMs: 12_000, telegraphMs: 1500, damage: 15, extraOnly: true },
+    ],
+  },
+  guardianDog: {
+    id: 'guardianDog',
+    name: 'Antiker Wächter-Hund',
+    baseHp: 1300,
+    baseDamage: 14,
+    spriteKey: 'boss-guardian-dog',
+    attacks: [
+      // Invulnerable until 3 floating runes are shot down.
+      { id: 'runeShield', cooldownMs: 14_000, telegraphMs: 1000, damage: 0, extraOnly: false },
+      // Shock wave ring with a gap.
+      { id: 'guardBark', cooldownMs: 5000, telegraphMs: 1200, damage: 15, extraOnly: false },
+      // Calls 3 mummies (generic summon callback).
+      { id: 'summonMummies', cooldownMs: 12_000, telegraphMs: 1200, damage: 0, extraOnly: true },
+    ],
+  },
+  pharaoh: {
+    id: 'pharaoh',
+    name: 'Pharao',
+    baseHp: 1700,
+    baseDamage: 14,
+    spriteKey: 'boss-pharaoh',
+    attacks: [
+      // Spiral of gold orbs.
+      { id: 'goldCurse', cooldownMs: 4500, telegraphMs: 1000, damage: 10, extraOnly: false },
+      // Vanishes and reappears at an announced spot.
+      { id: 'sarcophagus', cooldownMs: 9000, telegraphMs: 1200, damage: 0, extraOnly: false },
+      // Edge darkens, projectiles come from outside.
+      { id: 'sandstorm', cooldownMs: 14_000, telegraphMs: 1500, damage: 8, extraOnly: true },
+    ],
+  },
 };
 
 /**
