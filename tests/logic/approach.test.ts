@@ -33,7 +33,7 @@ describe('contactTimeSec', () => {
     }
   });
 
-  it.each([734, 800])('contact time at width %i is within 5%% of 640', (w) => {
+  it.each([734, 800, 850, 900])('contact time at width %i is within 5%% of 640', (w) => {
     for (const s of [slowest, fastest]) {
       expect(Math.abs(time(w, s) / time(640, s) - 1)).toBeLessThanOrEqual(0.05);
     }

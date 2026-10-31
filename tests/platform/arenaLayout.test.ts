@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ArenaWidthController, hostBoxFor, measureArena } from '../../src/platform/arenaLayout';
+import { ARENA } from '../../src/config/arena';
 
 // Photo IMG_6372: iPhone landscape home screen app, 852x393, insets t0 r47 b21 l47.
 const photo = {
@@ -28,14 +29,14 @@ describe('measureArena', () => {
     const box = hostBoxFor(measureArena(photo).area, 640);
     expect(box.width).toBeLessThan(670);
   });
-  it('desktop window and aspect ratios stay within 640..800', () => {
+  it('desktop window and aspect ratios stay within 640..900', () => {
     const cases: [number, number, number][] = [
       [1280, 720, 640],
       [1920, 1080, 640],
       [1000, 500, 720],
-      [900, 400, 800],
+      [900, 400, 810],
       [800, 600, 640],
-      [1600, 400, 800],
+      [1600, 400, 900],
     ];
     for (const [w, h, want] of cases) {
       const m = measureArena({
@@ -63,7 +64,7 @@ describe('measureArena', () => {
 /*
  * AP-96 diagnosis states, iPhone 15 landscape 852x393, insets t0 r47 b21 l47. Safari with toolbar:
  * the bar takes the top of the layout viewport; 51 pt is an assumed bar height (no device at hand),
- * every bar taller than 31 pt gives the same result (availH < 341 hits maxWidth 800).
+ * every bar taller than 31 pt gives the same result (availH < 341 gives want 850 or more, at most maxWidth 900).
  */
 const phone = (h: number) => ({
   probeW: 852,
@@ -83,22 +84,22 @@ describe('AP-96 diagnosis states', () => {
     expect(box.height).toBe(371);
     expect(box.left).toBeCloseTo(47, 5);
   });
-  it('Safari with bar (342): want is capped at 800, rest = inset + about 22 px', () => {
+  it('Safari with bar (342): want 850, rest = inset (47 plus rounding)', () => {
     const m = measureArena(phone(342));
-    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 321, 800]);
+    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 321, 850]);
     const box = hostBoxFor(m.area, m.wantedW);
     expect(box.height).toBe(321);
-    expect(box.width).toBe(713);
-    expect(restLeft(342, 800)).toBeCloseTo(69.3, 1);
+    expect(box.width).toBe(757);
+    expect(restLeft(342, 850)).toBeLessThan(48.5);
   });
-  it('the cap starts below an available height of 341 (bar taller than 31 pt)', () => {
+  it('want rises above 798 for bars taller than 31 pt', () => {
     expect(measureArena(phone(363)).wantedW).toBe(798);
     expect(measureArena(phone(362)).wantedW).toBe(800);
     expect(restLeft(363, 798)).toBeLessThan(48);
   });
-  it('want can never exceed 800: "want 900" is not reachable', () => {
+  it('want never exceeds ARENA.maxWidth (900)', () => {
     for (let h = 100; h <= 393; h += 1)
-      expect(measureArena(phone(h)).wantedW).toBeLessThanOrEqual(800);
+      expect(measureArena(phone(h)).wantedW).toBeLessThanOrEqual(ARENA.maxWidth);
   });
   it('PC 1280x720: 640, no bars', () => {
     const m = measureArena({
