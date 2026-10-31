@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { animKey } from '../../config/assets';
 import { OPACITY, THEME } from '../../config/theme';
-import { CONTACT_DESPAWN_DAMAGE, ENEMIES } from '../../config/enemies';
+import { CONTACT_DESPAWN_DAMAGE, ENEMIES, ENEMY_BODY_SIZE } from '../../config/enemies';
 import { addContact, isContactSpent } from '../../logic/contactBudget';
 import type { EnemyDef, EnemyId, StatusOnHit } from '../../contracts';
 import { ARENA, BASE_SPAWN_RADIUS } from '../../config/arena';
@@ -42,6 +42,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.center = ctx.center ?? FALLBACK_CENTER;
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    // Hit box from the config (brief frame sizes, AP-101), not from the placeholder PNG.
+    const size = ENEMY_BODY_SIZE[id];
+    if (size) this.setBodySize(size, size, true);
     if (def.aura) {
       this.auraGfx = scene.add
         .circle(0, 0, def.aura.radius, AURA_COLOR, OPACITY.aura)
@@ -71,9 +74,23 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.disableBody(true, true);
     this.setActive(false).setVisible(false);
     this.auraGfx?.setVisible(false);
+    this.onDespawn();
   }
 
   protected onSpawn(): void {}
+
+  /** Hook to hide the visuals of a subclass. Also runs inside the base constructor, before subclass fields exist. */
+  protected onDespawn(): void {}
+
+  /** True while lasers and other damage cannot hurt the enemy (burrowed sand worm, AP-101). */
+  get isInvulnerable(): boolean {
+    return false;
+  }
+
+  /** Factor on incoming damage (rolling armadillo 0.5, AP-101). */
+  protected damageFactor(): number {
+    return 1;
+  }
 
   /** Status effect of the contact with the player, from the config (AP-97). Applied by the scene from AP-102 on. */
   get onHit(): StatusOnHit | undefined {
@@ -82,8 +99,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   /** Returns true if the hit killed the enemy. No damage numbers (PE-31). */
   takeDamage(amount: number): boolean {
-    if (!this.active) return false;
-    this.hp = applyDamage(this.hp, amount);
+    if (!this.active || this.isInvulnerable) return false;
+    this.hp = applyDamage(this.hp, amount * this.damageFactor());
     if (isDead(this.hp)) {
       const { x, y } = this;
       this.despawn();
@@ -145,17 +162,33 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (dist < 1) {
       this.setVelocity(0, 0);
     } else {
-      // PE-100: faster only outside the 640 spawn ring (wide arenas), unchanged inside.
-      const speed =
-        this.def.speed * approachSpeedFactor(dist, BASE_SPAWN_RADIUS, ARENA.offscreenSpeedFactor);
+      const speed = this.approachSpeed(dist);
       this.setVelocity((dx / dist) * speed, (dy / dist) * speed);
     }
     this.faceCenter();
     return dist;
   }
 
+  /** Walking speed at a distance to the center. PE-100: faster only outside the 640 spawn ring, unchanged inside. */
+  protected approachSpeed(dist: number): number {
+    return (
+      this.def.speed * approachSpeedFactor(dist, BASE_SPAWN_RADIUS, ARENA.offscreenSpeedFactor)
+    );
+  }
+
   protected halt(): void {
     this.setVelocity(0, 0);
+  }
+
+  /**
+   * Switches the physics body on or off without hiding the sprite. Without a body there is no overlap:
+   * lasers pass and there is no contact damage (AP-101).
+   */
+  protected setHittable(on: boolean): void {
+    const body = this.body as Phaser.Physics.Arcade.Body | null;
+    if (!body || body.enable === on) return;
+    body.enable = on;
+    if (on) body.reset(this.x, this.y);
   }
 
   destroy(fromScene?: boolean): void {
