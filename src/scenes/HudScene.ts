@@ -39,6 +39,7 @@ import {
 } from './hud/hudMath';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
+import { StatusIndicator } from './hud/StatusIndicator';
 import { BATCH_LABELS } from './menu/levelGroups';
 
 export { formatTime };
@@ -63,8 +64,10 @@ export class HudScene extends Phaser.Scene {
   private coinCounter!: CoinCounter;
   private powers!: PowerIndicators;
   private armour!: ArmourIndicator;
+  private status!: StatusIndicator;
   private slots?: PowerSlots;
   private chipRow: FunkChip[] = [];
+  private statusRow: FunkChip[] = [];
   private rowY = 0;
   private k = 1;
 
@@ -129,6 +132,7 @@ export class HudScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.fpsText = undefined;
     this.chipRow = [];
+    this.statusRow = [];
     this.blinks = new Map();
     this.timerSec = 0;
     this.overtime = false;
@@ -174,6 +178,7 @@ export class HudScene extends Phaser.Scene {
     this.gameEvents.on(GameEvents.PowersChanged, this.onPowers, this);
     this.gameEvents.on(GameEvents.ArmourChanged, this.onArmour, this);
     this.gameEvents.on(GameEvents.PowerStoreChanged, this.onPowerStore, this);
+    this.gameEvents.on(GameEvents.PlayerStatus, this.onPlayerStatus, this);
     this.gameEvents.on(GameEvents.BossWarning, this.onBossWarning, this);
     this.gameEvents.on(GameEvents.BossSpawned, this.onBossSpawned, this);
     this.gameEvents.on(GameEvents.BossHpChanged, this.onBossHp, this);
@@ -483,21 +488,32 @@ export class HudScene extends Phaser.Scene {
     this.coinCounter = new CoinCounter(this, k, relayout);
     this.powers = new PowerIndicators(this, k, relayout);
     this.armour = new ArmourIndicator(this, k, relayout);
+    this.status = new StatusIndicator(this, k, relayout);
     this.chipRow = [this.coinCounter.chip, ...this.powers.chips, this.armour.chip];
+    // Status chips sit in their own second row: the first row never grows into the arena edge (H-23).
+    this.statusRow = [...this.status.chips];
     this.relayoutChips(m);
   }
 
   private relayoutChips(m: number): void {
     if (this.chipRow.length === 0) return;
-    const xs = layoutRow(
-      this.chipRow.map((c) => (c.visible ? c.width : null)),
-      Math.round(CHIP_GAP * this.k),
-      m,
-    );
-    this.chipRow.forEach((c, i) => {
-      const x = xs[i];
-      if (x !== null) c.setPosition(x, this.rowY);
-    });
+    const gap = Math.round(CHIP_GAP * this.k);
+    const rowH = Math.max(0, ...this.chipRow.map((c) => c.height));
+    const rows: [FunkChip[], number][] = [
+      [this.chipRow, this.rowY],
+      [this.statusRow, this.rowY + rowH + gap],
+    ];
+    for (const [row, y] of rows) {
+      const xs = layoutRow(
+        row.map((c) => (c.visible ? c.width : null)),
+        gap,
+        m,
+      );
+      row.forEach((c, i) => {
+        const x = xs[i];
+        if (x !== null) c.setPosition(x, y);
+      });
+    }
   }
 
   private createPauseOverlay(
@@ -580,6 +596,10 @@ export class HudScene extends Phaser.Scene {
   private onArmour(p: GameEventPayloads['armour-changed']): void {
     this.armour.set(p);
     this.slots?.setArmour(p);
+  }
+
+  private onPlayerStatus(p: GameEventPayloads['player-status']): void {
+    this.status.set(p.effects);
   }
 
   private onPowerStore(p: GameEventPayloads['power-store-changed']): void {
@@ -681,6 +701,7 @@ export class HudScene extends Phaser.Scene {
     this.bannerTween = undefined;
     this.resetBossBarState(1);
     this.chipRow = [];
+    this.statusRow = [];
     this.slots?.destroy();
     this.slots = undefined;
     if (this.gameEvents) {
@@ -690,6 +711,7 @@ export class HudScene extends Phaser.Scene {
       this.gameEvents.off(GameEvents.PowersChanged, this.onPowers, this);
       this.gameEvents.off(GameEvents.ArmourChanged, this.onArmour, this);
       this.gameEvents.off(GameEvents.PowerStoreChanged, this.onPowerStore, this);
+      this.gameEvents.off(GameEvents.PlayerStatus, this.onPlayerStatus, this);
       this.gameEvents.off(GameEvents.BossWarning, this.onBossWarning, this);
       this.gameEvents.off(GameEvents.BossSpawned, this.onBossSpawned, this);
       this.gameEvents.off(GameEvents.BossHpChanged, this.onBossHp, this);

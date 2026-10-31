@@ -73,6 +73,30 @@ export function secondsText(sec: number): string {
   return `${Math.max(0, Math.floor(Number.isFinite(sec) ? sec : 0))}s`;
 }
 
+/** Labels of the status effects (text is the second feature besides colour, brief principle 4). */
+export const STATUS_LABELS: Record<'poison' | 'slow', string> = { poison: 'GIFT', slow: 'LAHM' };
+
+export interface StatusDisplay {
+  /** Label plus remaining seconds, e.g. "GIFT 3s". */
+  text: string;
+  /** Remaining time as a share of the longest time seen, 0..1. */
+  ratio: number;
+}
+
+/** What a status chip shows; null while the effect is not active. */
+export function statusDisplay(
+  kind: 'poison' | 'slow',
+  remainingMs: number,
+  peakMs: number,
+): StatusDisplay | null {
+  if (!Number.isFinite(remainingMs) || remainingMs <= 0) return null;
+  const peak = Number.isFinite(peakMs) && peakMs > 0 ? Math.max(peakMs, remainingMs) : remainingMs;
+  return {
+    text: `${STATUS_LABELS[kind]} ${secondsText(secondsLeft(remainingMs))}`,
+    ratio: Math.min(1, Math.max(0, remainingMs / peak)),
+  };
+}
+
 /**
  * Prepares text for the bitmap fonts (upper case only): everything is upper case
  * except the "s" right after a digit (Astro Funk has a small s for seconds).

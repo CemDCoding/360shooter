@@ -422,6 +422,21 @@ describe('phone HUD layout (H-23, AP-86)', () => {
       chips.push({ x, y: rowY, w, h: mt.height });
       x += w + Math.round(4 * k);
     }
+    // Status chips (GIFT 3s / LAHM 3s, 7 glyphs, bar 24) sit in a second row below the first one.
+    const rowH = Math.max(...chips.map((c) => c.h));
+    const statusMt = chipMetrics(k);
+    const statusW = Math.round(
+      statusMt.padX * 2 +
+        textW(7, statusMt.textScale) +
+        Math.round(24 * statusMt.iconFactor) +
+        2 +
+        statusMt.gap,
+    );
+    let sx = m;
+    for (let i = 0; i < 2; i++) {
+      chips.push({ x: sx, y: rowY + rowH + Math.round(4 * k), w: statusW, h: statusMt.height });
+      sx += statusW + Math.round(4 * k);
+    }
     const slots = powerSlotRects(2, 1, H, base, m);
     const bar = bossBarRect(W, H, k, 200, 8, 8);
     return { m, energy, timer, pause, mute, chips, slots, bar };

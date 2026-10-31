@@ -1,5 +1,12 @@
 import Phaser from 'phaser';
-import type { ActivePowers, ItemDef, WeaponStats } from '../contracts';
+import type {
+  ActivePlayerStatus,
+  ActivePowers,
+  ItemDef,
+  StatusOnHit,
+  WeaponStats,
+} from '../contracts';
+import { PlayerStatusState } from '../logic/status';
 import { WEAPON_BASE } from '../config';
 import { animKey } from '../config/assets';
 import { applyDamage, applyHeal, isDead } from '../logic/health';
@@ -41,6 +48,8 @@ export interface PlayerCallbacks {
   onShoot?: () => void;
   onHurt?: () => void;
   onDeath?: () => void;
+  /** Active status effects changed (start, end or shown seconds). */
+  onStatusChange?: (effects: ActivePlayerStatus[]) => void;
 }
 
 /** Player in the screen center: delayed turning, auto-fire. No scene imports. */
@@ -60,6 +69,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private readonly shieldRing: Phaser.GameObjects.Arc;
   private weapon: Phaser.GameObjects.Sprite | null;
   private dead = false;
+  private readonly status = new PlayerStatusState();
+  private lastStatusKey = '';
+  /** False while no effect can be running: update() then skips building the event key. */
+  private statusMaybeActive = false;
+
+  /** Ends all status effects (round end, death). */
+  clearStatus(): void {
+    this.status.clear();
+    this.emitStatus(false);
+  }
 
   constructor(
     scene: Phaser.Scene,
@@ -125,10 +144,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   update(dt: number, targetAngle: number): void {
     if (this.dead) return;
     this.updatePowers(dt);
+    this.updateStatus(dt);
+    if (this.dead) return;
     this.facingDeg = stepRotation(
       this.facingDeg,
       Phaser.Math.RadToDeg(targetAngle),
-      this.config.turnSpeedDegPerSec,
+      this.config.turnSpeedDegPerSec * this.status.turnFactor(),
       dt,
     );
     const rad = Phaser.Math.DegToRad(this.facingDeg);
@@ -191,7 +212,39 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  takeDamage(amount: number): void {
+  /** Applies the status effects of a hit (poison, slow). No effect once dead. */
+  applyStatus(effects: StatusOnHit | undefined): void {
+    if (this.dead || !effects) return;
+    this.status.apply(effects);
+    this.statusMaybeActive = true;
+    this.emitStatus(false);
+  }
+
+  /** Active effects with remaining time (copy). */
+  get activeStatus(): ActivePlayerStatus[] {
+    return this.status.active();
+  }
+
+  /** Pause-safe: runs only from update(dt). Poison goes through the shield like any damage. */
+  private updateStatus(dt: number): void {
+    const poison = this.status.tick(dt);
+    if (poison > 0) this.takeDamage(poison, true);
+    this.emitStatus(false);
+  }
+
+  /** player-status only when an effect starts or ends or the shown seconds change. */
+  private emitStatus(force: boolean): void {
+    if (!force && !this.statusMaybeActive) return;
+    const list = this.status.active();
+    this.statusMaybeActive = list.length > 0;
+    const key = list.map((e) => `${e.kind}:${Math.ceil(e.remainingMs / 1000)}`).join('|');
+    if (!force && key === this.lastStatusKey) return;
+    this.lastStatusKey = key;
+    this.callbacks.onStatusChange?.(list);
+  }
+
+  /** `overTime`: damage over time (poison), no hit flash and no hurt sound each frame. */
+  takeDamage(amount: number, overTime = false): void {
     if (this.dead) return;
     const absorbed = absorbDamage(this.powers, amount);
     const shieldChanged = absorbed.state.shieldLeft !== this.powers.shieldLeft;
@@ -200,15 +253,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.shieldRing.setVisible(this.powers.shieldLeft > 0);
       this.callbacks.onShieldChange?.(this.powers.shieldLeft);
     }
-    this.setTintFill(HIT_TINT);
-    this.weapon?.setTintFill(HIT_TINT);
-    this.hitTintLeft = HIT_TINT_MS;
-    this.callbacks.onHurt?.();
+    if (!overTime) {
+      this.setTintFill(HIT_TINT);
+      this.weapon?.setTintFill(HIT_TINT);
+      this.hitTintLeft = HIT_TINT_MS;
+      this.callbacks.onHurt?.();
+    }
     if (absorbed.remainingDamage <= 0) return;
     this.hp = applyDamage(this.hp, absorbed.remainingDamage);
     this.callbacks.onHpChange?.(this.hp, this.config.maxHp);
     if (isDead(this.hp)) {
       this.dead = true;
+      this.status.clear();
+      this.emitStatus(false);
       this.shieldRing.setVisible(false);
       this.weapon?.setVisible(false);
       this.callbacks.onDeath?.();
@@ -238,5 +295,39 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.weapon?.destroy();
     this.weapon = null;
     super.destroy(fromScene);
+  }
+}
+
+/** Damage first (shield first), then the status effect of the hit (bolt, boss hazard). */
+export function hitPlayer(
+  player: Pick<Player, 'takeDamage' | 'applyStatus'>,
+  damage: number,
+  onHit: StatusOnHit | undefined,
+): void {
+  player.takeDamage(damage);
+  player.applyStatus(onHit);
+}
+
+/**
+ * Collects the contact statuses of one frame without allocating: at most one applyStatus per kind,
+ * so a pile of snakes does not refresh and redraw once per snake and frame.
+ */
+export class ContactStatus {
+  private poison: StatusOnHit | undefined;
+  private slow: StatusOnHit | undefined;
+
+  add(onHit: StatusOnHit | undefined): void {
+    if (!onHit) return;
+    if (onHit.poison && !this.poison) this.poison = onHit;
+    if (onHit.slow && !this.slow) this.slow = onHit;
+  }
+
+  /** Applies the collected effects and resets for the next frame. */
+  flush(player: Pick<Player, 'applyStatus'>): void {
+    const { poison, slow } = this;
+    this.poison = undefined;
+    this.slow = undefined;
+    if (poison) player.applyStatus(poison);
+    if (slow && slow !== poison) player.applyStatus(slow);
   }
 }
