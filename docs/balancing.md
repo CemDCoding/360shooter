@@ -10,10 +10,13 @@ Schwierigkeit nicht mehr stetig steigt.
 |---|---|---|
 | `SPAWN_INTERVAL_MS` (Liste, ein Eintrag pro Level) | `levels.ts` | Wartezeit zwischen zwei neuen Gegnern in Millisekunden. **Kleiner = mehr Gegner = schwerer.** Im Lauf der Runde sinkt sie auf 60 %. |
 | `MAX_ENEMIES` (Liste) | `levels.ts` | Wie viele Gegner gleichzeitig leben duerfen (hoechstens 150). Bremst, wenn die Astronautin nicht mitkommt. |
-| `poolOf` / Gewichte | `levels.ts` | Welche Gegner vorkommen und wie oft (hoeheres Gewicht = haeufiger). Die Gegner-Ab-Level stehen in `idee.txt` und nicht aendern. |
+| `POOL_OF_BATCH` / Gewichte | `levels.ts` | Welche Gegner je Batch vorkommen und wie oft (hoeheres Gewicht = haeufiger). Die Zuordnung Gegner zu Batch (F-19, PE-125) nicht aendern. |
+| `LEVEL_SCALING` (`hp`, `xp`, `coin`, `contact`) | `scaling.ts` | Faktoren je Level auf Lebenspunkte, Erfahrung, Muenz-Drop-Chance und Kontaktschaden. Ab Level 21 traegt `hp` die Kurve. |
+| `COST_BASE`, `COST_GROWTH`, `perLevel` | `upgrades.ts` | Preis und Wirkung der Upgrade-Stufen 1 bis 15. |
 | Rundendauer (3 oder 5 Minuten) | `levels.ts` | Vorgabe aus dem Plan (PE-05), nicht aendern. |
 | `hp`, `speed`, `contactDamage` | `enemies.ts` | Leben, Lauftempo und Schaden pro Sekunde bei Beruehrung eines Gegners. |
-| `projectile.damage` / `intervalMs` | `enemies.ts` | Schaden und Abstand der Hexen-Schuesse. |
+| `projectile.damage` / `intervalMs` | `enemies.ts` | Schaden und Abstand der Schuesse (Hexe, Kamel, Archaeologe, Mumie). |
+| `charge`, `burrow`, `onHit` | `enemies.ts` | Ansturm (Wildschwein, Armadillo), Eingraben (Sandwurm), Gift (Schlange) und Wickel (Mumie). Sie gehen in die Kennzahlen ein (siehe „Neue Gegner“). |
 | `aura.dps` / `radius` | `enemies.ts` | Dauerschaden und Reichweite des Waldgeists. |
 | `xp` | `enemies.ts` | Erfahrung pro besiegtem Gegner (Spielerlevel). |
 | `fireRatePerSec`, `damage` | `weapon.ts` | Schuesse pro Sekunde und Schaden pro Schuss der Laserpistole ohne Items. |
@@ -32,47 +35,75 @@ Schwierigkeit nicht mehr stetig steigt.
   ueber 1 braucht man Items. Mit Doppelschuss Stufe 2 (drei Schuesse) ist der Schaden 3-mal so hoch (120 pro Sekunde).
   In der Praxis trifft man nicht immer, deshalb ist Level 0 mit 0,50 bewusst unter 1.
   Die Eroeffnungswelle (AP-56) zaehlt bei Spawns/Min mit.
+  Seit AP-105 rechnet der Druck mit **wirksamen** Lebenspunkten: Ansturm, Eingraben und Wickel erhoehen sie (siehe „Neue Gegner“).
 - **Skalierung (AP-91)**: `LEVEL_SCALING` in `scaling.ts` mit den Faktoren `hp`, `xp`, `coin`, `contact` je Level. Die Kennzahlen rechnen sie ein (Lebenspunkte gerundet wie im Spiel).
 - **Schaden ohne Abschuss/Min**: Schaden pro Minute an der Astronautin, wenn sie gar nichts trifft und
   alle Gegner ungestoert ankommen. Sie ist nur zum Vergleichen der Level gedacht (die Zahl waechst mit
   der Rundendauer, daher sind 5-Minuten-Level hoeher). Annahme: Gegner starten 380 px vom Zentrum.
+  Gift (Schlange) und Wickel (Mumie) zaehlen hier als zusaetzlicher Schaden (AP-105).
 
 ## Tabelle aller Level
 
 | Level | Batch | Minuten | Spawn-Abstand (ms) | Max. Gegner | Spawns/Min | Gegner-HP/Min | Druck | Schaden ohne Abschuss/Min |
 |---|---|---|---|---|---|---|---|---|
-| 0 | forest | 3 | 1500 | 25 | 52 | 1196 | 0,50 | 5687 |
-| 1 | forest | 3 | 1450 | 28 | 54 | 1296 | 0,54 | 6718 |
-| 2 | forest | 3 | 1400 | 31 | 56 | 1456 | 0,61 | 7674 |
-| 3 | forest | 5 | 1360 | 34 | 57 | 1602 | 0,67 | 10233 |
-| 4 | forest | 5 | 1330 | 37 | 59 | 1817 | 0,76 | 12048 |
-| 5 | forestNight | 3 | 870 | 52 | 90 | 2015 | 0,84 | 14199 |
-| 6 | forestNight | 3 | 840 | 55 | 94 | 2089 | 0,87 | 14974 |
-| 7 | forestNight | 3 | 810 | 57 | 97 | 2164 | 0,90 | 15521 |
-| 8 | forestNight | 5 | 770 | 60 | 101 | 2253 | 0,94 | 17784 |
-| 9 | forestNight | 5 | 740 | 62 | 105 | 2342 | 0,98 | 18389 |
-| 10 | elfForest | 3 | 615 | 78 | 127 | 2564 | 1,07 | 24944 |
-| 11 | elfForest | 3 | 610 | 83 | 128 | 2584 | 1,08 | 26321 |
-| 12 | elfForest | 3 | 600 | 88 | 130 | 2624 | 1,09 | 27716 |
-| 13 | elfForest | 3 | 590 | 94 | 132 | 2671 | 1,11 | 29356 |
-| 14 | elfForest | 3 | 585 | 99 | 133 | 2691 | 1,12 | 30675 |
-| 15 | elfForest | 3 | 575 | 104 | 136 | 2738 | 1,14 | 32030 |
-| 16 | elfForest | 5 | 560 | 109 | 138 | 2790 | 1,16 | 37022 |
-| 17 | elfForest | 5 | 555 | 114 | 140 | 2818 | 1,17 | 38564 |
-| 18 | elfForest | 5 | 545 | 120 | 142 | 2866 | 1,19 | 40437 |
-| 19 | elfForest | 5 | 540 | 125 | 143 | 2895 | 1,21 | 41961 |
-| 20 | elfForest | 5 | 530 | 130 | 146 | 2947 | 1,23 | 43529 |
+| 0 | forest | 3 | 1500 | 25 | 52 | 1193 | 0,50 | 5716 |
+| 1 | forest | 3 | 1450 | 28 | 54 | 1294 | 0,54 | 6753 |
+| 2 | forest | 3 | 1400 | 31 | 56 | 1459 | 0,61 | 7714 |
+| 3 | forest | 5 | 1360 | 34 | 57 | 1610 | 0,67 | 10284 |
+| 4 | forest | 5 | 1330 | 37 | 59 | 1832 | 0,76 | 12108 |
+| 5 | forestNight | 3 | 870 | 52 | 90 | 2006 | 0,84 | 14970 |
+| 6 | forestNight | 3 | 840 | 55 | 94 | 2080 | 0,87 | 15787 |
+| 7 | forestNight | 3 | 810 | 57 | 97 | 2154 | 0,90 | 16365 |
+| 8 | forestNight | 5 | 770 | 60 | 101 | 2242 | 0,93 | 18728 |
+| 9 | forestNight | 5 | 740 | 62 | 105 | 2331 | 0,97 | 19365 |
+| 10 | elfForest | 3 | 615 | 78 | 127 | 2543 | 1,06 | 25133 |
+| 11 | elfForest | 3 | 610 | 83 | 128 | 2564 | 1,07 | 26520 |
+| 12 | elfForest | 3 | 600 | 88 | 130 | 2604 | 1,08 | 27925 |
+| 13 | elfForest | 3 | 590 | 94 | 132 | 2650 | 1,10 | 29578 |
+| 14 | elfForest | 3 | 585 | 99 | 133 | 2670 | 1,11 | 30907 |
+| 15 | elfForest | 3 | 575 | 104 | 136 | 2717 | 1,13 | 32273 |
+| 16 | elfForest | 5 | 560 | 109 | 138 | 2768 | 1,15 | 37294 |
+| 17 | elfForest | 5 | 555 | 114 | 140 | 2796 | 1,16 | 38847 |
+| 18 | elfForest | 5 | 545 | 120 | 142 | 2844 | 1,18 | 40734 |
+| 19 | elfForest | 5 | 540 | 125 | 143 | 2872 | 1,20 | 42270 |
+| 20 | elfForest | 5 | 530 | 130 | 146 | 2924 | 1,22 | 43849 |
+| 21 | desert | 3 | 525 | 131 | 148 | 3193 | 1,33 | 37646 |
+| 22 | desert | 3 | 520 | 132 | 150 | 3462 | 1,44 | 38307 |
+| 23 | desert | 3 | 515 | 133 | 151 | 3718 | 1,55 | 38974 |
+| 24 | desert | 5 | 510 | 134 | 152 | 4001 | 1,67 | 44032 |
+| 25 | desert | 5 | 505 | 135 | 153 | 4270 | 1,78 | 44819 |
+| 26 | pyramids | 3 | 500 | 136 | 156 | 4675 | 1,95 | 38060 |
+| 27 | pyramids | 3 | 495 | 137 | 157 | 5010 | 2,09 | 38683 |
+| 28 | pyramids | 3 | 490 | 138 | 159 | 5388 | 2,25 | 39313 |
+| 29 | pyramids | 5 | 485 | 139 | 159 | 5769 | 2,40 | 44620 |
+| 30 | pyramids | 5 | 480 | 140 | 161 | 6217 | 2,59 | 45323 |
+| 31 | oasis | 3 | 475 | 141 | 164 | 6801 | 2,83 | 45917 |
+| 32 | oasis | 3 | 470 | 142 | 165 | 7301 | 3,04 | 46545 |
+| 33 | oasis | 3 | 465 | 143 | 167 | 7865 | 3,28 | 47207 |
+| 34 | oasis | 3 | 460 | 144 | 169 | 8449 | 3,52 | 47848 |
+| 35 | oasis | 3 | 455 | 145 | 171 | 9069 | 3,78 | 48495 |
+| 36 | oasis | 5 | 450 | 146 | 172 | 9755 | 4,06 | 54872 |
+| 37 | oasis | 5 | 445 | 147 | 174 | 10477 | 4,37 | 55586 |
+| 38 | oasis | 5 | 440 | 148 | 176 | 11251 | 4,69 | 56306 |
+| 39 | oasis | 5 | 435 | 149 | 178 | 12095 | 5,04 | 57033 |
+| 40 | oasis | 5 | 430 | 150 | 180 | 12989 | 5,41 | 57796 |
+
+Seit AP-105 mit Wildschwein, Baer und Fee in Level 0 bis 20. Ab Level 21 ist der Druck gegen die Grundwaffe ohne Upgrades
+gerechnet und deshalb deutlich ueber 1: Die Wueste setzt Upgrades voraus (siehe „Level 21 bis 40“).
 
 ## Was die Tests sichern
 
-- Der Druck steigt mit jedem Level, auch ueber Batch-Grenzen (Spawns/Min ebenso).
-- Die Spruenge 4 zu 5 (Ist +11 %, erlaubt 8 bis 12 %) und 9 zu 10 (Ist +9 %, erlaubt 8 bis 10 %) sind spuerbar (mindestens 8 %)
-  und groesser als jeder normale Schritt im neuen Batch.
+- Der Druck steigt mit jedem Level 0 bis 40, auch ueber Batch-Grenzen (Spawns/Min ebenso).
+- Die Spruenge 4 zu 5 (Ist +9,5 %, erlaubt 8 bis 12 %), 9 zu 10 (Ist +9,1 %), 20 zu 21 (Ist +9,2 %), 25 zu 26 (Ist +9,5 %)
+  und 30 zu 31 (Ist +9,4 %, alle erlaubt 8 bis 10 %) sind spuerbar und groesser als jeder normale Schritt im neuen Batch.
 - Ab Level 5 waechst der Druck je Level um hoechstens 10 %.
 - 5-Minuten-Level sind in ihrem Batch fordernder als die 3-Minuten-Level.
-- Level 0 hat Druck 0,45 bis 0,55 (Ist 0,50), Level 4 0,72 bis 0,80 (Ist 0,76). Level 20 liegt bei 0,95 bis 1,25 (Ist 1,23):
+- Level 0 hat Druck 0,45 bis 0,55 (Ist 0,50), Level 4 0,72 bis 0,80 (Ist 0,76). Level 20 liegt bei 0,95 bis 1,25 (Ist 1,22):
   die Grundwaffe reicht nicht, schon Doppelschuss Stufe 1 (80 pro Sekunde) reicht rechnerisch aus.
-- Gold im Mittel etwa 45 je gewonnenem Level, Stufe 10 eines Upgrades nach 15 bis 20 Leveln (siehe unten).
+- Gold im Mittel etwa 45 je gewonnenem Level 0 bis 20, Stufe 10 eines Upgrades nach 15 bis 20 Leveln (siehe unten).
+- Level 0 bis 20: Druck, Gold und Erfahrung je Level hoechstens 4 % neben dem Stand vor M5 (PE-125).
+- Level 21 bis 40: `hp` ueber 0,77 und steigend, Druck mit angenommenen Upgrades steigend und in Level 40 bei 0,8 bis 1,25,
+  Stufe 15 einer Spur bis etwa Level 35, `MAX_ENEMIES` hoechstens 150.
 - Doppelschuss, Schild und Dauerfeuer bleiben spuerbar, aber nicht uebermaechtig (siehe unten).
 
 ## Aenderung nach dem Handtest (AP-23)
@@ -191,7 +222,111 @@ Begruendung des Faktors: Level 5 bis 20 hatten schon Luecken von hoechstens 1,13
 **Baum-HP und Anschluss Level 4 nach 5:** Der Verfluchte Baum hat in Level 0 bis 4 23 / 24 / 26 / 28 / 31 Lebenspunkte (statt 50), ab Level 5 jetzt 39. Der Sprung 31 auf 39 ist gewollt: Level 5 bringt zusaetzlich Hexe und Eichhoernchen, der Druck steigt stetig (0,76 auf 0,84), die Gegnerzahl je Minute springt aber von 59 auf 90 (Level 0 bis 4 wurden in AP-91 nur auf etwa x1,6 bis x2,2 angehoben). AP-95 aendert Level 0 bis 4 nicht. Eine Doppelschuss-Salve (Stufe 2, 3 mal 10 Schaden) toetet den Baum in Level 0 bis 3 in einem Zug, in Level 4 und ab Level 5 nicht (Handtest steht aus, H-24).
 Nachjustieren: `hp` und `contact` in `scaling.ts`, bei der Dichte `SPAWN_INTERVAL_MS`; `xp` und `coin` danach neu als alte durch neue Gegnerzahl setzen.
 
-**Level 21 bis 40 (M5, AP-97):** alle Werte (Abstand, `MAX_ENEMIES` bis 150, Gegner- und Boss-Werte, Pools inklusive Wildschwein, Baer und Fee in Level 0 bis 20) sind vorlaeufig und ohne `LEVEL_SCALING`; AP-105 stellt sie ein (PE-125, PE-129).
+**Level 21 bis 40 (M5, AP-97):** waren vorlaeufig, AP-105 hat sie eingestellt (siehe unten). Boss-Werte stehen in `bosses.ts` und gehoeren nicht dazu.
+Seit AP-105 hat der Baum in Level 0 bis 4 22 / 23 / 25 / 27 / 30 Lebenspunkte (siehe „Neue Gegner und Level 0 bis 20“).
+
+## Neue Gegner und Level 0 bis 20 (AP-105, PE-125, PE-127)
+
+Gegnerwerte nach den Stichworten aus F-19 (Basiswerte vor `LEVEL_SCALING`):
+
+| Gegner | Batches | HP | Tempo | Kontakt | Erfahrung / Muenze | Besonderheit | Wirksame HP | Schaden/s am Ziel |
+|---|---|---|---|---|---|---|---|---|
+| Wildschwein `boar` | Wald, Wald bei Nacht | 80 | 30 | 10 | 7 / 1 | Ansturm (800 ms Ankuendigung) | x1,23 | 10 |
+| Baer `bear` | Wald, Wald bei Nacht | 90 | 36 | 12 | 7 / 1 | Tank, mittel schnell | x1 | 12 |
+| Fee `fairy` | Wald bei Nacht, Elfenwald | 4 | 75 | 15 | 4 / 2 | Zickzack, sehr wenig HP, viel Schaden | x1 | 15 |
+| Mumie `mummy` | Pyramiden, Oase | 40 | 22 | 15 | 10 / 4 | Wickel 12 Schaden alle 2,6 s, Drehung 2 s halbiert | x1,24 | 6,4 |
+| Sandwurm `sandWorm` | Wueste, Pyramiden | 16 | 70 | 8 | 6 / 2 | Eingraben 1,8 s von 4,3 s | x1,21 | 8 |
+| Armadillo `armadillo` | Wueste | 90 | 20 | 10 | 8 / 3 | Ansturm, halber Schaden beim Rollen | x1,44 | 10 |
+| Kamel `camel` | Wueste | 35 | 30 | 6 | 10 / 4 | Spucke 8 Schaden alle 2,2 s | x1 | 3,6 |
+| Schlange `snake` | Wueste, Oase | 10 | 85 | 5 | 5 / 2 | Gift 3 Schaden/s fuer 3 s | x1 | 8 |
+| Archaeologe `archaeologist` | Pyramiden, Oase | 20 | 40 | 5 | 10 / 4 | Standardwerte wie die Hexe | x1 | 4 |
+| Sphinx `sphinx` | Pyramiden, Oase | 160 | 18 | 18 | 15 / 5 | Tank, die meisten HP | x1 | 18 |
+
+**Wie Ansturm, Eingraben, Wickel und Gift in die Rechnung eingehen** (Annahmen, `tests/logic/balance.test.ts`):
+
+- **Ansturm:** Die letzten `CHARGE_TRIGGER_DISTANCE` (120 px) legt der Gegner mit Ankuendigung und Sprint (`dashSpeed`) zurueck
+  statt im Gehen. Die Zeit zum Abschiessen auf 380 px Anlauf sinkt, die wirksamen HP steigen im selben Verhaeltnis
+  (Wildschwein 10,3 s statt 12,7 s, also x1,23). Armadillo dazu: halber Schaden waehrend des Rollens (1200 von 5600 ms), zusammen x1,44.
+- **Eingraben:** Abgetaucht ist der Sandwurm unverwundbar (1800 von 4300 ms). Die Haelfte dieser Zeit geht der Spielerin verloren
+  (in der anderen Haelfte trifft sie andere Gegner), also x(1 + 0,5 x 0,42) = x1,21.
+- **Wickel:** Die Spielerin dreht 2 s lang halb so schnell. Annahme: Die Haelfte der Kampfzeit ist Drehen. So lange der Wickel wirkt
+  (2 von 2,6 s), verliert sie ein Viertel ihres Schadens. Das zaehlt als x1,24 auf die Mumie und beim Schaden ohne Abschuss
+  als Aufschlag (1 + 0,5 x 0,77) auf den Wickel-Schaden.
+- **Gift:** aendert weder HP noch Schaden der Spielerin. Es zaehlt mit 3 Schaden/s zusaetzlich beim Schaden ohne Abschuss.
+
+**Level 0 bis 20 (PE-125):** Wildschwein und Baer ab Level 0, Fee ab Level 5, mit kleinen Gewichten (hoechstens 10 % des Baums).
+Die alten Gewichte sind vervielfacht (Wald 40 Baeume, Wald bei Nacht 60 / 30 / 48, Elfenwald 40 / 20 / 32 / 16), dazu Wildschwein 1
+und Baer 1 (Wald, Wald bei Nacht) sowie Fee 6 (Wald bei Nacht) bzw. 1 (Elfenwald). Die Fee (3 HP nach Skalierung) gleicht im Wald bei
+Nacht die beiden Tanks aus. Im Wald gibt es keinen leichten Gegner, deshalb ist `hp` in Level 0 bis 4 um einen Baum-Lebenspunkt gesenkt
+(0,44 / 0,46 / 0,50 / 0,54 / 0,60, Baum 22 / 23 / 25 / 27 / 30 statt 23 / 24 / 26 / 28 / 31). Spawn-Abstand, `MAX_ENEMIES`, `xp`,
+`coin` und `contact` bleiben. Die Fee bringt 2 Gold, damit der mittlere Muenzwert der Pools gleich bleibt.
+Ergebnis gegenueber vor M5: Druck je Level etwa -1 % bis +1 %, Gold und Erfahrung etwa -1 % bis +2 % (Test: hoechstens 4 %,
+Toleranz wie AP-95). Gold-Mittel Level 0 bis 20: 46,1 (Band 43 bis 47).
+
+## Level 21 bis 40 (AP-105, PE-129)
+
+Ziel: Die Kurve laeuft weiter, staerker werden die Gegner selbst, nicht ihre Zahl. `MAX_ENEMIES` hoechstens 150 (Leistung am iPhone, RI-6).
+
+- **Spawn-Abstand:** 525 ms (Level 21) bis 430 ms (Level 40), 5 ms je Level. Spawns/Min steigen nur von 146 (Level 20) auf 180 (+23 %).
+- **`MAX_ENEMIES`:** 131 bis 150, +1 je Level (Bremse, Obergrenze 150 in Level 40).
+- **Pools:** Die Gewichte halten die wirksamen mittleren HP der drei Batches nahe beieinander, Tanks sind selten:
+  Wueste Sandwurm 10, Armadillo 2, Kamel 4, Schlange 10; Pyramiden Mumie 3, Sandwurm 14, Archaeologe 8, Sphinx 1;
+  Oase Mumie 4, Schlange 14, Archaeologe 6, Sphinx 2.
+- **`hp`:** 0,806 (Level 21) bis 2,422 (Level 40), so gewaehlt, dass der Druck je Level um etwa +7,5 % steigt und an den
+  Batch-Grenzen 20 zu 21, 25 zu 26 und 30 zu 31 um etwa +9,5 % springt (wie 4 zu 5 und 9 zu 10, hoechstens +10 %).
+- **`contact`:** 0,77 bis 0,963, waechst wie die angenommenen Lebenspunkte der Spielerin (200 bei Stufe 10, 250 bei Stufe 15).
+  Geschosse, Gift und Aura werden nicht skaliert.
+- **`coin` und `xp`:** 1,2 (Level 21) plus 0,05 je Level bis 2,15 (Level 40). Die Muenz-Chance liegt damit bei 9,6 % bis 17,2 %.
+
+**Annahme Upgrades:** Der Plan nimmt Stufe 10 auf allen Spuren bei Level 21 und Stufe 15 bei Level 40 an, dazwischen linear.
+Fuer den Druck zaehlen nur Feuerrate und Schaden: Stufe 10 ergibt den 4-fachen, Stufe 15 den 6,25-fachen Schaden pro Sekunde.
+Begruendung: Wer jedes Level einmal gewinnt, hat nach Level 20 etwa 970 Gold, das reicht fuer Stufe 8 auf beiden Schadens-Spuren;
+Stufe 10 auf beiden braucht 1396 Gold, also einige Wiederholungen (auch Niederlagen bringen die Haelfte). Bis Level 40 reicht das Gold
+(6054) fuer Stufe 14 auf beiden Schadens-Spuren. Die Annahme ist also leicht optimistisch, deshalb prueft ein Test auch die Spielerin
+mit Stufe 8 bei Level 21 und Stufe 14 bei Level 40 (Level 40: Druck mit Upgrades 0,94, erlaubt hoechstens 1,25).
+
+| Level | `hp` | `coin` = `xp` | `contact` | Gold je Level | Gold Level 0 bis hier | Stufe (Annahme) / Druck mit Upgrades | Schritt Druck |
+|---|---|---|---|---|---|---|---|
+| 20 | 0,770 | 0,770 | 0,770 | 90 | 967 | - | +1,8 % |
+| 21 | 0,806 | 1,200 | 0,770 | 102 | 1069 | 10,0 / 0,33 | +9,2 % |
+| 22 | 0,850 | 1,250 | 0,780 | 107 | 1176 | 10,3 / 0,35 | +8,4 % |
+| 23 | 0,917 | 1,300 | 0,790 | 113 | 1289 | 10,5 / 0,37 | +7,4 % |
+| 24 | 0,984 | 1,350 | 0,800 | 195 | 1484 | 10,8 / 0,39 | +7,6 % |
+| 25 | 1,043 | 1,400 | 0,811 | 205 | 1689 | 11,1 / 0,40 | +6,7 % |
+| 26 | 1,054 | 1,450 | 0,821 | 160 | 1849 | 11,3 / 0,43 | +9,5 % |
+| 27 | 1,122 | 1,500 | 0,831 | 168 | 2017 | 11,6 / 0,45 | +7,2 % |
+| 28 | 1,191 | 1,550 | 0,841 | 175 | 2192 | 11,8 / 0,47 | +7,6 % |
+| 29 | 1,279 | 1,600 | 0,851 | 302 | 2494 | 12,1 / 0,49 | +7,1 % |
+| 30 | 1,344 | 1,650 | 0,861 | 315 | 2809 | 12,4 / 0,52 | +7,8 % |
+| 31 | 1,385 | 1,700 | 0,871 | 200 | 3009 | 12,6 / 0,55 | +9,4 % |
+| 32 | 1,472 | 1,750 | 0,881 | 208 | 3217 | 12,9 / 0,58 | +7,4 % |
+| 33 | 1,563 | 1,800 | 0,892 | 217 | 3434 | 13,2 / 0,61 | +7,7 % |
+| 34 | 1,663 | 1,850 | 0,902 | 225 | 3659 | 13,4 / 0,64 | +7,4 % |
+| 35 | 1,772 | 1,900 | 0,912 | 233 | 3893 | 13,7 / 0,67 | +7,3 % |
+| 36 | 1,891 | 1,950 | 0,922 | 402 | 4295 | 13,9 / 0,71 | +7,6 % |
+| 37 | 2,022 | 2,000 | 0,932 | 417 | 4711 | 14,2 / 0,74 | +7,4 % |
+| 38 | 2,147 | 2,050 | 0,942 | 432 | 5143 | 14,5 / 0,78 | +7,4 % |
+| 39 | 2,272 | 2,100 | 0,952 | 448 | 5591 | 14,7 / 0,82 | +7,5 % |
+| 40 | 2,422 | 2,150 | 0,963 | 463 | 6054 | 15,0 / 0,87 | +7,4 % |
+
+Lesart: Mit den angenommenen Upgrades beginnt die Wueste leicht (0,33) und wird stetig fordernder, Level 40 liegt bei 0,87
+(Level 20 ohne Upgrades: 1,22). Der Schaden ohne Abschuss steigt ab Level 21 langsamer als vorher, weil der Kontaktschaden nur
+mit den Leben der Spielerin waechst. Er ist wie bisher nur zum Vergleich innerhalb eines Batches gedacht.
+Nachjustieren: Druck ueber `hp` in `scaling.ts` (die Tests pruefen Schritte und Spruenge), Gold ueber `coin`.
+
+## Upgrades Stufe 11 bis 15 (AP-105, PE-129)
+
+Die Preise folgen weiter `round(10 x 1,4^k)`, die Wirkung je Stufe bleibt (+10 % Feuerrate bzw. Schaden, +10 Leben, +15 Grad/s).
+
+| Stufe | 11 | 12 | 13 | 14 | 15 |
+|---|---|---|---|---|---|
+| Preis (Gold) | 289 | 405 | 567 | 794 | 1111 |
+| Summe ab Stufe 0 | 987 | 1392 | 1959 | 2753 | 3864 |
+| Wirkung Feuerrate / Schaden | +110 % | +120 % | +130 % | +140 % | +150 % |
+| Wirkung Leben / Drehtempo | +110 / +165 | +120 / +180 | +130 / +195 | +140 / +210 | +150 / +225 |
+
+Eine Spur auf Stufe 15 kostet 3864 Gold. Mit dem Gold aller gewonnenen Level ist das nach Level 35 erreicht (3893 Gold; Test: nach
+Level 33 noch nicht, nach Level 36 sicher). Stufe 15 auf allen vier Spuren (15456 Gold) ist bis Level 40 nicht vorgesehen.
 
 ## Nachjustieren: Beispiele
 

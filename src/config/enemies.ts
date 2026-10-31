@@ -1,4 +1,4 @@
-// Balancing (AP-15), Erklaerung in docs/balancing.md. M5-Gegner seit AP-97 mit vorlaeufigen Werten (AP-105).
+// Balancing (AP-15), Erklaerung in docs/balancing.md. M5-Gegner eingestellt in AP-105 (F-19, PE-127).
 import type { EnemyDef, EnemyId } from '../contracts';
 
 export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
@@ -44,16 +44,16 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     spriteKey: 'enemy-forest-spirit',
     aura: { radius: 48, dps: 12 },
   },
-  // M5 (AP-97): starting values after PE-127, fine tuning in AP-105.
-  // Old maps (F-19): boar and bear from level 0, fairy from level 5. Their HP keep the mean HP of the old
-  // pools almost unchanged (Level 0-20 stay as they were, PE-125); tank values follow with AP-105.
+  // M5 (AP-105, F-19, PE-127). Old maps: boar and bear from level 0, fairy from level 5. Boar and bear
+  // have a lot of HP, the fairy very little HP and much contact damage. Small pool weights in levels.ts keep
+  // pressure, gold and xp of level 0-20 at the old pace (PE-125).
   boar: {
     id: 'boar',
-    hp: 55,
+    hp: 80,
     speed: 30,
     contactDamage: 10,
     behavior: 'charge',
-    xp: 5,
+    xp: 7,
     coinValue: 1,
     spriteKey: 'enemy-boar',
     charge: {
@@ -66,29 +66,29 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
   },
   bear: {
     id: 'bear',
-    hp: 45,
+    hp: 90,
     speed: 36,
-    contactDamage: 10,
+    contactDamage: 12,
     behavior: 'chase',
-    xp: 5,
+    xp: 7,
     coinValue: 1,
     spriteKey: 'enemy-bear',
   },
   fairy: {
     id: 'fairy',
-    hp: 6,
+    hp: 4,
     speed: 75,
-    contactDamage: 12,
+    contactDamage: 15,
     behavior: 'chase',
     movement: 'zigzag',
     xp: 4,
-    coinValue: 1,
+    coinValue: 2,
     spriteKey: 'enemy-fairy',
   },
   // Desert, pyramids, oasis (PE-123, PE-127).
   mummy: {
     id: 'mummy',
-    hp: 60,
+    hp: 40,
     speed: 22,
     contactDamage: 15,
     behavior: 'shooter',
@@ -97,7 +97,7 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     spriteKey: 'enemy-mummy',
     // Wrap: slows the turning of the player for 2 s (PE-127).
     projectile: {
-      damage: 10,
+      damage: 12,
       speed: 100,
       intervalMs: 2600,
       keepDistance: 150,
