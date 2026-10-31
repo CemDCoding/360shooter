@@ -67,6 +67,7 @@ export class HudScene extends Phaser.Scene {
   private status!: StatusIndicator;
   private slots?: PowerSlots;
   private chipRow: FunkChip[] = [];
+  private statusRow: FunkChip[] = [];
   private rowY = 0;
   private k = 1;
 
@@ -131,6 +132,7 @@ export class HudScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.fpsText = undefined;
     this.chipRow = [];
+    this.statusRow = [];
     this.blinks = new Map();
     this.timerSec = 0;
     this.overtime = false;
@@ -487,26 +489,31 @@ export class HudScene extends Phaser.Scene {
     this.powers = new PowerIndicators(this, k, relayout);
     this.armour = new ArmourIndicator(this, k, relayout);
     this.status = new StatusIndicator(this, k, relayout);
-    this.chipRow = [
-      this.coinCounter.chip,
-      ...this.powers.chips,
-      this.armour.chip,
-      ...this.status.chips,
-    ];
+    this.chipRow = [this.coinCounter.chip, ...this.powers.chips, this.armour.chip];
+    // Status chips sit in their own second row: the first row never grows into the arena edge (H-23).
+    this.statusRow = [...this.status.chips];
     this.relayoutChips(m);
   }
 
   private relayoutChips(m: number): void {
     if (this.chipRow.length === 0) return;
-    const xs = layoutRow(
-      this.chipRow.map((c) => (c.visible ? c.width : null)),
-      Math.round(CHIP_GAP * this.k),
-      m,
-    );
-    this.chipRow.forEach((c, i) => {
-      const x = xs[i];
-      if (x !== null) c.setPosition(x, this.rowY);
-    });
+    const gap = Math.round(CHIP_GAP * this.k);
+    const rowH = Math.max(0, ...this.chipRow.map((c) => c.height));
+    const rows: [FunkChip[], number][] = [
+      [this.chipRow, this.rowY],
+      [this.statusRow, this.rowY + rowH + gap],
+    ];
+    for (const [row, y] of rows) {
+      const xs = layoutRow(
+        row.map((c) => (c.visible ? c.width : null)),
+        gap,
+        m,
+      );
+      row.forEach((c, i) => {
+        const x = xs[i];
+        if (x !== null) c.setPosition(x, y);
+      });
+    }
   }
 
   private createPauseOverlay(
@@ -694,6 +701,7 @@ export class HudScene extends Phaser.Scene {
     this.bannerTween = undefined;
     this.resetBossBarState(1);
     this.chipRow = [];
+    this.statusRow = [];
     this.slots?.destroy();
     this.slots = undefined;
     if (this.gameEvents) {

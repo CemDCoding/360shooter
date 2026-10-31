@@ -3,7 +3,7 @@ import type { ActivePlayerStatus, PlayerStatusKind } from '../../contracts';
 import { FunkChip } from './FunkPanel';
 import { statusDisplay, type StatusDisplay } from './hudMath';
 
-/** Layout value (remaining-time bar width at k = 1), candidate for the config. */
+/** Remaining-time bar width at k = 1: same width as the shield bar chip (24 px), so both bars read alike. */
 const STATUS_BAR_W = 24;
 
 /**

@@ -37,7 +37,7 @@ import { ItemPickup } from '../entities/ItemPickup';
 import { MapBackground } from '../entities/MapBackground';
 import { Laser } from '../entities/Laser';
 import { LaserPool } from '../entities/LaserPool';
-import { Player, type PlayerConfig } from '../entities/Player';
+import { ContactStatus, hitPlayer, Player, type PlayerConfig } from '../entities/Player';
 import { EnemyPool } from '../entities/enemies/createEnemy';
 import { Enemy } from '../entities/enemies/Enemy';
 import { WitchBolt } from '../entities/enemies/WitchBolt';
@@ -209,6 +209,7 @@ export class GameScene extends Phaser.Scene {
   private lastShieldLeft = 0;
   /** Debug round via `?level=n`: the save game is never written (PE-49). */
   private debugRound = false;
+  private readonly contactStatus = new ContactStatus();
   /** Play clock (ms): sum of running frame times, stands still while paused (PE-29). */
   private playTimeMs = 0;
   private lastTimerSec = -1;
@@ -393,8 +394,7 @@ export class GameScene extends Phaser.Scene {
       const bolt = pick(a, b, WitchBolt);
       if (!bolt || !bolt.active || this.ended) return;
       bolt.despawn();
-      this.player.takeDamage(bolt.damage);
-      this.player.applyStatus(bolt.onHit);
+      hitPlayer(this.player, bolt.damage, bolt.onHit);
     });
   }
 
@@ -467,20 +467,19 @@ export class GameScene extends Phaser.Scene {
   private applyAreaDamage(dt: number): void {
     if (this.player.isDead) return;
     let damage = 0;
-    const statuses: StatusOnHit[] = [];
     this.physics.overlap(this.player, this.enemyPool.enemies, (a, b) => {
       const enemy = pick(a, b, Enemy);
       if (!enemy?.active) return;
       const dealt = enemy.contactDamageFor(dt) * this.enemyScales.get(enemy).contact;
       damage += dealt;
       // Contact status (snake poison): applied while the enemy touches the player.
-      if (dealt > 0 && enemy.onHit) statuses.push(enemy.onHit);
+      if (dealt > 0) this.contactStatus.add(enemy.onHit);
     });
     for (const e of this.enemyPool.enemies) {
       if (e.active) damage += e.auraDamageAt(this.player.x, this.player.y, dt);
     }
     if (damage > 0) this.player.takeDamage(damage);
-    for (const s of statuses) this.player.applyStatus(s);
+    this.contactStatus.flush(this.player);
   }
 
   /**
@@ -661,8 +660,7 @@ export class GameScene extends Phaser.Scene {
 
   /** A boss hazard hit the player: damage first (shield first), then the status effect (poison, slow). */
   private hitPlayerByBoss(damage: number, onHit: StatusOnHit | undefined): void {
-    this.player.takeDamage(damage);
-    this.player.applyStatus(onHit);
+    hitPlayer(this.player, damage, onHit);
   }
 
   private despawnBoss(): void {
