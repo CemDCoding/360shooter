@@ -61,12 +61,32 @@ Beispiel: `astronaut.png` hat 4 Frames mit je 32 x 32 Pixel. Die Datei ist also 
 | tiles-elf-forest.png      | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Elfenwald"               | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
 | weapon-raygun.png         | 24 x 16             | 6      | 144 x 16                      | Die Strahlenpistole, nach rechts zeigend  | Je Ausbaustufe 2 Frames (Ruhe, Schuss): Frame 1 und 2 Stufe 1, 3 und 4 Stufe 2, 5 und 6 Stufe 3 |
 | ui-icons.png              | 16 x 16             | 4      | 64 x 16                       | Symbole der Oberfläche                    | Frame 1: Ton an. Frame 2: Ton aus. Frame 3: Pause. Frame 4: Schloss           |
+| enemy-mummy.png           | 32 x 32             | 4      | 128 x 32                      | Gegner: Mumie                             | Frame 1 bis 4: Animation der Reihe nach |
+| mummy-wrap.png            | 16 x 8              | 2      | 32 x 8                        | Gegner-Schuss: Mumienbinde                | Frame 1 bis 2: Animation der Reihe nach |
+| enemy-sand-worm.png       | 24 x 24             | 4      | 96 x 24                       | Gegner: Sandwurm                          | Frame 1 bis 4: Animation der Reihe nach |
+| enemy-armadillo.png       | 32 x 32             | 4      | 128 x 32                      | Gegner: Gürteltier                        | Frame 1 bis 4: Animation der Reihe nach |
+| enemy-camel.png           | 32 x 32             | 4      | 128 x 32                      | Gegner: Kamel                             | Frame 1 bis 4: Animation der Reihe nach |
+| camel-spit.png            | 8 x 8               | 2      | 16 x 8                        | Gegner-Schuss: Kamelspucke                | Frame 1 bis 2: Animation der Reihe nach |
+| enemy-snake.png           | 24 x 24             | 4      | 96 x 24                       | Gegner: Schlange                          | Frame 1 bis 4: Animation der Reihe nach |
+| enemy-archaeologist.png   | 32 x 32             | 4      | 128 x 32                      | Gegner: Archäologe                        | Frame 1 bis 4: Animation der Reihe nach |
+| enemy-sphinx.png          | 48 x 48             | 4      | 192 x 48                      | Gegner: Sphinx                            | Frame 1 bis 4: Animation der Reihe nach |
+| enemy-boar.png            | 32 x 32             | 4      | 128 x 32                      | Gegner: Wildschwein                       | Frame 1 bis 4: Animation der Reihe nach |
+| enemy-bear.png            | 32 x 32             | 4      | 128 x 32                      | Gegner: Bär                               | Frame 1 bis 4: Animation der Reihe nach |
+| enemy-fairy.png           | 24 x 24             | 4      | 96 x 24                       | Gegner: Fee                               | Frame 1 bis 4: Animation der Reihe nach |
+| boss-sand-worm.png        | 64 x 64             | 4      | 256 x 64                      | Boss: Sandwurm (Kopf)                     | Frame 1 bis 4: Animation der Reihe nach |
+| boss-sand-worm-body.png   | 32 x 32             | 3      | 96 x 32                       | Boss: Körperglied des Sandwurms           | Frame 1 bis 3: Animation der Reihe nach |
+| boss-guardian-dog.png     | 64 x 64             | 4      | 256 x 64                      | Boss: Wächterhund                         | Frame 1 bis 4: Animation der Reihe nach |
+| boss-pharaoh.png          | 64 x 64             | 4      | 256 x 64                      | Boss: Pharao                              | Frame 1 bis 4: Animation der Reihe nach |
+| boss-pharaoh-orb.png      | 8 x 8               | 2      | 16 x 8                        | Boss-Angriff: Goldkugel des Pharaos       | Frame 1 bis 2: Animation der Reihe nach |
+| tiles-desert.png          | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Wüste"                   | Vier Kachel-Varianten. Reihenfolge der Datei lassen |
+| tiles-pyramids.png        | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Pyramiden"               | Vier Kachel-Varianten. Reihenfolge der Datei lassen |
+| tiles-oasis.png           | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Oase"                    | Vier Kachel-Varianten. Reihenfolge der Datei lassen |
 
 Tipp: Öffne zuerst die vorhandene Datei. So siehst du, wie die Frames angeordnet sind.
 
 ### So entstehen die Sprites
 
-Die 24 Sprites sind **keine Platzhalter**. Sie entstehen aus den Pixeldaten des Designers: `docs/design/assets/sprites.js` (Figuren, Waffe, Symbole) und `docs/design/assets/sprites-world.js` (Welt, Kacheln). Zum Ändern bearbeitest du diese Dateien und tippst dann:
+Die 45 Sprites sind **keine Platzhalter**. Sie entstehen aus den Pixeldaten des Designers: `docs/design/assets/sprites.js` (Figuren, Waffe, Symbole) `docs/design/assets/sprites-world.js` (Welt, Kacheln) und `docs/design/assets/sprites-desert.js` (Wüste: Gegner, Bosse, Kacheln). Zum Ändern bearbeitest du diese Dateien und tippst dann:
 
 ```
 npm run sprites:build

@@ -1,5 +1,5 @@
 // Baut die Ingame-Sprites aus den Pixeldaten des Designs
-// (docs/design/assets/sprites.js und sprites-world.js, window.PX_SPRITES)
+// (docs/design/assets/sprites.js, sprites-world.js und sprites-desert.js, window.PX_SPRITES)
 // nach public/assets/sprites/<key>.png (RGBA, Frames waagerecht nebeneinander).
 // Die Framegroesse und -zahl werden gegen ASSETS (src/config/assets.ts) geprueft.
 // Nur Node-Bordmittel, kein Netz. Die Ausgabe ist deterministisch (gleicher Lauf, gleiche Bytes).
@@ -11,23 +11,20 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 import { deflateSync } from 'node:zlib';
-import { ASSETS, PLACEHOLDER_KEYS } from '../src/config/assets.ts';
+import { ASSETS } from '../src/config/assets.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-// Reihenfolge ist wichtig: sprites-world.js ergaenzt window.PX_SPRITES aus sprites.js.
+// Reihenfolge ist wichtig: sprites-world.js und sprites-desert.js ergaenzen window.PX_SPRITES aus sprites.js.
+// PX_TOOLKIT aus sprites-desert.js ist kein Sprite-Schluessel und wird ignoriert (gebaut werden nur Manifest-Schluessel).
 const SOURCES = [
   join(root, 'docs', 'design', 'assets', 'sprites.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-world.js'),
+  join(root, 'docs', 'design', 'assets', 'sprites-desert.js'),
 ];
 const OUT_DIR = join(root, 'public', 'assets', 'sprites');
 
-/**
- * Spritesheets mit eigenem Design-Sprite. Platzhalter (PLACEHOLDER_KEYS, AP-97) teilen sich die PNG eines
- * vorhandenen Sprites und werden nicht gebaut, sonst wuerde die Original-PNG ueberschrieben.
- */
-const BUILT_DEFS = ASSETS.filter(
-  (a) => a.kind === 'spritesheet' && !PLACEHOLDER_KEYS.includes(a.key),
-);
+/** Alle Spritesheets des Manifests werden aus den Designer-Dateien gebaut. */
+const BUILT_DEFS = ASSETS.filter((a) => a.kind === 'spritesheet');
 
 /** Schluessel aller gebauten Sprites im Manifest. */
 export const SPRITE_KEYS = BUILT_DEFS.map((a) => a.key);
@@ -72,7 +69,7 @@ function encodePng(width, height, rgba) {
 }
 
 // ---------- Sprites ----------
-/** Liest window.PX_SPRITES aus beiden Designer-Dateien in einem leeren vm-Kontext (kein Node, kein Netz). */
+/** Liest window.PX_SPRITES aus den Designer-Dateien in einem leeren vm-Kontext (kein Node, kein Netz). */
 export function loadSprites(sourcePaths = SOURCES) {
   const sandbox = { window: {} };
   for (const p of sourcePaths) {

@@ -31,6 +31,26 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sprites/tiles-elf-forest.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/ui-icons.png              | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/weapon-raygun.png         | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites.js` und `sprites-world.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-mummy.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/mummy-wrap.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-sand-worm.png       | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-armadillo.png       | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-camel.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/camel-spit.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-snake.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-archaeologist.png   | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-sphinx.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-boar.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-bear.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/enemy-fairy.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/boss-sand-worm.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/boss-sand-worm-body.png   | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/boss-guardian-dog.png     | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/boss-pharaoh.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/boss-pharaoh-orb.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/tiles-desert.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/tiles-pyramids.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/tiles-oasis.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | fonts/astro-kapsel.png, .xml      | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | fonts/astro-funk.png, .xml        | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | sounds/laser.wav                  | selbst erzeugt                                                                                                                    | selbst erzeugt             |

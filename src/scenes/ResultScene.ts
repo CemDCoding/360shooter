@@ -40,10 +40,9 @@ const BIOME_COLOR: Record<BatchId, ColorName> = {
   forest: 'biome.forest',
   forestNight: 'biome.night',
   elfForest: 'biome.elf',
-  // M5 placeholders (AP-97) until the design tokens come in AP-106/AP-107.
-  desert: 'biome.forest',
-  pyramids: 'biome.elf',
-  oasis: 'biome.night',
+  desert: 'biome.desert',
+  pyramids: 'biome.pyramid',
+  oasis: 'biome.oasis',
 };
 
 /** Finite, non-negative number from scene data, else 0. */
