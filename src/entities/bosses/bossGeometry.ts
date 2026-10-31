@@ -301,3 +301,60 @@ export function waveArcs(
   for (let i = 0; i < count; i++) out.push({ start: gapStart + gap + i * size, size });
   return out;
 }
+
+// --- Pharao (AP-104) ---
+
+/**
+ * Arm angles of the gold curse spiral after `elapsedMs`: `arms` evenly spaced arms that turn with
+ * `spinRadPerSec` (sign = direction). The space between two arms is the gap of the spiral.
+ */
+export function spiralAngles(
+  arms: number,
+  baseAngle: number,
+  spinRadPerSec: number,
+  elapsedMs: number,
+): number[] {
+  const out: number[] = [];
+  if (arms <= 0) return out;
+  const turn = baseAngle + (spinRadPerSec * Math.max(0, elapsedMs)) / 1000;
+  for (let i = 0; i < arms; i++) out.push(turn + (i / arms) * FULL_TURN);
+  return out;
+}
+
+/**
+ * Start angle of the spiral so that arm 0 points at `targetAngle` in the middle of the burst
+ * (the player first sits in a gap, the arm sweeps across her halfway through).
+ */
+export function spiralBaseAngle(
+  targetAngle: number,
+  spinRadPerSec: number,
+  burstMs: number,
+): number {
+  return targetAngle - (spinRadPerSec * Math.max(0, burstMs)) / 2000;
+}
+
+/**
+ * Path angle where the pharaoh reappears after the sarcophagus: between a quarter and three quarters
+ * of a turn away from `current` (r in [0, 1)), so it never reappears where it vanished.
+ */
+export function reappearAngle(current: number, r: number): number {
+  const k = Math.min(1, Math.max(0, r));
+  return current + Math.PI / 2 + k * Math.PI;
+}
+
+/** Linear fade 0..1 over fadeMs; with reduced motion it switches at once (no fading, no flicker). */
+export function fadeLevel(elapsedMs: number, fadeMs: number, reduced: boolean): number {
+  if (reduced || !(fadeMs > 0)) return elapsedMs >= 0 ? 1 : 0;
+  return Math.min(1, Math.max(0, elapsedMs / fadeMs));
+}
+
+/**
+ * Alpha of the edge darkening bands, outermost first: the outer band has `strength` (map vignette),
+ * every band further in a bit less, the last one still above 0.
+ */
+export function bandAlphas(bands: number, strength: number): number[] {
+  const out: number[] = [];
+  const s = Math.min(1, Math.max(0, strength));
+  for (let i = 0; i < bands; i++) out.push((s * (bands - i)) / bands);
+  return out;
+}

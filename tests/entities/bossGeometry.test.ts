@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BOSS_TUNING, MIN_REACTION_MS } from '../../src/config/bosses';
 import {
+  bandAlphas,
   clampToArena,
   coilAngles,
   coilRadius,
@@ -8,11 +9,15 @@ import {
   ellipseAngle,
   ellipsePoint,
   emergePoint,
+  fadeLevel,
   flightTimeMs,
   followChain,
   fragmentPositions,
   ringPositions,
+  reappearAngle,
   ringSpikeAngles,
+  spiralAngles,
+  spiralBaseAngle,
   sproutDamage,
   sproutHitsLeft,
   stepToward,
@@ -353,5 +358,83 @@ describe('guardian dog geometry and fairness (AP-103, PE-75, PE-128)', () => {
     expect(S.runeOrbit + S.runeRadius + PR).toBeLessThan(D.orbit.ry);
     // The dog body (64 x 64) never touches the player on its path.
     expect(D.size / 2 + PR).toBeLessThan(D.orbit.ry);
+  });
+});
+
+describe('pharaoh geometry and fairness (AP-104, PE-75, PE-128)', () => {
+  const P = BOSS_TUNING.pharaoh;
+  const C = P.goldCurse;
+  const ST = P.sandstorm;
+  const PR = BOSS_TUNING.playerHitRadius;
+  /** Orb reach: player hit radius plus orb radius. */
+  const REACH = PR + P.orbRadius;
+
+  it('spreads the spiral arms evenly and turns them with the spin', () => {
+    const a0 = spiralAngles(4, 0, 1, 0);
+    expect(a0).toEqual([0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2]);
+    const a1 = spiralAngles(4, 0, 1, 500);
+    a1.forEach((a, i) => expect(a - a0[i]).toBeCloseTo(0.5));
+    expect(spiralAngles(0, 0, 1, 0)).toEqual([]);
+    expect(spiralAngles(2, 0, 1, -100)).toEqual([0, Math.PI]);
+  });
+
+  it('points arm 0 at the target in the middle of the burst', () => {
+    for (const spin of [C.spinRadPerSec, -C.spinRadPerSec]) {
+      const base = spiralBaseAngle(1.3, spin, C.burstMs);
+      expect(spiralAngles(C.arms, base, spin, C.burstMs / 2)[0]).toBeCloseTo(1.3);
+    }
+  });
+
+  it('leaves gaps: arms spaced wider than the player seen from the rim', () => {
+    const gap = (Math.PI * 2) / C.arms;
+    expect(gap).toBeGreaterThan(4 * Math.atan(REACH / P.orbit.ry));
+  });
+
+  it('reappears a quarter to three quarters of a turn away', () => {
+    for (const r of [0, 0.3, 0.99, 1, -1, 2]) {
+      const d = reappearAngle(1, r) - 1;
+      expect(d).toBeGreaterThanOrEqual(Math.PI / 2);
+      expect(d).toBeLessThanOrEqual((3 * Math.PI) / 2);
+    }
+  });
+
+  it('fades linearly, or switches at once with reduced motion', () => {
+    expect(fadeLevel(0, 1000, false)).toBe(0);
+    expect(fadeLevel(500, 1000, false)).toBeCloseTo(0.5);
+    expect(fadeLevel(2000, 1000, false)).toBe(1);
+    expect(fadeLevel(1, 1000, true)).toBe(1);
+    expect(fadeLevel(0, 0, false)).toBe(1);
+  });
+
+  it('darkens the edge with the map vignette strength at most, outer band strongest', () => {
+    const a = bandAlphas(ST.bands, 0.45);
+    expect(a).toHaveLength(ST.bands);
+    expect(a[0]).toBeCloseTo(0.45);
+    for (let i = 1; i < a.length; i++) expect(a[i]).toBeLessThan(a[i - 1]);
+    expect(a[a.length - 1]).toBeGreaterThan(0);
+    expect(bandAlphas(2, 3)[0]).toBe(1);
+    // The darkened band stays well away from the player in the middle.
+    expect(ST.bands * ST.bandWidth).toBeLessThan(ARENA.height / 2 - 64);
+  });
+
+  it.each(WIDTHS)('gives the player MIN_REACTION_MS before an orb reaches her at width %i', (w) => {
+    const center = { x: w / 2, y: 180 };
+    const rim = rimRadii(P.orbit, arenaOf(w));
+    for (const a of [0, 1, Math.PI / 2, 2.5, 4, 5.5]) {
+      const boss = ellipsePoint(center, rim, a);
+      const path = Math.hypot(boss.x - center.x, boss.y - center.y) - C.spawnOffset;
+      const speed = volleySpeed(path, C.speedPxPerSec, C.minSpeedPxPerSec, REACH, MIN_REACTION_MS);
+      expect(flightTimeMs(path - REACH, speed)).toBeGreaterThanOrEqual(MIN_REACTION_MS - 1e-6);
+      // Storm shots from the edge in the same direction.
+      const edge = edgePoint(center, a, arenaOf(w));
+      const d = Math.hypot(edge.x - center.x, edge.y - center.y);
+      const s = volleySpeed(d, ST.speedPxPerSec, ST.minSpeedPxPerSec, REACH, MIN_REACTION_MS);
+      expect(flightTimeMs(d - REACH, s)).toBeGreaterThanOrEqual(MIN_REACTION_MS - 1e-6);
+    }
+  });
+
+  it('keeps the pharaoh body and its orb start away from the player on its path', () => {
+    expect(P.size / 2 + PR).toBeLessThan(P.orbit.ry);
+    expect(C.spawnOffset + P.orbRadius + PR).toBeLessThan(P.orbit.ry);
   });
 });

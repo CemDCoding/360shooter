@@ -276,4 +276,55 @@ export const BOSS_TUNING = {
       markerRadius: 14,
     },
   },
+  /** Pharao (AP-104, PE-128, PE-133). Starting values, balancing in the manual test M5-DEP. */
+  pharaoh: {
+    /** Floating path around the player (same rim as the boss appears on; wider arenas grow, PE-101). */
+    orbit: { rx: 150, ry: 115 },
+    orbitSpeedRadPerSec: 0.25,
+    /** Sprite size (brief: 64 x 64; the placeholder is 48 x 48, so the size is set explicitly). */
+    size: 64,
+    /** Gold orbs alive at most (goldCurse and sandstorm share them; extra shots are skipped). */
+    maxOrbs: 64,
+    orbRadius: 4,
+    orbLifeMs: 6000,
+    goldCurse: {
+      /** Arms of the spiral; the space between two arms is the gap. */
+      arms: 4,
+      /** One orb per arm every emitEveryMs during burstMs, the arms turn slowly. */
+      emitEveryMs: 200,
+      burstMs: 1600,
+      spinRadPerSec: 0.6,
+      /** Top speed; closer to the player the orbs get slower so they keep MIN_REACTION_MS. */
+      speedPxPerSec: 90,
+      minSpeedPxPerSec: 30,
+      /** Orbs leave the pharaoh this far from its centre. */
+      spawnOffset: 24,
+      /** Warning lines along the arms (length, width). */
+      warnLength: 72,
+      warnLineWidth: 8,
+    },
+    sarcophagus: {
+      /** Ring warning at the spot where the pharaoh reappears. */
+      warnRadius: 36,
+      warnThickness: 8,
+      /** Safety: the pharaoh reappears at the latest this long after the warning ended (ms). */
+      maxHiddenExtraMs: 500,
+    },
+    sandstorm: {
+      /** Time the storm sends shots after the announcement (ms). */
+      durationMs: 6000,
+      shots: 5,
+      shotEveryMs: 1100,
+      /** Every single shot is announced by a line from the edge to the player (>= MIN_TELEGRAPH_MS). */
+      shotWarnMs: 800,
+      warnLineWidth: 8,
+      speedPxPerSec: 110,
+      minSpeedPxPerSec: 40,
+      /** Edge darkening: bands from the arena edge inwards, outer band = map vignette strength. */
+      bands: 4,
+      bandWidth: 16,
+      /** Fade out after the storm (ms); with prefers-reduced-motion it switches without fading. */
+      fadeOutMs: 500,
+    },
+  },
 } as const;
