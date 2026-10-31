@@ -232,4 +232,48 @@ export const BOSS_TUNING = {
       thickness: 20,
     },
   },
+  /** Antiker Wächter-Hund (AP-103, PE-128, PE-133). Starting values, balancing in the manual test M5-DEP. */
+  guardianDog: {
+    /** Path of the dog (same rim as the boss appears on; wider arenas grow like the stone rim, PE-101). */
+    orbit: { rx: 150, ry: 115 },
+    /** Slow walk of the tank on its path (rad/s). */
+    orbitSpeedRadPerSec: 0.2,
+    /** Sprite size (brief: 64 x 64). */
+    size: 64,
+    /** Visible spark when a laser bounces off the shield (ms). */
+    sparkMs: 120,
+    runeShield: {
+      /** Shield circle around the dog: lasers bounce off it while a rune lives. */
+      radius: 40,
+      runeCount: 3,
+      /** Distance of the floating runes from the dog (outside the shield, so lasers reach them first). */
+      runeOrbit: 56,
+      runeRadius: 8,
+      /** Laser hits until a rune breaks. */
+      runeHits: 2,
+      runeSpeedRadPerSec: 1.2,
+      /** Time limit of the invulnerability (ms): then the runes fade even if none was shot. */
+      maxMs: 8000,
+      /** Dots of the dotted shield ring (shape, not only colour). */
+      dotCount: 28,
+    },
+    guardBark: {
+      /** Radius at which the shock wave leaves the dog. */
+      startRadius: 36,
+      thickness: 12,
+      /** Gap of the wave (radians), at least as wide as the root ring gap. */
+      gapRad: 1.2,
+      /** Arcs of the wave; a laser hit on an arc breaks it (the player can open her own gap). */
+      arcCount: 12,
+      arcHits: 1,
+      /** Top speed; closer to the player the wave gets slower so it keeps MIN_REACTION_MS. */
+      speedPxPerSec: 80,
+      minSpeedPxPerSec: 30,
+    },
+    summonMummies: {
+      count: 3,
+      /** Warning circles at the screen edge where the mummies come in. */
+      markerRadius: 14,
+    },
+  },
 } as const;
