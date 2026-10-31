@@ -33,6 +33,7 @@ vi.mock('../../src/entities/bosses/GiantStone', () => ({ GiantStone: make('giant
 vi.mock('../../src/entities/bosses/GiantSandWorm', () => ({
   GiantSandWorm: make('giantSandWorm'),
 }));
+vi.mock('../../src/entities/bosses/GuardianDog', () => ({ GuardianDog: make('guardianDog') }));
 
 const scene = {} as never;
 const LEVEL_OF: Record<BossId, number> = {
