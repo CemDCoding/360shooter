@@ -128,3 +128,120 @@ export function sproutDamage(damage: number, hits: number, hitsLeft: number): nu
   const left = Math.min(hits, Math.max(0, hitsLeft));
   return (damage * left) / hits;
 }
+
+// --- Riesen-Sand-Wurm (AP-100) ---
+
+/** Point on an ellipse around the centre (angle in radians). */
+export function ellipsePoint(
+  center: Point,
+  radii: { rx: number; ry: number },
+  angle: number,
+): Point {
+  return { x: center.x + Math.cos(angle) * radii.rx, y: center.y + Math.sin(angle) * radii.ry };
+}
+
+/** Ellipse angle of a point (inverse of ellipsePoint for points on the ellipse). */
+export function ellipseAngle(center: Point, radii: { rx: number; ry: number }, p: Point): number {
+  return Math.atan2((p.y - center.y) / radii.ry, (p.x - center.x) / radii.rx);
+}
+
+/**
+ * Body chain that follows the head: every link keeps at most `spacing` to the one before it
+ * (head first). A link closer than `spacing` stays where it is.
+ */
+export function followChain(chain: readonly Point[], head: Point, spacing: number): Point[] {
+  const out: Point[] = [];
+  let prev = head;
+  for (const p of chain) {
+    const dx = p.x - prev.x;
+    const dy = p.y - prev.y;
+    const d = Math.hypot(dx, dy);
+    const next =
+      d > spacing && d > 0
+        ? { x: prev.x + (dx / d) * spacing, y: prev.y + (dy / d) * spacing }
+        : { x: p.x, y: p.y };
+    out.push(next);
+    prev = next;
+  }
+  return out;
+}
+
+/** Links laid out in a straight line from `start` in direction `angle` (first link one spacing away). */
+export function straightChain(
+  start: Point,
+  angle: number,
+  count: number,
+  spacing: number,
+): Point[] {
+  const out: Point[] = [];
+  for (let i = 1; i <= count; i++) {
+    out.push({
+      x: start.x + Math.cos(angle) * spacing * i,
+      y: start.y + Math.sin(angle) * spacing * i,
+    });
+  }
+  return out;
+}
+
+/**
+ * Break-out point of the burrow: beside the player at `distance`, on the side the worm dived from
+ * (so the sand trail never crosses the player).
+ */
+export function emergePoint(center: Point, from: Point, distance: number): Point {
+  const dx = from.x - center.x;
+  const dy = from.y - center.y;
+  const d = Math.hypot(dx, dy);
+  const ux = d > 1e-6 ? dx / d : 0;
+  const uy = d > 1e-6 ? dy / d : -1;
+  return { x: center.x + ux * distance, y: center.y + uy * distance };
+}
+
+/**
+ * Angles of the coil: the head sits at one edge of the gap, the links spread over the rest of the ring,
+ * the last link (tail) at the other edge. No link lies inside the gap [gapStart, gapStart + gapSize).
+ */
+export function coilAngles(
+  count: number,
+  gapStart: number,
+  gapSize: number,
+): { head: number; links: number[] } {
+  const head = gapStart + gapSize;
+  const arc = FULL_TURN - gapSize;
+  const links: number[] = [];
+  for (let i = 1; i <= count; i++) links.push(head + (arc * i) / count);
+  return { head, links };
+}
+
+/** Radius of the squeezing coil after `elapsedMs`, never below `stopRadius`. */
+export function coilRadius(
+  startRadius: number,
+  speedPxPerSec: number,
+  elapsedMs: number,
+  stopRadius: number,
+): number {
+  return Math.max(
+    stopRadius,
+    startRadius - (Math.max(0, speedPxPerSec) * Math.max(0, elapsedMs)) / 1000,
+  );
+}
+
+/**
+ * Speed of the skin spikes: at most `maxSpeed`, slower when the worm is close, so a spike needs at least
+ * `minReactionMs` to the player's hit circle. Never below `minSpeed`.
+ */
+export function volleySpeed(
+  distance: number,
+  maxSpeed: number,
+  minSpeed: number,
+  reachRadius: number,
+  minReactionMs: number,
+): number {
+  const fair = (Math.max(0, distance - reachRadius) * 1000) / Math.max(1, minReactionMs);
+  return Math.max(minSpeed, Math.min(maxSpeed, fair));
+}
+
+/** Damage share left after `hits` of `maxHits` (1 without hits, 0 after all hits). */
+export function weakenedShare(hits: number, maxHits: number): number {
+  if (!(maxHits > 0)) return 1;
+  return Math.max(0, 1 - Math.max(0, hits) / maxHits);
+}

@@ -1,15 +1,25 @@
 import { describe, expect, it } from 'vitest';
-import { BOSS_TUNING } from '../../src/config/bosses';
+import { BOSS_TUNING, MIN_REACTION_MS } from '../../src/config/bosses';
 import {
   clampToArena,
+  coilAngles,
+  coilRadius,
+  ellipseAngle,
+  ellipsePoint,
+  emergePoint,
   flightTimeMs,
+  followChain,
   fragmentPositions,
   ringSpikeAngles,
   sproutDamage,
   sproutHitsLeft,
   stepToward,
+  straightChain,
   treePositions,
+  volleySpeed,
+  weakenedShare,
 } from '../../src/entities/bosses/bossGeometry';
+import { angleInGap } from '../../src/entities/bosses/hazards';
 
 import { ARENA } from '../../src/config/arena';
 import { rimRadii } from '../../src/entities/bosses/rim';
@@ -154,5 +164,117 @@ describe('root bud damage', () => {
   });
   it('is full without hits', () => {
     expect(sproutDamage(15, hits, hits)).toBe(15);
+  });
+});
+
+// --- Riesen-Sand-Wurm (AP-100) ---
+
+describe('giant sand worm geometry and fairness (AP-100, PE-75, PE-128)', () => {
+  const W = BOSS_TUNING.giantSandWorm;
+  const PR = BOSS_TUNING.playerHitRadius;
+  /** Real body radius of the player (Player.ts BODY_RADIUS). */
+  const PLAYER_BODY = 10;
+  const c = { x: 320, y: 180 };
+
+  it('keeps the body links at most one spacing apart while they follow the head', () => {
+    let chain = straightChain(c, 0, W.segmentCount, W.segmentSpacing);
+    const head = { ...c };
+    for (let step = 0; step < 50; step++) {
+      head.x += 7;
+      head.y += step % 3;
+      chain = followChain(chain, head, W.segmentSpacing);
+      let prev = head;
+      for (const p of chain) {
+        expect(Math.hypot(p.x - prev.x, p.y - prev.y)).toBeLessThanOrEqual(W.segmentSpacing + 1e-9);
+        prev = p;
+      }
+    }
+  });
+
+  it('stretches a pulled chain to exactly the spacing', () => {
+    const chain = followChain([{ x: 100, y: 0 }], { x: 0, y: 0 }, 22);
+    expect(chain[0].x).toBeCloseTo(22);
+  });
+
+  it('lays out the coil with the head at one gap edge and no link in the gap', () => {
+    for (const start of [0, 1, 3, 6]) {
+      const { head, links } = coilAngles(W.segmentCount, start, W.coil.gapRad);
+      expect(links).toHaveLength(W.segmentCount);
+      expect(angleInGap(head, start, W.coil.gapRad)).toBe(false);
+      for (const a of links.slice(0, -1)) expect(angleInGap(a, start, W.coil.gapRad)).toBe(false);
+      // The tail sits on the other gap edge.
+      expect(Math.cos(links[links.length - 1] - start)).toBeCloseTo(1);
+    }
+  });
+
+  it('opens the coil gap at least as wide as the root ring gap', () => {
+    expect(W.coil.gapRad).toBeGreaterThanOrEqual(BOSS_TUNING.rootMonster.ring.gapRad);
+  });
+
+  it('gives the player MIN_REACTION_MS before the coil reaches her', () => {
+    expect(
+      flightTimeMs(W.coil.radius - PR - W.segmentRadius, W.coil.speedPxPerSec),
+    ).toBeGreaterThanOrEqual(MIN_REACTION_MS);
+  });
+
+  it('squeezes the coil down onto the player and never below the stop radius', () => {
+    const stop = W.segmentRadius;
+    expect(coilRadius(W.coil.radius, W.coil.speedPxPerSec, 0, stop)).toBe(W.coil.radius);
+    expect(coilRadius(W.coil.radius, W.coil.speedPxPerSec, 1e9, stop)).toBe(stop);
+    // At the stop radius every link touches the player's body.
+    expect(stop).toBeLessThanOrEqual(PLAYER_BODY + W.segmentRadius);
+  });
+
+  it('caps the coil damage without counterplay at 3 times the attack damage', () => {
+    expect(W.coil.damageShare * W.segmentCount).toBeLessThanOrEqual(3);
+  });
+
+  it('weakens the coil with every head hit and breaks it after breakHits', () => {
+    expect(weakenedShare(0, W.coil.breakHits)).toBe(1);
+    expect(weakenedShare(W.coil.breakHits / 2, W.coil.breakHits)).toBeCloseTo(0.5);
+    expect(weakenedShare(W.coil.breakHits, W.coil.breakHits)).toBe(0);
+  });
+
+  it.each(WIDTHS)('breaks out beside the player on the dive side at width %i', (w) => {
+    const center = { x: w / 2, y: 180 };
+    const rim = rimRadii(W.orbit, arenaOf(w));
+    for (const a of [0, 1, 2.5, 4, 5.5]) {
+      const from = ellipsePoint(center, rim, a);
+      const e = emergePoint(center, from, W.burrow.emergeDistance);
+      expect(Math.hypot(e.x - center.x, e.y - center.y)).toBeCloseTo(W.burrow.emergeDistance);
+      // Same side as the dive point: the trail never crosses the player.
+      const dot = (e.x - center.x) * (from.x - center.x) + (e.y - center.y) * (from.y - center.y);
+      expect(dot).toBeGreaterThan(0);
+      expect(inArenaOf(arenaOf(w))(from)).toBe(true);
+    }
+  });
+
+  it('hurts only inside the announced circle, which reaches the player; the head stays clear', () => {
+    expect(W.burrow.emergeDistance - W.burrow.eruptRadius).toBeLessThan(PLAYER_BODY);
+    // The surfaced head (64 x 64) keeps clear of the player: no contact damage beside her.
+    expect(W.burrow.emergeDistance - W.headSize / 2).toBeGreaterThan(PR);
+  });
+
+  it('lets lasers weaken the break-out like the root bud', () => {
+    const h = W.burrow.moundHits;
+    expect(sproutDamage(18, h, sproutHitsLeft(h, h))).toBe(0);
+    expect(sproutDamage(18, h, h)).toBe(18);
+  });
+
+  it('slows the skin spikes near the player so they keep MIN_REACTION_MS', () => {
+    const v = W.volley;
+    const reach = PR + v.spikeRadius;
+    for (const d of [W.burrow.emergeDistance, 80, W.coil.radius, W.orbit.ry, W.orbit.rx, 400]) {
+      const speed = volleySpeed(d, v.speedPxPerSec, v.minSpeedPxPerSec, reach, MIN_REACTION_MS);
+      expect(speed).toBeLessThanOrEqual(v.speedPxPerSec);
+      expect(flightTimeMs(d - reach, speed)).toBeGreaterThanOrEqual(MIN_REACTION_MS - 1e-6);
+    }
+  });
+
+  it('maps ellipse angles back and forth', () => {
+    const rim = { rx: 150, ry: 115 };
+    for (const a of [0, 1, 2, -2]) {
+      expect(ellipseAngle(c, rim, ellipsePoint(c, rim, a))).toBeCloseTo(a);
+    }
   });
 });

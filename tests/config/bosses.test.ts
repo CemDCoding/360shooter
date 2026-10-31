@@ -87,6 +87,17 @@ describe('boss config (PE-75)', () => {
     }
   });
 
+  it('announces the sand worm attacks fairly (AP-100)', () => {
+    const at = (id: string) => BOSSES.giantSandWorm.attacks.find((x) => x.id === id);
+    // The break-out circle shows for the whole dive: at least MIN_REACTION_MS before it hurts.
+    expect(at('burrow')?.telegraphMs).toBeGreaterThanOrEqual(MIN_REACTION_MS);
+    expect(at('spikeVolley')?.telegraphMs).toBeGreaterThanOrEqual(MIN_TELEGRAPH_MS);
+    expect(at('coil')?.telegraphMs).toBeGreaterThanOrEqual(MIN_TELEGRAPH_MS);
+    expect(at('coil')?.extraOnly).toBe(true);
+    // The worm moves on the same rim as the boss appears on, so it never starts inside its path.
+    expect(BOSS_TUNING.giantSandWorm.orbit).toEqual(BOSS_TUNING.giantStone.rim);
+  });
+
   it('caps the ring damage without counterplay at 3 times the attack damage', () => {
     const r = BOSS_TUNING.rootMonster.ring;
     expect(r.damageShare * r.spikeCount).toBeLessThanOrEqual(3);
