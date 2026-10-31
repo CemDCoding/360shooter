@@ -11,7 +11,7 @@ import {
   WEAPON_BASE,
 } from '../../src/config';
 import type { ActivePowers, LevelDef } from '../../src/contracts';
-import { MAX_UPGRADE_LEVEL } from '../../src/contracts';
+const PRE_M5_MAX_LEVEL = 10;
 import { upgradeCost } from '../../src/logic/upgrades';
 import { computeWeaponStats } from '../../src/logic/weapon';
 import { MIN_INTERVAL_FACTOR, openingCount } from '../../src/logic/spawn';
@@ -152,7 +152,8 @@ const GOLD_MEAN = GOLD.reduce((a, b) => a + b, 0) / GOLD.length;
 const TRACKS = ['weaponFireRate', 'weaponDamage', 'playerMaxHp', 'playerTurnSpeed'] as const;
 const trackCost = (track: (typeof TRACKS)[number]): number => {
   let sum = 0;
-  for (let k = 0; k < MAX_UPGRADE_LEVEL; k++) sum += upgradeCost(track, k) ?? 0;
+  // AP-105 stellt Preise 11–15 und Balancing neu ein
+  for (let k = 0; k < PRE_M5_MAX_LEVEL; k++) sum += upgradeCost(track, k) ?? 0;
   return sum;
 };
 

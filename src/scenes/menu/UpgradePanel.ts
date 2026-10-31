@@ -26,6 +26,10 @@ const ROW_W = PANEL_W - 2 * PAD_X;
 const ROW_H = 38;
 const ROW_GAP = 4;
 const STICKER_H = 14;
+/** 15 Pips: 5 px breit, 1 px Lücke (Stride 6), ganzzahlig; Spalte 90 px statt 80 (AP-99). */
+const PIP_STRIDE = 6;
+const PIP_W = 5;
+const PIP_COL_W = MAX_UPGRADE_LEVEL * PIP_STRIDE;
 
 /** Modal upgrade shop; buys via buyUpgrade + writeSave and redraws itself. */
 export class UpgradePanel extends Phaser.GameObjects.Container {
@@ -235,19 +239,19 @@ export class UpgradePanel extends Phaser.GameObjects.Container {
     // Pips: gefüllt = Stufe
     const pipX = x0 + 8 + 120 + 8;
     pipStates(level, MAX_UPGRADE_LEVEL).forEach((on, i) => {
-      const px = pipX + i * 8;
+      const px = pipX + i * PIP_STRIDE;
       g.fillStyle(THEME.colors[on ? 'menu.done-bg' : 'menu.outline'].num).fillRect(
         px,
         midY - 4,
-        6,
+        PIP_W,
         8,
       );
-      if (on) g.fillStyle(THEME.colors['menu.done-hi'].num).fillRect(px, midY - 4, 6, 2);
+      if (on) g.fillStyle(THEME.colors['menu.done-hi'].num).fillRect(px, midY - 4, PIP_W, 2);
     });
     items.push(
       kText(
         scene,
-        x0 + 8 + 120 + 8 + 80 + 8 + 40,
+        x0 + 8 + 120 + 8 + PIP_COL_W + 8 + 40,
         midY - 3,
         `${level}/${MAX_UPGRADE_LEVEL}`,
         1,
@@ -258,7 +262,7 @@ export class UpgradePanel extends Phaser.GameObjects.Container {
     );
 
     const caption = buyCaption(cost, gold);
-    const colW = ROW_W - 16 - 120 - 80 - 40 - 3 * 8;
+    const colW = ROW_W - 16 - 120 - PIP_COL_W - 40 - 3 * 8;
     const colX = x0 + ROW_W - 8 - colW;
     if (caption.state === 'max') {
       g.fillStyle(THEME.colors['menu.outline'].num).fillRect(colX - 2, midY - 18, colW + 4, 36);

@@ -6,11 +6,13 @@ const price = (k: number): number => Math.round(COST_BASE * COST_GROWTH ** k);
 
 describe('upgrades', () => {
   it('price series', () => {
-    expect(MAX_UPGRADE_LEVEL).toBe(10);
+    // AP-105 stellt Preise 11–15 und Balancing neu ein
+    expect(MAX_UPGRADE_LEVEL).toBe(15);
     const prices = Array.from({ length: MAX_UPGRADE_LEVEL }, (_, k) => price(k));
+    expect(prices).toHaveLength(15);
     expect(prices[0]).toBe(10);
     expect(prices[9]).toBe(207);
-    expect(prices.reduce((a, b) => a + b, 0)).toBe(698);
+    expect(prices.slice(0, 10).reduce((a, b) => a + b, 0)).toBe(698);
   });
 
   it('effect values and labels', () => {

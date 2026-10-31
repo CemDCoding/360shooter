@@ -30,10 +30,15 @@ describe('upgradeCost', () => {
     expect(upgradeCost('weaponDamage', -1)).toBeNull();
     expect(upgradeCost('weaponDamage', 1.5)).toBeNull();
   });
-  it('sums to 698 per track', () => {
+  it('sums to 698 for the first 10 levels (prices unchanged)', () => {
     let sum = 0;
-    for (let l = 0; l < MAX_UPGRADE_LEVEL; l++) sum += upgradeCost('playerMaxHp', l) ?? 0;
+    for (let l = 0; l < 10; l++) sum += upgradeCost('playerMaxHp', l) ?? 0;
     expect(sum).toBe(698);
+  });
+  it('has 15 levels, the last one still has a price', () => {
+    expect(MAX_UPGRADE_LEVEL).toBe(15);
+    expect(upgradeCost('playerMaxHp', 14)).not.toBeNull();
+    expect(upgradeCost('playerMaxHp', 15)).toBeNull();
   });
 });
 
@@ -55,8 +60,10 @@ describe('buyUpgrade', () => {
     const s2: SaveGame = { ...save(0), gold: 10, upgrades: undefined };
     expect(buyUpgrade(s2, 'weaponFireRate')?.upgrades?.weaponFireRate).toBe(1);
   });
-  it('full purchase series up to level 10, then not buyable', () => {
-    let s: SaveGame = save(698);
+  it('full purchase series up to level 15, then not buyable', () => {
+    let total = 0;
+    for (let l = 0; l < MAX_UPGRADE_LEVEL; l++) total += upgradeCost('playerTurnSpeed', l) ?? 0;
+    let s: SaveGame = save(total);
     for (let i = 0; i < MAX_UPGRADE_LEVEL; i++) {
       const next = buyUpgrade(s, 'playerTurnSpeed');
       expect(next).not.toBeNull();

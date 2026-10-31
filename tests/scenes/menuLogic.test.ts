@@ -35,6 +35,12 @@ describe('pipStates', () => {
     expect(pipStates(3, 10).filter(Boolean)).toHaveLength(3);
     expect(pipStates(3, 10)).toHaveLength(10);
   });
+  it('handles 15 pips: none, partial, all', () => {
+    expect(pipStates(0, 15)).toHaveLength(15);
+    expect(pipStates(0, 15).some(Boolean)).toBe(false);
+    expect(pipStates(12, 15).filter(Boolean)).toHaveLength(12);
+    expect(pipStates(15, 15).every(Boolean)).toBe(true);
+  });
   it('clamps below 0 and above total', () => {
     expect(pipStates(-2, 10).some(Boolean)).toBe(false);
     expect(pipStates(99, 10).every(Boolean)).toBe(true);
