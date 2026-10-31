@@ -101,6 +101,7 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
       speed: 100,
       intervalMs: 2600,
       keepDistance: 150,
+      spriteKey: 'mummy-wrap',
       onHit: { slow: { turnFactor: 0.5, durationMs: 2000 } },
     },
   },
@@ -142,7 +143,13 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 10,
     coinValue: 4,
     spriteKey: 'enemy-camel',
-    projectile: { damage: 8, speed: 110, intervalMs: 2200, keepDistance: 160 },
+    projectile: {
+      damage: 8,
+      speed: 110,
+      intervalMs: 2200,
+      keepDistance: 160,
+      spriteKey: 'camel-spit',
+    },
   },
   snake: {
     id: 'snake',
@@ -186,3 +193,38 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
  * ein Drittel der HP der Spielerin. Enemies without an entry never despawn this way.
  */
 export const CONTACT_DESPAWN_DAMAGE: Partial<Record<EnemyId, number>> = { cursedTree: 30 };
+
+/**
+ * Distance to the player (pixels) at which a charger (behavior 'charge') stops and starts its announcement
+ * (AP-101). Inside the view at 640 x 360. Reaction time = telegraphMs + distance / dashSpeed, at least 1000 ms.
+ */
+export const CHARGE_TRIGGER_DISTANCE = 120;
+
+/** Zigzag path of movement 'zigzag' (fairy, AP-101): sideways amplitude in pixels and period in ms. */
+export const ZIGZAG = { amplitude: 16, periodMs: 1400 } as const;
+
+/**
+ * Square hit box (pixels) of the M5 enemies after the frame sizes of the brief (PE-133). Set from the config,
+ * not from the PNG, because the placeholder PNGs (AP-97) have other sizes. Enemies without an entry keep
+ * the frame size of their sprite.
+ */
+export const ENEMY_BODY_SIZE: Partial<Record<EnemyId, number>> = {
+  mummy: 32,
+  armadillo: 32,
+  camel: 32,
+  archaeologist: 32,
+  boar: 32,
+  bear: 32,
+  sandWorm: 24,
+  snake: 24,
+  fairy: 24,
+  sphinx: 48,
+};
+
+/**
+ * Wind-up of a shooter before each shot (AP-101): the sprite holds `frame` for `ms` (at least
+ * MIN_TELEGRAPH_MS). Camel: frame 3 with full cheeks announces the spit (brief, PE-133).
+ */
+export const SHOOTER_WINDUP: Partial<Record<EnemyId, { frame: number; ms: number }>> = {
+  camel: { frame: 3, ms: 800 },
+};
