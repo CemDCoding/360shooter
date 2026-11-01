@@ -49,14 +49,14 @@ export class EnemyPool {
     id: EnemyId,
     x: number,
     y: number,
-    scale?: Pick<EnemyScale, 'hp'> & { size?: number },
+    scale?: Pick<EnemyScale, 'hp'> & Partial<Pick<EnemyScale, 'size' | 'tintStep' | 'shot'>>,
   ): Enemy {
     let e = this.enemies.find((en) => !en.active && en.def.id === id);
     if (!e) {
       e = createEnemy(this.scene, id, this.ctx);
       this.enemies.push(e);
     }
-    e.spawn(x, y, scale?.size ?? 1);
+    e.spawn(x, y, scale?.size ?? 1, scale?.tintStep ?? 0, scale?.shot ?? 1);
     if (scale) e.hp = Math.max(1, Math.round(e.def.hp * scale.hp));
     return e;
   }

@@ -13,6 +13,10 @@ export interface EnemyScale {
   contact: number;
   /** Size factor of the tier (AP-128), 1 = unchanged. Not a level factor. */
   size: number;
+  /** Tint step of the tier (AP-134), 0 = no tint. Not a level factor. */
+  tintStep: 0 | 1 | 2 | 3;
+  /** Damage factor of the tier on witch bolts and ghost aura (AP-134, V-24 (a)), 1 = unchanged. */
+  shot: number;
 }
 
 export const DEFAULT_ENEMY_SCALE: Readonly<EnemyScale> = {
@@ -21,6 +25,8 @@ export const DEFAULT_ENEMY_SCALE: Readonly<EnemyScale> = {
   coin: 1,
   contact: 1,
   size: 1,
+  tintStep: 0,
+  shot: 1,
 };
 
 function factor(v: number | undefined): number {
@@ -41,6 +47,8 @@ export function enemyScaleFor(levelId: number): EnemyScale {
     coin: factor(s.coin),
     contact: factor(s.contact) * tier.damageFactor,
     size: tier.scale,
+    tintStep: tier.tintStep,
+    shot: tier.damageFactor,
   };
 }
 

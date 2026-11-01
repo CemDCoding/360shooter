@@ -155,6 +155,36 @@ export function chipMetrics(k: number, shrink = 1): ChipMetrics {
   };
 }
 
+/** Time strip below the double shot chip (AP-134, H-33): measures in px for the HUD factor k. */
+export interface TimebarMetrics {
+  /** Height of the fill bar: `max(size.hud-timebar-h, round(2k))`. */
+  barH: number;
+  /** Height of the glass strip: bar plus 1 px frame above and below (4 px at k = 1, 5 px at k = 1.36). */
+  stripH: number;
+  /** Gap between chip and strip (`size.hud-timebar-gap`). */
+  gap: number;
+}
+
+export function timebarMetrics(k: number): TimebarMetrics {
+  const f = Number.isFinite(k) && k > 0 ? k : 1;
+  const barH = Math.max(THEME.sizePx['size.hud-timebar-h'], Math.round(2 * f));
+  return { barH, stripH: barH + 2, gap: THEME.sizePx['size.hud-timebar-gap'] };
+}
+
+export interface TimebarState {
+  /** Fill length 0..1 (left to right). */
+  ratio: number;
+  /** True in the last 5 s (`motion.timebar-warn`, strictly below): fill turns `hud.danger`. */
+  warn: boolean;
+}
+
+/** Fill length and warning state of the double shot time left; `stageMs` is the length of one stage. */
+export function timebarState(msLeft: number, stageMs: number): TimebarState {
+  const left = Number.isFinite(msLeft) && msLeft > 0 ? msLeft : 0;
+  const ratio = stageMs > 0 ? Math.min(1, left / stageMs) : 0;
+  return { ratio, warn: left < THEME.motionMs['motion.timebar-warn'] };
+}
+
 /** Left edges of chips laid out in a row; hidden entries (null width) take no space. */
 export function layoutRow(
   widths: readonly (number | null)[],

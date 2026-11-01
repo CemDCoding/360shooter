@@ -8,6 +8,7 @@ import { ARENA, BASE_SPAWN_RADIUS } from '../../config/arena';
 import { approachSpeedFactor } from '../../logic/approach';
 import { distance } from '../../logic/geometry';
 import { applyDamage, auraDamage, isDead } from '../../logic/health';
+import { tierTintColor } from './tierTint';
 
 /** Fallback target point (base arena center). */
 const FALLBACK_CENTER = { x: ARENA.baseWidth / 2, y: ARENA.height / 2 } as const;
@@ -30,6 +31,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private readonly ctx: EnemyContext;
   private flashLeftMs = 0;
   private contactSpent = false;
+  private tintStep = 0;
+  /** Damage factor of the tier on aura and bolts (AP-134, V-24 (a)), 1 = unchanged. */
+  protected shotFactor = 1;
   private auraGfx?: Phaser.GameObjects.Arc;
 
   constructor(scene: Phaser.Scene, id: EnemyId, ctx: EnemyContext = {}) {
@@ -54,12 +58,17 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.despawn();
   }
 
-  /** `size` is the tier size factor (AP-128). It is set on every spawn, so a pooled enemy never keeps an old one. */
-  spawn(x: number, y: number, size = 1): void {
+  /**
+   * `size` is the tier size factor (AP-128), `tintStep` the tier tint (AP-134), `shot` the tier damage factor
+   * on aura and bolts (AP-134). All are set on every spawn, so a pooled enemy never keeps an old one.
+   */
+  spawn(x: number, y: number, size = 1, tintStep = 0, shot = 1): void {
     this.hp = this.def.hp;
     this.flashLeftMs = 0;
     this.contactSpent = false;
-    this.clearTint();
+    this.tintStep = tintStep;
+    this.shotFactor = Number.isFinite(shot) && shot > 0 ? shot : 1;
+    this.applyTierTint();
     // The arcade body follows the sprite scale, so hit and contact area grow with the picture.
     this.setScale(size);
     this.enableBody(true, x, y, true, true);
@@ -76,6 +85,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setActive(false).setVisible(false);
     this.auraGfx?.setVisible(false);
     this.onDespawn();
+  }
+
+  /** Back to the tier tint (multiplicative, step 0 = none) after a hit flash or on spawn. */
+  private applyTierTint(): void {
+    const color = tierTintColor(this.tintStep);
+    if (color === null) this.clearTint();
+    else this.setTint(color);
   }
 
   protected onSpawn(): void {}
@@ -136,7 +152,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const aura = this.def.aura;
     if (!aura || !this.active) return 0;
     if (distance(this.x, this.y, tx, ty) > aura.radius) return 0;
-    return auraDamage(aura.dps, dtMs);
+    return auraDamage(aura.dps * this.shotFactor, dtMs);
   }
 
   update(_time: number, delta: number): void {
@@ -150,7 +166,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
     if (this.flashLeftMs > 0) {
       this.flashLeftMs -= delta;
-      if (this.flashLeftMs <= 0) this.clearTint();
+      if (this.flashLeftMs <= 0) this.applyTierTint();
     }
     this.behave(delta);
     this.auraGfx?.setPosition(this.x, this.y);

@@ -12,7 +12,7 @@ import { tierFor } from '../../src/logic/tier';
 describe('enemyScaleFor', () => {
   it('returns finite factors above 0 for every level', () => {
     for (let id = 0; id <= 20; id += 1) {
-      for (const v of Object.values(enemyScaleFor(id))) {
+      for (const v of Object.values(enemyScaleFor(id)).filter((x) => x !== 0)) {
         expect(Number.isFinite(v)).toBe(true);
         expect(v).toBeGreaterThan(0);
       }
@@ -33,7 +33,7 @@ describe('enemyScaleFor', () => {
 
   it('multiplies the level factor by the tier once (AP-128)', () => {
     // Stage 0 keeps the old values, stage 4 is level factor times 1.32 hp / 1.2 contact.
-    expect(enemyScaleFor(5)).toEqual({ ...LEVEL_SCALING[5], size: 1 });
+    expect(enemyScaleFor(5)).toEqual({ ...LEVEL_SCALING[5], size: 1, tintStep: 0, shot: 1 });
     expect(enemyScaleFor(9).hp).toBeCloseTo(LEVEL_SCALING[9].hp * 1.32);
     expect(enemyScaleFor(9).contact).toBeCloseTo(LEVEL_SCALING[9].contact * 1.2);
     expect(enemyScaleFor(9).size).toBeCloseTo(1.12);
@@ -41,7 +41,15 @@ describe('enemyScaleFor', () => {
 
   it('falls back to the default for unknown levels', () => {
     for (const id of [-1, LEVEL_SCALING.length, 1.5, Number.NaN, Infinity]) {
-      expect(enemyScaleFor(id)).toEqual({ hp: 1, xp: 1, coin: 1, contact: 1, size: 1 });
+      expect(enemyScaleFor(id)).toEqual({
+        hp: 1,
+        xp: 1,
+        coin: 1,
+        contact: 1,
+        size: 1,
+        tintStep: 0,
+        shot: 1,
+      });
     }
   });
 
@@ -55,7 +63,15 @@ describe('enemyScaleFor', () => {
 });
 
 describe('ScaleRegistry (pool recycling)', () => {
-  const scaled = { hp: 2, xp: 3, coin: 0.5, contact: 4, size: 1.1 };
+  const scaled = {
+    hp: 2,
+    xp: 3,
+    coin: 0.5,
+    contact: 4,
+    size: 1.1,
+    tintStep: 2 as const,
+    shot: 1.1,
+  };
 
   it('gives a recycled enemy the default scale when it is respawned as a summon', () => {
     const tree = {};
@@ -81,5 +97,29 @@ describe('xpBonus and scaledDropChance', () => {
     expect(xpBonus(10, { ...DEFAULT_ENEMY_SCALE, xp: 0.5 })).toBe(-5);
     expect(scaledDropChance(0.08, { ...DEFAULT_ENEMY_SCALE, coin: 2 })).toBeCloseTo(0.16);
     expect(scaledDropChance(0.5, { ...DEFAULT_ENEMY_SCALE, coin: 10 })).toBe(1);
+  });
+});
+
+describe('tintStep and shot (AP-134)', () => {
+  it('takes tintStep and the damage factor of the tier for every level', () => {
+    for (let id = 0; id < LEVEL_SCALING.length; id += 1) {
+      const t = tierFor(id);
+      const s = enemyScaleFor(id);
+      expect(s.tintStep).toBe(t.tintStep);
+      // Only the tier factor, not the level factor: bolts and aura were never scaled per level.
+      expect(s.shot).toBe(t.damageFactor);
+    }
+  });
+
+  it('keeps stage 0 unchanged and grows shot with the stage', () => {
+    expect(enemyScaleFor(5).shot).toBe(1);
+    expect(enemyScaleFor(5).tintStep).toBe(0);
+    expect(enemyScaleFor(9).shot).toBeCloseTo(1.2);
+    expect(enemyScaleFor(9).tintStep).toBe(3);
+  });
+
+  it('defaults to no tint and shot 1', () => {
+    expect(DEFAULT_ENEMY_SCALE.tintStep).toBe(0);
+    expect(DEFAULT_ENEMY_SCALE.shot).toBe(1);
   });
 });

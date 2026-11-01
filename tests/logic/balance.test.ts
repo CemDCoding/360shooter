@@ -20,6 +20,7 @@ import { MAX_UPGRADE_LEVEL } from '../../src/contracts';
 import { upgradeCost, upgradeFactors } from '../../src/logic/upgrades';
 import { computeWeaponStats } from '../../src/logic/weapon';
 import { MIN_INTERVAL_FACTOR, openingCount } from '../../src/logic/spawn';
+import { enemyScaleFor } from '../../src/logic/scaling';
 import { tierFor } from '../../src/logic/tier';
 
 /** Stufe 10 einer Upgrade-Spur nach 15 bis 20 Spiel-Leveln (PE-50, PE-83), gilt fuer Level 0 bis 20. */
@@ -124,15 +125,18 @@ function hitDamage(enemyId: EnemyId, contactScale = 1): number {
   );
 }
 
-/** Schaden pro Sekunde fuer Gegner, die bleiben (Aura, Schuetzen; Wickel eingerechnet, AP-105). */
-function threatDps(enemyId: EnemyId): number {
+/**
+ * Schaden pro Sekunde fuer Gegner, die bleiben (Aura, Schuetzen; Wickel eingerechnet, AP-105).
+ * `shot` ist der Stufen-Schadensfaktor von Bolzen und Aura (AP-134, `EnemyScale.shot`), 1 = Stufe 0.
+ */
+function threatDps(enemyId: EnemyId, shot = 1): number {
   const e = ENEMIES[enemyId];
-  if (e.aura) return e.aura.dps;
+  if (e.aura) return e.aura.dps * shot;
   if (e.projectile) {
-    const shot = (e.projectile.damage * 1000) / e.projectile.intervalMs;
+    const perSec = (e.projectile.damage * shot * 1000) / e.projectile.intervalMs;
     const slow = e.projectile.onHit?.slow;
     const uptime = slow ? Math.min(1, slow.durationMs / e.projectile.intervalMs) : 0;
-    return shot * (1 + (slow ? (1 - slow.turnFactor) * uptime : 0));
+    return perSec * (1 + (slow ? (1 - slow.turnFactor) * uptime : 0));
   }
   return 0;
 }
@@ -185,6 +189,8 @@ function metrics(level: LevelDef): Metrics {
   const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
   const meanHp = poolMean(level.enemyPool, (id) => tieredHp(id, level.id) * pressureFactor(id));
   const contactScale = LEVEL_SCALING[level.id].contact * tierFor(level.id).damageFactor;
+  // Bolzen und Aura wachsen nur mit dem Stufenfaktor, nicht mit dem Level-Faktor (AP-134, V-24 (a)).
+  const shotScale = enemyScaleFor(level.id).shot;
 
   const durMs = level.durationSec * 1000;
   let t = level.spawnIntervalMs;
@@ -207,7 +213,7 @@ function metrics(level: LevelDef): Metrics {
         ? left > 0
           ? hitDamage(entry.enemyId, contactScale)
           : 0
-        : threatDps(entry.enemyId) * left;
+        : threatDps(entry.enemyId, shotScale) * left;
       freeDamage += (entry.weight / total) * damage;
     }
     const progress = Math.min(1, t / durMs);
