@@ -6,6 +6,8 @@ import { Laser } from './Laser';
 /** Object pool of lasers backed by an Arcade group. Use `group` for overlap checks. */
 export class LaserPool {
   readonly group: Phaser.Physics.Arcade.Group;
+  /** Extra enemies every new shot passes through (heaven body piece, AP-143); set once per round. */
+  pierce = 0;
 
   constructor(private readonly scene: Phaser.Scene) {
     this.group = scene.physics.add.group({
@@ -37,6 +39,7 @@ export class LaserPool {
         stats.projectileScale,
         stats.damage,
         stats.range,
+        this.pierce,
       );
       fired.push(laser);
     }

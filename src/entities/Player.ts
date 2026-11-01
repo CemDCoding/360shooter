@@ -2,10 +2,22 @@ import Phaser from 'phaser';
 import type {
   ActivePlayerStatus,
   ActivePowers,
+  GearModifiers,
   ItemDef,
   StatusOnHit,
+  UpgradeLevels,
   WeaponStats,
 } from '../contracts';
+import {
+  applyGearToStats,
+  healAmount,
+  resolveIncomingDamage,
+  type GearSetState,
+} from '../logic/gear';
+import type { IncomingDamageResult } from '../logic/gear';
+import type { Rng } from '../logic/rng';
+import { upgradeFactors } from '../logic/upgrades';
+import { weaponStageForUpgrades } from '../logic/weaponMount';
 import { PlayerStatusState } from '../logic/status';
 import { WEAPON_BASE } from '../config';
 import { animKey } from '../config/assets';
@@ -37,6 +49,37 @@ export interface PlayerConfig extends WeaponFactors {
   weaponStage: number;
 }
 
+/**
+ * Player values of a round: gold upgrades first, then the bought gear on top (F-16, AP-143). With empty gear
+ * (`gearModifiers` of nothing) the values equal the upgrade values exactly.
+ */
+export function playerConfigFor(
+  levels: UpgradeLevels | undefined,
+  gear: GearModifiers,
+): PlayerConfig {
+  const lv = levels ?? { weaponFireRate: 0, weaponDamage: 0, playerMaxHp: 0, playerTurnSpeed: 0 };
+  const f = applyGearToStats(upgradeFactors(lv), gear);
+  return {
+    maxHp: f.playerMaxHp,
+    turnSpeedDegPerSec: f.playerTurnSpeedDegPerSec,
+    weaponFireRateMult: f.weaponFireRateMult,
+    weaponDamageMult: f.weaponDamageMult,
+    weaponStage: weaponStageForUpgrades(lv),
+  };
+}
+
+/** Gear of the round for the damage path and heals (AP-143). */
+export interface PlayerGear {
+  modifiers: GearModifiers;
+  /** Set effects of the round; its diamond block is used up by a blocked hit. */
+  sets: GearSetState;
+  /** Round randomness (block chance); only drawn with the diamond head piece. */
+  rng: Rng;
+}
+
+/** What stopped a hit completely (gear): the diamond set block or the block chance of the head piece. */
+export type GearBlock = NonNullable<IncomingDamageResult['blockedBy']>;
+
 const SHIELD_RING_RADIUS = 20;
 const SHIELD_RING_COLOR = THEME.colors['game.shield-ring'].num;
 
@@ -50,6 +93,8 @@ export interface PlayerCallbacks {
   onDeath?: () => void;
   /** Active status effects changed (start, end or shown seconds). */
   onStatusChange?: (effects: ActivePlayerStatus[]) => void;
+  /** A hit was stopped completely by the gear (AP-143); no damage, no flash, no hurt sound. */
+  onGearBlock?: (by: GearBlock) => void;
 }
 
 /** Player in the screen center: delayed turning, auto-fire. No scene imports. */
@@ -73,6 +118,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private lastStatusKey = '';
   /** False while no effect can be running: update() then skips building the event key. */
   private statusMaybeActive = false;
+  /** Gear of the round (AP-143); null: the old damage path (shield only). */
+  private gear: PlayerGear | null = null;
+
+  /** Sets the gear of the round (once, right after the player was created). */
+  setGear(gear: PlayerGear | null): void {
+    this.gear = gear;
+  }
 
   /** Ends all status effects (round end, death). */
   clearStatus(): void {
@@ -138,6 +190,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   get isDead(): boolean {
     return this.dead;
+  }
+
+  /** True during the white hit flash (gear overlays flash along, AP-143). */
+  get isHitFlashing(): boolean {
+    return this.hitTintLeft > 0;
   }
 
   /** dt in ms, targetAngle in radians (from AimInput). */
@@ -243,12 +300,22 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.callbacks.onStatusChange?.(list);
   }
 
-  /** `overTime`: damage over time (poison), no hit flash and no hurt sound each frame. */
-  takeDamage(amount: number, overTime = false): void {
-    if (this.dead) return;
-    const absorbed = absorbDamage(this.powers, amount);
-    const shieldChanged = absorbed.state.shieldLeft !== this.powers.shieldLeft;
-    this.powers = absorbed.state;
+  /**
+   * The one damage path of the player. `overTime`: damage over time (poison), no hit flash and no hurt sound
+   * each frame. With gear the order is fixed by `resolveIncomingDamage` (AP-138): set block, block chance,
+   * damage reduction, shield. Returns false if the gear stopped the hit completely (then its status effect
+   * does not apply either), true otherwise.
+   */
+  takeDamage(amount: number, overTime = false): boolean {
+    if (this.dead) return true;
+    const r = this.resolveDamage(amount, overTime);
+    if (r.blockedBy !== null) {
+      if (r.setBlockUsed) this.gear?.sets.consumeBlock();
+      this.callbacks.onGearBlock?.(r.blockedBy);
+      return false;
+    }
+    const shieldChanged = r.powers.shieldLeft !== this.powers.shieldLeft;
+    this.powers = r.powers;
     if (shieldChanged) {
       this.shieldRing.setVisible(this.powers.shieldLeft > 0);
       this.callbacks.onShieldChange?.(this.powers.shieldLeft);
@@ -259,8 +326,32 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.hitTintLeft = HIT_TINT_MS;
       this.callbacks.onHurt?.();
     }
-    if (absorbed.remainingDamage <= 0) return;
-    this.hp = applyDamage(this.hp, absorbed.remainingDamage);
+    if (r.damage <= 0) return true;
+    this.applyHpDamage(r.damage);
+    return true;
+  }
+
+  /**
+   * Without gear exactly the old path (shield only). Damage over time (poison) never uses up the diamond set
+   * block, so the 30 s block stays for a real hit.
+   */
+  private resolveDamage(amount: number, overTime: boolean): IncomingDamageResult {
+    const gear = this.gear;
+    if (!gear) {
+      const absorbed = absorbDamage(this.powers, amount);
+      return {
+        damage: absorbed.remainingDamage,
+        powers: absorbed.state,
+        blockedBy: null,
+        setBlockUsed: false,
+      };
+    }
+    const blockReady = !overTime && gear.sets.blockReady();
+    return resolveIncomingDamage(amount, gear.modifiers, blockReady, this.powers, gear.rng);
+  }
+
+  private applyHpDamage(damage: number): void {
+    this.hp = applyDamage(this.hp, damage);
     this.callbacks.onHpChange?.(this.hp, this.config.maxHp);
     if (isDead(this.hp)) {
       this.dead = true;
@@ -281,7 +372,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   applyItem(def: ItemDef): void {
     if (this.dead) return;
     if (def.effect === 'heal') {
-      this.heal(def.perStack);
+      // Heaven head piece doubles the heal (AP-143); without gear the plain item value.
+      this.heal(this.gear ? healAmount(this.gear.modifiers, def.perStack) : def.perStack);
       return;
     }
     this.powers = applyPowerItem(this.powers, def);
@@ -298,13 +390,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 }
 
-/** Damage first (shield first), then the status effect of the hit (bolt, boss hazard). */
+/**
+ * Damage first (shield first), then the status effect of the hit (bolt, boss hazard). A hit the gear stopped
+ * completely (`takeDamage` returns false) brings no status effect either (AP-143).
+ */
 export function hitPlayer(
-  player: Pick<Player, 'takeDamage' | 'applyStatus'>,
+  player: {
+    takeDamage(amount: number): boolean | void;
+    applyStatus(effects: StatusOnHit | undefined): void;
+  },
   damage: number,
   onHit: StatusOnHit | undefined,
 ): void {
-  player.takeDamage(damage);
+  if (player.takeDamage(damage) === false) return;
   player.applyStatus(onHit);
 }
 

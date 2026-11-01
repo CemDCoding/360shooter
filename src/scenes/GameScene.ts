@@ -13,14 +13,17 @@ import { STORABLE_POWERS } from '../config/powerStore';
 import {
   GameEvents,
   type EnemyId,
+  type EquippedGear,
+  type GearModifiers,
+  type ItemRules,
   type GameEventName,
   type GameEventPayloads,
   type ItemDef,
   type LevelDef,
   type PowerStoreState,
   type StatusOnHit,
-  type UpgradeLevels,
 } from '../contracts';
+import { HELL_SET_RING } from '../config/gear';
 import type { ActiveArmour, ArmourDef } from '../contracts/armour';
 import { spawnRadiusFor } from '../config/arena';
 import { BOSS_TUNING } from '../config/bosses';
@@ -38,14 +41,22 @@ import {
 } from '../entities/bosses/hazards';
 import { ParryOverlay } from '../entities/ParryOverlay';
 import { ArmourRing } from '../entities/ArmourRing';
-import { CoinPool } from '../entities/CoinPool';
-import { ItemPickup } from '../entities/ItemPickup';
+import { CoinPool, withMagnetFactor } from '../entities/CoinPool';
+import { ItemPickup, withLifetimeFactor } from '../entities/ItemPickup';
 import { MapBackground } from '../entities/MapBackground';
 import { Laser } from '../entities/Laser';
 import { LaserPool } from '../entities/LaserPool';
-import { ContactStatus, hitPlayer, Player, type PlayerConfig } from '../entities/Player';
+import {
+  ContactStatus,
+  hitPlayer,
+  Player,
+  playerConfigFor,
+  type GearBlock,
+  type PlayerConfig,
+} from '../entities/Player';
+import { GearBlastPool, GearOverlay } from '../entities/GearOverlay';
 import { EnemyPool } from '../entities/enemies/createEnemy';
-import { Enemy } from '../entities/enemies/Enemy';
+import { Enemy, type EnemyHitFlash } from '../entities/enemies/Enemy';
 import { WitchBolt } from '../entities/enemies/WitchBolt';
 import { WitchBoltPool } from '../entities/enemies/WitchBoltPool';
 import {
@@ -58,6 +69,19 @@ import {
   tickArmour,
 } from '../logic/armour';
 import { clearForBoss, shouldSpawnNormalEnemies } from '../logic/bossClear';
+import {
+  burnOnHit,
+  deathBlastTargets,
+  GearSetState,
+  gearModifiers,
+  gearTextureKeys,
+  itemLifetimeFactor,
+  knockbackVector,
+  magnetFactor,
+  pierceCount,
+  rollCrit,
+  thornsDamage,
+} from '../logic/gear';
 import { rollCoinDrop } from '../logic/coins';
 import {
   DEFAULT_ENEMY_SCALE,
@@ -83,8 +107,6 @@ import type { RoundResult } from '../logic/progression';
 import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
 import { SpawnDirector } from '../logic/spawn';
-import { upgradeFactors } from '../logic/upgrades';
-import { weaponStageForUpgrades } from '../logic/weaponMount';
 import { getSoundService, PARRY_KEY, type SoundService } from '../platform/audio';
 import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
@@ -157,24 +179,21 @@ function armourKey(a: ActiveArmour): string {
   return `${a.id ?? ''}|${hudSeconds(a.activeMsLeft)}|${hudSeconds(a.cooldownMsLeft)}`;
 }
 
-function playerConfigFrom(levels: UpgradeLevels | undefined): PlayerConfig {
-  const f = upgradeFactors(
-    levels ?? { weaponFireRate: 0, weaponDamage: 0, playerMaxHp: 0, playerTurnSpeed: 0 },
-  );
-  return {
-    maxHp: f.playerMaxHp,
-    turnSpeedDegPerSec: f.playerTurnSpeedDegPerSec,
-    weaponFireRateMult: f.weaponFireRateMult,
-    weaponDamageMult: f.weaponDamageMult,
-    weaponStage: weaponStageForUpgrades(levels ?? { weaponFireRate: 0, weaponDamage: 0 }),
-  };
-}
+const NO_GEAR: EquippedGear = { head: null, body: null, legs: null };
+/** Status sink for a contact hit the gear blocked: the collected effects are dropped. */
+const NO_STATUS_TARGET = { applyStatus: (): void => undefined };
 
 interface PendingDrop {
   x: number;
   y: number;
   coinValue: number;
   coinChance: number;
+}
+
+/** Where a defeated enemy explodes (lava boots, AP-143); handled in the next update. */
+interface PendingBlast {
+  x: number;
+  y: number;
 }
 
 /** One round: player in the center, enemies from the ring, timer, items, coins, armour. */
@@ -228,6 +247,21 @@ export class GameScene extends Phaser.Scene {
   private bossInvulnerable = false;
   /** Quicktime circles of the boss attacks (AP-133); destroyed in cleanup. */
   private parryOverlay?: ParryOverlay;
+  /** Bought gear of this round (AP-143), read once at round start; neutral without gear. */
+  private gear: GearModifiers = gearModifiers(NO_GEAR);
+  /** Set effects (diamond block, hell ring, heaven regen) on pausable play time. */
+  private gearSets = new GearSetState([]);
+  private gearOverlay?: GearOverlay;
+  private blasts?: GearBlastPool;
+  private pendingBlasts: PendingBlast[] = [];
+  /** Burn of the hell body piece, null without it (then no burn loop runs). */
+  private burn: { durationMs: number; dps: number } | null = null;
+  /** Hell set fire ring, separate from the fire-ring item: its cooldown is never touched (PE-169). */
+  private setRingMsLeft = 0;
+  /** Item ring or set ring is shown (one ring picture for both). */
+  private ringShown = false;
+  /** Item rules with the lifetime of the heaven legs (AP-143). */
+  private itemRules: ItemRules = ITEM_RULES;
 
   constructor() {
     super('GameScene');
@@ -259,6 +293,15 @@ export class GameScene extends Phaser.Scene {
     this.bossSpawned = false;
     this.bossDefeatedFlag = false;
     this.parryOverlay = undefined;
+    this.gear = gearModifiers(NO_GEAR);
+    this.gearSets = new GearSetState([]);
+    this.gearOverlay = undefined;
+    this.blasts = undefined;
+    this.pendingBlasts = [];
+    this.burn = null;
+    this.setRingMsLeft = 0;
+    this.ringShown = false;
+    this.itemRules = ITEM_RULES;
   }
 
   create(): void {
@@ -269,13 +312,20 @@ export class GameScene extends Phaser.Scene {
     // endRound() pauses the world; make sure a restarted round ("Nochmal") runs again.
     this.physics.resume();
 
-    // Upgrades bought in the menu apply to this round (PE-41).
-    this.playerConfig = playerConfigFrom(loadSave().upgrades);
+    // Upgrades bought in the menu apply to this round (PE-41), the equipped gear on top (AP-143).
+    const save = loadSave();
+    const equipped = save.equippedGear ?? NO_GEAR;
+    this.gear = gearModifiers(equipped);
+    this.gearSets = new GearSetState(this.gear.setBonuses);
+    this.burn = burnOnHit(this.gear);
+    this.itemRules = withLifetimeFactor(ITEM_RULES, itemLifetimeFactor(this.gear));
+    this.playerConfig = playerConfigFor(save.upgrades, this.gear);
 
     // Fixed seed per level: same floor layout every round.
     this.background = new MapBackground(this, this.level.batch, this.level.id * 7919 + 1);
 
     this.lasers = new LaserPool(this);
+    this.lasers.pierce = pierceCount(this.gear);
     this.boltPool = new WitchBoltPool(this);
     this.enemyPool = new EnemyPool(this, {
       boltPool: this.boltPool,
@@ -287,6 +337,8 @@ export class GameScene extends Phaser.Scene {
     });
     this.player = new Player(this, this.center.x, this.center.y, this.lasers, this.playerConfig);
     this.player.setDepth(10);
+    this.player.setGear({ modifiers: this.gear, sets: this.gearSets, rng: this.rng });
+    this.createGearVisuals(equipped);
     this.stick = new VirtualStick(this);
     // A press on a quicktime circle is checked first and used up; it does not aim (AP-133).
     this.aim = new AimInput(this, this.center.x, this.center.y, this.stick, (x, y) =>
@@ -294,7 +346,7 @@ export class GameScene extends Phaser.Scene {
     );
     this.parryOverlay = new ParryOverlay(this);
 
-    this.coinPool = new CoinPool(this, COIN_RULES);
+    this.coinPool = new CoinPool(this, withMagnetFactor(COIN_RULES, magnetFactor(this.gear)));
     this.coinPool.onCollected = (value) => {
       if (this.ended) return;
       this.roundCoins += value;
@@ -357,16 +409,40 @@ export class GameScene extends Phaser.Scene {
     this.player.callbacks.onStatsChange = () => this.emitPowers();
     this.player.callbacks.onStatusChange = (effects) =>
       emitGameEvent(this.events, GameEvents.PlayerStatus, { effects });
+    this.player.callbacks.onGearBlock = (by: GearBlock) => {
+      // Only the diamond set block shows its ring; the block chance of the head has no picture (brief H-35).
+      if (by === 'setBlock') this.gearOverlay?.playBlock();
+    };
+  }
+
+  /**
+   * Gear overlays on the astronaut (legs, body, head) and the diamond glint; the explosion pool only with the
+   * lava boots. Nothing is created without gear.
+   */
+  private createGearVisuals(equipped: EquippedGear): void {
+    const keys = gearTextureKeys(equipped);
+    const diamondSet = this.gear.setBonuses.some((b) => b.kind === 'timedBlock');
+    if (keys.length > 0 || diamondSet) {
+      this.gearOverlay = new GearOverlay(this, keys, diamondSet);
+      this.syncGearOverlay(0);
+    }
+    if (this.gear.effects.some((e) => e.kind === 'deathBlast'))
+      this.blasts = new GearBlastPool(this);
+  }
+
+  private syncGearOverlay(dt: number): void {
+    this.gearOverlay?.sync(this.player, dt, this.gearSets.blockReady());
   }
 
   private addColliders(): void {
-    // Laser vs enemy: one laser hits one enemy.
+    // Laser vs enemy: one laser hits one enemy (the heaven body piece lets it pass through more, AP-143).
     this.physics.add.overlap(this.enemyPool.enemies, this.lasers.group, (a, b) => {
       const enemy = pick(a, b, Enemy);
       const laser = pick(a, b, Laser);
       if (!enemy || !laser || !enemy.active || !laser.active || this.ended) return;
-      this.lasers.release(laser);
-      if (!this.damageEnemy(enemy, laser.damage)) this.sfx.play('sfx-hit');
+      if (laser.hasHit(enemy)) return;
+      if (!laser.registerHit(enemy)) this.lasers.release(laser);
+      if (!this.laserHitsEnemy(enemy, laser.damage)) this.sfx.play('sfx-hit');
     });
     // Laser vs item: shooting an item collects it (PE-16).
     this.physics.add.overlap(this.items, this.lasers.group, (a, b) => {
@@ -414,21 +490,71 @@ export class GameScene extends Phaser.Scene {
    * Single damage path for enemies (laser and fire ring). On a kill the drop rolls are
    * queued with the enemy's coin value; XP and sound run via the pool's onDeath.
    */
-  private damageEnemy(enemy: Enemy, amount: number): boolean {
+  private damageEnemy(enemy: Enemy, amount: number, flash: EnemyHitFlash = 'hit'): boolean {
     const { x, y } = enemy;
-    const killed = enemy.takeDamage(amount);
-    if (killed) {
-      const scale = this.enemyScales.get(enemy);
-      // onDeath already added def.xp: add the difference to the scaled value.
-      this.killXp += xpBonus(enemy.def.xp, scale);
-      this.pendingDrops.push({
-        x,
-        y,
-        coinValue: enemy.def.coinValue ?? 0,
-        coinChance: scaledDropChance(COIN_RULES.dropChance, scale),
-      });
-    }
+    const killed = enemy.takeDamage(amount, flash);
+    if (killed) this.onEnemyKilled(enemy, x, y);
     return killed;
+  }
+
+  /**
+   * One laser hit on an enemy (AP-143): critical hit of the hell head (golden flash, damage times the crit
+   * factor), then the burn of the hell body piece on a survivor. Without gear exactly damageEnemy(laser damage).
+   */
+  private laserHitsEnemy(enemy: Enemy, damage: number): boolean {
+    const crit = rollCrit(this.gear, this.rng);
+    const killed = this.damageEnemy(enemy, damage * crit, crit > 1 ? 'crit' : 'hit');
+    if (!killed && this.burn) enemy.applyBurn(this.burn);
+    return killed;
+  }
+
+  /** Rewards of a kill (drops, scaled xp) and the explosion of the lava boots. */
+  private onEnemyKilled(enemy: Enemy, x: number, y: number): void {
+    const scale = this.enemyScales.get(enemy);
+    // onDeath already added def.xp: add the difference to the scaled value.
+    this.killXp += xpBonus(enemy.def.xp, scale);
+    this.pendingDrops.push({
+      x,
+      y,
+      coinValue: enemy.def.coinValue ?? 0,
+      coinChance: scaledDropChance(COIN_RULES.dropChance, scale),
+    });
+    if (this.blasts) this.pendingBlasts.push({ x, y });
+  }
+
+  /**
+   * Explosions of the lava boots (AP-143), one frame after the kill: damage over the same enemy damage path as
+   * a laser hit (rewards, further explosions next frame). Bosses are not in the enemy pool, so the blast never
+   * hurts them (like the fire ring, Q-23).
+   */
+  private updateBlasts(): void {
+    if (this.pendingBlasts.length === 0) return;
+    const blasts = this.pendingBlasts;
+    this.pendingBlasts = [];
+    const targets: { x: number; y: number; radius: number; enemy: Enemy }[] = [];
+    for (const e of this.enemyPool.enemies) {
+      if (!e.active) continue;
+      const r = (e.body as Phaser.Physics.Arcade.Body | null)?.halfWidth ?? 0;
+      targets.push({ x: e.x, y: e.y, radius: r, enemy: e });
+    }
+    for (const { x, y } of blasts) {
+      // Above enemies and items, below the astronaut and her weapon (depth - 1).
+      this.blasts?.play(x, y, this.player.depth - 2);
+      const hit = deathBlastTargets(this.gear, x, y, targets);
+      for (const t of hit.targets) {
+        if (t.enemy.active) this.damageEnemy(t.enemy, hit.damage);
+      }
+    }
+  }
+
+  /** Burn ticks of the hell body piece through the enemy damage path (rewards); no flash per tick. */
+  private applyBurnDamage(): void {
+    if (!this.burn) return;
+    for (const e of this.enemyPool.enemies) {
+      if (!e.active) continue;
+      const d = e.takeBurnDamage();
+      if (d > 0) this.damageEnemy(e, d, 'none');
+    }
   }
 
   update(time: number, delta: number): void {
@@ -440,9 +566,13 @@ export class GameScene extends Phaser.Scene {
     this.lasers.update();
     this.boltPool.update();
     this.enemyPool.update(time, dt);
+    this.applyBurnDamage();
+    this.updateBlasts();
     this.spawnEnemies(dt);
     this.applyAreaDamage(dt);
+    this.updateGearSets(dt);
     this.updateArmour(dt);
+    this.syncGearOverlay(dt);
     this.updateBoss(time, dt);
     this.updateParry(dt);
     this.spawnDrops();
@@ -488,13 +618,29 @@ export class GameScene extends Phaser.Scene {
       const dealt = enemy.contactDamageFor(dt) * this.enemyScales.get(enemy).contact;
       damage += dealt;
       // One hit per hitting enemy (AP-112); status (snake poison) comes with the hit.
-      if (dealt > 0) this.contactStatus.add(enemy.onHit);
+      if (dealt > 0) {
+        this.contactStatus.add(enemy.onHit);
+        this.contactRecoil(enemy);
+      }
     });
     for (const e of this.enemyPool.enemies) {
       if (e.active) damage += e.auraDamageAt(this.player.x, this.player.y, dt);
     }
-    if (damage > 0) this.player.takeDamage(damage);
-    this.contactStatus.flush(this.player);
+    // A hit the gear stopped completely brings no status effect either (AP-143).
+    const landed = damage > 0 ? this.player.takeDamage(damage) : true;
+    this.contactStatus.flush(landed ? this.player : NO_STATUS_TARGET);
+  }
+
+  /**
+   * Thorns and knockback of the diamond body and legs (AP-143) on an enemy that dealt contact damage: pushed
+   * away from the player and damaged over the enemy damage path (rewards). No-op without the pieces.
+   */
+  private contactRecoil(enemy: Enemy): void {
+    const thorns = thornsDamage(this.gear);
+    const push = knockbackVector(this.gear, this.player.x, this.player.y, enemy.x, enemy.y);
+    if (thorns <= 0 && push.x === 0 && push.y === 0) return;
+    const { x, y } = enemy;
+    if (enemy.recoil(thorns, push.x, push.y)) this.onEnemyKilled(enemy, x, y);
   }
 
   /**
@@ -503,21 +649,50 @@ export class GameScene extends Phaser.Scene {
    */
   private updateArmour(dt: number): void {
     const def = this.armourDef;
-    if (!def) return;
-    const wasActive = this.armour.id !== null;
-    if (wasActive && !this.player.isDead) {
-      const dmg = ringDamageFor(def, dt);
+    const itemActive = def !== null && this.armour.id !== null;
+    const setActive = this.setRingMsLeft > 0;
+    // One ring burns at a time: the item ring (if active) or the hell set ring, never twice per frame.
+    const ringDef = itemActive ? def : setActive ? HELL_SET_RING : null;
+    if (ringDef && !this.player.isDead) {
+      const dmg = ringDamageFor(ringDef, dt);
       const { x: cx, y: cy } = this.player;
       for (const e of this.enemyPool.enemies) {
         if (!e.active) continue;
         const r = (e.body as Phaser.Physics.Arcade.Body | null)?.halfWidth ?? 0;
-        if (isInRing(def, cx, cy, e.x, e.y, r)) this.damageEnemy(e, dmg);
+        if (isInRing(ringDef, cx, cy, e.x, e.y, r)) this.damageEnemy(e, dmg);
       }
     }
-    this.armour = tickArmour(this.armour, dt, def);
-    if (this.armour.id !== null) this.armourRing?.setCenter(this.player.x, this.player.y);
-    else if (wasActive) this.armourRing?.hide();
-    this.emitArmour();
+    if (def) this.armour = tickArmour(this.armour, dt, def);
+    this.setRingMsLeft = Math.max(0, this.setRingMsLeft - dt);
+    this.updateRingVisual();
+    if (def) this.emitArmour();
+  }
+
+  /** Ring picture follows the player while the item ring or the hell set ring burns. */
+  private updateRingVisual(): void {
+    const on = this.armour.id !== null || this.setRingMsLeft > 0;
+    if (on) {
+      if (!this.ringShown) this.armourRing?.show(this.armourDef ?? HELL_SET_RING);
+      this.ringShown = true;
+      this.armourRing?.setCenter(this.player.x, this.player.y);
+    } else if (this.ringShown) {
+      this.ringShown = false;
+      this.armourRing?.hide();
+    }
+  }
+
+  /**
+   * Set effects on pausable play time (AP-143): the hell set lights the fire ring for 3 s (own timer, the
+   * cooldown of the fire-ring item stays untouched), the heaven set heals. The diamond block is used up in
+   * the player's damage path.
+   */
+  private updateGearSets(dt: number): void {
+    if (this.player.isDead) return;
+    const tick = this.gearSets.tick(dt);
+    if (tick.ringTriggers > 0) {
+      this.setRingMsLeft = Math.max(this.setRingMsLeft, HELL_SET_RING.durationMs);
+    }
+    if (tick.regenHp > 0) this.player.heal(tick.regenHp);
   }
 
   /** Boss warning (33 s left) and appearance (30 s left), driven by the round state (PE-18). */
@@ -628,7 +803,8 @@ export class GameScene extends Phaser.Scene {
         if (!laser || !part || !laser.active || !part.active || this.ended) return;
         if (part.isInvulnerable) return;
         this.lasers.release(laser);
-        if (!part.takeDamage(laser.damage)) this.sfx.play('sfx-hit');
+        if (!part.takeDamage(laser.damage * rollCrit(this.gear, this.rng)))
+          this.sfx.play('sfx-hit');
       });
     }
     if (this.bossDefeatedFlag) return;
@@ -756,7 +932,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnItem(x: number, y: number, def: ItemDef): void {
-    const item = new ItemPickup(this, x, y, def, ITEM_RULES, this.playTimeMs);
+    const item = new ItemPickup(this, x, y, def, this.itemRules, this.playTimeMs);
     item.setDepth(5);
     item.onCollected = (collected) => {
       // Timed powers go into the storage slot instead of starting (PE-70).
@@ -771,7 +947,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnArmourPickup(x: number, y: number, def: ArmourDef): void {
-    const pickup = new ArmourPickup(this, x, y, def, ITEM_RULES, this.playTimeMs);
+    const pickup = new ArmourPickup(this, x, y, def, this.itemRules, this.playTimeMs);
     pickup.setDepth(5);
     pickup.onCollected = (collected) => this.onArmourCollected(collected);
     this.armourPickups.push(pickup);
@@ -795,6 +971,7 @@ export class GameScene extends Phaser.Scene {
     this.armourDef = def;
     this.armourRing?.show(def);
     this.armourRing?.setCenter(this.player.x, this.player.y);
+    this.ringShown = true;
     this.emitArmour(true);
     return true;
   }
@@ -883,6 +1060,9 @@ export class GameScene extends Phaser.Scene {
     this.player.clearStatus();
     this.armour = resetArmour();
     this.armourDef = null;
+    this.setRingMsLeft = 0;
+    this.ringShown = false;
+    this.pendingBlasts = [];
     this.armourRing?.hide();
     // Round over (win, timeout or death): the storage is emptied, nothing is saved (PE-70).
     // The HUD hears about it, so it no longer shows a stale "ready" slot (V-14 a).
@@ -977,6 +1157,8 @@ export class GameScene extends Phaser.Scene {
     this.player.callbacks.onShoot = undefined;
     this.player.callbacks.onHurt = undefined;
     this.player.callbacks.onStatusChange = undefined;
+    this.player.callbacks.onGearBlock = undefined;
+    this.player.setGear(null);
     for (const item of this.items) item.onCollected = undefined;
     for (const pickup of this.armourPickups) pickup.onCollected = undefined;
     this.items = [];
@@ -988,6 +1170,13 @@ export class GameScene extends Phaser.Scene {
     this.coinPool = undefined;
     this.armourRing?.destroy();
     this.armourRing = undefined;
+    this.setRingMsLeft = 0;
+    this.ringShown = false;
+    this.pendingBlasts = [];
+    this.gearOverlay?.destroy();
+    this.gearOverlay = undefined;
+    this.blasts?.destroy();
+    this.blasts = undefined;
     this.background?.destroy();
     this.background = undefined;
     this.stick?.destroy();

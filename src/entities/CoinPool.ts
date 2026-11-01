@@ -3,6 +3,15 @@ import type { CoinRules } from '../contracts';
 import { COIN_RULES } from '../config';
 import { Coin } from './Coin';
 
+/**
+ * Coin rules with the magnet radius times `factor` (heaven legs, AP-143). Factor 1 (no gear) returns the
+ * rules unchanged; broken factors count as 1.
+ */
+export function withMagnetFactor(rules: CoinRules, factor: number): CoinRules {
+  if (!Number.isFinite(factor) || factor <= 0 || factor === 1) return rules;
+  return { ...rules, magnetRadiusPx: rules.magnetRadiusPx * factor };
+}
+
 /** Pool of coins. Coins have no lifetime; they stay until collected or cleared. */
 export class CoinPool {
   readonly coins: Coin[] = [];

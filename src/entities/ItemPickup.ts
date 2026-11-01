@@ -15,6 +15,15 @@ const OUTLINE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
   [0, 1],
 ];
 
+/**
+ * Item rules with the lifetime on the ground times `factor` (heaven legs, AP-143). Factor 1 (no gear) returns
+ * the rules unchanged; broken factors count as 1. The blink window at the end stays the same.
+ */
+export function withLifetimeFactor(rules: ItemRules, factor: number): ItemRules {
+  if (!Number.isFinite(factor) || factor <= 0 || factor === 1) return rules;
+  return { ...rules, lifetimeMs: rules.lifetimeMs * factor };
+}
+
 /** Item that appears where an enemy died; shoot it to collect it. */
 export class ItemPickup extends Phaser.Physics.Arcade.Sprite {
   readonly def: ItemDef;
