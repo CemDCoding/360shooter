@@ -38,6 +38,7 @@ import {
   PIXEL_LOCK,
 } from './hud/hudMath';
 import { pauseLayout } from './hud/pauseLayout';
+import { PetBar, petBarRect } from './hud/PetBar';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
 import { StatusIndicator } from './hud/StatusIndicator';
@@ -71,6 +72,8 @@ export class HudScene extends Phaser.Scene {
   private armour!: ArmourIndicator;
   private status!: StatusIndicator;
   private slots?: PowerSlots;
+  /** Pet bar above the slots (AP-144): created with the first pet-changed, so without a pet there is none. */
+  private petBar: PetBar | null = null;
   private chipRow: FunkChip[] = [];
   private statusRow: FunkChip[] = [];
   private rowY = 0;
@@ -169,6 +172,7 @@ export class HudScene extends Phaser.Scene {
     this.createChips(k);
     this.createBossUi(width, height, k);
     this.slots = new PowerSlots(this, height, this.e.bottom, this.onSlotPressed, this.e.left);
+    this.petBar = null;
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
@@ -199,6 +203,7 @@ export class HudScene extends Phaser.Scene {
     this.gameEvents.on(GameEvents.ArmourChanged, this.onArmour, this);
     this.gameEvents.on(GameEvents.PowerStoreChanged, this.onPowerStore, this);
     this.gameEvents.on(GameEvents.PlayerStatus, this.onPlayerStatus, this);
+    this.gameEvents.on(GameEvents.PetChanged, this.onPet, this);
     this.gameEvents.on(GameEvents.BossWarning, this.onBossWarning, this);
     this.gameEvents.on(GameEvents.BossSpawned, this.onBossSpawned, this);
     this.gameEvents.on(GameEvents.BossHpChanged, this.onBossHp, this);
@@ -706,6 +711,16 @@ export class HudScene extends Phaser.Scene {
     this.slots?.setStore(p);
   }
 
+  /** Pet bar: appears with the first state of the round's pet, sits above the slots (fixed size). */
+  private onPet(p: GameEventPayloads['pet-changed']): void {
+    if (!p) return;
+    if (!this.petBar) {
+      const rect = petBarRect(this.scale.height, this.e.bottom, this.e.left);
+      this.petBar = new PetBar(this, rect, p.petId);
+    }
+    this.petBar.set(p);
+  }
+
   /** A ready slot was tapped: report it to the GameScene, but never while paused or after the end. */
   private readonly onSlotPressed = (id: string): void => {
     if (!this.scene.isActive(GAME_KEY) || this.scene.isPaused(GAME_KEY)) return;
@@ -806,6 +821,8 @@ export class HudScene extends Phaser.Scene {
     this.statusRow = [];
     this.slots?.destroy();
     this.slots = undefined;
+    this.petBar?.destroy();
+    this.petBar = null;
     if (this.gameEvents) {
       this.gameEvents.off(GameEvents.HpChanged, this.onHp, this);
       this.gameEvents.off(GameEvents.TimerTick, this.onTimer, this);
@@ -814,6 +831,7 @@ export class HudScene extends Phaser.Scene {
       this.gameEvents.off(GameEvents.ArmourChanged, this.onArmour, this);
       this.gameEvents.off(GameEvents.PowerStoreChanged, this.onPowerStore, this);
       this.gameEvents.off(GameEvents.PlayerStatus, this.onPlayerStatus, this);
+      this.gameEvents.off(GameEvents.PetChanged, this.onPet, this);
       this.gameEvents.off(GameEvents.BossWarning, this.onBossWarning, this);
       this.gameEvents.off(GameEvents.BossSpawned, this.onBossSpawned, this);
       this.gameEvents.off(GameEvents.BossHpChanged, this.onBossHp, this);

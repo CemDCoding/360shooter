@@ -1,9 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// PetBar.ts draws with Phaser objects; its layout and look are pure functions (Phaser is not loaded here).
+vi.mock('phaser', () => ({ default: {} }));
+
 import { BOSSES } from '../../src/config/bosses';
 import { STORABLE_POWERS } from '../../src/config/powerStore';
 import { THEME } from '../../src/config/theme';
 import { slotStatus } from '../../src/logic/powerStore';
 import { pauseLayout } from '../../src/scenes/hud/pauseLayout';
+import {
+  petBarFilled,
+  petBarLook,
+  petBarParts,
+  petBarRect,
+  petBarWidth,
+  trackFillWidth,
+} from '../../src/scenes/hud/PetBar';
 import {
   armourDisplay,
   bannerBlink,
@@ -38,6 +50,7 @@ import {
   shieldRatio,
   slotIconScale,
   STICK_CATCH_DIAMETER,
+  timebarMetrics,
 } from '../../src/scenes/hud/hudMath';
 
 describe('hudMath', () => {
@@ -440,7 +453,12 @@ describe('phone HUD layout (H-23, AP-86)', () => {
     }
     const slots = powerSlotRects(2, 1, H, base, m);
     const bar = bossBarRect(W, H, k, 200, 8, 8);
-    return { m, energy, timer, pause, mute, chips, slots, bar };
+    // Rest time strip below the double shot chip (AP-134) and the pet bar above the slots (AP-144).
+    const tb = timebarMetrics(k);
+    const ds = chips[1];
+    const timebar = { x: ds.x, y: ds.y + ds.h + tb.gap, w: ds.w, h: tb.stripH };
+    const petBar = petBarRect(H, m, m);
+    return { m, energy, timer, pause, mute, chips, slots, bar, timebar, petBar };
   }
 
   const combos: [number, number][] = [];
@@ -467,6 +485,39 @@ describe('phone HUD layout (H-23, AP-86)', () => {
     expect(H - (l.bar.y + l.bar.h)).toBe(l.m);
     expect(l.slots[0].w).toBe(40);
     expect(l.slots[1].x - (l.slots[0].x + 40)).toBe(8);
+  });
+
+  it.each(combos)('places the pet bar clear of all HUD parts at width %s, k = %s', (W, k) => {
+    const l = layout(W, k);
+    const r = l.petBar;
+    expect(rectInArena(r, W, H)).toBe(true);
+    // Safe area: margin m on the left, inside the arena on all sides.
+    expect(r.x).toBe(l.m);
+    expect(r.y).toBeGreaterThanOrEqual(l.m);
+    // Lower edge size.hud-petbar-gap above the slots, as wide as both slots, fixed height.
+    expect(l.slots[0].y - (r.y + r.h)).toBe(THEME.sizePx['size.hud-petbar-gap']);
+    expect(r.w).toBe(l.slots[1].x + l.slots[1].w - l.slots[0].x);
+    expect(r.h).toBe(THEME.sizePx['size.hud-petbar-h']);
+    const stick = {
+      x: W - 24 - STICK_CATCH_DIAMETER,
+      y: H - 24 - STICK_CATCH_DIAMETER,
+      w: STICK_CATCH_DIAMETER,
+      h: STICK_CATCH_DIAMETER,
+    };
+    const bossLabelH = 8 * (k > 1 ? Math.max(2, Math.ceil(k)) : 1) + 3;
+    const bossArea = { ...l.bar, y: l.bar.y - bossLabelH, h: l.bar.h + bossLabelH };
+    const others = [
+      l.energy,
+      l.timer,
+      l.pause,
+      l.mute,
+      ...l.chips,
+      l.timebar,
+      ...l.slots,
+      bossArea,
+      stick,
+    ];
+    for (const o of others) expect(rectsOverlap(r, o)).toBe(false);
   });
 
   it('takes the slot margin separately from size and gap', () => {
@@ -543,5 +594,67 @@ describe('pauseLayout (H-33, view 6)', () => {
       buttonW: [96, 144],
     });
     expect(l.buttons[0].x).toBeGreaterThanOrEqual(60);
+  });
+});
+
+describe('pet bar (AP-144, brief H-35 view 6)', () => {
+  const egg = { phase: 'egg' as const, xp: 3, xpToNext: 6, powerUps: 0 };
+  const pet = (powerUps: number, xp = 2) => ({
+    phase: 'hatched' as const,
+    xp,
+    xpToNext: 10,
+    powerUps,
+  });
+
+  it('is 88 x 20 above the slots at the mockup place (8, 288) at k = 1', () => {
+    expect(petBarWidth()).toBe(88);
+    expect(petBarRect(360, 8, 8)).toEqual({ x: 8, y: 288, w: 88, h: 20 });
+    // Safe-area inset on the left: the bar moves in with the slots.
+    expect(petBarRect(360, 8, 30).x).toBe(30);
+  });
+
+  it('lays out icon, 40 x 6 track and three 4 x 6 pips like the mockup', () => {
+    const p = petBarParts({ x: 8, y: 288, w: 88, h: 20 });
+    expect(p.icon).toEqual({ x: 19, y: 298 });
+    expect(p.track).toEqual({ x: 31, y: 295, w: 40, h: 6 });
+    expect(p.pips.map((r) => r.x)).toEqual([77, 83, 89]);
+    expect(p.pips[2].x + p.pips[2].w).toBe(8 + 88 - 3);
+    expect(p.track.x + p.track.w).toBeLessThan(p.pips[0].x);
+    expect(p.eggLabel).toEqual({ x: 93, y: 298 });
+  });
+
+  it('shows the egg with "EI", then the pet with pips, MAX at stage 3', () => {
+    expect(petBarLook(egg)).toEqual({
+      icon: 'egg',
+      fraction: 0.5,
+      max: false,
+      pips: null,
+      style: { line: 'hud.line' },
+    });
+    expect(petBarLook(pet(2))).toMatchObject({ icon: 'pet', pips: 2, max: false });
+    expect(petBarLook(pet(3, 10))).toEqual({
+      icon: 'pet',
+      fraction: 1,
+      max: true,
+      pips: 3,
+      style: { line: 'hud.accent', glow: true },
+    });
+  });
+
+  it('flashes only when the bar became full (hatch or power-up)', () => {
+    expect(petBarFilled(null, egg)).toBe(false);
+    expect(petBarFilled(egg, { ...egg, xp: 5 })).toBe(false);
+    expect(petBarFilled(egg, pet(0))).toBe(true);
+    expect(petBarFilled(pet(0), pet(1))).toBe(true);
+    expect(petBarFilled(pet(1), pet(1, 5))).toBe(false);
+    expect(petBarFilled(pet(3, 10), pet(3, 10))).toBe(false);
+  });
+
+  it('fills the track in whole pixels', () => {
+    expect(trackFillWidth(0)).toBe(0);
+    expect(trackFillWidth(0.5)).toBe(20);
+    expect(trackFillWidth(0.33)).toBe(13);
+    expect(trackFillWidth(2)).toBe(40);
+    expect(trackFillWidth(NaN)).toBe(0);
   });
 });

@@ -20,6 +20,7 @@ import {
   type GameEventPayloads,
   type ItemDef,
   type LevelDef,
+  type PetId,
   type PowerStoreState,
   type StatusOnHit,
 } from '../contracts';
@@ -55,6 +56,9 @@ import {
   type PlayerConfig,
 } from '../entities/Player';
 import { GearBlastPool, GearOverlay } from '../entities/GearOverlay';
+import { PetCompanion } from '../entities/pets/PetCompanion';
+import { petChangedPayload, petGearKeyFor } from '../entities/pets/petLogic';
+import type { PetWorld } from '../entities/pets/Pet';
 import { EnemyPool } from '../entities/enemies/createEnemy';
 import { Enemy, type EnemyHitFlash } from '../entities/enemies/Enemy';
 import { WitchBolt } from '../entities/enemies/WitchBolt';
@@ -83,6 +87,8 @@ import {
   thornsDamage,
 } from '../logic/gear';
 import { rollCoinDrop } from '../logic/coins';
+import { addPetXp, createPetRound, killWeight, petStats, type PetRound } from '../logic/pets';
+import { getPet } from '../config/pets';
 import {
   DEFAULT_ENEMY_SCALE,
   ScaleRegistry,
@@ -262,6 +268,12 @@ export class GameScene extends Phaser.Scene {
   private ringShown = false;
   /** Item rules with the lifetime of the heaven legs (AP-143). */
   private itemRules: ItemRules = ITEM_RULES;
+  /** Pet bar of the active pet (AP-144); null without a pet (then nothing pet-related runs). */
+  private petRound: PetRound | null = null;
+  /** Egg or hatched pet beside the astronaut; destroyed in cleanup. */
+  private pet?: PetCompanion<Enemy>;
+  /** Living enemies handed to the pet each frame (one reused array, no garbage per frame). */
+  private petTargets: Enemy[] = [];
 
   constructor() {
     super('GameScene');
@@ -302,6 +314,9 @@ export class GameScene extends Phaser.Scene {
     this.setRingMsLeft = 0;
     this.ringShown = false;
     this.itemRules = ITEM_RULES;
+    this.petRound = null;
+    this.pet = undefined;
+    this.petTargets = [];
   }
 
   create(): void {
@@ -339,6 +354,8 @@ export class GameScene extends Phaser.Scene {
     this.player.setDepth(10);
     this.player.setGear({ modifiers: this.gear, sets: this.gearSets, rng: this.rng });
     this.createGearVisuals(equipped);
+    const activePet = save.activePet ?? null;
+    this.createPet(activePet, activePet ? (save.petGear?.[activePet] ?? null) : null);
     this.stick = new VirtualStick(this);
     // A press on a quicktime circle is checked first and used up; it does not aim (AP-133).
     this.aim = new AimInput(this, this.center.x, this.center.y, this.stick, (x, y) =>
@@ -390,7 +407,69 @@ export class GameScene extends Phaser.Scene {
     this.emitPowers(true);
     this.emitArmour(true);
     this.emitPowerStore();
+    this.emitPet();
   };
+
+  /**
+   * Active pet of the save (AP-144): starts every round as an egg beside the astronaut, its bar is the round
+   * state from logic/pets. Without an active pet nothing is created and the round is unchanged.
+   */
+  private createPet(petId: PetId | null, petGearId: string | null): void {
+    if (!petId) return;
+    this.petRound = createPetRound(this.level);
+    this.pet = new PetCompanion<Enemy>(
+      this,
+      getPet(petId),
+      petGearKeyFor(petId, petGearId),
+      this.player,
+    );
+    this.pet.setRound(this.petRound);
+  }
+
+  /** Weighted kills fill the pet bar (a boss counts PET_RULES.bossWeight); pet-changed on every change. */
+  private addPetKills(isBoss: boolean): void {
+    const round = this.petRound;
+    if (!round || this.ended) return;
+    const next = addPetXp(round, killWeight(isBoss));
+    if (next === round) return;
+    this.petRound = next;
+    this.pet?.setRound(next);
+    this.emitPet();
+  }
+
+  private emitPet(): void {
+    if (!this.petRound || !this.pet) return;
+    emitGameEvent(
+      this.events,
+      GameEvents.PetChanged,
+      petChangedPayload(this.pet.def.id, this.petRound),
+    );
+  }
+
+  /**
+   * Egg, hatch and fight on play time. Pet damage goes through damageEnemy (rewards, bar), healing through
+   * Player.heal. Only pool enemies are targets: bosses are not in the pool (like the fire ring, Q-23).
+   */
+  private updatePet(dt: number): void {
+    const pet = this.pet;
+    const round = this.petRound;
+    if (!pet || !round || this.player.isDead) return;
+    const targets = this.petTargets;
+    targets.length = 0;
+    for (const e of this.enemyPool.enemies) if (e.active) targets.push(e);
+    const world: PetWorld<Enemy> = {
+      player: this.player,
+      enemies: targets,
+      stats: petStats(pet.def, round.powerUps, this.player.stats.damage),
+      radiusOf: (e) => (e.body as Phaser.Physics.Arcade.Body | null)?.halfWidth ?? 0,
+      damage: (e, amount, flash) => {
+        if (e.active && !this.ended && amount > 0) this.damageEnemy(e, amount, flash);
+      },
+      slow: (e, effect) => e.applySlow(effect),
+      heal: (hp) => this.player.heal(hp),
+    };
+    pet.update(dt, world);
+  }
 
   private bindPlayerCallbacks(): void {
     this.player.callbacks.onHpChange = (hp, maxHp) =>
@@ -520,6 +599,7 @@ export class GameScene extends Phaser.Scene {
       coinChance: scaledDropChance(COIN_RULES.dropChance, scale),
     });
     if (this.blasts) this.pendingBlasts.push({ x, y });
+    this.addPetKills(false);
   }
 
   /**
@@ -573,6 +653,7 @@ export class GameScene extends Phaser.Scene {
     this.updateGearSets(dt);
     this.updateArmour(dt);
     this.syncGearOverlay(dt);
+    this.updatePet(dt);
     this.updateBoss(time, dt);
     this.updateParry(dt);
     this.spawnDrops();
@@ -781,6 +862,7 @@ export class GameScene extends Phaser.Scene {
     this.parryOverlay?.clear();
     this.sfx.play('sfx-boss-defeated');
     emitGameEvent(this.events, GameEvents.BossDefeated, { bossId });
+    this.addPetKills(true);
     this.round.bossDefeated();
   }
 
@@ -1177,6 +1259,11 @@ export class GameScene extends Phaser.Scene {
     this.gearOverlay = undefined;
     this.blasts?.destroy();
     this.blasts = undefined;
+    // Also after abortRound and "Nochmal": egg, pet, snowball pool, aura and hearts go with the round.
+    this.pet?.destroy();
+    this.pet = undefined;
+    this.petRound = null;
+    this.petTargets = [];
     this.background?.destroy();
     this.background = undefined;
     this.stick?.destroy();
