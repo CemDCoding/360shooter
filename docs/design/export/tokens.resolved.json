@@ -156,7 +156,18 @@
         "ember": "#ffb04a",
         "oasis-mote": "#d8ff8a",
         "ward": "#7ad8ff",
-        "aura": "#5fe0c0"
+        "aura": "#5fe0c0",
+        "tier-0": "#ffffff",
+        "tier-1": "#ffe8d8",
+        "tier-2": "#ffcfb0",
+        "tier-3": "#ffb088",
+        "parry-fill": "#060c05b8",
+        "parry-circle": "#a8d86b",
+        "parry-approach": "#e5f2d8",
+        "parry-perfect": "#ffcf4a",
+        "parry-good": "#a8d86b",
+        "parry-miss": "#ff8a7b",
+        "parry-burst": "#5fb8ff"
       }
     },
     "font": {
@@ -206,7 +217,14 @@
       "energy-segments": 10,
       "hud-slot": "40px",
       "hud-slot-gap": "8px",
-      "hud-slot-icon-scale": 3
+      "hud-slot-icon-scale": 3,
+      "parry-radius": "20px",
+      "parry-distance": "56px",
+      "parry-touch-slack": "4px",
+      "parry-line": "2px",
+      "parry-ring-start": 2.5,
+      "hud-timebar-h": "2px",
+      "hud-timebar-gap": "1px"
     },
     "motion": {
       "duration": {
@@ -216,7 +234,11 @@
         "blink": "500ms",
         "hit": "120ms",
         "store-flash": "200ms",
-        "trail": "300ms"
+        "trail": "300ms",
+        "parry-approach": "800ms",
+        "parry-feedback": "400ms",
+        "parry-burst": "600ms",
+        "timebar-warn": "5000ms"
       },
       "banner-blinks": 3,
       "easing": {

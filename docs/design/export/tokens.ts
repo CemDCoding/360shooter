@@ -157,7 +157,18 @@ export const tokens = {
       "ember": "var(--color-game-ember)",
       "oasis-mote": "var(--color-game-oasis-mote)",
       "ward": "var(--color-game-ward)",
-      "aura": "var(--color-game-aura)"
+      "aura": "var(--color-game-aura)",
+      "tier-0": "var(--color-game-tier-0)",
+      "tier-1": "var(--color-game-tier-1)",
+      "tier-2": "var(--color-game-tier-2)",
+      "tier-3": "var(--color-game-tier-3)",
+      "parry-fill": "var(--color-game-parry-fill)",
+      "parry-circle": "var(--color-game-parry-circle)",
+      "parry-approach": "var(--color-game-parry-approach)",
+      "parry-perfect": "var(--color-game-parry-perfect)",
+      "parry-good": "var(--color-game-parry-good)",
+      "parry-miss": "var(--color-game-parry-miss)",
+      "parry-burst": "var(--color-game-parry-burst)"
     }
   },
   "font": {
@@ -203,7 +214,14 @@ export const tokens = {
     "energy-segments": "var(--size-energy-segments)",
     "hud-slot": "var(--size-hud-slot)",
     "hud-slot-gap": "var(--size-hud-slot-gap)",
-    "hud-slot-icon-scale": "var(--size-hud-slot-icon-scale)"
+    "hud-slot-icon-scale": "var(--size-hud-slot-icon-scale)",
+    "parry-radius": "var(--size-parry-radius)",
+    "parry-distance": "var(--size-parry-distance)",
+    "parry-touch-slack": "var(--size-parry-touch-slack)",
+    "parry-line": "var(--size-parry-line)",
+    "parry-ring-start": "var(--size-parry-ring-start)",
+    "hud-timebar-h": "var(--size-hud-timebar-h)",
+    "hud-timebar-gap": "var(--size-hud-timebar-gap)"
   },
   "motion": {
     "duration": {
@@ -213,7 +231,11 @@ export const tokens = {
       "blink": "var(--motion-duration-blink)",
       "hit": "var(--motion-duration-hit)",
       "store-flash": "var(--motion-duration-store-flash)",
-      "trail": "var(--motion-duration-trail)"
+      "trail": "var(--motion-duration-trail)",
+      "parry-approach": "var(--motion-duration-parry-approach)",
+      "parry-feedback": "var(--motion-duration-parry-feedback)",
+      "parry-burst": "var(--motion-duration-parry-burst)",
+      "timebar-warn": "var(--motion-duration-timebar-warn)"
     },
     "banner-blinks": "var(--motion-banner-blinks)",
     "easing": {

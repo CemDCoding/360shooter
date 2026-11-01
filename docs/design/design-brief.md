@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** geändert am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“ in Arbeit, noch nicht freigegeben). Zuletzt freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand (2026-11-01):** H-33 Interview fertig (1a–4a, 5a, 6a). In Arbeit (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
+**Stand (2026-11-01):** H-33 fertig (1a–4a, 5a, 6a), Mockup, Tokens und Übergabe stehen. Wartet auf die Freigabe durch den Nutzer. Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
 **Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
@@ -427,5 +427,43 @@ Keine neuen Abhängigkeiten, Schriften oder Fremd-Assets.
 - 4a **Restzeit-Balken:** 2 px hoch (skaliert mit k), so breit wie der Chip, 1 px Abstand darunter. Füllung Phosphor auf dunkler Spur, in den letzten 5 s Warnrot. Kein Blinken.
 - 5a **Pause:** zwei Funk-Buttons mittig unter der Infozeile, „WEITER“ (Hauptaktion, Akzentrahmen, Fokus zuerst) und „HAUPTMENÜ“ (Linienrahmen). Hinweis gekürzt auf „ESC ODER P: WEITER“. Tippen auf freie Fläche setzt fort, Tippen auf die Buttons nicht.
 - 6a **Rückfrage:** vorhandener Kassetten-Dialog mit eigenen Texten: „RUNDE ABBRECHEN?“, „GOLD UND ERFAHRUNG DIESER RUNDE GEHEN VERLOREN.“, Buttons „WEITERSPIELEN“ (secondary, Fokus zuerst) und „RUNDE BEENDEN“ (danger). Der Kassetten-Stil zeigt den Rückweg ins Menü an (bewusste Ausnahme zu Grundsatz 2). Braucht optionale Button-Texte in `ConfirmDialog.ts` (heute fest „Ja, löschen“/„Abbrechen“).
+
+**Ergebnis:** Mockup `mockups/m7-quicktime-und-stufen.html` (Ansichten 1–7 und 3b), Screenshots `screenshots/m7-quicktime-und-stufen-desktop.png` und `-mobile.png`.
+
+**Quicktime-Kreis (`ParryOverlay`, Weltobjekt, skaliert nicht mit k):**
+
+| Teil | Wert |
+|---|---|
+| Kreis | Radius `size.parry-radius` 20 (Ø 40, etwa 44 pt am iPhone), Mittelpunkt im Abstand `size.parry-distance` 56 zur Mitte der Astronautin (Kreis endet bei 76, weit weg vom Stick ab x 490). Füllung `game.parry-fill` (Glas), Rand `size.parry-line` 2 px `game.parry-circle`, Nummer 1/2/3 Funk 2× `game.parry-circle`. Trefferfläche Radius + `size.parry-touch-slack` 4. |
+| Ring | 2 px `game.parry-approach`. Erscheint mit dem Kreis bei `hitAtMs − motion.duration.parry-approach` (800 ms, frühestens beim Start der Ankündigung, dann kürzer), Startradius × `size.parry-ring-start` 2,5, schrumpft **linear** auf den Kreisrand bei `hitAtMs`. Linear statt Pixel-Easing, weil das Timing ablesbar sein muss. |
+| PERFEKT | Rand `game.parry-perfect` mit Glühen, Pixel-Stern statt Nummer, Wort „PERFEKT“ |
+| GUT | Rand `game.parry-good`, Haken (7×7-Pixel, 2×) statt Nummer, Wort „GUT“ |
+| VERFEHLT | Rand **gestrichelt** `game.parry-miss`, Füllung weg, X statt Nummer, Wort „VERFEHLT“. Gilt auch für nicht angetippte Kreise nach `hitAtMs + goodWindowMs`. |
+| Wort | Funk 2× in der Gradfarbe auf Glasschild (`hud.glass`, 1-px-Rahmen in Gradfarbe, Innenabstand 3/4), Mitte radial **außen** am Kreis (Abstand Kreismitte 34, weg von der Astronautin), in der Arena gehalten. Steht `motion.duration.parry-feedback` 400 ms, dann verschwinden Kreis und Wort. |
+| PARRY! | Alle Kreise getroffen: „PARRY!“ Funk 3× `hud.text` auf Glasschild mit Rahmen `game.parry-burst`, 62 px über der Mitte; dazu Schildring 2 px `game.parry-burst` mit Fläche 15 %, wächst von Radius 20 auf 40. Dauer `motion.duration.parry-burst` 600 ms, Ton `sfx-parry`. |
+| Bewegung reduziert | Ring schrumpft trotzdem (er ist die Information), aber kein Glühen, kein Wachsen des Schildrings (bleibt bei 40) und kein Aufploppen der Wörter |
+| Tiefe | über Gegnern und Boss-Geschossen, unter dem HUD. Der rote Warnkreis der Ankündigung (`Telegraph`) bleibt darunter sichtbar. |
+
+**Gegnerstufen „Glut“:** `game.tier-0` `#ffffff` (= `clearTint`), `tier-1` `#ffe8d8`, `tier-2` `#ffcfb0`, `tier-3` `#ffb088` (ab Stufe 3), multiplikativ (`setTint`). Messung in Ansicht 4: Der Umriss (Nachtschwarz) bleibt unverändert. Der Körper behält bei `tier-3` auf jedem Boden mindestens 63 % seines Kontrasts aus Stufe 0 (schlechtester Fall Oase, Archäologe 4,75 → 2,99:1). Hinweis: Im Wald liegt der Körperkontrast schon bei Stufe 0 nur bei etwa 1,2:1 (Wildschwein). Dort trägt der Umriss die Lesbarkeit, die Tönung ändert daran fast nichts (1,16 → 1,11). Treffer-Blitz bleibt `game.hit-flash` 120 ms, danach zurück zur Stufen-Tönung.
+
+**Restzeit-Balken:** Glasstreifen (`hud.glass`) so breit wie der Doppelschuss-Chip, `size.hud-timebar-gap` 1 px unter dem Chip, darin 1 px Rand und der Balken `max(2, round(2k))` hoch (`size.hud-timebar-h`). Spur `hud.line-dim`, Füllung `hud.accent` von links, Länge = `doubleShotMsLeft / DOUBLE_SHOT_STAGE_MS`. Unter `motion.duration.timebar-warn` (5 s) Füllung `hud.danger`. Kein Blinken. Nur bei Stufe 1 und 2. Bei k = 1 ist der Streifen 4 px hoch, bei k = 1,36 5 px. Er hängt unter der Chip-Reihe (Oberkante bleibt `rowY`) und berührt nichts.
+
+**Pause:** von oben: „– PAUSE –“ (Funk 3× bzw. 4×) · 12 · Infozeile Funk `funkScale(1,k)` · 20 · Buttons · 14 · Hinweis „ESC ODER P: WEITER“. Buttons als FunkButton (Höhe `round(32k)`, Abstand 12, zusammen zentriert): „WEITER“ `primary` (Text `hud.accent`, Akzentrahmen, Fokus zuerst), „HAUPTMENÜ“ normal (Text `hud.text`). Bei k = 1 liegt die Gruppe bei y ≈ 112–252.
+
+**Neue Tokens:** `color.game.tier-0..3`, `game.parry-fill`, `-circle`, `-approach`, `-perfect`, `-good`, `-miss`, `-burst`; `size.parry-radius`, `-distance`, `-touch-slack`, `-line`, `-ring-start`, `size.hud-timebar-h`, `-gap`; `motion.duration.parry-approach`, `-feedback`, `-burst`, `timebar-warn`. 26 neue `$pairs`, `contrast.js --tokens` grün, Exporte (css, ts, json) neu gebaut.
+
+**Übergabe H-33 an den Planner:**
+
+| Datei / Paket | Änderung |
+|---|---|
+| AP-132 Theme-Sync | `npm run theme:build`; neue Tokens oben in `src/config/theme.ts`. Die `size.parry-*`-Werte sind Vorgaben für `PARRY_RULES` (`circleRadiusPx` 20, `distanceFromPlayerPx` 56, `ringStartScale` 2,5, Touch-Toleranz 4). |
+| AP-126 / AP-129 (Lücke im Vertrag) | `ParryRules` hat keine **Anlaufzeit des Rings**. Vorschlag: `approachMs` 800 (oder die Szene liest `motion.duration.parry-approach`). `minGapMs` ≥ 250 bleibt; Kreise einer Gruppe dürfen gleichzeitig sichtbar sein, die Nummern zeigen die Reihenfolge. |
+| AP-133 `ParryOverlay.ts` | nach Tabelle „Quicktime-Kreis“, Ansichten 1–3b |
+| AP-134 `Enemy.ts`/`createEnemy.ts` | Stufe → Token `game.tier-<min(tintStep,3)>`, Stufe 0 `clearTint()`; nach Treffer-Blitz und beim Pool zurück auf die Stufen-Tönung. Ansicht 4 |
+| AP-134 `PowerIndicators.ts`, `hudMath.ts` | Restzeit-Balken nach Absatz oben, Ansicht 5. `chipMetrics`-Test um die Streifenhöhe ergänzen |
+| AP-131 `HudScene.ts` (Pause) | zwei Buttons nach Absatz „Pause“, Ansicht 6. Tipps auf die Buttons beenden die Pause nicht |
+| AP-131 `ConfirmDialog.ts` | **Ausnahme von „nicht anfassen“ nötig:** optionale Button-Texte (z. B. `{ confirmLabel, cancelLabel }`, Vorgabe wie heute). Aufruf mit „RUNDE ABBRECHEN?\nGOLD UND ERFAHRUNG DIESER RUNDE GEHEN VERLOREN.“, „RUNDE BEENDEN“ (danger), „WEITERSPIELEN“ (Fokus). Ansicht 7. Der Dialog bleibt Kassette (Entscheidung 6a). |
+
+Keine neuen Sprites, Schriften oder Abhängigkeiten. Der Haken und das X sind 7×7-Pixel-Formen, im Code als Graphics-Rechtecke oder als zwei neue Frames in `ui-icons` (Wahl des Coders, Pixel in Ansicht 3). Design-Review für AP-131, AP-133 und AP-134 gegen `screenshots/m7-quicktime-und-stufen-desktop.png`. Handtest H-34: Kreise am iPhone mit dem Daumen treffbar, Wörter lesbar, Stufen im Gedränge unterscheidbar.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
