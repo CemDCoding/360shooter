@@ -138,7 +138,7 @@ Die Stufe 10 gilt fuer das Spiel-Level (0 bis 20), nicht fuers Spielerlevel (PE-
 | Dauerfeuer | 20 Schuesse/s (5-mal die Grundwaffe) fuer 4 Sekunden | `durationMs` 4000, `RAPID_FIRE_MAX_PER_SEC` |
 | Dauerfeuer-Anteil in Level 20 | etwa 20 % der Rundenzeit, Schaden im Mittel etwa 1,8-fach | bei 8 % Item-Drop, 30 von 100 Gewicht |
 
-Boss (PE-76, AP-68): Der Boss erscheint erst in den letzten 30 Sekunden der Runde (vorher 60 s). Die Gegner-Spawnrate wird nur in diesem Fenster halbiert. Wird der Boss besiegt, endet die Runde sofort mit Sieg.
+Boss (PE-76, AP-68): Der Boss erscheint erst in den letzten 30 Sekunden der Runde (vorher 60 s). Beim Boss-Auftritt verschwinden alle normalen Gegner, und im Boss-Kampf spawnt kein normaler Gegner nach, solange der Boss lebt (PE-137, Q-58). Wird der Boss besiegt, endet die Runde sofort mit Sieg.
 
 Was sich gegenueber AP-27 geaendert hat:
 
@@ -198,7 +198,7 @@ Begruendung des Faktors: Level 5 bis 20 hatten schon Luecken von hoechstens 1,13
 - **`MAX_ENEMIES`:** je Level x1,3 (Level 5: 40 auf 52, Level 20: 100 auf 130). Der Hoechstwert 130 ist +30 % ueber dem Hoechstwert nach AP-91 (100), das ist die Obergrenze aus RI-6; mehr wird nicht gebraucht. Level 0 bis 4 unveraendert (25 bis 37).
 - **Schwaechere Einzelgegner:** `hp` und `contact` 0,77 in allen Level 5 bis 20 (Baum 39, Hexe 15, Eichhoernchen 6, Waldgeist 8 Lebenspunkte, gerundet wie im Spiel), `xp` und `coin` 0,767 bis 0,776 (alte durch neue Gegnerzahl je Level, damit Gold und Erfahrung je Level gleich bleiben).
 - **Ergebnis:** Druck je Level aendert sich um hoechstens +0,01 (Level 20: 1,22 auf 1,23, Band 0,95 bis 1,25). Sprung 4 zu 5: +10,9 % (erlaubt bis 12 %), 9 zu 10: +9,5 % (erlaubt 8 bis 10 %), Schritte ab Level 6 hoechstens +9,5 %. Gold-Mittel ueber alle Level 46,0 (Band 43 bis 47), Stufe 10 einer Upgrade-Spur nach etwa 15,2 Leveln. Gesamt-Kontaktschaden je Level bleibt (Gegnerzahl mal `contact`).
-- **Boss-Fairness:** `BOSS_SPAWN_RATE_FACTOR` und die Boss-Konfiguration sind unveraendert; die Spawnrate in Boss-Phasen wird weiter halbiert (der Abstand ist aber kuerzer, die Phase hat also mehr normale Gegner als vor AP-95, immer begrenzt durch `maxEnemies`).
+- **Boss-Fairness:** `BOSS_SPAWN_RATE_FACTOR` und die Boss-Konfiguration sind unveraendert; im Boss-Kampf spawnen keine normalen Gegner mehr (PE-137, Q-58); `BOSS_SPAWN_RATE_FACTOR` ist im Spiel gegenstandslos.
 
 | Level | Spawns/Min vorher / nachher | Faktor | Abstand vorher / nachher (ms) | Max. Gegner vorher / nachher |
 |---|---|---|---|---|
