@@ -1,9 +1,7 @@
 {
   "name": "360shooter",
   "version": "0.1.0",
-  "directories": {
-    "doc": "docs"
-  },
+  "main": "build/desktop/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -18,7 +16,10 @@
     "theme:build": "node scripts/build-theme.mjs",
     "fonts:build": "node scripts/build-fonts.mjs",
     "sprites:build": "node scripts/build-sprites.mjs",
-    "preview:lan": "npm run build && vite preview --host"
+    "preview:lan": "npm run build && vite preview --host",
+    "desktop:icon": "node scripts/build-desktop-icon.mjs",
+    "desktop:build": "npm run build && tsc -p desktop && electron-builder --win portable",
+    "desktop:start": "tsc -p desktop && electron ."
   },
   "type": "module",
   "dependencies": {
@@ -26,6 +27,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "electron": "45.2.1",
+    "electron-builder": "26.18.0",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.10",
@@ -37,5 +40,34 @@
   "private": true,
   "engines": {
     "node": ">=24"
+  },
+  "build": {
+    "appId": "local.360shooter.desktop",
+    "productName": "360shooter",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "package.json",
+      "dist/**/*",
+      "build/desktop/**/*.js",
+      "!node_modules/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.exe"
+    }
   }
 }

@@ -4,7 +4,8 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   // Designer files (browser scripts, PE-62) are not part of the project code.
-  { ignores: ['dist/', 'node_modules/', 'docs/design/**'] },
+  // release/ and build/desktop/ are output of desktop:build (AP-121).
+  { ignores: ['dist/', 'node_modules/', 'docs/design/**', 'release/', 'build/desktop/'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   prettier,
@@ -31,6 +32,19 @@ export default tseslint.config(
           message: 'No system fonts here. Use the font tokens from src/config/theme.ts.',
         },
       ],
+    },
+  },
+  // Desktop shell (AP-121): Electron main process, runs in Node, not in the browser.
+  {
+    files: ['desktop/**/*.ts'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        Buffer: 'readonly',
+        console: 'readonly',
+        URL: 'readonly',
+        Response: 'readonly',
+      },
     },
   },
 );
