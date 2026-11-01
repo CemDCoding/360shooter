@@ -2,21 +2,31 @@ import Phaser from 'phaser';
 import { LEVELS, PROGRESSION } from '../config';
 import { ARENA } from '../config/arena';
 import { THEME } from '../config/theme';
-import { WEAPON_MOUNT } from '../config/weaponMount';
 import type { SaveGame } from '../contracts';
 import { levelForXp, xpForLevel } from '../logic/progression';
-import { weaponFrame, weaponStageForUpgrades } from '../logic/weaponMount';
 import { addMuteButton, getSoundService } from '../platform/audio';
 import { prefersReducedMotion } from '../platform/motion';
 import { loadSave, resetSave } from '../platform/storage';
 import { isValidLevelId } from './debug';
 import { insetContentOffset, liftForBottom, readSafeInsets } from './safeInsets';
 import { Button } from './menu/Button';
+import { openGearPanel } from './menu/GearPanel';
+import { GearPreview } from './menu/GearPreview';
+import { openShopPanel } from './menu/ShopPanel';
+import { CARD_FOCUS_ORDER, cardRows, stepCardFocus, suitLine, weaponLine } from './menu/homeLogic';
 import { ConfirmDialog } from './menu/ConfirmDialog';
 import { UpgradePanel } from './menu/UpgradePanel';
 import { GRID_HEIGHT, GRID_WIDTH, LevelGrid } from './menu/LevelGrid';
 import { LevelPager } from './menu/LevelPager';
-import { drawBar, drawBevel, drawDashedRule, kText, textWidth, type KText } from './menu/kassette';
+import {
+  drawBar,
+  drawBevel,
+  drawDashedRule,
+  drawRing,
+  kText,
+  textWidth,
+  type KText,
+} from './menu/kassette';
 import { isLevelUnlocked, pageCount, xpFraction } from './menu/levelGroups';
 import {
   PAGE_SLIDE_MS,
@@ -32,9 +42,6 @@ import {
   swipeDirection,
 } from './menu/menuLogic';
 
-const IDLE_ANIM = 'astronaut-idle';
-const MAX_SUM = 20;
-
 // Layout nach docs/design/mockups/hauptmenue.html (logische Pixel 640x360)
 const PROFILE = { x: 16, y: 52, w: 184, h: 252, pad: 12 };
 const GRID = { x: 216, y: 52 };
@@ -47,15 +54,11 @@ const NOTE_RIGHT = 56;
 const NOTE_Y = 22;
 
 /** Alle Waffen- und Anzug-Stufen als Summen für die Porträt-Karte. */
-function upgradeSums(save: SaveGame): { weapon: number; suit: number; stage: number } {
+function upgradeSums(save: SaveGame): { weapon: number; suit: number } {
   const u = save.upgrades;
   const weapon = (u?.weaponFireRate ?? 0) + (u?.weaponDamage ?? 0);
   const suit = (u?.playerMaxHp ?? 0) + (u?.playerTurnSpeed ?? 0);
-  const stage = weaponStageForUpgrades({
-    weaponFireRate: u?.weaponFireRate ?? 0,
-    weaponDamage: u?.weaponDamage ?? 0,
-  });
-  return { weapon, suit, stage };
+  return { weapon, suit };
 }
 
 export class MenuScene extends Phaser.Scene {
@@ -65,7 +68,18 @@ export class MenuScene extends Phaser.Scene {
   private goldLabel: KText | null = null;
   private weaponText: KText | null = null;
   private suitText: KText | null = null;
-  private weaponIcon: Phaser.GameObjects.Image | null = null;
+  private diamondText: KText | null = null;
+  private diamondShadow: KText | null = null;
+  private diamondIcon: Phaser.GameObjects.Image | null = null;
+  private preview: GearPreview | null = null;
+  private portraitRing: Phaser.GameObjects.Graphics | null = null;
+  private shopButton: Button | null = null;
+  private upgradeButton: Button | null = null;
+  /** Open shop or gear window (they destroy themselves through their close callback). */
+  private modal: Phaser.GameObjects.Container | null = null;
+  /** Keyboard focus on the card (index into CARD_FOCUS_ORDER), -1 = none. */
+  private cardFocus = -1;
+  private won: number[] = [];
   private starting = false;
   private grid: LevelGrid | null = null;
   private pager: LevelPager | null = null;
@@ -88,9 +102,12 @@ export class MenuScene extends Phaser.Scene {
   create(): void {
     this.dialog = null;
     this.panel = null;
+    this.modal = null;
+    this.cardFocus = -1;
     this.starting = false;
     getSoundService(this.game).reload();
     const save = loadSave();
+    this.won = [...(save.wonLevels ?? [])];
     // RS-02: centred 640 layout, kept out of the side insets; lifted if the lowest row (pager, reset) would reach the home bar.
     const ins = readSafeInsets(this.registry);
     this.ox = insetContentOffset(this.scale.width, ARENA.baseWidth, ins);
@@ -149,7 +166,15 @@ export class MenuScene extends Phaser.Scene {
       this.goldLabel = null;
       this.weaponText = null;
       this.suitText = null;
-      this.weaponIcon = null;
+      this.diamondText = null;
+      this.diamondShadow = null;
+      this.diamondIcon = null;
+      this.preview = null;
+      this.portraitRing = null;
+      this.shopButton = null;
+      this.upgradeButton = null;
+      this.modal?.destroy();
+      this.modal = null;
       this.grid = null;
       this.pager = null;
       this.maskShape?.destroy();
@@ -168,7 +193,13 @@ export class MenuScene extends Phaser.Scene {
       this.highest,
       (id) => this.pickLevel(id),
       page,
+      this.won,
     );
+  }
+
+  /** A dialog, the upgrade panel, the shop or the gear window is open. */
+  private blocked(): boolean {
+    return Boolean(this.dialog || this.panel || this.modal);
   }
 
   /** A tile tap only counts if the pointer did not travel like a swipe. */
@@ -190,13 +221,24 @@ export class MenuScene extends Phaser.Scene {
       pointer.downX <= x + GRID_WIDTH &&
       pointer.downY + this.lift >= GRID.y &&
       pointer.downY + this.lift <= GRID.y + GRID_HEIGHT;
-    if (!inside || this.dialog || this.panel) return;
+    if (!inside || this.blocked()) return;
     const dir = swipeDirection(pointer.upX - pointer.downX);
     if (dir !== 0) this.goToPage(stepPage(this.page, dir, this.pageTotal));
   };
 
   private readonly onKeyDown = (e: KeyboardEvent): void => {
-    if (this.dialog || this.panel) return;
+    if (this.blocked()) return;
+    if (e.code === 'Tab') {
+      e.preventDefault();
+      this.cardFocus = stepCardFocus(this.cardFocus, e.shiftKey ? -1 : 1);
+      this.applyCardFocus();
+      return;
+    }
+    if ((e.code === 'Enter' || e.code === 'Space') && this.cardFocus >= 0) {
+      e.preventDefault();
+      this.activateCard(CARD_FOCUS_ORDER[this.cardFocus]);
+      return;
+    }
     if (e.code !== 'ArrowLeft' && e.code !== 'ArrowRight') return;
     this.pager?.showFocus();
     this.goToPage(stepPage(this.page, e.code === 'ArrowLeft' ? -1 : 1, this.pageTotal));
@@ -215,7 +257,7 @@ export class MenuScene extends Phaser.Scene {
   /** Turns to a page: 4 steps over 200 ms, instantly with reduced motion. */
   private goToPage(target: number): void {
     const next = clampPage(target, this.pageTotal);
-    if (this.sliding || next === this.page || this.dialog || this.panel || !this.grid) return;
+    if (this.sliding || next === this.page || this.blocked() || !this.grid) return;
     const dir: 1 | -1 = next > this.page ? 1 : -1;
     const old = this.grid;
     const baseX = this.ox + GRID.x;
@@ -313,10 +355,8 @@ export class MenuScene extends Phaser.Scene {
     g.fillStyle(THEME.colors['menu.surface-lo'].num)
       .fillRect(px, py, 64, 2)
       .fillRect(px, py, 2, 64);
-    if (this.textures.exists('astronaut')) {
-      const astronaut = this.add.sprite(px + 32, py + 32, 'astronaut').setScale(2);
-      if (this.ensureIdleAnim() && !prefersReducedMotion()) astronaut.play(IDLE_ANIM);
-    }
+    this.buildPreview(save, px + 32, py + 32);
+    this.drawPortraitButton(px, py);
 
     const level = Math.max(save.playerLevel, levelForXp(save.playerXp, PROGRESSION));
     const base = xpForLevel(level, PROGRESSION);
@@ -334,73 +374,167 @@ export class MenuScene extends Phaser.Scene {
     drawDashedRule(g, left, ruleY, innerW, 'menu.surface-hi');
 
     // Gold
-    const goldY = ruleY + 2 + 8 + 8;
+    const { goldY, weaponY, shopY, upgradesY: upY } = cardRows(y, h, pad);
     if (this.textures.exists('coin-small'))
       this.add.image(left + 8, goldY, 'coin-small', 0).setScale(2);
     this.goldText = kText(this, left + 22, goldY - 7, String(save.gold ?? 0), 2, 'menu.gold');
     this.goldLabel = kText(this, 0, goldY - 3, 'Gold', 1, 'menu.text-muted');
+    // Diamanten rechts in derselben Zeile: Raute 2x, Zahl 2x mit Schatten
+    this.diamondShadow = kText(this, right + 2, goldY - 7 + 2, '0', 2, 'menu.outline', 1, 0);
+    this.diamondText = kText(this, right, goldY - 7, '0', 2, 'menu.diamond', 1, 0);
+    if (this.textures.exists('diamond'))
+      this.diamondIcon = this.add.image(0, goldY, 'diamond', 0).setScale(2);
 
-    // Waffe und Anzug
+    // Waffe und Anzug in einer Zeile
     const sums = upgradeSums(save);
-    const weaponY = goldY + 8 + 10 + 8;
-    if (this.textures.exists('weapon-raygun')) {
-      this.weaponIcon = this.add.image(
-        left + WEAPON_MOUNT.frame.width / 2,
-        weaponY,
-        'weapon-raygun',
-        weaponFrame(sums.stage, 0),
-      );
-    }
-    kText(this, left + WEAPON_MOUNT.frame.width + 5, weaponY - 3, 'Waffe', 1, 'menu.text-muted');
-    this.weaponText = kText(
-      this,
-      right,
-      weaponY - 3,
-      `${sums.weapon} / ${MAX_SUM}`,
-      1,
-      'menu.text',
-      1,
-      0,
-    );
-    const suitY = weaponY + 8 + 6 + 4;
-    kText(this, left, suitY - 3, 'Anzug', 1, 'menu.text-muted');
+    this.weaponText = kText(this, left, weaponY - 3, weaponLine(sums.weapon), 1, 'menu.text-muted');
     this.suitText = kText(
       this,
       right,
-      suitY - 3,
-      `${sums.suit} / ${MAX_SUM}`,
+      weaponY - 3,
+      suitLine(sums.suit),
       1,
-      'menu.text',
+      'menu.text-muted',
       1,
       0,
     );
-    this.placeGoldLabel();
 
-    new Button(this, x + w / 2, y + h - pad - 16, 'Upgrades', () => this.openUpgrades(), {
+    // SHOP (sekundär) über UPGRADES (primär), 12 Abstand, Tab-Reihenfolge: Porträt, SHOP, UPGRADES
+    const leading = this.textures.exists('diamond') ? { key: 'diamond', frame: 0 } : undefined;
+    this.shopButton = new Button(this, x + w / 2, shopY, 'Shop', () => this.openShop(), {
+      variant: 'secondary',
+      width: innerW,
+      leading,
+    });
+    this.upgradeButton = new Button(this, x + w / 2, upY, 'Upgrades', () => this.openUpgrades(), {
       variant: 'primary',
       width: innerW,
     });
+    this.setDiamonds(save.diamonds ?? 0);
+  }
+
+  /** Porträt der Karte: Astronautin mit Rüstung und aktivem Pet (Ruhe-Animation steckt in GearPreview). */
+  private buildPreview(save: SaveGame, cx: number, cy: number): void {
+    this.preview?.destroy();
+    const pet = save.activePet ?? null;
+    this.preview = new GearPreview(this, cx, cy, {
+      scale: 2,
+      equipped: save.equippedGear,
+      pet,
+      petGear: pet ? (save.petGear?.[pet] ?? null) : null,
+    });
+    this.preview.setSize(64, 64);
+  }
+
+  /** Das ganze Porträt ist der Knopf; Aufkleber „ÄNDERN“ überlappt die untere rechte Ecke. */
+  private drawPortraitButton(px: number, py: number): void {
+    const open = (): void => this.openGear();
+    const stickerG = this.add.graphics().setDepth(2);
+    const label = kText(this, 0, 0, 'Ändern', 1, 'menu.sticker-fg');
+    label.setDepth(2);
+    const hasIcon = this.textures.exists('ui-icons-m8');
+    const sw = 5 + (hasIcon ? 8 + 4 : 0) + textWidth(label) + 5;
+    const sh = 14;
+    const sx = px + 64 + 8 - sw;
+    const sy = py + 64 - 8;
+    stickerG.fillStyle(THEME.colors['menu.outline'].num).fillRect(sx, sy, sw + 4, sh + 4);
+    stickerG.fillStyle(THEME.colors['menu.outline'].num).fillRect(sx + 2, sy + 2, sw + 4, sh + 4);
+    stickerG.fillStyle(THEME.colors['menu.sticker-bg'].num).fillRect(sx, sy, sw, sh);
+    let tx = sx + 5;
+    if (hasIcon) {
+      this.add
+        .image(tx + 4, sy + sh / 2, 'ui-icons-m8', 0)
+        .setTint(THEME.colors['menu.sticker-fg'].num)
+        .setDepth(2);
+      tx += 8 + 4;
+    }
+    label.setPosition(tx, sy + 4);
+    const tap = (x: number, y: number, w: number, h: number): void => {
+      const zone = this.add
+        .zone(x + w / 2, y + h / 2, w, h)
+        .setDepth(2)
+        .setInteractive({ useHandCursor: true });
+      zone.on('pointerup', open);
+    };
+    tap(px, py, 64, 64);
+    tap(sx, sy, sw, sh);
+    this.portraitRing = this.add.graphics().setDepth(3);
+    this.portraitRing.setData('rect', { x: px, y: py });
+  }
+
+  /** Fokus-Ringe (Porträt in eigener Ebene, Gap 0) und Knopf-Fokus nach der Tab-Reihenfolge. */
+  private applyCardFocus(): void {
+    const ring = this.portraitRing;
+    const at = ring?.getData('rect') as { x: number; y: number } | undefined;
+    if (ring && at) {
+      ring.clear();
+      if (CARD_FOCUS_ORDER[this.cardFocus] === 'portrait')
+        drawRing(ring, at.x, at.y, 64, 64, 0, 'menu.focus');
+    }
+    this.shopButton?.setFocused(CARD_FOCUS_ORDER[this.cardFocus] === 'shop');
+    this.upgradeButton?.setFocused(CARD_FOCUS_ORDER[this.cardFocus] === 'upgrades');
+  }
+
+  private activateCard(target: (typeof CARD_FOCUS_ORDER)[number] | undefined): void {
+    if (target === 'portrait') this.openGear();
+    else if (target === 'shop') this.openShop();
+    else if (target === 'upgrades') this.openUpgrades();
+  }
+
+  /** Diamanten-Zähler rechts in der Goldzeile, rechtsbündig; „GOLD“ weicht, wenn es eng wird. */
+  private setDiamonds(n: number): void {
+    const text = String(Math.max(0, Math.floor(n)));
+    this.diamondText?.setText(text);
+    this.diamondShadow?.setText(text);
+    if (this.diamondText && this.diamondIcon) {
+      const left = this.diamondText.x - textWidth(this.diamondText) - 4;
+      this.diamondIcon.setX(Math.round(left - this.diamondIcon.displayWidth / 2));
+    }
+    this.placeGoldLabel();
   }
 
   /** „GOLD“ steht rechts neben der Zahl, auch wenn die Zahl nach einem Kauf kürzer oder länger wird. */
   private placeGoldLabel(): void {
     if (!this.goldText || !this.goldLabel) return;
-    this.goldLabel.setX(Math.round(this.goldText.x + textWidth(this.goldText) + 6));
+    const x = Math.round(this.goldText.x + textWidth(this.goldText) + 6);
+    this.goldLabel.setX(x);
+    const limit = this.diamondIcon
+      ? this.diamondIcon.x - this.diamondIcon.displayWidth / 2 - 4
+      : Infinity;
+    this.goldLabel.setVisible(x + textWidth(this.goldLabel) <= limit);
   }
 
-  /** Nach einem Kauf: Gold, Waffen- und Anzug-Summe und Waffen-Symbol der Ausbaustufe neu setzen. */
+  /** Nach einem Kauf oder einer Änderung: Gold, Diamanten, Summen, Waffen-Symbol und Porträt neu setzen. */
   private refreshProfile(): void {
     const save = loadSave();
     const sums = upgradeSums(save);
     this.goldText?.setText(String(save.gold ?? 0));
-    this.placeGoldLabel();
-    this.weaponText?.setText(`${sums.weapon} / ${MAX_SUM}`);
-    this.suitText?.setText(`${sums.suit} / ${MAX_SUM}`);
-    this.weaponIcon?.setFrame(weaponFrame(sums.stage, 0));
+    this.setDiamonds(save.diamonds ?? 0);
+    this.weaponText?.setText(weaponLine(sums.weapon));
+    this.suitText?.setText(suitLine(sums.suit));
+    const p = this.preview;
+    if (p) this.buildPreview(save, p.x, p.y);
+  }
+
+  private openShop(): void {
+    if (this.blocked()) return;
+    this.modal = openShopPanel(this, () => this.closeModal());
+  }
+
+  private openGear(): void {
+    if (this.blocked()) return;
+    this.modal = openGearPanel(this, () => this.closeModal());
+  }
+
+  /** Schließt Shop oder Ausrüstung (zerstört das Fenster, hebt seine Tastatur-Listener auf) und zeichnet die Karte neu. */
+  private closeModal(): void {
+    this.modal?.destroy();
+    this.modal = null;
+    this.refreshProfile();
   }
 
   private openUpgrades(): void {
-    if (this.dialog || this.panel) return;
+    if (this.blocked()) return;
     this.panel = new UpgradePanel(
       this,
       () => this.refreshProfile(),
@@ -411,28 +545,15 @@ export class MenuScene extends Phaser.Scene {
     );
   }
 
-  private ensureIdleAnim(): boolean {
-    if (!this.textures.exists('astronaut')) return false;
-    if (!this.anims.exists(IDLE_ANIM)) {
-      this.anims.create({
-        key: IDLE_ANIM,
-        frames: this.anims.generateFrameNumbers('astronaut', { start: 0, end: 1 }),
-        frameRate: 3,
-        repeat: -1,
-      });
-    }
-    return true;
-  }
-
   private startLevel(levelId: number, highestUnlocked: number): void {
-    if (this.starting || this.dialog || this.panel) return;
+    if (this.starting || this.blocked()) return;
     if (!isValidLevelId(levelId) || !isLevelUnlocked(levelId, highestUnlocked)) return;
     this.starting = true;
     this.scene.start('GameScene', { levelId });
   }
 
   private askReset(): void {
-    if (this.dialog || this.panel) return;
+    if (this.blocked()) return;
     this.dialog = new ConfirmDialog(
       this,
       'Wirklich löschen?\nAuch Gold und Upgrades werden gelöscht.',

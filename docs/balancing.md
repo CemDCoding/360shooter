@@ -496,6 +496,43 @@ weiter nur HP und Kontakt.
 - `MAX_ENEMIES` hoechstens 250, Abstand mindestens 150 ms, HP-Aufschlag = gewuenscht durch moeglich.
 - Gold und Erfahrung je gewonnener Runde im Band ±10 % um den Stand vor AP-127.
 
+## Diamanten, Shop, Ruestung, Pets (M8, AP-136, AP-145, PE-166 bis PE-179)
+
+Alle Zahlen stehen nur im Code (`config/shop.ts`, `config/gear.ts`, `config/pets.ts`); dieser Abschnitt liest sie ab. Alle Werte sind Startwerte fuer den Handtest M8-DEP (H-36).
+
+**Diamanten:** Der erste Sieg eines Levels bringt 1 Diamant, das letzte Level jeder Map (4, 9, 20, 25, 30, 40) bringt 3 (`DIAMOND_RULES`, die Map-Enden werden aus den Batch-Starts abgeleitet). Bis Level 40 sind das 35 + 6 * 3 = 53 Diamanten. Zweiter Sieg und Niederlage geben nichts. Alte Staende bekommen die Diamanten einmal rueckwirkend (alle Level unter dem hoechsten freien gelten als gewonnen, das hoechste freie nicht). Die Hauptmenue-Kachel traegt den Diamant-Haken, wenn das Level in `wonLevels` steht.
+
+**Preise:**
+
+| Artikel | Anzahl | Preis | Summe |
+|---|---|---|---|
+| Pet-Ei (Biene, Pinguin, Capybara) | 3 | 5 | 15 |
+| Ruestungsteil (3 Sets mal Kopf, Oberteil, Hose+Schuhe) | 9 | 3 | 27 |
+| Pet-Ruestung (3 Pets mal 3 Sets) | 9 | 2 | 18 |
+| Alles zusammen | 21 | | **60** |
+
+Verdienbar sind bis Level 40 nur 53 Diamanten, 7 fehlen zum Komplettkauf: man muss auswaehlen (PE-172, PE-173). Diamanten sind reine Spielwaehrung (PE-177).
+
+**Ruestung (PE-169):**
+
+| Set | Teil | Wert | Spezialeffekt |
+|---|---|---|---|
+| Diamant | Kristallhelm | +10 Leben | 10 % Block |
+| Diamant | Kristallpanzer | 10 % weniger Schaden | Dornen 10 |
+| Diamant | Kristallstiefel | +10 Leben | Rueckstoss 24 px |
+| Hoelle | Teufelshoerner | +10 % Schaden | 10 % Krit (doppelter Schaden) |
+| Hoelle | Glutpanzer | +10 % Schaden | Brand 3 s, 5 Schaden/s |
+| Hoelle | Lavastiefel | +5 % Schaden | Explosion Radius 40 px, 15 Schaden |
+| Himmel | Heiligenschein | +10 % Drehtempo | doppelte Heilung |
+| Himmel | Engelsweste | +10 % Feuerrate | Schuss durchschlaegt 1 weiteres Ziel |
+| Himmel | Wolkenstiefel | +10 % Drehtempo | Magnet und Item-Dauer 1,5-fach |
+
+Set-Effekt bei allen drei Teilen: Diamant = alle 30 s ein Block, Hoelle = alle 20 s ein Feuerring fuer 3 s, Himmel = 1 Leben alle 2 s.
+
+**Pets (PE-170):** Pets sind unverwundbar. Biene: 220 px/s, Stich 40 % des Laserschadens, 2,5 Stiche/s. Pinguin: Schneeball alle 0,9 s, 120 % des Laserschadens, 40 % langsamer fuer 1,5 s. Capybara: Aura Radius 70 px, 50 % des Laserschadens je Sekunde, 30 % langsamer, heilt 2 Leben alle 10 s.
+
+**Pet-Leiste (PE-179):** Das Pet startet jede Runde als Ei. Besiegte Gegner fuellen die Leiste (ein Boss zaehlt wie 10 Gegner, `bossWeight`). Die erste volle Leiste (15 % der erwarteten Gegner der Runde, `hatchFraction` 0,15) laesst das Pet schluepfen, jede weitere Leiste (25 %, `powerUpFraction` 0,25) gibt ein Power-up bis Rundenende, hoechstens 3 (`maxPowerUps`). Jedes Power-up macht Schaden und Tempo 1,3-fach; Zusatzboni: zweite Biene, Schneeball-Radius 1,5-fach, Aura-Radius 1,3-fach.
+
 ## Nachjustieren: Beispiele
 
 - Level 0 zu schwer: in `levels.ts` den Faktor von Level 0 (`COUNT_RAMP`) senken oder in `scaling.ts` `hp` von Level 0 senken; der Test verlangt mindestens 1,4-mal den Druck vor AP-127.
