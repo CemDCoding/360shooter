@@ -51,6 +51,7 @@ import {
   rollArmourDrop,
   tickArmour,
 } from '../logic/armour';
+import { clearForBoss, shouldSpawnNormalEnemies } from '../logic/bossClear';
 import { rollCoinDrop } from '../logic/coins';
 import {
   DEFAULT_ENEMY_SCALE,
@@ -454,9 +455,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnEnemies(dt: number): void {
+    const bossAlive = this.boss !== undefined && !this.bossDefeatedFlag;
+    // Q-58: no normal spawns while the boss lives.
+    if (!shouldSpawnNormalEnemies(bossAlive)) return;
     let alive = 0;
     for (const e of this.enemyPool.enemies) if (e.active) alive += 1;
-    const bossAlive = this.boss !== undefined && !this.bossDefeatedFlag;
     for (const req of this.spawner.tick(dt, alive, bossAlive)) {
       const p = pointOnRing(req.angle, req.radius, this.center.x, this.center.y);
       this.spawnScaled(req.enemyId, p.x, p.y, this.levelScale);
@@ -522,7 +525,13 @@ export class GameScene extends Phaser.Scene {
     if (phase === 'active' && !this.bossSpawned) this.spawnBoss(bossId);
   }
 
+  /** PE-137: boss appearance despawns all normal enemies and their bolts, no kill and no reward. */
+  private clearNormalEnemiesForBoss(): void {
+    clearForBoss(this.enemyPool.enemies, this.boltPool.bolts);
+  }
+
   private spawnBoss(bossId: NonNullable<LevelDef['bossId']>): void {
+    this.clearNormalEnemiesForBoss();
     this.bossSpawned = true;
     this.bossInvulnerable = false;
     const boss = createBoss(this, bossId, this.level.id, {
