@@ -86,7 +86,7 @@ Tipp: Öffne zuerst die vorhandene Datei. So siehst du, wie die Frames angeordne
 
 ### So entstehen die Sprites
 
-Die 45 Sprites sind **keine Platzhalter**. Sie entstehen aus den Pixeldaten des Designers: `docs/design/assets/sprites.js` (Figuren, Waffe, Symbole) `docs/design/assets/sprites-world.js` (Welt, Kacheln) und `docs/design/assets/sprites-desert.js` (Wüste: Gegner, Bosse, Kacheln). Zum Ändern bearbeitest du diese Dateien und tippst dann:
+Die 82 Sprites sind **keine Platzhalter**. Sie entstehen aus den Pixeldaten des Designers: `docs/design/assets/sprites.js` (Figuren, Waffe, Symbole) `docs/design/assets/sprites-world.js` (Welt, Kacheln) und `docs/design/assets/sprites-desert.js` (Wüste: Gegner, Bosse, Kacheln) und `docs/design/assets/sprites-m8.js` (Shop, Rüstungsteile, Pets, Eier, Pet-Rüstungen, Diamant, Effekte). Zum Ändern bearbeitest du diese Dateien und tippst dann:
 
 ```
 npm run sprites:build

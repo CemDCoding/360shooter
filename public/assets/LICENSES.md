@@ -51,6 +51,43 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sprites/tiles-desert.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/tiles-pyramids.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | sprites/tiles-oasis.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-desert.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-diamond-head.png     | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-diamond-body.png     | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-diamond-legs.png     | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-hell-head.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-hell-body.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-hell-legs.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-heaven-head.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-heaven-body.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-heaven-legs.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-icons.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-diamond-glint.png    | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-burn.png             | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/gear-blast.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-bee.png               | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-penguin.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-capybara.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-bee-diamond.png   | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-bee-hell.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-bee-heaven.png    | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-penguin-diamond.png| eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-penguin-hell.png  | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-penguin-heaven.png| eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-capybara-diamond.png| eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-capybara-hell.png | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-capybara-heaven.png| eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/petgear-icons.png         | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/egg-bee.png               | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/egg-penguin.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/egg-capybara.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-hatch.png             | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-snowball.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-sting.png             | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-steam.png             | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/pet-heal.png              | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/diamond.png               | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/diamond-marker.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
+| sprites/ui-icons-m8.png           | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m8.js`, erzeugt mit `npm run sprites:build`) | eigene Arbeit des Projekts |
 | fonts/astro-kapsel.png, .xml      | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | fonts/astro-funk.png, .xml        | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | sounds/laser.wav                  | selbst erzeugt                                                                                                                    | selbst erzeugt             |

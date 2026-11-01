@@ -59,7 +59,7 @@ describe('build-sprites', () => {
   const sprites = loadSprites();
 
   it('loads exactly the sprites of the manifest with matching geometry', () => {
-    expect(defs).toHaveLength(45);
+    expect(defs).toHaveLength(82);
     expect([...SPRITE_KEYS].sort()).toEqual(defs.map((d) => d.key).sort());
     for (const def of defs) {
       const s = sprites[def.key] as Sprite;
