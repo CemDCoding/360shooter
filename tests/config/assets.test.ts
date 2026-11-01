@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ASSETS } from '../../src/config/assets';
+import { GEAR_PIECES } from '../../src/config/gear';
+import { PETS } from '../../src/config/pets';
+import { SHOP_ITEMS } from '../../src/config/shop';
 
 // Kein @types/node im Projekt: minimale Typen fuer node:fs (Variable verhindert Typaufloesung).
 interface Bytes {
@@ -20,13 +23,23 @@ const readFileSync = (rel: string): Bytes =>
   fs.readFileSync(new URL(`../../public/${rel}`, import.meta.url));
 
 describe('asset manifest', () => {
+  it('has a texture for every shop item and pet (AP-140)', () => {
+    const keys = new Set(ASSETS.map((a) => a.key));
+    for (const item of SHOP_ITEMS) expect(keys.has(item.id), item.id).toBe(true);
+    for (const g of GEAR_PIECES) expect(keys.has(g.id), g.id).toBe(true);
+    for (const p of PETS) {
+      expect(keys.has(`pet-${p.id}`), p.id).toBe(true);
+      expect(keys.has(`egg-${p.id}`), p.id).toBe(true);
+    }
+  });
+
   it('has unique keys and unique paths', () => {
     expect(new Set(ASSETS.map((a) => a.key)).size).toBe(ASSETS.length);
     expect(new Set(ASSETS.map((a) => a.path)).size).toBe(ASSETS.length);
   });
 
-  it('has 45 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
-    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(45);
+  it('has 82 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
+    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(82);
     const expected: Record<string, [number, number, number]> = {
       'enemy-mummy': [32, 32, 4],
       'mummy-wrap': [16, 8, 2],
