@@ -22,7 +22,7 @@ import type { BossHazard } from './hazards';
 import { rimRadii } from './rim';
 import { Telegraph } from './Telegraph';
 import { WormSpike } from './WormSpike';
-import { OUTLINE_COLOR, SAND_COLOR, SPARK_COLOR } from './wormStyle';
+import { OUTLINE_COLOR, SAND_COLOR, SPARK_COLOR, UNDERSAND_ALPHA } from './wormStyle';
 
 const T = BOSS_TUNING.giantSandWorm;
 const BODY_KEY = 'boss-sand-worm-body';
@@ -69,7 +69,7 @@ interface Coil {
  * Boss "Riesen-Sand-Wurm" (desert 21-25, AP-100, PE-128). A head (`boss-sand-worm`) with a chain of body links
  * (`boss-sand-worm-body`, about 22 px apart, the last one shows the tail tip) roams on a path around the player.
  * Attacks (all announced at least MIN_TELEGRAPH_MS, all with counterplay, PE-75):
- * - burrow: dives (invulnerable, head hidden, boss bar IMMUN), a sand trail of horizontal strokes wanders to a
+ * - burrow: dives (invulnerable, head dimmed and links hidden, boss bar IMMUN), a sand trail of horizontal strokes wanders to a
  *   point beside the player that is announced with a warning circle. Lasers on the sand mound weaken the
  *   break-out; it hurts once and only inside the announced circle.
  * - spikeVolley: warning lines, then a fan of skin spikes (shootable, at least MIN_REACTION_MS of flight).
@@ -137,6 +137,7 @@ export class GiantSandWorm extends BossBase {
     this.trail?.clear();
     for (const l of this.links ?? []) l.setVisible(false);
     this.resetState();
+    this.setAlpha(1);
   }
 
   /** Spikes, sand mound, break-out and body links for the generic hit path of the scene (PE-134). */
@@ -165,6 +166,7 @@ export class GiantSandWorm extends BossBase {
 
   protected override onSpawn(): void {
     this.resetState();
+    this.setAlpha(1);
     this.setVelocity(0, 0);
     this.setImmovable(true);
     const head = { x: this.x, y: this.y };
@@ -275,6 +277,11 @@ export class GiantSandWorm extends BossBase {
     const dive = this.dive;
     if (dive) {
       dive.elapsedMs += dt;
+      // The dimmed head rides the mound; with reduced motion it rests at the break-out point.
+      if (!this.reduced) {
+        const m = this.moundPoint(dive);
+        this.setPosition(m.x, m.y);
+      }
       this.drawTrail(dive);
       return;
     }
@@ -343,7 +350,7 @@ export class GiantSandWorm extends BossBase {
   private placeLinks(): void {
     const links = this.links;
     if (!links) return;
-    const visible = this.active && this.linksVisible();
+    const visible = this.linksVisible();
     links.forEach((link, i) => {
       const p = this.linkPos[i];
       if (!p) return;
@@ -357,9 +364,9 @@ export class GiantSandWorm extends BossBase {
     return (i + wiggle) % 2;
   }
 
-  /** Links show unless the worm is under the sand; a running coil stays visible. */
+  /** Links show unless the worm is under the sand (a dive beats a running coil); one source for look and hitbox. */
   private linksVisible(): boolean {
-    return this.coil !== null || this.dive === null;
+    return this.active && this.dive === null;
   }
 
   // --- burrow ---
@@ -371,10 +378,11 @@ export class GiantSandWorm extends BossBase {
     const from = { x: this.x, y: this.y };
     const to = emergePoint(this.center, from, T.burrow.emergeDistance);
     this.dive = { from, to, totalMs: telegraphMs, elapsedMs: 0, hitsLeft: T.burrow.moundHits };
-    // Under the sand: invulnerable (boss bar IMMUN), head hidden, no body for lasers or contact.
+    // Under the sand: invulnerable (boss bar IMMUN), only the dimmed head shows, no body for lasers or contact.
     this.invulnerable = true;
     this.disableBody(false, false);
-    this.setVisible(false);
+    this.setAlpha(UNDERSAND_ALPHA).setVisible(true);
+    if (this.reduced) this.setPosition(to.x, to.y);
     this.track(Telegraph.circle(this.scene, to.x, to.y, T.burrow.eruptRadius, telegraphMs));
     this.drawTrail(this.dive);
   }
@@ -387,6 +395,7 @@ export class GiantSandWorm extends BossBase {
     const { to } = dive;
     this.invulnerable = false;
     this.enableBody(true, to.x, to.y, true, true);
+    this.setAlpha(1);
     this.eruption = {
       x: to.x,
       y: to.y,
