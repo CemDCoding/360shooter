@@ -91,7 +91,7 @@ describe('levels', () => {
     }
   });
 
-  it('keeps the spawn interval and max enemies of level 0 to 20 unchanged (AP-97)', () => {
+  it('keeps the spawn interval and max enemies of level 0 to 20 unchanged (AP-97, AP-113)', () => {
     expect(LEVELS.slice(0, 21).map((l) => l.spawnIntervalMs)).toEqual(OLD_INTERVALS);
     expect(LEVELS.slice(0, 21).map((l) => l.maxEnemies)).toEqual(OLD_MAX);
   });
@@ -104,9 +104,17 @@ describe('levels', () => {
         expect(w('zombieSquirrel') / w('cursedTree'), `level ${l.id}`).toBeCloseTo(0.8, 9);
       }
       if (l.id >= 10) expect(w('forestSpirit') / w('cursedTree')).toBeCloseTo(0.4, 9);
-      // Boar, bear and fairy come with small weights (at most 10 % of the trees each).
-      for (const id of ['boar', 'bear', 'fairy'] as const) {
-        expect(w(id), `${id} level ${l.id}`).toBeLessThanOrEqual(w('cursedTree') * 0.1);
+      // Boar, bear and fairy: pool shares of AP-113 (PE-136, Q-56) are at least twice the old ones.
+      const total = l.enemyPool.reduce((s, e) => s + e.weight, 0);
+      const oldShare: Partial<Record<EnemyId, number>> =
+        l.batch === 'forest'
+          ? { boar: 0.024, bear: 0.024 }
+          : l.batch === 'forestNight'
+            ? { boar: 0.007, bear: 0.007, fairy: 0.041 }
+            : { fairy: 0.009 };
+      for (const [id, before] of Object.entries(oldShare) as [EnemyId, number][]) {
+        expect(w(id) / total, `${id} level ${l.id}`).toBeGreaterThanOrEqual(before * 2);
+        expect(w(id) / total, `${id} level ${l.id}`).toBeLessThanOrEqual(0.12);
       }
     }
   });

@@ -3,6 +3,8 @@
 // Die Faktoren sind das Verhaeltnis alte zu neue Gegnerzahl, sodass Druck, Gold, Erfahrung und
 // Kontaktschaden je Level gleich bleiben (Q-51). Der Baum hat 50 Lebenspunkte, hp * 50 ist ganzzahlig.
 // AP-105: hp in Level 0 bis 4 um einen Baum-Lebenspunkt gesenkt, das gleicht Wildschwein und Baer aus (PE-125).
+// AP-113 (PE-136): Wildschwein, Baer und Fee erscheinen deutlich haeufiger; hp, xp und coin sind neu eingestellt, contact
+// ist wegen des Einmaltreffers (AP-112) doppelt so hoch (CONTACT_COMPENSATION).
 // Level 5 bis 20 (AP-95): etwa 1,3-mal so viele Gegner, hp und contact 0,77, xp und coin = alte durch neue Gegnerzahl.
 // Level 21 bis 40 (AP-105, PE-129): die Gegner selbst werden staerker (hp ueber 0,77 hinaus).
 // Erklaerung in docs/balancing.md.
@@ -13,18 +15,35 @@ export interface LevelScaling {
   contact: number;
 }
 
+/**
+ * Ausgleichsfaktor auf `contact` (AP-113, PE-135, Q-56): Kontakt-Gegner treffen nur noch einmal mit
+ * `CONTACT_HIT_SECONDS` (0,5 s) statt wie bisher im Mittel etwa 1 s. Damit sich der Druck gleich anfuehlt, ist
+ * `contact` in allen Leveln doppelt so hoch.
+ */
+export const CONTACT_COMPENSATION = 2;
+
+/**
+ * Level 0 bis 4 (AP-91, AP-113): `hp` ist die Tank-Skala des Baums (50 Lebenspunkte, ganzzahlig), `xp` und `coin`
+ * gleichen die neue Pool-Mischung mit Wildschwein, Baer und Fee aus (der Baum bringt 5 Erfahrung, Wildschwein
+ * und Baer 7), `contact` ist die alte Skala mal `CONTACT_COMPENSATION`.
+ */
 const DENSE: readonly LevelScaling[] = [
-  { hp: 0.44, xp: 0.462, coin: 0.462, contact: 0.46 },
-  { hp: 0.46, xp: 0.488, coin: 0.488, contact: 0.49 },
-  { hp: 0.5, xp: 0.512, coin: 0.512, contact: 0.51 },
-  { hp: 0.54, xp: 0.57, coin: 0.57, contact: 0.57 },
-  { hp: 0.6, xp: 0.621, coin: 0.621, contact: 0.62 },
+  { hp: 0.44, xp: 0.443, coin: 0.462, contact: 0.92 },
+  { hp: 0.46, xp: 0.467, coin: 0.488, contact: 0.98 },
+  { hp: 0.5, xp: 0.49, coin: 0.512, contact: 1.02 },
+  { hp: 0.54, xp: 0.546, coin: 0.57, contact: 1.14 },
+  { hp: 0.6, xp: 0.595, coin: 0.621, contact: 1.24 },
 ];
 
-/** Level 5 bis 20 (AP-95), Index 0 = Level 5: xp und coin sind das Verhaeltnis alte zu neue Gegnerzahl. */
+/** Level 5 bis 20 (AP-95, AP-113), Index 0 = Level 5: `hp` traegt den Druck der neuen Pool-Mischung. */
+const DENSE_LATE_HP: readonly number[] = [
+  0.714, 0.71, 0.7, 0.7, 0.7, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81,
+];
+
+/** Level 5 bis 20 (AP-95, AP-113), Index 0 = Level 5: xp und coin gleichen Gegnerzahl und Pool-Mischung aus. */
 const DENSE_LATE_XP: readonly number[] = [
-  0.771, 0.769, 0.773, 0.77, 0.771, 0.774, 0.776, 0.774, 0.771, 0.775, 0.771, 0.77, 0.772, 0.77,
-  0.774, 0.77,
+  0.781, 0.779, 0.783, 0.78, 0.781, 0.781, 0.783, 0.781, 0.778, 0.782, 0.778, 0.777, 0.779, 0.777,
+  0.781, 0.777,
 ];
 
 /** First level of M5 (desert). */
@@ -43,12 +62,18 @@ const M5_HP: readonly number[] = [
 const m5Coin = (i: number): number => Math.round((1.2 + 0.05 * i) * 1000) / 1000;
 
 /** `contact` ab Level 21: waechst wie die angenommenen Lebenspunkte der Spielerin (200 bei Stufe 10 bis 250 bei Stufe 15). */
-const m5Contact = (i: number): number => Math.round(0.77 * (1 + (0.25 * i) / 19) * 1000) / 1000;
+const m5Contact = (i: number): number =>
+  Math.round(CONTACT_COMPENSATION * 0.77 * (1 + (0.25 * i) / 19) * 1000) / 1000;
 
 export const LEVEL_SCALING: readonly LevelScaling[] = Array.from({ length: 41 }, (_, id) => {
   if (id < DENSE.length) return { ...DENSE[id] };
   if (id < M5_FIRST) {
-    return { hp: 0.77, xp: DENSE_LATE_XP[id - 5], coin: DENSE_LATE_XP[id - 5], contact: 0.77 };
+    return {
+      hp: DENSE_LATE_HP[id - 5],
+      xp: DENSE_LATE_XP[id - 5],
+      coin: DENSE_LATE_XP[id - 5],
+      contact: Math.round(CONTACT_COMPENSATION * 0.77 * 1000) / 1000,
+    };
   }
   const i = id - M5_FIRST;
   return { hp: M5_HP[i], xp: m5Coin(i), coin: m5Coin(i), contact: m5Contact(i) };

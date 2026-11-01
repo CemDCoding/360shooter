@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   CHARGE_TRIGGER_DISTANCE,
   COIN_RULES,
+  CONTACT_COMPENSATION as CONTACT_COMPENSATION_CONFIG,
+  CONTACT_HIT_SECONDS,
   ENEMIES,
   ITEMS,
   ITEM_RULES,
@@ -99,8 +101,27 @@ function pressureFactor(enemyId: EnemyId): number {
   return f;
 }
 
-/** Gegnerschaden pro Sekunde, wenn er die Astronautin erreicht hat (Gift und Wickel eingerechnet, AP-105). */
-function threatDps(enemyId: EnemyId, contactScale = 1): number {
+/** Gegner, die einmal treffen und verschwinden (AP-112, PE-135): Verfolger, Ansturm, Eingraben. */
+const isHitEnemy = (enemyId: EnemyId): boolean => {
+  const e = ENEMIES[enemyId];
+  return !e.aura && !e.projectile && e.contactDamage > 0;
+};
+
+/**
+ * Einmaliger Schaden eines Treffer-Gegners (AP-113): `contactDamage x CONTACT_HIT_SECONDS x contact`,
+ * dazu das Gift der Schlange einmalig `dps x durationMs / 1000`.
+ */
+function hitDamage(enemyId: EnemyId, contactScale = 1): number {
+  const e = ENEMIES[enemyId];
+  const poison = e.onHit?.poison;
+  return (
+    e.contactDamage * CONTACT_HIT_SECONDS * contactScale +
+    (poison ? (poison.dps * poison.durationMs) / 1000 : 0)
+  );
+}
+
+/** Schaden pro Sekunde fuer Gegner, die bleiben (Aura, Schuetzen; Wickel eingerechnet, AP-105). */
+function threatDps(enemyId: EnemyId): number {
   const e = ENEMIES[enemyId];
   if (e.aura) return e.aura.dps;
   if (e.projectile) {
@@ -109,7 +130,7 @@ function threatDps(enemyId: EnemyId, contactScale = 1): number {
     const uptime = slow ? Math.min(1, slow.durationMs / e.projectile.intervalMs) : 0;
     return shot * (1 + (slow ? (1 - slow.turnFactor) * uptime : 0));
   }
-  return e.contactDamage * contactScale + (e.onHit?.poison?.dps ?? 0);
+  return 0;
 }
 
 /** Lebenspunkte eines Gegners im Level, gerundet wie in `EnemyPool.spawn` (AP-90, AP-91). */
@@ -146,14 +167,21 @@ function metrics(level: LevelDef): Metrics {
   let allSpawns = Math.min(openingCount(level), level.maxEnemies);
   while (t < durMs) {
     allSpawns += 1;
-    if (spawned < level.maxEnemies) {
-      spawned += 1;
-      for (const entry of level.enemyPool) {
-        const arrive = (SPAWN_RADIUS / ENEMIES[entry.enemyId].speed) * 1000;
-        const left = Math.max(0, durMs - t - arrive) / 1000;
-        freeDamage +=
-          (entry.weight / total) * threatDps(entry.enemyId, LEVEL_SCALING[level.id].contact) * left;
-      }
+    // Treffer-Gegner verschwinden nach dem Treffer, sie zaehlen nicht gegen `maxEnemies`. Aura und Schuetzen bleiben (AP-113).
+    const capLeft = spawned < level.maxEnemies;
+    if (capLeft) spawned += 1;
+    for (const entry of level.enemyPool) {
+      const hit = isHitEnemy(entry.enemyId);
+      if (!hit && !capLeft) continue;
+      const arrive = (SPAWN_RADIUS / ENEMIES[entry.enemyId].speed) * 1000;
+      const left = Math.max(0, durMs - t - arrive) / 1000;
+      // Treffer-Gegner schaden einmal, wenn sie die Spielerin vor Rundenende erreichen (AP-113).
+      const damage = hit
+        ? left > 0
+          ? hitDamage(entry.enemyId, LEVEL_SCALING[level.id].contact)
+          : 0
+        : threatDps(entry.enemyId) * left;
+      freeDamage += (entry.weight / total) * damage;
     }
     const progress = Math.min(1, t / durMs);
     t += level.spawnIntervalMs * (1 - (1 - MIN_INTERVAL_FACTOR) * progress);
@@ -233,6 +261,16 @@ const POOL_BEFORE_M5: Partial<Record<BatchId, EnemyPoolEntry[]>> = {
     { enemyId: 'forestSpirit', weight: 4 },
   ],
 };
+/**
+ * xp und coin je Level 0 bis 20 vor AP-113 (Stand AP-105). Zusammen mit `POOL_BEFORE_M5` die Referenz fuer
+ * Gold und Erfahrung je Runde: dieselbe Pace, nur die Pool-Mischung ist neu (AP-113).
+ */
+const XP_BEFORE_AP113 = [
+  0.462, 0.488, 0.512, 0.57, 0.621, 0.771, 0.769, 0.773, 0.77, 0.771, 0.774, 0.776, 0.774, 0.771,
+  0.775, 0.771, 0.77, 0.772, 0.77, 0.774, 0.77,
+];
+/** Ausgleichsfaktor auf `contact` (AP-113, Q-56): Einmaltreffer 0,5 s statt etwa 1 s Kontaktschaden. */
+const CONTACT_COMPENSATION = 2;
 /** Druck je Level 0 bis 20 vor M5 (Tabelle in docs/balancing.md nach AP-95). */
 const PRESSURE_BEFORE_M5 = [
   0.5, 0.54, 0.61, 0.67, 0.76, 0.84, 0.87, 0.9, 0.94, 0.98, 1.07, 1.08, 1.09, 1.11, 1.12, 1.14,
@@ -343,16 +381,69 @@ describe('balance: boar, bear and fairy in level 0 to 20 (PE-125, AP-105)', () =
     }
   });
 
-  it('gold and xp of every level 0 to 20 stay within 4 percent of the old pools', () => {
+  it('gold and xp of every level 0 to 20 stay within 4 percent of the old pools at the old pace (AP-113)', () => {
     for (let i = 0; i < M5_FIRST; i++) {
       const old = POOL_BEFORE_M5[batchOf(i)]!;
+      const oldCoin = spawnCount(LEVELS[i]) * COIN_RULES.dropChance * XP_BEFORE_AP113[i];
+      const oldGold = oldCoin * poolMean(old, (id) => ENEMIES[id].coinValue ?? 0);
+      const oldXp =
+        spawnCount(LEVELS[i]) * XP_BEFORE_AP113[i] * poolMean(old, (id) => ENEMIES[id].xp);
       for (const [name, ratio] of [
-        ['gold', goldOf(LEVELS[i]) / goldOf(LEVELS[i], old)],
-        ['xp', xpOf(LEVELS[i]) / xpOf(LEVELS[i], old)],
+        ['gold', goldOf(LEVELS[i]) / oldGold],
+        ['xp', xpOf(LEVELS[i]) / oldXp],
       ] as const) {
         expect(ratio, `${name} level ${i}`).toBeGreaterThanOrEqual(0.96);
         expect(ratio, `${name} level ${i}`).toBeLessThanOrEqual(1.04);
       }
+    }
+  });
+
+  it('boar, bear and fairy have at least twice the pool share of before AP-113 and sit near the targets (Q-56)', () => {
+    // Anteil am Pool vor AP-113 und Ziel (Plan AP-113, Abweichung bis 1,5 Prozentpunkte).
+    const share = (l: LevelDef, id: EnemyId): number =>
+      (l.enemyPool.find((e) => e.enemyId === id)?.weight ?? 0) /
+      l.enemyPool.reduce((s, e) => s + e.weight, 0);
+    const cases: [number, EnemyId, number, number][] = [
+      [0, 'boar', 0.024, 0.07],
+      [0, 'bear', 0.024, 0.07],
+      [5, 'boar', 0.007, 0.05],
+      [5, 'bear', 0.007, 0.05],
+      [5, 'fairy', 0.041, 0.1],
+      [10, 'fairy', 0.009, 0.05],
+    ];
+    for (const [level, id, before, target] of cases) {
+      for (const l of LEVELS.filter((x) => x.batch === LEVELS[level].batch)) {
+        expect(share(l, id), `${id} level ${l.id}`).toBeGreaterThanOrEqual(before * 2);
+        expect(Math.abs(share(l, id) - target), `${id} level ${l.id}`).toBeLessThanOrEqual(
+          0.015 + 1e-9,
+        );
+      }
+    }
+  });
+
+  it('keeps the tanks tanks: boar and bear have at least 1.5 times the base hp of the cursed tree', () => {
+    expect(ENEMIES.boar.hp).toBeGreaterThanOrEqual(ENEMIES.cursedTree.hp * 1.5);
+    expect(ENEMIES.bear.hp).toBeGreaterThanOrEqual(ENEMIES.cursedTree.hp * 1.5);
+    // Baum in Level 0 bis 4 nicht weicher als vor AP-113 (22 bis 30 Lebenspunkte, AP-91).
+    [22, 23, 25, 27, 30].forEach((hp, i) =>
+      expect(scaledHp('cursedTree', i)).toBeGreaterThanOrEqual(hp),
+    );
+  });
+
+  it('compensates the single hit with factor 2 on contact and keeps one hit below 15 percent of the player hp', () => {
+    expect(CONTACT_COMPENSATION_CONFIG).toBe(CONTACT_COMPENSATION);
+    for (const l of LEVELS) {
+      const maxHit = Math.max(
+        ...l.enemyPool
+          .filter((e) => isHitEnemy(e.enemyId))
+          .map(
+            (e) =>
+              ENEMIES[e.enemyId].contactDamage * CONTACT_HIT_SECONDS * LEVEL_SCALING[l.id].contact,
+          ),
+      );
+      // Angenommene Lebenspunkte der Spielerin: 100 bis Level 20, ab Level 21 200 bis 250 (AP-105).
+      const playerHp = l.id < M5_FIRST ? PLAYER.maxHp : 200 + (50 * (l.id - M5_FIRST)) / 19;
+      expect(maxHit, `level ${l.id}`).toBeLessThanOrEqual(playerHp * 0.15);
     }
   });
 
@@ -362,7 +453,7 @@ describe('balance: boar, bear and fairy in level 0 to 20 (PE-125, AP-105)', () =
     expect(pressureFactor('sandWorm')).toBeGreaterThan(1);
     expect(pressureFactor('mummy')).toBeGreaterThan(1);
     expect(pressureFactor('cursedTree')).toBe(1);
-    expect(threatDps('snake')).toBeGreaterThan(ENEMIES.snake.contactDamage);
+    expect(hitDamage('snake')).toBeGreaterThan(ENEMIES.snake.contactDamage * CONTACT_HIT_SECONDS);
     const wrap = ENEMIES.mummy.projectile!;
     expect(threatDps('mummy')).toBeGreaterThan((wrap.damage * 1000) / wrap.intervalMs);
   });
@@ -427,9 +518,19 @@ describe('balance: difficulty curve', () => {
     ];
     for (let i = 5; i < 21; i++) {
       const oldCount = (before[i - 5] * LEVELS[i].durationSec) / 60;
-      const ratioGold = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].coin) / oldCount;
-      const ratioXp = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].xp) / oldCount;
-      const ratioContact = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / oldCount;
+      // AP-113: Referenz bleibt die Pace nach AP-91; die neue Pool-Mischung ist ueber das Mittel von Gold und Erfahrung eingerechnet,
+      // der Kontakt-Faktor ueber den Ausgleichsfaktor. Toleranz unveraendert 4 %.
+      const old = POOL_BEFORE_M5[batchOf(i)]!;
+      const mixGold =
+        poolMean(LEVELS[i].enemyPool, (id) => ENEMIES[id].coinValue ?? 0) /
+        poolMean(old, (id) => ENEMIES[id].coinValue ?? 0);
+      const mixXp =
+        poolMean(LEVELS[i].enemyPool, (id) => ENEMIES[id].xp) /
+        poolMean(old, (id) => ENEMIES[id].xp);
+      const ratioGold = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].coin * mixGold) / oldCount;
+      const ratioXp = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].xp * mixXp) / oldCount;
+      const ratioContact =
+        (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / (oldCount * CONTACT_COMPENSATION);
       for (const r of [ratioGold, ratioXp, ratioContact]) {
         expect(r, `level ${i}`).toBeGreaterThan(0.96);
         expect(r, `level ${i}`).toBeLessThan(1.04);
@@ -441,11 +542,12 @@ describe('balance: difficulty curve', () => {
     expect(M[4].spawnsPerMin).toBeLessThan(M[5].spawnsPerMin);
   });
 
-  it('total contact damage of level 0 to 4 (enemy count x contact factor) stays within 5 percent of before AP-91', () => {
+  it('total contact damage of level 0 to 4 (enemy count x contact factor) stays within 5 percent of before AP-91 times the compensation (AP-113)', () => {
     // Gegnerzahl vor AP-91: 72 / 79 / 86 / 163 / 182, Kontaktfaktor damals 1.
     const before = [72, 79, 86, 163, 182];
     for (let i = 0; i < 5; i++) {
-      const ratio = (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / before[i];
+      const ratio =
+        (spawnCount(LEVELS[i]) * LEVEL_SCALING[i].contact) / (before[i] * CONTACT_COMPENSATION);
       expect(ratio, `level ${i}`).toBeGreaterThan(0.95);
       expect(ratio, `level ${i}`).toBeLessThanOrEqual(1.05);
     }
@@ -499,7 +601,10 @@ describe('balance: level 21 to 40 (AP-105, PE-129)', () => {
   it('makes the enemies stronger rather than more: hp factor above 0.77 and rising, spawns grow slowly', () => {
     for (let i = M5_FIRST; i < LEVELS.length; i++) {
       expect(LEVEL_SCALING[i].hp, `level ${i}`).toBeGreaterThan(0.77);
-      expect(LEVEL_SCALING[i].hp, `level ${i}`).toBeGreaterThan(LEVEL_SCALING[i - 1].hp);
+      // Level 21 liegt knapp unter dem hp von Level 20 (0,81, AP-113: Elfenwald mit mehr Fee, der Druck traegt die Kurve).
+      if (i > M5_FIRST) {
+        expect(LEVEL_SCALING[i].hp, `level ${i}`).toBeGreaterThan(LEVEL_SCALING[i - 1].hp);
+      }
     }
     // Die Gegnerzahl je Minute waechst von Level 20 bis 40 um hoechstens 30 %, der Druck um mehr als das Dreifache.
     expect(M[40].spawnsPerMin / M[20].spawnsPerMin).toBeLessThanOrEqual(1.3);

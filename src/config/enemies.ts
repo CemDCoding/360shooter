@@ -45,11 +45,12 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     aura: { radius: 48, dps: 12 },
   },
   // M5 (AP-105, F-19, PE-127). Old maps: boar and bear from level 0, fairy from level 5. Boar and bear
-  // have a lot of HP, the fairy very little HP and much contact damage. Small pool weights in levels.ts keep
-  // pressure, gold and xp of level 0-20 at the old pace (PE-125).
+  // have a lot of HP (tanks: at least 1.5 times the HP of the cursed tree, AP-113), the fairy very little HP and much
+  // contact damage. The pool weights in levels.ts (AP-113: boar and bear about 5-6 %, fairy 5-10 %) and the
+  // scaling keep pressure, gold and xp of level 0-20 at the old pace (PE-125, PE-136).
   boar: {
     id: 'boar',
-    hp: 80,
+    hp: 75,
     speed: 30,
     contactDamage: 10,
     behavior: 'charge',
@@ -66,7 +67,7 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
   },
   bear: {
     id: 'bear',
-    hp: 90,
+    hp: 75,
     speed: 36,
     contactDamage: 12,
     behavior: 'chase',

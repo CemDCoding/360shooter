@@ -140,6 +140,9 @@ describe('enemies M5 (AP-97, PE-127)', () => {
     // Wildschwein und Baer: viel HP, mehr als der Baum.
     expect(e.boar.hp).toBeGreaterThan(e.cursedTree.hp);
     expect(e.bear.hp).toBeGreaterThan(e.cursedTree.hp);
+    // Tanks bleiben Tanks (AP-113): mindestens das 1,5-Fache des Baums.
+    expect(e.boar.hp).toBeGreaterThanOrEqual(e.cursedTree.hp * 1.5);
+    expect(e.bear.hp).toBeGreaterThanOrEqual(e.cursedTree.hp * 1.5);
     // Sphinx: Tank, die meisten HP aller normalen Gegner, langsam.
     for (const other of Object.values(e)) {
       if (other.id !== 'sphinx') expect(e.sphinx.hp, other.id).toBeGreaterThan(other.hp);

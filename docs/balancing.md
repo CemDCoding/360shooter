@@ -40,55 +40,55 @@ Schwierigkeit nicht mehr stetig steigt.
 - **Schaden ohne Abschuss/Min**: Schaden pro Minute an der Astronautin, wenn sie gar nichts trifft und
   alle Gegner ungestoert ankommen. Sie ist nur zum Vergleichen der Level gedacht (die Zahl waechst mit
   der Rundendauer, daher sind 5-Minuten-Level hoeher). Annahme: Gegner starten 380 px vom Zentrum.
-  Gift (Schlange) und Wickel (Mumie) zaehlen hier als zusaetzlicher Schaden (AP-105).
+  Gift (Schlange) und Wickel (Mumie) zaehlen hier als zusaetzlicher Schaden (AP-105). Seit AP-113 treffen Verfolger, Ansturm und Eingraben nur einmal (0,5 s Kontaktschaden), siehe „Spawn-Gewichte ... (AP-113)“; die Zahlen der Tabelle sind deshalb viel kleiner als vor AP-113 und nur untereinander vergleichbar.
 
 ## Tabelle aller Level
 
 | Level | Batch | Minuten | Spawn-Abstand (ms) | Max. Gegner | Spawns/Min | Gegner-HP/Min | Druck | Schaden ohne Abschuss/Min |
 |---|---|---|---|---|---|---|---|---|
-| 0 | forest | 3 | 1500 | 25 | 52 | 1193 | 0,50 | 5716 |
-| 1 | forest | 3 | 1450 | 28 | 54 | 1294 | 0,54 | 6753 |
-| 2 | forest | 3 | 1400 | 31 | 56 | 1459 | 0,61 | 7714 |
-| 3 | forest | 5 | 1360 | 34 | 57 | 1610 | 0,67 | 10284 |
-| 4 | forest | 5 | 1330 | 37 | 59 | 1832 | 0,76 | 12108 |
-| 5 | forestNight | 3 | 870 | 52 | 90 | 2006 | 0,84 | 14970 |
-| 6 | forestNight | 3 | 840 | 55 | 94 | 2080 | 0,87 | 15787 |
-| 7 | forestNight | 3 | 810 | 57 | 97 | 2154 | 0,90 | 16365 |
-| 8 | forestNight | 5 | 770 | 60 | 101 | 2242 | 0,93 | 18728 |
-| 9 | forestNight | 5 | 740 | 62 | 105 | 2331 | 0,97 | 19365 |
-| 10 | elfForest | 3 | 615 | 78 | 127 | 2543 | 1,06 | 25133 |
-| 11 | elfForest | 3 | 610 | 83 | 128 | 2564 | 1,07 | 26520 |
-| 12 | elfForest | 3 | 600 | 88 | 130 | 2604 | 1,08 | 27925 |
-| 13 | elfForest | 3 | 590 | 94 | 132 | 2650 | 1,10 | 29578 |
-| 14 | elfForest | 3 | 585 | 99 | 133 | 2670 | 1,11 | 30907 |
-| 15 | elfForest | 3 | 575 | 104 | 136 | 2717 | 1,13 | 32273 |
-| 16 | elfForest | 5 | 560 | 109 | 138 | 2768 | 1,15 | 37294 |
-| 17 | elfForest | 5 | 555 | 114 | 140 | 2796 | 1,16 | 38847 |
-| 18 | elfForest | 5 | 545 | 120 | 142 | 2844 | 1,18 | 40734 |
-| 19 | elfForest | 5 | 540 | 125 | 143 | 2872 | 1,20 | 42270 |
-| 20 | elfForest | 5 | 530 | 130 | 146 | 2924 | 1,22 | 43849 |
-| 21 | desert | 3 | 525 | 131 | 148 | 3193 | 1,33 | 37646 |
-| 22 | desert | 3 | 520 | 132 | 150 | 3462 | 1,44 | 38307 |
-| 23 | desert | 3 | 515 | 133 | 151 | 3718 | 1,55 | 38974 |
-| 24 | desert | 5 | 510 | 134 | 152 | 4001 | 1,67 | 44032 |
-| 25 | desert | 5 | 505 | 135 | 153 | 4270 | 1,78 | 44819 |
-| 26 | pyramids | 3 | 500 | 136 | 156 | 4675 | 1,95 | 38060 |
-| 27 | pyramids | 3 | 495 | 137 | 157 | 5010 | 2,09 | 38683 |
-| 28 | pyramids | 3 | 490 | 138 | 159 | 5388 | 2,25 | 39313 |
-| 29 | pyramids | 5 | 485 | 139 | 159 | 5769 | 2,40 | 44620 |
-| 30 | pyramids | 5 | 480 | 140 | 161 | 6217 | 2,59 | 45323 |
-| 31 | oasis | 3 | 475 | 141 | 164 | 6801 | 2,83 | 45917 |
-| 32 | oasis | 3 | 470 | 142 | 165 | 7301 | 3,04 | 46545 |
-| 33 | oasis | 3 | 465 | 143 | 167 | 7865 | 3,28 | 47207 |
-| 34 | oasis | 3 | 460 | 144 | 169 | 8449 | 3,52 | 47848 |
-| 35 | oasis | 3 | 455 | 145 | 171 | 9069 | 3,78 | 48495 |
-| 36 | oasis | 5 | 450 | 146 | 172 | 9755 | 4,06 | 54872 |
-| 37 | oasis | 5 | 445 | 147 | 174 | 10477 | 4,37 | 55586 |
-| 38 | oasis | 5 | 440 | 148 | 176 | 11251 | 4,69 | 56306 |
-| 39 | oasis | 5 | 435 | 149 | 178 | 12095 | 5,04 | 57033 |
-| 40 | oasis | 5 | 430 | 150 | 180 | 12989 | 5,41 | 57796 |
+| 0 | forest | 3 | 1500 | 25 | 52 | 1229 | 0,51 | 216 |
+| 1 | forest | 3 | 1450 | 28 | 54 | 1338 | 0,56 | 238 |
+| 2 | forest | 3 | 1400 | 31 | 56 | 1507 | 0,63 | 256 |
+| 3 | forest | 5 | 1360 | 34 | 57 | 1663 | 0,69 | 307 |
+| 4 | forest | 5 | 1330 | 37 | 59 | 1889 | 0,79 | 341 |
+| 5 | forestNight | 3 | 870 | 52 | 90 | 2066 | 0,86 | 2258 |
+| 6 | forestNight | 3 | 840 | 55 | 94 | 2132 | 0,89 | 2372 |
+| 7 | forestNight | 3 | 810 | 57 | 97 | 2174 | 0,91 | 2460 |
+| 8 | forestNight | 5 | 770 | 60 | 101 | 2264 | 0,94 | 2782 |
+| 9 | forestNight | 5 | 740 | 62 | 105 | 2354 | 0,98 | 2880 |
+| 10 | elfForest | 3 | 615 | 78 | 127 | 2560 | 1,07 | 9768 |
+| 11 | elfForest | 3 | 610 | 83 | 128 | 2580 | 1,08 | 10284 |
+| 12 | elfForest | 3 | 600 | 88 | 130 | 2621 | 1,09 | 10812 |
+| 13 | elfForest | 3 | 590 | 94 | 132 | 2668 | 1,11 | 11431 |
+| 14 | elfForest | 3 | 585 | 99 | 133 | 2688 | 1,12 | 11927 |
+| 15 | elfForest | 3 | 575 | 104 | 136 | 2735 | 1,14 | 12440 |
+| 16 | elfForest | 5 | 560 | 109 | 138 | 2786 | 1,16 | 14241 |
+| 17 | elfForest | 5 | 555 | 114 | 140 | 2814 | 1,17 | 14816 |
+| 18 | elfForest | 5 | 545 | 120 | 142 | 2862 | 1,19 | 15519 |
+| 19 | elfForest | 5 | 540 | 125 | 143 | 2891 | 1,20 | 16088 |
+| 20 | elfForest | 5 | 530 | 130 | 146 | 2943 | 1,23 | 16678 |
+| 21 | desert | 3 | 525 | 131 | 148 | 3193 | 1,33 | 4386 |
+| 22 | desert | 3 | 520 | 132 | 150 | 3462 | 1,44 | 4431 |
+| 23 | desert | 3 | 515 | 133 | 151 | 3718 | 1,55 | 4477 |
+| 24 | desert | 5 | 510 | 134 | 152 | 4001 | 1,67 | 4989 |
+| 25 | desert | 5 | 505 | 135 | 153 | 4270 | 1,78 | 5039 |
+| 26 | pyramids | 3 | 500 | 136 | 156 | 4675 | 1,95 | 12638 |
+| 27 | pyramids | 3 | 495 | 137 | 157 | 5010 | 2,09 | 12748 |
+| 28 | pyramids | 3 | 490 | 138 | 159 | 5388 | 2,25 | 12858 |
+| 29 | pyramids | 5 | 485 | 139 | 159 | 5769 | 2,40 | 14582 |
+| 30 | pyramids | 5 | 480 | 140 | 161 | 6217 | 2,59 | 14702 |
+| 31 | oasis | 3 | 475 | 141 | 164 | 6801 | 2,83 | 13326 |
+| 32 | oasis | 3 | 470 | 142 | 165 | 7301 | 3,04 | 13441 |
+| 33 | oasis | 3 | 465 | 143 | 167 | 7865 | 3,28 | 13557 |
+| 34 | oasis | 3 | 460 | 144 | 169 | 8449 | 3,52 | 13674 |
+| 35 | oasis | 3 | 455 | 145 | 171 | 9069 | 3,78 | 13791 |
+| 36 | oasis | 5 | 450 | 146 | 172 | 9755 | 4,06 | 15578 |
+| 37 | oasis | 5 | 445 | 147 | 174 | 10477 | 4,37 | 15706 |
+| 38 | oasis | 5 | 440 | 148 | 176 | 11251 | 4,69 | 15834 |
+| 39 | oasis | 5 | 435 | 149 | 178 | 12095 | 5,04 | 15963 |
+| 40 | oasis | 5 | 430 | 150 | 180 | 12989 | 5,41 | 16093 |
 
-Seit AP-105 mit Wildschwein, Baer und Fee in Level 0 bis 20. Ab Level 21 ist der Druck gegen die Grundwaffe ohne Upgrades
+Seit AP-105 mit Wildschwein, Baer und Fee in Level 0 bis 20, Stand nach AP-113. Ab Level 21 ist der Druck gegen die Grundwaffe ohne Upgrades
 gerechnet und deshalb deutlich ueber 1: Die Wueste setzt Upgrades voraus (siehe „Level 21 bis 40“).
 
 ## Was die Tests sichern
@@ -231,8 +231,8 @@ Gegnerwerte nach den Stichworten aus F-19 (Basiswerte vor `LEVEL_SCALING`):
 
 | Gegner | Batches | HP | Tempo | Kontakt | Erfahrung / Muenze | Besonderheit | Wirksame HP | Schaden/s am Ziel |
 |---|---|---|---|---|---|---|---|---|
-| Wildschwein `boar` | Wald, Wald bei Nacht | 80 | 30 | 10 | 7 / 1 | Ansturm (800 ms Ankuendigung) | x1,23 | 10 |
-| Baer `bear` | Wald, Wald bei Nacht | 90 | 36 | 12 | 7 / 1 | Tank, mittel schnell | x1 | 12 |
+| Wildschwein `boar` | Wald, Wald bei Nacht | 75 | 30 | 10 | 7 / 1 | Ansturm (800 ms Ankuendigung) | x1,23 | Einmaltreffer 5 |
+| Baer `bear` | Wald, Wald bei Nacht | 75 | 36 | 12 | 7 / 1 | Tank, mittel schnell | x1 | Einmaltreffer 6 |
 | Fee `fairy` | Wald bei Nacht, Elfenwald | 4 | 75 | 15 | 4 / 2 | Zickzack, sehr wenig HP, viel Schaden | x1 | 15 |
 | Mumie `mummy` | Pyramiden, Oase | 40 | 22 | 15 | 10 / 4 | Wickel 12 Schaden alle 2,6 s, Drehung 2 s halbiert | x1,24 | 6,4 |
 | Sandwurm `sandWorm` | Wueste, Pyramiden | 16 | 70 | 8 | 6 / 2 | Eingraben 1,8 s von 4,3 s | x1,21 | 8 |
@@ -262,6 +262,59 @@ Nacht die beiden Tanks aus. Im Wald gibt es keinen leichten Gegner, deshalb ist 
 `coin` und `contact` bleiben. Die Fee bringt 2 Gold, damit der mittlere Muenzwert der Pools gleich bleibt.
 Ergebnis gegenueber vor M5: Druck je Level etwa -1 % bis +1 %, Gold und Erfahrung etwa -1 % bis +2 % (Test: hoechstens 4 %,
 Toleranz wie AP-95). Gold-Mittel Level 0 bis 20: 46,1 (Band 43 bis 47).
+
+## Spawn-Gewichte Wildschwein, Baer, Fee und Balancing neu (AP-113, PE-136)
+
+Nach dem Handtest M5 sollen Wildschwein, Baer und Fee in Level 0 bis 20 deutlich haeufiger kommen (Q-56). Druck, Gold und
+Erfahrung bleiben in den Baendern von `tests/logic/balance.test.ts` (Toleranz 4 %, Schritt hoechstens +10 % je Level,
+`MAX_ENEMIES` hoechstens 150). Die Baender sind nicht veraendert.
+
+**Neue Gewichte** (Anteil am Pool, vorher in Klammern):
+
+| Batch | Gewichte | Anteile |
+|---|---|---|
+| Wald (0 bis 4) | Baum 178, Wildschwein 11, Baer 11 (Summe 200) | je 5,5 % (2,4 %) |
+| Wald bei Nacht (5 bis 9) | Baum 120, Hexe 60, Eichhoernchen 96, Wildschwein 17, Baer 17, Fee 35 (Summe 345) | Wildschwein, Baer je 4,9 % (0,7 %), Fee 10,1 % (4,1 %) |
+| Elfenwald (10 bis 20) | Baum 80, Hexe 40, Eichhoernchen 64, Waldgeist 32, Fee 12 (Summe 228) | Fee 5,3 % (0,9 %) |
+
+Ziel waren 7 % (Wald), 5 % / 10 % (Wald bei Nacht) und 5 % (Elfenwald). Im Wald liegt der Anteil 1,5 Prozentpunkte darunter
+(Abweichung erlaubt, Plan AP-113): Im Wald gibt es keinen leichten Gegner, und der Baum darf nicht unter 22 bis 30 HP (AP-91). Bei 7 % waeren
+die Druck-Abweichungen gegen die Referenz ueber 4 % gewesen. Alle Anteile sind mindestens doppelt so hoch wie vorher. Die alten Gegner behalten ihr Verhaeltnis
+untereinander. Level 21 bis 40 haben diese Gegner nicht im Pool und bleiben in den Gewichten unveraendert.
+
+**Stellschrauben** (in der Reihenfolge des Plans):
+
+- **`hp` in `scaling.ts`:** Level 5 bis 9: 0,714 / 0,71 / 0,70 / 0,70 / 0,70 (vorher 0,77), Level 10 bis 20: 0,81 (vorher 0,77, die Fee senkt dort
+  den Druck). Level 0 bis 4 bleiben (der Baum behaelt 22 / 23 / 25 / 27 / 30 HP). Level 21 (0,806) liegt jetzt knapp unter Level 20 (0,81),
+  die Druck-Kurve steigt trotzdem (Sprung 20 zu 21 +8,5 %).
+- **Basis-HP in `enemies.ts`:** Wildschwein 80 auf 75, Baer 90 auf 75 (genau das 1,5-Fache des Baums, Tanks bleiben Tanks).
+- **`xp` und `coin`:** gleichen die neue Mischung aus (der Baum bringt 5 XP, Wildschwein und Baer 7). Level 0 bis 4 getrennt (xp 0,443 / 0,467 / 0,49 / 0,546 / 0,595,
+  coin unveraendert), Level 5 bis 20 gleich (0,777 bis 0,783).
+- **`SPAWN_INTERVAL_MS` und `MAX_ENEMIES`:** unveraendert (Level 0 steht schon auf der Obergrenze 1,5 s).
+
+**Kontakt-Treffer-Modell (wegen AP-112):** Verfolger, Ansturm und Eingraben treffen einmal mit `contactDamage` x `CONTACT_HIT_SECONDS`
+(0,5 s) x `contact` und verschwinden. Der Test rechnet `freeRunDamagePerMin` jetzt so: ein Treffer je Gegner, der die Spielerin vor
+Rundenende erreicht (Ankunftszeit aus 380 px Anlauf und Tempo), Gift der Schlange einmalig `dps` x Dauer. Treffer-Gegner zaehlen nicht gegen `MAX_ENEMIES`
+(sie verschwinden), Aura und Schuetzen bleiben pro Sekunde. Der Druck (HP/s durch Basis-DPS) haengt nicht am Kontakt.
+
+**Ausgleich des Kontaktschadens (Annahme, Q-56):** Bisher richtete ein Kontakt-Gegner im Mittel etwa 1,0 s Kontaktschaden an (Annahme: die Spielerin schiesst
+ihn in etwa 1 s ab). Neu sind es 0,5 s. Damit der Druck gleich bleibt, ist `contact` in allen Leveln mit `CONTACT_COMPENSATION = 2`
+multipliziert (Level 0 bis 4: 0,92 / 0,98 / 1,02 / 1,14 / 1,24, Level 5 bis 20: 1,54, Level 21 bis 40: 1,54 bis 1,925). Ein Einzeltreffer des
+staerksten Kontakt-Gegners eines Levels bleibt unter 15 % der angenommenen Spielerin-HP (hoechstens 11,6 von 100 in Level 0 bis 20, Test). Die Verhaeltnis-Tests
+zum Kontaktschaden (Level 0 bis 4: 5 %, Level 5 bis 20: 4 %) gelten mit Referenz mal 2, mit gleicher Toleranz.
+
+**Ergebnis** (Test, Toleranzen gleich):
+
+| Kennzahl | vorher (AP-105) | nachher |
+|---|---|---|
+| Druck Level 0 / 4 / 5 / 9 / 10 / 20 | 0,50 / 0,76 / 0,84 / 0,97 / 1,06 / 1,22 | 0,51 / 0,79 / 0,86 / 0,98 / 1,07 / 1,23 |
+| Druck gegen Referenz (Tabelle nach AP-95) | -1 % bis +1 % | Level 0 bis 4: +2,4 bis +3,5 %, Level 5 bis 20: -0,5 bis +2,5 % (Band 4 %) |
+| Sprung Level 4 zu 5 / 9 zu 10 / 20 zu 21 | +9,5 % / +9,1 % / +9,2 % | +9,4 % / +8,8 % / +8,5 % |
+| Gold-Mittel Level 0 bis 20 | 46,1 | 46,3 (Band 43 bis 47) |
+| Gold und Erfahrung je Level | Referenz | gleich, Abweichung hoechstens 4 % gegen die alte Pool-Mischung und die alte Skala |
+
+Die Gold- und Erfahrungs-Tests mit „vorher“-Zaehlung (AP-95) rechnen jetzt gegen die alte Pool-Mischung (`POOL_BEFORE_M5`) und die alten
+`xp`/`coin`-Werte (`XP_BEFORE_AP113`), nicht mehr gegen die nackte Gegnerzahl; Toleranz bleibt 4 %.
 
 ## Level 21 bis 40 (AP-105, PE-129)
 
