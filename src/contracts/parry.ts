@@ -21,6 +21,10 @@ export interface ParryRules {
   ringStartScale: number;
   /** Distance of the circles from the player in arena units. */
   distanceFromPlayerPx: number;
+  /** Lead time of the closing ring before the hit, in ms (ring shrinks over this time). */
+  approachMs: number;
+  /** Touch allowance added to circleRadiusPx for the tap reach, in arena units. */
+  touchSlackPx: number;
   /** Minimum gap between two circles in ms. */
   minGapMs: number;
 }
