@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { BASE_VOLUME, LASER_KEY, LASER_THROTTLE_MS, SoundService } from '../../src/platform/audio';
+import { ASSETS } from '../../src/config/assets';
+import {
+  BASE_VOLUME,
+  LASER_KEY,
+  LASER_THROTTLE_MS,
+  PARRY_KEY,
+  SoundService,
+} from '../../src/platform/audio';
 import { loadSave, type StorageLike } from '../../src/platform/storage';
 
 function fakeStorage(): StorageLike {
@@ -43,6 +50,19 @@ describe('SoundService', () => {
     advance(1);
     service.play(LASER_KEY);
     expect(played.filter((p) => p.key === LASER_KEY)).toHaveLength(2);
+  });
+
+  it('has the parry sound in the manifest and plays it unthrottled (AP-133)', () => {
+    const asset = ASSETS.find((a) => a.key === PARRY_KEY);
+    expect(asset?.kind).toBe('audio');
+    expect(asset?.path).toBe('assets/sounds/parry.wav');
+    const { service, played } = setup();
+    service.play(PARRY_KEY);
+    service.play(PARRY_KEY);
+    expect(played).toEqual([
+      { key: PARRY_KEY, volume: BASE_VOLUME },
+      { key: PARRY_KEY, volume: BASE_VOLUME },
+    ]);
   });
 
   it('plays nothing while muted', () => {

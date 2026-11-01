@@ -21,9 +21,22 @@ import {
   type SchedulerRng,
 } from '../../logic/boss';
 import { applyDamage, auraDamage, isDead } from '../../logic/health';
-import type { BossHazard } from './hazards';
+import {
+  ParryTracker,
+  parriedDamage,
+  type BossHazard,
+  type ParryGroup,
+  type ParryOutcome,
+} from './hazards';
 
-export type { BossHazard, HazardShape, LaserProbe } from './hazards';
+export type {
+  BossHazard,
+  HazardShape,
+  LaserProbe,
+  ParryGroup,
+  ParryOutcome,
+  ParryTap,
+} from './hazards';
 
 const FLASH_MS = 120;
 const FLASH_TINT = THEME.colors['game.hit-flash'].num;
@@ -54,6 +67,11 @@ export interface BossContext {
    * spawn path (e.g. the guardian dog calls mummies). `onSummonTrees` of the root monster stays as it is.
    */
   onSummon?: (enemyId: EnemyId, positions: { x: number; y: number }[]) => void;
+  /**
+   * Quicktime result of an attack at its impact (AP-133), called right before onAttack. The scene shows the
+   * final grades and, if `blocked`, the "PARRY!" effect with the sound.
+   */
+  onParryResolved?: (outcome: ParryOutcome) => void;
 }
 
 /**
@@ -83,6 +101,9 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
   private readonly scheduler: AttackScheduler;
   private readonly ctx: BossContext;
   private flashLeftMs = 0;
+  /** Quicktime circles of the announced attacks (AP-133); emptied by despawn(). */
+  private readonly parry = new ParryTracker();
+  private readonly parryRng: SchedulerRng;
 
   constructor(scene: Phaser.Scene, bossId: BossId, levelId: number, ctx: BossContext = {}) {
     const def = BOSSES[bossId];
@@ -96,6 +117,7 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     this.arena = ctx.arena ?? FALLBACK_ARENA;
     this.center = ctx.center ?? { x: this.arena.width / 2, y: this.arena.height / 2 };
     this.scheduler = new AttackScheduler(def, this.variant, ctx.rng ?? { next: Math.random });
+    this.parryRng = ctx.rng ?? { next: Math.random };
     scene.add.existing(this);
     scene.physics.add.existing(this);
     // Rule for subclasses: this call runs inside the base constructor, before their fields exist.
@@ -123,6 +145,8 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
 
   despawn(): void {
     this.scheduler.cancel();
+    // Boss death, round end or split: open circles go with the boss (no later damage or sound).
+    this.parry.clear();
     this.disableBody(true, true);
     this.setActive(false).setVisible(false);
   }
@@ -135,10 +159,38 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     void attack;
   }
 
-  /** The announced attack hits now. */
-  protected onAttack(attackId: string, damage: number): void {
+  /**
+   * The announced attack hits now. `damage` already carries the quicktime share (AP-133): projectiles and zones
+   * made here with `damage` are reduced for exactly this attack. `parryFactor` (0..1, 1 = no circles or all
+   * missed) is for damage fixed earlier in onTelegraph (e.g. the root bud).
+   */
+  protected onAttack(attackId: string, damage: number, parryFactor: number): void {
     void attackId;
     void damage;
+    void parryFactor;
+  }
+
+  /**
+   * false: this announcement gets no quicktime circles although the attack has some (the subclass skips the
+   * attack, e.g. the stone is still rolling). Called right before onTelegraph.
+   */
+  protected canParry(attack: BossAttackDef): boolean {
+    void attack;
+    return true;
+  }
+
+  /** Open quicktime groups of this boss (read by the scene for ParryOverlay). */
+  get parryGroups(): readonly ParryGroup[] {
+    return this.parry.groups;
+  }
+
+  /**
+   * A tap or click at `point` (world coordinates); `center` is the player. Returns true if it hit an open
+   * circle: the tap is used up and must not aim.
+   */
+  tapParry(point: { x: number; y: number }, center: { x: number; y: number }): boolean {
+    if (!this.active) return false;
+    return this.parry.tap(point, center) !== null;
   }
 
   /** Movement hook, runs every frame while the boss lives. */
@@ -188,6 +240,8 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
       if (this.flashLeftMs <= 0) this.applyBaseTint();
     }
     this.behave(delta);
+    // Same play time as the scheduler: the last circle stays gradable until the impact (fairness).
+    this.parry.tick(delta);
     for (const ev of this.scheduler.tick(delta)) this.handle(ev);
   }
 
@@ -195,9 +249,19 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     if (!this.active) return;
     if (ev.type === 'telegraph') {
       const attack = this.def.attacks.find((a) => a.id === ev.attackId);
-      if (attack) this.onTelegraph(attack);
+      if (!attack) return;
+      // Only attacks with damage get circles (PE-157); the boss can still skip one (canParry).
+      const withCircles = attack.damage > 0 && attack.parryCircles > 0 && this.canParry(attack);
+      this.onTelegraph(attack);
+      if (withCircles && this.active) {
+        this.parry.open(attack.id, attack.parryCircles, ev.telegraphMs, this.parryRng);
+      }
     } else {
-      this.onAttack(ev.attackId, ev.damage);
+      const outcome = this.parry.resolve(ev.attackId);
+      const factor = outcome ? outcome.damageFactor : 1;
+      if (outcome) this.ctx.onParryResolved?.(outcome);
+      // The share holds for this attack only; later attacks start with their own circles.
+      this.onAttack(ev.attackId, parriedDamage(ev.damage, factor), factor);
     }
   }
 
