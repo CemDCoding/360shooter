@@ -9,7 +9,7 @@ import { parseDebugFps } from './debug';
 import type { HudInitData } from './GameScene';
 import { ArmourIndicator } from './hud/ArmourIndicator';
 import { CoinCounter } from './hud/CoinCounter';
-import { FunkButton } from './hud/FunkButton';
+import { FUNK_MIN_BUTTON, FunkButton } from './hud/FunkButton';
 import {
   drawDottedLine,
   FUNK_GLYPH_H,
@@ -37,9 +37,11 @@ import {
   patternWidth,
   PIXEL_LOCK,
 } from './hud/hudMath';
+import { pauseLayout } from './hud/pauseLayout';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
 import { StatusIndicator } from './hud/StatusIndicator';
+import { ConfirmDialog } from './menu/ConfirmDialog';
 import { BATCH_LABELS } from './menu/levelGroups';
 import { clampSpan, edge, edges, NO_SAFE_INSETS, readSafeInsets } from './safeInsets';
 
@@ -54,6 +56,8 @@ const MAX_K = 1.4;
 /** Glyph scale of the energy and timer numbers: desktop step 3, independent of k (PE-94, funkScale would jump to 4 on phones). */
 const HUD_NUMBER_SCALE = 3;
 const PAUSE_DEPTH = 100;
+/** Funk scale of the pause button labels (H-33: 2x). */
+const PAUSE_BUTTON_SCALE = 2;
 /** Boss bar width in arena units at k = 1 (runde.html 3: 200 px, bottom centre). */
 const BOSS_BAR_W = 200;
 const BOSS_BAR_H = 8;
@@ -121,6 +125,9 @@ export class HudScene extends Phaser.Scene {
 
   private pauseOverlay!: Phaser.GameObjects.Container;
   private pauseInfo!: Phaser.GameObjects.BitmapText;
+  private continueButton!: FunkButton;
+  private abortDialog: ConfirmDialog | null = null;
+  private dialogKeyGuard = false;
   private levelId = 0;
 
   private blinks = new Map<string, Phaser.Tweens.Tween>();
@@ -178,8 +185,10 @@ export class HudScene extends Phaser.Scene {
     this.setHp(data?.hp ?? 0, data?.maxHp ?? 1);
     this.setTimer(data?.remainingSec ?? 0);
 
-    this.input.keyboard?.on('keydown-ESC', this.togglePause, this);
-    this.input.keyboard?.on('keydown-P', this.togglePause, this);
+    this.abortDialog = null;
+    this.dialogKeyGuard = false;
+    this.input.keyboard?.on('keydown-ESC', this.onPauseKey, this);
+    this.input.keyboard?.on('keydown-P', this.onPauseKey, this);
 
     const game = this.scene.get(GAME_KEY);
     this.gameEvents = game.events;
@@ -549,37 +558,102 @@ export class HudScene extends Phaser.Scene {
       .rectangle(0, 0, width, height, scrim.num, scrim.alpha ?? 1)
       .setOrigin(0)
       .setInteractive();
+    // A tap on the free area resumes; the buttons and the dialog sit above it (topOnly input).
     dim.on('pointerup', this.togglePause, this);
-    const cy = Math.round(height * 0.33);
-    const title = funkText(this, width / 2, cy, '— PAUSE —', funkScale(4, k), 'hud.text').setOrigin(
-      0.5,
-    );
+    const titleScale = funkScale(4, k);
     const lab = funkScale(1, k);
-    this.pauseInfo = funkText(
+    const labels: [string, string] = ['WEITER', 'HAUPTMENÜ'];
+    const buttonW = labels.map((l) =>
+      Math.max(FUNK_MIN_BUTTON, Math.round(measureFunk(this, l, PAUSE_BUTTON_SCALE) + 24)),
+    ) as [number, number];
+    const lay = pauseLayout({
+      width,
+      height,
+      k,
+      edges: this.e,
+      titleH: FUNK_GLYPH_H * titleScale,
+      infoH: FUNK_GLYPH_H * lab,
+      hintH: FUNK_GLYPH_H * lab,
+      buttonW,
+    });
+    const title = funkText(
       this,
       width / 2,
-      cy + Math.round(36 * k),
-      '',
-      lab,
-      'hud.text-muted',
-    ).setOrigin(0.5);
+      lay.titleY,
+      '— PAUSE —',
+      titleScale,
+      'hud.text',
+    ).setOrigin(0.5, 0);
+    this.pauseInfo = funkText(this, width / 2, lay.infoY, '', lab, 'hud.text-muted').setOrigin(
+      0.5,
+      0,
+    );
     const hint = funkText(
       this,
       width / 2,
-      cy + Math.round(52 * k),
-      'TIPPEN, ESC ODER P ZUM WEITERSPIELEN',
+      lay.hintY,
+      'ESC ODER P: WEITER',
       lab,
-      'hud.accent',
-    ).setOrigin(0.5);
+      'hud.text-muted',
+    ).setOrigin(0.5, 0);
+    const [r1, r2] = lay.buttons;
+    this.continueButton = new FunkButton(this, r1.x + r1.w / 2, r1.y + r1.h / 2, {
+      label: labels[0],
+      primary: true,
+      textScale: PAUSE_BUTTON_SCALE,
+      width: r1.w,
+      height: r1.h,
+      onClick: () => this.togglePause(),
+    });
+    const menuButton = new FunkButton(this, r2.x + r2.w / 2, r2.y + r2.h / 2, {
+      label: labels[1],
+      textScale: PAUSE_BUTTON_SCALE,
+      width: r2.w,
+      height: r2.h,
+      onClick: () => this.askAbort(),
+    });
     return this.add
-      .container(0, 0, [dim, title, this.pauseInfo, hint])
+      .container(0, 0, [dim, title, this.pauseInfo, this.continueButton, menuButton, hint])
       .setDepth(PAUSE_DEPTH)
       .setVisible(false);
   }
 
   private togglePause(): void {
+    if (this.abortDialog) return;
     if (this.scene.isPaused(GAME_KEY)) this.scene.resume(GAME_KEY);
     else if (this.scene.isActive(GAME_KEY)) this.scene.pause(GAME_KEY);
+  }
+
+  /** ESC and P: with the dialog open (or in the frame it closed) they only concern the dialog. */
+  private onPauseKey(): void {
+    if (this.abortDialog || this.dialogKeyGuard) return;
+    this.togglePause();
+  }
+
+  /** "HAUPTMENÜ": ask before the round is dropped (PE-159, H-33 6a). Only while paused. */
+  private askAbort(): void {
+    if (this.abortDialog || !this.scene.isPaused(GAME_KEY)) return;
+    this.abortDialog = new ConfirmDialog(
+      this,
+      'RUNDE ABBRECHEN?\nGOLD UND ERFAHRUNG DIESER RUNDE GEHEN VERLOREN.',
+      () => {
+        this.closeAbortDialog();
+        this.events.emit(GameEvents.RoundAbortRequested, {});
+      },
+      () => this.closeAbortDialog(true),
+      { confirmLabel: 'RUNDE BEENDEN', cancelLabel: 'WEITERSPIELEN' },
+    );
+  }
+
+  /** Back to the pause. ESC reaches the pause handler too: a one-frame guard keeps it from resuming. */
+  private closeAbortDialog(guardKey = false): void {
+    this.abortDialog?.destroy();
+    this.abortDialog = null;
+    if (!guardKey) return;
+    this.dialogKeyGuard = true;
+    this.time.delayedCall(0, () => {
+      this.dialogKeyGuard = false;
+    });
   }
 
   private onGamePaused(): void {
@@ -590,10 +664,13 @@ export class HudScene extends Phaser.Scene {
     parts.push(`${formatTime(this.timerSec)} ÜBRIG`);
     setFunk(this.pauseInfo, parts.join(' · '), 'hud.text-muted');
     this.pauseOverlay.setVisible(true);
+    this.continueButton.setFocused(true);
     this.slots?.setPaused(true);
   }
 
   private onGameResumed(): void {
+    this.closeAbortDialog();
+    this.continueButton.setFocused(false);
     this.pauseOverlay.setVisible(false);
     this.slots?.setPaused(false);
   }
@@ -716,8 +793,10 @@ export class HudScene extends Phaser.Scene {
   }
 
   private cleanup(): void {
-    this.input.keyboard?.off('keydown-ESC', this.togglePause, this);
-    this.input.keyboard?.off('keydown-P', this.togglePause, this);
+    this.input.keyboard?.off('keydown-ESC', this.onPauseKey, this);
+    this.input.keyboard?.off('keydown-P', this.onPauseKey, this);
+    this.abortDialog?.destroy();
+    this.abortDialog = null;
     for (const t of this.blinks.values()) t.stop();
     this.blinks.clear();
     this.bannerTween?.stop();

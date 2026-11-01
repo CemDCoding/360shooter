@@ -3,6 +3,7 @@ import { BOSSES } from '../../src/config/bosses';
 import { STORABLE_POWERS } from '../../src/config/powerStore';
 import { THEME } from '../../src/config/theme';
 import { slotStatus } from '../../src/logic/powerStore';
+import { pauseLayout } from '../../src/scenes/hud/pauseLayout';
 import {
   armourDisplay,
   bannerBlink,
@@ -473,5 +474,74 @@ describe('phone HUD layout (H-23, AP-86)', () => {
       { x: 11, y: 309, w: 40, h: 40 },
       { x: 59, y: 309, w: 40, h: 40 },
     ]);
+  });
+});
+
+describe('pauseLayout (H-33, view 6)', () => {
+  const lay = (k: number, e: number, w: number, h: number) => {
+    const lab = 8 * (k <= 1 ? 1 : Math.max(2, Math.ceil(k)));
+    const input = {
+      width: w,
+      height: h,
+      k,
+      edges: { top: e, right: e, bottom: e, left: e },
+      titleH: 8 * Math.round(4 * k),
+      infoH: lab,
+      hintH: lab,
+      buttonW: [96, 144] as [number, number],
+    };
+    return { l: pauseLayout(input), input };
+  };
+
+  it('uses the mockup stack at k = 1: top 112, gaps 12, 20, 14, buttons 32 high 12 apart', () => {
+    const { l } = lay(1, 8, 640, 360);
+    expect(l.titleY).toBe(112);
+    expect(l.infoY).toBe(112 + 32 + 12);
+    expect(l.buttons[0].y).toBe(l.infoY + 8 + 20);
+    expect(l.buttons[0].h).toBe(32);
+    expect(l.hintY).toBe(l.buttons[0].y + 32 + 14);
+    expect(l.buttons[1].x - (l.buttons[0].x + l.buttons[0].w)).toBe(12);
+  });
+
+  it('centres the button pair', () => {
+    const { l } = lay(1, 8, 640, 360);
+    const right = 640 - (l.buttons[1].x + l.buttons[1].w);
+    expect(Math.abs(l.buttons[0].x - right)).toBeLessThanOrEqual(1);
+  });
+
+  it.each([1, 1.36, 1.4])(
+    'keeps both buttons round(32k) high and inside the safe area at k = %s',
+    (k) => {
+      const m = Math.round(8 * k);
+      const { l } = lay(k, m, 480, 360);
+      for (const b of l.buttons) {
+        expect(b.h).toBe(Math.round(32 * k));
+        expect(b.x).toBeGreaterThanOrEqual(m);
+        expect(b.x + b.w).toBeLessThanOrEqual(480 - m);
+        expect(b.y).toBeGreaterThanOrEqual(m);
+        expect(b.y + b.h).toBeLessThanOrEqual(360 - m);
+      }
+      expect(l.hintY).toBeGreaterThan(l.buttons[0].y + l.buttons[0].h);
+    },
+  );
+
+  it('moves the group up when it would reach into the bottom edge', () => {
+    const { l, input } = lay(1.4, 11, 640, 220);
+    expect(l.hintY + input.hintH).toBeLessThanOrEqual(220 - 11);
+    expect(l.titleY).toBeGreaterThanOrEqual(11);
+  });
+
+  it('moves the button pair inward past a left inset', () => {
+    const l = pauseLayout({
+      width: 300,
+      height: 360,
+      k: 1,
+      edges: { top: 8, right: 8, bottom: 8, left: 60 },
+      titleH: 32,
+      infoH: 8,
+      hintH: 8,
+      buttonW: [96, 144],
+    });
+    expect(l.buttons[0].x).toBeGreaterThanOrEqual(60);
   });
 });

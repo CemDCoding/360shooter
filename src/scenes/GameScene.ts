@@ -317,6 +317,9 @@ export class GameScene extends Phaser.Scene {
     // Taps on a power slot come from the HUD as a scene event (AP-66); removed in cleanup.
     hud.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
     hud.events.on(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
+    // "RUNDE BEENDEN" in the pause menu (PE-159); removed in cleanup, so repeated aborts never stack.
+    hud.events.off(GameEvents.RoundAbortRequested, this.onAbortRequested, this);
+    hud.events.on(GameEvents.RoundAbortRequested, this.onAbortRequested, this);
     this.scene.launch(HUD_KEY, hudData);
     this.scene.bringToTop(HUD_KEY);
   }
@@ -873,6 +876,22 @@ export class GameScene extends Phaser.Scene {
     this.scene.start('ResultScene', data);
   }
 
+  private readonly onAbortRequested = (): void => {
+    this.abortRound();
+  };
+
+  /**
+   * The player left the round from the pause menu (PE-159): no settleRound, no save access, no result
+   * screen, no end sound. The scene is cleaned up by its SHUTDOWN handler (cleanup) and the menu starts.
+   */
+  private abortRound(): void {
+    if (this.ended) return;
+    this.ended = true;
+    this.physics.pause();
+    this.scene.stop(HUD_KEY);
+    this.scene.start('MenuScene');
+  }
+
   /** Auto pause when the page goes to the background (PE-29). */
   private readonly onVisibilityChange = (): void => {
     if (document.hidden && !this.ended && this.scene.isActive()) this.scene.pause();
@@ -883,6 +902,7 @@ export class GameScene extends Phaser.Scene {
     const hud = this.scene.get(HUD_KEY);
     hud?.events.off(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
     hud?.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
+    hud?.events.off(GameEvents.RoundAbortRequested, this.onAbortRequested, this);
     this.powerStore = resetPowerStore();
     this.despawnBoss();
     this.player.callbacks.onHpChange = undefined;

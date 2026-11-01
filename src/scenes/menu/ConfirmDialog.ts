@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { THEME } from '../../config/theme';
 import { prefersReducedMotion } from '../../platform/motion';
 import { attachKeyboardFocus, Button, type KeyboardFocus } from './Button';
+import { pickConfirmLabels, type ConfirmLabels } from './confirmLabels';
 import { drawBevel, kText, motionMs } from './kassette';
 
 /** The menu camera may be lifted a few units (RS-02): the scrim reaches below the canvas so no strip stays uncovered. */
@@ -19,7 +20,13 @@ export class ConfirmDialog extends Phaser.GameObjects.Container {
   private readonly escKey: Phaser.Input.Keyboard.Key | null;
   private readonly onEsc: () => void;
 
-  constructor(scene: Phaser.Scene, message: string, onConfirm: () => void, onCancel: () => void) {
+  constructor(
+    scene: Phaser.Scene,
+    message: string,
+    onConfirm: () => void,
+    onCancel: () => void,
+    labels?: ConfirmLabels,
+  ) {
     const { width, height } = scene.scale;
     super(scene, 0, 0);
     this.setDepth(1000);
@@ -29,15 +36,24 @@ export class ConfirmDialog extends Phaser.GameObjects.Container {
       .setOrigin(0)
       .setInteractive();
     const [title = '', ...rest] = message.split('\n');
-    const left = Math.round((width - DIALOG_W) / 2);
+    const picked = pickConfirmLabels(labels);
     const top = Math.round(height / 2 - DIALOG_H / 2 - 18);
+    const btnY = top + DIALOG_H - PAD - 16;
+    const yes = new Button(scene, 0, btnY, picked.confirm, onConfirm, { variant: 'danger' });
+    const no = new Button(scene, 0, btnY, picked.cancel, onCancel, { variant: 'secondary' });
+    // nebeneinander mit 16 px Abstand, als Paar zentriert; der Dialog wächst bei langen Texten mit
+    const gap = 16;
+    const yesW = yes.width;
+    const noW = no.width;
+    const dialogW = Math.max(DIALOG_W, yesW + gap + noW + PAD * 2);
+    const left = Math.round((width - dialogW) / 2);
     const g = scene.add.graphics();
-    drawBevel(g, left, top, DIALOG_W, DIALOG_H, {
+    drawBevel(g, left, top, dialogW, DIALOG_H, {
       fill: 'menu.surface',
       hi: 'menu.surface-hi',
       lo: 'menu.surface-lo',
     });
-    const cx = left + DIALOG_W / 2;
+    const cx = left + dialogW / 2;
     const titleText = kText(scene, cx, top + PAD, title, 2, 'menu.text', 0.5, 0);
     const detailText = kText(
       scene,
@@ -49,13 +65,6 @@ export class ConfirmDialog extends Phaser.GameObjects.Container {
       0.5,
       0,
     );
-    const btnY = top + DIALOG_H - PAD - 16;
-    const yes = new Button(scene, cx, btnY, 'Ja, löschen', onConfirm, { variant: 'danger' });
-    const no = new Button(scene, cx, btnY, 'Abbrechen', onCancel, { variant: 'secondary' });
-    // nebeneinander mit 16 px Abstand, als Paar zentriert
-    const gap = 16;
-    const yesW = yes.width;
-    const noW = no.width;
     const startX = cx - (yesW + gap + noW) / 2;
     yes.setX(Math.round(startX + yesW / 2));
     no.setX(Math.round(startX + yesW + gap + noW / 2));
