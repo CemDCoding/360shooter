@@ -28,6 +28,7 @@ const SOUNDS = {
   'sfx-boss-warning': { f0: 300, f1: 900, dur: 0.6, wave: 'square' },
   'sfx-boss-defeated': { f0: 800, f1: 100, dur: 0.8, wave: 'saw' },
   'sfx-shield-break': { f0: 700, f1: 150, dur: 0.3, wave: 'saw' },
+  'sfx-parry': { f0: 1000, f1: 1800, dur: 0.18, wave: 'square' },
 };
 function makeWav(spec) {
   const rate = 44100;

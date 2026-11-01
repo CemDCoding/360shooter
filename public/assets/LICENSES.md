@@ -64,6 +64,7 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sounds/shield-break.wav           | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 | sounds/boss-warning.wav           | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 | sounds/boss-defeated.wav          | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/parry.wav                  | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 
 ## App-Icons (`public/icons/`)
 
