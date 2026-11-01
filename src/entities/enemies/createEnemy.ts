@@ -44,14 +44,19 @@ export class EnemyPool {
     private readonly ctx: CreateEnemyContext,
   ) {}
 
-  /** `scale` is optional: without it the enemy keeps the hp of its definition. */
-  spawn(id: EnemyId, x: number, y: number, scale?: Pick<EnemyScale, 'hp'>): Enemy {
+  /** `scale` is optional: without it the enemy keeps the hp and size of its definition. */
+  spawn(
+    id: EnemyId,
+    x: number,
+    y: number,
+    scale?: Pick<EnemyScale, 'hp'> & { size?: number },
+  ): Enemy {
     let e = this.enemies.find((en) => !en.active && en.def.id === id);
     if (!e) {
       e = createEnemy(this.scene, id, this.ctx);
       this.enemies.push(e);
     }
-    e.spawn(x, y);
+    e.spawn(x, y, scale?.size ?? 1);
     if (scale) e.hp = Math.max(1, Math.round(e.def.hp * scale.hp));
     return e;
   }
