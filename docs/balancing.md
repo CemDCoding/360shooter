@@ -137,7 +137,7 @@ Die Stufe 10 gilt fuer das Spiel-Level (0 bis 20), nicht fuers Spielerlevel (PE-
 
 | Kennzahl | Wert | Woher |
 |---|---|---|
-| Gold je gewonnenem Level, Mittel ueber Level 0-20 | etwa 45 (Level 0: etwa 7, Level 20: etwa 105) | `dropChance` 0,08, `coinValue` 1/1/4/4 |
+| Gold je gewonnenem Level, Mittel ueber Level 0-20 | etwa 45 (Level 0: etwa 5,8, Level 20: etwa 90,8) | `dropChance` 0,08, `coinValue` 1/1/4/4 |
 | Preis Stufe 0 auf 1 / Stufe 9 auf 10 | 10 / 207 Gold | `COST_BASE`, `COST_GROWTH` |
 | Eine Upgrade-Spur auf Stufe 10 | 698 Gold, also etwa 15,5 Level im Mittel | Summe der Preise |
 | Alle vier Spuren auf Stufe 10 | 2792 Gold (etwa 2 800) | 4 mal 698 |
@@ -416,6 +416,7 @@ Level 20 hat Stufe 10 (+80 % HP), Level 40 Stufe 9 (+72 % HP).
   der Faktor (Level 0 bis 14). Wo die Obergrenze greift, kommen weniger, dafuer zaehere Gegner, und jeder bringt im selben
   Verhaeltnis mehr. Gold und Erfahrung je Runde bleiben dadurch gleich (Test: Band ±10 %, Ist -1,6 % bis +0,4 %).
 - **`hp` und `contact` je Gegner** bleiben (bewusst mehr Druck, PE-152); nur der Aufschlag kommt ab Level 15 auf `hp`.
+- **Item- und Ruestungs-Drops (AP-146, PE-182):** werden je besiegtem Gegner gewuerfelt und wuerden mit der Gegnerzahl wachsen. `ITEM_DROP_FACTOR` (`scaling.ts`, = `CAP_HP_BONUS / ENEMY_COUNT_FACTOR`, derselbe Faktor wie bei `xp` und `coin`) teilt `dropChance` durch den wirksamen Faktor (`scaledDropRate` in `items.ts`), Items und Ruestung je Runde bleiben auf dem Stand vor AP-127 (Dauerfeuer in Level 20 wieder etwa 23 %).
 
 **Druck** (Test, `tests/logic/balance.test.ts`): Gegner pro Minute (nach der Obergrenze) x mittlere wirksame HP x Stufen-Faktor
 durch die Grundwaffe (40 pro Sekunde). Geschoss- und Aura-Schaden wachsen erst mit AP-134 mit der Stufe (V-24), der Druck rechnet

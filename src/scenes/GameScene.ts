@@ -12,7 +12,6 @@ import { ARMOUR_RULES, ARMOURS } from '../config/armour';
 import { STORABLE_POWERS } from '../config/powerStore';
 import {
   GameEvents,
-  type ActivePowers,
   type EnemyId,
   type GameEventName,
   type GameEventPayloads,
@@ -71,7 +70,7 @@ import {
 import { settleRound } from '../logic/economy';
 import { pointOnRing } from '../logic/geometry';
 import { canLaserDestroyBolt } from '../logic/projectiles';
-import { rollDrop } from '../logic/items';
+import { rollDrop, scaledDropRate } from '../logic/items';
 import {
   canActivate,
   createPowerStore,
@@ -91,7 +90,7 @@ import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
 import { VirtualStick } from './controls/VirtualStick';
 import { parseDebugLevel, resolveLevelId } from './debug';
-import { energyRatio, powerBlock } from './hud/hudMath';
+import { energyRatio, hudSeconds, powerBlock, powersKey } from './hud/hudMath';
 import { POWER_SLOT_PRESSED } from './hud/PowerSlots';
 
 /** Upper bound for one frame step, avoids huge jumps after a stall (ms). */
@@ -148,15 +147,6 @@ function pick<T>(a: unknown, b: unknown, ctor: abstract new (...args: never[]) =
   if (a instanceof ctor) return a;
   if (b instanceof ctor) return b;
   return null;
-}
-
-/** Whole seconds as the HUD shows them (changes at most once per second). */
-function hudSeconds(ms: number): number {
-  return ms > 0 ? Math.ceil(ms / 1000) : 0;
-}
-
-function powersKey(p: ActivePowers): string {
-  return `${p.doubleShotStage}|${hudSeconds(p.doubleShotMsLeft)}|${Math.ceil(p.shieldLeft)}|${hudSeconds(p.rapidFireMsLeft)}`;
 }
 
 function armourKey(a: ActiveArmour): string {
@@ -739,12 +729,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnDrops(): void {
+    // AP-146: item and armour drops are rolled per enemy, so divide by the enemy count factor (like coins).
+    const itemRules = {
+      ...ITEM_RULES,
+      dropChance: scaledDropRate(ITEM_RULES.dropChance, this.level.id),
+    };
+    const armourRules = {
+      ...ARMOUR_RULES,
+      dropChance: scaledDropRate(ARMOUR_RULES.dropChance, this.level.id),
+    };
     for (const { x, y, coinValue, coinChance } of this.pendingDrops) {
-      const def = rollDrop(this.rng, ITEM_RULES, ITEMS);
+      const def = rollDrop(this.rng, itemRules, ITEMS);
       if (def) this.spawnItem(x, y, def);
       if (coinValue > 0 && rollCoinDrop(this.rng, { ...COIN_RULES, dropChance: coinChance }))
         this.coinPool?.spawn(x, y, coinValue);
-      if (ARMOURS.length > 0 && rollArmourDrop(this.rng, ARMOUR_RULES)) {
+      if (ARMOURS.length > 0 && rollArmourDrop(this.rng, armourRules)) {
         const armourDef = ARMOURS[Math.floor(this.rng.next() * ARMOURS.length)] ?? ARMOURS[0];
         this.spawnArmourPickup(x, y, armourDef);
       }

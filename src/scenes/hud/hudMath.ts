@@ -1,6 +1,6 @@
 /** Pure helpers for the HUD indicators (no Phaser). */
 import { BOSSES } from '../../config/bosses';
-import { ITEMS } from '../../config/items';
+import { DOUBLE_SHOT_STAGE_MS, ITEMS } from '../../config/items';
 import { THEME, type ColorName } from '../../config/theme';
 import type { ActiveArmour, ActivePowers, BossId } from '../../contracts';
 import type { SlotStatus } from '../../logic/powerStore';
@@ -467,4 +467,18 @@ export function patternCells(rows: readonly string[]): [number, number][] {
 /** Width of a pixel pattern in cells. */
 export function patternWidth(rows: readonly string[]): number {
   return rows.reduce((w, r) => Math.max(w, r.length), 0);
+}
+
+/** Whole seconds as the HUD shows them (changes at most once per second). */
+export function hudSeconds(ms: number): number {
+  return ms > 0 ? Math.ceil(ms / 1000) : 0;
+}
+
+/**
+ * Change key of the power indicators (AP-146, PE-184): the HUD is only refreshed when it changes. Contains the warning
+ * state of the double shot bar (same source as the bar), so the colour switch is not up to 1 s late.
+ */
+export function powersKey(p: ActivePowers): string {
+  const warn = p.doubleShotStage > 0 && timebarState(p.doubleShotMsLeft, DOUBLE_SHOT_STAGE_MS).warn;
+  return `${p.doubleShotStage}|${hudSeconds(p.doubleShotMsLeft)}|${warn ? 1 : 0}|${Math.ceil(p.shieldLeft)}|${hudSeconds(p.rapidFireMsLeft)}`;
 }

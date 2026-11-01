@@ -5,6 +5,7 @@ import {
   CONTACT_COMPENSATION,
   ENEMIES,
   ENEMY_COUNT_FACTOR,
+  ITEM_DROP_FACTOR,
   LEVELS,
   LEVEL_COUNT,
   LEVEL_SCALING,
@@ -147,5 +148,21 @@ describe('LEVEL_SCALING', () => {
 
   it('keeps the coin drop chance of level 40 below 20 percent', () => {
     expect(COIN_RULES.dropChance * LEVEL_SCALING[LEVEL_COUNT - 1].coin).toBeLessThan(0.2);
+  });
+});
+
+describe('ITEM_DROP_FACTOR (AP-146)', () => {
+  it('has one value per level, in (0, 1]', () => {
+    expect(ITEM_DROP_FACTOR).toHaveLength(LEVEL_COUNT);
+    for (const v of ITEM_DROP_FACTOR) {
+      expect(v).toBeGreaterThan(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('equals CAP_HP_BONUS / ENEMY_COUNT_FACTOR (same factor as xp and coin)', () => {
+    ITEM_DROP_FACTOR.forEach((v, id) => {
+      expect(v).toBeCloseTo(CAP_HP_BONUS[id] / ENEMY_COUNT_FACTOR[id], 12);
+    });
   });
 });
