@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CAP_HP_BONUS,
   CHARGE_TRIGGER_DISTANCE,
   COIN_RULES,
   CONTACT_COMPENSATION as CONTACT_COMPENSATION_CONFIG,
@@ -17,6 +18,8 @@ import {
 } from '../../src/config';
 import type { ActivePowers, EnemyId, EnemyPoolEntry, LevelDef } from '../../src/contracts';
 import { MAX_UPGRADE_LEVEL } from '../../src/contracts';
+import { ARMOUR_RULES } from '../../src/config/armour';
+import { scaledDropRate } from '../../src/logic/items';
 import { upgradeCost, upgradeFactors } from '../../src/logic/upgrades';
 import { computeWeaponStats } from '../../src/logic/weapon';
 import { MIN_INTERVAL_FACTOR, openingCount } from '../../src/logic/spawn';
@@ -262,7 +265,7 @@ function xpOf(level: LevelDef, pool: readonly EnemyPoolEntry[] = level.enemyPool
 /** Anteil der Rundenzeit mit Dauerfeuer, wenn jedes Item aufgesammelt wird und nichts ueberlappt. */
 function rapidFireUptime(level: LevelDef): number {
   const share = itemDef('rapidFire').dropWeight / ITEMS.reduce((s, i) => s + i.dropWeight, 0);
-  const drops = spawnCount(level) * ITEM_RULES.dropChance * share;
+  const drops = spawnCount(level) * scaledDropRate(ITEM_RULES.dropChance, level.id) * share;
   return Math.min(1, (drops * (itemDef('rapidFire').durationMs ?? 0)) / (level.durationSec * 1000));
 }
 
@@ -329,13 +332,25 @@ describe('balance: player damage', () => {
     const buffer = shield.perStack * shield.maxStacks;
     expect(buffer).toBeLessThanOrEqual(PLAYER.maxHp * 1.5);
     expect(buffer).toBeGreaterThanOrEqual(PLAYER.maxHp * 0.5);
-    // Dauerfeuer: fuer sich spuerbar, im Mittel ueber die Runde (Level 20) vor AP-127 weniger als +100 %.
-    // AP-127: Item-Drops wachsen mit der Gegnerzahl (Level 20 x1,92), `ITEM_RULES.dropChance` (items.ts) liegt nicht im
-    // Paket. Ist jetzt etwa +180 %, Grenze deshalb +200 % bis zur Entscheidung (offener Punkt an den Lead).
+    // Dauerfeuer: fuer sich spuerbar, im Mittel ueber die Runde (Level 20) weniger als +100 % (AP-146: Drops durch den
+    // Gegnerzahl-Faktor geteilt, Level 20 wieder etwa 23 % Dauerfeuer-Anteil).
     expect(RAPID_FIRE_MAX_PER_SEC / WEAPON_BASE.fireRatePerSec).toBeGreaterThan(2);
     const uptime = rapidFireUptime(LEVELS[20]);
     expect(uptime).toBeGreaterThan(0.1);
-    expect(1 + uptime * (dps(0, true) / BASE_DPS - 1)).toBeLessThan(3);
+    expect(1 + uptime * (dps(0, true) / BASE_DPS - 1)).toBeLessThan(2);
+  });
+
+  it('item and armour drops per round stay within 2 % of the state before AP-127 (AP-146)', () => {
+    for (const level of LEVELS) {
+      // Vor AP-127: Basis-Gegnerzahl x dropChance; jetzt: Gegnerzahl x dropChance x ITEM_DROP_FACTOR.
+      const before = spawnCount(level) / ENEMY_COUNT_FACTOR[level.id];
+      for (const base of [ITEM_RULES.dropChance, ARMOUR_RULES.dropChance]) {
+        const after = spawnCount(level) * scaledDropRate(base, level.id);
+        const want = before * base * CAP_HP_BONUS[level.id];
+        expect(after / want, `level ${level.id}`).toBeGreaterThan(0.98);
+        expect(after / want, `level ${level.id}`).toBeLessThan(1.02);
+      }
+    }
   });
 
   it('upgrades of fire rate and damage multiply the dps (stage 10 = 4x, stage 15 = 6.25x)', () => {

@@ -1,4 +1,4 @@
-import { DOUBLE_SHOT_STAGE_MS } from '../config';
+import { DOUBLE_SHOT_STAGE_MS, ITEM_DROP_FACTOR } from '../config';
 import type { ActivePowers, ItemDef, ItemRules } from '../contracts';
 import { MAX_DOUBLE_SHOT_STAGE } from './powers';
 import type { Rng } from './rng';
@@ -14,6 +14,13 @@ export function rollDrop(rng: Rng, rules: ItemRules, defs: readonly ItemDef[]): 
     if (roll < 0) return d;
   }
   return defs[defs.length - 1] ?? null;
+}
+
+/** Drop chance scaled by the level's enemy count factor (AP-146), clamped to 0..1. */
+export function scaledDropRate(baseChance: number, levelId: number): number {
+  const factor = ITEM_DROP_FACTOR[levelId] ?? 1;
+  const v = baseChance * factor;
+  return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0;
 }
 
 /** Returns the new power state; heal leave it unchanged. */

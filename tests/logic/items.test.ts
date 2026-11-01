@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { DOUBLE_SHOT_STAGE_MS, ITEMS, ITEM_RULES } from '../../src/config';
+import { DOUBLE_SHOT_STAGE_MS, ITEM_DROP_FACTOR, ITEMS, ITEM_RULES } from '../../src/config';
 import type { ItemDef } from '../../src/contracts';
-import { applyPowerItem, isExpired, rollDrop } from '../../src/logic/items';
+import { applyPowerItem, isExpired, rollDrop, scaledDropRate } from '../../src/logic/items';
 import { emptyPowers } from '../../src/logic/powers';
 import { createRng } from '../../src/logic/rng';
 
@@ -95,5 +95,19 @@ describe('isExpired', () => {
   it('uses lifetime', () => {
     expect(isExpired(0, ITEM_RULES.lifetimeMs - 1, ITEM_RULES.lifetimeMs)).toBe(false);
     expect(isExpired(0, ITEM_RULES.lifetimeMs, ITEM_RULES.lifetimeMs)).toBe(true);
+  });
+});
+
+describe('scaledDropRate (AP-146)', () => {
+  it('multiplies the chance by the level factor', () => {
+    expect(scaledDropRate(0.08, 20)).toBeCloseTo(0.08 * ITEM_DROP_FACTOR[20], 12);
+    expect(scaledDropRate(0.08, 0)).toBeCloseTo(0.08 * ITEM_DROP_FACTOR[0], 12);
+  });
+
+  it('is clamped to 0..1', () => {
+    expect(scaledDropRate(0, 5)).toBe(0);
+    expect(scaledDropRate(-1, 5)).toBe(0);
+    expect(scaledDropRate(100, 5)).toBe(1);
+    expect(scaledDropRate(Number.NaN, 5)).toBe(0);
   });
 });

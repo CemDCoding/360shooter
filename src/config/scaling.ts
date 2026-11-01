@@ -113,3 +113,12 @@ export const LEVEL_SCALING: readonly LevelScaling[] = BASE_LEVEL_SCALING.map((s,
     contact: s.contact,
   };
 });
+
+/**
+ * Faktor auf die Item- und Ruestungs-Drop-Chance je Level (AP-146, PE-182): derselbe Wert, mit dem `xp` und `coin`
+ * geteilt wurden (`CAP_HP_BONUS / ENEMY_COUNT_FACTOR`). Drops werden je besiegtem Gegner gewuerfelt; ohne Faktor
+ * wuerden sie mit der Gegnerzahl wachsen. So bleiben Items und Ruestung je Runde auf dem Stand vor AP-127.
+ */
+export const ITEM_DROP_FACTOR: readonly number[] = CAP_HP_BONUS.map(
+  (bonus, id) => bonus / ENEMY_COUNT_FACTOR[id],
+);
