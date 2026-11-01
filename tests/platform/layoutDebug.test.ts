@@ -41,6 +41,7 @@ const base = {
   roundRunning: false,
   widthChanges: 2,
   lastChange: 'end',
+  insetsUnits: { top: 0, right: 43, bottom: 20, left: 43 },
 };
 
 describe('layoutReport', () => {
@@ -62,6 +63,7 @@ describe('layoutReport', () => {
       'arena want 734 now 640 round false',
       'area 852x393 @0,0 ins t0 r47 b21 l47',
       'avail 758x372',
+      'ins u t0 r43 b20 l43',
       'host 758x371 @47,0',
       'canvas 656x369 @98,0 rest l98 r98',
       'phaser game 640x360 disp 656x369 par 758x371',

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { ArenaWidthController, hostBoxFor, measureArena } from '../../src/platform/arenaLayout';
+import {
+  ArenaWidthController,
+  hostBoxFor,
+  insetsInArenaUnits,
+  measureArena,
+} from '../../src/platform/arenaLayout';
 import { ARENA } from '../../src/config/arena';
 
 // Photo IMG_6372: iPhone landscape home screen app, 852x393, insets t0 r47 b21 l47.
@@ -12,22 +17,73 @@ const photo = {
 };
 
 describe('measureArena', () => {
-  it('photo values (758x372 safe area) want 734, not 640', () => {
+  it('photo values (852x393, insets 0/47/21/47) want 780 from the whole area (PE-140)', () => {
     const m = measureArena(photo);
-    expect(m.availW).toBe(758);
+    expect(m.availW).toBe(758); // room inside the insets, only for the overlay
     expect(m.availH).toBe(372);
-    expect(m.wantedW).toBe(734);
+    expect(m.wantedW).toBe(780);
   });
-  it('host box fills the safe area width with the wanted width', () => {
+  it('host box covers the whole screen (852x393 +-1), not the safe area', () => {
     const m = measureArena(photo);
     const box = hostBoxFor(m.area, m.wantedW);
-    expect(box.left).toBeCloseTo(47, 0);
-    expect(758 - box.width).toBeLessThanOrEqual(2);
-    expect(372 - box.height).toBeLessThanOrEqual(2);
+    expect(Math.abs(box.left)).toBeLessThanOrEqual(1);
+    expect(Math.abs(box.top)).toBeLessThanOrEqual(1);
+    expect(852 - box.width).toBeLessThanOrEqual(1);
+    expect(393 - box.height).toBeLessThanOrEqual(1);
   });
-  it('with width 640 the same box leaves bars (the bug of the photo)', () => {
+  it('insets in arena units: about 0/43/20/43, rounded up', () => {
+    const { wantedInsets: i } = measureArena(photo);
+    expect(i.top).toBe(0);
+    expect(Math.abs(i.right - 43)).toBeLessThanOrEqual(1);
+    expect(Math.abs(i.bottom - 20)).toBeLessThanOrEqual(1);
+    expect(Math.abs(i.left - 43)).toBeLessThanOrEqual(1);
+  });
+  it('mirrored and one-sided insets give the same width and the same box', () => {
+    const base = measureArena(photo);
+    const variants = [
+      { top: 0, right: 21, bottom: 47, left: 47 },
+      { top: 0, right: 47, bottom: 21, left: 0 },
+      { top: 0, right: 0, bottom: 0, left: 0 },
+    ];
+    for (const insets of variants) {
+      const m = measureArena({ ...photo, insets });
+      expect(m.wantedW).toBe(780);
+      expect(hostBoxFor(m.area, m.wantedW)).toEqual(hostBoxFor(base.area, base.wantedW));
+    }
+    const left = measureArena({ ...photo, insets: { top: 0, right: 0, bottom: 21, left: 47 } });
+    const right = measureArena({ ...photo, insets: { top: 0, right: 47, bottom: 21, left: 0 } });
+    expect(left.wantedInsets.left).toBe(right.wantedInsets.right);
+    expect(left.wantedInsets.right).toBe(0);
+  });
+  it('with width 640 the box would leave bars (why the width follows the screen)', () => {
     const box = hostBoxFor(measureArena(photo).area, 640);
-    expect(box.width).toBeLessThan(670);
+    expect(box.width).toBeLessThan(800);
+  });
+  it('insetsInArenaUnits rounds up, never goes negative, survives garbage', () => {
+    const z = { top: 0, right: 0, bottom: 0, left: 0 };
+    expect(insetsInArenaUnits({ top: 1, right: 10, bottom: 10.01, left: -5 }, 2)).toEqual({
+      top: 1,
+      right: 5,
+      bottom: 6,
+      left: 0,
+    });
+    expect(insetsInArenaUnits({ top: 5, right: NaN, bottom: 5, left: 5 }, 0)).toEqual(z);
+    expect(insetsInArenaUnits({ top: 5, right: 5, bottom: 5, left: 5 }, NaN)).toEqual(z);
+  });
+  it('iPad 4:3 (1024x768): 640, bars top and bottom, bars eat the inset', () => {
+    const m = measureArena({
+      probeW: 1024,
+      probeH: 768,
+      insets: { top: 20, right: 0, bottom: 20, left: 0 },
+      vv: null,
+      win: { width: 1024, height: 768 },
+    });
+    expect(m.wantedW).toBe(640);
+    const box = hostBoxFor(m.area, 640);
+    expect(box.left).toBe(0);
+    expect(box.width).toBe(1024);
+    expect(box.top).toBe(96); // (768 - 576) / 2 bar each
+    expect(m.wantedInsets).toEqual({ top: 0, right: 0, bottom: 0, left: 0 });
   });
   it('desktop window and aspect ratios stay within 640..900', () => {
     const cases: [number, number, number][] = [
@@ -76,26 +132,35 @@ const phone = (h: number) => ({
 const restLeft = (h: number, w: number): number => hostBoxFor(measureArena(phone(h)).area, w).left;
 
 describe('AP-96 diagnosis states', () => {
-  it('home screen app / Safari without bar (393): want 734, rest = inset 47 per side (H-e)', () => {
+  it('home screen app / Safari without bar (393): want 780, rest <= 1 per side', () => {
     const m = measureArena(phone(393));
-    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 372, 734]);
+    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 372, 780]);
     const box = hostBoxFor(m.area, m.wantedW);
-    expect(box.width).toBe(758);
-    expect(box.height).toBe(371);
-    expect(box.left).toBeCloseTo(47, 5);
+    expect(box.width).toBe(851);
+    expect(box.height).toBe(392); // 392.99 floored, rest <= 1
+    expect(box.left).toBeCloseTo(0.25, 1);
   });
-  it('Safari with bar (342): want 850, rest = inset (47 plus rounding)', () => {
+  it('Safari with bar (342): want 897 (852/342), rest <= 1, insets by the smaller scale', () => {
     const m = measureArena(phone(342));
-    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 321, 850]);
+    expect([m.availW, m.availH, m.wantedW]).toEqual([758, 321, 897]);
     const box = hostBoxFor(m.area, m.wantedW);
-    expect(box.height).toBe(321);
-    expect(box.width).toBe(757);
-    expect(restLeft(342, 850)).toBeLessThan(48.5);
+    expect(box.height).toBe(341);
+    expect(box.width).toBe(852);
+    expect(852 - box.width).toBeLessThanOrEqual(1);
+    expect(342 - box.height).toBeLessThanOrEqual(1);
+    expect(m.wantedInsets).toEqual({ top: 0, right: 50, bottom: 23, left: 50 });
   });
-  it('want rises above 798 for bars taller than 31 pt', () => {
-    expect(measureArena(phone(363)).wantedW).toBe(798);
-    expect(measureArena(phone(362)).wantedW).toBe(800);
-    expect(restLeft(363, 798)).toBeLessThan(48);
+  it('capped at 900 (height 330): a rest of 27 px per side stays, as computed', () => {
+    const m = measureArena(phone(330));
+    expect(m.wantedW).toBe(900);
+    const box = hostBoxFor(m.area, 900);
+    expect(box.width).toBe(825);
+    expect(box.left).toBeCloseTo(13.5, 5);
+  });
+  it('want rises above 798 for bars taller than 31 pt, rest stays <= 1', () => {
+    expect(measureArena(phone(363)).wantedW).toBe(845);
+    expect(measureArena(phone(362)).wantedW).toBe(847);
+    expect(restLeft(363, 845)).toBeLessThanOrEqual(1);
   });
   it('want never exceeds ARENA.maxWidth (900)', () => {
     for (let h = 100; h <= 393; h += 1)
@@ -112,14 +177,58 @@ describe('AP-96 diagnosis states', () => {
     expect(m.wantedW).toBe(640);
     expect(hostBoxFor(m.area, 640)).toEqual({ left: 0, top: 0, width: 1280, height: 720 });
   });
-  it('bar only in visualViewport (probe still 393): covered home bar inset dropped, 798', () => {
+  it('bar only in visualViewport (probe still 393): covered home bar inset dropped, 897', () => {
     const m = measureArena({
       ...phone(393),
       vv: { width: 852, height: 342, offsetLeft: 0, offsetTop: 0 },
     });
     expect(m.area.insets.bottom).toBe(0);
+    expect(m.wantedInsets.bottom).toBe(0);
     expect(m.availH).toBe(342);
-    expect(m.wantedW).toBe(798);
+    expect(m.wantedW).toBe(897);
+  });
+  it('PC 1920x1080: 640, insets 0', () => {
+    const m = measureArena({
+      probeW: 1920,
+      probeH: 1080,
+      insets: { top: 0, right: 0, bottom: 0, left: 0 },
+      vv: null,
+      win: { width: 1920, height: 1080 },
+    });
+    expect(m.wantedW).toBe(640);
+    expect(m.wantedInsets).toEqual({ top: 0, right: 0, bottom: 0, left: 0 });
+    expect(hostBoxFor(m.area, 640)).toEqual({ left: 0, top: 0, width: 1920, height: 1080 });
+  });
+});
+
+describe('ArenaWidthController insets (PE-109, PE-141, Q-61)', () => {
+  const a = { top: 0, right: 43, bottom: 20, left: 43 };
+  const b = { top: 0, right: 20, bottom: 43, left: 0 };
+  it('applies width and insets together outside a round', () => {
+    const c = new ArenaWidthController();
+    c.want(780, a);
+    expect(c.currentInsets).toEqual(a);
+    expect(c.want(780, b)).toBe(780); // same width, flipped notch: still a change
+    expect(c.currentInsets).toEqual(b);
+    expect(c.want(780, b)).toBeNull();
+  });
+  it('keeps width and insets fixed during a round, applies both at its end', () => {
+    const c = new ArenaWidthController();
+    c.want(780, a);
+    c.roundStart();
+    expect(c.want(897, b)).toBeNull();
+    expect([c.currentW, c.currentInsets]).toEqual([780, a]);
+    expect(c.roundEnd()).toBe(897);
+    expect([c.currentW, c.currentInsets]).toEqual([897, b]);
+  });
+  it('insets alone are deferred during a round, too', () => {
+    const c = new ArenaWidthController();
+    c.want(780, a);
+    c.roundStart();
+    expect(c.want(780, b)).toBeNull();
+    expect(c.currentInsets).toEqual(a);
+    expect(c.roundEnd()).toBe(780);
+    expect(c.currentInsets).toEqual(b);
   });
 });
 

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   GameEvents,
   MAX_UPGRADE_LEVEL,
+  SAFE_INSETS_KEY,
+  type SafeInsets,
   type ActivePowers,
   type CoinRules,
   type UpgradeLevels,
@@ -147,6 +149,12 @@ describe('contracts', () => {
     const payload: GameEventPayloads['power-store-changed'] = state;
     expect(GameEvents.PowerStoreChanged).toBe('power-store-changed');
     expect(payload.stored).toEqual(['rapidFire']);
+  });
+
+  it('accepts SafeInsets with a fixed registry key (AP-117)', () => {
+    const insets: SafeInsets = { top: 0, right: 43, bottom: 20, left: 43 };
+    expect(SAFE_INSETS_KEY).toBe('safeInsets');
+    expect(Object.keys(insets).sort()).toEqual(['bottom', 'left', 'right', 'top']);
   });
 
   it('boss-hp-changed carries the invulnerable flag (V-12)', () => {
