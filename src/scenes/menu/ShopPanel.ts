@@ -15,6 +15,7 @@ import {
   HEAD_H,
   infoView,
   moveFocus,
+  PET_ROLE_TEXT,
   shopLayout,
   SHOP_PANEL,
   SHOP_TABS,
@@ -220,10 +221,12 @@ export class ShopPanel extends Phaser.GameObjects.Container {
     const rects = tileRects(this.tabId, lay.grid);
     this.drawHeads(items, lay.grid, rects);
     const tilesStart = this.focusables.length;
+    const ringG = scene.add.graphics();
     ids.forEach((id, i) => {
       const rect = rects[i];
-      if (rect) this.drawTile(items, g, id, rect, save, tilesStart + i);
+      if (rect) this.drawTile(items, g, ringG, id, rect, save, tilesStart + i);
     });
+    items.push(ringG); // Ringe zuletzt, damit Nachbarkacheln sie nicht überdecken
 
     // Infozeile
     const info = infoView(save, this.selectedId);
@@ -248,7 +251,13 @@ export class ShopPanel extends Phaser.GameObjects.Container {
     });
     const hasBuy = info.button.kind === 'buy';
     if (info.button.kind !== 'none') {
-      const bw = BUTTON_MIN_W;
+      const leadKey = info.button.kind === 'buy' ? 'diamond' : 'ui-icons-m8';
+      const leadW = scene.textures.exists(leadKey)
+        ? scene.textures.getFrame(leadKey, 0).width + 6
+        : 0;
+      const probe = kText(scene, 0, 0, info.button.label, 2, 'menu.text');
+      const bw = Math.max(BUTTON_MIN_W, textWidth(probe) + leadW + 20);
+      probe.destroy();
       const cx = ir.x + ir.w - 6 - bw / 2;
       const cy = ir.y + ir.h / 2;
       let btn: Button;
@@ -263,14 +272,14 @@ export class ShopPanel extends Phaser.GameObjects.Container {
         btn = new Button(scene, cx, cy, info.button.label, () => undefined, {
           variant: 'secondary',
           width: bw,
-          scale: 1,
+          scale: 2,
         });
         btn.setEnabled(false);
       } else {
         btn = new Button(scene, cx, cy, info.button.label, () => undefined, {
           variant: 'done',
           width: bw,
-          scale: 1,
+          scale: 2,
           leading: scene.textures.exists('ui-icons-m8')
             ? { key: 'ui-icons-m8', frame: 1 }
             : undefined,
@@ -322,6 +331,7 @@ export class ShopPanel extends Phaser.GameObjects.Container {
   private drawTile(
     items: Phaser.GameObjects.GameObject[],
     g: Phaser.GameObjects.Graphics,
+    ringG: Phaser.GameObjects.Graphics,
     itemId: string,
     r: Rect,
     save: ReturnType<typeof loadSave>,
@@ -365,9 +375,18 @@ export class ShopPanel extends Phaser.GameObjects.Container {
           0,
         ),
       );
-      const role = infoView(save, itemId).lines[0] ?? '';
+      const role = PET_ROLE_TEXT[item.petId];
       items.push(
-        kText(scene, r.x + r.w / 2, r.y + 108, owned ? '' : role, 1, 'menu.text-muted', 0.5, 0),
+        kText(
+          scene,
+          r.x + r.w / 2,
+          r.y + 108,
+          role,
+          1,
+          owned ? 'menu.done-fg' : 'menu.text-muted',
+          0.5,
+          0,
+        ),
       );
       this.drawPrice(items, owned, item.price, r.x + r.w / 2 + 12, priceY, true);
     } else {
@@ -387,8 +406,8 @@ export class ShopPanel extends Phaser.GameObjects.Container {
       this.drawPrice(items, owned, item.price, priceRight, priceY, false);
     }
     if (view === 'selected' || view === 'selected-owned')
-      drawRing(g, r.x, r.y, r.w, r.h, 2, 'menu.selected');
-    if (this.focusIdx === focusIndex) drawRing(g, r.x, r.y, r.w, r.h, 4, 'menu.focus');
+      drawRing(ringG, r.x, r.y, r.w, r.h, 0, 'menu.selected');
+    if (this.focusIdx === focusIndex) drawRing(ringG, r.x, r.y, r.w, r.h, 0, 'menu.focus');
     const act = (): void => this.select(itemId);
     items.push(this.zone(r, act));
     this.focusables.push({ rect: r, activate: act });
@@ -471,6 +490,11 @@ export class ShopPanel extends Phaser.GameObjects.Container {
       return;
     }
     writeSave(result.save);
+    // Tastaturfokus bleibt auf der gekauften Kachel (kein versehentliches Schließen mit dem nächsten Enter).
+    if (this.focusIdx >= 0) {
+      const at = tabItemIds(this.tabId).indexOf(id);
+      if (at >= 0) this.focusIdx = this.focusLayout.tabs + at;
+    }
     const from = before.diamonds ?? 0;
     const to = result.save.diamonds ?? 0;
     this.redraw();

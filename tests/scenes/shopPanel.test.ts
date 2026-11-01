@@ -65,10 +65,11 @@ describe('tile and info states', () => {
     expect(infoView(base(), 'gear-hell-head').button).toMatchObject({ kind: 'buy', price: 3 });
     const poor = infoView(base({ diamonds: 1 }), 'gear-hell-head');
     expect(poor.button.kind).toBe('short');
-    expect(poor.lines).toEqual(['ES FEHLEN 2 DIAMANTEN.']);
+    expect(poor.lines).toHaveLength(2);
+    expect(poor.lines[1]).toBe('ES FEHLEN 2 DIAMANTEN.');
     const own = infoView(base({ owned: ['gear-hell-head'] }), 'gear-hell-head');
     expect(own.button.kind).toBe('owned');
-    expect(own.lines).toEqual(['ANLEGEN: TIPPE AUF DEIN PORTRÄT.']);
+    expect(own.lines[1]).toBe('ANLEGEN: TIPPE AUF DEIN PORTRÄT.');
   });
 
   it('pet gear without egg is buyable and says so', () => {
@@ -87,6 +88,11 @@ describe('tile and info states', () => {
         expect(v.lines.length).toBeLessThanOrEqual(2);
         for (const l of v.lines) expect(l.length).toBeLessThanOrEqual(MAX_LINE_CHARS);
       }
+  });
+
+  it('pet gear names use the pet gear set labels', () => {
+    expect(infoView(base(), 'petgear-bee-diamond').name).toBe('BIENE · KRISTALL');
+    expect(infoView(base(), 'petgear-bee-hell').name).toBe('BIENE · GLUT');
   });
 
   it('tile view', () => {

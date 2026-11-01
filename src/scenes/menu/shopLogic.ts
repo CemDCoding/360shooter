@@ -1,6 +1,6 @@
 // Reine Layout- und Zustandsfunktionen des Shop-Fensters (AP-141, ohne Phaser, testbar).
 import type { GearEffectDef, GearSet, GearStats, PetId, SaveGame } from '../../contracts';
-import { GEAR_PIECES, GEAR_SETS, GEAR_SLOTS, GEAR_SET_LABELS } from '../../config/gear';
+import { GEAR_PIECES, GEAR_SETS, GEAR_SLOTS, PET_GEAR_SET_LABELS } from '../../config/gear';
 import { PETS, PET_IDS } from '../../config/pets';
 import { eggItemId, getShopItem, petGearItemId } from '../../config/shop';
 import { buyBlocker } from '../../logic/shop';
@@ -117,7 +117,7 @@ const SET_BONUS_TEXT: Record<GearSet, string> = {
   heaven: 'SET: +1 LEBEN ALLE 2 S',
 };
 
-const PET_ROLE_TEXT: Record<PetId, string> = {
+export const PET_ROLE_TEXT: Record<PetId, string> = {
   bee: 'STICHT NAHE GEGNER',
   penguin: 'WIRFT SCHNEEBÄLLE',
   capybara: 'AURA UND HEILUNG',
@@ -182,25 +182,25 @@ export function infoView(save: SaveGame, itemId: string | null): InfoView {
     lines = [PET_ROLE_TEXT[item.petId], 'SCHLÜPFT IN DER RUNDE.'];
   } else if (item.category === 'petGear' && item.petId && item.set) {
     const pet = PETS.find((x) => x.id === item.petId);
-    name = `${pet?.label ?? ''} · ${GEAR_SET_LABELS[item.set]}`;
+    name = `${pet?.label ?? ''} · ${PET_GEAR_SET_LABELS[item.set]}`;
     lines = [`RÜSTUNG FÜR ${pet?.label ?? 'PET'}`];
     if (!isOwned(save, eggItemId(item.petId))) lines.push('PET NOCH NICHT GEKAUFT');
   }
-  lines = lines.slice(0, 2).map((l) => l.slice(0, MAX_LINE_CHARS));
+  lines = lines.slice(0, 2);
 
   const blocker = buyBlocker(save, itemId);
   let button: InfoButton;
   if (blocker === 'already-owned') {
     button = { kind: 'owned', label: 'GEKAUFT' };
-    lines = ['ANLEGEN: TIPPE AUF DEIN PORTRÄT.'];
+    lines = [lines[0] ?? '', 'ANLEGEN: TIPPE AUF DEIN PORTRÄT.'];
   } else if (blocker === 'not-enough-diamonds') {
     const missing = item.price - (save.diamonds ?? 0);
     button = { kind: 'short', label: 'ZU WENIG' };
-    lines = [`ES FEHLEN ${missing} DIAMANTEN.`];
+    lines = [lines[0] ?? '', `ES FEHLEN ${missing} DIAMANTEN.`];
   } else {
     button = { kind: 'buy', label: `KAUFEN ${item.price}`, price: item.price };
   }
-  return { name, lines, button };
+  return { name, lines: lines.filter((l) => l !== ''), button };
 }
 
 /** Tastaturfokus: 0-2 Reiter, danach Kacheln, dann ggf. Kaufknopf, zuletzt Schließen. */
