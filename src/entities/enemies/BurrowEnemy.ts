@@ -1,7 +1,9 @@
 import type Phaser from 'phaser';
+import { animKey } from '../../config/assets';
 import { OPACITY, THEME } from '../../config/theme';
 import { BurrowState, effectiveEmergeMs, type BurrowPhase } from '../../logic/burrow';
 import { distance } from '../../logic/geometry';
+import { prefersReducedMotion } from '../../platform/motion';
 import { ChaseEnemy } from './ChaseEnemy';
 
 const SAND_COLOR = THEME.colors['game.sand'].num;
@@ -12,6 +14,8 @@ const HILL_HEIGHT = 10;
 const HILL_LINE = 2;
 const WARN_RADIUS = 16;
 const WARN_LINE = 2;
+/** Rows (frame pixels) of the 24x24 sprite frames that show the head; below are neck, body and painted hill. */
+const HEAD_CROP_HEIGHT = 12;
 
 /**
  * Fill alpha of the surfacing warning: grows from 0 to OPACITY.dim over the announcement. Pure, for tests.
@@ -29,6 +33,7 @@ export function emergeFillAlpha(leftMs: number, totalMs: number): number {
  * plus a drawn sand hill ring (brief gap, transition PE-133: alpha OPACITY.dim and a ring in game.sand),
  * so the state is readable by shape, not only by colour. Before surfacing a warning circle fills for at
  * least MIN_TELEGRAPH_MS at the surfacing point, which keeps the configured distance to the player.
+ * While burrowed only the dimmed head is shown (body cropped away, PE-139) above a filled sand hill.
  * The logic is the pure BurrowState (AP-98).
  */
 export class BurrowEnemy extends ChaseEnemy {
@@ -50,11 +55,17 @@ export class BurrowEnemy extends ChaseEnemy {
     if (!def) throw new Error(`${this.def.id} has behavior burrow but no burrow definition`);
     // A fresh state per spawn: a pooled worm never comes back burrowed.
     this.logic = new BurrowState(def, { x: this.x, y: this.y });
-    this.setAlpha(1);
+    this.showFull();
   }
 
   protected onDespawn(): void {
     this.gfx?.clear().setVisible(false);
+    this.showFull();
+  }
+
+  /** Full sprite again: no crop, no dimming. */
+  private showFull(): void {
+    this.setCrop();
     this.setAlpha(1);
   }
 
@@ -84,13 +95,20 @@ export class BurrowEnemy extends ChaseEnemy {
     this.halt();
     this.setHittable(false);
     this.setAlpha(OPACITY.dim);
+    this.setCrop(0, 0, this.width, HEAD_CROP_HEIGHT);
+    if (prefersReducedMotion()) {
+      this.stop();
+      this.setFrame(0);
+    }
   }
 
   private surface(state: BurrowState): void {
     this.setPosition(state.position.x, state.position.y);
     this.setHittable(true);
     this.halt();
-    this.setAlpha(1);
+    this.showFull();
+    const anim = animKey(this.def.spriteKey);
+    if (this.scene.anims.exists(anim)) this.play(anim, true);
     this.gfx?.clear().setVisible(false);
   }
 
@@ -98,6 +116,8 @@ export class BurrowEnemy extends ChaseEnemy {
     const gfx = (this.gfx ??= this.scene.add.graphics().setDepth(this.depth + 1));
     const { x, y } = state.position;
     gfx.clear().setVisible(true);
+    gfx.fillStyle(SAND_COLOR, 1);
+    gfx.fillEllipse(x, y + HILL_HEIGHT / 2, HILL_WIDTH, HILL_HEIGHT);
     gfx.lineStyle(HILL_LINE, SAND_COLOR, 1);
     gfx.strokeEllipse(x, y + HILL_HEIGHT / 2, HILL_WIDTH, HILL_HEIGHT);
     if (state.phase === 'emerge' && this.def.burrow) {

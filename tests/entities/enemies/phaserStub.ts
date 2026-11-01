@@ -30,6 +30,7 @@ export class StubGraphics {
       'strokeCircle',
       'fillCircle',
       'strokeEllipse',
+      'fillEllipse',
       'fillStyle',
       'fillRect',
       'generateTexture',
@@ -149,6 +150,8 @@ class Sprite {
   rotation = 0;
   frameIndex: number | undefined;
   anim: string | undefined;
+  crop: [number, number, number, number] | undefined;
+  cropCalls: unknown[][] = [];
   texKey: string;
   tint: number | undefined;
   body: StubBody;
@@ -232,6 +235,11 @@ class Sprite {
   }
   stop(): this {
     this.anim = undefined;
+    return this;
+  }
+  setCrop(...args: number[]): this {
+    this.cropCalls.push(args);
+    this.crop = args.length >= 4 ? [args[0]!, args[1]!, args[2]!, args[3]!] : undefined;
     return this;
   }
   setTexture(key: string): this {
