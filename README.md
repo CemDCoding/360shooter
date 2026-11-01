@@ -48,6 +48,19 @@ Hinweis: Der Server darf **nur im Heimnetz** laufen. Keine Portweiterleitung im 
 
 `public/icons/` enthält Platzhalter-Icons (180, 192, 512 Pixel). `npm run icons` erzeugt sie neu. Der Designer kann sie durch eigene PNGs mit gleichem Namen und gleicher Größe ersetzen. Auf dem iPhone das Symbol danach vom Home-Bildschirm löschen und neu hinzufügen.
 
+## Windows-.exe bauen und weitergeben
+
+Für Freunde ohne Node gibt es eine portable Windows-`.exe`. Sie wird nicht installiert, sondern per Doppelklick gestartet.
+
+1. Im Projektordner `npm install` eintippen (nur beim ersten Mal).
+2. `npm run desktop:build` eintippen. Das baut das Spiel und verpackt es.
+3. Die fertige Datei liegt im Ordner `release/` und heißt `360shooter-<version>-portable.exe` (Version aus `package.json`, z. B. `360shooter-0.1.0-portable.exe`, etwa 110 MB).
+4. Nur diese eine Datei weitergeben, zusammen mit der Anleitung [docs/guides/exe-fuer-freunde.md](docs/guides/exe-fuer-freunde.md).
+
+Zum Ausprobieren ohne Verpacken: erst `npm run build`, dann `npm run desktop:start` (braucht ein vorhandenes `dist/`).
+
+Hinweis: Die `.exe` **nur privat** weitergeben, zum Beispiel per USB-Stick, Cloud-Link oder Messenger an Freunde. Nicht öffentlich hochladen (kein itch.io, keine GitHub-Releases). Die Datei ist nicht signiert, Windows zeigt deshalb beim ersten Start eine Warnung. Die Anleitung erklärt, wie man sie bestätigt. Die `.exe` und der Ordner `release/` werden nicht committet. Wird das Spiel öffentlich geteilt, müssen Impressum, Datenschutz und Lizenzen neu bewertet werden.
+
 ## Debug-Parameter
 
 An die Adresse anhängen, z. B. `http://localhost:5173/?level=5`:
