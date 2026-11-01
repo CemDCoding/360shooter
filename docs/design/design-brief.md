@@ -557,7 +557,7 @@ Keine neuen Sprites, Schriften oder Abhängigkeiten. Der Haken und das X sind 7�
 
 | Datei / Paket | Änderung |
 |---|---|
-| AP-140 Theme- und Sprite-Sync | `npm run theme:build` (neue Tokens oben). `scripts/build-sprites.mjs` lädt nach `sprites-desert.js` zusätzlich `docs/design/assets/sprites-m8.js` im selben vm-Kontext. 43 neue Sprites laut Tabelle (Sprite-Anzahl im Test anpassen), Einträge in `src/config/assets.ts`, `public/assets/LICENSES.md` (eigene Arbeit), `docs/guides/grafik-austauschen.md`. |
+| AP-140 Theme- und Sprite-Sync | `npm run theme:build` (neue Tokens oben). `scripts/build-sprites.mjs` lädt nach `sprites-desert.js` zusätzlich `docs/design/assets/sprites-m8.js` im selben vm-Kontext. 38 neue Sprites laut Tabelle (Sprite-Anzahl im Test anpassen), Einträge in `src/config/assets.ts`, `public/assets/LICENSES.md` (eigene Arbeit), `docs/guides/grafik-austauschen.md`. |
 | AP-136 Verträge | Textur-Schlüssel: `gear-${set}-${slot}`, `pet-${id}`, `petgear-${id}-${set}`, `egg-${id}`; Icon-Index wie oben. Namen der Teile (`label`) nach 12a; Pet-Rüstungen „BIENE · KRISTALL“, „· GLUT“, „· HIMMEL“. |
 | AP-141 Shop | `ShopPanel.ts` nach Tabelle „Shop“, Ansichten 2–4 |
 | AP-142 Ausrüstung | `GearPanel.ts`, `GearPreview.ts` nach Absatz „Ausrüstungs-Fenster“, Ansicht 5. Die Vorschau wird auch für Porträt (2×) und Ergebnis (3×) genutzt. |
