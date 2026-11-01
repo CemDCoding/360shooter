@@ -62,31 +62,32 @@ const MAX_ENEMIES: readonly number[] = [
 
 /**
  * Spawn-Pool je Batch (F-19, PE-125). Der Pool haengt am Batch. Die alten Gewichte sind vervielfacht
- * (gleiche Anteile untereinander), damit Wildschwein, Baer und Fee mit kleinen Gewichten (hoechstens 10 % des
- * Baums) dazukommen. Die Gewichte halten Druck, Gold und Erfahrung von Level 0 bis 20 im Band (AP-105).
+ * (gleiche Anteile untereinander). AP-113 (PE-136, Q-56): Anteil am Pool Wald je Wildschwein und Baer 5,5 %, Wald bei
+ * Nacht je 4,9 % und Fee 10,1 %, Elfenwald Fee 5,3 % (vorher 2,4 / 0,7 / 4,1 / 0,9 %). Die Gewichte mit LEVEL_SCALING
+ * halten Druck, Gold und Erfahrung von Level 0 bis 20 im Band (AP-105, AP-113).
  * Wueste, Pyramiden und Oase: Gewichte so, dass die wirksamen mittleren Lebenspunkte je Pool fast gleich sind und
  * die Kurve ueber LEVEL_SCALING laeuft (Tanks selten, siehe docs/balancing.md).
  */
 const POOL_OF_BATCH: Readonly<Record<BatchId, readonly EnemyPoolEntry[]>> = {
   forest: [
-    { enemyId: 'cursedTree', weight: 40 },
-    { enemyId: 'boar', weight: 1 },
-    { enemyId: 'bear', weight: 1 },
+    { enemyId: 'cursedTree', weight: 178 },
+    { enemyId: 'boar', weight: 11 },
+    { enemyId: 'bear', weight: 11 },
   ],
   forestNight: [
-    { enemyId: 'cursedTree', weight: 60 },
-    { enemyId: 'forestWitch', weight: 30 },
-    { enemyId: 'zombieSquirrel', weight: 48 },
-    { enemyId: 'boar', weight: 1 },
-    { enemyId: 'bear', weight: 1 },
-    { enemyId: 'fairy', weight: 6 },
+    { enemyId: 'cursedTree', weight: 120 },
+    { enemyId: 'forestWitch', weight: 60 },
+    { enemyId: 'zombieSquirrel', weight: 96 },
+    { enemyId: 'boar', weight: 17 },
+    { enemyId: 'bear', weight: 17 },
+    { enemyId: 'fairy', weight: 35 },
   ],
   elfForest: [
-    { enemyId: 'cursedTree', weight: 40 },
-    { enemyId: 'forestWitch', weight: 20 },
-    { enemyId: 'zombieSquirrel', weight: 32 },
-    { enemyId: 'forestSpirit', weight: 16 },
-    { enemyId: 'fairy', weight: 1 },
+    { enemyId: 'cursedTree', weight: 80 },
+    { enemyId: 'forestWitch', weight: 40 },
+    { enemyId: 'zombieSquirrel', weight: 64 },
+    { enemyId: 'forestSpirit', weight: 32 },
+    { enemyId: 'fairy', weight: 12 },
   ],
   desert: [
     { enemyId: 'sandWorm', weight: 10 },

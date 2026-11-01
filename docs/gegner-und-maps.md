@@ -36,13 +36,13 @@ Der Spawn-Pool hängt am **Batch** (`POOL_OF_BATCH` in `levels.ts`), alle Level 
 | **Pyramiden** (Level 26 bis 30) | Mumie, Sandwurm, Archäologe, Sphinx | Antiker Wächter-Hund |
 | **Pyramiden-Oase** (Level 31 bis 40) | Mumie, Schlange, Archäologe, Sphinx | Pharao |
 
-Spawn-Gewichte (je höher, desto häufiger; Anteil am Pool). Die Gewichte sind je Batch fest. Wildschwein, Bär und Fee kommen mit kleinen Gewichten dazu, damit Level 0 bis 20 nicht schwerer werden (PE-125). In Wüste, Pyramiden und Oase sind die Pools so gewichtet, dass die wirksamen mittleren Lebenspunkte je Pool fast gleich sind, die Tanks sind selten.
+Spawn-Gewichte (je höher, desto häufiger; Anteil am Pool). Die Gewichte sind je Batch fest. Wildschwein, Bär und Fee kommen seit AP-113 (PE-136) deutlich häufiger vor (mindestens doppelt so hoch wie vorher), Skalierung und Basiswerte gleichen den Druck aus, damit Level 0 bis 20 nicht schwerer werden (PE-125). In Wüste, Pyramiden und Oase sind die Pools so gewichtet, dass die wirksamen mittleren Lebenspunkte je Pool fast gleich sind, die Tanks sind selten.
 
 | Batch (Level) | Gewichte (Summe) und Anteil |
 |---|---|
-| Wald (0 bis 4) | Verfluchter Baum 40 (95,2 %), Wildschwein 1 (2,4 %), Bär 1 (2,4 %) – Summe 42 |
-| Wald bei Nacht (5 bis 9) | Verfluchter Baum 60 (41,1 %), Waldhexe 30 (20,5 %), Zombie-Eichhörnchen 48 (32,9 %), Wildschwein 1 (0,7 %), Bär 1 (0,7 %), Fee 6 (4,1 %) – Summe 146 |
-| Elfenwald (10 bis 20) | Verfluchter Baum 40 (36,7 %), Waldhexe 20 (18,3 %), Zombie-Eichhörnchen 32 (29,4 %), Waldgeist-Wesen 16 (14,7 %), Fee 1 (0,9 %) – Summe 109 |
+| Wald (0 bis 4) | Verfluchter Baum 178 (89,0 %), Wildschwein 11 (5,5 %), Bär 11 (5,5 %) – Summe 200 |
+| Wald bei Nacht (5 bis 9) | Verfluchter Baum 120 (34,8 %), Waldhexe 60 (17,4 %), Zombie-Eichhörnchen 96 (27,8 %), Wildschwein 17 (4,9 %), Bär 17 (4,9 %), Fee 35 (10,1 %) – Summe 345 |
+| Elfenwald (10 bis 20) | Verfluchter Baum 80 (35,1 %), Waldhexe 40 (17,5 %), Zombie-Eichhörnchen 64 (28,1 %), Waldgeist-Wesen 32 (14,0 %), Fee 12 (5,3 %) – Summe 228 |
 | Wüste (21 bis 25) | Sandwurm 10 (38,5 %), Armadillo 2 (7,7 %), Kamel 4 (15,4 %), Schlange 10 (38,5 %) – Summe 26 |
 | Pyramiden (26 bis 30) | Mumie 3 (11,5 %), Sandwurm 14 (53,8 %), Archäologe 8 (30,8 %), Sphinx 1 (3,8 %) – Summe 26 |
 | Pyramiden-Oase (31 bis 40) | Mumie 4 (15,4 %), Schlange 14 (53,8 %), Archäologe 6 (23,1 %), Sphinx 2 (7,7 %) – Summe 26 |
@@ -119,7 +119,7 @@ Es gibt 14 normale Gegner in drei Gruppen. Die Tabellen zeigen je Gegner die Wer
 | Kontaktschaden | 10 | 5 | 5 | 0 |
 | Erfahrung (XP) | 5 | 10 | 4 | 8 |
 | Münzwert | 1 | 4 | 1 | 4 |
-| Besonderheit | Verschwindet von selbst nach 30 Schaden durch Kontakt (3 s Kontakt, AP-60). | Schuss: 8 Schaden, Geschwindigkeit 120, alle 2000 ms, hält 140 px Abstand. | Schnell, sehr wenig HP. | Aura: Radius 48 px, 12 Schaden pro Sekunde, kein Kontaktschaden. |
+| Besonderheit | Trifft einmal (Kontakt-Gegner, siehe Regel unten) und verschwindet. | Schuss: 8 Schaden, Geschwindigkeit 120, alle 2000 ms, hält 140 px Abstand. | Schnell, sehr wenig HP. | Aura: Radius 48 px, 12 Schaden pro Sekunde, kein Kontaktschaden. |
 | Pool (Map) | Wald, Wald bei Nacht, Elfenwald | Wald bei Nacht, Elfenwald | Wald bei Nacht, Elfenwald | Elfenwald |
 | Erscheint ab Level | 0 | 5 | 5 | 10 |
 
@@ -130,12 +130,12 @@ Es gibt 14 normale Gegner in drei Gruppen. Die Tabellen zeigen je Gegner die Wer
 | ID | `boar` | `bear` | `fairy` |
 | Sprite-Schlüssel | `enemy-boar` | `enemy-bear` | `enemy-fairy` |
 | Verhalten | `charge` (Ansturm) | `chase` | `chase` mit Zickzack |
-| Lebenspunkte (HP) | 80 | 90 | 4 |
+| Lebenspunkte (HP) | 75 | 75 | 4 |
 | Geschwindigkeit | 30 | 36 | 75 |
 | Kontaktschaden | 10 | 12 | 15 |
 | Erfahrung (XP) | 7 | 7 | 4 |
 | Münzwert | 1 | 1 | 2 |
-| Besonderheit | Ansturm (siehe unten): 800 ms Ankündigung, Sprint 150 px/s für 900 ms, Pause 3500 ms, voller Schaden. | Viel HP, langsam. | Sehr wenig HP, viel Kontaktschaden. Läuft im Zickzack (siehe unten). |
+| Besonderheit | Ansturm (siehe unten): 800 ms Ankündigung, Sprint 150 px/s für 900 ms, Pause 3500 ms, voller Schaden. | Viel HP (Tank), langsam. | Sehr wenig HP, viel Kontaktschaden. Läuft im Zickzack (siehe unten). |
 | Pool (Map) | Wald, Wald bei Nacht | Wald, Wald bei Nacht | Wald bei Nacht, Elfenwald |
 | Erscheint ab Level | 0 | 0 | 5 |
 
@@ -183,55 +183,60 @@ Die Mumie, der Armadillo, das Kamel, der Archäologe, das Wildschwein, der Bär 
 - **Wickel** (`onHit.slow`, Mumie): Ein Treffer des Wickels bremst die Drehung der Spielerin auf den Faktor 0,5 für 2000 ms.
 - **Zickzack** (`movement: 'zigzag'`, Fee): Die Fee läuft seitlich versetzt, Ausschlag 16 px, Periode 1400 ms (`ZIGZAG`).
 
+**Regel Kontakt-Gegner (AP-112, AP-113, PE-135):** Verfolger, Ansturm und Eingraben (auch die Tanks) treffen **einmal** mit
+0,5 s Kontaktschaden (`contactDamage` x `CONTACT_HIT_SECONDS` x `contact`) und verschwinden danach ohne Münze und Erfahrung. Ausnahmen:
+Waldgeist (Aura), Schützen (Hexe, Mumie, Kamel, Archäologe) und Bosse. Weil der Treffer kürzer ist als der frühere Dauerkontakt (etwa 1 s), ist `contact` in
+allen Leveln verdoppelt.
+
 ### 2.2 Level-Skalierung der normalen Gegner
 
 Je Level werden HP, XP, Münz-Drop und Kontaktschaden mit Faktoren multipliziert (`LEVEL_SCALING`). Seit AP-91 und AP-95 gibt es in Level 0 bis 20 dafür mehr, aber schwächere Gegner. Druck, Gold und Erfahrung je Runde bleiben gleich. Die Aura des Waldgeist-Wesens und der Schaden der Hexen-Schüsse werden nicht von diesen Faktoren erfasst.
 
-Ab Level 21 (AP-105) bleibt die Gegnerzahl fast gleich, dafür werden die Gegner selbst stärker: Die HP-Kurve wächst um etwa 7,5 % je Level (der Sprung an einer Batch-Grenze beträgt etwa 9,5 %). XP und Münzen steigen um 0,05 je Level ab 1,2, damit eine Upgrade-Spur bis etwa Level 35 die Stufe 15 erreicht. Der Kontaktschaden wächst wie die angenommenen Lebenspunkte der Spielerin.
+Ab Level 21 (AP-105) bleibt die Gegnerzahl fast gleich, dafür werden die Gegner selbst stärker: Die HP-Kurve wächst um etwa 7,5 % je Level (der Sprung an einer Batch-Grenze beträgt etwa 9,5 %). XP und Münzen steigen um 0,05 je Level ab 1,2, damit eine Upgrade-Spur bis etwa Level 35 die Stufe 15 erreicht. Der Kontaktschaden wächst wie die angenommenen Lebenspunkte der Spielerin (ab AP-113 mit dem Ausgleichsfaktor 2 für den Einmaltreffer).
 
 | Level | HP | XP | Münze | Kontakt |
 |---|---|---|---|---|
-| 0 | 0,44 | 0,462 | 0,462 | 0,46 |
-| 1 | 0,46 | 0,488 | 0,488 | 0,49 |
-| 2 | 0,50 | 0,512 | 0,512 | 0,51 |
-| 3 | 0,54 | 0,570 | 0,570 | 0,57 |
-| 4 | 0,60 | 0,621 | 0,621 | 0,62 |
-| 5 | 0,77 | 0,771 | 0,771 | 0,77 |
-| 6 | 0,77 | 0,769 | 0,769 | 0,77 |
-| 7 | 0,77 | 0,773 | 0,773 | 0,77 |
-| 8 | 0,77 | 0,770 | 0,770 | 0,77 |
-| 9 | 0,77 | 0,771 | 0,771 | 0,77 |
-| 10 | 0,77 | 0,774 | 0,774 | 0,77 |
-| 11 | 0,77 | 0,776 | 0,776 | 0,77 |
-| 12 | 0,77 | 0,774 | 0,774 | 0,77 |
-| 13 | 0,77 | 0,771 | 0,771 | 0,77 |
-| 14 | 0,77 | 0,775 | 0,775 | 0,77 |
-| 15 | 0,77 | 0,771 | 0,771 | 0,77 |
-| 16 | 0,77 | 0,770 | 0,770 | 0,77 |
-| 17 | 0,77 | 0,772 | 0,772 | 0,77 |
-| 18 | 0,77 | 0,770 | 0,770 | 0,77 |
-| 19 | 0,77 | 0,774 | 0,774 | 0,77 |
-| 20 | 0,77 | 0,770 | 0,770 | 0,77 |
-| 21 | 0,806 | 1,200 | 1,200 | 0,770 |
-| 22 | 0,850 | 1,250 | 1,250 | 0,780 |
-| 23 | 0,917 | 1,300 | 1,300 | 0,790 |
-| 24 | 0,984 | 1,350 | 1,350 | 0,800 |
-| 25 | 1,043 | 1,400 | 1,400 | 0,811 |
-| 26 | 1,054 | 1,450 | 1,450 | 0,821 |
-| 27 | 1,122 | 1,500 | 1,500 | 0,831 |
-| 28 | 1,191 | 1,550 | 1,550 | 0,841 |
-| 29 | 1,279 | 1,600 | 1,600 | 0,851 |
-| 30 | 1,344 | 1,650 | 1,650 | 0,861 |
-| 31 | 1,385 | 1,700 | 1,700 | 0,871 |
-| 32 | 1,472 | 1,750 | 1,750 | 0,881 |
-| 33 | 1,563 | 1,800 | 1,800 | 0,892 |
-| 34 | 1,663 | 1,850 | 1,850 | 0,902 |
-| 35 | 1,772 | 1,900 | 1,900 | 0,912 |
-| 36 | 1,891 | 1,950 | 1,950 | 0,922 |
-| 37 | 2,022 | 2,000 | 2,000 | 0,932 |
-| 38 | 2,147 | 2,050 | 2,050 | 0,942 |
-| 39 | 2,272 | 2,100 | 2,100 | 0,952 |
-| 40 | 2,422 | 2,150 | 2,150 | 0,963 |
+| 0 | 0,44 | 0,443 | 0,462 | 0,92 |
+| 1 | 0,46 | 0,467 | 0,488 | 0,98 |
+| 2 | 0,50 | 0,490 | 0,512 | 1,02 |
+| 3 | 0,54 | 0,546 | 0,570 | 1,14 |
+| 4 | 0,60 | 0,595 | 0,621 | 1,24 |
+| 5 | 0,714 | 0,781 | 0,781 | 1,54 |
+| 6 | 0,71 | 0,779 | 0,779 | 1,54 |
+| 7 | 0,70 | 0,783 | 0,783 | 1,54 |
+| 8 | 0,70 | 0,780 | 0,780 | 1,54 |
+| 9 | 0,70 | 0,781 | 0,781 | 1,54 |
+| 10 | 0,81 | 0,781 | 0,781 | 1,54 |
+| 11 | 0,81 | 0,783 | 0,783 | 1,54 |
+| 12 | 0,81 | 0,781 | 0,781 | 1,54 |
+| 13 | 0,81 | 0,778 | 0,778 | 1,54 |
+| 14 | 0,81 | 0,782 | 0,782 | 1,54 |
+| 15 | 0,81 | 0,778 | 0,778 | 1,54 |
+| 16 | 0,81 | 0,777 | 0,777 | 1,54 |
+| 17 | 0,81 | 0,779 | 0,779 | 1,54 |
+| 18 | 0,81 | 0,777 | 0,777 | 1,54 |
+| 19 | 0,81 | 0,781 | 0,781 | 1,54 |
+| 20 | 0,81 | 0,777 | 0,777 | 1,54 |
+| 21 | 0,806 | 1,200 | 1,200 | 1,540 |
+| 22 | 0,850 | 1,250 | 1,250 | 1,560 |
+| 23 | 0,917 | 1,300 | 1,300 | 1,581 |
+| 24 | 0,984 | 1,350 | 1,350 | 1,601 |
+| 25 | 1,043 | 1,400 | 1,400 | 1,621 |
+| 26 | 1,054 | 1,450 | 1,450 | 1,641 |
+| 27 | 1,122 | 1,500 | 1,500 | 1,662 |
+| 28 | 1,191 | 1,550 | 1,550 | 1,682 |
+| 29 | 1,279 | 1,600 | 1,600 | 1,702 |
+| 30 | 1,344 | 1,650 | 1,650 | 1,722 |
+| 31 | 1,385 | 1,700 | 1,700 | 1,743 |
+| 32 | 1,472 | 1,750 | 1,750 | 1,763 |
+| 33 | 1,563 | 1,800 | 1,800 | 1,783 |
+| 34 | 1,663 | 1,850 | 1,850 | 1,803 |
+| 35 | 1,772 | 1,900 | 1,900 | 1,824 |
+| 36 | 1,891 | 1,950 | 1,950 | 1,844 |
+| 37 | 2,022 | 2,000 | 2,000 | 1,864 |
+| 38 | 2,147 | 2,050 | 2,050 | 1,884 |
+| 39 | 2,272 | 2,100 | 2,100 | 1,905 |
+| 40 | 2,422 | 2,150 | 2,150 | 1,925 |
 
 Beispiele: Ein Verfluchter Baum hat auf Level 0 etwa 50 × 0,44 = 22 HP und auf Level 20 etwa 50 × 0,77 = 38,5 HP. Eine Sphinx hat auf Level 26 etwa 160 × 1,054 = 169 HP und auf Level 40 etwa 160 × 2,422 = 387,5 HP. Ein Armadillo hat auf Level 21 etwa 90 × 0,806 = 72,5 HP.
 
