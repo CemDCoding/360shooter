@@ -96,7 +96,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** ändert PE-157 („Ein Klick/Tipp auf einen Kreis“) und §2 F-29. Vertrag `src/contracts/parry.ts`, Logik `src/logic/parry.ts`, `ParryOverlay.ts`, neues Paket.
 - **Größe:** L
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: Vertrag `ParryCircle` erweitert, Eingabe mit Halten, Ziehen und evtl. zweitem Touch-Zeiger neben dem Stick
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.2 – Ersatz ohne Halten und Ziehen, Option „Einfache Abwehr“
 - **Vorschlag:** B2 geht auch durch zwei Tipps (Druck- und Loslass-Zeitpunkt), B5 auch durch „Kreis tippen, dann Ziel tippen“, beides immer aktiv. Dazu eine Einstellung „Einfache Abwehr“, in der alle Bausteine als Tipp-Kreis laufen (Trugkreise entfallen, Wahl und Reihenfolge werden ein einfacher Tipp).
@@ -104,7 +104,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** Abnahmekriterium für das Paket aus RS-03.1. Die Einstellung kommt in das bestehende Einstellungs- bzw. Pausemenü.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: neue Einstellung im lokalen Spielstand (`localStorage`)
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.3 – Baummonster „Dornröschen“
 - **Vorschlag:** `rootThrust` wird zur Dornenknospe (B2 + B1, 2 Kreise), `rootRing` zur Dornenhecke (2 Rosen-Kreise plus 1 Spindel-Trugkreis), wie in Ergebnis 5. Schaden und Abklingzeit bleiben.
@@ -112,7 +112,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** präzisiert PE-34 und PE-75 (Baummonster), `RootMonster.ts`, `config/bosses.ts`. Nach RS-03.1.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.4 – Waldgeist „Mondkiesel und Erlkönigs Töchter“
 - **Vorschlag:** `orbFan` mit Kieselspur (B4), `decoys` bekommt kleinen Schaden (Startwert 8) und Trugkreise (B1 + B3), wie in Ergebnis 5.
@@ -120,7 +120,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** ändert PE-34 (Trugbilder machen jetzt Schaden), `ForestGhost.ts`, `config/bosses.ts`. Nach RS-03.1.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.5 – Riesen-Stein „Morgenlicht und Riesenzank“
 - **Vorschlag:** `roll` mit Morgenlicht (B2 + 2 × B1). Neuer Zusatzangriff „Riesenzank“ nach dem Zerfall bei 50 % (B5, 2 Kreise): Die Teilsteine prallen aneinander statt auf die Spielerin, kein Schaden am Boss.
@@ -128,7 +128,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** ändert PE-34 (Riesen-Stein bekommt einen Zusatzangriff), `GiantStone.ts`, `config/bosses.ts`. Nach RS-03.1.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.6 – Sand-Wurm „Fessel der Göttinnen“
 - **Vorschlag:** `coil` mit Bann-Zug (B5, 2 Kreise). Bei `burrow` liegen die Kreise auf der Seite, auf der die Sandspur ankommt.
@@ -136,7 +136,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** präzisiert F-20 (Riesen-Sand-Wurm), `GiantSandWorm.ts`, `config/bosses.ts`. Nach RS-03.1.
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.7 – Wächter-Hund „Schlaflied und Herzenswaage“
 - **Vorschlag:** `guardBark` als Schlummertakt (B7). Neuer Zusatzangriff Herzenswaage (B6, 2 Waagen nacheinander) in den Zusatz-Leveln, `summonMummies` bleibt.
@@ -144,7 +144,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** präzisiert F-20, neuer Angriff in `GuardianDog.ts` und `config/bosses.ts`. Nach RS-03.1.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.8 – Pharao „Rätsel der Sphinx“
 - **Vorschlag:** `goldCurse` bekommt die Rätsel-Wahl (B6, 1 Kreis aus 3 Symbolen), `sandstorm` einen Sand-Trugkreis (B3).
@@ -152,7 +152,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** präzisiert F-20, `Pharaoh.ts`, `config/bosses.ts`. Nach RS-03.1.
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-03.9 – Designer-Nachtrag für Quicktime-Symbole
 - **Vorschlag:** Der Designer entwirft die Symbole und Zustände der Bausteine (Rose bzw. Knospe, Spindel, Kiesel, Nebelumriss, Seil und Ziel, Sonne bzw. Lichtlinie, Waage mit Herz und Feder, Beine 4/2/3 mit Rätselbildern, Kopf-Marken) und die Wertungsanzeige je Kreis. Jeder Baustein muss ohne Farbe erkennbar sein, ohne Blinken, und bei reduced-motion gelten Ersatzanimationen.
@@ -160,7 +160,7 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 - **Plan-Bezug:** [Mensch]-Schritt für den Design-Brief vor den Boss-Paketen RS-03.3 bis .8.
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Design: neue Sprites und Tokens
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ## Vertrauen und Lücken
 
@@ -196,3 +196,4 @@ Der bestehende Kreis mit schrumpfendem Ring stammt sinngemäß aus osu! (Hit-Cir
 ## Entscheidungen
 
 - Nutzer am 2026-11-01: Rahmen 1a (nur bestehende Bosse), 2a (neue Eingaben erlaubt, Prüfung durch den Researcher), 3b (kein Konter), 4b (gleiche Schwierigkeit)
+- Nutzer am 2026-11-01: RS-03.1 bis RS-03.9 freigegeben
