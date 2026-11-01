@@ -4,6 +4,8 @@ import { prefersReducedMotion } from '../../platform/motion';
 import { attachKeyboardFocus, Button, type KeyboardFocus } from './Button';
 import { drawBevel, kText, motionMs } from './kassette';
 
+/** The menu camera may be lifted a few units (RS-02): the scrim reaches below the canvas so no strip stays uncovered. */
+const BACKDROP_EXTRA = 64;
 const DIALOG_W = 360;
 const DIALOG_H = 112;
 const PAD = 16;
@@ -23,7 +25,7 @@ export class ConfirmDialog extends Phaser.GameObjects.Container {
     this.setDepth(1000);
     const scrim = THEME.colors['menu.scrim'];
     const backdrop = scene.add
-      .rectangle(0, 0, width, height, scrim.num, scrim.alpha)
+      .rectangle(0, 0, width, height + BACKDROP_EXTRA, scrim.num, scrim.alpha)
       .setOrigin(0)
       .setInteractive();
     const [title = '', ...rest] = message.split('\n');

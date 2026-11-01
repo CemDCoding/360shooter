@@ -10,6 +10,7 @@ import { addMuteButton, getSoundService } from '../platform/audio';
 import { prefersReducedMotion } from '../platform/motion';
 import { loadSave, resetSave } from '../platform/storage';
 import { isValidLevelId } from './debug';
+import { insetContentOffset, liftForBottom, readSafeInsets } from './safeInsets';
 import { Button } from './menu/Button';
 import { ConfirmDialog } from './menu/ConfirmDialog';
 import { UpgradePanel } from './menu/UpgradePanel';
@@ -20,7 +21,6 @@ import { isLevelUnlocked, pageCount, xpFraction } from './menu/levelGroups';
 import {
   PAGE_SLIDE_MS,
   PAGE_SLIDE_STEPS,
-  centerOffset,
   clampPage,
   isFreshSave,
   pageLabel,
@@ -40,6 +40,8 @@ const PROFILE = { x: 16, y: 52, w: 184, h: 252, pad: 12 };
 const GRID = { x: 216, y: 52 };
 /** Pager bar under the panel, same row as the reset button. */
 const PAGER_Y = 316;
+/** Lowest edge of the menu controls (pager bar y 316 + 32, reset button 332 + 16). */
+const MENU_LOWEST = 348;
 /** Hint line in the header: right aligned up to x 584 (56 px left of the edge), y 22. */
 const NOTE_RIGHT = 56;
 const NOTE_Y = 22;
@@ -76,6 +78,8 @@ export class MenuScene extends Phaser.Scene {
   private sliding = false;
   /** Horizontal shift that centres the 640 layout (PE-102). */
   private ox = 0;
+  /** Upward shift of the layout so the lowest row clears the home bar (RS-02). */
+  private lift = 0;
 
   constructor() {
     super('MenuScene');
@@ -87,7 +91,11 @@ export class MenuScene extends Phaser.Scene {
     this.starting = false;
     getSoundService(this.game).reload();
     const save = loadSave();
-    this.ox = centerOffset(this.scale.width, ARENA.baseWidth);
+    // RS-02: centred 640 layout, kept out of the side insets; lifted if the lowest row (pager, reset) would reach the home bar.
+    const ins = readSafeInsets(this.registry);
+    this.ox = insetContentOffset(this.scale.width, ARENA.baseWidth, ins);
+    this.lift = liftForBottom(this.scale.height, MENU_LOWEST, ins.bottom);
+    this.cameras.main.setScroll(0, this.lift);
     const ox = this.ox;
     const right = ox + ARENA.baseWidth;
 
@@ -180,8 +188,8 @@ export class MenuScene extends Phaser.Scene {
     const inside =
       pointer.downX >= x &&
       pointer.downX <= x + GRID_WIDTH &&
-      pointer.downY >= GRID.y &&
-      pointer.downY <= GRID.y + GRID_HEIGHT;
+      pointer.downY + this.lift >= GRID.y &&
+      pointer.downY + this.lift <= GRID.y + GRID_HEIGHT;
     if (!inside || this.dialog || this.panel) return;
     const dir = swipeDirection(pointer.upX - pointer.downX);
     if (dir !== 0) this.goToPage(stepPage(this.page, dir, this.pageTotal));
@@ -256,7 +264,8 @@ export class MenuScene extends Phaser.Scene {
   /** Sternenhimmel und Planet (nur Tokens: Planet in Pflaume, Sterne in Creme und Koralle). */
   private drawBackground(): void {
     const { width, height } = this.scale;
-    const g = this.add.graphics();
+    // Full-screen backdrop: does not move with the lifted camera.
+    const g = this.add.graphics().setScrollFactor(0);
     const planet = { x: this.ox + 600, y: 430, r: 180 };
     g.fillStyle(THEME.colors['plum.600'].num).fillCircle(planet.x, planet.y, planet.r);
     g.fillStyle(THEME.colors['plum.550'].num).fillCircle(planet.x - 72, planet.y - 90, 70);

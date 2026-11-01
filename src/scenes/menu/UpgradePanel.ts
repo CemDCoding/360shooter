@@ -12,6 +12,8 @@ import { attachKeyboardFocus, Button, type KeyboardFocus } from './Button';
 import { drawBevel, kText, motionMs, textWidth } from './kassette';
 import { buyCaption, nextWeaponStage, pipStates } from './menuLogic';
 
+/** The menu camera may be lifted a few units (RS-02): the scrim reaches below the canvas so no strip stays uncovered. */
+const BACKDROP_EXTRA = 64;
 const WEAPON_TRACKS: readonly UpgradeTrack[] = ['weaponFireRate', 'weaponDamage'];
 const SUIT_TRACKS: readonly UpgradeTrack[] = ['playerMaxHp', 'playerTurnSpeed'];
 
@@ -49,7 +51,7 @@ export class UpgradePanel extends Phaser.GameObjects.Container {
     const { width, height } = scene.scale;
     const scrim = THEME.colors['menu.scrim'];
     const backdrop = scene.add
-      .rectangle(0, 0, width, height, scrim.num, scrim.alpha)
+      .rectangle(0, 0, width, height + BACKDROP_EXTRA, scrim.num, scrim.alpha)
       .setOrigin(0)
       .setInteractive();
     this.content = scene.add.container(0, 0);

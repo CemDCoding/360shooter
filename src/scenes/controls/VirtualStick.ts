@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { THEME, themeColor } from '../../config/theme';
 import { STICK_CATCH_DIAMETER } from '../hud/hudMath';
+import { readSafeInsets, stickCenter } from '../safeInsets';
 import { STICK_ON_DESKTOP, stickAngleRad, stickVector, stickVisible } from '../../platform/stick';
 
 /** Layout/feel constants of the stick (arena units). Drawn size comes from the design tokens. */
@@ -14,7 +15,8 @@ const DEPTH = 50;
 
 /**
  * Virtual stick, bottom right, touch devices and (switch) desktop with mouse. Owns one pointer (by id; the mouse has id 0).
- * The canvas already lies inside the safe area (layoutArena), so the margin is relative to it.
+ * The canvas covers the whole screen (RS-02): the whole catch circle keeps `max(EDGE_MARGIN, inset)`
+ * to the right and bottom edge, so it lies above the home bar and outside the side inset.
  */
 export class VirtualStick {
   private readonly scene: Phaser.Scene;
@@ -36,8 +38,10 @@ export class VirtualStick {
     this.scene = scene;
     this.enabled = stickVisible(!!scene.sys.game.device.input.touch, STICK_ON_DESKTOP);
     const { width, height } = scene.scale;
-    this.cx = width - EDGE_MARGIN - this.catchRadius;
-    this.cy = height - EDGE_MARGIN - this.catchRadius;
+    const ins = readSafeInsets(scene.registry);
+    const c = stickCenter(width, height, this.catchRadius, EDGE_MARGIN, ins);
+    this.cx = c.x;
+    this.cy = c.y;
     const accent = themeColor('hud.accent').num;
     // Dotted phosphor ring: drawn as dots on a graphics object, with a faint glass fill.
     const glass = themeColor('hud.glass');

@@ -19,6 +19,7 @@ import {
 } from './hud/hudMath';
 import { BATCH_LABELS } from './menu/levelGroups';
 import { centerOffset } from './menu/menuLogic';
+import { readSafeInsets, sideMargins } from './safeInsets';
 
 /** Right-hand log head text after a lost round (Q-54, PE-118). */
 export const DEFEAT_TEXT = 'NIEDERLAGE';
@@ -27,7 +28,6 @@ const BAND_H = 6;
 /** Same cap as the HUD so labels stay readable on phones without overflowing. */
 const MAX_K = 1.4;
 const BUTTON_GAP = 12;
-const FACT_LABEL_X = SIDE;
 const FACT_VALUE_X = 182;
 const FACT_TOP = 162;
 /** Fact rows: Funk 2x line (16) plus a row gap of 8 (H-14, 6a). */
@@ -54,6 +54,9 @@ function nonNegative(value: unknown): number {
 export class ResultScene extends Phaser.Scene {
   private done = false;
   private lab = 1;
+  /** Side margins in layout units: max(SIDE, inset - offset), RS-02. */
+  private sideL = SIDE;
+  private sideR = SIDE;
 
   constructor() {
     super('ResultScene');
@@ -65,6 +68,9 @@ export class ResultScene extends Phaser.Scene {
     const ox = centerOffset(fullWidth, ARENA.baseWidth);
     const width = ARENA.baseWidth;
     this.cameras.main.setScroll(-ox, 0);
+    const sides = sideMargins(SIDE, fullWidth, ARENA.baseWidth, ox, readSafeInsets(this.registry));
+    this.sideL = sides.left;
+    this.sideR = sides.right;
     this.done = false;
     this.lab = funkScale(
       1,
@@ -96,18 +102,18 @@ export class ResultScene extends Phaser.Scene {
     const logY = 20 + BAND_H;
     const logLeft = funkText(
       this,
-      SIDE,
+      this.sideL,
       logY,
       logParts.join(' · '),
       this.lab,
       'hud.text-muted',
     ).setOrigin(0, 0);
     // The survived time is only known for a won round (the full level time).
-    let logRightX = width - SIDE;
+    let logRightX = width - this.sideR;
     if (won && level) {
       const right = funkText(
         this,
-        width - SIDE,
+        width - this.sideR,
         logY,
         `${formatTime(level.durationSec)} ÜBERLEBT`,
         this.lab,
@@ -117,7 +123,7 @@ export class ResultScene extends Phaser.Scene {
     } else if (!won) {
       const right = funkText(
         this,
-        width - SIDE,
+        width - this.sideR,
         logY,
         DEFEAT_TEXT,
         this.lab,
@@ -129,10 +135,10 @@ export class ResultScene extends Phaser.Scene {
     // Boss level only (6a): boss row in the facts, seal in the log head after a boss win.
     const bossId = level?.bossId;
     const bossWon = bossId !== undefined && won && data?.bossDefeated === true;
-    if (bossWon) this.createSeal(SIDE + logLeft.width, logRightX, logY);
+    if (bossWon) this.createSeal(this.sideL + logLeft.width, logRightX, logY);
 
-    this.add.image(SIDE + 48, 96, 'astronaut', 0).setScale(3);
-    const heroX = SIDE + 96 + 18;
+    this.add.image(this.sideL + 48, 96, 'astronaut', 0).setScale(3);
+    const heroX = this.sideL + 96 + 18;
     funkText(
       this,
       heroX,
@@ -204,7 +210,7 @@ export class ResultScene extends Phaser.Scene {
   ): void {
     const g = this.add.graphics();
     g.fillStyle(themeColor('hud.line').num, 1);
-    for (let x = SIDE; x < width - SIDE; x += 2) g.fillRect(x, 150, 1, 1);
+    for (let x = this.sideL; x < width - this.sideR; x += 2) g.fillRect(x, 150, 1, 1);
 
     const debugRound = data?.debugRound === true;
     const coins = nonNegative(data?.roundCoins);
@@ -213,7 +219,7 @@ export class ResultScene extends Phaser.Scene {
     const goldTotal = nonNegative(data?.goldTotal);
     const row = (i: number, label: string): number => {
       const y = FACT_TOP + i * FACT_STEP;
-      funkText(this, FACT_LABEL_X, y, label, this.lab, 'hud.text-muted').setOrigin(0, 0.5);
+      funkText(this, this.sideL, y, label, this.lab, 'hud.text-muted').setOrigin(0, 0.5);
       return y;
     };
 
@@ -221,7 +227,7 @@ export class ResultScene extends Phaser.Scene {
     let i0 = 0;
     if (f.boss) {
       const by = row(i0++, 'BOSS');
-      const maxX = width - SIDE;
+      const maxX = width - this.sideR;
       if (f.boss.defeated) {
         const text = `${f.boss.name} · BESIEGT`;
         const starW = patternWidth(PIXEL_STAR) * 2 + 8;
@@ -272,17 +278,23 @@ export class ResultScene extends Phaser.Scene {
     if (debugRound) {
       // Unmissable (AP-88, Q-49): a filled banner, the round was a ?level= debug round and saved nothing.
       const text = 'DEBUG-RUNDE: GOLD UND SPIELSTAND WERDEN NICHT GESPEICHERT';
-      const maxW = width - SIDE * 2 - 16;
+      const maxW = width - this.sideL - this.sideR - 16;
       const scale = measureFunk(this, text, 2) <= maxW ? 2 : 1;
       const h = FUNK_GLYPH_H * scale + 12;
       this.add
-        .rectangle(SIDE, noteY, width - SIDE * 2, h, themeColor('hud.danger').num)
+        .rectangle(
+          this.sideL,
+          noteY,
+          width - this.sideL - this.sideR,
+          h,
+          themeColor('hud.danger').num,
+        )
         .setOrigin(0, 0.5);
-      funkText(this, SIDE + 8, noteY, text, scale, 'hud.screen').setOrigin(0, 0.5);
+      funkText(this, this.sideL + 8, noteY, text, scale, 'hud.screen').setOrigin(0, 0.5);
     } else if (data?.saved === false) {
       funkText(
         this,
-        FACT_LABEL_X,
+        this.sideL,
         noteY,
         'FORTSCHRITT KONNTE NICHT GESPEICHERT WERDEN.',
         this.lab,
@@ -306,8 +318,9 @@ export class ResultScene extends Phaser.Scene {
     const mainIndex = buttons.length === 3 ? 1 : 0;
     buttons[mainIndex].primary = true;
 
-    const y = height - 44;
-    let right = width - SIDE;
+    // Bottom row: at least 44 from the edge, and the button (32 high) stays above the home bar (RS-02).
+    const y = height - Math.max(44, readSafeInsets(this.registry).bottom + 24);
+    let right = width - this.sideR;
     const created: FunkButton[] = [];
     for (let i = buttons.length - 1; i >= 0; i--) {
       const b = buttons[i];
