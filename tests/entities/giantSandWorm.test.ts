@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import type { BossAttackDef } from '../../src/contracts';
 import type { BossHazard } from '../../src/entities/bosses/hazards';
 
+const motion = vi.hoisted(() => ({ reduced: false }));
+vi.mock('../../src/platform/motion', () => ({ prefersReducedMotion: () => motion.reduced }));
+
 // Minimal Phaser stand-in: game objects only keep position, visibility and activity; drawing is a no-op.
 vi.mock('phaser', () => {
   class GameObject {
@@ -9,6 +12,7 @@ vi.mock('phaser', () => {
     x = 0;
     y = 0;
     depth = 0;
+    alpha = 1;
     active = true;
     visible = true;
     body: { enable: boolean } | null = { enable: true };
@@ -24,6 +28,10 @@ vi.mock('phaser', () => {
     }
     setVisible(v: boolean): this {
       this.visible = v;
+      return this;
+    }
+    setAlpha(a: number): this {
+      this.alpha = a;
       return this;
     }
     setActive(v: boolean): this {
@@ -48,7 +56,6 @@ vi.mock('phaser', () => {
     'setFrame',
     'setVelocity',
     'setImmovable',
-    'setAlpha',
     'play',
     'clear',
     'fillStyle',
@@ -100,6 +107,7 @@ vi.mock('phaser', () => {
 
 const { GiantSandWorm } = await import('../../src/entities/bosses/GiantSandWorm');
 const { BOSS_TUNING, BOSSES, MIN_TELEGRAPH_MS } = await import('../../src/config/bosses');
+const { OPACITY } = await import('../../src/config/theme');
 
 const W = BOSS_TUNING.giantSandWorm;
 const CENTER = { x: 320, y: 180 };
@@ -135,6 +143,8 @@ interface WormInternals {
   behave(dt: number): void;
   isInvulnerable: boolean;
   visible: boolean;
+  alpha: number;
+  despawn(): void;
   x: number;
   y: number;
   getHazards(): readonly BossHazard[];
@@ -194,13 +204,14 @@ describe('GiantSandWorm (AP-100)', () => {
     expect(links.every((h) => h.shootable)).toBe(true);
   });
 
-  it('burrow: invulnerable and hidden under the sand, hurts once only in the announced circle', () => {
+  it('burrow: invulnerable, only the dimmed head shows under the sand, hurts once only in the announced circle', () => {
     const worm = makeWorm();
     const before = runFor(worm, 100);
     expect(before).toBe(0);
     worm.onTelegraph(attack('burrow'));
     expect(worm.isInvulnerable).toBe(true);
-    expect(worm.visible).toBe(false);
+    expect(worm.visible).toBe(true);
+    expect(worm.alpha).toBe(OPACITY.dim);
     // Nothing hurts during the dive; only the sand mound is there (no body links shown).
     const hazards = worm.getHazards();
     expect(hazards).toHaveLength(1);
@@ -209,6 +220,7 @@ describe('GiantSandWorm (AP-100)', () => {
     worm.onAttack('burrow', 18);
     expect(worm.isInvulnerable).toBe(false);
     expect(worm.visible).toBe(true);
+    expect(worm.alpha).toBe(1);
     expect(Math.hypot(worm.x - CENTER.x, worm.y - CENTER.y)).toBeCloseTo(W.burrow.emergeDistance);
     expect(runFor(worm, W.burrow.eruptMs + 100)).toBeCloseTo(18);
   });
@@ -269,5 +281,108 @@ describe('GiantSandWorm (AP-100)', () => {
     for (let i = 0; i < W.coil.breakHits; i++) worm.takeDamage(1);
     expect(worm.isCoiling).toBe(false);
     expect(runFor(worm, 3000)).toBe(0);
+  });
+
+  describe('burrow: head only (AP-115)', () => {
+    const linkSprites = (worm: object): { visible: boolean }[] =>
+      (worm as unknown as { links: { visible: boolean }[] }).links;
+
+    it('hides every link while diving and restores them on break-out', () => {
+      const worm = makeWorm();
+      runFor(worm, 100);
+      worm.onTelegraph(attack('burrow'));
+      runFor(worm, 200);
+      expect(linkSprites(worm).every((l) => !l.visible)).toBe(true);
+      runFor(worm, attack('burrow').telegraphMs);
+      worm.onAttack('burrow', 18);
+      runFor(worm, 32);
+      expect(linkSprites(worm).every((l) => l.visible)).toBe(true);
+      expect(worm.alpha).toBe(1);
+    });
+
+    it('the dimmed head rides the mound to the break-out point', () => {
+      const worm = makeWorm();
+      worm.onTelegraph(attack('burrow'));
+      const start = { x: worm.x, y: worm.y };
+      runFor(worm, attack('burrow').telegraphMs / 2);
+      expect(worm.x).not.toBe(start.x);
+      runFor(worm, attack('burrow').telegraphMs);
+      const mound = worm.getHazards()[0].shape as { x: number; y: number };
+      expect(Math.hypot(worm.x - mound.x, worm.y - mound.y)).toBeLessThan(1);
+    });
+
+    it('despawn during the dive leaves nothing behind, spawn restores a full worm', () => {
+      const worm = makeWorm() as ReturnType<typeof makeWorm> & {
+        spawn(x: number, y: number): void;
+      };
+      worm.onTelegraph(attack('burrow'));
+      runFor(worm, 300);
+      worm.despawn();
+      expect(worm.alpha).toBe(1);
+      expect(worm.visible).toBe(false);
+      expect(linkSprites(worm).every((l) => !l.visible)).toBe(true);
+      expect(worm.getHazards()).toHaveLength(0);
+      worm.spawn(CENTER.x + 150, CENTER.y);
+      expect(worm.alpha).toBe(1);
+      expect(worm.visible).toBe(true);
+      expect(worm.isInvulnerable).toBe(false);
+      expect(worm.getHazards()).toHaveLength(W.segmentCount);
+      expect(linkSprites(worm).every((l) => l.visible)).toBe(true);
+    });
+
+    it('takeDamage during the dive does nothing and keeps the dimming', () => {
+      const worm = makeWorm();
+      worm.onTelegraph(attack('burrow'));
+      const hp = worm.hp;
+      expect(worm.takeDamage(5)).toBe(false);
+      expect(worm.hp).toBe(hp);
+      expect(worm.alpha).toBe(OPACITY.dim);
+    });
+
+    it('a dive beats a running coil for the links, the coil returns after the break-out', () => {
+      const worm = makeWorm(23);
+      worm.onTelegraph(attack('coil'));
+      worm.onAttack('coil', 15);
+      worm.onTelegraph(attack('burrow'));
+      runFor(worm, 100);
+      expect(linkSprites(worm).every((l) => !l.visible)).toBe(true);
+      expect(
+        worm.getHazards().filter((h) => h.shootable && h.shape.kind === 'circle'),
+      ).toHaveLength(1);
+      worm.onAttack('burrow', 18);
+      runFor(worm, 16);
+      expect(linkSprites(worm).every((l) => l.visible)).toBe(true);
+    });
+
+    it('dives twice in a row, dimming and restoring each time', () => {
+      const worm = makeWorm();
+      for (let i = 0; i < 2; i++) {
+        worm.onTelegraph(attack('burrow'));
+        expect(worm.alpha).toBe(OPACITY.dim);
+        expect(worm.visible).toBe(true);
+        runFor(worm, attack('burrow').telegraphMs);
+        worm.onAttack('burrow', 18);
+        expect(worm.alpha).toBe(1);
+        runFor(worm, 200);
+      }
+    });
+
+    it('reduced motion: the head rests at the break-out point from the start', () => {
+      motion.reduced = true;
+      try {
+        const worm = makeWorm();
+        worm.onTelegraph(attack('burrow'));
+        const rest = { x: worm.x, y: worm.y };
+        runFor(worm, attack('burrow').telegraphMs / 2);
+        expect(worm.x).toBe(rest.x);
+        expect(worm.y).toBe(rest.y);
+        expect(Math.hypot(rest.x - CENTER.x, rest.y - CENTER.y)).toBeCloseTo(
+          W.burrow.emergeDistance,
+        );
+        expect(worm.alpha).toBe(OPACITY.dim);
+      } finally {
+        motion.reduced = false;
+      }
+    });
   });
 });
