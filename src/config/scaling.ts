@@ -7,7 +7,13 @@
 // ist wegen des Einmaltreffers (AP-112) doppelt so hoch (CONTACT_COMPENSATION).
 // Level 5 bis 20 (AP-95): etwa 1,3-mal so viele Gegner, hp und contact 0,77, xp und coin = alte durch neue Gegnerzahl.
 // Level 21 bis 40 (AP-105, PE-129): die Gegner selbst werden staerker (hp ueber 0,77 hinaus).
+// M7 (AP-127, PE-152, PE-163): etwa 2,5-mal so viele Gegner (ENEMY_COUNT_FACTOR in levels.ts). `hp` und `contact` je Gegner
+// bleiben, `xp` und `coin` werden durch den Faktor geteilt (Gold und Erfahrung je Runde gleich). Wo die Obergrenze
+// MAX_ENEMIES_CAP greift, bekommt `hp` den Aufschlag CAP_HP_BONUS. Die Gegnerstufe (tierFor) steckt NICHT in diesen Werten,
+// `enemyScaleFor` in logic/scaling.ts rechnet sie dazu.
 // Erklaerung in docs/balancing.md.
+import { ENEMY_COUNT_FACTOR, MAX_ENEMIES_CAP, MAX_ENEMIES_WANTED } from './levels';
+
 export interface LevelScaling {
   hp: number;
   xp: number;
@@ -65,7 +71,8 @@ const m5Coin = (i: number): number => Math.round((1.2 + 0.05 * i) * 1000) / 1000
 const m5Contact = (i: number): number =>
   Math.round(CONTACT_COMPENSATION * 0.77 * (1 + (0.25 * i) / 19) * 1000) / 1000;
 
-export const LEVEL_SCALING: readonly LevelScaling[] = Array.from({ length: 41 }, (_, id) => {
+/** Werte vor AP-127 (Stand AP-113), Index = Level-ID. */
+const BASE_LEVEL_SCALING: readonly LevelScaling[] = Array.from({ length: 41 }, (_, id) => {
   if (id < DENSE.length) return { ...DENSE[id] };
   if (id < M5_FIRST) {
     return {
@@ -77,4 +84,32 @@ export const LEVEL_SCALING: readonly LevelScaling[] = Array.from({ length: 41 },
   }
   const i = id - M5_FIRST;
   return { hp: M5_HP[i], xp: m5Coin(i), coin: m5Coin(i), contact: m5Contact(i) };
+});
+
+const round = (v: number, digits: number): number => Math.round(v * 10 ** digits) / 10 ** digits;
+
+/**
+ * HP-Aufschlag ab der Obergrenze (AP-127, PE-152): gewuenschte durch moegliche gleichzeitige Gegner
+ * (`MAX_ENEMIES_WANTED / MAX_ENEMIES_CAP`, mindestens 1). Level 0 bis 14 haben 1, Level 15 1,04, Level 20 1,3, Level 40 1,5.
+ * Annahme: Die Obergrenze bremst die Gegnerzahl im selben Verhaeltnis, der Aufschlag holt den Druck zurueck.
+ */
+export const CAP_HP_BONUS: readonly number[] = MAX_ENEMIES_WANTED.map((w) =>
+  round(Math.max(1, w / MAX_ENEMIES_CAP), 4),
+);
+
+/**
+ * Faktoren je Level ab AP-127. `hp` = Wert vor AP-127 mal `CAP_HP_BONUS`. `xp` und `coin` = Wert vor AP-127 durch den
+ * wirksamen Gegnerzahl-Faktor (`ENEMY_COUNT_FACTOR / CAP_HP_BONUS`): Wo die Obergrenze greift, kommen weniger, dafuer
+ * zaehere Gegner, und jeder bringt im selben Verhaeltnis mehr. Gold und Erfahrung je Runde bleiben so gleich (PE-163).
+ * `contact` je Gegner bleibt (bewusst mehr Druck, PE-152).
+ */
+export const LEVEL_SCALING: readonly LevelScaling[] = BASE_LEVEL_SCALING.map((s, id) => {
+  const bonus = CAP_HP_BONUS[id];
+  const reward = bonus / ENEMY_COUNT_FACTOR[id];
+  return {
+    hp: round(s.hp * bonus, 3),
+    xp: round(s.xp * reward, 4),
+    coin: round(s.coin * reward, 4),
+    contact: s.contact,
+  };
 });

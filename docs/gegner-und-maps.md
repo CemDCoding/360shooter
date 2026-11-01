@@ -1,6 +1,6 @@
 # Gegner und Maps – Übersicht
 
-Stand: 2026-10-31, aus dem Code gelesen (`src/config/enemies.ts`, `levels.ts`, `maps.ts`, `scaling.ts`, `bosses.ts`). Zahlen ändern nur dort, nicht in dieser Datei. Erklärung der Werte: `docs/balancing.md`.
+Stand: 2026-11-01 (Gegnerzahlen, Skalierung, Stufen und Boss-HP nach AP-126 bis AP-128 und AP-127), aus dem Code gelesen (`src/config/enemies.ts`, `levels.ts`, `maps.ts`, `scaling.ts`, `tiers.ts`, `bosses.ts`). Zahlen ändern nur dort, nicht in dieser Datei. Erklärung der Werte: `docs/balancing.md`.
 
 Kurzbegriffe: **Batch** = Spielwelt mit eigener Map. **Level** = einzelne Runde (0 bis 40). Eine **Map** gehört zu genau einem Batch. Es gibt sechs Batches, 14 normale Gegner und sechs Bosse.
 
@@ -49,51 +49,51 @@ Spawn-Gewichte (je höher, desto häufiger; Anteil am Pool). Die Gewichte sind j
 
 ### Level-Tabelle
 
-Dauer: 180 s oder 300 s (die erste Hälfte eines Batches, aufgerundet, dauert 180 s). Der Spawn-Abstand gilt zu Beginn der Runde und sinkt im Lauf der Runde auf 60 % (also mehr Gegner). `Max.` ist die Obergrenze gleichzeitig lebender Gegner (höchstens 150). Ab Level 21 sinkt der Spawn-Abstand nur noch um 5 ms je Level (525 auf 430 ms) und `Max.` steigt um 1 je Level (131 bis 150). Stärker werden die Gegner selbst (siehe 2.3).
+Dauer: 180 s oder 300 s (die erste Hälfte eines Batches, aufgerundet, dauert 180 s). Der Spawn-Abstand gilt zu Beginn der Runde und sinkt im Lauf der Runde auf 60 % (also mehr Gegner). `Max.` ist die Obergrenze gleichzeitig lebender Gegner (höchstens 250, AP-127). Seit AP-127 (M7) kommen etwa 2,5-mal so viele Gegner: Der Spawn-Abstand ist der frühere Wert geteilt durch den Gegnerzahl-Faktor (Level 0 1,5, Level 1 1,75, Level 2 2,0, Level 3 2,25, ab Level 4 2,5), `Max.` der frühere Wert mal Faktor. Ab Level 15 greift die Obergrenze 250, dort haben die Gegner dafür mehr HP (siehe 2.2). Ab Level 21 sinkt der Spawn-Abstand nur noch um 2 ms je Level (210 auf 172 ms). Stärker werden die Gegner selbst (siehe 2.2).
 
 | Level | Map | Dauer | Spawn-Abstand (ms) | Max. Gegner | Boss |
 |---|---|---|---|---|---|
-| 0 | Wald | 180 s | 1500 | 25 | Baummonster |
-| 1 | Wald | 180 s | 1450 | 28 | Baummonster |
-| 2 | Wald | 180 s | 1400 | 31 | Baummonster |
-| 3 | Wald | 300 s | 1360 | 34 | Baummonster |
-| 4 | Wald | 300 s | 1330 | 37 | Baummonster |
-| 5 | Wald bei Nacht | 180 s | 870 | 52 | Waldgeist |
-| 6 | Wald bei Nacht | 180 s | 840 | 55 | Waldgeist |
-| 7 | Wald bei Nacht | 180 s | 810 | 57 | Waldgeist |
-| 8 | Wald bei Nacht | 300 s | 770 | 60 | Waldgeist |
-| 9 | Wald bei Nacht | 300 s | 740 | 62 | Waldgeist |
-| 10 | Elfenwald | 180 s | 615 | 78 | Riesen-Stein |
-| 11 | Elfenwald | 180 s | 610 | 83 | Riesen-Stein |
-| 12 | Elfenwald | 180 s | 600 | 88 | Riesen-Stein |
-| 13 | Elfenwald | 180 s | 590 | 94 | Riesen-Stein |
-| 14 | Elfenwald | 180 s | 585 | 99 | Riesen-Stein |
-| 15 | Elfenwald | 180 s | 575 | 104 | Riesen-Stein |
-| 16 | Elfenwald | 300 s | 560 | 109 | Riesen-Stein |
-| 17 | Elfenwald | 300 s | 555 | 114 | Riesen-Stein |
-| 18 | Elfenwald | 300 s | 545 | 120 | Riesen-Stein |
-| 19 | Elfenwald | 300 s | 540 | 125 | Riesen-Stein |
-| 20 | Elfenwald | 300 s | 530 | 130 | Riesen-Stein |
-| 21 | Wüste | 180 s | 525 | 131 | Sand-Wurm |
-| 22 | Wüste | 180 s | 520 | 132 | Sand-Wurm |
-| 23 | Wüste | 180 s | 515 | 133 | Sand-Wurm |
-| 24 | Wüste | 300 s | 510 | 134 | Sand-Wurm |
-| 25 | Wüste | 300 s | 505 | 135 | Sand-Wurm |
-| 26 | Pyramiden | 180 s | 500 | 136 | Wächter-Hund |
-| 27 | Pyramiden | 180 s | 495 | 137 | Wächter-Hund |
-| 28 | Pyramiden | 180 s | 490 | 138 | Wächter-Hund |
-| 29 | Pyramiden | 300 s | 485 | 139 | Wächter-Hund |
-| 30 | Pyramiden | 300 s | 480 | 140 | Wächter-Hund |
-| 31 | Pyramiden-Oase | 180 s | 475 | 141 | Pharao |
-| 32 | Pyramiden-Oase | 180 s | 470 | 142 | Pharao |
-| 33 | Pyramiden-Oase | 180 s | 465 | 143 | Pharao |
-| 34 | Pyramiden-Oase | 180 s | 460 | 144 | Pharao |
-| 35 | Pyramiden-Oase | 180 s | 455 | 145 | Pharao |
-| 36 | Pyramiden-Oase | 300 s | 450 | 146 | Pharao |
-| 37 | Pyramiden-Oase | 300 s | 445 | 147 | Pharao |
-| 38 | Pyramiden-Oase | 300 s | 440 | 148 | Pharao |
-| 39 | Pyramiden-Oase | 300 s | 435 | 149 | Pharao |
-| 40 | Pyramiden-Oase | 300 s | 430 | 150 | Pharao |
+| 0 | Wald | 180 s | 1000 | 38 | Baummonster |
+| 1 | Wald | 180 s | 829 | 49 | Baummonster |
+| 2 | Wald | 180 s | 700 | 62 | Baummonster |
+| 3 | Wald | 300 s | 604 | 77 | Baummonster |
+| 4 | Wald | 300 s | 532 | 93 | Baummonster |
+| 5 | Wald bei Nacht | 180 s | 348 | 130 | Waldgeist |
+| 6 | Wald bei Nacht | 180 s | 336 | 138 | Waldgeist |
+| 7 | Wald bei Nacht | 180 s | 324 | 143 | Waldgeist |
+| 8 | Wald bei Nacht | 300 s | 308 | 150 | Waldgeist |
+| 9 | Wald bei Nacht | 300 s | 296 | 155 | Waldgeist |
+| 10 | Elfenwald | 180 s | 246 | 195 | Riesen-Stein |
+| 11 | Elfenwald | 180 s | 244 | 208 | Riesen-Stein |
+| 12 | Elfenwald | 180 s | 240 | 220 | Riesen-Stein |
+| 13 | Elfenwald | 180 s | 236 | 235 | Riesen-Stein |
+| 14 | Elfenwald | 180 s | 234 | 248 | Riesen-Stein |
+| 15 | Elfenwald | 180 s | 230 | 250 | Riesen-Stein |
+| 16 | Elfenwald | 300 s | 224 | 250 | Riesen-Stein |
+| 17 | Elfenwald | 300 s | 222 | 250 | Riesen-Stein |
+| 18 | Elfenwald | 300 s | 218 | 250 | Riesen-Stein |
+| 19 | Elfenwald | 300 s | 216 | 250 | Riesen-Stein |
+| 20 | Elfenwald | 300 s | 212 | 250 | Riesen-Stein |
+| 21 | Wüste | 180 s | 210 | 250 | Sand-Wurm |
+| 22 | Wüste | 180 s | 208 | 250 | Sand-Wurm |
+| 23 | Wüste | 180 s | 206 | 250 | Sand-Wurm |
+| 24 | Wüste | 300 s | 204 | 250 | Sand-Wurm |
+| 25 | Wüste | 300 s | 202 | 250 | Sand-Wurm |
+| 26 | Pyramiden | 180 s | 200 | 250 | Wächter-Hund |
+| 27 | Pyramiden | 180 s | 198 | 250 | Wächter-Hund |
+| 28 | Pyramiden | 180 s | 196 | 250 | Wächter-Hund |
+| 29 | Pyramiden | 300 s | 194 | 250 | Wächter-Hund |
+| 30 | Pyramiden | 300 s | 192 | 250 | Wächter-Hund |
+| 31 | Pyramiden-Oase | 180 s | 190 | 250 | Pharao |
+| 32 | Pyramiden-Oase | 180 s | 188 | 250 | Pharao |
+| 33 | Pyramiden-Oase | 180 s | 186 | 250 | Pharao |
+| 34 | Pyramiden-Oase | 180 s | 184 | 250 | Pharao |
+| 35 | Pyramiden-Oase | 180 s | 182 | 250 | Pharao |
+| 36 | Pyramiden-Oase | 300 s | 180 | 250 | Pharao |
+| 37 | Pyramiden-Oase | 300 s | 178 | 250 | Pharao |
+| 38 | Pyramiden-Oase | 300 s | 176 | 250 | Pharao |
+| 39 | Pyramiden-Oase | 300 s | 174 | 250 | Pharao |
+| 40 | Pyramiden-Oase | 300 s | 172 | 250 | Pharao |
 
 Der Riesen-Stein ist für Spielerlevel 6 nicht freigeschaltet. Zum Testen `?level=10`, `?level=18` oder ein beliebiges Level bis `?level=40` verwenden (PE-79).
 
@@ -190,59 +190,63 @@ allen Leveln verdoppelt.
 
 ### 2.2 Level-Skalierung der normalen Gegner
 
-Je Level werden HP, XP, Münz-Drop und Kontaktschaden mit Faktoren multipliziert (`LEVEL_SCALING`). Seit AP-91 und AP-95 gibt es in Level 0 bis 20 dafür mehr, aber schwächere Gegner. Druck, Gold und Erfahrung je Runde bleiben gleich. Die Aura des Waldgeist-Wesens und der Schaden der Hexen-Schüsse werden nicht von diesen Faktoren erfasst.
+Je Level werden HP, XP, Münz-Drop und Kontaktschaden mit Faktoren multipliziert (`LEVEL_SCALING`). Seit AP-91 und AP-95 gibt es in Level 0 bis 20 dafür mehr, aber schwächere Gegner. Die Aura des Waldgeist-Wesens und der Schaden der Hexen-Schüsse werden nicht von diesen Faktoren erfasst.
+
+**Seit AP-127 (M7, mehr Gegner):** HP und Kontaktschaden je Gegner bleiben, XP und Münz-Drop sind durch den Gegnerzahl-Faktor geteilt, damit Gold und Erfahrung je Runde gleich bleiben. Ab Level 15 kommt ein HP-Aufschlag dazu (gewünschte durch mögliche gleichzeitige Gegner, Level 15 ×1,04 bis Level 40 ×1,5); XP und Münz-Drop steigen dort im selben Verhältnis. Die Tabelle zeigt die Werte mit Aufschlag.
+
+**Gegnerstufen (AP-128, PE-161):** Zusätzlich zur Tabelle bekommt jeder normale Gegner je Level-Index im Batch (Stufe) +8 % HP und +5 % Kontaktschaden (ohne Deckel) und wird um 3 % je Stufe größer (höchstens +15 %). Stufe 0 ist das erste Level eines Batches; Level 4 und 9 haben Stufe 4, Level 20 Stufe 10 (+80 % HP, +50 % Schaden), Level 40 Stufe 9 (+72 % HP). Werte in `src/config/tiers.ts`, Druck je Level in `docs/balancing.md`.
 
 Ab Level 21 (AP-105) bleibt die Gegnerzahl fast gleich, dafür werden die Gegner selbst stärker: Die HP-Kurve wächst um etwa 7,5 % je Level (der Sprung an einer Batch-Grenze beträgt etwa 9,5 %). XP und Münzen steigen um 0,05 je Level ab 1,2, damit eine Upgrade-Spur bis etwa Level 35 die Stufe 15 erreicht. Der Kontaktschaden wächst wie die angenommenen Lebenspunkte der Spielerin (ab AP-113 mit dem Ausgleichsfaktor 2 für den Einmaltreffer).
 
 | Level | HP | XP | Münze | Kontakt |
 |---|---|---|---|---|
-| 0 | 0,44 | 0,443 | 0,462 | 0,92 |
-| 1 | 0,46 | 0,467 | 0,488 | 0,98 |
-| 2 | 0,50 | 0,490 | 0,512 | 1,02 |
-| 3 | 0,54 | 0,546 | 0,570 | 1,14 |
-| 4 | 0,60 | 0,595 | 0,621 | 1,24 |
-| 5 | 0,714 | 0,781 | 0,781 | 1,54 |
-| 6 | 0,71 | 0,779 | 0,779 | 1,54 |
-| 7 | 0,70 | 0,783 | 0,783 | 1,54 |
-| 8 | 0,70 | 0,780 | 0,780 | 1,54 |
-| 9 | 0,70 | 0,781 | 0,781 | 1,54 |
-| 10 | 0,81 | 0,781 | 0,781 | 1,54 |
-| 11 | 0,81 | 0,783 | 0,783 | 1,54 |
-| 12 | 0,81 | 0,781 | 0,781 | 1,54 |
-| 13 | 0,81 | 0,778 | 0,778 | 1,54 |
-| 14 | 0,81 | 0,782 | 0,782 | 1,54 |
-| 15 | 0,81 | 0,778 | 0,778 | 1,54 |
-| 16 | 0,81 | 0,777 | 0,777 | 1,54 |
-| 17 | 0,81 | 0,779 | 0,779 | 1,54 |
-| 18 | 0,81 | 0,777 | 0,777 | 1,54 |
-| 19 | 0,81 | 0,781 | 0,781 | 1,54 |
-| 20 | 0,81 | 0,777 | 0,777 | 1,54 |
-| 21 | 0,806 | 1,200 | 1,200 | 1,540 |
-| 22 | 0,850 | 1,250 | 1,250 | 1,560 |
-| 23 | 0,917 | 1,300 | 1,300 | 1,581 |
-| 24 | 0,984 | 1,350 | 1,350 | 1,601 |
-| 25 | 1,043 | 1,400 | 1,400 | 1,621 |
-| 26 | 1,054 | 1,450 | 1,450 | 1,641 |
-| 27 | 1,122 | 1,500 | 1,500 | 1,662 |
-| 28 | 1,191 | 1,550 | 1,550 | 1,682 |
-| 29 | 1,279 | 1,600 | 1,600 | 1,702 |
-| 30 | 1,344 | 1,650 | 1,650 | 1,722 |
-| 31 | 1,385 | 1,700 | 1,700 | 1,743 |
-| 32 | 1,472 | 1,750 | 1,750 | 1,763 |
-| 33 | 1,563 | 1,800 | 1,800 | 1,783 |
-| 34 | 1,663 | 1,850 | 1,850 | 1,803 |
-| 35 | 1,772 | 1,900 | 1,900 | 1,824 |
-| 36 | 1,891 | 1,950 | 1,950 | 1,844 |
-| 37 | 2,022 | 2,000 | 2,000 | 1,864 |
-| 38 | 2,147 | 2,050 | 2,050 | 1,884 |
-| 39 | 2,272 | 2,100 | 2,100 | 1,905 |
-| 40 | 2,422 | 2,150 | 2,150 | 1,925 |
+| 0 | 0,44 | 0,2953 | 0,308 | 0,92 |
+| 1 | 0,46 | 0,2669 | 0,2789 | 0,98 |
+| 2 | 0,5 | 0,245 | 0,256 | 1,02 |
+| 3 | 0,54 | 0,2427 | 0,2533 | 1,14 |
+| 4 | 0,6 | 0,238 | 0,2484 | 1,24 |
+| 5 | 0,714 | 0,3124 | 0,3124 | 1,54 |
+| 6 | 0,71 | 0,3116 | 0,3116 | 1,54 |
+| 7 | 0,7 | 0,3132 | 0,3132 | 1,54 |
+| 8 | 0,7 | 0,312 | 0,312 | 1,54 |
+| 9 | 0,7 | 0,3124 | 0,3124 | 1,54 |
+| 10 | 0,81 | 0,3124 | 0,3124 | 1,54 |
+| 11 | 0,81 | 0,3132 | 0,3132 | 1,54 |
+| 12 | 0,81 | 0,3124 | 0,3124 | 1,54 |
+| 13 | 0,81 | 0,3112 | 0,3112 | 1,54 |
+| 14 | 0,81 | 0,3128 | 0,3128 | 1,54 |
+| 15 | 0,842 | 0,3236 | 0,3236 | 1,54 |
+| 16 | 0,885 | 0,3394 | 0,3394 | 1,54 |
+| 17 | 0,923 | 0,3552 | 0,3552 | 1,54 |
+| 18 | 0,972 | 0,373 | 0,373 | 1,54 |
+| 19 | 1,014 | 0,3911 | 0,3911 | 1,54 |
+| 20 | 1,053 | 0,404 | 0,404 | 1,54 |
+| 21 | 1,057 | 0,6298 | 0,6298 | 1,540 |
+| 22 | 1,122 | 0,66 | 0,66 | 1,560 |
+| 23 | 1,221 | 0,6926 | 0,6926 | 1,581 |
+| 24 | 1,319 | 0,7236 | 0,7236 | 1,601 |
+| 25 | 1,41 | 0,7571 | 0,7571 | 1,621 |
+| 26 | 1,433 | 0,7888 | 0,7888 | 1,641 |
+| 27 | 1,539 | 0,8232 | 0,8232 | 1,662 |
+| 28 | 1,644 | 0,8556 | 0,8556 | 1,682 |
+| 29 | 1,78 | 0,8909 | 0,8909 | 1,702 |
+| 30 | 1,882 | 0,924 | 0,924 | 1,722 |
+| 31 | 1,956 | 0,9602 | 0,9602 | 1,743 |
+| 32 | 2,09 | 0,994 | 0,994 | 1,763 |
+| 33 | 2,238 | 1,031 | 1,031 | 1,783 |
+| 34 | 2,395 | 1,0656 | 1,0656 | 1,803 |
+| 35 | 2,573 | 1,1035 | 1,1035 | 1,824 |
+| 36 | 2,761 | 1,1388 | 1,1388 | 1,844 |
+| 37 | 2,976 | 1,1776 | 1,1776 | 1,864 |
+| 38 | 3,178 | 1,2136 | 1,2136 | 1,884 |
+| 39 | 3,39 | 1,2533 | 1,2533 | 1,905 |
+| 40 | 3,633 | 1,29 | 1,29 | 1,925 |
 
-Beispiele: Ein Verfluchter Baum hat auf Level 0 etwa 50 × 0,44 = 22 HP und auf Level 20 etwa 50 × 0,77 = 38,5 HP. Eine Sphinx hat auf Level 26 etwa 160 × 1,054 = 169 HP und auf Level 40 etwa 160 × 2,422 = 387,5 HP. Ein Armadillo hat auf Level 21 etwa 90 × 0,806 = 72,5 HP.
+Beispiele (mit Stufe, gerundet wie im Spiel): Ein Verfluchter Baum hat auf Level 0 50 × 0,44 = 22 HP und auf Level 20 50 × 1,053 × 1,8 = 95 HP. Eine Sphinx hat auf Level 26 160 × 1,433 = 229 HP und auf Level 40 160 × 3,633 × 1,72 = 1000 HP. Ein Armadillo hat auf Level 21 90 × 1,057 = 95 HP.
 
 ### 2.3 Bosse
 
-Pro Batch gibt es einen Boss, insgesamt sechs. Die anderen Level des Batches nutzen ihn als Variante: **HP +15 % und Schaden +10 % pro Level-Index im Batch** (Index 0 ist das erste Level des Batches). Ab dem **3. Level des Batches (Index 2)** kommt ein zusätzlicher Angriff dazu (in der Tabelle als „Zusatz“ markiert).
+Pro Batch gibt es einen Boss, insgesamt sechs. Seit AP-126 (PE-154) haben alle Bosse die doppelte Basis-HP; die Gegnerstufen (2.2) gelten nicht für Bosse. Die anderen Level des Batches nutzen ihn als Variante: **HP +15 % und Schaden +10 % pro Level-Index im Batch** (Index 0 ist das erste Level des Batches). Ab dem **3. Level des Batches (Index 2)** kommt ein zusätzlicher Angriff dazu (in der Tabelle als „Zusatz“ markiert).
 
 **Ablauf:** Die Warnung „Boss kommt!“ erscheint 33 s vor Rundenende, der Boss selbst 30 s vor Rundenende. Beim Boss-Auftritt verschwinden alle normalen Gegner und ihre Geschosse sofort, ohne Münze und XP (PE-137). Im Boss-Kampf spawnt kein normaler Gegner nach, solange der Boss lebt (Q-58). Jeder Angriff wird mindestens 700 ms vorher angekündigt, und die Spielerin hat mindestens 1000 ms Reaktionszeit.
 
@@ -255,9 +259,9 @@ Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er a
 | ID | `rootMonster` | `forestGhost` | `giantStone` |
 | Sprite | `boss-root-monster` | `boss-forest-ghost` | `boss-giant-stone` |
 | Map / Level | Wald, 0 bis 4 | Wald bei Nacht, 5 bis 9 | Elfenwald, 10 bis 20 |
-| Basis-HP | 500 | 600 | 800 |
+| Basis-HP (seit AP-126 doppelt, PE-154) | 1000 | 1200 | 1600 |
 | Basis-Schaden | 10 | 8 | 12 |
-| HP am letzten Level im Batch | 500 × (1 + 0,15 × 4) = 800 | 600 × (1 + 0,15 × 4) = 960 | 800 × (1 + 0,15 × 10) = 2000 |
+| HP am letzten Level im Batch | 1000 × (1 + 0,15 × 4) = 1600 | 1200 × (1 + 0,15 × 4) = 1920 | 1600 × (1 + 0,15 × 10) = 4000 |
 
 **Wüsten-Bosse (AP-100, AP-103, AP-104)**
 
@@ -266,9 +270,9 @@ Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er a
 | ID | `giantSandWorm` | `guardianDog` | `pharaoh` |
 | Sprite | `boss-sand-worm` (Kopf), `boss-sand-worm-body` (Glieder) | `boss-guardian-dog` | `boss-pharaoh`, `boss-pharaoh-orb` (Goldkugel) |
 | Map / Level | Wüste, 21 bis 25 | Pyramiden, 26 bis 30 | Pyramiden-Oase, 31 bis 40 |
-| Basis-HP | 1000 | 1300 | 1700 |
+| Basis-HP (seit AP-126 doppelt, PE-154) | 2000 | 2600 | 3400 |
 | Basis-Schaden | 12 | 14 | 14 |
-| HP am letzten Level im Batch | 1000 × (1 + 0,15 × 4) = 1600 | 1300 × (1 + 0,15 × 4) = 2080 | 1700 × (1 + 0,15 × 9) = 3995 |
+| HP am letzten Level im Batch | 2000 × (1 + 0,15 × 4) = 3200 | 2600 × (1 + 0,15 × 4) = 4160 | 3400 × (1 + 0,15 × 9) = 7990 |
 
 **Angriffe:**
 
