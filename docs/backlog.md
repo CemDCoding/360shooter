@@ -14,7 +14,8 @@ Reihenfolge = Priorität (oben zuerst). Die Priorität entscheidet der Nutzer.
 
 | ID | Titel | Prio | Größe | Status | Berührt Sicherheit/Datenschutz/Architektur |
 |---|---|---|---|---|---|
-| RQ-01 | Windows-.exe zum privaten Testen durch Freunde | mittel (Vorschlag) | M | entwurf | Architektur: Desktop-Hülle um das Spiel; neue Abhängigkeit: Werkzeug zum Verpacken; Doku: Plan §2 (Downloads) und PE-02 betroffen |
+| RQ-01 | Windows-.exe zum privaten Testen durch Freunde | mittel | M | freigegeben | Architektur: Desktop-Hülle um das Spiel; neue Abhängigkeit: Werkzeug zum Verpacken; Doku: Plan §2 (Downloads) und PE-02 betroffen |
+| RQ-02 | Handy-Zugriff aus der .exe (lokaler Server im Heimnetz) | niedrig (Vorschlag) | M | entwurf | Architektur: lokaler Server in der .exe; Sicherheit: nur Heimnetz, Firewall-Freigabe; baut auf RQ-01 auf |
 
 **Status:** `entwurf` (im Interview) · `freigegeben` (Nutzer hat zugestimmt, wartet auf den Planner) · `übernommen` (steht im Plan) · `zurückgestellt` · `verworfen`
 **Größe:** `S` (≈ 1 Paket) · `M` (2–3 Pakete) · `L` (mehr, besser teilen)
@@ -41,8 +42,8 @@ Reihenfolge = Priorität (oben zuerst). Die Priorität entscheidet der Nutzer.
 
 ### RQ-01 – Windows-.exe zum privaten Testen durch Freunde
 
-- **Status:** entwurf · **Prio:** mittel (Vorschlag) · **Größe:** M
-- **Angelegt:** 2026-11-01 · **Freigegeben:** –
+- **Status:** freigegeben · **Prio:** mittel · **Größe:** M
+- **Angelegt:** 2026-11-01 · **Freigegeben:** 2026-11-01
 - **Ziel (warum):** Der Nutzer kann Freunden das Spiel zum Testen geben, ohne dass diese Node, einen Dev-Server oder einen Browser-Aufbau brauchen. Rückmeldung von Testern zu Spielgefühl und Balance.
 - **Beschreibung (was):** Der Nutzer erzeugt per Befehl eine einzelne portable Windows-`.exe` des Spiels. Freunde bekommen die Datei privat (USB, Cloud-Link, Messenger), starten sie per Doppelklick und spielen mit Maus am PC. Es gibt keine Installation. Der Spielstand (Gold, Upgrades, Level) bleibt lokal auf dem Rechner des Freundes erhalten. Eine kurze Anleitung erklärt die Windows-Warnung bei unsigniertem Programm („Weitere Informationen“ → „Trotzdem ausführen“) und wie man den Fortschritt zurücksetzt.
 - **Abnahmekriterien:**
@@ -57,3 +58,21 @@ Reihenfolge = Priorität (oben zuerst). Die Priorität entscheidet der Nutzer.
 - **Berührt:** Daten ja (Spielstand lokal, wie bisher) · personenbezogene Daten nein · Recht (Impressum, Datenschutzerklärung) nein, solange die Weitergabe privat bleibt; bei öffentlichem Teilen neu zu bewerten · neue Abhängigkeit oder externer Dienst ja (Verpackungswerkzeug, vom Nutzer freizugeben; kein externer Dienst) · Architektur ja (Desktop-Hülle)
 - **Offene Fragen an den Planner:** Wahl der Hülle und des Werkzeugs; Umgang mit Fenstergröße/Vollbild; Speicherort des Spielstands; Auswirkung auf PE-02 und §2 „Downloads“ (privater Test, nicht Veröffentlichung); Lizenzen der Assets bei Weitergabe an Dritte prüfen (R1); Anpassung „Freigegebene Abhängigkeiten“.
 - **Entscheidungen:** Nutzer am 2026-11-01: Weitergabe privat (1a), portable einzelne .exe (2a), unsignierte Datei mit Anleitung zur Windows-Warnung (3a), Spielstand lokal behalten (4a).
+  Nutzer am 2026-11-01: Abnahmekriterien und Abgrenzung passen, Prio mittel; RQ-01 freigegeben. Handy-Zugriff ist ausdrücklich nicht Teil von RQ-01, sondern RQ-02.
+
+### RQ-02 – Handy-Zugriff aus der .exe (lokaler Server im Heimnetz)
+
+- **Status:** entwurf · **Prio:** niedrig (Vorschlag) · **Größe:** M
+- **Angelegt:** 2026-11-01 · **Freigegeben:** –
+- **Ziel (warum):** Freunde, die die `.exe` auf ihrem PC haben, können das Spiel zusätzlich auf dem eigenen Handy mit Touch-Steuerung testen, so wie der Nutzer es heute mit dem iPhone macht.
+- **Beschreibung (was):** Die `.exe` aus RQ-01 startet auf Wunsch einen kleinen lokalen Server und zeigt die Adresse im Heimnetz an (z. B. `http://192.168.x.x:port`). Das Handy im selben WLAN öffnet diese Adresse im Browser und spielt mit Touch. Der Server ist nur im Heimnetz erreichbar. Beim ersten Start fragt die Windows-Firewall nach einer Freigabe, die Kurzanleitung erklärt das.
+- **Abnahmekriterien (Entwurf, noch nicht bestätigt):**
+  - [ ] Die `.exe` zeigt eine Adresse an, die das Handy im selben WLAN öffnen kann.
+  - [ ] Auf dem Handy läuft eine komplette Runde mit Touch-Steuerung.
+  - [ ] Der Server ist ohne Zutun des Nutzers nicht aus dem Internet erreichbar; die Doku nennt „keine Portfreigabe im Router“.
+  - [ ] Die Kurzanleitung erklärt die Firewall-Abfrage.
+  - [ ] Der Handy-Zugriff ist abschaltbar bzw. startet nur bewusst.
+- **Nicht im Umfang:** Zugriff von außerhalb des Heimnetzes, Hosting, Konten, Homescreen-App-Anleitung für Android.
+- **Berührt:** Daten nein · personenbezogene Daten nein · Recht nein (privat, Heimnetz) · neue Abhängigkeit oder externer Dienst offen (Planner) · Architektur ja (lokaler Server, Netzwerk-Freigabe)
+- **Offene Fragen an den Planner:** Abhängigkeit von RQ-01; Ausnahme von „keine Netzwerkaufrufe“ nur für eingehende lokale Verbindungen; Auswahl Port und Adresse; Umgang mit §5 „Dev-Server im WLAN“.
+- **Entscheidungen:** Nutzer am 2026-11-01: als eigene Anforderung nach RQ-01 anlegen, nicht in RQ-01 aufnehmen. Abnahmekriterien und Freigabe stehen noch aus.
