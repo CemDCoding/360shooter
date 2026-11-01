@@ -126,6 +126,10 @@ export interface ResultSceneData {
   goldGained: number;
   /** Gold total after the round (as stored). */
   goldTotal: number;
+  /** Diamonds credited from this round (first win of the level, 0 otherwise, AP-137). */
+  diamondsGained: number;
+  /** Diamonds total after the round (as stored). */
+  diamondsTotal: number;
   /** Debug round (`?level=n`): nothing was written to the save game (PE-49). */
   debugRound: boolean;
   /** The round's boss was defeated (result screen shows "Boss besiegt"). */
@@ -925,6 +929,8 @@ export class GameScene extends Phaser.Scene {
       goldShare: result === 'won' ? GOLD_KEEP_ON_WIN : GOLD_KEEP_ON_LOSS,
       goldGained: settled.goldGained,
       goldTotal: stored.gold ?? 0,
+      diamondsGained: settled.diamondsGained,
+      diamondsTotal: stored.diamonds ?? 0,
       debugRound: this.debugRound,
       bossDefeated: this.bossDefeatedFlag,
       bossHpLeft: this.bossDefeatedFlag ? 0 : bossHpLeft,

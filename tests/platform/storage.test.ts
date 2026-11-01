@@ -29,8 +29,18 @@ const v1 = {
   muted: true,
 };
 
+const v3Defaults = {
+  diamonds: 2,
+  wonLevels: [0, 1],
+  owned: [] as string[],
+  equippedGear: { head: null, body: null, legs: null },
+  activePet: null,
+  petGear: {},
+};
+
 const valid: SaveGame = {
-  version: 2,
+  version: 3,
+  ...v3Defaults,
   gold: 120,
   upgrades: { weaponFireRate: 1, weaponDamage: 2, playerMaxHp: 0, playerTurnSpeed: 10 },
   playerXp: 50,
@@ -59,7 +69,7 @@ describe('loadSave', () => {
     for (const bad of [
       { ...valid, playerXp: '50' },
       { ...valid, muted: 'yes' },
-      { ...valid, version: 3 },
+      { ...valid, version: 4 },
       { ...valid, playerLevel: 1.5 },
       { ...valid, playerXp: null },
       [],
@@ -106,16 +116,18 @@ describe('save v1/v2', () => {
   it('loads v1 keeping xp and unlock, gold and upgrades 0', () => {
     expect(loadSave(memory(JSON.stringify(v1)))).toEqual({
       ...v1,
-      version: 2,
+      ...v3Defaults,
+      version: 3,
       gold: 0,
       upgrades: defaultSave().upgrades,
     });
   });
-  it('loads v2', () => {
-    expect(loadSave(memory(JSON.stringify(valid)))).toEqual(valid);
+  it('loads v2 as v3 with retroactive diamonds', () => {
+    const v2 = { ...valid, version: 2, diamonds: 99, wonLevels: [5], owned: ['egg-bee'] };
+    expect(loadSave(memory(JSON.stringify(v2)))).toEqual(valid);
   });
-  it('default is v2 with zeros', () => {
-    expect(defaultSave()).toMatchObject({ version: 2, gold: 0 });
+  it('default is v3 with zeros', () => {
+    expect(defaultSave()).toMatchObject({ version: 3, gold: 0, diamonds: 0 });
     expect(Object.values(defaultSave().upgrades!)).toEqual([0, 0, 0, 0]);
   });
   it('broken gold becomes 0 and keeps progress', () => {
@@ -148,20 +160,26 @@ describe('save v1/v2', () => {
     const l = loadSave(memory(JSON.stringify({ ...valid, upgrades: 5 })));
     expect(l).toEqual({ ...valid, upgrades: defaultSave().upgrades });
   });
-  it('writeSave writes version 2 with only known fields', () => {
+  it('writeSave writes version 3 with only known fields', () => {
     const s = memory();
     expect(writeSave({ ...v1, version: 1 } as SaveGame, s)).toBe(true);
     const raw = JSON.parse(s.data.get(SAVE_KEY)!);
-    expect(raw.version).toBe(2);
+    expect(raw.version).toBe(3);
     expect(raw.gold).toBe(0);
     expect(Object.keys(raw).sort()).toEqual([
+      'activePet',
+      'diamonds',
+      'equippedGear',
       'gold',
       'highestUnlockedLevel',
       'muted',
+      'owned',
+      'petGear',
       'playerLevel',
       'playerXp',
       'upgrades',
       'version',
+      'wonLevels',
     ]);
   });
 });
@@ -192,6 +210,105 @@ describe('writeSave / resetSave', () => {
   });
   it('resets', () => {
     const s = memory(JSON.stringify(valid));
+    resetSave(s);
+    expect(loadSave(s)).toEqual(defaultSave());
+  });
+});
+
+describe('save v3 (AP-137)', () => {
+  const owned = ['egg-bee', 'petgear-bee-diamond', 'petgear-penguin-diamond'];
+  const rich: SaveGame = {
+    ...valid,
+    diamonds: 7,
+    owned,
+    activePet: 'bee',
+    petGear: { bee: 'petgear-bee-diamond' },
+  };
+  it('round-trips ownership and equipment', () => {
+    expect(loadSave(memory(JSON.stringify(rich)))).toEqual(rich);
+  });
+  it('migrates v1/v2 once: highest 10 gives levels 0..9 and 14 diamonds', () => {
+    const l = loadSave(memory(JSON.stringify({ ...v1, highestUnlockedLevel: 10 })));
+    expect(l.wonLevels).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(l.diamonds).toBe(14);
+    expect(loadSave(memory(JSON.stringify(l)))).toEqual(l);
+  });
+  it('never counts the last level as won in the migration', () => {
+    const l = loadSave(memory(JSON.stringify({ ...v1, highestUnlockedLevel: LEVEL_COUNT - 1 })));
+    expect(l.wonLevels).not.toContain(LEVEL_COUNT - 1);
+    expect(l.diamonds).toBe(53 - 3);
+  });
+  it('does not migrate v3 again', () => {
+    const l = loadSave(
+      memory(JSON.stringify({ ...valid, wonLevels: [], diamonds: 0, highestUnlockedLevel: 10 })),
+    );
+    expect(l.wonLevels).toEqual([]);
+    expect(l.diamonds).toBe(0);
+  });
+  it('sanitizes manipulated fields, each on its own', () => {
+    for (const bad of [-1, 1.5, '3', null, 1e9]) {
+      expect(loadSave(memory(JSON.stringify({ ...rich, diamonds: bad }))).diamonds).toBe(0);
+    }
+    const l = loadSave(
+      memory(
+        JSON.stringify({
+          ...rich,
+          wonLevels: [3, 3, -1, 99, 1.5, 'x', 1],
+          owned: ['egg-bee', 'egg-bee', 'hax', 5, 'petgear-bee-diamond'],
+          activePet: 'penguin',
+          petGear: { bee: 'petgear-bee-diamond', penguin: 'petgear-bee-diamond', dog: 'x' },
+          equippedGear: { head: 'gear-diamond-body', body: null, legs: 'nope' },
+        }),
+      ),
+    );
+    expect(l.wonLevels).toEqual([1, 3]);
+    expect(l.owned).toEqual(['egg-bee', 'petgear-bee-diamond']);
+    expect(l.activePet).toBeNull();
+    expect(l.petGear).toEqual({ bee: 'petgear-bee-diamond' });
+    expect(l.equippedGear).toEqual({ head: null, body: null, legs: null });
+    expect(l.diamonds).toBe(7);
+  });
+  it('drops equipment that is not owned and non-array fields', () => {
+    const l = loadSave(
+      memory(
+        JSON.stringify({
+          ...rich,
+          owned: 'egg-bee',
+          wonLevels: 5,
+          equippedGear: 3,
+          petGear: [],
+          activePet: 'bee',
+        }),
+      ),
+    );
+    expect(l).toMatchObject({ owned: [], wonLevels: [], activePet: null, petGear: {} });
+    expect(l.equippedGear).toEqual({ head: null, body: null, legs: null });
+  });
+  it('keeps owned gear in the right slot and rejects a wrong slot', () => {
+    const own = [...owned, 'gear-diamond-head'];
+    const ok = loadSave(
+      memory(
+        JSON.stringify({
+          ...rich,
+          owned: own,
+          equippedGear: { head: 'gear-diamond-head', body: null, legs: null },
+        }),
+      ),
+    );
+    expect(ok.equippedGear?.head).toBe('gear-diamond-head');
+    const wrong = loadSave(
+      memory(
+        JSON.stringify({
+          ...rich,
+          owned: own,
+          equippedGear: { head: null, body: 'gear-diamond-head', legs: null },
+        }),
+      ),
+    );
+    expect(wrong.equippedGear?.body).toBeNull();
+  });
+  it('reset deletes diamonds, purchases, equipment and pets', () => {
+    const s = memory(JSON.stringify(rich));
     resetSave(s);
     expect(loadSave(s)).toEqual(defaultSave());
   });

@@ -1,6 +1,7 @@
 // Wirtschaft (AP-29): Goldauszahlung am Rundenende. Reine Funktionen.
 import type { ProgressionRules, SaveGame } from '../contracts';
 import { GOLD_KEEP_ON_LOSS, GOLD_KEEP_ON_WIN } from '../config/coins';
+import { applyFirstWin } from './diamonds';
 import { applyRoundResult, roundXp, type RoundResult } from './progression';
 
 /** Obergrenze fuer Gold (gleicher Wert wie in der Speicherung). */
@@ -26,12 +27,14 @@ export interface RoundSettlement {
   shown: SaveGame;
   xpGained: number;
   goldGained: number;
+  /** Diamanten vom ersten Sieg dieses Levels (0 sonst und in der Debug-Runde, AP-137). */
+  diamondsGained: number;
   /** Genau ein Schreibvorgang je normaler Runde; Debug-Runde schreibt nie (PE-40, PE-49). */
   shouldWrite: boolean;
   debugRound: boolean;
 }
 
-/** Rechnet eine Runde ab: XP, Freischaltung und Gold. Rein, kein Speicherzugriff. */
+/** Rechnet eine Runde ab: XP, Freischaltung, Gold und Diamanten. Rein, kein Speicherzugriff. */
 export function settleRound(
   save: SaveGame,
   levelId: number,
@@ -43,12 +46,15 @@ export function settleRound(
 ): RoundSettlement {
   const xp = roundXp(killXp, result, rules);
   const withResult = applyRoundResult(save, levelId, result, xp, rules);
-  const next = applyRoundGold(withResult, roundCoins, result);
+  const withGold = applyRoundGold(withResult, roundCoins, result);
+  const first = applyFirstWin(withGold, levelId, result);
+  const next = first.save;
   return {
     next,
     shown: debug ? save : next,
     xpGained: debug ? 0 : xp,
     goldGained: debug ? 0 : goldPayout(roundCoins, result),
+    diamondsGained: debug ? 0 : first.diamondsGained,
     shouldWrite: !debug,
     debugRound: debug,
   };
