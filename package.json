@@ -18,7 +18,7 @@
     "sprites:build": "node scripts/build-sprites.mjs",
     "preview:lan": "npm run build && vite preview --host",
     "desktop:icon": "node scripts/build-desktop-icon.mjs",
-    "desktop:build": "npm run build && tsc -p desktop && electron-builder --win portable",
+    "desktop:build": "npm run build && tsc -p desktop && electron-builder --win nsis",
     "desktop:start": "tsc -p desktop && electron ."
   },
   "type": "module",
@@ -58,7 +58,7 @@
     "win": {
       "target": [
         {
-          "target": "portable",
+          "target": "nsis",
           "arch": [
             "x64"
           ]
@@ -66,8 +66,14 @@
       ],
       "icon": "build/icon.ico"
     },
-    "portable": {
-      "artifactName": "${productName}-${version}-portable.exe"
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "${productName}-${version}-setup.exe"
     }
   }
 }
