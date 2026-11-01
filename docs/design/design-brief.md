@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** geändert am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“ in Arbeit, noch nicht freigegeben). Zuletzt freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand (2026-11-01):** H-33 fertig (1a–4a, 5a, 6a), Mockup, Tokens und Übergabe stehen. Wartet auf die Freigabe durch den Nutzer. Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
+**Status:** freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
 **Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
@@ -408,7 +408,7 @@ Die Angriffe der Bosse sind Sache von Planner und Balancing. Braucht ein Angriff
 
 Keine neuen Abhängigkeiten, Schriften oder Fremd-Assets.
 
-### 2026-11-01 · Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“ (in Arbeit)
+### 2026-11-01 · Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“ (freigegeben am 2026-11-01)
 
 **Auftrag (Plan §13 H-33, PE-160; Grundlage F-27 bis F-30, PE-155 bis PE-161):**
 
