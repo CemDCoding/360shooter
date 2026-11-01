@@ -1,19 +1,22 @@
 # 360shooter am PC spielen: Kurzanleitung
 
-Du hast eine Datei wie `360shooter-0.1.0-portable.exe` bekommen. Diese Anleitung erklärt in ein paar Schritten, wie du das Spiel startest. Die Datei ist nur für dich gedacht. Bitte gib sie nicht weiter und lade sie nirgends hoch.
+Du hast eine Datei wie `360shooter-0.1.0-setup.exe` bekommen. Diese Anleitung erklärt in ein paar Schritten, wie du das Spiel startest. Die Datei ist nur für dich gedacht. Bitte gib sie nicht weiter und lade sie nirgends hoch.
 
 Du brauchst einen Windows-PC und eine Maus. Gezielt wird mit der Maus, geschossen mit der Maustaste.
 
-## 1. Starten
+## 1. Einrichten und Starten
 
 1. Speichere die Datei an einem Ort, den du wiederfindest, zum Beispiel auf dem Desktop oder im Ordner „Downloads“.
-2. Starte das Spiel mit einem **Doppelklick** auf die Datei.
+2. Starte die Datei mit einem **Doppelklick**. Es öffnet sich kurz ein kleines Fenster mit einem Fortschrittsbalken. Du musst nichts auswählen und nichts bestätigen.
+3. Nach ein paar Sekunden startet das Spiel von selbst.
 
-Es gibt **keine Installation**. Die Datei ist das ganze Spiel. Der Start kann ein paar Sekunden dauern, weil Windows die Datei bei jedem Start erst auspackt.
+Die Datei richtet das Spiel nur für dein Benutzerkonto ein. Dafür braucht es **keine Administrator-Rechte**, und Windows fragt nicht nach einem Passwort. Das Spiel landet im Ordner `%LOCALAPPDATA%\Programs\360shooter`. Außerdem bekommst du eine Verknüpfung **„360shooter“** auf dem Desktop und im Startmenü.
+
+Zum **nächsten Spielen** brauchst du die Setup-Datei nicht mehr: Doppelklick auf die Verknüpfung „360shooter“ auf dem Desktop oder im Startmenü genügt.
 
 ## 2. Die Windows-Warnung
 
-Beim ersten Start zeigt Windows wahrscheinlich ein blaues Fenster: **„Der Computer wurde durch Windows geschützt“**.
+Beim Start der Setup-Datei zeigt Windows wahrscheinlich ein blaues Fenster: **„Der Computer wurde durch Windows geschützt“**.
 
 1. Klicke auf **„Weitere Informationen“**.
 2. Klicke auf **„Trotzdem ausführen“**.
@@ -47,6 +50,12 @@ Du kannst diesen Pfad in die Adresszeile des Explorers eintippen und mit Enter �
 ## 5. Daten und Internet
 
 Das Spiel sendet nichts ins Internet und sammelt keine Daten über dich. Es braucht keine Anmeldung und kein Konto. Der Spielstand bleibt auf deinem PC.
+
+## 6. Spiel wieder entfernen
+
+Öffne die Windows-Einstellungen, gehe zu **Apps** (bzw. „Apps & Features“), suche **360shooter** und klicke auf **Deinstallieren**. Das entfernt das Spiel und die Verknüpfungen. Dein Spielstand im Ordner `%APPDATA%\360shooter` bleibt dabei liegen; wenn du ihn nicht mehr brauchst, lösche den Ordner von Hand.
+
+Bekommst du später eine neue Setup-Datei, starte sie einfach. Sie ersetzt die alte Version, dein Spielstand bleibt erhalten.
 
 ## Auf dem Handy spielen
 

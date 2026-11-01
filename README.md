@@ -50,14 +50,16 @@ Hinweis: Der Server darf **nur im Heimnetz** laufen. Keine Portweiterleitung im 
 
 ## Windows-.exe bauen und weitergeben
 
-Für Freunde ohne Node gibt es eine portable Windows-`.exe`. Sie wird nicht installiert, sondern per Doppelklick gestartet.
+Für Freunde ohne Node gibt es eine Windows-Setup-`.exe` (electron-builder, Ziel `nsis`, Ein-Klick-Installation nur für den angemeldeten Benutzer, ohne Administrator-Rechte). Ein Doppelklick richtet das Spiel unter `%LOCALAPPDATA%\Programs\360shooter` ein, legt eine Verknüpfung „360shooter“ auf dem Desktop und im Startmenü an und startet es.
 
 1. Im Projektordner `npm install` eintippen (nur beim ersten Mal).
 2. `npm run desktop:build` eintippen. Das baut das Spiel und verpackt es.
-3. Die fertige Datei liegt im Ordner `release/` und heißt `360shooter-<version>-portable.exe` (Version aus `package.json`, z. B. `360shooter-0.1.0-portable.exe`, etwa 110 MB).
+3. Die fertige Datei liegt im Ordner `release/` und heißt `360shooter-<version>-setup.exe` (Version aus `package.json`, z. B. `360shooter-0.1.0-setup.exe`, etwa 115 MB). Der Ordner `release/win-unpacked/` ist nur ein Zwischenergebnis.
 4. Nur diese eine Datei weitergeben, zusammen mit der Anleitung [docs/guides/exe-fuer-freunde.md](docs/guides/exe-fuer-freunde.md).
 
 Zum Ausprobieren ohne Verpacken: erst `npm run build`, dann `npm run desktop:start` (braucht ein vorhandenes `dist/`).
+
+Warum kein portables Ziel: Die portable `.exe` von electron-builder entpackt sich bei jedem Start nach `%TEMP%`. Electron (ab Version 45) prüft beim Start die Rechte des Programmordners für seine Sandbox und bricht ab, wenn der Ordner, wie bei `%TEMP%` auf vielen Windows-PCs, einen AppContainer-Eintrag ohne „ALL APPLICATION PACKAGES“ erbt (Fehler `install_dir_access.cc`, Exit-Code 0x80000003). Der Installationsordner unter `%LOCALAPPDATA%\Programs` hat dieses Problem nicht und bleibt außerdem stabil, sodass die Windows-Firewall beim Handy-Zugriff nur einmal fragt.
 
 Hinweis: Die `.exe` **nur privat** weitergeben, zum Beispiel per USB-Stick, Cloud-Link oder Messenger an Freunde. Nicht öffentlich hochladen (kein itch.io, keine GitHub-Releases). Die Datei ist nicht signiert, Windows zeigt deshalb beim ersten Start eine Warnung. Die Anleitung erklärt, wie man sie bestätigt. Die `.exe` und der Ordner `release/` werden nicht committet. Wird das Spiel öffentlich geteilt, müssen Impressum, Datenschutz und Lizenzen neu bewertet werden.
 
