@@ -50,4 +50,14 @@ Das Spiel sendet nichts ins Internet und sammelt keine Daten über dich. Es brau
 
 ## Auf dem Handy spielen
 
-folgt
+Du kannst das Spiel auch auf dem Handy spielen, solange PC und Handy im selben WLAN sind. Der Handy-Zugriff ist nach jedem Programmstart aus und startet nur, wenn du ihn selbst einschaltest.
+
+1. Drücke im Spiel **Strg+H** (geht auch im Vollbild) oder wähle im Menü **Spiel > Handy-Zugriff…**.
+2. Klicke auf **Starten**. Das Fenster zeigt eine oder mehrere Adressen, zum Beispiel `http://192.168.178.20:8360`.
+3. Öffne eine dieser Adressen im Browser deines Handys.
+4. Fragt die Windows-Firewall beim ersten Start nach: **„Private Netzwerke“ zulassen**, **„Öffentliche Netzwerke“ nicht zulassen**.
+5. Richte im Router **keine Portfreigabe** ein. Der Zugriff ist nur für dein Heimnetz gedacht.
+6. Der Spielstand am Handy ist vom PC getrennt und gehört zu dieser Adresse. Eine andere Adresse oder ein anderes Handy beginnt bei null.
+7. Zum Beenden drücke wieder **Strg+H** und klicke auf **Stoppen**. Beim Schließen des Spiels stoppt der Zugriff automatisch.
+
+Zeigt das Fenster „kein privates Netzwerk gefunden“, ist der PC nicht mit einem WLAN oder LAN verbunden. Meldet es „Port belegt“, läuft das Spiel schon ein zweites Mal oder ein anderes Programm nutzt den Port.
