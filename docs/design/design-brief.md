@@ -1,6 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Status:** geändert (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“ in Arbeit, noch nicht freigegeben). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand H-35 (2026-11-01):** Interview läuft. Runde 1 beantwortet (Rüstung, Sets, Pets, Eier). Nächste Fragen: Pet-Rüstungen, Pet-Leiste, Shop, Diamant.
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
 **Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
@@ -465,5 +466,18 @@ Keine neuen Abhängigkeiten, Schriften oder Fremd-Assets.
 | AP-131 `ConfirmDialog.ts` | **Ausnahme von „nicht anfassen“ nötig:** optionale Button-Texte (z. B. `{ confirmLabel, cancelLabel }`, Vorgabe wie heute). Aufruf mit „RUNDE ABBRECHEN?\nGOLD UND ERFAHRUNG DIESER RUNDE GEHEN VERLOREN.“, „RUNDE BEENDEN“ (danger), „WEITERSPIELEN“ (Fokus). Ansicht 7. Der Dialog bleibt Kassette (Entscheidung 6a). |
 
 Keine neuen Sprites, Schriften oder Abhängigkeiten. Der Haken und das X sind 7×7-Pixel-Formen, im Code als Graphics-Rechtecke oder als zwei neue Frames in `ui-icons` (Wahl des Coders, Pixel in Ansicht 3). Design-Review für AP-131, AP-133 und AP-134 gegen `screenshots/m7-quicktime-und-stufen-desktop.png`. Handtest H-34: Kreise am iPhone mit dem Daumen treffbar, Wörter lesbar, Stufen im Gedränge unterscheidbar.
+
+### 2026-11-01 · Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“ (in Arbeit)
+
+**Auftrag (Plan §13 H-35, PE-176; Grundlage F-31 bis F-35, PE-165 bis PE-180):** Shop, Ausrüstungs-Fenster, Spielerkarte mit Rüstung, Shop-Button, Diamant-Symbol und -Zähler, Diamant-Haken auf Level-Kacheln, „+1/+3“ im Ergebnis, Pet-Leiste im HUD. Sprites: 9 Rüstungsteile (groß im Menü und als Overlay auf `astronaut`), Diamant-Glanz, 3 Eier, 3 Pets mit Angriff, Schneeball, Capybara-Aura, 9 Pet-Rüstungen.
+
+**Rahmen:** bleibt in der freigegebenen Richtung (Kassette im Menü, Funk in der Runde, Grundsätze 1–8). Varianten innerhalb des Systems, keine neuen Richtungen.
+
+**Entscheidungen (Nutzer, 2026-11-01):**
+
+- 1a **Rüstung als Aufsatz auf dem Anzug:** Jedes Teil ändert die Silhouette (Helmaufsatz/Krone, Schulterstücke mit Brustplatte, Stiefel mit Kniestücken). Visier und Gesicht bleiben frei, gemischte Sets bleiben stimmig.
+- 2a **Niedliche Spielzeug-Rüstung:** Diamant = facettiertes Eisblau mit weißen Glanzpunkten und kantigen Kristallzacken · Hölle = Obsidian mit glühenden Lava-Fugen (Orange) und Teufelshörnchen am Helm · Himmel = Weiß-Gold mit Flügelchen an Helm und Stiefeln und Heiligenschein-Ring. Jedes Set über Form **und** Farbe erkennbar (Grundsatz 4).
+- 3a **Pets 16×16 chibi** mit großem Kopf im Stil der Astronautin (Umriss Nachtschwarz, gleiche Palette, Wangen in Rosa), Biene eher 12×12. Klar kleiner als die Spielerin und als die Gegner.
+- 4a **Eier verraten ihr Pet:** Bienen-Ei gelb mit schwarzen Streifen, Pinguin-Ei eisblau mit Schneeflocke, Capybara-Ei sandbraun mit Blättchen. Kurz vor dem Schlüpfen Wackeln und Risse.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
