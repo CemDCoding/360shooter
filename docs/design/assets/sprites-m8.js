@@ -360,6 +360,14 @@
     frameWidth: 8, frameHeight: 8, palette: { o: INK, W: '#ffffff', i: GEAR.i, I: GEAR.I, j: GEAR.j, J: GEAR.J },
     frames: [GEM, glint(GEM, [[2, 2, 'i'], [4, 2, 'W']]), glint(GEM, [[2, 2, 'i'], [4, 3, 'W'], [3, 3, 'i']]), glint(GEM, [[2, 2, 'W'], [1, 2, 'W']])],
   };
+  // menu glyphs 8x8, white, tinted in the game: 0 = pencil (portrait "AENDERN"), 1 = check (GEKAUFT / equipped)
+  S['ui-icons-m8'] = {
+    frameWidth: 8, frameHeight: 8, palette: { w: '#ffffff' },
+    frames: [
+      ['......w.', '.....www', '....www.', '...www..', '..www...', '.www....', 'ww......', 'w.......'],
+      ['........', '.......w', '......ww', 'w....ww.', 'ww..ww..', '.wwww...', '..ww....', '........'],
+    ],
+  };
   // level tile marker: 0 = diamond earned (filled), 1 = still to earn (hollow)
   S['diamond-marker'] = {
     frameWidth: 8, frameHeight: 8, palette: { o: INK, W: '#ffffff', i: GEAR.i, I: GEAR.I, j: GEAR.j, J: GEAR.J },

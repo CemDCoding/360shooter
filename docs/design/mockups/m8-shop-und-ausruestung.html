@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M8 · Shop, Ausrüstung, Diamanten, Pet-Leiste · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .k-panel.col { display: flex; flex-direction: column; }
+  .pxs { display: inline-block; line-height: 0; vertical-align: middle; }
+  .pxs canvas { image-rendering: pixelated; display: block; }
+  .legend { margin-top: auto; display: flex; gap: 12px; align-items: center; }
+  .legend .row { gap: 4px; }
+  .group { margin-bottom: 10px; }
+  .group-head { height: 14px; margin-bottom: 13px; display: flex; gap: 6px; align-items: center; }
+  .k-tile .mark { position: absolute; right: 0; bottom: 0; }
+  .pager { position: absolute; left: 216px; top: 316px; width: 408px; height: 32px; display: flex; gap: 8px; align-items: center; }
+  .side { flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; gap: 6px; position: relative; }
+  .side.on { background: var(--color-menu-surface); box-shadow: inset 2px 2px 0 var(--color-menu-surface-hi), inset -2px -2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline), 4px 4px 0 2px var(--color-menu-outline); }
+  .side.off { background: var(--color-menu-surface-sunken); box-shadow: inset 2px 2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline); }
+  .side .reel { width: 8px; height: 8px; background: var(--color-menu-outline); box-shadow: inset 0 0 0 2px var(--color-menu-text-muted); }
+  .side.on .reel { background: var(--color-menu-action-bg); box-shadow: 0 0 0 1px var(--color-menu-outline); }
+  .side.on::after { content: ""; position: absolute; left: 50%; top: -14px; margin-left: -5px; border: 5px solid transparent; border-bottom: 6px solid var(--color-menu-focus); }
+  /* player card */
+  .portrait { position: relative; cursor: pointer; }
+  .portrait .edit { position: absolute; right: -6px; bottom: -8px; height: 14px; }
+  .portrait.is-focus { outline: 2px solid var(--color-menu-focus); outline-offset: 4px; }
+  .k-btn.secondary { --b: var(--color-menu-surface-sunken); --hi: var(--color-menu-surface-sunken-hi); --lo: var(--color-menu-surface-lo); }
+  /* shop */
+  .m-shop { left: 216px; top: 52px; width: 408px; height: 296px; padding: 10px; }
+  .tabs { display: flex; gap: 6px; height: 28px; align-items: center; }
+  .tab { height: 28px; padding: 0 8px; display: flex; align-items: center; gap: 5px; position: relative; }
+  .tab.on { background: var(--color-menu-surface); box-shadow: inset 2px 2px 0 var(--color-menu-surface-hi), inset -2px -2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline), 3px 3px 0 2px var(--color-menu-outline); }
+  .tab.off { background: var(--color-menu-surface-sunken); box-shadow: inset 2px 2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline); }
+  .tab.on::after { content: ""; position: absolute; left: 50%; bottom: -12px; margin-left: -5px; border: 5px solid transparent; border-top: 6px solid var(--color-menu-focus); }
+  .sgrid { display: grid; gap: 4px 8px; margin-top: 6px; }
+  .colhead { height: 10px; display: flex; align-items: center; justify-content: center; }
+  .rowhead { display: flex; align-items: center; }
+  .stile { height: 50px; position: relative; display: flex; align-items: center; gap: 6px; padding: 0 6px; cursor: pointer;
+    background: var(--color-menu-surface-sunken); box-shadow: inset 2px 2px 0 var(--color-menu-surface-sunken-hi), inset -2px -2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline); }
+  .stile .price { margin-left: auto; display: flex; align-items: center; gap: 3px; }
+  .stile.owned { background: var(--color-menu-owned-bg); box-shadow: inset 2px 2px 0 var(--color-menu-done-hi), inset -2px -2px 0 var(--color-menu-done-lo), 0 0 0 2px var(--color-menu-outline); }
+  .stile.sel { box-shadow: inset 2px 2px 0 var(--color-menu-surface-sunken-hi), inset -2px -2px 0 var(--color-menu-surface-lo), 0 0 0 2px var(--color-menu-outline), 0 0 0 4px var(--color-menu-selected); }
+  .stile.owned.sel { box-shadow: inset 2px 2px 0 var(--color-menu-done-hi), inset -2px -2px 0 var(--color-menu-done-lo), 0 0 0 2px var(--color-menu-outline), 0 0 0 4px var(--color-menu-selected); }
+  .stile.big { height: 160px; flex-direction: column; justify-content: center; gap: 8px; padding: 6px; }
+  .stile.big .price { margin: 0; }
+  .info { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 48px; padding: 4px 8px; display: flex; align-items: center; gap: 10px; }
+  .info .txt { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+  .k-btn.wide { min-width: 112px; }
+  /* gear window */
+  .m-gear { left: 16px; top: 52px; width: 608px; height: 296px; padding: 10px; }
+  .preview { width: 196px; height: 236px; position: relative; overflow: hidden; flex-shrink: 0; }
+  .preview .ground { position: absolute; left: -40px; right: -40px; bottom: -150px; height: 210px; border-radius: 50%; background: radial-gradient(circle at 35% 20%, #5a2a52 0 45%, #3a1838 45% 100%); box-shadow: inset 0 3px 0 #6c3a62; }
+  .gear-rows { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .grow { height: 32px; display: grid; grid-template-columns: 72px 32px minmax(0, 1fr) 32px; gap: 6px; align-items: center; }
+  .gval { height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 6px; }
+  .grow.is-focus .gval { outline: 2px solid var(--color-menu-focus); outline-offset: 2px; }
+  .effects { margin-top: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .pip3 { display: flex; gap: 3px; }
+  .pip3 > i { width: 8px; height: 8px; display: block; background: var(--color-menu-outline); box-shadow: inset 0 0 0 2px var(--color-menu-text-muted); }
+  .pip3 > i.on { background: var(--c, var(--color-menu-action-bg)); box-shadow: 0 0 0 1px var(--color-menu-outline); }
+  /* HUD */
+  .slot { position: absolute; width: 40px; height: 40px; display: grid; place-items: center; }
+  .petbar { position: absolute; width: 88px; height: 20px; display: flex; align-items: center; gap: 4px; padding: 0 3px; }
+  .petbar .trk { width: 40px; height: 6px; background: var(--color-hud-line-dim); position: relative; }
+  .petbar .trk > i { position: absolute; left: 0; top: 0; bottom: 0; display: block; background: var(--color-hud-accent); }
+  .petbar .pips { display: flex; gap: 2px; margin-left: auto; }
+  .petbar .pips > i { width: 4px; height: 6px; display: block; outline: 1px solid var(--color-hud-line); outline-offset: -1px; }
+  .petbar .pips > i.on { background: var(--color-hud-accent); outline: 0; }
+  .petbar.flash { background: var(--color-hud-flash); }
+  .petbar.ready { border-color: var(--color-hud-accent); box-shadow: 0 0 6px var(--color-hud-glow); }
+  .cap { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  /* result */
+  .res { position: absolute; inset: 0; background: var(--color-hud-screen); }
+  .band { position: absolute; left: 0; right: 0; top: 0; height: 6px; }
+  .logline { position: absolute; left: 32px; top: 20px; right: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .hero { position: absolute; left: 32px; top: 46px; display: flex; gap: 18px; align-items: center; }
+  .facts { position: absolute; left: 32px; top: 150px; width: 576px; display: grid; grid-template-columns: 150px 1fr; row-gap: 9px; column-gap: 12px; padding-top: 12px; border-top: 1px dotted var(--color-hud-line); }
+  .actions { position: absolute; left: 32px; right: 32px; top: 304px; display: flex; gap: 12px; justify-content: flex-end; }
+  .dia-new { outline: 1px solid var(--color-hud-diamond); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>M8 · Shop, Ausrüstung, Diamanten, Pet-Leiste</h1>
+  <p>Ergänzung H-35 (Entscheidungen 6a, 7a, 9a–12a). Menü und Shop im Kassetten-Stil, Pet-Leiste und Ergebnis im Funk-Stil. Positionen in logischen Pixeln (640×360). Sprites aus <code>assets/sprites-m8.js</code>, Vorschau <code>m8-sprites.html</code>.</p>
+</header>
+
+<section><h2>1 · HAUPTMENÜ: Spielerkarte mit Rüstung, Diamanten neben dem Gold, „◆ SHOP“, Diamant-Marken auf den Kacheln</h2><div class="stage-wrap"><div class="stage" id="v1" data-component="MenuScene" data-font="kapsel"></div></div></section>
+<section><h2>2 · SHOP · RÜSTUNG (Glutpanzer gewählt, kaufbar)</h2><div class="stage-wrap"><div class="stage" id="v2" data-component="ShopPanel" data-font="kapsel"></div></div></section>
+<section><h2>3 · SHOP · EIER (Pinguin-Ei gewählt, zu wenig Diamanten; Bienen-Ei gekauft)</h2><div class="stage-wrap"><div class="stage" id="v3" data-component="ShopPanel" data-font="kapsel"></div></div></section>
+<section><h2>4 · SHOP · PET-RÜSTUNG (gekaufter Artikel gewählt)</h2><div class="stage-wrap"><div class="stage" id="v4" data-component="ShopPanel" data-font="kapsel"></div></div></section>
+<section><h2>5 · AUSRÜSTUNG (Klick auf das Porträt; Fokus auf „OBERTEIL“, Set Hölle 2/3)</h2><div class="stage-wrap"><div class="stage" id="v5" data-component="GearPanel" data-font="kapsel"></div></div></section>
+<section><h2>6 · RUNDE: Pet-Leiste über dem Lagerplatz (links Ei 60 %, rechts Zustände)</h2><div class="stage-wrap"><div class="stage" id="v6" data-component="HudScene" data-font="funk"></div></div></section>
+<section><h2>7 · ERGEBNIS: erster Sieg im letzten Level einer Map (+3 Diamanten)</h2><div class="stage-wrap"><div class="stage" id="v7" data-component="ResultScene" data-font="funk"></div></div></section>
+
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script>
+  const S = window.PX_SPRITES;
+  const P = (t, s, c, extra) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"${extra || ''}></span>`;
+  // <span class="pxs" data-k="key1,key2" data-f="0" data-s="2" [data-tint="--var"]> = PX_SPRITES layers stacked
+  const X = (keys, f, s, tint, label) => `<span class="pxs" data-k="${keys}" data-f="${f || 0}" data-s="${s || 1}"${tint ? ` data-tint="${tint}"` : ''}${label ? ` role="img" aria-label="${label}"` : ' aria-hidden="true"'}></span>`;
+  const DIA = (s, label) => X('diamond', 0, s || 2, null, label || 'Diamanten');
+  const GEARKEYS = (g) => ['astronaut', ...['legs', 'body', 'head'].filter((s) => g[s]).map((s) => `gear-${g[s]}-${s}`)].join(',');
+  const SETS = ['diamond', 'hell', 'heaven'], SLOTS = ['head', 'body', 'legs'], PETS = ['bee', 'penguin', 'capybara'];
+  const SET_NAME = { diamond: 'DIAMANT', hell: 'HÖLLE', heaven: 'HIMMEL' };
+  const SET_SW = { diamond: 'var(--color-ice-300)', hell: 'var(--color-sprite-gear-lava)', heaven: 'var(--color-sprite-gear-gold)' };
+  const PIECE = { 'diamond-head': 'KRISTALLHELM', 'diamond-body': 'KRISTALLPANZER', 'diamond-legs': 'KRISTALLSTIEFEL', 'hell-head': 'TEUFELSHÖRNER', 'hell-body': 'GLUTPANZER', 'hell-legs': 'LAVASTIEFEL', 'heaven-head': 'HEILIGENSCHEIN', 'heaven-body': 'ENGELSWESTE', 'heaven-legs': 'WOLKENSTIEFEL' };
+  const PET_NAME = { bee: 'BIENE', penguin: 'PINGUIN', capybara: 'CAPYBARA' };
+  const PG_NAME = { diamond: 'KRISTALL', hell: 'GLUT', heaven: 'HIMMEL' };
+  const lockSpr = '';
+
+  // ---------- menu skeleton ----------
+  const tile = (i, st) => {
+    if (i < st.current) return `<div class="k-tile done" aria-label="Level ${i} geschafft, Diamant erhalten">${P(i, 2, '--color-menu-done-fg')}<span class="mark">${X('diamond-marker', 0, 1)}</span></div>`;
+    if (i === st.current) return `<div class="k-tile current" aria-current="true" aria-label="Level ${i}, aktuell, Diamant noch offen">${P(i, 2, '--color-menu-action-fg')}<span class="mark">${X('diamond-marker', 1, 1)}</span></div>`;
+    return `<div class="k-tile locked" aria-label="Level ${i} gesperrt"><span class="spr" data-n="lock" data-s="2" style="--px-o:var(--color-menu-locked-fg);--px-k:var(--color-menu-locked-bg)"></span></div>`;
+  };
+  const group = ([name, from, to, biome], st) => { let t = ''; for (let i = from; i <= to; i++) t += tile(i, st); return `<div class="group"><div class="group-head"><span class="k-sticker"><i class="k-swatch" style="background:var(--color-biome-${biome})"></i>${P(name, 0, '--color-menu-sticker-fg')}</span>${P(from + '–' + to, 0, '--color-menu-text-muted')}</div><div class="tiles">${t}</div></div>`; };
+  const side = (l, r, on) => `<div class="side ${on ? 'on' : 'off'}" role="tab" aria-selected="${on}"><i class="reel"></i>${P('SEITE ' + l, 2, on ? '--color-menu-text' : '--color-menu-text-muted')}${P(r, 0, '--color-menu-text-muted')}<i class="reel"></i></div>`;
+  const arrow = (d, dis) => `<div class="k-btn icon ${dis ? 'is-disabled' : ''}" role="button" aria-label="${d === '<' ? 'Zurück' : 'Weiter'}">${P(d, 2, dis ? '--color-menu-text-disabled' : '--color-menu-text')}</div>`;
+  function frame(st) {
+    return `<div class="k-scene"></div><div class="k-stars"></div><div class="k-planet"></div>
+      <span class="abs row" style="left:16px;top:14px;gap:6px">${P('360', 3, '--color-menu-action-bg', ' data-sh="--color-menu-outline"')}${P('SHOOTER', 3, '--color-menu-text', ' data-sh="--color-menu-outline"')}</span>
+      <span class="abs" style="right:56px;top:22px">${P(st.hint || 'TIPPE AUF EIN FREIES LEVEL.', 0, '--color-menu-text-muted')}</span>
+      <div class="abs k-btn icon" style="left:592px;top:10px" aria-label="Ton aus"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-menu-text);--px-k:var(--color-menu-surface)"></span></div>`;
+  }
+  function card(st) {
+    return `<div class="abs m-profile k-panel col" data-component="PlayerCard">
+        <div class="row" style="gap:10px">
+          <div class="portrait k-sunken ${st.portraitFocus ? 'is-focus' : ''}" role="button" aria-label="Ausrüstung ändern">${X(GEARKEYS(st.gear), 0, 2, null, 'Astronautin mit Rüstung')}
+            <span class="edit k-sticker">${X('ui-icons-m8', 0, 1, '--color-menu-sticker-fg')}${P('ÄNDERN', 0, '--color-menu-sticker-fg')}</span></div>
+          <div>${P('SPIELERLEVEL', 0, '--color-menu-text-muted')}<div style="margin-top:8px">${P(st.level, 4, '--color-menu-text', ' data-sh="--color-menu-outline"')}</div></div>
+        </div>
+        <div class="k-bar" style="margin-top:14px" role="img" aria-label="Erfahrung"><i style="width:${st.xpPct}%"></i></div>
+        <div class="row" style="justify-content:space-between;margin-top:5px">${P('XP', 0, '--color-menu-text-muted')}${P(st.xpText, 0, '--color-menu-text-muted')}</div>
+        <hr class="k-rule" style="margin:8px 0 7px">
+        <div class="row" style="gap:5px"><span class="spr" data-n="coin" data-s="2"></span>${P(st.gold, 2, '--color-menu-gold', ' data-sh="--color-menu-outline"')}${P('GOLD', 0, '--color-menu-text-muted')}
+          <span class="row" style="gap:4px;margin-left:auto" data-component="DiamondCount">${DIA(2)}${P(st.dia, 2, '--color-menu-diamond', ' data-sh="--color-menu-outline"')}</span></div>
+        <div class="row" style="justify-content:space-between;margin-top:8px"><span class="row" style="gap:5px"><span class="spr" data-n="raygun1"></span>${P('WAFFE ' + st.weapon + '/20', 0, '--color-menu-text-muted')}</span>${P('ANZUG ' + st.suit + '/20', 0, '--color-menu-text-muted')}</div>
+        <div class="k-btn secondary" style="margin-top:auto" role="button" data-component="ShopButton">${DIA(2)}${P('SHOP', 2, '--color-menu-text')}</div>
+        <div class="k-btn primary" style="margin-top:12px" role="button">${P('UPGRADES', 2, '--color-menu-action-fg')}</div>
+      </div>
+      <div class="abs m-reset k-btn danger" style="position:absolute" role="button">${P('FORTSCHRITT ZURÜCKSETZEN', 0, '--color-menu-danger-fg')}</div>`;
+  }
+  const PAGE_A = [['WALD', 0, 4, 'forest'], ['WALD BEI NACHT', 5, 9, 'night'], ['ELFENWALD', 10, 20, 'elf']];
+  const ST = { level: 14, xpPct: 55, xpText: '1100 / 2000', gold: 248, dia: 12, weapon: 9, suit: 8, current: 12, gear: { head: 'hell', body: 'hell', legs: 'diamond' } };
+
+  // ---------- view 1 ----------
+  document.getElementById('v1').innerHTML = frame(ST) + card({ ...ST, portraitFocus: false }) + `
+    <div class="abs m-levels k-panel col" style="padding-top:14px" data-component="LevelGrid">
+      ${PAGE_A.map((g) => group(g, ST)).join('')}
+      <div class="legend">
+        <span class="row">${X('diamond-marker', 0, 1)}${P('GESCHAFFT', 0, '--color-menu-text-muted')}</span>
+        <span class="row">${X('diamond-marker', 1, 1)}${P('DIAMANT OFFEN', 0, '--color-menu-text-muted')}</span>
+        <span class="row"><i class="k-swatch" style="background:var(--color-menu-action-bg)"></i>${P('AKTUELL', 0, '--color-menu-text-muted')}</span>
+        <span class="row"><span class="spr" data-n="lock" style="--px-o:var(--color-menu-text-muted);--px-k:var(--color-menu-locked-bg)"></span>${P('GESPERRT', 0, '--color-menu-text-muted')}</span>
+      </div>
+    </div>
+    <div class="pager">${arrow('<', true)}${side('A', '0–20', true)}${side('B', '21–40', false)}${arrow('>')}</div>`;
+
+  // ---------- shop ----------
+  const tabs = (on) => `<div class="tabs" role="tablist">${[['egg', 'EIER'], ['gear', 'RÜSTUNG'], ['petGear', 'PET-RÜSTUNG']].map(([k, l]) => `<div class="tab ${k === on ? 'on' : 'off'}" role="tab" aria-selected="${k === on}">${P(l, k === on ? 2 : 0, k === on ? '--color-menu-text' : '--color-menu-text-muted')}</div>`).join('')}</div>`;
+  const price = (n) => `<span class="price">${DIA(1)}${P(n, 2, '--color-menu-diamond')}</span>`;
+  const owned = `<span class="price">${X('ui-icons-m8', 1, 2, '--color-menu-done-fg', 'gekauft')}</span>`;
+  const stile = (icon, st, cost, label) => `<div class="stile ${st.owned ? 'owned' : ''} ${st.sel ? 'sel' : ''}" role="button" aria-pressed="${!!st.sel}" aria-label="${label}${st.owned ? ', gekauft' : ', ' + cost + ' Diamanten'}">${icon}${st.owned ? owned : price(cost)}</div>`;
+  function shop(id, o) {
+    let body = '';
+    if (o.tab === 'gear') {
+      body = `<div class="sgrid" style="grid-template-columns:70px repeat(3,1fr)"><span></span>${['KOPF', 'OBERTEIL', 'HOSE+SCHUHE'].map((h) => `<span class="colhead">${P(h, 0, '--color-menu-text-muted')}</span>`).join('')}
+        ${SETS.map((set, si) => `<span class="rowhead"><span class="k-sticker"><i class="k-swatch" style="background:${SET_SW[set]}"></i>${P(SET_NAME[set], 0, '--color-menu-sticker-fg')}</span></span>` +
+          SLOTS.map((slot, ci) => stile(X('gear-icons', si * 3 + ci, 2), o.state[`${set}-${slot}`] || {}, 3, PIECE[`${set}-${slot}`])).join('')).join('')}</div>`;
+    } else if (o.tab === 'petGear') {
+      body = `<div class="sgrid" style="grid-template-columns:70px repeat(3,1fr)"><span></span>${SETS.map((s) => `<span class="colhead">${P(SET_NAME[s], 0, '--color-menu-text-muted')}</span>`).join('')}
+        ${PETS.map((pet, pi) => `<span class="rowhead">${P(PET_NAME[pet], 0, '--color-menu-text')}</span>` +
+          SETS.map((set, si) => stile(X('petgear-icons', pi * 3 + si, 3), o.state[`${pet}-${set}`] || {}, 2, PET_NAME[pet] + ' · ' + PG_NAME[set])).join('')).join('')}</div>`;
+    } else {
+      body = `<div class="sgrid" style="grid-template-columns:repeat(3,1fr)">${PETS.map((pet) => {
+        const st = o.state[pet] || {};
+        return `<div class="stile big ${st.owned ? 'owned' : ''} ${st.sel ? 'sel' : ''}" role="button" aria-label="Ei ${PET_NAME[pet]}">${X('egg-' + pet, 0, 4)}${P(PET_NAME[pet], 2, st.owned ? '--color-menu-done-fg' : '--color-menu-text')}${P({ bee: 'STICHT NAHE GEGNER', penguin: 'WIRFT SCHNEEBÄLLE', capybara: 'AURA UND HEILUNG' }[pet], 0, st.owned ? '--color-menu-done-fg' : '--color-menu-text-muted')}${st.owned ? owned : price(5)}</div>`;
+      }).join('')}</div>`;
+    }
+    const i = o.info;
+    const btn = i.state === 'buy' ? `<div class="k-btn primary wide is-focus" role="button">${P('KAUFEN', 2, '--color-menu-action-fg')}${X('diamond', 0, 1)}${P(i.cost, 2, '--color-menu-action-fg')}</div>`
+      : i.state === 'poor' ? `<div class="k-btn wide is-disabled" role="button" aria-disabled="true">${P('ZU WENIG', 2, '--color-menu-text-disabled')}</div>`
+      : `<div class="k-btn done wide is-disabled" role="button" aria-disabled="true" style="--b:var(--color-menu-owned-bg);box-shadow:0 0 0 2px var(--color-menu-outline)">${X('ui-icons-m8', 1, 1, '--color-menu-done-fg')}${P('GEKAUFT', 2, '--color-menu-done-fg')}</div>`;
+    document.getElementById(id).innerHTML = frame({ hint: 'WÄHLE EINEN ARTIKEL.' }) + card(ST).replace('k-panel col', 'k-panel col" style="filter:none') + `<div class="k-scrim" style="background:var(--color-menu-scrim)"></div>
+      <div class="abs m-shop k-panel" role="dialog" aria-label="Shop" data-component="ShopPanel">
+        <div class="row" style="justify-content:space-between">${tabs(o.tab)}
+          <span class="row" style="gap:8px"><span class="row" style="gap:4px" aria-label="${o.dia} Diamanten">${DIA(2)}${P(o.dia, 2, '--color-menu-diamond', ' data-sh="--color-menu-outline"')}</span>
+          <div class="k-btn icon" role="button" aria-label="Shop schließen">${P('X', 2, '--color-menu-text')}</div></span></div>
+        ${body}
+        <div class="info k-sunken" data-component="ShopInfo">
+          <div class="txt">${P(i.name, 2, '--color-menu-text')}${i.lines.map((l) => P(l, 0, '--color-menu-text-muted')).join('')}</div>${btn}
+        </div>
+      </div>`;
+  }
+  shop('v2', { tab: 'gear', dia: 12, state: { 'hell-head': { owned: 1 }, 'diamond-legs': { owned: 1 }, 'hell-body': { sel: 1 } },
+    info: { name: 'GLUTPANZER', lines: ['+10 % SCHADEN · BRAND 3 S', 'SET HÖLLE 3/3: ALLE 20 S FEUERRING'], state: 'buy', cost: 3 } });
+  shop('v3', { tab: 'egg', dia: 2, state: { bee: { owned: 1 }, penguin: { sel: 1 } },
+    info: { name: 'PINGUIN-EI', lines: ['WIRFT SCHNEEBÄLLE, DIE BREMSEN.', 'ES FEHLEN 3 DIAMANTEN.'], state: 'poor', cost: 5 } });
+  shop('v4', { tab: 'petGear', dia: 9, state: { 'bee-hell': { owned: 1, sel: 1 }, 'bee-diamond': {}, 'capybara-heaven': { owned: 1 } },
+    info: { name: 'BIENE · GLUT', lines: ['NUR AUSSEHEN, KEINE WERTE.', 'ANLEGEN: TIPPE AUF DEIN PORTRÄT.'], state: 'owned', cost: 2 } });
+
+  // ---------- view 5: gear window ----------
+  const grow = (label, val, icon, opt = {}) => `<div class="grow ${opt.focus ? 'is-focus' : ''}" role="group" aria-label="${label}">
+      ${P(label, 0, '--color-menu-text-muted')}${arrow('<', opt.disL)}
+      <div class="gval k-sunken">${icon || ''}${P(val, 2, val === 'KEINS' ? '--color-menu-text-muted' : '--color-menu-text')}${opt.tag ? `<span style="margin-left:auto" class="row">${opt.tag}</span>` : ''}</div>
+      ${arrow('>', opt.disR)}</div>`;
+  const sw = (set) => `<i class="k-swatch" style="background:${SET_SW[set]}"></i>`;
+  const G5 = { head: 'hell', body: 'hell', legs: 'diamond' };
+  document.getElementById('v5').innerHTML = frame({ hint: 'PFEILE: TEIL WECHSELN.' }) + `<div class="k-scrim"></div>
+    <div class="abs m-gear k-panel" role="dialog" aria-label="Ausrüstung" data-component="GearPanel">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">${P('AUSRÜSTUNG', 2, '--color-menu-text')}<div class="k-btn primary" role="button">${P('FERTIG', 2, '--color-menu-action-fg')}</div></div>
+      <div class="row" style="gap:12px;align-items:flex-start">
+        <div class="preview k-sunken" data-component="GearPreview"><div class="ground"></div>
+          <span class="abs" style="left:4px;top:46px">${X(GEARKEYS(G5), 0, 4, null, 'Astronautin mit Rüstung')}</span>
+          <span class="abs" style="left:124px;top:146px">${X('pet-bee,petgear-bee-hell', 0, 4, null, 'Biene mit Glut-Rüstung')}</span>
+          <span class="abs k-sticker" style="left:8px;top:8px">${sw('hell')}${P('SET HÖLLE', 0, '--color-menu-sticker-fg')}<span class="pip3" style="--c:var(--color-sprite-gear-lava)" role="img" aria-label="2 von 3"><i class="on"></i><i class="on"></i><i></i></span>${P('2/3', 0, '--color-menu-sticker-fg')}</span>
+          <span class="abs" style="left:8px;top:28px">${P('FEHLT: LAVASTIEFEL', 0, '--color-menu-text-muted')}</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="gear-rows">
+            ${grow('KOPF', 'TEUFELSHÖRNER', sw('hell'))}
+            ${grow('OBERTEIL', 'GLUTPANZER', sw('hell'), { focus: 1 })}
+            ${grow('HOSE+SCHUHE', 'KRISTALLSTIEFEL', sw('diamond'))}
+            ${grow('PET', 'BIENE', X('pet-bee', 0, 1))}
+            ${grow('PET-RÜSTUNG', 'GLUT', sw('hell'))}
+          </div>
+          <div class="effects k-sunken" data-component="GearSummary">
+            ${P('WERTE: +20 % SCHADEN · +10 MAX. ENERGIE', 0, '--color-menu-text')}
+            ${P('EFFEKTE: KRITISCH 10 % · BRAND · RÜCKSTOSS', 0, '--color-menu-text')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // ---------- view 6: HUD with pet bar ----------
+  const petbar = (x, y, o) => `<div class="petbar f-glass ${o.cls || ''}" style="left:${x}px;top:${y}px" role="img" aria-label="${o.label}" data-component="PetBar">
+      ${X(o.icon, o.f || 0, 1)}${o.max ? P('MAX', 1, '--color-hud-accent') : `<span class="trk"><i style="width:${o.pct}%"></i></span>`}
+      ${o.egg ? P('EI', 1, '--color-hud-text-muted', ' style="margin-left:auto"') : `<span class="pips">${[0, 1, 2].map((n) => `<i class="${n < o.lvl ? 'on' : ''}"></i>`).join('')}</span>`}</div>`;
+  document.getElementById('v6').innerHTML = `
+    <div class="w-ground forest"></div><div class="w-vignette"></div>
+    <span class="abs" style="left:304px;top:164px">${X(GEARKEYS(G5), 0, 1)}</span>
+    <span class="abs" style="left:290px;top:180px">${X('egg-bee', 1, 1)}</span>
+    <div class="abs f-glass f-energy" style="left:8px;top:8px;width:160px;height:40px">${P('64', 3, '--color-hud-text')}<div>${P('ENERGIE', 1, '--color-hud-text-muted')}<div class="f-segs">${'<i></i>'.repeat(6)}<i class="half"></i>${'<i class="off"></i>'.repeat(3)}</div></div></div>
+    <div class="abs f-glass" style="left:284px;top:8px;width:72px;height:40px;display:grid;place-items:center">${P('2:19', 3, '--color-hud-text')}</div>
+    <div class="abs f-btn icon" style="left:560px;top:8px"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-hud-text);--px-k:var(--color-hud-screen)"></span></div>
+    <div class="abs f-btn icon" style="left:600px;top:8px">${P('II', 2, '--color-hud-text')}</div>
+    ${petbar(8, 288, { icon: 'egg-bee', f: 1, pct: 60, egg: 1, label: 'Pet: Ei, 60 Prozent bis zum Schlüpfen' })}
+    <div class="slot f-glass dim" style="left:8px;top:312px">${X('item-rapid-fire', 0, 2)}</div>
+    <div class="slot f-glass" style="left:56px;top:312px;border-color:var(--color-hud-accent)">${X('item-fire-ring', 0, 2)}</div>
+    <div class="f-stick" style="left:526px;top:246px"><i></i></div>
+    <div class="abs f-glass" style="left:400px;top:96px;width:224px;height:200px;padding:10px;display:flex;flex-direction:column;gap:10px">
+      ${P('ZUSTÄNDE PET-LEISTE (88×20, FEST)', 1, '--color-hud-text-muted')}
+      <div class="cap" style="position:relative;height:20px">${petbar(0, 0, { icon: 'egg-penguin', pct: 25, egg: 1, label: 'Ei 25 %' })}<span class="abs" style="left:96px;top:6px">${P('EI · BIS SCHLUPF', 1, '--color-hud-text-muted')}</span></div>
+      <div class="cap" style="position:relative;height:20px">${petbar(0, 0, { icon: 'egg-penguin', f: 3, pct: 100, egg: 1, cls: 'flash', label: 'Ei schlüpft' })}<span class="abs" style="left:96px;top:6px">${P('VOLL · SCHLÜPFT', 1, '--color-hud-accent')}</span></div>
+      <div class="cap" style="position:relative;height:20px">${petbar(0, 0, { icon: 'pet-penguin', pct: 40, lvl: 0, label: 'Pinguin, Stufe 0' })}<span class="abs" style="left:96px;top:6px">${P('PET · STUFE 0/3', 1, '--color-hud-text-muted')}</span></div>
+      <div class="cap" style="position:relative;height:20px">${petbar(0, 0, { icon: 'pet-capybara', pct: 70, lvl: 2, label: 'Capybara, Stufe 2' })}<span class="abs" style="left:96px;top:6px">${P('STUFE 2/3', 1, '--color-hud-text-muted')}</span></div>
+      <div class="cap" style="position:relative;height:20px">${petbar(0, 0, { icon: 'pet-bee', lvl: 3, max: 1, cls: 'ready', label: 'Biene, Stufe 3, Maximum' })}<span class="abs" style="left:96px;top:6px">${P('STUFE 3/3 · MAX', 1, '--color-hud-accent')}</span></div>
+    </div>
+    <div class="f-scan"></div>`;
+
+  // ---------- view 7: result ----------
+  const fbtn = (l, p, f) => `<div class="f-btn ${p ? 'primary' : ''} ${f ? 'is-focus' : ''}" role="button">${P(l, 2, p ? '--color-hud-accent' : '--color-hud-text')}</div>`;
+  document.getElementById('v7').innerHTML = `
+    <div class="res"></div><div class="band" style="background:var(--color-biome-night)"></div>
+    <div class="logline">${P('LOG · LEVEL 9 · WALD BEI NACHT', 0, '--color-hud-text-muted')}${P('5:00 ÜBERLEBT', 0, '--color-hud-text-muted')}</div>
+    <div class="hero">${X(GEARKEYS(G5), 0, 3, null, 'Astronautin')}<span style="margin-left:-14px;align-self:flex-end">${X('pet-bee,petgear-bee-hell', 0, 3)}</span>
+      <div style="display:flex;flex-direction:column;gap:10px">${P('GEWONNEN', 4, '--color-hud-accent')}${P('DER WALD IST WIEDER STILL.', 0, '--color-hud-text-muted')}</div></div>
+    <div class="facts">
+      ${P('ERFAHRUNG', 0, '--color-hud-text-muted')}${P('+180 XP', 2, '--color-hud-text')}
+      ${P('MÜNZEN', 0, '--color-hud-text-muted')}<span class="row" style="gap:8px"><span class="spr" data-n="coin" data-s="2"></span>${P('31 · ANTEIL 100 % · +31 GOLD', 2, '--color-hud-gold')}</span>
+      ${P('GOLD GESAMT', 0, '--color-hud-text-muted')}${P('279', 2, '--color-hud-gold')}
+      ${P('DIAMANTEN', 0, '--color-hud-text-muted')}<span class="row" style="gap:8px" data-component="DiamondGain"><span class="row dia-new" style="gap:6px">${DIA(2)}${P('+3', 2, '--color-hud-diamond')}</span>${P('ERSTER SIEG · LETZTES LEVEL DER MAP · GESAMT 15', 0, '--color-hud-text-muted')}</span>
+    </div>
+    <div class="actions">${fbtn('NOCHMAL')}${fbtn('NÄCHSTES LEVEL', 1, 1)}${fbtn('MENÜ')}</div>
+    <div class="f-scan"></div>`;
+
+  // close-up screenshots: list the view numbers to show (empty = all)
+  const ONLY = [];
+  if (ONLY.length) document.querySelectorAll('header, section').forEach((n, i) => { if (!ONLY.includes(i)) n.style.display = 'none'; });
+
+  // ---------- PX_SPRITES renderer for .pxs ----------
+  const cache = {};
+  function frameCanvas(key, f) {
+    const id = key + ':' + f; if (cache[id]) return cache[id];
+    const d = S[key]; if (!d) return null;
+    const c = document.createElement('canvas'); c.width = d.frameWidth; c.height = d.frameHeight;
+    const x = c.getContext('2d');
+    (d.frames[f] || d.frames[0]).forEach((r, y) => [...r].forEach((ch, i) => { if (ch !== '.') { x.fillStyle = d.palette[ch]; x.fillRect(i, y, 1, 1); } }));
+    return (cache[id] = c);
+  }
+  document.querySelectorAll('.pxs').forEach((el) => {
+    const keys = el.dataset.k.split(','), f = +el.dataset.f, s = +el.dataset.s;
+    const base = S[keys[0]]; if (!base) return;
+    const c = document.createElement('canvas'); c.width = base.frameWidth; c.height = base.frameHeight;
+    const x = c.getContext('2d'); keys.forEach((k) => { const fc = frameCanvas(k, f); if (fc) x.drawImage(fc, 0, 0); });
+    if (el.dataset.tint) { x.globalCompositeOperation = 'source-in'; x.fillStyle = getComputedStyle(el).getPropertyValue(el.dataset.tint).trim(); x.fillRect(0, 0, c.width, c.height); }
+    c.style.width = base.frameWidth * s + 'px'; c.style.height = base.frameHeight * s + 'px';
+    el.appendChild(c);
+  });
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+</body>
+</html>
