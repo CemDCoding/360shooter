@@ -3,7 +3,6 @@
 // Hardening (§5): context isolation, sandbox, no Node in the renderer, no preload, no
 // navigation, no new windows, no requests outside the own scheme, CSP, DevTools only unpacked.
 import { app, BrowserWindow, Menu, protocol, session } from 'electron';
-import type { MenuItemConstructorOptions } from 'electron';
 import {
   APP_SCHEME,
   APP_SCHEME_PRIVILEGES,
@@ -11,7 +10,9 @@ import {
   handleAppRequest,
   isAllowedRequestUrl,
 } from './appProtocol.js';
+import { buildMenuTemplate, isPhoneShortcut } from './menu.js';
 import { distDir } from './paths.js';
+import { showPhoneDialog, stopPhoneAccess } from './phoneDialog.js';
 import { createWindowOptions, isFullscreenToggle, menuBarVisible } from './window.js';
 
 const APP_NAME = '360shooter';
@@ -26,29 +27,22 @@ function toggleFullScreen(win: BrowserWindow): void {
   win.setFullScreen(!win.isFullScreen());
 }
 
+function openPhone(): void {
+  void showPhoneDialog(mainWindow, distDir(app.getAppPath()));
+}
+
 function buildMenu(): Menu {
-  const template: MenuItemConstructorOptions[] = [
-    {
-      label: 'Spiel',
-      submenu: [
-        {
-          label: 'Vollbild an/aus (F11)',
-          click: () => {
-            if (mainWindow) toggleFullScreen(mainWindow);
-          },
+  return Menu.buildFromTemplate(
+    buildMenuTemplate({
+      isPackaged: app.isPackaged,
+      actions: {
+        toggleFullScreen: () => {
+          if (mainWindow) toggleFullScreen(mainWindow);
         },
-        { type: 'separator' },
-        { role: 'quit', label: 'Beenden' },
-      ],
-    },
-  ];
-  if (!app.isPackaged) {
-    template.push({
-      label: 'Entwicklung',
-      submenu: [{ role: 'reload' }, { role: 'toggleDevTools' }],
-    });
-  }
-  return Menu.buildFromTemplate(template);
+        openPhoneDialog: openPhone,
+      },
+    }),
+  );
 }
 
 function hardenSession(): void {
@@ -73,6 +67,9 @@ function createMainWindow(): BrowserWindow {
     if (isFullscreenToggle(input)) {
       event.preventDefault();
       toggleFullScreen(win);
+    } else if (isPhoneShortcut(input)) {
+      event.preventDefault();
+      openPhone();
     }
   });
   win.once('ready-to-show', () => win.show());
@@ -102,6 +99,9 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('window-all-closed', () => app.quit());
+  app.on('will-quit', () => {
+    void stopPhoneAccess();
+  });
 
   void app.whenReady().then(() => {
     const root = distDir(app.getAppPath());
