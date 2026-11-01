@@ -149,7 +149,7 @@ function hudSeconds(ms: number): number {
 }
 
 function powersKey(p: ActivePowers): string {
-  return `${p.doubleShotStage}|${Math.ceil(p.shieldLeft)}|${hudSeconds(p.rapidFireMsLeft)}`;
+  return `${p.doubleShotStage}|${hudSeconds(p.doubleShotMsLeft)}|${Math.ceil(p.shieldLeft)}|${hudSeconds(p.rapidFireMsLeft)}`;
 }
 
 function armourKey(a: ActiveArmour): string {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ITEMS, ITEM_RULES } from '../../src/config';
+import { DOUBLE_SHOT_STAGE_MS, ITEMS, ITEM_RULES } from '../../src/config';
 import type { ItemDef } from '../../src/contracts';
 import { applyPowerItem, isExpired, rollDrop } from '../../src/logic/items';
 import { emptyPowers } from '../../src/logic/powers';
@@ -51,6 +51,15 @@ describe('rollDrop', () => {
   it('falls back to the last def when rounding leaves the roll non-negative', () => {
     const seq = [0, 1];
     expect(rollDrop({ next: () => seq.shift() ?? 1 }, always, ITEMS)).toBe(ITEMS[ITEMS.length - 1]);
+  });
+});
+
+describe('applyPowerItem double shot timer', () => {
+  it('pickup resets the remaining time, also at stage 2', () => {
+    const d = def('doubleShot');
+    const s = applyPowerItem({ ...emptyPowers(), doubleShotStage: 2, doubleShotMsLeft: 3000 }, d);
+    expect(s.doubleShotStage).toBe(2);
+    expect(s.doubleShotMsLeft).toBe(DOUBLE_SHOT_STAGE_MS);
   });
 });
 
