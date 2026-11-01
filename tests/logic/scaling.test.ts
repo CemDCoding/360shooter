@@ -7,6 +7,7 @@ import {
   scaledDropChance,
   xpBonus,
 } from '../../src/logic/scaling';
+import { tierFor } from '../../src/logic/tier';
 
 describe('enemyScaleFor', () => {
   it('returns finite factors above 0 for every level', () => {
@@ -20,14 +21,27 @@ describe('enemyScaleFor', () => {
 
   it('returns the configured factors: weaker enemies in level 0 to 20 (AP-91, AP-95)', () => {
     for (let id = 0; id <= 20; id += 1) {
-      expect(enemyScaleFor(id)).toEqual(LEVEL_SCALING[id]);
-      expect(enemyScaleFor(id).hp).toBeLessThan(1);
+      const s = enemyScaleFor(id);
+      const t = tierFor(id);
+      expect(s.hp).toBeCloseTo(LEVEL_SCALING[id].hp * t.hpFactor);
+      expect(s.contact).toBeCloseTo(LEVEL_SCALING[id].contact * t.damageFactor);
+      expect(s.xp).toBe(LEVEL_SCALING[id].xp);
+      expect(s.coin).toBe(LEVEL_SCALING[id].coin);
+      expect(s.size).toBe(t.scale);
     }
+  });
+
+  it('multiplies the level factor by the tier once (AP-128)', () => {
+    // Stage 0 keeps the old values, stage 4 is level factor times 1.32 hp / 1.2 contact.
+    expect(enemyScaleFor(5)).toEqual({ ...LEVEL_SCALING[5], size: 1 });
+    expect(enemyScaleFor(9).hp).toBeCloseTo(LEVEL_SCALING[9].hp * 1.32);
+    expect(enemyScaleFor(9).contact).toBeCloseTo(LEVEL_SCALING[9].contact * 1.2);
+    expect(enemyScaleFor(9).size).toBeCloseTo(1.12);
   });
 
   it('falls back to the default for unknown levels', () => {
     for (const id of [-1, LEVEL_SCALING.length, 1.5, Number.NaN, Infinity]) {
-      expect(enemyScaleFor(id)).toEqual({ hp: 1, xp: 1, coin: 1, contact: 1 });
+      expect(enemyScaleFor(id)).toEqual({ hp: 1, xp: 1, coin: 1, contact: 1, size: 1 });
     }
   });
 
@@ -41,7 +55,7 @@ describe('enemyScaleFor', () => {
 });
 
 describe('ScaleRegistry (pool recycling)', () => {
-  const scaled = { hp: 2, xp: 3, coin: 0.5, contact: 4 };
+  const scaled = { hp: 2, xp: 3, coin: 0.5, contact: 4, size: 1.1 };
 
   it('gives a recycled enemy the default scale when it is respawned as a summon', () => {
     const tree = {};

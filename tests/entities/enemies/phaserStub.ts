@@ -200,6 +200,13 @@ class Sprite {
     this.body.velocity = { x, y };
     return this;
   }
+  scaleX = 1;
+  scaleY = 1;
+  setScale(s: number): this {
+    this.scaleX = s;
+    this.scaleY = s;
+    return this;
+  }
   setFlipX(v: boolean): this {
     this.flipX = v;
     return this;

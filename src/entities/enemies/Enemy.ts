@@ -54,11 +54,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.despawn();
   }
 
-  spawn(x: number, y: number): void {
+  /** `size` is the tier size factor (AP-128). It is set on every spawn, so a pooled enemy never keeps an old one. */
+  spawn(x: number, y: number, size = 1): void {
     this.hp = this.def.hp;
     this.flashLeftMs = 0;
     this.contactSpent = false;
     this.clearTint();
+    // The arcade body follows the sprite scale, so hit and contact area grow with the picture.
+    this.setScale(size);
     this.enableBody(true, x, y, true, true);
     this.setActive(true).setVisible(true);
     this.auraGfx?.setVisible(true).setPosition(x, y);

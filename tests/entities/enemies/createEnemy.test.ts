@@ -59,6 +59,18 @@ describe('createEnemy without the AP-97 fallbacks (AP-101)', () => {
     expect(ENEMY_BODY_SIZE.cursedTree).toBeUndefined();
   });
 
+  it('sizes a pooled enemy by tier and resets the size on reuse (AP-128)', () => {
+    const { scene, boltPool } = setup();
+    const pool = new EnemyPool(sceneOf(scene), { boltPool, center: CENTER });
+    const a = pool.spawn('boar', 0, 0, { hp: 1, size: 1.15 });
+    expect(a.scaleX).toBe(1.15);
+    a.despawn();
+    const b = pool.spawn('boar', 0, 0);
+    expect(b).toBe(a);
+    expect(b.scaleX).toBe(1);
+    expect(b.scaleY).toBe(1);
+  });
+
   it('reuses pooled enemies of the same id', () => {
     const { scene, boltPool } = setup();
     const pool = new EnemyPool(sceneOf(scene), { boltPool, center: CENTER });
