@@ -63,9 +63,10 @@ export function buildTheme(json) {
   const sizePx = [];
   const sizeCount = [];
   for (const [k, v] of Object.entries(flatten({ size: base.size }))) {
-    const n = typeof v === 'number' ? v : px(v);
+    const isCount = typeof v === 'number' || (typeof v === 'string' && /^\d+(\.\d+)?$/.test(v));
+    const n = isCount ? Number(v) : px(v);
     if (n === null) throw new Error(`Unbekannte Größe: ${k}=${v}`);
-    (typeof v === 'number' ? sizeCount : sizePx).push([k, n]);
+    (isCount ? sizeCount : sizePx).push([k, n]);
   }
   const dur = Object.entries(base.motion.duration).map(([k, v]) => [`motion.${k}`, ms(v)]);
   const easing = Object.entries(base.motion.easing).map(([k, v]) => [`motion.${k}`, q(v)]);

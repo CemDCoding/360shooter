@@ -87,6 +87,7 @@ describe('THEME other tokens', () => {
     expect(THEME.spacePx['space.2']).toBe(8);
     expect(THEME.sizePx['size.target']).toBe(32);
     expect(THEME.sizeCount['size.energy-segments']).toBe(10);
+    expect(THEME.sizeCount['size.gear-preview-scale']).toBe(4);
     expect(THEME.motionMs['motion.base']).toBe(150);
     expect(THEME.motionCount['motion.banner-blinks']).toBe(3);
     expect(THEME.font.family.menu[0]).toBe('Astro Kapsel');

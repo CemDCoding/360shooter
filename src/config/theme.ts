@@ -45,6 +45,10 @@ const COLORS = {
   'phos.600': { num: 0x567f02, css: '#567f02' },
   'phos.800': { num: 0x2c4210, css: '#2c4210' },
   'phos.950': { num: 0x0a1108, css: '#0a1108' },
+  'ice.100': { num: 0xe8fbff, css: '#e8fbff' },
+  'ice.300': { num: 0x9fe6ff, css: '#9fe6ff' },
+  'ice.500': { num: 0x5ab4e6, css: '#5ab4e6' },
+  'ice.700': { num: 0x2f6fa8, css: '#2f6fa8' },
   'biome.forest': { num: 0x6cc04a, css: '#6cc04a' },
   'biome.night': { num: 0x6a86ff, css: '#6a86ff' },
   'biome.elf': { num: 0xc89bff, css: '#c89bff' },
@@ -87,6 +91,20 @@ const COLORS = {
   'sprite.coin': { num: 0xffcf4a, css: '#ffcf4a' },
   'sprite.coin-hi': { num: 0xffe2a0, css: '#ffe2a0' },
   'sprite.coin-lo': { num: 0xc7922a, css: '#c7922a' },
+  'sprite.gear-ice-hi': { num: 0xe8fbff, css: '#e8fbff' },
+  'sprite.gear-ice': { num: 0x9fe6ff, css: '#9fe6ff' },
+  'sprite.gear-ice-shade': { num: 0x5ab4e6, css: '#5ab4e6' },
+  'sprite.gear-ice-deep': { num: 0x2f6fa8, css: '#2f6fa8' },
+  'sprite.gear-obsidian-hi': { num: 0x5a3450, css: '#5a3450' },
+  'sprite.gear-obsidian': { num: 0x3a2036, css: '#3a2036' },
+  'sprite.gear-lava': { num: 0xff8a3a, css: '#ff8a3a' },
+  'sprite.gear-lava-hi': { num: 0xffd06a, css: '#ffd06a' },
+  'sprite.gear-horn': { num: 0xe0483c, css: '#e0483c' },
+  'sprite.gear-horn-hi': { num: 0xff8a70, css: '#ff8a70' },
+  'sprite.gear-white': { num: 0xffffff, css: '#ffffff' },
+  'sprite.gear-cloud': { num: 0xdfe6ff, css: '#dfe6ff' },
+  'sprite.gear-gold': { num: 0xffd24a, css: '#ffd24a' },
+  'sprite.gear-gold-shade': { num: 0xc8901e, css: '#c8901e' },
   'menu.bg': { num: 0x1a0f24, css: '#1a0f24' },
   'menu.surface': { num: 0x2d1a3d, css: '#2d1a3d' },
   'menu.surface-hi': { num: 0x4a2c60, css: '#4a2c60' },
@@ -115,6 +133,9 @@ const COLORS = {
   'menu.gold': { num: 0xffcf4a, css: '#ffcf4a' },
   'menu.focus': { num: 0xfff4e8, css: '#fff4e8' },
   'menu.scrim': { num: 0x0b0610, css: '#0b0610', alpha: 0.8 },
+  'menu.diamond': { num: 0x9fe6ff, css: '#9fe6ff' },
+  'menu.owned-bg': { num: 0x5fe0c0, css: '#5fe0c0' },
+  'menu.selected': { num: 0xfff4e8, css: '#fff4e8' },
   'hud.glass': { num: 0x060c05, css: '#060c05', alpha: 0.722 },
   'hud.screen': { num: 0x0a1108, css: '#0a1108' },
   'hud.line': { num: 0x567f02, css: '#567f02' },
@@ -132,6 +153,7 @@ const COLORS = {
   'hud.flash': { num: 0xa8d86b, css: '#a8d86b', alpha: 0.502 },
   'hud.trail': { num: 0xe0c9d6, css: '#e0c9d6' },
   'hud.danger-dim': { num: 0x5a2236, css: '#5a2236' },
+  'hud.diamond': { num: 0x9fe6ff, css: '#9fe6ff' },
   'game.laser-raygun': { num: 0xff8fae, css: '#ff8fae' },
   'game.shield-ring': { num: 0x5fb8ff, css: '#5fb8ff' },
   'game.fire-ring': { num: 0xff8a3a, css: '#ff8a3a' },
@@ -154,6 +176,9 @@ const COLORS = {
   'game.parry-good': { num: 0xa8d86b, css: '#a8d86b' },
   'game.parry-miss': { num: 0xff8a7b, css: '#ff8a7b' },
   'game.parry-burst': { num: 0x5fb8ff, css: '#5fb8ff' },
+  'game.pet-aura': { num: 0xffd98a, css: '#ffd98a' },
+  'game.gear-block': { num: 0x9fe6ff, css: '#9fe6ff' },
+  'game.crit': { num: 0xffe2a0, css: '#ffe2a0' },
 } as const satisfies Record<string, ThemeColor>;
 
 /** Abstände in px. */
@@ -190,6 +215,11 @@ const SIZE_PX = {
   'size.parry-line': 2,
   'size.hud-timebar-h': 2,
   'size.hud-timebar-gap': 1,
+  'size.hud-petbar-h': 20,
+  'size.hud-petbar-gap': 4,
+  'size.pet-offset-x': 22,
+  'size.pet-offset-y': 8,
+  'size.shop-tile-h': 56,
 } as const;
 
 /** Größen als Anzahl. */
@@ -197,6 +227,7 @@ const SIZE_COUNT = {
   'size.energy-segments': 10,
   'size.hud-slot-icon-scale': 3,
   'size.parry-ring-start': 2.5,
+  'size.gear-preview-scale': 4,
 } as const;
 
 /** Zeiten in ms. */
@@ -212,6 +243,9 @@ const MOTION_MS = {
   'motion.parry-feedback': 400,
   'motion.parry-burst': 600,
   'motion.timebar-warn': 5000,
+  'motion.gear-block': 300,
+  'motion.diamond-pop': 200,
+  'motion.hatch': 300,
 } as const;
 
 /** Bewegung als Anzahl. */
