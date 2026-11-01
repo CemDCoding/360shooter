@@ -2,9 +2,6 @@ import { PARRY_RULES } from '../config/parry';
 import type { ParryCircle, ParryGrade, ParryRules } from '../contracts';
 import type { Rng } from './rng';
 
-/** Extra tap tolerance around a circle in arena units (finger is not exact). */
-export const PARRY_TOUCH_TOLERANCE_PX = 8;
-
 /** A circle with its result; `null` means still open. */
 export interface ParryCircleState extends ParryCircle {
   result: ParryGrade | null;
@@ -68,7 +65,7 @@ export function hitCircle(
   center: { x: number; y: number },
   rules: ParryRules = PARRY_RULES,
 ): ParryCircleState | null {
-  const reach = rules.circleRadiusPx + PARRY_TOUCH_TOLERANCE_PX;
+  const reach = rules.circleRadiusPx + rules.touchSlackPx;
   let best: ParryCircleState | null = null;
   let bestDist = Infinity;
   for (const c of circles) {
@@ -83,6 +80,24 @@ export function hitCircle(
     }
   }
   return best;
+}
+
+/**
+ * Closing ring of a circle at `nowMs` (same clock as hitAtMs). Appears at
+ * max(0, hitAtMs - approachMs), starts at ringStartScale and shrinks linearly to 1 at hitAtMs.
+ * Before the appearance and after the hit it is not visible.
+ */
+export function ringState(
+  circle: ParryCircle,
+  nowMs: number,
+  rules: ParryRules = PARRY_RULES,
+): { visible: boolean; scale: number } {
+  const start = Math.max(0, circle.hitAtMs - rules.approachMs);
+  if (nowMs < start || nowMs > circle.hitAtMs)
+    return { visible: false, scale: rules.ringStartScale };
+  const span = circle.hitAtMs - start;
+  const t = span > 0 ? (nowMs - start) / span : 1;
+  return { visible: true, scale: rules.ringStartScale + (1 - rules.ringStartScale) * t };
 }
 
 /** Grades the tap on one open circle; already graded circles stay unchanged. */

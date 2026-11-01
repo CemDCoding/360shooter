@@ -14,4 +14,12 @@ describe('PARRY_RULES (AP-126, PE-157, PE-158)', () => {
     expect(PARRY_RULES.ringStartScale).toBeGreaterThan(1);
     expect(PARRY_RULES.distanceFromPlayerPx).toBeGreaterThan(PARRY_RULES.circleRadiusPx);
   });
+
+  it('matches the approved design H-33', () => {
+    expect(PARRY_RULES.distanceFromPlayerPx).toBe(56);
+    expect(PARRY_RULES.approachMs).toBe(800);
+    expect(PARRY_RULES.touchSlackPx).toBe(4);
+    expect(PARRY_RULES.circleRadiusPx).toBe(20);
+    expect(PARRY_RULES.ringStartScale).toBe(2.5);
+  });
 });

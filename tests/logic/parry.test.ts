@@ -6,6 +6,7 @@ import {
   gradeTap,
   hitCircle,
   planCircles,
+  ringState,
   resolveParry,
   tapCircle,
 } from '../../src/logic/parry';
@@ -54,13 +55,42 @@ describe('hitCircle', () => {
   const circles = [{ ...c, result: null }];
   const d = PARRY_RULES.distanceFromPlayerPx;
   it('hits inside radius plus tolerance', () => {
-    expect(hitCircle(circles, { x: 100 + d + 25, y: 100 }, center)).not.toBeNull();
+    expect(hitCircle(circles, { x: 100 + d + 24, y: 100 }, center)).not.toBeNull();
+  });
+  it('misses just outside (25 px)', () => {
+    expect(hitCircle(circles, { x: 100 + d + 25, y: 100 }, center)).toBeNull();
   });
   it('misses outside', () => {
     expect(hitCircle(circles, { x: 100 + d + 40, y: 100 }, center)).toBeNull();
   });
   it('ignores resolved circles', () => {
     expect(hitCircle([{ ...c, result: 'miss' }], { x: 100 + d, y: 100 }, center)).toBeNull();
+  });
+});
+
+describe('ringState', () => {
+  const r = PARRY_RULES;
+  const k = { index: 0, angleDeg: 0, hitAtMs: 1500 };
+  it('is hidden before appearing', () => {
+    expect(ringState(k, 1500 - r.approachMs - 1).visible).toBe(false);
+  });
+  it('starts at ringStartScale', () => {
+    expect(ringState(k, 1500 - r.approachMs)).toEqual({ visible: true, scale: r.ringStartScale });
+  });
+  it('shrinks linearly to the middle', () => {
+    const s = ringState(k, 1500 - r.approachMs / 2);
+    expect(s.visible).toBe(true);
+    expect(s.scale).toBeCloseTo((r.ringStartScale + 1) / 2);
+  });
+  it('is 1 exactly at hitAtMs and hidden afterwards', () => {
+    expect(ringState(k, 1500)).toEqual({ visible: true, scale: 1 });
+    expect(ringState(k, 1501).visible).toBe(false);
+  });
+  it('starts at 0 for early circles (shorter approach, faster ring)', () => {
+    const e = { index: 0, angleDeg: 0, hitAtMs: 400 };
+    expect(ringState(e, -1).visible).toBe(false);
+    expect(ringState(e, 0)).toEqual({ visible: true, scale: r.ringStartScale });
+    expect(ringState(e, 200).scale).toBeCloseTo((r.ringStartScale + 1) / 2);
   });
 });
 
