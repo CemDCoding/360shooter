@@ -177,7 +177,7 @@ describe('power slots layout (H-14)', () => {
 describe('powerBlock', () => {
   const rapid = { id: 'rapidFire', kind: 'item' as const };
   const ring = { id: 'fire-ring', kind: 'armour' as const };
-  const idle = { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 };
+  const idle = { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0, doubleShotMsLeft: 0 };
   const noArmour = { id: null, activeMsLeft: 0, cooldownMsLeft: 0 };
 
   it('blocks rapid fire while it runs and shows the seconds left', () => {

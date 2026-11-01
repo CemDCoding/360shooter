@@ -195,7 +195,12 @@ class PowerSlot {
 export class PowerSlots {
   private readonly slots: PowerSlot[];
   private store: PowerStoreState = { stored: [] };
-  private powers: ActivePowers = { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 };
+  private powers: ActivePowers = {
+    doubleShotStage: 0,
+    shieldLeft: 0,
+    rapidFireMsLeft: 0,
+    doubleShotMsLeft: 0,
+  };
   private armour: ActiveArmour = { id: null, activeMsLeft: 0, cooldownMsLeft: 0 };
 
   constructor(

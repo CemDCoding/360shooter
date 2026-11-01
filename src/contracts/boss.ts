@@ -13,10 +13,12 @@ export interface BossAttackDef {
   id: string;
   /** Pause after the attack was executed until it may start again (ms). */
   cooldownMs: number;
-  /** Warning time before the attack hits (ms), at least 700. */
+  /** Warning time before the attack hits (ms), at least 1200 ms for attacks with damage (M7, PE-157). */
   telegraphMs: number;
   /** Base damage per hit before the variant multiplier, 0 for attacks that only summon or move. */
   damage: number;
+  /** Number of quicktime circles of this attack, 0 = none (M7, PE-157). */
+  parryCircles: 0 | 1 | 2 | 3;
   /** Only used by variants with extraAttack = true (from the 3rd level of a batch). */
   extraOnly: boolean;
 }

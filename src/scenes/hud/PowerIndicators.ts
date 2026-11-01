@@ -41,7 +41,7 @@ export class PowerIndicators {
       shrink: chipShrink('shield'),
     });
     this.rapidFire = new FunkChip(scene, { icon: { key: key('rapidFire') }, k });
-    this.set({ doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 });
+    this.set({ doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0, doubleShotMsLeft: 0 });
   }
 
   /** Chips in display order. */

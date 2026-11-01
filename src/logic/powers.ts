@@ -12,7 +12,7 @@ export interface ShotSpec {
 }
 
 export function emptyPowers(): ActivePowers {
-  return { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 };
+  return { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0, doubleShotMsLeft: 0 };
 }
 
 export function clampStage(stage: number): 0 | 1 | 2 {

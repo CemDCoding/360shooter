@@ -41,3 +41,6 @@ export const ITEM_RULES: ItemRules = { dropChance: 0.08, lifetimeMs: 10000 };
 
 /** Obergrenze der Feuerrate waehrend Dauerfeuer */
 export const RAPID_FIRE_MAX_PER_SEC = 20;
+
+/** Duration of one double shot stage in ms; after it the stage falls back by one (M7, PE-156). */
+export const DOUBLE_SHOT_STAGE_MS = 20_000;

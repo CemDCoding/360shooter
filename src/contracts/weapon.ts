@@ -15,4 +15,6 @@ export interface ActivePowers {
   /** Verbleibende Schadenspunkte, die der Schild abfaengt */
   shieldLeft: number;
   rapidFireMsLeft: number;
+  /** Restzeit der aktuellen Doppelschuss-Stufe in ms, 0 = aus (M7, PE-156) */
+  doubleShotMsLeft: number;
 }
