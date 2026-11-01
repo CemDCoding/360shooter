@@ -178,7 +178,7 @@ Die Mumie, der Armadillo, das Kamel, der Archäologe, das Wildschwein, der Bär 
   | Wildschwein | 800 ms | 150 | 900 ms | 3500 ms | Faktor 1 (voll) |
   | Armadillo | 900 ms | 140 | 1200 ms | 3500 ms | Faktor 0,5 (rollt) |
 
-- **Eingraben** (`burrow`, Sandwurm): 1800 ms unter der Erde (unverwundbar), danach 2500 ms über der Erde. Er taucht 90 px von der Spielerin auf, der Auftauchpunkt wird 800 ms vorher angekündigt.
+- **Eingraben** (`burrow`, Sandwurm): 1800 ms unter der Erde (unverwundbar), danach 2500 ms über der Erde. Er taucht 90 px von der Spielerin auf, der Auftauchpunkt wird 800 ms vorher angekündigt. Abgetaucht ist nur der abgedimmte Kopf über dem Sandhügel zu sehen (PE-139).
 - **Gift** (`onHit.poison`, Schlange): Ein Treffer vergiftet die Spielerin mit 3 Schaden pro Sekunde für 3000 ms.
 - **Wickel** (`onHit.slow`, Mumie): Ein Treffer des Wickels bremst die Drehung der Spielerin auf den Faktor 0,5 für 2000 ms.
 - **Zickzack** (`movement: 'zigzag'`, Fee): Die Fee läuft seitlich versetzt, Ausschlag 16 px, Periode 1400 ms (`ZIGZAG`).
@@ -244,7 +244,7 @@ Beispiele: Ein Verfluchter Baum hat auf Level 0 etwa 50 × 0,44 = 22 HP und auf 
 
 Pro Batch gibt es einen Boss, insgesamt sechs. Die anderen Level des Batches nutzen ihn als Variante: **HP +15 % und Schaden +10 % pro Level-Index im Batch** (Index 0 ist das erste Level des Batches). Ab dem **3. Level des Batches (Index 2)** kommt ein zusätzlicher Angriff dazu (in der Tabelle als „Zusatz“ markiert).
 
-**Ablauf:** Die Warnung „Boss kommt!“ erscheint 33 s vor Rundenende, der Boss selbst 30 s vor Rundenende. Solange er lebt, ist die Spawnrate der normalen Gegner halbiert. Jeder Angriff wird mindestens 700 ms vorher angekündigt, und die Spielerin hat mindestens 1000 ms Reaktionszeit.
+**Ablauf:** Die Warnung „Boss kommt!“ erscheint 33 s vor Rundenende, der Boss selbst 30 s vor Rundenende. Beim Boss-Auftritt verschwinden alle normalen Gegner und ihre Geschosse sofort, ohne Münze und XP (PE-137). Im Boss-Kampf spawnt kein normaler Gegner nach, solange der Boss lebt (Q-58). Jeder Angriff wird mindestens 700 ms vorher angekündigt, und die Spielerin hat mindestens 1000 ms Reaktionszeit.
 
 Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er am Timerende, läuft die Runde als „BOSS!“ weiter bis Sieg oder Niederlage.
 
@@ -281,7 +281,7 @@ Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er a
 | Waldgeist | `fade` | Wird halb durchsichtig und kurz unverwundbar. | 9000 ms | 1000 ms | 0 | nein |
 | Waldgeist | `decoys` | Teilt sich kurz in 2 Attrappen. | 12 000 ms | 1000 ms | 0 | ja |
 | Riesen-Stein | `roll` | Rollt entlang einer Warnlinie zur Mitte und springt zurück. | 6000 ms | 1200 ms | 20 | nein |
-| Sand-Wurm | `burrow` | Taucht ab (unverwundbar), eine Sandspur wandert zur Spielerin, der Wurm bricht neben ihr im angekündigten Kreis aus. Der Sandhügel am Ende der Spur schwächt den Ausbruch, wenn man ihn beschießt. | 7000 ms | 1200 ms | 18 | nein |
+| Sand-Wurm | `burrow` | Taucht ab (unverwundbar); beim Eingraben bleibt nur der abgedimmte Kopf sichtbar, die Körperglieder sind ausgeblendet und ohne Hitbox (PE-138). Eine Sandspur wandert zur Spielerin, der Wurm bricht neben ihr im angekündigten Kreis aus. Der Sandhügel am Ende der Spur schwächt den Ausbruch, wenn man ihn beschießt. | 7000 ms | 1200 ms | 18 | nein |
 | Sand-Wurm | `spikeVolley` | Fächer aus Hautstacheln (abschießbar wie die Geisterkugeln). | 4000 ms | 900 ms | 10 | nein |
 | Sand-Wurm | `coil` | Der Körper umkreist die Spielerin als Ring mit Lücke und drückt zu. Nur der Kopf ist verwundbar. | 12 000 ms | 1500 ms | 15 | ja |
 | Wächter-Hund | `runeShield` | Unverwundbar, bis 3 schwebende Runen abgeschossen sind. | 14 000 ms | 1000 ms | 0 | nein |
