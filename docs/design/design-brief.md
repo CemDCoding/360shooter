@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** geändert (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“ in Arbeit, noch nicht freigegeben). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-35 (2026-11-01):** Interview läuft. Interview abgeschlossen (Entscheidungen 1a–12a). Nächster Schritt: Sprites (`assets/sprites-m8.js`), Mockups `mockups/m8-sprites.html` und `mockups/m8-shop-und-ausruestung.html`, Tokens, Selbstkontrolle, Freigabe.
+**Stand H-35 (2026-11-01):** Sprites, Mockups, Tokens und Übergabe sind fertig (siehe „Änderungen“, H-35). Es fehlt nur noch die Freigabe durch den Nutzer, danach folgt der Planner-Auftrag „Design übernehmen“.
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
 **Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
@@ -489,5 +489,82 @@ Keine neuen Sprites, Schriften oder Abhängigkeiten. Der Haken und das X sind 7�
 - 12a **Namen:** Diamant KRISTALLHELM, KRISTALLPANZER, KRISTALLSTIEFEL · Hölle TEUFELSHÖRNER, GLUTPANZER, LAVASTIEFEL · Himmel HEILIGENSCHEIN, ENGELSWESTE, WOLKENSTIEFEL. Pet-Rüstungen „BIENE · KRISTALL“, „PINGUIN · GLUT“, „CAPYBARA · HIMMEL“ usw.
 - (Designer) Ausrüstungs-Fenster nach PE-174: links Astronautin 4× auf Planetenstück, Pet daneben, sanfte Ruhe-Animation; rechts fünf Zeilen mit Pfeilen; unten Werte, Effekte, Set-Hinweis „SET HÖLLE 2/3“.
 - (Designer) Angriffe: Biene sticht mit kurzem Strich, Schneeball 6×6 mit Glanz, Schlüpfen mit Schalenstücken und Funken; im Mockup gezeigt.
+
+**Annahmen (Designer, angenommen):**
+
+- Die Diamant-Marke **ersetzt den Stern** auf gewonnenen Kacheln (gefüllter Diamant = gewonnen und Diamant erhalten). Die aktuelle Kachel zeigt einen **hohlen** Diamanten („noch offen“). Legende: „◆ GESCHAFFT · ◇ DIAMANT OFFEN · AKTUELL · GESPERRT“. Zwei Marken (Stern + Diamant) wären auf 32 px zu voll, und gewonnen bedeutet seit PE-166 dasselbe wie Diamant erhalten. Dass das letzte Level einer Map 3 gibt, steht nur im Ergebnis, nicht auf der Kachel.
+- Pet-Rüstungen sind auch ohne das passende Ei kaufbar (F-35 verbietet es nicht). Die Infozeile zeigt dann „PET NOCH NICHT GEKAUFT“. Im Ausrüstungs-Fenster ist die Zeile PET-RÜSTUNG bei „KEINS“ als Pet deaktiviert.
+- Kritische Treffer zeigen sich nur als goldener statt weißer Treffer-Blitz (`game.crit`), ohne Zahl (Grundsatz 8). Dornen, Rückstoß, Durchschlag, Magnet und Himmel-Regeneration bekommen keine eigene Grafik.
+- Auf dem Ergebnis-Bildschirm trägt die Astronautin ihre Rüstung, und das aktive Pet steht daneben (3×).
+
+**Ergebnis:**
+
+- Pixelquelle `docs/design/assets/sprites-m8.js` (ergänzt `PX_SPRITES`, Ladefolge `sprites.js` → `sprites-world.js` → `sprites-desert.js` → `sprites-m8.js`, im leeren vm-Kontext auswertbar).
+- Vorschau `mockups/m8-sprites.html` (Astronautin mit allen Sets und Mischungen, vier Spielszenen, alle Sheets, Prüfung von Größe und Palette), Screenshot `screenshots/m8-sprites-desktop.png`, Nahansichten `m8-zoom-top-desktop.png`, `m8-zoom-pets-desktop.png`.
+- Oberflächen `mockups/m8-shop-und-ausruestung.html`, Ansichten 1–7, Screenshot `screenshots/m8-shop-und-ausruestung-desktop.png`, Nahansichten `m8-zoom-a` bis `m8-zoom-e`. Die Hochformat-Aufnahme (`-mobile.png`) schneidet die 640er Bühne ab; Ziel ist das Querformat, maßgeblich sind die Desktop-Bilder.
+- Neue Tokens: Rohfarbe `color.ice.100/300/500/700`; `color.sprite.gear-*` (14 Paletten-Farben der Sets); `color.menu.diamond`, `menu.owned-bg`, `menu.selected`; `color.hud.diamond`; `color.game.pet-aura`, `game.gear-block`, `game.crit`; `size.hud-petbar-h` (20), `hud-petbar-gap` (4), `pet-offset-x` (22), `pet-offset-y` (8), `shop-tile-h` (50), `gear-preview-scale` (4); `motion.duration.gear-block` (300 ms), `diamond-pop` (200 ms), `hatch` (300 ms). 16 neue `$pairs`, `contrast.js --tokens` grün, Exporte (css, ts, json) neu gebaut.
+
+**Sprites (alle eigene Arbeit, Umriss Tinte `#0b0610`, Pets schauen nach rechts):**
+
+| Schlüssel | Größe × Frames | Inhalt |
+|---|---|---|
+| `gear-<set>-<slot>` (9: `diamond`/`hell`/`heaven` × `head`/`body`/`legs`) | 32×32 × 4 | Overlay genau auf `astronaut` Frame 0–3 (Frame 1 Kopf sinkt, 2–3 Lehnen, 3 Antenne). Kind-Sprite mit gleichem Frame und gleichem `flipX`. Reihenfolge über der Astronautin: Hose+Schuhe, Oberteil, Kopf (= `gearTextureKeys`). Tiefe zur Waffe wie die Astronautin. |
+| `gear-icons` | 24×24 × 9 | Shop-Icons: Astronautin mit einem Teil, Ausschnitt. Index = Set × 3 + Slot (Set: diamond, hell, heaven; Slot: head, body, legs). Anzeige 2×. |
+| `gear-diamond-glint` | 32×32 × 4 | Set-Effekt Diamant: Funkeln um die Astronautin, 4 fps, nur solange der Block bereit ist |
+| `gear-burn` | 8×8 × 4 | Brand am Gegner (Glutpanzer), 8 fps, über dem Gegner |
+| `gear-blast` | 24×24 × 4 | kleine Explosion (Lavastiefel), einmal, 12 fps |
+| `pet-bee`, `pet-penguin`, `pet-capybara` | 16×16 × 6 | 0–3 Ruhe bzw. Bewegung (4 fps), 4–5 Angriff (Biene ausholen/stechen, Pinguin ausholen/werfen, Capybara zufrieden/Herz beim Heilen) |
+| `petgear-<pet>-<set>` (9) | 16×16 × 6 | Overlay genau auf die Pet-Frames |
+| `petgear-icons` | 16×16 × 9 | Shop-Icons: Pet Frame 0 mit Rüstung. Index = Pet × 3 + Set (Pet: bee, penguin, capybara). Anzeige 3×. |
+| `egg-bee`, `egg-penguin`, `egg-capybara` | 16×16 × 4 | 0 Ruhe, 1 wackelt links, 2 wackelt rechts, 3 Risse. Ab 80 % Leiste Frames 1/2 im Wechsel (4 fps), bei 100 % Frame 3 |
+| `pet-hatch` | 24×24 × 3 | Schlupf: Schale fliegt auseinander, Funken; einmal in `motion.duration.hatch`, danach erscheint das Pet |
+| `pet-snowball` | 8×8 × 2 | Schneeball (Pinguin) |
+| `pet-sting` | 8×8 × 2 | Stich-Funke am Gegner (Biene) |
+| `pet-steam` | 8×8 × 4 | Dampfwölkchen der Capybara-Aura, steigen langsam auf |
+| `pet-heal` | 8×8 × 4 | Herz steigt über der Astronautin auf, wenn die Capybara heilt |
+| `diamond` | 8×8 × 4 | Währung, Anzeige ×2 (16 px) wie `coin-small`; Frames 1–3 Glanz |
+| `diamond-marker` | 8×8 × 2 | Kachel-Marke 1×: 0 erhalten (gefüllt), 1 noch offen (hohl) |
+| `ui-icons-m8` | 8×8 × 2 | weiß, getönt: 0 Stift („ÄNDERN“), 1 Haken (GEKAUFT, ausgerüstet) |
+
+**Spielerkarte (`MenuScene.ts`, Ansicht 1):** Porträt = `astronaut` + Gear-Overlays 2× mit Ruhe-Animation. Das ganze Porträt (64×64) ist der Knopf zum Ausrüstungs-Fenster, Fokus-Ring `menu.focus`. Aufkleber „✎ ÄNDERN“ (`k-sticker`, Kapsel 1×, Stift `ui-icons-m8` 0 in `menu.sticker-fg`) überlappt die untere rechte Ecke. Goldzeile: rechts `diamond` 2× + Zahl Kapsel 2× `menu.diamond` mit Schatten `menu.outline`. WAFFE und ANZUG in **einer** Zeile („WAFFE 9/20 · ANZUG 8/20“ links/rechts), damit die Buttons passen. Darunter „◆ SHOP“ als Kassetten-Button `secondary` (Fläche `menu.surface-sunken`, Fase `surface-sunken-hi`/`surface-lo`, Text `menu.text`), 12 Abstand, dann „UPGRADES“ (primary).
+
+**Level-Kacheln (`LevelGrid.ts`):** Stern-Badge entfällt; unten rechts `diamond-marker` 1× (gewonnen Frame 0, aktuell Frame 1). Legende nach Annahme oben.
+
+**Shop (`ShopPanel.ts`, Ansichten 2–4):** modal, `menu.scrim` über dem Rest. Panel x 216–624, y 52–348 (deckt Level-Panel und Blätter-Leiste), Innenabstand 10.
+
+| Teil | Wert |
+|---|---|
+| Kopfzeile (Höhe 32) | Reiter EIER · RÜSTUNG · PET-RÜSTUNG (Höhe 28, Abstand 6; aktiv erhaben wie `.side.on` mit Kapsel 2× `menu.text` und Dreieck `menu.focus` nach unten; inaktiv versenkt, Kapsel 1× `menu.text-muted`). Rechts `diamond` 2× + Zahl Kapsel 2× `menu.diamond`, dann Schließen-Knopf 32×32 „X“. Esc schließt. |
+| RÜSTUNG | Raster: Zeilenkopf 70 (Aufkleber mit Set-Farbfeld `sprite.gear-ice`/`gear-lava`/`gear-gold` und Set-Name), 3 Spalten mit Kopf KOPF · OBERTEIL · HOSE+SCHUHE (Kapsel 1× muted, Höhe 10). Kacheln `size.shop-tile-h` 50, Abstand 4/8, Icon `gear-icons` 2× links, rechts Preis (`diamond` 1× + Zahl Kapsel 2× `menu.diamond`). |
+| PET-RÜSTUNG | Zeilen BIENE, PINGUIN, CAPYBARA (Kapsel 1× `menu.text`), Spalten DIAMANT · HÖLLE · HIMMEL, Icon `petgear-icons` 3×. |
+| EIER | drei hohe Kacheln (160): Ei 4×, Name Kapsel 2×, Rolle Kapsel 1× („STICHT NAHE GEGNER“, „WIRFT SCHNEEBÄLLE“, „AURA UND HEILUNG“), Preis. |
+| Kachel-Zustände | kaufbar: versenkt (`surface-sunken`), Preis · gewählt: zusätzlich 2-px-Ring `menu.selected` mit 2 Abstand · gekauft: Fläche `menu.owned-bg` mit Fase `done-hi/lo`, Haken `ui-icons-m8` 1 2× in `menu.done-fg` statt Preis · Fokus wie `k-tile.is-focus` |
+| Infozeile (unten, Höhe 48, versenkt) | links Name Kapsel 2× `menu.text`, darunter höchstens zwei Zeilen Kapsel 1× `menu.text-muted` (höchstens 40 Zeichen; Werte, Effekt, Set-Bonus). Rechts der Knopf (mind. 112 breit): **KAUFEN** primary „KAUFEN ◆ 3“ (Fokus nach Auswahl) · **ZU WENIG** deaktiviert, Text `menu.text-disabled`, zweite Zeile „ES FEHLEN n DIAMANTEN.“ · **GEKAUFT** Fläche `owned-bg`, Haken + „GEKAUFT“ `done-fg`, nicht drückbar, zweite Zeile „ANLEGEN: TIPPE AUF DEIN PORTRÄT.“ |
+| Kauf | ein Tipp auf KAUFEN, keine Rückfrage (11a). Danach Kachel → gekauft, Zahl oben zählt herunter, `diamond` spielt einmal Frame 1–3 (`duration.base`); ohne Bewegung nur der Wechsel. |
+| Start | Reiter RÜSTUNG, keine Kachel gewählt; Infozeile „WÄHLE EINEN ARTIKEL.“ ohne Knopf. |
+
+**Ausrüstungs-Fenster (`GearPanel.ts` + `GearPreview.ts`, Ansicht 5):** modal, Panel x 16–624, y 52–348, Innenabstand 10. Kopf: „AUSRÜSTUNG“ Kapsel 2×, rechts „FERTIG“ (primary, schließt; Esc ebenso). Links Vorschau 196×236 (versenkt) mit Planetenbogen unten: Astronautin `size.gear-preview-scale` 4× (Ruhe-Animation Frames 0–1), Pet 4× rechts unten davor; oben links Aufkleber „SET HÖLLE ▪▪▫ 2/3“ (Farbfeld und Pips in Set-Farbe), darunter „FEHLT: LAVASTIEFEL“ Kapsel 1× muted; ohne angefangenes Set entfällt beides. Rechts fünf Zeilen (Höhe 32, Abstand 4): Label 72 (Kapsel 1× muted), „<“ 32, Wertfeld (versenkt, Set-Farbfeld bzw. Pet 1×, Name Kapsel 2×; „KEINS“ in `text-muted`), „>“ 32. Die Pfeile blättern nur durch gekaufte Teile plus „KEINS“. Am Ende eines Durchlaufs springt die Liste zurück zum Anfang, die Pfeile bleiben deshalb aktiv. Bei nur „KEINS“ sind sie deaktiviert. Darunter Kasten (versenkt) mit zwei Zeilen Kapsel 1× `menu.text`: „WERTE: …“ und „EFFEKTE: …“. Tastatur: ↑/↓ wählt die Zeile (Fokus-Ring um das Wertfeld), ←/→ blättert.
+
+**Pet-Leiste (`hud/PetBar.ts`, Ansicht 6):** Funk-Glas 88×`size.hud-petbar-h` (fest, wie die Fächer), links `m`, Unterkante `size.hud-petbar-gap` über den Fächern. Inhalt: Ei bzw. Pet 1×, Leiste 40×6 (Spur `hud.line-dim`, Füllung `hud.accent`), rechts als Ei „EI“ (Funk 1× muted), nach dem Schlupf drei Pips 4×6 (an: `hud.accent`, aus: Rahmen `hud.line`). Stufe 3: Leiste wird zu „MAX“ (Funk 1× `hud.accent`), Rahmen `hud.accent` mit Glühen. Leiste voll: Fläche `hud.flash` für `store-flash` (ohne Bewegung entfällt sie). Kein Blinken. Nicht antippbar.
+
+**Pet in der Welt:** Abstand `pet-offset-x` 22 zur Seite gegenüber dem Zielwinkel, `pet-offset-y` 8 (Biene −10). Tiefe unter der Astronautin, über Gegnern. Das Pet folgt der Spiegelung. Ei: Frame 0, ab 80 % Wackeln, bei 100 % Risse, dann `pet-hatch` und Pet. Capybara-Aura: Kreis Fläche `game.pet-aura` mit `opacity.aura`, Ring 1 px gepunktet (2 an, 2 aus) in voller Deckkraft, 3–5 `pet-steam` mit Alpha 0,8 steigen auf; bei größerer Aura (Power-up) wächst nur der Radius. Biene: Flug zum Gegner, `pet-sting` am Ziel. Pinguin: Frame 4/5, `pet-snowball` fliegt; verlangsamte Gegner bekommen keine eigene Grafik. Heilung: `pet-heal` über der Astronautin. Ohne Bewegung (`prefers-reduced-motion`): Eier wackeln nicht, Dampf steht still, Funkeln aus.
+
+**Rüstung in der Runde:** Overlays wie oben. Diamant-Set: `gear-diamond-glint` solange bereit; beim Block 2-px-Ring `game.gear-block` von 16 auf 28 px in `duration.gear-block` (ohne Bewegung: Ring 28 für 120 ms). Hölle-Set nutzt den vorhandenen Feuerring. Kritischer Treffer: `setTintFill(game.crit)` für `duration.hit` statt `game.hit-flash`.
+
+**Ergebnis (`ResultScene.ts`, Ansicht 7):** nur beim ersten Sieg eines Levels neue Faktenzeile „DIAMANTEN“: `diamond` 2× + „+1“/„+3“ Funk 2× `hud.diamond` in einem 1-px-Rahmen `hud.diamond`, danach Funk 1× muted „ERSTER SIEG“ bzw. „ERSTER SIEG · LETZTES LEVEL DER MAP“ und „· GESAMT n“. Erscheint nach den anderen Zeilen mit `duration.diamond-pop` in 4 Stufen; ohne Bewegung sofort. Held: Astronautin mit Rüstung 3× + aktives Pet 3×.
+
+**Übergabe H-35 an den Planner:**
+
+| Datei / Paket | Änderung |
+|---|---|
+| AP-140 Theme- und Sprite-Sync | `npm run theme:build` (neue Tokens oben). `scripts/build-sprites.mjs` lädt nach `sprites-desert.js` zusätzlich `docs/design/assets/sprites-m8.js` im selben vm-Kontext. 43 neue Sprites laut Tabelle (Sprite-Anzahl im Test anpassen), Einträge in `src/config/assets.ts`, `public/assets/LICENSES.md` (eigene Arbeit), `docs/guides/grafik-austauschen.md`. |
+| AP-136 Verträge | Textur-Schlüssel: `gear-${set}-${slot}`, `pet-${id}`, `petgear-${id}-${set}`, `egg-${id}`; Icon-Index wie oben. Namen der Teile (`label`) nach 12a; Pet-Rüstungen „BIENE · KRISTALL“, „· GLUT“, „· HIMMEL“. |
+| AP-141 Shop | `ShopPanel.ts` nach Tabelle „Shop“, Ansichten 2–4 |
+| AP-142 Ausrüstung | `GearPanel.ts`, `GearPreview.ts` nach Absatz „Ausrüstungs-Fenster“, Ansicht 5. Die Vorschau wird auch für Porträt (2×) und Ergebnis (3×) genutzt. |
+| AP-143 Rüstung in der Runde | Overlays als Kind-Sprites, Diamant-Glanz und Block-Ring, `gear-burn`, `gear-blast`, `game.crit` |
+| AP-144 Pets | Pet, Ei, Schlupf, Angriffe, Aura und `hud/PetBar.ts` nach den Absätzen oben, Ansicht 6 und `m8-sprites.html` Szenen. Layout-Test von H-23 um die Pet-Leiste erweitern (keine Überlappung bei Breite 640/734/800 und k 1/1,36/1,4). |
+| AP-145 Einbindung | Spielerkarte, „◆ SHOP“, Diamant-Zähler, Kachel-Marken und Legende (Ansicht 1); Ergebnis-Zeile (Ansicht 7) |
+
+Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Review für AP-141, AP-142, AP-144 und AP-145 gegen `screenshots/m8-shop-und-ausruestung-desktop.png` und die Nahansichten; AP-143 gegen `screenshots/m8-sprites-desktop.png`. Handtest H-36: Rüstung bei allen Zielwinkeln und Frames (kein Versatz), Pets im Gedränge erkennbar, Shop-Texte am iPhone lesbar (Kapsel 1×).
 
 - keine weiteren (erste Fassung vom 2026-10-25)
