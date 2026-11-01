@@ -17,4 +17,13 @@ export const PARRY_RULES: ParryRules = {
   approachMs: 800,
   touchSlackPx: 4,
   minGapMs: 300,
+  // M9 (RS-03.1, PE-188): starting values, manual test H-38.
+  holdMinMs: 300,
+  holdMaxMs: 600,
+  beatMs: 400,
+  previewStepMs: 300,
+  dragTargetRadiusPx: 24,
+  dragTargetDistancePx: 56,
+  twoTapMaxGapMs: 700,
+  seqTelegraphMinMs: 1800,
 };

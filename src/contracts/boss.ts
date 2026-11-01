@@ -1,3 +1,5 @@
+import type { ParryPatternDef } from './parry';
+
 export type BossId =
   | 'rootMonster'
   | 'forestGhost'
@@ -21,6 +23,10 @@ export interface BossAttackDef {
   parryCircles: 0 | 1 | 2 | 3;
   /** Only used by variants with extraAttack = true (from the 3rd level of a batch). */
   extraOnly: boolean;
+  /** Kinds of the quicktime circles (M9). parryCircles stays the number of real (non-decoy) circles. */
+  parryPattern?: ParryPatternDef;
+  /** New attack, only active when the boss class unlocks it (M9, PE-193). */
+  optIn?: boolean;
 }
 
 export interface BossDef {

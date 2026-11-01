@@ -220,3 +220,23 @@ function seq(values: number[]): () => number {
   let i = 0;
   return () => values[i++ % values.length];
 }
+
+describe('availableAttacks optIn filter (AP-148)', () => {
+  it('hides optIn attacks unless the boss unlocks them', () => {
+    const extra = variantForLevel(2);
+    expect(availableAttacks(BOSSES.giantStone, extra).map((a) => a.id)).not.toContain('quarrel');
+    expect(availableAttacks(BOSSES.giantStone, extra, []).map((a) => a.id)).not.toContain(
+      'quarrel',
+    );
+    expect(availableAttacks(BOSSES.giantStone, extra, ['quarrel']).map((a) => a.id)).toContain(
+      'quarrel',
+    );
+  });
+
+  it('still respects extraOnly for unlocked optIn attacks', () => {
+    const plain = variantForLevel(0);
+    expect(
+      availableAttacks(BOSSES.guardianDog, plain, ['heartScale']).map((a) => a.id),
+    ).not.toContain('heartScale');
+  });
+});

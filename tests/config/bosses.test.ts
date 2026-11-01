@@ -10,6 +10,7 @@ import {
   MIN_REACTION_MS,
   MIN_TELEGRAPH_MS,
 } from '../../src/config/bosses';
+import { PARRY_RULES } from '../../src/config/parry';
 import { WEAPON_MOUNT } from '../../src/config/weaponMount';
 import { flightTimeMs } from '../../src/entities/bosses/bossGeometry';
 
@@ -143,7 +144,7 @@ describe('M5 bosses (AP-97, PE-128)', () => {
     guardianDog: {
       sprite: 'boss-guardian-dog',
       base: ['runeShield', 'guardBark'],
-      extra: ['summonMummies'],
+      extra: ['summonMummies', 'heartScale'],
     },
     pharaoh: { sprite: 'boss-pharaoh', base: ['goldCurse', 'sarcophagus'], extra: ['sandstorm'] },
   } as const;
@@ -210,9 +211,88 @@ describe('M7 boss data (AP-126, PE-154, PE-157)', () => {
           expect(a.parryCircles, id).toBe(0);
         } else {
           expect(a.telegraphMs, id).toBeGreaterThanOrEqual(1200);
-          expect(a.parryCircles, id).toBe(a.damage >= 18 ? 3 : a.damage >= 13 ? 2 : 1);
+          // M9 (PE-190) raised orbFan to 2 and guardBark to 3 circles; decoys deals 8 with 1.
+          const m9: Record<string, number> = {
+            'forestGhost.orbFan': 2,
+            'guardianDog.guardBark': 3,
+          };
+          expect(a.parryCircles, id).toBe(m9[id] ?? (a.damage >= 18 ? 3 : a.damage >= 13 ? 2 : 1));
         }
       }
     }
+  });
+});
+
+describe('M9 boss data (AP-148, PE-188 to PE-190)', () => {
+  const all = Object.values(BOSSES).flatMap((b) => b.attacks.map((a) => ({ b, a })));
+  const get = (boss: keyof typeof BOSSES, id: string) =>
+    BOSSES[boss].attacks.find((a) => a.id === id)!;
+
+  it('real step count equals parryCircles (decoys excluded, one right choice per group)', () => {
+    for (const { b, a } of all) {
+      if (!a.parryPattern) continue;
+      const steps = a.parryPattern.steps;
+      const real = steps.filter((s) => s.kind !== 'decoy' && s.kind !== 'choice').length;
+      const groups = new Set(steps.filter((s) => s.kind === 'choice').map((s) => s.group ?? 0));
+      for (const g of groups) {
+        const ch = steps.filter((s) => s.kind === 'choice' && (s.group ?? 0) === g);
+        expect(ch.filter((s) => s.correct).length, `${b.id}.${a.id} group ${g}`).toBe(1);
+      }
+      expect(real + groups.size, `${b.id}.${a.id}`).toBe(a.parryCircles);
+    }
+  });
+
+  it('keeps the announcement long enough', () => {
+    for (const { b, a } of all) {
+      if (a.damage > 0) expect(a.telegraphMs, `${b.id}.${a.id}`).toBeGreaterThanOrEqual(1200);
+      const kinds = a.parryPattern?.steps.map((s) => s.kind) ?? [];
+      if (kinds.includes('sequence') || kinds.includes('choice')) {
+        expect(a.telegraphMs, `${b.id}.${a.id}`).toBeGreaterThanOrEqual(
+          PARRY_RULES.seqTelegraphMinMs,
+        );
+      }
+    }
+  });
+
+  it('keeps hold times inside the allowed range', () => {
+    for (const { a } of all) {
+      for (const s of a.parryPattern?.steps ?? []) {
+        if (s.kind === 'hold') {
+          expect(s.holdMs).toBeGreaterThanOrEqual(PARRY_RULES.holdMinMs);
+          expect(s.holdMs).toBeLessThanOrEqual(PARRY_RULES.holdMaxMs);
+        }
+      }
+    }
+  });
+
+  it('follows PE-190 for the changed attacks', () => {
+    expect(get('forestGhost', 'orbFan').parryCircles).toBe(2);
+    expect(get('guardianDog', 'guardBark').parryCircles).toBe(3);
+    expect(get('forestGhost', 'decoys').damage).toBe(8);
+    expect(get('forestGhost', 'decoys').parryCircles).toBe(1);
+    expect(get('rootMonster', 'rootThrust').parryPattern!.steps.map((s) => s.kind)).toEqual([
+      'hold',
+      'tap',
+    ]);
+    expect(get('giantSandWorm', 'coil').parryPattern!.steps.map((s) => s.kind)).toEqual([
+      'drag',
+      'drag',
+    ]);
+    expect(get('giantSandWorm', 'burrow').parryPattern).toBeUndefined();
+    expect(get('giantSandWorm', 'spikeVolley').parryPattern).toBeUndefined();
+  });
+
+  it('adds quarrel and heartScale as optIn extra attacks with 15 damage', () => {
+    for (const [boss, id] of [
+      ['giantStone', 'quarrel'],
+      ['guardianDog', 'heartScale'],
+    ] as const) {
+      const a = get(boss, id);
+      expect(a.optIn).toBe(true);
+      expect(a.extraOnly).toBe(true);
+      expect(a.damage).toBe(15);
+      expect(a.parryCircles).toBe(2);
+    }
+    expect(all.filter(({ a }) => a.optIn).length).toBe(2);
   });
 });

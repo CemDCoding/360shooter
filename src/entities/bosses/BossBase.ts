@@ -116,7 +116,12 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     this.ctx = ctx;
     this.arena = ctx.arena ?? FALLBACK_ARENA;
     this.center = ctx.center ?? { x: this.arena.width / 2, y: this.arena.height / 2 };
-    this.scheduler = new AttackScheduler(def, this.variant, ctx.rng ?? { next: Math.random });
+    this.scheduler = new AttackScheduler(
+      def,
+      this.variant,
+      ctx.rng ?? { next: Math.random },
+      this.optInAttacks(),
+    );
     this.parryRng = ctx.rng ?? { next: Math.random };
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -177,6 +182,11 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
   protected canParry(attack: BossAttackDef): boolean {
     void attack;
     return true;
+  }
+
+  /** Ids of the optIn attacks this boss unlocks (M9, PE-193). Called in the constructor: return a constant. */
+  protected optInAttacks(): readonly string[] {
+    return [];
   }
 
   /** Open quicktime groups of this boss (read by the scene for ParryOverlay). */

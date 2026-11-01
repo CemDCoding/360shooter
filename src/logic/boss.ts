@@ -64,8 +64,14 @@ export function scaledDamage(base: number, variant: BossVariant): number {
 }
 
 /** Attacks the variant may use. */
-export function availableAttacks(def: BossDef, variant: BossVariant): BossAttackDef[] {
-  return def.attacks.filter((a) => variant.extraAttack || !a.extraOnly);
+export function availableAttacks(
+  def: BossDef,
+  variant: BossVariant,
+  optIns: readonly string[] = [],
+): BossAttackDef[] {
+  return def.attacks.filter(
+    (a) => (variant.extraAttack || !a.extraOnly) && (!a.optIn || optIns.includes(a.id)),
+  );
 }
 
 export interface AttackEvent {
@@ -103,8 +109,9 @@ export class AttackScheduler {
     def: BossDef,
     private readonly variant: BossVariant,
     private readonly rng: SchedulerRng,
+    optIns: readonly string[] = [],
   ) {
-    this.attacks = availableAttacks(def, variant);
+    this.attacks = availableAttacks(def, variant, optIns);
     for (const a of this.attacks) this.cooldownLeft.set(a.id, a.cooldownMs);
   }
 
