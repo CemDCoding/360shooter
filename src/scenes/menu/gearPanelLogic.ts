@@ -147,7 +147,7 @@ function pct(mul: number): number {
   return Math.round((mul - 1) * 100);
 }
 
-/** Werte als Kurztexte, z. B. "+20 MAX. HP", "-10 % SCHADEN". */
+/** Werte als Kurztexte, z. B. "+20 MAX. HP", "-10 % ERHALTENER SCHADEN". */
 export function statLines(m: GearModifiers): string[] {
   const out: string[] = [];
   if (m.maxHpAdd > 0) out.push(`+${Math.round(m.maxHpAdd)} MAX. HP`);
@@ -158,7 +158,7 @@ export function statLines(m: GearModifiers): string[] {
   const turn = pct(m.turnSpeedMul);
   if (turn !== 0) out.push(`${turn > 0 ? '+' : '-'}${Math.abs(turn)} % DREHTEMPO`);
   const taken = Math.round((1 - m.damageTakenMul) * 100);
-  if (taken !== 0) out.push(`${taken > 0 ? '-' : '+'}${Math.abs(taken)} % SCHADEN`);
+  if (taken !== 0) out.push(`${taken > 0 ? '-' : '+'}${Math.abs(taken)} % ERHALTENER SCHADEN`);
   return out;
 }
 

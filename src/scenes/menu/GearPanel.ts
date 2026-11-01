@@ -29,12 +29,13 @@ const PANEL = { x: 16, y: 52, w: 608, h: 296 };
 const PAD = 10;
 const HEAD_H = 32;
 const PREVIEW = { w: 196, h: 236 };
-const COL_GAP = 12;
+const COL_GAP = 8;
 const ROW_H = 32;
-const ROW_GAP = 4;
-const LABEL_W = 76;
+const ROW_GAP = 6;
+const LABEL_W = 80;
+const FIELD_GAP = 6;
 const ARROW_W = 32;
-const BOX_H = 52;
+const BOX_H = 44;
 const WRAP_CHARS = 50;
 
 const PREVIEW_SCALE = THEME.sizeCount['size.gear-preview-scale'];
@@ -196,7 +197,7 @@ export class GearPanel extends Phaser.GameObjects.Container {
     // Rows
     const rx = x0 + PREVIEW.w + COL_GAP;
     const rw = px + PANEL.w - PAD - rx;
-    const fieldW = rw - LABEL_W - 2 * ARROW_W - 2 * 4;
+    const fieldW = rw - LABEL_W - 2 * ARROW_W - 2 * FIELD_GAP;
     GEAR_ROWS.forEach((row, i) => {
       this.addRow(items, g, row, i, rx, bodyY + i * (ROW_H + ROW_GAP), fieldW);
     });
@@ -209,15 +210,19 @@ export class GearPanel extends Phaser.GameObjects.Container {
       ...wrapLine(summary.values, WRAP_CHARS),
       ...wrapLine(summary.effects, WRAP_CHARS),
     ];
-    lines.slice(0, 4).forEach((line, i) => {
-      items.push(kText(scene, rx + 8, boxY + 7 + i * 10, line, 1, 'menu.text'));
+    const hint = nothingOwned(save);
+    const shown = lines.slice(0, 4);
+    // Mockup pitch 13 px when it fits, 10 px for four lines.
+    const pitch = shown.length + (hint ? 1 : 0) <= 3 ? 13 : 10;
+    shown.forEach((line, i) => {
+      items.push(kText(scene, rx + 8, boxY + 5 + i * pitch, line, 1, 'menu.text'));
     });
-    if (nothingOwned(save)) {
+    if (hint) {
       items.push(
         kText(
           scene,
           rx + 8,
-          boxY + 7 + 2 * 10 + 4,
+          boxY + 5 + shown.length * pitch,
           'NOCH NICHTS GEKAUFT: GEH IN DEN SHOP.',
           1,
           'menu.text-muted',
@@ -238,29 +243,26 @@ export class GearPanel extends Phaser.GameObjects.Container {
     if (!sticker) return;
     const scene = this.scene;
     const color = THEME.colors[SET_COLORS[sticker.set]].num;
-    const title = kText(scene, x + 5 + 10 + 5, y + 5, sticker.title, 1, 'menu.sticker-fg');
+    const outline = THEME.colors['menu.outline'].num;
+    const textY = y + 3;
+    const title = kText(scene, x + 4 + 12 + 5, textY, sticker.title, 1, 'menu.sticker-fg');
     const titleW = textWidth(title) || sticker.title.length * 7;
-    const pipsX = x + 5 + 10 + 5 + titleW + 6;
-    const count = kText(
-      scene,
-      pipsX + sticker.total * 6 + 4,
-      y + 5,
-      sticker.countText,
-      1,
-      'menu.sticker-fg',
-    );
-    const w = pipsX + sticker.total * 6 + 4 + (textWidth(count) || 21) + 5 - x;
-    g.fillStyle(THEME.colors['menu.outline'].num).fillRect(x - 2, y - 2, w + 4, 18);
+    const pipsX = x + 4 + 12 + 5 + titleW + 6;
+    const pipStride = 10;
+    const countX = pipsX + sticker.total * pipStride + 2;
+    const count = kText(scene, countX, textY, sticker.countText, 1, 'menu.sticker-fg');
+    const w = countX + (textWidth(count) || 21) + 5 - x;
+    g.fillStyle(outline).fillRect(x - 2, y - 2, w + 4, 18);
     g.fillStyle(THEME.colors['menu.sticker-bg'].num).fillRect(x, y, w, 14);
+    // Swatch 10x10 with 1 px outline.
+    g.fillStyle(outline).fillRect(x + 4, y + 1, 12, 12);
     g.fillStyle(color).fillRect(x + 5, y + 2, 10, 10);
+    // Pips 8x8: filled = set colour with outline, empty = hollow with muted frame.
     for (let i = 0; i < sticker.total; i++) {
+      const px = pipsX + i * pipStride;
       const on = i < sticker.count;
-      g.fillStyle(on ? color : THEME.colors['menu.outline'].num).fillRect(
-        pipsX + i * 6,
-        y + 5,
-        4,
-        4,
-      );
+      g.fillStyle(on ? outline : THEME.colors['menu.text-muted'].num).fillRect(px, y + 3, 8, 8);
+      g.fillStyle(on ? color : THEME.colors['menu.surface'].num).fillRect(px + 1, y + 4, 6, 6);
     }
     items.push(title, count);
     if (sticker.missing) items.push(kText(scene, x, y + 20, sticker.missing, 1, 'menu.text-muted'));
@@ -307,22 +309,22 @@ export class GearPanel extends Phaser.GameObjects.Container {
       return b;
     };
     items.push(mkArrow('<', x + LABEL_W + ARROW_W / 2, -1));
-    const fx = x + LABEL_W + ARROW_W + 4;
+    const fx = x + LABEL_W + ARROW_W + FIELD_GAP;
     sunken(g, fx, y, fieldW, ROW_H);
-    items.push(mkArrow('>', fx + fieldW + 4 + ARROW_W / 2, 1));
+    items.push(mkArrow('>', fx + fieldW + FIELD_GAP + ARROW_W / 2, 1));
 
     let textX = fx + 8;
     const set = option?.set;
     if (option && row === 'pet' && option.petId) {
       const key = `pet-${option.petId}`;
       if (scene.textures.exists(key)) {
-        items.push(scene.add.image(fx + 8 + 8, midY, key, 0));
+        items.push(scene.add.image(fx + 14, midY, key, 0));
       }
-      textX = fx + 8 + 16 + 6;
+      textX = fx + 28;
     } else if (set) {
-      g.fillStyle(THEME.colors['menu.outline'].num).fillRect(fx + 6, midY - 7, 14, 14);
-      g.fillStyle(THEME.colors[SET_COLORS[set]].num).fillRect(fx + 8, midY - 5, 10, 10);
-      textX = fx + 26;
+      g.fillStyle(THEME.colors['menu.outline'].num).fillRect(fx + 5, midY - 6, 12, 12);
+      g.fillStyle(THEME.colors[SET_COLORS[set]].num).fillRect(fx + 6, midY - 5, 10, 10);
+      textX = fx + 19;
     }
     const isNone = option?.id === null || !option;
     const name: KText = kText(
@@ -339,7 +341,10 @@ export class GearPanel extends Phaser.GameObjects.Container {
       name.setAlpha(0.6);
     }
     if (index === this.focusRow) {
-      drawRing(g, fx, y, fieldW, ROW_H, THEME.spacePx['space.half'], 'menu.focus');
+      // Own graphics above the arrow buttons; gap 0 keeps the ring inside the row gap.
+      const ring = scene.add.graphics();
+      drawRing(ring, fx, y, fieldW, ROW_H, 0, 'menu.focus');
+      items.push(ring);
     }
   }
 

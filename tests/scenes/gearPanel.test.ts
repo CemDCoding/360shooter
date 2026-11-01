@@ -161,7 +161,7 @@ describe('texts', () => {
   });
   it('shows a damage reduction and a neutral state', () => {
     expect(statLines(gearModifiers({ head: null, body: 'gear-diamond-body', legs: null }))).toEqual(
-      ['-10 % SCHADEN'],
+      ['-10 % ERHALTENER SCHADEN'],
     );
     expect(gearSummary(none)).toEqual({ values: 'WERTE: KEINE', effects: 'EFFEKTE: KEINE' });
   });
