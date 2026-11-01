@@ -39,7 +39,7 @@ Die Ränder kommen nicht von einem Rechenfehler, sondern von der Entscheidung, d
 - **Plan-Bezug:** §4 (Layout-Vertrag `fitArena`/`hostBoxFor`, Arena-Breite), §16 (PE-97, PE-99 ändern), neues Paket
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: Layout-Vertrag und Entscheidung PE-97/PE-99
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-02.2 – Sicherer Bereich nur für HUD und Bedienung
 - **Vorschlag:** Die Insets (Sonde `#safe`) werden in Spieleinheiten umgerechnet und als gemeinsamer Wert an HudScene, Stick, Pause- und Ton-Taste, Seiten-Tasten und Menüs gegeben. Jeder Abstand gilt nach `max(Designrand, Inset)`. Der Stick liegt immer über der Home-Bar. Text und Tasten liegen nie unter Notch oder Dynamic Island, in beiden Drehrichtungen.
@@ -47,7 +47,7 @@ Die Ränder kommen nicht von einem Rechenfehler, sondern von der Entscheidung, d
 - **Plan-Bezug:** §4 (neuer Vertrag „safe insets in game units“), Abnahmekriterium im Paket zu RS-02.1 oder eigenes Paket
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: neuer gemeinsamer Wert für Szenen
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-02.3 – Spawn-Ring aus der ganzen sichtbaren Fläche
 - **Vorschlag:** Der Spawn-Ring (halbe Diagonale + 24) und die Kontaktzeit-Regel nach PE-100 rechnen mit der randlosen Fläche. Dazu ein Test für 780 × 360 (Kontaktzeit wie bei 640, Toleranz wie bei AP-109).
@@ -55,7 +55,7 @@ Die Ränder kommen nicht von einem Rechenfehler, sondern von der Entscheidung, d
 - **Plan-Bezug:** Abnahmekriterium für das Paket zu RS-02.1
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ### RS-02.4 – Handtest „keine Ränder“
 - **Vorschlag:** Handtest-Punkt auf `stage`, iPhone 15 quer, Homescreen-App und Safari, **beide Drehrichtungen** (Dynamic Island links und rechts): kein Streifen in Menüfarbe, HUD und Tasten frei von Dynamic Island und Home-Bar, Stick reagiert über der Home-Bar, nach dem Drehen in der Pause bleibt alles richtig. Zusätzlich ein Foto mit aktivierter Layout-Anzeige.
@@ -63,7 +63,7 @@ Die Ränder kommen nicht von einem Rechenfehler, sondern von der Entscheidung, d
 - **Plan-Bezug:** §9 Handtest, §13 [Mensch]
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-01)
 
 ## Vertrauen und Lücken
 - **Foto:** `IMG_6372.PNG` ist vom 2026-10-26 und zeigt ein 16:9-Feld (≈ 664 × 374 pt, je ≈ 95 pt Rand). Laut Nutzer sieht es heute noch so aus. Nach AP-78/AP-89/AP-96/AP-109 sollten auf `dev` nur noch 47 pt je Seite bleiben. Gibt es auf `stage` noch ≈ 95 pt, ist entweder `stage` nicht aktuell oder die Breite greift am Gerät nicht. Das klärt erst H-26 bzw. RS-02.4 (Zeile `arena want/now`). Die vorgeschlagene Lösung beseitigt beide Fälle nur, wenn die Breite am Gerät wirklich angewendet wird.
@@ -86,3 +86,4 @@ Die Ränder kommen nicht von einem Rechenfehler, sondern von der Entscheidung, d
 
 ## Entscheidungen
 - Nutzer am 2026-11-01: Spielwelt darf unter Notch und Home-Bar laufen; iPhone zuerst; Ränder sollen verschwinden.
+- Nutzer am 2026-11-01: RS-02.1, RS-02.2, RS-02.3 und RS-02.4 freigegeben

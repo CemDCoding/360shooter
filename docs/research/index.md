@@ -5,4 +5,4 @@ Berichte des Researchers (ma-researcher). Freigegebene Vorschläge übernimmt de
 | Bericht | Thema | Datum | Vorschläge (Status) |
 |---|---|---|---|
 | [RS-01](RS-01-wellen-design.md) | Wellen-Design: Spawn-Verhalten und Gegnerstärke | 2026-10-28 | .1 bis .6 freigegeben · .7 verworfen |
-| [RS-02](RS-02-seitenraender-safe-area.md) | Seitenränder am Handy: Spielwelt randlos, Bedienung im sicheren Bereich | 2026-11-01 | .1 bis .4 entwurf |
+| [RS-02](RS-02-seitenraender-safe-area.md) | Seitenränder am Handy: Spielwelt randlos, Bedienung im sicheren Bereich | 2026-11-01 | .1 bis .4 freigegeben |
