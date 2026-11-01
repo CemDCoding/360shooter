@@ -1,5 +1,6 @@
 import type { ActiveArmour } from './armour';
 import type { BossId } from './boss';
+import type { PetId, PetRoundState } from './pet';
 import type { PowerStoreState } from './powerStore';
 import type { ActivePowers } from './weapon';
 
@@ -18,6 +19,7 @@ export const GameEvents = {
   PowerStoreChanged: 'power-store-changed',
   PlayerStatus: 'player-status',
   RoundAbortRequested: 'round-abort-requested',
+  PetChanged: 'pet-changed',
 } as const;
 
 /** Kind of a status effect on the player (PE-127). */
@@ -50,4 +52,6 @@ export interface GameEventPayloads {
   'player-status': { effects: ActivePlayerStatus[] };
   /** Direction HUD -> game scene: the player confirmed "abort round" in the pause menu (M7, PE-159). */
   'round-abort-requested': Record<string, never>;
+  /** Pet bar state of the active pet, game scene -> HUD (M8, PE-168). */
+  'pet-changed': PetRoundState & { petId: PetId };
 }

@@ -12,3 +12,6 @@ export * from './arena';
 export * from './scaling';
 export * from './tiers';
 export * from './parry';
+export * from './gear';
+export * from './pets';
+export * from './shop';

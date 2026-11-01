@@ -133,6 +133,29 @@ describe('contracts', () => {
       gold: 10,
       upgrades: levels,
     };
+    const v3: SaveGame = {
+      version: 3,
+      playerXp: 0,
+      playerLevel: 1,
+      highestUnlockedLevel: 0,
+      muted: false,
+      diamonds: 4,
+      wonLevels: [0, 1],
+      owned: ['egg-bee'],
+      equippedGear: { head: 'gear-hell-head', body: null, legs: null },
+      activePet: 'bee',
+      petGear: { bee: 'petgear-bee-hell', penguin: null },
+    };
+    expect(v3.version).toBe(3);
+    const petEvent: GameEventPayloads['pet-changed'] = {
+      petId: 'penguin',
+      phase: 'egg',
+      xp: 0,
+      xpToNext: 10,
+      powerUps: 0,
+    };
+    expect(GameEvents.PetChanged).toBe('pet-changed');
+    expect(petEvent.petId).toBe('penguin');
     const old: SaveGame = {
       version: 1,
       playerXp: 0,
