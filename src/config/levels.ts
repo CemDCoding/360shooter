@@ -1,5 +1,6 @@
 // Balancing (AP-15, Level 5-20 neu in AP-23, alle Level neu eingestellt in AP-56): alle Level-Werte stehen hier, Erklaerung in docs/balancing.md.
 // Level 21-40 (M5): Kurve eingestellt in AP-105 (PE-129), Level 0-20 mit Wildschwein, Baer und Fee (PE-125).
+// M7 (AP-127, PE-152, PE-153): etwa 2,5-mal so viele Gegner, Obergrenze 250.
 import type { BatchId, BossId, EnemyPoolEntry, LevelDef } from '../contracts';
 
 export const LEVEL_COUNT = 41;
@@ -37,28 +38,68 @@ const SHORT_LEVELS: readonly number[] = [
 ];
 
 /**
- * Spawn-Abstand pro Level in ms (Anfang der Runde, sinkt im Lauf der Runde auf 60 %).
+ * Gegnerzahl-Faktor je Level (M7, AP-127, F-25, PE-152, PE-153): Level 0 1,5, Level 1 1,75, Level 2 2,0,
+ * Level 3 2,25, ab Level 4 2,5. Der Spawn-Abstand wird durch den Faktor geteilt, `MAX_ENEMIES` mit ihm
+ * multipliziert (hoechstens `MAX_ENEMIES_CAP`). Die HP je Gegner bleiben gleich, `xp` und `coin` in
+ * LEVEL_SCALING werden durch den Faktor geteilt (PE-163). Index = Level-ID.
+ */
+const COUNT_RAMP: readonly number[] = [1.5, 1.75, 2, 2.25];
+const COUNT_FACTOR_FULL = 2.5;
+export const ENEMY_COUNT_FACTOR: readonly number[] = Array.from(
+  { length: LEVEL_COUNT },
+  (_, id) => COUNT_RAMP[id] ?? COUNT_FACTOR_FULL,
+);
+
+/**
+ * Obergrenze gleichzeitig lebender Gegner (AP-127, PE-152, ersetzt 150 aus RI-6). Bei Ruckeln am iPhone diesen
+ * Wert senken (RI-28); der HP-Aufschlag in `scaling.ts` gleicht den fehlenden Druck dann von selbst aus.
+ */
+export const MAX_ENEMIES_CAP = 250;
+
+/**
+ * Untergrenze des Spawn-Abstands in ms (AP-127). Am Rundenende sinkt der Abstand auf 60 % (90 ms, gut 5 Frames bei
+ * 60 fps), so kommt hoechstens ein Gegner je 5 Frames. Der kleinste Wert (Level 40) liegt mit 172 ms darueber.
+ */
+export const MIN_SPAWN_INTERVAL_MS = 150;
+
+/**
+ * Spawn-Abstand pro Level in ms vor AP-127 (Anfang der Runde, sinkt im Lauf der Runde auf 60 %).
  * Kleiner = mehr Gegner. Index = Level-ID.
  * Level 0 bis 4 (AP-91): dichter, groesste Luecke hoechstens 1,5 s. Level 5 bis 20 (AP-95): etwa 1,3-mal so viele
- * Gegner je Minute. Die einzelnen Gegner sind dafuer schwaecher (LEVEL_SCALING), sodass Druck, Gold
- * und Erfahrung gleich bleiben.
+ * Gegner je Minute, die einzelnen Gegner dafuer schwaecher (LEVEL_SCALING).
  * Level 21 bis 40 (AP-105, PE-129): sinkt nur noch um 5 ms je Level (525 auf 430 ms, etwa +1 % Gegner je Level).
  * Staerker werden die Gegner selbst (LEVEL_SCALING `hp`), nicht ihre Zahl.
  */
-const SPAWN_INTERVAL_MS: readonly number[] = [
+const BASE_SPAWN_INTERVAL_MS: readonly number[] = [
   1500, 1450, 1400, 1360, 1330, 870, 840, 810, 770, 740, 615, 610, 600, 590, 585, 575, 560, 555,
   545, 540, 530, 525, 520, 515, 510, 505, 500, 495, 490, 485, 480, 475, 470, 465, 460, 455, 450,
   445, 440, 435, 430,
 ];
 
 /**
- * Maximal gleichzeitig lebende Gegner pro Level (Obergrenze 150; Level 5 bis 20 seit AP-95 hoechstens +30 %, RI-6).
- * Level 21 bis 40 (AP-105, PE-129): +1 je Level von 131 bis 150 (Obergrenze, Leistung am iPhone). Index = Level-ID.
+ * Maximal gleichzeitig lebende Gegner pro Level vor AP-127 (Obergrenze damals 150, RI-6).
+ * Level 21 bis 40 (AP-105, PE-129): +1 je Level von 131 bis 150. Index = Level-ID.
  */
-const MAX_ENEMIES: readonly number[] = [
+const BASE_MAX_ENEMIES: readonly number[] = [
   25, 28, 31, 34, 37, 52, 55, 57, 60, 62, 78, 83, 88, 94, 99, 104, 109, 114, 120, 125, 130, 131,
   132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150,
 ];
+
+/** Spawn-Abstand ab AP-127: bisheriger Abstand durch den Faktor, auf ganze ms gerundet (Level 0: 1000, Level 40: 172). */
+const SPAWN_INTERVAL_MS: readonly number[] = BASE_SPAWN_INTERVAL_MS.map((ms, id) =>
+  Math.max(MIN_SPAWN_INTERVAL_MS, Math.round(ms / ENEMY_COUNT_FACTOR[id])),
+);
+
+/**
+ * Gewuenschte gleichzeitige Gegner ab AP-127: bisheriger Wert mal Faktor, gerundet. Wo dieser Wert ueber
+ * `MAX_ENEMIES_CAP` liegt (Level 15 bis 40), greift die Obergrenze und `hp` bekommt einen Aufschlag (scaling.ts).
+ */
+export const MAX_ENEMIES_WANTED: readonly number[] = BASE_MAX_ENEMIES.map((max, id) =>
+  Math.round(max * ENEMY_COUNT_FACTOR[id]),
+);
+
+/** Maximal gleichzeitig lebende Gegner pro Level ab AP-127 (Level 0: 38, ab Level 15: 250). Index = Level-ID. */
+const MAX_ENEMIES: readonly number[] = MAX_ENEMIES_WANTED.map((w) => Math.min(MAX_ENEMIES_CAP, w));
 
 /**
  * Spawn-Pool je Batch (F-19, PE-125). Der Pool haengt am Batch. Die alten Gewichte sind vervielfacht

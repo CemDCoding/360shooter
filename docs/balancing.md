@@ -8,8 +8,11 @@ Schwierigkeit nicht mehr stetig steigt.
 
 | Wert | Datei | Wirkung |
 |---|---|---|
-| `SPAWN_INTERVAL_MS` (Liste, ein Eintrag pro Level) | `levels.ts` | Wartezeit zwischen zwei neuen Gegnern in Millisekunden. **Kleiner = mehr Gegner = schwerer.** Im Lauf der Runde sinkt sie auf 60 %. |
-| `MAX_ENEMIES` (Liste) | `levels.ts` | Wie viele Gegner gleichzeitig leben duerfen (hoechstens 150). Bremst, wenn die Astronautin nicht mitkommt. |
+| `ENEMY_COUNT_FACTOR` (Liste) | `levels.ts` | Gegnerzahl-Faktor je Level seit AP-127 (1,5 bis 2,5): teilt den Spawn-Abstand und vervielfacht `MAX_ENEMIES`, `xp` und `coin` werden durch ihn geteilt. |
+| `BASE_SPAWN_INTERVAL_MS` (Liste, ein Eintrag pro Level) | `levels.ts` | Wartezeit zwischen zwei neuen Gegnern in Millisekunden vor AP-127, im Spiel durch den Faktor geteilt (mindestens `MIN_SPAWN_INTERVAL_MS` 150). **Kleiner = mehr Gegner = schwerer.** Im Lauf der Runde sinkt sie auf 60 %. |
+| `BASE_MAX_ENEMIES` (Liste), `MAX_ENEMIES_CAP` | `levels.ts` | Wie viele Gegner gleichzeitig leben duerfen: Wert vor AP-127 mal Faktor, hoechstens `MAX_ENEMIES_CAP` (250 seit AP-127, vorher 150). Bremst, wenn die Astronautin nicht mitkommt. Bei Ruckeln senken. |
+| `CAP_HP_BONUS` | `scaling.ts` | HP-Aufschlag, wo `MAX_ENEMIES_CAP` greift (wird berechnet, nicht von Hand setzen). |
+| `TIER_RULES` | `tiers.ts` | Gegnerstufen (AP-128): HP und Schaden je Level-Index im Batch. |
 | `POOL_OF_BATCH` / Gewichte | `levels.ts` | Welche Gegner je Batch vorkommen und wie oft (hoeheres Gewicht = haeufiger). Die Zuordnung Gegner zu Batch (F-19, PE-125) nicht aendern. |
 | `LEVEL_SCALING` (`hp`, `xp`, `coin`, `contact`) | `scaling.ts` | Faktoren je Level auf Lebenspunkte, Erfahrung, Muenz-Drop-Chance und Kontaktschaden. Ab Level 21 traegt `hp` die Kurve. |
 | `COST_BASE`, `COST_GROWTH`, `perLevel` | `upgrades.ts` | Preis und Wirkung der Upgrade-Stufen 1 bis 15. |
@@ -36,6 +39,7 @@ Schwierigkeit nicht mehr stetig steigt.
   In der Praxis trifft man nicht immer, deshalb ist Level 0 mit 0,50 bewusst unter 1.
   Die Eroeffnungswelle (AP-56) zaehlt bei Spawns/Min mit.
   Seit AP-105 rechnet der Druck mit **wirksamen** Lebenspunkten: Ansturm, Eingraben und Wickel erhoehen sie (siehe „Neue Gegner“).
+  Seit AP-127 zaehlt der Stufen-Faktor der Gegner (`tierFor`) mit, und die Gegnerzahl wird um die Obergrenze gekuerzt (siehe Abschnitt M7).
 - **Skalierung (AP-91)**: `LEVEL_SCALING` in `scaling.ts` mit den Faktoren `hp`, `xp`, `coin`, `contact` je Level. Die Kennzahlen rechnen sie ein (Lebenspunkte gerundet wie im Spiel).
 - **Schaden ohne Abschuss/Min**: Schaden pro Minute an der Astronautin, wenn sie gar nichts trifft und
   alle Gegner ungestoert ankommen. Sie ist nur zum Vergleichen der Level gedacht (die Zahl waechst mit
@@ -43,6 +47,8 @@ Schwierigkeit nicht mehr stetig steigt.
   Gift (Schlange) und Wickel (Mumie) zaehlen hier als zusaetzlicher Schaden (AP-105). Seit AP-113 treffen Verfolger, Ansturm und Eingraben nur einmal (0,5 s Kontaktschaden), siehe „Spawn-Gewichte ... (AP-113)“; die Zahlen der Tabelle sind deshalb viel kleiner als vor AP-113 und nur untereinander vergleichbar.
 
 ## Tabelle aller Level
+
+**Stand bis AP-127** (ohne Gegnerstufe). Die Werte ab AP-127 stehen in „M7: mehr Gegner und Gegnerstufen (AP-127)“.
 
 | Level | Batch | Minuten | Spawn-Abstand (ms) | Max. Gegner | Spawns/Min | Gegner-HP/Min | Druck | Schaden ohne Abschuss/Min |
 |---|---|---|---|---|---|---|---|---|
@@ -92,6 +98,9 @@ Seit AP-105 mit Wildschwein, Baer und Fee in Level 0 bis 20, Stand nach AP-113. 
 gerechnet und deshalb deutlich ueber 1: Die Wueste setzt Upgrades voraus (siehe „Level 21 bis 40“).
 
 ## Was die Tests sichern
+
+**Stand bis AP-127.** Ab AP-127 sind die Druck-Baender ersetzt (siehe „Was die Tests ab AP-127 sichern“ im Abschnitt M7).
+Weiter gelten die Aussagen zu Gold, Upgrades, Spawns/Min, 5-Minuten-Leveln und Items (Dauerfeuer siehe dort).
 
 - Der Druck steigt mit jedem Level 0 bis 40, auch ueber Batch-Grenzen (Spawns/Min ebenso).
 - Die Spruenge 4 zu 5 (Ist +9,5 %, erlaubt 8 bis 12 %), 9 zu 10 (Ist +9,1 %), 20 zu 21 (Ist +9,2 %), 25 zu 26 (Ist +9,5 %)
@@ -198,7 +207,7 @@ Begruendung des Faktors: Level 5 bis 20 hatten schon Luecken von hoechstens 1,13
 - **`MAX_ENEMIES`:** je Level x1,3 (Level 5: 40 auf 52, Level 20: 100 auf 130). Der Hoechstwert 130 ist +30 % ueber dem Hoechstwert nach AP-91 (100), das ist die Obergrenze aus RI-6; mehr wird nicht gebraucht. Level 0 bis 4 unveraendert (25 bis 37).
 - **Schwaechere Einzelgegner:** `hp` und `contact` 0,77 in allen Level 5 bis 20 (Baum 39, Hexe 15, Eichhoernchen 6, Waldgeist 8 Lebenspunkte, gerundet wie im Spiel), `xp` und `coin` 0,767 bis 0,776 (alte durch neue Gegnerzahl je Level, damit Gold und Erfahrung je Level gleich bleiben).
 - **Ergebnis:** Druck je Level aendert sich um hoechstens +0,01 (Level 20: 1,22 auf 1,23, Band 0,95 bis 1,25). Sprung 4 zu 5: +10,9 % (erlaubt bis 12 %), 9 zu 10: +9,5 % (erlaubt 8 bis 10 %), Schritte ab Level 6 hoechstens +9,5 %. Gold-Mittel ueber alle Level 46,0 (Band 43 bis 47), Stufe 10 einer Upgrade-Spur nach etwa 15,2 Leveln. Gesamt-Kontaktschaden je Level bleibt (Gegnerzahl mal `contact`).
-- **Boss-Fairness:** `BOSS_SPAWN_RATE_FACTOR` und die Boss-Konfiguration sind unveraendert; im Boss-Kampf spawnen keine normalen Gegner mehr (PE-137, Q-58); `BOSS_SPAWN_RATE_FACTOR` ist im Spiel gegenstandslos.
+- **Boss-Fairness:** `BOSS_SPAWN_RATE_FACTOR` und die Boss-Konfiguration blieben in AP-95 unveraendert (seit AP-126 haben die Bosse doppelte Basis-HP, PE-154); im Boss-Kampf spawnen keine normalen Gegner mehr (PE-137, Q-58); `BOSS_SPAWN_RATE_FACTOR` ist im Spiel gegenstandslos.
 
 | Level | Spawns/Min vorher / nachher | Faktor | Abstand vorher / nachher (ms) | Max. Gegner vorher / nachher |
 |---|---|---|---|---|
@@ -267,7 +276,7 @@ Toleranz wie AP-95). Gold-Mittel Level 0 bis 20: 46,1 (Band 43 bis 47).
 
 Nach dem Handtest M5 sollen Wildschwein, Baer und Fee in Level 0 bis 20 deutlich haeufiger kommen (Q-56). Druck, Gold und
 Erfahrung bleiben in den Baendern von `tests/logic/balance.test.ts` (Toleranz 4 %, Schritt hoechstens +10 % je Level,
-`MAX_ENEMIES` hoechstens 150). Die Baender sind nicht veraendert.
+`MAX_ENEMIES` hoechstens 150, alles bis AP-127). Die Baender sind nicht veraendert.
 
 **Neue Gewichte** (Anteil am Pool, vorher in Klammern):
 
@@ -319,6 +328,7 @@ Die Gold- und Erfahrungs-Tests mit „vorher“-Zaehlung (AP-95) rechnen jetzt g
 ## Level 21 bis 40 (AP-105, PE-129)
 
 Ziel: Die Kurve laeuft weiter, staerker werden die Gegner selbst, nicht ihre Zahl. `MAX_ENEMIES` hoechstens 150 (Leistung am iPhone, RI-6).
+Zahlen in diesem Abschnitt: **Stand bis AP-127** (seit AP-127 2,5-mal so viele Gegner, Obergrenze 250, siehe Abschnitt M7).
 
 - **Spawn-Abstand:** 525 ms (Level 21) bis 430 ms (Level 40), 5 ms je Level. Spawns/Min steigen nur von 146 (Level 20) auf 180 (+23 %).
 - **`MAX_ENEMIES`:** 131 bis 150, +1 je Level (Bremse, Obergrenze 150 in Level 40).
@@ -381,9 +391,114 @@ Die Preise folgen weiter `round(10 x 1,4^k)`, die Wirkung je Stufe bleibt (+10 %
 Eine Spur auf Stufe 15 kostet 3864 Gold. Mit dem Gold aller gewonnenen Level ist das nach Level 35 erreicht (3893 Gold; Test: nach
 Level 33 noch nicht, nach Level 36 sicher). Stufe 15 auf allen vier Spuren (15456 Gold) ist bis Level 40 nicht vorgesehen.
 
+## M7: mehr Gegner und Gegnerstufen (AP-127)
+
+Ziel (F-25, PE-152, PE-153): etwa 2,5-mal so viele Gegner bei gleichen HP je Gegner, Obergrenze 250 gleichzeitig,
+Gold und Erfahrung je Runde wie bisher (PE-163, Q-64 Option a). Dazu kommen die Gegnerstufen aus AP-128 (PE-161):
+je Level-Index im Batch (Stufe) +8 % HP und +5 % Schaden, ohne Deckel (`TIER_RULES` in `tiers.ts`). Die Stufe steht
+**nicht** in `LEVEL_SCALING`: `enemyScaleFor` (`logic/scaling.ts`) multipliziert `hp` und `contact` mit ihr.
+Level 20 hat Stufe 10 (+80 % HP), Level 40 Stufe 9 (+72 % HP).
+
+**Stellschrauben:**
+
+- **Gegnerzahl-Faktor** `ENEMY_COUNT_FACTOR` (`levels.ts`): Level 0 1,5, Level 1 1,75, Level 2 2,0, Level 3 2,25, ab Level 4 2,5.
+- **Spawn-Abstand:** bisheriger Wert durch den Faktor, auf ganze ms gerundet (Level 0: 1500 auf 1000 ms, Level 40: 430 auf 172 ms).
+  Untergrenze `MIN_SPAWN_INTERVAL_MS = 150`: Am Rundenende sinkt der Abstand auf 60 % (90 ms, gut 5 Frames bei 60 fps),
+  mehr als ein Gegner je 5 Frames bringt am iPhone nichts ausser Last. Sie greift heute nirgends (kleinster Wert 172 ms).
+- **`MAX_ENEMIES`:** bisheriger Wert mal Faktor (`MAX_ENEMIES_WANTED`), hoechstens `MAX_ENEMIES_CAP = 250` (ersetzt 150 aus RI-6).
+  Die Obergrenze greift ab Level 15 (gewuenscht 260) bis Level 40 (gewuenscht 375).
+- **HP-Aufschlag** `CAP_HP_BONUS` (`scaling.ts`): gewuenscht durch moeglich, also `MAX_ENEMIES_WANTED / 250`, mindestens 1
+  (Level 15: 1,04, Level 20: 1,30, Level 40: 1,50). Annahme: Die Obergrenze bremst die Gegnerzahl im selben Verhaeltnis
+  (von 375 gewuenschten Gegnern leben hoechstens 250, also kommen nur zwei Drittel). Der Aufschlag macht jeden Gegner im
+  selben Verhaeltnis zaeher, der Druck erreicht so trotzdem das 2,5-Fache. Rechnung: Druck = Gegner pro Minute x (250 / gewuenscht)
+  x mittlere HP x Aufschlag x Stufe = 2,5 x alter Druck x Stufe.
+- **`xp` und `coin`:** Wert vor AP-127 durch den **wirksamen** Faktor (Faktor durch Aufschlag). Ohne Obergrenze ist das genau
+  der Faktor (Level 0 bis 14). Wo die Obergrenze greift, kommen weniger, dafuer zaehere Gegner, und jeder bringt im selben
+  Verhaeltnis mehr. Gold und Erfahrung je Runde bleiben dadurch gleich (Test: Band ±10 %, Ist -1,6 % bis +0,4 %).
+- **`hp` und `contact` je Gegner** bleiben (bewusst mehr Druck, PE-152); nur der Aufschlag kommt ab Level 15 auf `hp`.
+
+**Druck** (Test, `tests/logic/balance.test.ts`): Gegner pro Minute (nach der Obergrenze) x mittlere wirksame HP x Stufen-Faktor
+durch die Grundwaffe (40 pro Sekunde). Geschoss- und Aura-Schaden wachsen erst mit AP-134 mit der Stufe (V-24), der Druck rechnet
+weiter nur HP und Kontakt.
+
+| Level | Faktor | Spawn-Abstand (ms) | Max. Gegner (gewuenscht) | HP-Aufschlag | Stufe | Druck alt / neu | neu / alt | Gold je Runde alt / neu | Druck mit Upgrades (Annahme AP-105) |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | 1,5 | 1000 | 38 (38) | 1,00 | 0 | 0,51 / 0,77 | x1,51 | 5,8 / 5,8 | - |
+| 1 | 1,75 | 829 | 49 (49) | 1,00 | 1 | 0,56 / 1,06 | x1,90 | 6,3 / 6,3 | - |
+| 2 | 2,0 | 700 | 62 (62) | 1,00 | 2 | 0,63 / 1,46 | x2,32 | 6,9 / 6,9 | - |
+| 3 | 2,25 | 604 | 77 (77) | 1,00 | 3 | 0,69 / 1,90 | x2,74 | 13,0 / 13,0 | - |
+| 4 | 2,5 | 532 | 93 (93) | 1,00 | 4 | 0,79 / 2,60 | x3,30 | 14,6 / 14,4 | - |
+| 5 | 2,5 | 348 | 130 (130) | 1,00 | 0 | 0,86 / 2,12 | x2,46 | 27,5 / 27,1 | - |
+| 6 | 2,5 | 336 | 138 (138) | 1,00 | 1 | 0,89 / 2,32 | x2,61 | 28,4 / 28,0 | - |
+| 7 | 2,5 | 324 | 143 (143) | 1,00 | 2 | 0,91 / 2,56 | x2,83 | 29,6 / 29,2 | - |
+| 8 | 2,5 | 308 | 150 (150) | 1,00 | 3 | 0,94 / 2,85 | x3,02 | 51,1 / 50,7 | - |
+| 9 | 2,5 | 296 | 155 (155) | 1,00 | 4 | 0,98 / 3,16 | x3,22 | 53,2 / 52,8 | - |
+| 10 | 2,5 | 246 | 195 (195) | 1,00 | 0 | 1,07 / 2,64 | x2,47 | 47,6 / 47,1 | - |
+| 11 | 2,5 | 244 | 208 (208) | 1,00 | 1 | 1,08 / 2,87 | x2,67 | 48,1 / 47,6 | - |
+| 12 | 2,5 | 240 | 220 (220) | 1,00 | 2 | 1,09 / 3,16 | x2,89 | 48,7 / 48,2 | - |
+| 13 | 2,5 | 236 | 235 (235) | 1,00 | 3 | 1,11 / 3,39 | x3,05 | 49,4 / 48,8 | - |
+| 14 | 2,5 | 234 | 248 (248) | 1,00 | 4 | 1,12 / 3,65 | x3,26 | 50,0 / 49,5 | - |
+| 15 | 2,5 | 230 | 250 (260) | 1,04 | 5 | 1,14 / 3,95 | x3,47 | 50,7 / 50,1 | - |
+| 16 | 2,5 | 224 | 250 (273) | 1,09 | 6 | 1,16 / 4,23 | x3,64 | 85,9 / 85,4 | - |
+| 17 | 2,5 | 222 | 250 (285) | 1,14 | 7 | 1,17 / 4,56 | x3,89 | 87,0 / 86,4 | - |
+| 18 | 2,5 | 218 | 250 (300) | 1,20 | 8 | 1,19 / 4,89 | x4,10 | 88,3 / 87,8 | - |
+| 19 | 2,5 | 216 | 250 (313) | 1,25 | 9 | 1,20 / 5,14 | x4,27 | 89,6 / 89,0 | - |
+| 20 | 2,5 | 212 | 250 (325) | 1,30 | 10 | 1,23 / 5,50 | x4,48 | 90,8 / 90,2 | - |
+| 21 | 2,5 | 210 | 250 (328) | 1,31 | 0 | 1,33 / 3,31 | x2,49 | 101,9 / 100,9 | 0,83 |
+| 22 | 2,5 | 208 | 250 (330) | 1,32 | 1 | 1,44 / 3,74 | x2,60 | 107,1 / 106,1 | 0,91 |
+| 23 | 2,5 | 206 | 250 (333) | 1,33 | 2 | 1,55 / 4,43 | x2,86 | 112,6 / 111,4 | 1,05 |
+| 24 | 2,5 | 204 | 250 (335) | 1,34 | 3 | 1,67 / 5,08 | x3,05 | 195,2 / 194,2 | 1,18 |
+| 25 | 2,5 | 202 | 250 (338) | 1,35 | 4 | 1,78 / 5,86 | x3,29 | 204,6 / 203,4 | 1,32 |
+| 26 | 2,5 | 200 | 250 (340) | 1,36 | 0 | 1,95 / 4,83 | x2,48 | 160,4 / 159,0 | 1,06 |
+| 27 | 2,5 | 198 | 250 (343) | 1,37 | 1 | 2,09 / 5,60 | x2,68 | 167,7 / 166,0 | 1,20 |
+| 28 | 2,5 | 196 | 250 (345) | 1,38 | 2 | 2,25 / 6,47 | x2,88 | 174,8 / 173,3 | 1,36 |
+| 29 | 2,5 | 194 | 250 (348) | 1,39 | 3 | 2,40 / 7,41 | x3,08 | 302,1 / 300,5 | 1,52 |
+| 30 | 2,5 | 192 | 250 (350) | 1,40 | 4 | 2,59 / 8,45 | x3,26 | 314,7 / 313,2 | 1,69 |
+| 31 | 2,5 | 190 | 250 (353) | 1,41 | 0 | 2,83 / 7,03 | x2,48 | 200,3 / 198,6 | 1,37 |
+| 32 | 2,5 | 188 | 250 (355) | 1,42 | 1 | 3,04 / 8,14 | x2,68 | 208,3 / 206,6 | 1,55 |
+| 33 | 2,5 | 186 | 250 (358) | 1,43 | 2 | 3,28 / 9,37 | x2,86 | 216,9 / 214,8 | 1,75 |
+| 34 | 2,5 | 184 | 250 (360) | 1,44 | 3 | 3,52 / 10,79 | x3,06 | 225,1 / 223,2 | 1,97 |
+| 35 | 2,5 | 182 | 250 (363) | 1,45 | 4 | 3,78 / 12,35 | x3,27 | 233,5 / 231,6 | 2,20 |
+| 36 | 2,5 | 180 | 250 (365) | 1,46 | 5 | 4,06 / 14,12 | x3,47 | 402,0 / 399,9 | 2,46 |
+| 37 | 2,5 | 178 | 250 (368) | 1,47 | 6 | 4,37 / 16,11 | x3,69 | 416,6 / 414,7 | 2,75 |
+| 38 | 2,5 | 176 | 250 (370) | 1,48 | 7 | 4,69 / 18,26 | x3,89 | 432,0 / 429,8 | 3,05 |
+| 39 | 2,5 | 174 | 250 (373) | 1,49 | 8 | 5,04 / 20,54 | x4,08 | 447,6 / 445,3 | 3,36 |
+| 40 | 2,5 | 172 | 250 (375) | 1,50 | 9 | 5,41 / 23,19 | x4,29 | 463,4 / 461,3 | 3,71 |
+
+„Druck alt“ ist der Stand vor AP-127 (ohne Stufe, Tabelle „Tabelle aller Level“). „neu / alt“ ist Faktor mal Stufe
+(kleine Abweichungen durch gerundete HP und die groessere Eroeffnungswelle). Gold-Mittel Level 0 bis 20: 45,9 (Band 43 bis 47).
+
+**Lesart und Folgen (RI-30, Feinjustierung nach H-34):**
+
+- Level 0 ist mit Druck 0,77 weiter mit der Grundwaffe zu schaffen. Ab Level 1 liegt der Druck ueber 1, ab Level 4 bei 2,1 bis 23,2:
+  Doppelschuss und Upgrades werden frueh noetig. Level 20 braucht 220 HP pro Sekunde (vorher 49), das ist mehr als Doppelschuss
+  Stufe 2 ohne Upgrades (120) und knapp unter Doppelschuss Stufe 2 mit Upgrade-Stufe 10 auf beiden Schadens-Spuren (480, bei halber Trefferquote 240).
+- Level 21 bis 40 mit den angenommenen Upgrades (Stufe 10 bei Level 21 bis 15 bei Level 40): Druck 0,83 bis 3,71 (vorher 0,33 bis 0,87).
+  Level 40 braucht damit auch mit Doppelschuss Stufe 2 (x3) noch mehr Schaden, als die Upgrades bis Stufe 15 bringen.
+  Die frueheren Fairness-Baender (Level 40 mit Upgrades 0,8 bis 1,25) sind deshalb nicht mehr im Test.
+- Innerhalb eines Batches steigt der Druck je Level um 5 bis 18 %. An jeder Batch-Grenze faellt er (die Stufe beginnt wieder bei 0),
+  jeder Batch beginnt aber hoeher als der vorige. In Level 1 bis 4 steigt zusaetzlich der Faktor (+11 bis +17 % je Level),
+  die Schritte sind dort 1,30 bis 1,38.
+- Item-Drops haengen an der Zahl besiegter Gegner (`ITEM_RULES.dropChance` in `items.ts`, nicht Teil von AP-127). Mit mehr Gegnern
+  kommen auch mehr Items: Dauerfeuer in Level 20 etwa 45 % der Rundenzeit (vorher 23 %), Schaden im Mittel etwa 2,8-fach (vorher 1,9-fach).
+- Ein Einzeltreffer des staerksten Kontakt-Gegners liegt mit dem Level-Faktor weiter unter 15 % der Spielerin-HP; die Stufe kommt
+  ohne Deckel dazu (PE-161), in Level 20 (Stufe 10, +50 % Schaden) sind es bis zu 17,3 von 100.
+- **Bei Ruckeln `MAX_ENEMIES` senken:** `MAX_ENEMIES_CAP` in `levels.ts` kleiner setzen (RI-28). Der HP-Aufschlag und `xp`/`coin`
+  passen sich von selbst an, Druck sowie Gold und Erfahrung je Runde bleiben gleich, nur kommen weniger, dafuer zaehere Gegner.
+
+**Was die Tests ab AP-127 sichern** (die alten Baender „Druck je Level gleich“, ±4 % und `MAX_ENEMIES` hoechstens 150 sind ersetzt):
+
+- Faktor 1,5 / 1,75 / 2,0 / 2,25, ab Level 4 2,5; Spawns pro Minute = Faktor mal vorher (±3 %).
+- Druck mindestens 1,4-mal der alte Wert in Level 0 bis 3 und 2,3-mal in Level 4 bis 40 (Stufe eingerechnet).
+- Druck innerhalb jedes Batches streng steigend, jeder Batch beginnt hoeher als der vorige.
+- Schritt zwischen Nachbarleveln hoechstens 1,25; in Level 1 bis 4 gilt die Grenze fuer den Schritt ohne den Anstieg des Faktors.
+- `MAX_ENEMIES` hoechstens 250, Abstand mindestens 150 ms, HP-Aufschlag = gewuenscht durch moeglich.
+- Gold und Erfahrung je gewonnener Runde im Band ±10 % um den Stand vor AP-127.
+
 ## Nachjustieren: Beispiele
 
-- Level 0 zu schwer: in `scaling.ts` `hp` von Level 0 senken oder in `levels.ts` `SPAWN_INTERVAL_MS[0]` erhoehen (hoechstens 1500, groesste Luecke); Druck-Untergrenze 0,45 beachten.
+- Level 0 zu schwer: in `levels.ts` den Faktor von Level 0 (`COUNT_RAMP`) senken oder in `scaling.ts` `hp` von Level 0 senken; der Test verlangt mindestens 1,4-mal den Druck vor AP-127.
+- Ruckeln am iPhone (`?fps=1`): `MAX_ENEMIES_CAP` in `levels.ts` senken, der HP-Aufschlag gleicht aus (siehe Abschnitt M7).
 - Rundenstart zu hektisch oder zu leer: `OPENING_RADIUS_FACTOR` (Abstand der Eroeffnungswelle, 0,65) oder den Anteil in `openingCount` (15 %, 3 bis 8) in `spawn.ts` aendern.
   Dann stimmt eventuell der Abstand zu Level 1 nicht mehr, der Test sagt es dir.
 - Items zu stark: `perStack` oder `maxStacks` in `items.ts` senken, bei Dauerfeuer `durationMs`.

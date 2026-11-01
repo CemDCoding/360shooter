@@ -3,8 +3,12 @@ import {
   BATCH_STARTS,
   BOSS_OF_BATCH,
   ENEMIES,
+  ENEMY_COUNT_FACTOR,
   LEVELS,
   LEVEL_COUNT,
+  MAX_ENEMIES_CAP,
+  MAX_ENEMIES_WANTED,
+  MIN_SPAWN_INTERVAL_MS,
   batchOf,
   getLevel,
 } from '../../src/config';
@@ -34,13 +38,15 @@ const POOL_IDS: Record<BatchId, EnemyId[]> = {
   oasis: ['mummy', 'snake', 'archaeologist', 'sphinx'],
 };
 
-/** Values of level 0 to 20 before AP-97: they must stay unchanged (only the pools grow). */
+/** Values before AP-127 (AP-95, AP-105, AP-113). AP-127 divides the interval by the count factor and multiplies max. */
 const OLD_INTERVALS = [
   1500, 1450, 1400, 1360, 1330, 870, 840, 810, 770, 740, 615, 610, 600, 590, 585, 575, 560, 555,
-  545, 540, 530,
+  545, 540, 530, 525, 520, 515, 510, 505, 500, 495, 490, 485, 480, 475, 470, 465, 460, 455, 450,
+  445, 440, 435, 430,
 ];
 const OLD_MAX = [
-  25, 28, 31, 34, 37, 52, 55, 57, 60, 62, 78, 83, 88, 94, 99, 104, 109, 114, 120, 125, 130,
+  25, 28, 31, 34, 37, 52, 55, 57, 60, 62, 78, 83, 88, 94, 99, 104, 109, 114, 120, 125, 130, 131,
+  132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150,
 ];
 
 describe('levels', () => {
@@ -56,7 +62,7 @@ describe('levels', () => {
     expect(l.durationSec).toBe(shortIds.includes(id) ? 180 : 300);
     expect(l.enemyPool.map((e) => e.enemyId).sort()).toEqual([...POOL_IDS[batch]].sort());
     expect(l.enemyPool.every((e) => e.weight > 0)).toBe(true);
-    expect(l.maxEnemies).toBeLessThanOrEqual(150);
+    expect(l.maxEnemies).toBeLessThanOrEqual(250);
     expect(l.bossId).toBe(BOSS_OF_BATCH[batch]);
   });
 
@@ -91,9 +97,31 @@ describe('levels', () => {
     }
   });
 
-  it('keeps the spawn interval and max enemies of level 0 to 20 unchanged (AP-97, AP-113)', () => {
-    expect(LEVELS.slice(0, 21).map((l) => l.spawnIntervalMs)).toEqual(OLD_INTERVALS);
-    expect(LEVELS.slice(0, 21).map((l) => l.maxEnemies)).toEqual(OLD_MAX);
+  it('divides the old spawn interval by the count factor and multiplies the old max enemies, cap 250 (AP-127, PE-152)', () => {
+    expect(MAX_ENEMIES_CAP).toBe(250);
+    expect(ENEMY_COUNT_FACTOR).toHaveLength(LEVEL_COUNT);
+    LEVELS.forEach((l, id) => {
+      const f = ENEMY_COUNT_FACTOR[id];
+      expect(l.spawnIntervalMs, `level ${id}`).toBe(Math.round(OLD_INTERVALS[id] / f));
+      expect(MAX_ENEMIES_WANTED[id], `level ${id}`).toBe(Math.round(OLD_MAX[id] * f));
+      expect(l.maxEnemies, `level ${id}`).toBe(Math.min(250, Math.round(OLD_MAX[id] * f)));
+    });
+    expect(LEVELS[0].maxEnemies).toBe(38);
+    expect(LEVELS[0].spawnIntervalMs).toBe(1000);
+    expect(LEVELS[40].spawnIntervalMs).toBe(172);
+  });
+
+  it('caps max enemies at 250 from level 15 (wanted 260) to level 40 (wanted 375), below the cap before (AP-127)', () => {
+    for (let i = 0; i < LEVELS.length; i++) {
+      expect(LEVELS[i].maxEnemies === 250, `level ${i}`).toBe(i >= 15);
+      expect(MAX_ENEMIES_WANTED[i] > 250, `level ${i}`).toBe(i >= 15);
+    }
+    expect(MAX_ENEMIES_WANTED[40]).toBe(375);
+  });
+
+  it('keeps every spawn interval at or above the lower bound of 150 ms (AP-127)', () => {
+    expect(MIN_SPAWN_INTERVAL_MS).toBe(150);
+    for (const l of LEVELS) expect(l.spawnIntervalMs, `level ${l.id}`).toBeGreaterThanOrEqual(150);
   });
 
   it('keeps the old enemies in the old pools with their old shares', () => {
@@ -137,9 +165,13 @@ describe('levels', () => {
     expect(getLevel(41)).toBeUndefined();
   });
 
-  it('max enemies never fall from level to level and level 0 starts at 1.5 s (AP-91)', () => {
+  it('max enemies never fall from level to level (rising up to the cap) and level 0 starts at 1.0 to 1.5 s (AP-91, AP-127)', () => {
     for (let i = 1; i < LEVELS.length; i++) {
-      expect(LEVELS[i].maxEnemies).toBeGreaterThan(LEVELS[i - 1].maxEnemies);
+      if (LEVELS[i - 1].maxEnemies < MAX_ENEMIES_CAP) {
+        expect(LEVELS[i].maxEnemies, `level ${i}`).toBeGreaterThan(LEVELS[i - 1].maxEnemies);
+      } else {
+        expect(LEVELS[i].maxEnemies, `level ${i}`).toBe(MAX_ENEMIES_CAP);
+      }
     }
     expect(LEVELS[0].spawnIntervalMs).toBeGreaterThanOrEqual(1000);
     expect(LEVELS[0].spawnIntervalMs).toBeLessThanOrEqual(1500);
@@ -160,17 +192,11 @@ describe('levels', () => {
     }
   });
 
-  it('max enemies of level 5 to 20 grow at most 30 percent over the peak after AP-91 (100), phone performance RI-6 (AP-95)', () => {
-    for (let i = 5; i <= 20; i++) {
-      expect(LEVELS[i].maxEnemies, `level ${i}`).toBeLessThanOrEqual(130);
-    }
-  });
-
-  it('level 21 to 40 lower the spawn interval only by 5 ms per level, 525 to 430 ms (AP-105, PE-129)', () => {
-    expect(LEVELS[21].spawnIntervalMs).toBe(525);
-    expect(LEVELS[40].spawnIntervalMs).toBe(430);
+  it('level 21 to 40 lower the spawn interval only by 2 ms per level, 210 to 172 ms (AP-105, PE-129, AP-127)', () => {
+    expect(LEVELS[21].spawnIntervalMs).toBe(210);
+    expect(LEVELS[40].spawnIntervalMs).toBe(172);
     for (let i = 22; i < LEVELS.length; i++) {
-      expect(LEVELS[i - 1].spawnIntervalMs - LEVELS[i].spawnIntervalMs, `level ${i}`).toBe(5);
+      expect(LEVELS[i - 1].spawnIntervalMs - LEVELS[i].spawnIntervalMs, `level ${i}`).toBe(2);
     }
   });
 
@@ -185,16 +211,9 @@ describe('levels', () => {
     }
   });
 
-  it('max enemies of level 21 to 40 rise by 1 from 131 to 150 (AP-105)', () => {
-    expect(LEVELS.slice(21).map((l) => l.maxEnemies)).toEqual(
-      Array.from({ length: 20 }, (_, i) => 131 + i),
-    );
-  });
-
-  it('max enemies of level 21 to 40 stay at 150 or below, level 40 at the cap (PE-129)', () => {
+  it('max enemies of level 21 to 40 stay at the cap 250 (AP-127, PE-152)', () => {
     for (let i = 21; i < LEVELS.length; i++) {
-      expect(LEVELS[i].maxEnemies, `level ${i}`).toBeLessThanOrEqual(150);
+      expect(LEVELS[i].maxEnemies, `level ${i}`).toBe(250);
     }
-    expect(LEVELS[40].maxEnemies).toBe(150);
   });
 });

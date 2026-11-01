@@ -113,7 +113,8 @@ describe('SpawnDirector', () => {
         expect(diff).toBeCloseTo(i * step, 6);
       });
     }
-    expect(openingCount(lvl(0))).toBe(4);
+    // AP-127: Level 0 hat 38 statt 25 Max. Gegner, 15 % davon sind 6 (vorher 4).
+    expect(openingCount(lvl(0))).toBe(6);
     expect(openingCount(lvl(20))).toBe(8);
   });
 
@@ -189,7 +190,7 @@ describe('spawn density of level 0 to 4 (AP-91)', () => {
     return times;
   }
 
-  it('has no gap longer than 1.6 s between two spawns in level 0 to 4', () => {
+  it('has no gap longer than 1.1 s between two spawns in level 0 to 4 (AP-127)', () => {
     for (let id = 0; id <= 4; id++) {
       const times = spawnTimes(lvl(id), 11);
       let last = 0;
@@ -198,8 +199,8 @@ describe('spawn density of level 0 to 4 (AP-91)', () => {
         maxGap = Math.max(maxGap, t - last);
         last = t;
       }
-      // 1,5 s Spawn-Abstand plus eine Tick-Breite Messfehler.
-      expect(maxGap, `level ${id}`).toBeLessThanOrEqual(1600);
+      // Spawn-Abstand (seit AP-127 hoechstens 1,0 s) plus eine Tick-Breite Messfehler.
+      expect(maxGap, `level ${id}`).toBeLessThanOrEqual(1100);
     }
   });
 
