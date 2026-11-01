@@ -71,6 +71,26 @@ describe('round settlement chain (AP-88)', () => {
     expect(st.getItem(SAVE_KEY)).not.toBeNull();
   });
 
+  it('diamonds: first win credits once, second win, loss and debug give 0 (AP-137)', () => {
+    const st = memoryStorage();
+    const run = (result: 'won' | 'lost', debug = false) => {
+      const s = settleRound(loadSave(st), 4, result, 10, 0, debug, PROGRESSION);
+      if (s.shouldWrite) writeSave(s.next, st);
+      return s;
+    };
+    expect(run('lost').diamondsGained).toBe(0);
+    st.writes = 0;
+    const first = run('won');
+    expect(first.diamondsGained).toBe(3);
+    expect(st.writes).toBe(1);
+    expect(loadSave(st).diamonds).toBe(3);
+    expect(run('won').diamondsGained).toBe(0);
+    const dbg = run('won', true);
+    expect(dbg.diamondsGained).toBe(0);
+    expect(dbg.shown.diamonds).toBe(3);
+    expect(loadSave(st).diamonds).toBe(3);
+  });
+
   it('a coin inside the collect radius is collected (roundCoins counting step)', () => {
     let roundCoins = 0;
     const r = coinMagnetStep({ x: 0, y: 0 }, { x: 1, y: 1 }, 16, COIN_RULES, 0);
