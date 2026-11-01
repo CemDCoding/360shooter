@@ -198,7 +198,13 @@ export class PowerSlots {
   private powers: ActivePowers = { doubleShotStage: 0, shieldLeft: 0, rapidFireMsLeft: 0 };
   private armour: ActiveArmour = { id: null, activeMsLeft: 0, cooldownMsLeft: 0 };
 
-  constructor(scene: Phaser.Scene, arenaH: number, edge: number, onPress: (id: string) => void) {
+  constructor(
+    scene: Phaser.Scene,
+    arenaH: number,
+    edge: number,
+    onPress: (id: string) => void,
+    leftEdge: number = edge,
+  ) {
     // PE-94: slots keep desktop size (edge 40, gap 8) on phones; only the outer margin is the
     // HUD margin m = round(8k) (H-23), the same as every other HUD element.
     const rects = powerSlotRects(
@@ -211,6 +217,7 @@ export class PowerSlots {
         margin: THEME.spacePx['space.2'],
       },
       edge,
+      leftEdge,
     );
     const iconScale = slotIconScale(
       rects[0]?.w ?? 0,

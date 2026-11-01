@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { getLevel } from '../config/levels';
 import { OPACITY, THEME, themeColor, type ColorName } from '../config/theme';
-import { GameEvents, type GameEventPayloads } from '../contracts';
+import { GameEvents, type GameEventPayloads, type SafeInsets } from '../contracts';
 import { addMuteButton } from '../platform/audio';
 import { hudScale } from '../platform/layout';
 import { prefersReducedMotion } from '../platform/motion';
@@ -41,6 +41,7 @@ import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
 import { StatusIndicator } from './hud/StatusIndicator';
 import { BATCH_LABELS } from './menu/levelGroups';
+import { clampSpan, edge, edges, NO_SAFE_INSETS, readSafeInsets } from './safeInsets';
 
 export { formatTime };
 
@@ -70,6 +71,8 @@ export class HudScene extends Phaser.Scene {
   private statusRow: FunkChip[] = [];
   private rowY = 0;
   private k = 1;
+  /** Distance of the HUD to each canvas edge: max(design margin m, safe-area inset), fixed per round (PE-141). */
+  private e: SafeInsets = NO_SAFE_INSETS;
 
   private energyPanel!: FunkPanel;
   private energyNum!: Phaser.GameObjects.BitmapText;
@@ -150,18 +153,26 @@ export class HudScene extends Phaser.Scene {
     );
     this.k = k;
     const m = Math.round(MARGIN * k);
+    this.e = edges(m, readSafeInsets(this.registry));
 
-    this.createEnergy(m, k);
-    this.createTimer(width, m, k);
+    this.createEnergy(k);
+    this.createTimer(width, k);
     const btn = Math.round(THEME.sizePx['size.target'] * Math.max(1, k));
     this.createButtons(width, m, btn);
-    this.createChips(m, k);
+    this.createChips(k);
     this.createBossUi(width, height, k);
-    this.slots = new PowerSlots(this, height, m, this.onSlotPressed);
+    this.slots = new PowerSlots(this, height, this.e.bottom, this.onSlotPressed, this.e.left);
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
-      this.fpsText = funkText(this, width - 4, height - 4, '', 1, 'hud.accent').setOrigin(1, 1);
+      this.fpsText = funkText(
+        this,
+        width - edge(4, this.e.right),
+        height - edge(4, this.e.bottom),
+        '',
+        1,
+        'hud.accent',
+      ).setOrigin(1, 1);
     }
 
     this.setHp(data?.hp ?? 0, data?.maxHp ?? 1);
@@ -201,7 +212,9 @@ export class HudScene extends Phaser.Scene {
   }
 
   /** Energy panel: number (3x), label and ten segments. */
-  private createEnergy(m: number, k: number): void {
+  private createEnergy(k: number): void {
+    const mx = this.e.left;
+    const my = this.e.top;
     const numScale = HUD_NUMBER_SCALE;
     const labScale = funkScale(1, k);
     const pad = Math.round(8 * k);
@@ -215,35 +228,44 @@ export class HudScene extends Phaser.Scene {
     const gap = Math.round(8 * k);
     const w = pad * 2 + numW + gap + Math.max(segsW, labW);
     const h = FUNK_GLYPH_H * numScale + pad * 2;
-    this.energyPanel = new FunkPanel(this, m, m, w, h, true);
-    this.energyNum = funkText(this, m + pad, m + h / 2, '0', numScale, 'hud.text').setOrigin(
+    this.energyPanel = new FunkPanel(this, mx, my, w, h, true);
+    this.energyNum = funkText(this, mx + pad, my + h / 2, '0', numScale, 'hud.text').setOrigin(
       0,
       0.5,
     );
     const blockH = FUNK_GLYPH_H * labScale + Math.round(4 * k) + this.segH;
-    const top = m + (h - blockH) / 2;
-    const bx = m + pad + numW + gap;
+    const top = my + (h - blockH) / 2;
+    const bx = mx + pad + numW + gap;
     this.energyLabel = funkText(this, bx, top, 'ENERGIE', labScale, 'hud.text-muted');
     this.segX = bx;
     this.segY = top + FUNK_GLYPH_H * labScale + Math.round(4 * k);
     this.segGfx = this.add.graphics();
-    this.rowY = m + h + Math.round(CHIP_GAP * k);
+    this.rowY = my + h + Math.round(CHIP_GAP * k);
   }
 
-  private createTimer(width: number, m: number, k: number): void {
+  private createTimer(width: number, k: number): void {
+    const my = this.e.top;
     const scale = HUD_NUMBER_SCALE;
     const pad = Math.round(8 * k);
     const w =
       Math.max(measureFunk(this, '10:00', scale), measureFunk(this, 'BOSS!', scale)) + pad * 2;
     const h = FUNK_GLYPH_H * scale + pad * 2;
-    this.timerPanel = new FunkPanel(this, Math.round(width / 2 - w / 2), m, w, h);
-    this.timerText = funkText(this, width / 2, m + h / 2, '0:00', scale, 'hud.text').setOrigin(0.5);
+    // Centred; only moves inward if it would reach into an inset (RS-02).
+    const wantX = Math.round(width / 2 - w / 2);
+    const x = clampSpan(wantX, w, this.e.left, width - this.e.right);
+    const cx = x === wantX ? width / 2 : x + w / 2;
+    this.timerPanel = new FunkPanel(this, x, my, w, h);
+    this.timerText = funkText(this, cx, my + h / 2, '0:00', scale, 'hud.text').setOrigin(0.5);
   }
 
   /** Boss bar at the bottom centre and the "Boss kommt!" banner, both hidden until needed (runde.html 3). */
   private createBossUi(width: number, height: number, k: number): void {
     const lab = funkScale(1, k);
-    const { x, y, w, h } = bossBarRect(width, height, k, BOSS_BAR_W, BOSS_BAR_H, MARGIN);
+    const { x, y, w, h } = bossBarRect(width, height, k, BOSS_BAR_W, BOSS_BAR_H, MARGIN, {
+      bottom: this.e.bottom,
+      minX: this.e.left,
+      maxX: width - this.e.right,
+    });
     const panel = new FunkPanel(this, x, y, w, h, false, { line: 'hud.danger' });
     const fill = this.add.graphics();
     const name = funkText(this, x, y - 3, '', lab, 'hud.text').setOrigin(0, 1);
@@ -294,9 +316,10 @@ export class HudScene extends Phaser.Scene {
       gap +
       FUNK_GLYPH_H * lab +
       padBottom;
-    const bx = Math.round(width / 2 - bw / 2);
+    const wantX = Math.round(width / 2 - bw / 2);
+    const bx = clampSpan(wantX, bw, this.e.left, width - this.e.right);
     const by = Math.round(height * BANNER_TOP);
-    const cx = Math.round(width / 2);
+    const cx = bx === wantX ? Math.round(width / 2) : Math.round(bx + bw / 2);
     b.panel.setSize(bw, bh).setPosition(bx, by);
     let cy = by + padTop;
     b.head.setPosition(cx, cy);
@@ -471,8 +494,8 @@ export class HudScene extends Phaser.Scene {
   }
 
   private createButtons(width: number, m: number, size: number): void {
-    const px = width - m - size / 2;
-    const y = m + size / 2;
+    const px = width - this.e.right - size / 2;
+    const y = this.e.top + size / 2;
     new FunkButton(this, px, y, {
       icon: { key: 'ui-icons', frame: 2 },
       width: size,
@@ -483,8 +506,8 @@ export class HudScene extends Phaser.Scene {
   }
 
   /** Chip row: coins always, power chips and the fire ring only while active. */
-  private createChips(m: number, k: number): void {
-    const relayout = (): void => this.relayoutChips(m);
+  private createChips(k: number): void {
+    const relayout = (): void => this.relayoutChips();
     this.coinCounter = new CoinCounter(this, k, relayout);
     this.powers = new PowerIndicators(this, k, relayout);
     this.armour = new ArmourIndicator(this, k, relayout);
@@ -492,10 +515,10 @@ export class HudScene extends Phaser.Scene {
     this.chipRow = [this.coinCounter.chip, ...this.powers.chips, this.armour.chip];
     // Status chips sit in their own second row: the first row never grows into the arena edge (H-23).
     this.statusRow = [...this.status.chips];
-    this.relayoutChips(m);
+    this.relayoutChips();
   }
 
-  private relayoutChips(m: number): void {
+  private relayoutChips(): void {
     if (this.chipRow.length === 0) return;
     const gap = Math.round(CHIP_GAP * this.k);
     const rowH = Math.max(0, ...this.chipRow.map((c) => c.height));
@@ -507,7 +530,7 @@ export class HudScene extends Phaser.Scene {
       const xs = layoutRow(
         row.map((c) => (c.visible ? c.width : null)),
         gap,
-        m,
+        this.e.left,
       );
       row.forEach((c, i) => {
         const x = xs[i];

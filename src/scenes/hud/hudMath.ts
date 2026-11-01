@@ -210,6 +210,7 @@ export function powerSlotRects(
   arenaH: number,
   base: SlotMetrics,
   edge?: number,
+  leftEdge?: number,
 ): Rect[] {
   const f = Number.isFinite(k) && k > 0 ? k : 1;
   const size = 2 * Math.round((base.size * f) / 2);
@@ -219,9 +220,12 @@ export function powerSlotRects(
     edge !== undefined && Number.isFinite(edge) && edge >= 0
       ? Math.round(edge)
       : Math.round(base.margin * f);
+  // `leftEdge`: own left margin (safe-area inset, RS-02); `edge` is then the bottom margin only.
+  const left =
+    leftEdge !== undefined && Number.isFinite(leftEdge) && leftEdge >= 0 ? Math.round(leftEdge) : m;
   const y = Math.round(arenaH) - m - size;
   const n = Math.max(0, Math.floor(Number.isFinite(count) ? count : 0));
-  return Array.from({ length: n }, (_, i) => ({ x: m + i * (size + gap), y, w: size, h: size }));
+  return Array.from({ length: n }, (_, i) => ({ x: left + i * (size + gap), y, w: size, h: size }));
 }
 
 /**
@@ -242,11 +246,17 @@ export function bossBarRect(
   barW: number,
   barH: number,
   margin: number,
+  /** Safe-area limits (RS-02): bottom margin override and the allowed x range; default: no limit. */
+  limits?: { bottom?: number; minX?: number; maxX?: number },
 ): Rect {
   const w = Math.round(barW * k);
   const h = Math.round(barH * k);
-  const m = Math.round(margin * k);
-  return { x: Math.round(arenaW / 2 - w / 2), y: arenaH - m - h, w, h };
+  const m = Math.max(Math.round(margin * k), limits?.bottom ?? 0);
+  let x = Math.round(arenaW / 2 - w / 2);
+  if (limits?.minX !== undefined || limits?.maxX !== undefined) {
+    x = Math.max(limits.minX ?? 0, Math.min(x, (limits.maxX ?? arenaW) - w));
+  }
+  return { x, y: arenaH - m - h, w, h };
 }
 
 /** Lock state of a stored power: the same power is running or the armour cools down. */
