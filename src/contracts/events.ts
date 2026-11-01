@@ -17,6 +17,7 @@ export const GameEvents = {
   BossDefeated: 'boss-defeated',
   PowerStoreChanged: 'power-store-changed',
   PlayerStatus: 'player-status',
+  RoundAbortRequested: 'round-abort-requested',
 } as const;
 
 /** Kind of a status effect on the player (PE-127). */
@@ -47,4 +48,6 @@ export interface GameEventPayloads {
   'power-store-changed': PowerStoreState;
   /** Active status effects of the player (empty list: none). Sent when the set or the remaining time changes. */
   'player-status': { effects: ActivePlayerStatus[] };
+  /** Direction HUD -> game scene: the player confirmed "abort round" in the pause menu (M7, PE-159). */
+  'round-abort-requested': Record<string, never>;
 }

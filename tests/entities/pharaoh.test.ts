@@ -249,7 +249,7 @@ describe('Pharaoh (AP-104)', () => {
     expect(variantForLevel(31).index).toBe(0);
     expect(variantForLevel(40).index).toBe(9);
     expect(variantForLevel(40).hpMultiplier).toBeCloseTo(2.35);
-    expect(scaledHp(BOSSES.pharaoh, variantForLevel(40))).toBe(3995);
+    expect(scaledHp(BOSSES.pharaoh, variantForLevel(40))).toBe(7990);
   });
 
   it('floats on its path around the player and stays clear of her', () => {

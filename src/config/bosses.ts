@@ -21,42 +21,91 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   rootMonster: {
     id: 'rootMonster',
     name: 'Verwurzeltes Baummonster',
-    baseHp: 500,
+    baseHp: 1000,
     baseDamage: 10,
     spriteKey: 'boss-root-monster',
     attacks: [
       // Roots break out under the player after the warning.
-      { id: 'rootThrust', cooldownMs: 3500, telegraphMs: 1000, damage: 15, extraOnly: false },
+      {
+        id: 'rootThrust',
+        cooldownMs: 3500,
+        telegraphMs: 1200,
+        damage: 15,
+        parryCircles: 2,
+        extraOnly: false,
+      },
       // Calls 3 to 5 cursed trees (the boss reports them via callback).
-      { id: 'forestCall', cooldownMs: 10_000, telegraphMs: 1200, damage: 0, extraOnly: false },
+      {
+        id: 'forestCall',
+        cooldownMs: 10_000,
+        telegraphMs: 1200,
+        damage: 0,
+        parryCircles: 0,
+        extraOnly: false,
+      },
       // Ring of roots with one visible gap.
-      { id: 'rootRing', cooldownMs: 9000, telegraphMs: 1500, damage: 15, extraOnly: true },
+      {
+        id: 'rootRing',
+        cooldownMs: 9000,
+        telegraphMs: 1500,
+        damage: 15,
+        parryCircles: 2,
+        extraOnly: true,
+      },
     ],
   },
   forestGhost: {
     id: 'forestGhost',
     name: 'Waldgeist',
-    baseHp: 600,
+    baseHp: 1200,
     baseDamage: 8,
     spriteKey: 'boss-forest-ghost',
     attacks: [
       // Fan of ghost orbs.
-      { id: 'orbFan', cooldownMs: 3500, telegraphMs: 900, damage: 10, extraOnly: false },
+      {
+        id: 'orbFan',
+        cooldownMs: 3500,
+        telegraphMs: 1200,
+        damage: 10,
+        parryCircles: 1,
+        extraOnly: false,
+      },
       // Turns half transparent and invulnerable for a short time.
-      { id: 'fade', cooldownMs: 9000, telegraphMs: 1000, damage: 0, extraOnly: false },
+      {
+        id: 'fade',
+        cooldownMs: 9000,
+        telegraphMs: 1000,
+        damage: 0,
+        parryCircles: 0,
+        extraOnly: false,
+      },
       // Splits into 2 decoys for a short time.
-      { id: 'decoys', cooldownMs: 12_000, telegraphMs: 1000, damage: 0, extraOnly: true },
+      {
+        id: 'decoys',
+        cooldownMs: 12_000,
+        telegraphMs: 1000,
+        damage: 0,
+        parryCircles: 0,
+        extraOnly: true,
+      },
     ],
   },
   giantStone: {
     id: 'giantStone',
     name: 'Riesen-Stein',
-    baseHp: 800,
+    baseHp: 1600,
     baseDamage: 12,
     spriteKey: 'boss-giant-stone',
     attacks: [
       // Rolls to the middle along a warning line and bounces back.
-      { id: 'roll', cooldownMs: 6000, telegraphMs: 1200, damage: 20, extraOnly: false },
+      {
+        id: 'roll',
+        cooldownMs: 6000,
+        telegraphMs: 1200,
+        damage: 20,
+        parryCircles: 3,
+        extraOnly: false,
+      },
     ],
   },
   // M5 (AP-97, PE-128): starting values, behaviour and fine tuning in AP-100, AP-103 and AP-104.
@@ -64,47 +113,110 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   giantSandWorm: {
     id: 'giantSandWorm',
     name: 'Riesen-Sand-Wurm',
-    baseHp: 1000,
+    baseHp: 2000,
     baseDamage: 12,
     spriteKey: 'boss-sand-worm',
     attacks: [
       // Dives (invulnerable), a sand trail wanders to the player, the worm breaks out next to her
       // inside the announced circle. The mound at the end of the trail can be shot to weaken it.
-      { id: 'burrow', cooldownMs: 7000, telegraphMs: 1200, damage: 18, extraOnly: false },
+      {
+        id: 'burrow',
+        cooldownMs: 7000,
+        telegraphMs: 1200,
+        damage: 18,
+        parryCircles: 3,
+        extraOnly: false,
+      },
       // Fan of skin spikes (shootable like the ghost orbs).
-      { id: 'spikeVolley', cooldownMs: 4000, telegraphMs: 900, damage: 10, extraOnly: false },
+      {
+        id: 'spikeVolley',
+        cooldownMs: 4000,
+        telegraphMs: 1200,
+        damage: 10,
+        parryCircles: 1,
+        extraOnly: false,
+      },
       // Body circles the player as a ring with a gap and squeezes; only the head is vulnerable.
-      { id: 'coil', cooldownMs: 12_000, telegraphMs: 1500, damage: 15, extraOnly: true },
+      {
+        id: 'coil',
+        cooldownMs: 12_000,
+        telegraphMs: 1500,
+        damage: 15,
+        parryCircles: 2,
+        extraOnly: true,
+      },
     ],
   },
   guardianDog: {
     id: 'guardianDog',
     name: 'Antiker Wächter-Hund',
-    baseHp: 1300,
+    baseHp: 2600,
     baseDamage: 14,
     spriteKey: 'boss-guardian-dog',
     attacks: [
       // Invulnerable until 3 floating runes are shot down.
-      { id: 'runeShield', cooldownMs: 14_000, telegraphMs: 1000, damage: 0, extraOnly: false },
+      {
+        id: 'runeShield',
+        cooldownMs: 14_000,
+        telegraphMs: 1000,
+        damage: 0,
+        parryCircles: 0,
+        extraOnly: false,
+      },
       // Shock wave ring with a gap.
-      { id: 'guardBark', cooldownMs: 5000, telegraphMs: 1200, damage: 15, extraOnly: false },
+      {
+        id: 'guardBark',
+        cooldownMs: 5000,
+        telegraphMs: 1200,
+        damage: 15,
+        parryCircles: 2,
+        extraOnly: false,
+      },
       // Calls 3 mummies (generic summon callback).
-      { id: 'summonMummies', cooldownMs: 12_000, telegraphMs: 1200, damage: 0, extraOnly: true },
+      {
+        id: 'summonMummies',
+        cooldownMs: 12_000,
+        telegraphMs: 1200,
+        damage: 0,
+        parryCircles: 0,
+        extraOnly: true,
+      },
     ],
   },
   pharaoh: {
     id: 'pharaoh',
     name: 'Pharao',
-    baseHp: 1700,
+    baseHp: 3400,
     baseDamage: 14,
     spriteKey: 'boss-pharaoh',
     attacks: [
       // Spiral of gold orbs.
-      { id: 'goldCurse', cooldownMs: 4500, telegraphMs: 1000, damage: 10, extraOnly: false },
+      {
+        id: 'goldCurse',
+        cooldownMs: 4500,
+        telegraphMs: 1200,
+        damage: 10,
+        parryCircles: 1,
+        extraOnly: false,
+      },
       // Vanishes and reappears at an announced spot.
-      { id: 'sarcophagus', cooldownMs: 9000, telegraphMs: 1200, damage: 0, extraOnly: false },
+      {
+        id: 'sarcophagus',
+        cooldownMs: 9000,
+        telegraphMs: 1200,
+        damage: 0,
+        parryCircles: 0,
+        extraOnly: false,
+      },
       // Edge darkens, projectiles come from outside.
-      { id: 'sandstorm', cooldownMs: 14_000, telegraphMs: 1500, damage: 8, extraOnly: true },
+      {
+        id: 'sandstorm',
+        cooldownMs: 14_000,
+        telegraphMs: 1500,
+        damage: 8,
+        parryCircles: 1,
+        extraOnly: true,
+      },
     ],
   },
 };

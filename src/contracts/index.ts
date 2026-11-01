@@ -13,3 +13,5 @@ export * from './upgrade';
 export * from './armour';
 export * from './powerStore';
 export * from './arena';
+export * from './parry';
+export * from './tier';

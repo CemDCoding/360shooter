@@ -168,9 +168,9 @@ describe('M5 bosses (AP-97, PE-128)', () => {
   });
 
   it('starts in the range of the old bosses and grows from batch to batch', () => {
-    expect(BOSSES.giantSandWorm.baseHp).toBe(1000);
-    expect(BOSSES.guardianDog.baseHp).toBe(1300);
-    expect(BOSSES.pharaoh.baseHp).toBe(1700);
+    expect(BOSSES.giantSandWorm.baseHp).toBe(2000);
+    expect(BOSSES.guardianDog.baseHp).toBe(2600);
+    expect(BOSSES.pharaoh.baseHp).toBe(3400);
     for (const id of Object.keys(expected) as (keyof typeof expected)[]) {
       expect(BOSSES[id].baseDamage, id).toBeGreaterThan(0);
       expect(BOSSES[id].baseDamage, id).toBeLessThanOrEqual(20);
@@ -185,6 +185,34 @@ describe('M5 bosses (AP-97, PE-128)', () => {
     ];
     for (const key of keys) {
       expect(ASSETS.find((a) => a.key === key)?.kind, key).toBe('spritesheet');
+    }
+  });
+});
+
+describe('M7 boss data (AP-126, PE-154, PE-157)', () => {
+  it('doubles the base HP', () => {
+    const hp = Object.fromEntries(Object.values(BOSSES).map((b) => [b.id, b.baseHp]));
+    expect(hp).toEqual({
+      rootMonster: 1000,
+      forestGhost: 1200,
+      giantStone: 1600,
+      giantSandWorm: 2000,
+      guardianDog: 2600,
+      pharaoh: 3400,
+    });
+  });
+
+  it('announces damaging attacks at least 1200 ms and sets the circles by damage', () => {
+    for (const def of Object.values(BOSSES)) {
+      for (const a of def.attacks) {
+        const id = `${def.id}.${a.id}`;
+        if (a.damage === 0) {
+          expect(a.parryCircles, id).toBe(0);
+        } else {
+          expect(a.telegraphMs, id).toBeGreaterThanOrEqual(1200);
+          expect(a.parryCircles, id).toBe(a.damage >= 18 ? 3 : a.damage >= 13 ? 2 : 1);
+        }
+      }
     }
   });
 });

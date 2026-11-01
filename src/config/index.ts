@@ -10,3 +10,5 @@ export * from './progression';
 export * from './powerStore';
 export * from './arena';
 export * from './scaling';
+export * from './tiers';
+export * from './parry';

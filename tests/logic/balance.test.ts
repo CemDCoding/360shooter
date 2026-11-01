@@ -36,6 +36,7 @@ const power = (doubleShotStage: number, rapidFireMsLeft = 0): ActivePowers => ({
   doubleShotStage,
   shieldLeft: 0,
   rapidFireMsLeft,
+  doubleShotMsLeft: 0,
 });
 
 /** Schaden pro Sekunde (alle Schuesse zusammen, volle Trefferquote) mit Items. */

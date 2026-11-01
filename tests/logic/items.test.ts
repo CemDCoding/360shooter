@@ -77,7 +77,7 @@ describe('applyPowerItem', () => {
     expect(s.rapidFireMsLeft).toBe(d.durationMs);
   });
   it('heal leaves powers unchanged', () => {
-    const s = { doubleShotStage: 1, shieldLeft: 10, rapidFireMsLeft: 100 };
+    const s = { doubleShotStage: 1, shieldLeft: 10, rapidFireMsLeft: 100, doubleShotMsLeft: 0 };
     expect(applyPowerItem(s, def('heal'))).toEqual(s);
   });
 });

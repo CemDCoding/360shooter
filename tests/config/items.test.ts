@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
   ITEMS,
+  DOUBLE_SHOT_STAGE_MS,
   ITEM_RULES,
   PLAYER,
   PROGRESSION,
   RAPID_FIRE_MAX_PER_SEC,
   WEAPON_BASE,
 } from '../../src/config';
+
+it('double shot stage lasts 20 s (AP-126, PE-156)', () => {
+  expect(DOUBLE_SHOT_STAGE_MS).toBe(20_000);
+});
 
 describe('items and base values', () => {
   it('has the four new items, old types are gone', () => {

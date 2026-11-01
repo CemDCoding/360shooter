@@ -109,7 +109,12 @@ describe('contracts', () => {
       playerMaxHp: 2,
       playerTurnSpeed: MAX_UPGRADE_LEVEL,
     };
-    const powers: ActivePowers = { doubleShotStage: 1, shieldLeft: 2, rapidFireMsLeft: 5000 };
+    const powers: ActivePowers = {
+      doubleShotStage: 1,
+      shieldLeft: 2,
+      rapidFireMsLeft: 5000,
+      doubleShotMsLeft: 0,
+    };
     const item: ItemDef = {
       id: 'rapid',
       effect: 'rapidFire',
@@ -225,6 +230,9 @@ describe('contracts', () => {
       ],
     };
     expect(GameEvents.PlayerStatus).toBe('player-status');
+    expect(GameEvents.RoundAbortRequested).toBe('round-abort-requested');
+    const abort: GameEventPayloads['round-abort-requested'] = {};
+    expect(abort).toEqual({});
     expect(status.effects.map((e) => e.kind)).toEqual(['poison', 'slow']);
     expect([batches, bosses, charge, burrow, zigzag, shot].length).toBe(6);
   });
