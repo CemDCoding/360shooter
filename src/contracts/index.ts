@@ -15,3 +15,6 @@ export * from './powerStore';
 export * from './arena';
 export * from './parry';
 export * from './tier';
+export * from './gear';
+export * from './pet';
+export * from './shop';
