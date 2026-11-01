@@ -105,6 +105,11 @@ export class ForestGhost extends BossBase {
     for (const o of this.orbs) o.tick(delta);
   }
 
+  protected override canParry(attack: BossAttackDef): boolean {
+    // AP-153 unlocks the decoys circles.
+    return attack.id !== 'decoys';
+  }
+
   protected onTelegraph(attack: BossAttackDef): void {
     if (attack.id === 'orbFan') {
       // Hold still so the warning lines match the shot.

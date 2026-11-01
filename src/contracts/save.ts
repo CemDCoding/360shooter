@@ -10,6 +10,8 @@ export interface SaveGame {
   muted: boolean;
   /** Ab Version 2; optional, damit Staende der Version 1 gueltig bleiben. */
   gold?: number;
+  /** Ab M9; optional wie gold, keine neue Version (PE-189). Schalter EINFACHE ABWEHR. */
+  easyParry?: boolean;
   /** Ab Version 2; optional wie gold. */
   upgrades?: UpgradeLevels;
   /** Ab Version 3; optional wie gold. Diamanten (nur Spielwaehrung, PE-177). */

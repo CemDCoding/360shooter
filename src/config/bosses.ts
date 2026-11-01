@@ -33,6 +33,12 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
         damage: 15,
         parryCircles: 2,
         extraOnly: false,
+        parryPattern: {
+          steps: [
+            { kind: 'hold', symbol: 'rose', holdMs: 450 },
+            { kind: 'tap', symbol: 'rose' },
+          ],
+        },
       },
       // Calls 3 to 5 cursed trees (the boss reports them via callback).
       {
@@ -51,6 +57,13 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
         damage: 15,
         parryCircles: 2,
         extraOnly: true,
+        parryPattern: {
+          steps: [
+            { kind: 'tap', symbol: 'rose' },
+            { kind: 'tap', symbol: 'rose' },
+            { kind: 'decoy', symbol: 'spindle' },
+          ],
+        },
       },
     ],
   },
@@ -65,10 +78,16 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
       {
         id: 'orbFan',
         cooldownMs: 3500,
-        telegraphMs: 1200,
+        telegraphMs: 1800,
         damage: 10,
-        parryCircles: 1,
+        parryCircles: 2,
         extraOnly: false,
+        parryPattern: {
+          steps: [
+            { kind: 'sequence', symbol: 'pebble' },
+            { kind: 'sequence', symbol: 'pebble' },
+          ],
+        },
       },
       // Turns half transparent and invulnerable for a short time.
       {
@@ -83,10 +102,17 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
       {
         id: 'decoys',
         cooldownMs: 12_000,
-        telegraphMs: 1000,
-        damage: 0,
-        parryCircles: 0,
+        telegraphMs: 1200,
+        damage: 8,
+        parryCircles: 1,
         extraOnly: true,
+        parryPattern: {
+          steps: [
+            { kind: 'tap', symbol: 'ghost' },
+            { kind: 'decoy', symbol: 'mist' },
+            { kind: 'decoy', symbol: 'mist' },
+          ],
+        },
       },
     ],
   },
@@ -105,6 +131,25 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
         damage: 20,
         parryCircles: 3,
         extraOnly: false,
+        parryPattern: {
+          steps: [{ kind: 'hold', symbol: 'sun', holdMs: 450 }, { kind: 'tap' }, { kind: 'tap' }],
+        },
+      },
+      // Riesenzank after the stone broke apart: drag two pebbles onto their targets (M9, PE-190). Off until a class unlocks it.
+      {
+        id: 'quarrel',
+        cooldownMs: 12_000,
+        telegraphMs: 1400,
+        damage: 15,
+        parryCircles: 2,
+        extraOnly: true,
+        optIn: true,
+        parryPattern: {
+          steps: [
+            { kind: 'drag', symbol: 'pebble' },
+            { kind: 'drag', symbol: 'pebble' },
+          ],
+        },
       },
     ],
   },
@@ -144,6 +189,12 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
         damage: 15,
         parryCircles: 2,
         extraOnly: true,
+        parryPattern: {
+          steps: [
+            { kind: 'drag', symbol: 'rope' },
+            { kind: 'drag', symbol: 'rope' },
+          ],
+        },
       },
     ],
   },
@@ -169,8 +220,15 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
         cooldownMs: 5000,
         telegraphMs: 1200,
         damage: 15,
-        parryCircles: 2,
+        parryCircles: 3,
         extraOnly: false,
+        parryPattern: {
+          steps: [
+            { kind: 'beat', symbol: 'head' },
+            { kind: 'beat', symbol: 'head' },
+            { kind: 'beat', symbol: 'head' },
+          ],
+        },
       },
       // Calls 3 mummies (generic summon callback).
       {
@@ -180,6 +238,24 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
         damage: 0,
         parryCircles: 0,
         extraOnly: true,
+      },
+      // Herzenswaage: two rounds, pick the feather (M9, PE-190). Off until a class unlocks it.
+      {
+        id: 'heartScale',
+        cooldownMs: 12_000,
+        telegraphMs: 1800,
+        damage: 15,
+        parryCircles: 2,
+        extraOnly: true,
+        optIn: true,
+        parryPattern: {
+          steps: [
+            { kind: 'choice', symbol: 'heart', group: 1 },
+            { kind: 'choice', symbol: 'feather', group: 1, correct: true },
+            { kind: 'choice', symbol: 'heart', group: 2 },
+            { kind: 'choice', symbol: 'feather', group: 2, correct: true },
+          ],
+        },
       },
     ],
   },
@@ -194,10 +270,17 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
       {
         id: 'goldCurse',
         cooldownMs: 4500,
-        telegraphMs: 1200,
+        telegraphMs: 1800,
         damage: 10,
         parryCircles: 1,
         extraOnly: false,
+        parryPattern: {
+          steps: [
+            { kind: 'choice', symbol: 'legs4', correct: true },
+            { kind: 'choice', symbol: 'legs2' },
+            { kind: 'choice', symbol: 'legs3' },
+          ],
+        },
       },
       // Vanishes and reappears at an announced spot.
       {
@@ -216,6 +299,9 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
         damage: 8,
         parryCircles: 1,
         extraOnly: true,
+        parryPattern: {
+          steps: [{ kind: 'tap' }, { kind: 'decoy', symbol: 'sand' }],
+        },
       },
     ],
   },

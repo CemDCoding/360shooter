@@ -23,3 +23,21 @@ describe('PARRY_RULES (AP-126, PE-157, PE-158)', () => {
     expect(PARRY_RULES.ringStartScale).toBe(2.5);
   });
 });
+
+describe('PARRY_RULES M9 (AP-148, RS-03.1)', () => {
+  it('has the agreed building block values', () => {
+    expect(PARRY_RULES.holdMinMs).toBe(300);
+    expect(PARRY_RULES.holdMaxMs).toBe(600);
+    expect(PARRY_RULES.beatMs).toBe(400);
+    expect(PARRY_RULES.previewStepMs).toBe(300);
+    expect(PARRY_RULES.dragTargetRadiusPx).toBe(24);
+    expect(PARRY_RULES.dragTargetDistancePx).toBe(56);
+    expect(PARRY_RULES.twoTapMaxGapMs).toBe(700);
+    expect(PARRY_RULES.seqTelegraphMinMs).toBe(1800);
+  });
+
+  it('keeps the drag target at least as large as the circle', () => {
+    expect(PARRY_RULES.dragTargetRadiusPx).toBeGreaterThanOrEqual(PARRY_RULES.circleRadiusPx);
+    expect(PARRY_RULES.holdMaxMs).toBeGreaterThan(PARRY_RULES.holdMinMs);
+  });
+});

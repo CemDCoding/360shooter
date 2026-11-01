@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  EASY_PARRY_KEY,
   GameEvents,
   MAX_UPGRADE_LEVEL,
   SAFE_INSETS_KEY,
@@ -15,6 +16,8 @@ import {
   type StatusOnHit,
   type GameEventPayloads,
   type ItemDef,
+  type ParryCircle,
+  type ParryPatternDef,
   type ItemRules,
   type LevelDef,
   type PlayerDef,
@@ -272,5 +275,33 @@ describe('contracts', () => {
     };
     expect(old.movement).toBeUndefined();
     expect(old.onHit).toBeUndefined();
+  });
+});
+
+describe('M9 contracts (AP-148)', () => {
+  it('keeps old circles valid (kind missing = tap) and accepts the new fields', () => {
+    const old: ParryCircle = { index: 0, angleDeg: 10, hitAtMs: 500 };
+    const drag: ParryCircle = {
+      index: 1,
+      angleDeg: 20,
+      hitAtMs: 900,
+      kind: 'drag',
+      target: { angleDeg: 90, distancePx: 56 },
+      symbol: 'rope',
+    };
+    const pattern: ParryPatternDef = {
+      steps: [{ kind: 'tap' }, { kind: 'decoy', symbol: 'mist' }],
+    };
+    expect(old.kind).toBeUndefined();
+    expect(drag.kind).toBe('drag');
+    expect(pattern.steps).toHaveLength(2);
+  });
+
+  it('has the easyParry registry key and an optional save field', () => {
+    expect(EASY_PARRY_KEY).toBe('easyParry');
+    const save: Pick<SaveGame, 'easyParry'> = {};
+    expect(save.easyParry).toBeUndefined();
+    const on: Pick<SaveGame, 'easyParry'> = { easyParry: true };
+    expect(on.easyParry).toBe(true);
   });
 });
