@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** geändert am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“ in Arbeit, noch nicht freigegeben). Zuletzt freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand (2026-11-01):** H-33 Runde 1 beantwortet (1a, 2a, 3a, 4a). Runde 2 gestellt (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
+**Stand (2026-11-01):** H-33 Interview fertig (1a–4a, 5a, 6a). In Arbeit (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
 **Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
@@ -425,5 +425,7 @@ Keine neuen Abhängigkeiten, Schriften oder Fremd-Assets.
 - 2a **Rückmeldung als kurzes Funkwort am Kreis** (≈ 400 ms). PERFEKT: Kreis gold mit Pixel-Stern. GUT: Phosphor mit Haken. VERFEHLT: Kreis zerbricht in Warnrot mit X. Alle getroffen: „PARRY!“ groß über der Astronautin mit kurzem Schildring. Wort und Form, nie nur Farbe. Mit `prefers-reduced-motion` ohne Aufploppen.
 - 3a **Stufen-Tönung „Glut“:** multiplikativ, von Stufe 1 bis 3 wärmer bis rötlich. Werte so gewählt, dass die Gegner auf allen sechs Böden lesbar bleiben (Prüfung im Ergebnis). Zweites Merkmal ist die Größe.
 - 4a **Restzeit-Balken:** 2 px hoch (skaliert mit k), so breit wie der Chip, 1 px Abstand darunter. Füllung Phosphor auf dunkler Spur, in den letzten 5 s Warnrot. Kein Blinken.
+- 5a **Pause:** zwei Funk-Buttons mittig unter der Infozeile, „WEITER“ (Hauptaktion, Akzentrahmen, Fokus zuerst) und „HAUPTMENÜ“ (Linienrahmen). Hinweis gekürzt auf „ESC ODER P: WEITER“. Tippen auf freie Fläche setzt fort, Tippen auf die Buttons nicht.
+- 6a **Rückfrage:** vorhandener Kassetten-Dialog mit eigenen Texten: „RUNDE ABBRECHEN?“, „GOLD UND ERFAHRUNG DIESER RUNDE GEHEN VERLOREN.“, Buttons „WEITERSPIELEN“ (secondary, Fokus zuerst) und „RUNDE BEENDEN“ (danger). Der Kassetten-Stil zeigt den Rückweg ins Menü an (bewusste Ausnahme zu Grundsatz 2). Braucht optionale Button-Texte in `ConfirmDialog.ts` (heute fest „Ja, löschen“/„Abbrechen“).
 
 - keine weiteren (erste Fassung vom 2026-10-25)
