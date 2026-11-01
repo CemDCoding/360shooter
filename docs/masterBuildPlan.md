@@ -28,8 +28,8 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 - **Offen [Mensch]:** **H-28 und H-30 laufen in einem Release `dev` → `stage`** (Q-62 (a) und Q-61 (a) vom Nutzer bestätigt, H-26 entfällt). Jetzt bereit: Homescreen-App neu anlegen, Handtest §9.2 „Nachtrag 9“ (H-30: kein Streifen, HUD/Stick/Menü außerhalb Dynamic Island und Home-Bar in beiden Drehrichtungen, Drehen in der Pause, Layout-Anzeige 780 ± 1, PC 640×360) und §9.2 „M5-DEP“ (inkl. Zusatzpunkte: Wald-Anteil Wildschwein/Bär 5,5 % statt 7 %, Druck Level 0 bis 4, Kopf des Boss-Wurms, Sandhügel des kleinen Wurms). Dazu H-24, H-22 (Rest), H-18, H-12, H-16. `IMG_6372.PNG` (iPhone-Seitenränder) liegt unversioniert im Hauptcheckout, nicht anfassen.
 - **Endwerte AP-105/AP-113:** Spawn-Abstand L21–40 525 → 430 ms, `MAX_ENEMIES` L21–40 131..150, `LEVEL_SCALING` hp 0,806..2,422 (Level 21 knapp unter Level 20, 0,806 gegen 0,81: hp dort nicht strikt steigend, Druck-Kurve steigt), `CONTACT_COMPENSATION = 2` in `scaling.ts`, Bär-HP 90 → 75, Wildschwein 80, Sphinx 160, Armadillo 90, Preise Stufe 11–15: 289/405/567/794/1111. Bänder unverändert (±4 %, Sprung ≤ 1,1, `MAX_ENEMIES` ≤ 150). Bei Ruckeln `MAX_ENEMIES` Level 10 bis 20 senken (`balancing.md`).
 - **Erkenntnisse (Details §18):** **M7:** `PARRY_RULES` Abstand 90/Toleranz 8 weichen vom Design ab (56/4) → AP-135; `EnemyScale` trägt kein `tintStep` → AP-134; `enemyScaleFor` enthält den Stufenfaktor schon (nicht doppelt einrechnen, AP-127); Bolzen und Aura werden bisher nicht skaliert, AP-134 skaliert sie mit dem Stufenfaktor (V-24 (a), `EnemyScale.shot`); `ConfirmDialog.ts` hat festen Text „Ja, löschen“/„Abbrechen“ und eigenes ESC; erster Quicktime-Kreis ≈ 410–440 ms. Installation je Worktree mit dem Lockfile-Befehl nacheinander; der role-guard blockiert Lead-Merge-Befehle mit `cd`/`&&`; Designer-Commits an `docs/design/export/` brauchen `theme:build`, an `sprites*.js` `sprites:build`; Coder formatieren nie das ganze Projekt; `build-sprites.test.ts` trägt die Sprite-Anzahl fest ein (45); Phaser-Container-Unterklassen dürfen `w`, `count`, `next`, `prev`, `active`, `setActive` nicht als Feldnamen nutzen; `GameScene` ist in vitest nicht importierbar (Quelltext-Test per `?raw` in `bossClear.test.ts` hängt am Wortlaut); `shouldClearForBoss` ist nur Spezifikation, `BOSS_SPAWN_RATE_FACTOR` gegenstandslos (toter Code); Nachtrag 9: `SafeInsets` sind in der Runde fest wie die Breite (Q-61) und werden nur beim Szenenstart gelesen, `MENU_LOWEST = 348` in `MenuScene.ts` mitführen, wenn ein Paket das Menülayout ändert, `BACKDROP_EXTRA = 64` steht doppelt (ConfirmDialog, UpgradePanel), `docs/balancing.md` Z. 141 und 201 widersprechen dem Code (AP-120).
-- **Nächster Schritt:** **Lead: M7 W3 starten** (AP-132 zuerst mergen, dann AP-127, AP-131, AP-135; keine gemeinsame Datei in W3, `GameScene.ts` nur AP-131, `HudScene.ts` nur AP-131, `theme.ts` nur AP-132); danach W4 (AP-133 opus, AP-134). **Q-64 und V-24 sind vom Nutzer entschieden (beide Option a, PE-165): AP-127 und AP-134 haben keine Vorbedingung mehr.** Parallel **H-32 [Mensch] (M6-DEP):** Datei mit AP-124/AP-125 neu bauen (`npm run desktop:build`), Handy-Zugriff im WLAN prüfen (Strg+H, Firewall nur „Private Netzwerke“, Stopp, Port belegt), **Prüfpunkt Doppelauslösung Strg+H/F11 im Vollbild** (Menü-Accelerator und `before-input-event`), danach Release `dev` → `stage` → `master` (Details §9.2). **H-28 und H-30 sind unabhängig von H-32.** **AP-125 (Ergebnis, vom Nutzer bestätigt):** Ursache der nicht startenden portablen `.exe`: Electron 45 FATAL `install_dir_access.cc` („Sandboxed processes cannot read %TEMP%\<id>: ACL has AppContainer package SID but none for ALL APPLICATION PACKAGES“, Exit 0x80000003); die portable Vorlage entpackt immer nach `$TEMP`, nicht reparierbar. Lösung: Ziel `nsis` (oneClick, ohne Admin, nach `%LOCALAPPDATA%\Programs\360shooter`, Verknüpfungen, Spielstand bleibt bei Deinstallation). Start vom Coder belegt (Setup /S und ohne Parameter, Fenster „360shooter“ nach ≈ 21 s, stabil, Deinstallation sauber); Fensterinhalt beim Nutzer in H-31 bestätigt. **Ziel-Wechsel `portable` → `nsis` vom Nutzer bestätigt (V-22, PE-151, §3, PE-145), F-23 in §2 angepasst (V-23).** Parallel [Mensch] H-28 und H-30 in einem Release `dev` → `stage`. Vorschlag V-17 (Sprite-Sync) wartet auf den Nutzer. **Erkenntnisse AP-124 (§18):** bei H-32 Doppelauslösung von Strg+H/F11 prüfen (besonders F11 im Vollbild).
-- **Offene Fragen an den Nutzer:** (1) Wald-Anteil Wildschwein/Bär 5,5 % statt 7 % (Plan erlaubt ±1,5 pp wegen der Druck-Bänder): im Handtest H-28 beurteilen; zu wenig, dann Folgepaket. (2) **Q-60/H-29 (optional, nicht blockierend):** eigener Kopf-Frame für den kleinen Sandwurm, die übrigen Lücken und die Randlogik bei Notch/Home-Bar im Brief durch den Designer? Alternative `opacity.ghost` (0,6) für den abgedimmten Kopf erst nach dem Handtest. (3) Q-52 (optional): Foto der Layout-Anzeige ist Teil von H-30. PE-131 (900) und PE-100 (Faktor 7) sind bestätigt. (4) Soll der tote Code `BOSS_SPAWN_RATE_FACTOR`/`bossActive` entfernt werden? Nicht eingeplant. (5) V-24 und Q-64 sind entschieden (PE-165), keine offene Frage dazu.
+- **Nächster Schritt:** **Neu M8 (Shop, Diamanten, Rüstung, Pets; Interview 2026-11-01, AP-136 bis AP-145):** H-35 (Designer) jetzt parallel zu M7 möglich; M8 W1 (AP-136) erst nach dem Merge von M7 W4 (PE-176); W3 bis W5 brauchen den Auftrag „Design übernehmen“ nach H-35. Hinweis: Die PE-165 aus „Q-64/V-24“ heißt jetzt PE-181. **Lead: M7 W3 starten** (AP-132 zuerst mergen, dann AP-127, AP-131, AP-135; keine gemeinsame Datei in W3, `GameScene.ts` nur AP-131, `HudScene.ts` nur AP-131, `theme.ts` nur AP-132); danach W4 (AP-133 opus, AP-134). **Q-64 und V-24 sind vom Nutzer entschieden (beide Option a, PE-181): AP-127 und AP-134 haben keine Vorbedingung mehr.** Parallel **H-32 [Mensch] (M6-DEP):** Datei mit AP-124/AP-125 neu bauen (`npm run desktop:build`), Handy-Zugriff im WLAN prüfen (Strg+H, Firewall nur „Private Netzwerke“, Stopp, Port belegt), **Prüfpunkt Doppelauslösung Strg+H/F11 im Vollbild** (Menü-Accelerator und `before-input-event`), danach Release `dev` → `stage` → `master` (Details §9.2). **H-28 und H-30 sind unabhängig von H-32.** **AP-125 (Ergebnis, vom Nutzer bestätigt):** Ursache der nicht startenden portablen `.exe`: Electron 45 FATAL `install_dir_access.cc` („Sandboxed processes cannot read %TEMP%\<id>: ACL has AppContainer package SID but none for ALL APPLICATION PACKAGES“, Exit 0x80000003); die portable Vorlage entpackt immer nach `$TEMP`, nicht reparierbar. Lösung: Ziel `nsis` (oneClick, ohne Admin, nach `%LOCALAPPDATA%\Programs\360shooter`, Verknüpfungen, Spielstand bleibt bei Deinstallation). Start vom Coder belegt (Setup /S und ohne Parameter, Fenster „360shooter“ nach ≈ 21 s, stabil, Deinstallation sauber); Fensterinhalt beim Nutzer in H-31 bestätigt. **Ziel-Wechsel `portable` → `nsis` vom Nutzer bestätigt (V-22, PE-151, §3, PE-145), F-23 in §2 angepasst (V-23).** Parallel [Mensch] H-28 und H-30 in einem Release `dev` → `stage`. Vorschlag V-17 (Sprite-Sync) wartet auf den Nutzer. **Erkenntnisse AP-124 (§18):** bei H-32 Doppelauslösung von Strg+H/F11 prüfen (besonders F11 im Vollbild).
+- **Offene Fragen an den Nutzer:** (1) Wald-Anteil Wildschwein/Bär 5,5 % statt 7 % (Plan erlaubt ±1,5 pp wegen der Druck-Bänder): im Handtest H-28 beurteilen; zu wenig, dann Folgepaket. (2) **Q-60/H-29 (optional, nicht blockierend):** eigener Kopf-Frame für den kleinen Sandwurm, die übrigen Lücken und die Randlogik bei Notch/Home-Bar im Brief durch den Designer? Alternative `opacity.ghost` (0,6) für den abgedimmten Kopf erst nach dem Handtest. (3) Q-52 (optional): Foto der Layout-Anzeige ist Teil von H-30. PE-131 (900) und PE-100 (Faktor 7) sind bestätigt. (4) Soll der tote Code `BOSS_SPAWN_RATE_FACTOR`/`bossActive` entfernt werden? Nicht eingeplant. (5) V-24 und Q-64 sind entschieden (PE-181), keine offene Frage dazu.
 
 <!-- Ende Lagebericht -->
 
@@ -66,7 +66,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | fertig | – | G1 |
-| 2 | Umfang | in Klärung (M8) | PE-34 (Boss-Verhalten) durch Handtest M3-DEP bestätigt (2026-10-26); F-07, F-15 bis F-17 und Backlog freigegeben (H-07); F-01 mit Stick übernommen (V-05, 2026-10-25); F-17 bleibt Pflicht (V-06 abgelehnt, PE-56); M5: F-18 bis F-22 (PE-123), Boss-Verhalten PE-128 angenommen (Bestätigung in H-28); **M7 (Interview 2026-11-01): F-25 bis F-30 neu (PE-152 bis PE-163)**; **M8 Shop (Interview läuft): F-31 bis F-35 in Klärung (PE-165 bis PE-177, Q-65)** | G1 |
+| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) durch Handtest M3-DEP bestätigt (2026-10-26); F-07, F-15 bis F-17 und Backlog freigegeben (H-07); F-01 mit Stick übernommen (V-05, 2026-10-25); F-17 bleibt Pflicht (V-06 abgelehnt, PE-56); M5: F-18 bis F-22 (PE-123), Boss-Verhalten PE-128 angenommen (Bestätigung in H-28); **M7 (Interview 2026-11-01): F-25 bis F-30 neu (PE-152 bis PE-163)**; **M8 Shop (Interview 2026-11-01): F-31 bis F-35 neu (PE-165 bis PE-180)** | G1 |
 | 3 | Tech-Stack | angenommen | Werkzeuge (Vitest, ESLint, Prettier) angenommen | G1 |
 | 4 | Architektur, Datenmodell, Verträge | fertig | – | G1 |
 | 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | – | G1 |
@@ -76,15 +76,15 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 bestätigt 2026-10-25; M2b-Nachtrag AP-56 neu; M2c-Nachtrag AP-58–AP-62 (PE-65), AP-16 hängt nach PE-69 am Nachtrag) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de); Nachtrag 3 N8 AP-76 (HUD-Größe Handy), AP-77 (Seitenverhältnis, Beleg) und AP-78 (Theme-Sync, PE-95) fertig (gemergt da5ead9, 665b843, 95418ac, 2026-10-26); **Nachtrag 4 N9 AP-79 (Sprite-Pipeline, 24 PNGs) und AP-80 (Doku, Lizenzen) neu (PE-107, 2026-10-26), fertig (gemergt 2c0dd76, ab1e4ba; 2026-10-27)**; M4 W1/W2 AP-81 bis AP-84 fertig (gemergt 9267542, 675afef, 0bd0ed0, 9383e4a; 2026-10-27); **Nachtrag 5 N10 AP-87 (Prettier-Aufräumen, PE-110) fertig (gemergt b0182b9, 2026-10-27)**; Folgepakete Seitenverhältnis Teil 2 (Variante B, M4, PE-96 bis PE-106, Planner-Interview) sind M4 (AP-81 bis AP-86); **Nachtrag 6 N11 AP-88 bis AP-94 neu (Fix-Pakete Handtest H-22 und Design H-23, PE-111 bis PE-118, 2026-10-28), AP-86 verfeinert; Folgepaket AP-95 (B5 Teil 3, Level 5 bis 20, PE-120); Design H-25 übernommen (PE-121), AP-92 bereit**; **M5 AP-97 bis AP-108 neu (2026-10-31, PE-123 bis PE-130), AP-106 und AP-107 warten auf H-27**; **Nachtrag 9 AP-117 und AP-118 neu (RS-02, PE-140 bis PE-143, 2026-11-01), G2 erfüllt**; **M6 AP-121 bis AP-124 neu (RQ-01, RQ-02, PE-144 bis PE-150, 2026-11-01), G2 erfüllt; AP-125 (Fix versendbare Windows-Datei, PE-151) neu, G2 erfüllt**; **M7 AP-126 bis AP-134 neu (PE-152 bis PE-163, 2026-11-01), AP-135 neu aus „Design übernehmen“ (PE-164), G2 erfüllt für W1 bis W4 (H-33 übernommen), W1 und W2 `fertig`** | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de); Nachtrag 3 N8 AP-76 (HUD-Größe Handy), AP-77 (Seitenverhältnis, Beleg) und AP-78 (Theme-Sync, PE-95) fertig (gemergt da5ead9, 665b843, 95418ac, 2026-10-26); **Nachtrag 4 N9 AP-79 (Sprite-Pipeline, 24 PNGs) und AP-80 (Doku, Lizenzen) neu (PE-107, 2026-10-26), fertig (gemergt 2c0dd76, ab1e4ba; 2026-10-27)**; M4 W1/W2 AP-81 bis AP-84 fertig (gemergt 9267542, 675afef, 0bd0ed0, 9383e4a; 2026-10-27); **Nachtrag 5 N10 AP-87 (Prettier-Aufräumen, PE-110) fertig (gemergt b0182b9, 2026-10-27)**; Folgepakete Seitenverhältnis Teil 2 (Variante B, M4, PE-96 bis PE-106, Planner-Interview) sind M4 (AP-81 bis AP-86); **Nachtrag 6 N11 AP-88 bis AP-94 neu (Fix-Pakete Handtest H-22 und Design H-23, PE-111 bis PE-118, 2026-10-28), AP-86 verfeinert; Folgepaket AP-95 (B5 Teil 3, Level 5 bis 20, PE-120); Design H-25 übernommen (PE-121), AP-92 bereit**; **M5 AP-97 bis AP-108 neu (2026-10-31, PE-123 bis PE-130), AP-106 und AP-107 warten auf H-27**; **Nachtrag 9 AP-117 und AP-118 neu (RS-02, PE-140 bis PE-143, 2026-11-01), G2 erfüllt**; **M6 AP-121 bis AP-124 neu (RQ-01, RQ-02, PE-144 bis PE-150, 2026-11-01), G2 erfüllt; AP-125 (Fix versendbare Windows-Datei, PE-151) neu, G2 erfüllt**; **M7 AP-126 bis AP-134 neu (PE-152 bis PE-163, 2026-11-01), AP-135 neu aus „Design übernehmen“ (PE-164), G2 erfüllt für W1 bis W4 (H-33 übernommen), W1 und W2 `fertig`**; **M8 AP-136 bis AP-145 neu (PE-165 bis PE-180, 2026-11-01), G2 für W1 und W2 erfüllt, W3 bis W5 nach H-35 und „Design übernehmen“** | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
-| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu; PE-83 bestätigt (Nutzer 2026-10-26), Q-43 beantwortet (PE-84), PE-85 (Design H-14 übernommen, AP-72 neu), PE-86 (Theme-Sync, AP-71), Q-44 neu, V-12 neu, V-13 und V-14 neu (Vorschläge aus AP-66); Handtest M3-DEP bestanden (2026-10-26): PE-34, PE-75 und Q-41 (PE-80) bestätigt, Q-44 beantwortet (PE-90), Q-46 offen; PE-91 (AP-75, N7; H-18 zurückgestellt, Q-45 erweitert); PE-92 bis PE-94 (Befunde Smoke-Test stage, Ursachen und Ziele, angenommen), Q-47 (Seitenverhältnis A oder B) und Q-48 (Insets-Foto) offen; PE-95 (dev rot nach Designer-Commit 57573d8, AP-78 Theme-Sync); Q-47 beantwortet (Variante B, PE-96), Q-48 beantwortet (Insets bestätigt, PE-97), V-15 entschieden (PE-98, geschlossen); PE-99 bis PE-106 und PE-109 (Variante B: Mechanik, Fairness, Boss-Arena, Menü, HUD-Tabelle Designer, Chips, Banner, Abnahme, Breite fest pro Runde und Schnitt M4; Interview) neu; PE-107 (Design übernommen, Brief vom 2026-10-26 Ingame-Sprites, AP-79 und AP-80) und PE-108 (Q-46 über die Sprite-Gestaltung, angenommen, Bestätigung in H-22) neu; V-16 bis V-18 als Vorschläge; Q-45 offen; **PE-111 bis PE-119 neu (PE-119: B3 auf drei Anzeigen erweitert, Q-50 bestätigt, Release nach W2; Handtest H-22, Befunde B1 bis B6, Design H-23 übernommen, Q-45 entschieden, V-16 und V-18 übernommen, Q-46 geändert), Q-49 bis Q-54 offen, V-19 neu**; **PE-140 bis PE-143 (RS-02 übernommen), Q-61 und Q-62 vom Nutzer bestätigt (2026-11-01)**; **PE-144 bis PE-150 (RQ-01, RQ-02, M6), PE-149 und F11 in PE-146 angenommen, Q-63 entschieden (a); PE-151 (Fix-Paket AP-125, angenommen vom Planner auf Lead-Auftrag, V-22 wartet auf den Nutzer)**; **PE-152 bis PE-162 (M7 Schwierigkeit und Komfort, Nutzer 2026-11-01), PE-163 vom Nutzer bestätigt, Q-64 entschieden (a); PE-164 (Design H-33 übernommen), V-24 entschieden (a), PE-165** | laufend |
+| 16 | Planungsentscheidungen und offene Fragen | angenommen | PE-34, PE-37, PE-38 bestätigen; PE-41 (Zahlen), PE-43 (Richtwerte), PE-44, PE-45 bestätigen (angenommen); PE-57 und Q-23 bestätigt (2026-10-25); PE-54 bis PE-58 neu, V-05 übernommen, V-06 abgelehnt; PE-59 (Design übernommen), PE-60 (Reihenfolge, bestätigt 2026-10-25), Q-31 geklärt („BOSS!“); PE-61 (Handtest-Befunde M2b-DEP, AP-56) neu; PE-62 (Lint-Fix auf dev, AP-57 erledigt) neu; PE-63 (`ß` fehlt, „SCHLIESSEN“) und PE-64 (Zeichensatz Bitmap-Schriften) neu; PE-65 bis PE-68 (Handtest M2c-DEP, M2c-Nachtrag AP-58 bis AP-62) neu, PE-66 (Schwelle 30) und PE-67 (120 ms, 360 °/s) angenommen; PE-69 (autonomer Modus, ersetzt die Freigabe pro Meilenstein aus PE-15, AP-16 hängt am M2c-Nachtrag) neu; V-07 (§2 F-01 Stick am PC), V-08 (manuelle Power-up-Aktivierung), V-09 (Hinweis `docs/balancing.md`) und V-10 (§7.2 Freigabe) als Vorschläge; Q-34 bis Q-36 beantwortet; PE-74 (Antworten Q-37 bis Q-39) und PE-75 (Boss-Fairness bei fester Spielerin, AP-67, angenommen, mit PE-34 zu bestätigen) neu; PE-76 (Boss in den letzten 30 s, Sieg sofort, ändert PE-18), PE-77 (Stick am PC aus, PE-68 zurückgenommen, bestätigt), PE-78 (Gold besser erkennbar), PE-79 (Riesen-Stein per `?level`) und PE-80 (Boss-Sieg vor 0:00 zahlt wie Timer-Sieg, angenommen) neu; Q-40 beantwortet (Münzen vorhanden, schlecht erkennbar), Q-41 und Q-42 neu; V-07 überholt, V-11 (§2 F-05) neu; PE-83 bestätigt (Nutzer 2026-10-26), Q-43 beantwortet (PE-84), PE-85 (Design H-14 übernommen, AP-72 neu), PE-86 (Theme-Sync, AP-71), Q-44 neu, V-12 neu, V-13 und V-14 neu (Vorschläge aus AP-66); Handtest M3-DEP bestanden (2026-10-26): PE-34, PE-75 und Q-41 (PE-80) bestätigt, Q-44 beantwortet (PE-90), Q-46 offen; PE-91 (AP-75, N7; H-18 zurückgestellt, Q-45 erweitert); PE-92 bis PE-94 (Befunde Smoke-Test stage, Ursachen und Ziele, angenommen), Q-47 (Seitenverhältnis A oder B) und Q-48 (Insets-Foto) offen; PE-95 (dev rot nach Designer-Commit 57573d8, AP-78 Theme-Sync); Q-47 beantwortet (Variante B, PE-96), Q-48 beantwortet (Insets bestätigt, PE-97), V-15 entschieden (PE-98, geschlossen); PE-99 bis PE-106 und PE-109 (Variante B: Mechanik, Fairness, Boss-Arena, Menü, HUD-Tabelle Designer, Chips, Banner, Abnahme, Breite fest pro Runde und Schnitt M4; Interview) neu; PE-107 (Design übernommen, Brief vom 2026-10-26 Ingame-Sprites, AP-79 und AP-80) und PE-108 (Q-46 über die Sprite-Gestaltung, angenommen, Bestätigung in H-22) neu; V-16 bis V-18 als Vorschläge; Q-45 offen; **PE-111 bis PE-119 neu (PE-119: B3 auf drei Anzeigen erweitert, Q-50 bestätigt, Release nach W2; Handtest H-22, Befunde B1 bis B6, Design H-23 übernommen, Q-45 entschieden, V-16 und V-18 übernommen, Q-46 geändert), Q-49 bis Q-54 offen, V-19 neu**; **PE-140 bis PE-143 (RS-02 übernommen), Q-61 und Q-62 vom Nutzer bestätigt (2026-11-01)**; **PE-144 bis PE-150 (RQ-01, RQ-02, M6), PE-149 und F11 in PE-146 angenommen, Q-63 entschieden (a); PE-151 (Fix-Paket AP-125, angenommen vom Planner auf Lead-Auftrag, V-22 wartet auf den Nutzer)**; **PE-152 bis PE-162 (M7 Schwierigkeit und Komfort, Nutzer 2026-11-01), PE-163 vom Nutzer bestätigt, Q-64 entschieden (a); PE-164 (Design H-33 übernommen), V-24 entschieden (a), PE-181 (ursprünglich als PE-165 eingetragen, umbenannt wegen Doppelvergabe)**; **PE-165 bis PE-180 (M8 Shop, Nutzer 2026-11-01); angenommen: PE-177 sowie Teile von PE-169 (Explosion, Rückstoß), PE-170 (Power-up-Boni) und PE-179 (Boss zählt 10, Pet-Schaden relativ); Q-65 geklärt** | laufend |
 | 17 | Abdeckungsmatrix | fertig | – | G2 |
 | 18 | Änderungsprotokoll | laufend | – | laufend |
 
-**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig). M3-Nachtrag W1 (AP-68, AP-69, AP-70) abgeschlossen am 2026-10-26, alle `fertig`. M3-Nachtrag W2 (AP-71) und Nachtrag 2 N5 (AP-66) abgeschlossen am 2026-10-26, beide `fertig`. H-15 [Mensch] abgenommen und M3-DEP abgenommen (Handtest 2026-10-26, PC und iPhone, ohne Befunde); Release nach `stage` offen (H-17). Q-44 beantwortet (16 px, PE-90). N6 (AP-72, AP-73, AP-74) abgeschlossen am 2026-10-26, alle `fertig`; Abnahme des Nachtrags 2 über den Handtest H-18 offen, Q-46 offen. N7 (AP-75) abgeschlossen am 2026-10-26, `fertig` (gemergt 59f53de, Code-Review Runde 1 bestanden). Smoke-Punkt in H-18 offen, blockiert kein Folgepaket. N8 (AP-76, AP-77, AP-78) abgeschlossen am 2026-10-26, alle `fertig` (Reviews Runde 1 bestanden, AP-76 auch Design-Review, 458/458). H-17 erledigt (stage auf dev-Stand). Q-47 Variante B (PE-96): Planung im Planner-Interview läuft. Mechanik, Fairness, Boss-Arena und Menü entschieden (PE-99 bis PE-102), §4 um „Arena-Größe“ ergänzt (freigegeben). HUD-Tabelle durch den Designer (PE-103), Chips und Banner unverändert (PE-104, PE-105), Abnahme (PE-106), Breite während der Runde fest (PE-109). **G2(M4 „Breites Spielfeld“) erfüllt** für AP-81 bis AP-85 (Schnitt vom Nutzer bestätigt, 2026-10-26, PE-109); M4 W1 (AP-81) `fertig` (2026-10-27). AP-86 ist grob und wird nach H-23 per „Design übernehmen“ verfeinert (G2 für AP-86 offen). G2(Nachtrag 4 „Einbau der Ingame-Sprites“) erfüllt (2026-10-26): H-19 ☑ (Nutzer: „sprites sind freigegeben“), AP-79 und AP-80 vollständig, Abhängigkeiten erfüllt (Designer-Commits 57573d8, 7740338, 8c7b88b und AP-78 auf dev), Abdeckungsmatrix ergänzt, [Mensch]-Schritt H-22 steht; N9 (AP-79, AP-80) abgeschlossen am 2026-10-27, beide `fertig` (gemergt 2c0dd76, ab1e4ba; Reviews Runde 1 bestanden, AP-79 auch Design-Review; Tests 489/489); Abnahme H-22 [Mensch] fällig. M4 W1 (AP-81, 9267542) und W2 (AP-83 675afef, AP-82 0bd0ed0, AP-84 9383e4a) abgeschlossen am 2026-10-27, alle `fertig` (Reviews Runde 1 bestanden). **M4 W3:** AP-85 abgeschlossen am 2026-10-27, `fertig` (gemergt 7767845, Review und Design-Review Runde 1 bestanden, Tests 491/491). AP-86 weiter grob (G2 offen bis H-23 und „Design übernehmen“); H-24 (M4-DEP) folgt danach. **N10:** AP-87 abgeschlossen am 2026-10-27, `fertig` (gemergt b0182b9, Review Runde 1 bestanden, `prettier --check .` grün, Tests 491/491). **G2(Nachtrag 6 „Fix-Pakete H-22 und H-23“) erfüllt (2026-10-28):** AP-88, AP-89, AP-93 (W1), AP-86 (verfeinert), AP-90, AP-94 (W2), AP-91 (W3) vollständig; Brief-Ergänzung H-23 vom Nutzer freigegeben (Designer-Commits fca6486, ae5fb1a, e88a624), Theme-Sync AP-93 liegt vor allen Paketen, die `theme.ts` lesen. **AP-92 (Münzen 12 px): G2 erfüllt am 2026-10-28** (Brief-Ergänzung H-25 vom Nutzer freigegeben, Designer-Commits dcb2861 und 01c085b, Übernahme PE-121; H-25 erledigt). **AP-95 (B5 Teil 3, Level 5 bis 20, N11 W4): G2 erfüllt** (Paket vollständig, PE-120), Status `bereit` seit dem AP-91-Merge. AP-86 `bereit` nach AP-93 (G2 erfüllt). Reihenfolge und Dateieigentum siehe §12 „Nachtrag 6“. **N11 W1 (AP-88, AP-89, AP-93) abgeschlossen am 2026-10-28, alle `fertig`** (gemergt ae7d3ac, f31fbec, 4057ecd; Reviews AP-88 und AP-89 Runde 1, AP-93 Runde 2 bestanden; Tests 506/506). W2 (AP-86, AP-90, AP-94) `bereit`, G2 erfüllt; AP-91 `bereit` nach AP-90; AP-92 `bereit` (H-25 übernommen, hängt nicht mehr an AP-86, da `CoinCounter.ts` unberührt bleibt). **N11 W3 (AP-91, AP-92) abgeschlossen am 2026-10-28, beide `fertig`** (gemergt b8e625a, 4a017fa; Reviews Runde 1 bestanden, AP-92 auch Design-Review; Tests 559/559). AP-95 (W4) `bereit`. **G2(M5 „Wüste und Pyramiden“) erfüllt für W1 bis W4 und W6 (2026-10-31):** AP-97 bis AP-105 und AP-108 vollständig, Schnitt vom Nutzer bestätigt, [Mensch]-Schritte H-27 und H-28 stehen, Abdeckungsmatrix ergänzt. AP-97 `bereit`. **W5 (AP-106, AP-107): G2 erfüllt am 2026-10-31** (H-27 erledigt, „Design übernehmen“ ausgeführt, PE-133; neu AP-110 und AP-111; PE-134 Boss-Geschoss-Pfad in AP-100). **M5 W1 (AP-97, AP-109, AP-110) und W2 (AP-98, AP-99, AP-100) abgeschlossen am 2026-10-31, alle `fertig`** (gemergt 271709c, 44aa67b, 0b19dda, 0029b16, febfe22, 5e298b7). W3 (AP-101, AP-102, AP-103) `läuft`; W4 (AP-104, AP-105, AP-111) `offen` bis W3 gemergt ist. **G2(Nachtrag 9 „Randlose Spielwelt“, RS-02) erfüllt am 2026-11-01:** AP-117 und AP-118 vollständig (§12), Vertrag `SafeInsets` eine Welle vor seinen Nutzern, keine gemeinsame Datei mit AP-119, [Mensch]-Schritt H-30 steht (ersetzt H-26), Abdeckungsmatrix ergänzt, Q-61 und Q-62 vom Nutzer bestätigt. AP-117 `bereit`. **G2(M6 „Desktop-Test“, RQ-01, RQ-02) erfüllt am 2026-11-01:** AP-121 bis AP-124 vollständig (§12), Schnitt vom Nutzer bestätigt (PE-150), Gerüst AP-121 allein in W1, keine gemeinsame Datei innerhalb einer Welle, [Mensch]-Schritte H-31 und H-32 stehen, Abdeckungsmatrix ergänzt, `electron` und `electron-builder` freigegeben (PE-145). AP-121 `bereit`. **M6 W1 bis W3 abgeschlossen am 2026-11-01** (gemergt AP-121 525b667, AP-123 5643e77, AP-122 603de37, AP-124 f92480c; Reviews Runde 1 bestanden; 1101/1101 Tests). **G2(AP-125, Fix versendbare Datei, W3b) erfüllt am 2026-11-01:** Paket vollständig (§12), Abhängigkeiten AP-121 und AP-124 gemergt, keine Dateiüberschneidung innerhalb der Welle (allein in W3b), keine neue Abhängigkeit, H-31 wird nach AP-125 neu angesetzt, H-32 hängt zusätzlich an AP-125 (PE-151). **AP-125 abgeschlossen am 2026-11-01, `fertig`** (gemergt c00ffc9, Review Runde 1 bestanden, 1101/1101 Tests, Ziel `nsis`); H-31 [Mensch] neu gefasst und `bereit`, H-32 wartet auf H-31. **G2(M7 „Schwierigkeit und Komfort“) erfüllt am 2026-11-01 für W1 bis W3:** AP-126 bis AP-132 vollständig (§12), Schnitt vom Nutzer bestätigt (PE-162), Verträge in W1 vor allen Nutzern, keine Datei doppelt innerhalb einer Welle (§8 „M7“), [Mensch]-Schritte H-33 und H-34 stehen, Abdeckungsmatrix ergänzt, keine neue Abhängigkeit. AP-133 und AP-134 (W4) brauchten zusätzlich H-33 und den Planner-Auftrag „Design übernehmen“. **M7 W1 und W2 abgeschlossen am 2026-11-01, alle `fertig`** (AP-126 8323f4b, AP-129 0497794, AP-128 cd0129d, AP-130 2cf6677; Reviews Runde 1 bestanden). **G2(M7 W3 und W4) erfüllt am 2026-11-01:** H-33 freigegeben und übernommen (PE-164, Designer-Commits f53943b und 28cdc1e), Pakettexte mit Token-Namen und Maßen ergänzt, neu AP-135 (W3), keine Datei doppelt innerhalb einer Welle (§8 „M7“: `GameScene.ts` nur AP-131 in W3 und nur AP-133 in W4, `HudScene.ts` nur AP-131, `theme.ts` nur AP-132, `FunkPanel.ts`/`logic/scaling.ts`/`Enemy.ts` nur AP-134), keine neue Abhängigkeit. W3 `bereit`: AP-132, AP-127, AP-131, AP-135. W4 `offen` bis W3 gemergt.
+**Gates:** G1 erfüllt. G2(M0), G2(M1), G2(M2) erfüllt. G2(M3) erfüllt mit Annahme PE-34 (Boss-Verhalten), Bestätigung durch den Nutzer vor M3-Freigabe. G2(M2b): Planung freigegeben (H-07, 2026-10-24), M2-DEP abgenommen (2026-10-25). Erweitert um AP-38, AP-39 (nach AP-38) und die Rüstungspakete AP-37a und AP-37c (PE-58). W1 (AP-25, AP-26, AP-38) abgeschlossen am 2026-10-25, alle `fertig`. W2 abgeschlossen am 2026-10-25, alle `fertig`. W3 abgeschlossen am 2026-10-25, alle `fertig`. W4 (AP-31, AP-34, AP-37c) abgeschlossen am 2026-10-25, alle `fertig`. W5 (AP-32, AP-33, AP-35) abgeschlossen am 2026-10-25, alle `fertig`. W6 (AP-36) abgeschlossen am 2026-10-25, `fertig`. W7 (M2b-DEP) abgenommen am 2026-10-25 (PC und iPhone), `fertig`; Handtest-Befunde: AP-56 (Balancing und Rundenstart) als M2b-Nachtrag vor M2c W1, Stick und HUD-Kasten in AP-53. G2(M2c): Design freigegeben (Brief 2026-10-25), Pakete AP-50–AP-55 vollständig, Reihenfolge nach M2b-DEP und vor M3 vom Nutzer bestätigt (PE-60, H-11, 2026-10-25). W8 (AP-56, AP-57) abgeschlossen am 2026-10-25, beide `fertig`. M2c W1 (AP-50, AP-51) abgeschlossen am 2026-10-25, beide `fertig`. M2c W2 (AP-52, AP-53, AP-54) abgeschlossen am 2026-10-25, alle `fertig`. M2c W3 (AP-55) abgeschlossen am 2026-10-25, `fertig`. M2c-Nachtrag (N1: AP-58, AP-60, AP-61; N2: AP-59, AP-62) abgeschlossen am 2026-10-25, alle `fertig`. M2c-DEP-Wiederholung offen [Mensch], blockiert M3 nicht (PE-69). G2(M3): AP-16 hängt nur noch vom M2c-Nachtrag ab, Bedingung erfüllt. M3 W1 (AP-16) und W2 (AP-17, AP-18, AP-19) abgeschlossen am 2026-10-25, alle `fertig`. Neu: W2b mit AP-67 (Fairness-Fix, PE-75) vor W3 (AP-20); G2 für AP-67 erfüllt (Paket vollständig, Abhängigkeiten AP-16 bis AP-19 fertig). M3-Nachtrag W1 (AP-68, AP-69, AP-70) abgeschlossen am 2026-10-26, alle `fertig`. M3-Nachtrag W2 (AP-71) und Nachtrag 2 N5 (AP-66) abgeschlossen am 2026-10-26, beide `fertig`. H-15 [Mensch] abgenommen und M3-DEP abgenommen (Handtest 2026-10-26, PC und iPhone, ohne Befunde); Release nach `stage` offen (H-17). Q-44 beantwortet (16 px, PE-90). N6 (AP-72, AP-73, AP-74) abgeschlossen am 2026-10-26, alle `fertig`; Abnahme des Nachtrags 2 über den Handtest H-18 offen, Q-46 offen. N7 (AP-75) abgeschlossen am 2026-10-26, `fertig` (gemergt 59f53de, Code-Review Runde 1 bestanden). Smoke-Punkt in H-18 offen, blockiert kein Folgepaket. N8 (AP-76, AP-77, AP-78) abgeschlossen am 2026-10-26, alle `fertig` (Reviews Runde 1 bestanden, AP-76 auch Design-Review, 458/458). H-17 erledigt (stage auf dev-Stand). Q-47 Variante B (PE-96): Planung im Planner-Interview läuft. Mechanik, Fairness, Boss-Arena und Menü entschieden (PE-99 bis PE-102), §4 um „Arena-Größe“ ergänzt (freigegeben). HUD-Tabelle durch den Designer (PE-103), Chips und Banner unverändert (PE-104, PE-105), Abnahme (PE-106), Breite während der Runde fest (PE-109). **G2(M4 „Breites Spielfeld“) erfüllt** für AP-81 bis AP-85 (Schnitt vom Nutzer bestätigt, 2026-10-26, PE-109); M4 W1 (AP-81) `fertig` (2026-10-27). AP-86 ist grob und wird nach H-23 per „Design übernehmen“ verfeinert (G2 für AP-86 offen). G2(Nachtrag 4 „Einbau der Ingame-Sprites“) erfüllt (2026-10-26): H-19 ☑ (Nutzer: „sprites sind freigegeben“), AP-79 und AP-80 vollständig, Abhängigkeiten erfüllt (Designer-Commits 57573d8, 7740338, 8c7b88b und AP-78 auf dev), Abdeckungsmatrix ergänzt, [Mensch]-Schritt H-22 steht; N9 (AP-79, AP-80) abgeschlossen am 2026-10-27, beide `fertig` (gemergt 2c0dd76, ab1e4ba; Reviews Runde 1 bestanden, AP-79 auch Design-Review; Tests 489/489); Abnahme H-22 [Mensch] fällig. M4 W1 (AP-81, 9267542) und W2 (AP-83 675afef, AP-82 0bd0ed0, AP-84 9383e4a) abgeschlossen am 2026-10-27, alle `fertig` (Reviews Runde 1 bestanden). **M4 W3:** AP-85 abgeschlossen am 2026-10-27, `fertig` (gemergt 7767845, Review und Design-Review Runde 1 bestanden, Tests 491/491). AP-86 weiter grob (G2 offen bis H-23 und „Design übernehmen“); H-24 (M4-DEP) folgt danach. **N10:** AP-87 abgeschlossen am 2026-10-27, `fertig` (gemergt b0182b9, Review Runde 1 bestanden, `prettier --check .` grün, Tests 491/491). **G2(Nachtrag 6 „Fix-Pakete H-22 und H-23“) erfüllt (2026-10-28):** AP-88, AP-89, AP-93 (W1), AP-86 (verfeinert), AP-90, AP-94 (W2), AP-91 (W3) vollständig; Brief-Ergänzung H-23 vom Nutzer freigegeben (Designer-Commits fca6486, ae5fb1a, e88a624), Theme-Sync AP-93 liegt vor allen Paketen, die `theme.ts` lesen. **AP-92 (Münzen 12 px): G2 erfüllt am 2026-10-28** (Brief-Ergänzung H-25 vom Nutzer freigegeben, Designer-Commits dcb2861 und 01c085b, Übernahme PE-121; H-25 erledigt). **AP-95 (B5 Teil 3, Level 5 bis 20, N11 W4): G2 erfüllt** (Paket vollständig, PE-120), Status `bereit` seit dem AP-91-Merge. AP-86 `bereit` nach AP-93 (G2 erfüllt). Reihenfolge und Dateieigentum siehe §12 „Nachtrag 6“. **N11 W1 (AP-88, AP-89, AP-93) abgeschlossen am 2026-10-28, alle `fertig`** (gemergt ae7d3ac, f31fbec, 4057ecd; Reviews AP-88 und AP-89 Runde 1, AP-93 Runde 2 bestanden; Tests 506/506). W2 (AP-86, AP-90, AP-94) `bereit`, G2 erfüllt; AP-91 `bereit` nach AP-90; AP-92 `bereit` (H-25 übernommen, hängt nicht mehr an AP-86, da `CoinCounter.ts` unberührt bleibt). **N11 W3 (AP-91, AP-92) abgeschlossen am 2026-10-28, beide `fertig`** (gemergt b8e625a, 4a017fa; Reviews Runde 1 bestanden, AP-92 auch Design-Review; Tests 559/559). AP-95 (W4) `bereit`. **G2(M5 „Wüste und Pyramiden“) erfüllt für W1 bis W4 und W6 (2026-10-31):** AP-97 bis AP-105 und AP-108 vollständig, Schnitt vom Nutzer bestätigt, [Mensch]-Schritte H-27 und H-28 stehen, Abdeckungsmatrix ergänzt. AP-97 `bereit`. **W5 (AP-106, AP-107): G2 erfüllt am 2026-10-31** (H-27 erledigt, „Design übernehmen“ ausgeführt, PE-133; neu AP-110 und AP-111; PE-134 Boss-Geschoss-Pfad in AP-100). **M5 W1 (AP-97, AP-109, AP-110) und W2 (AP-98, AP-99, AP-100) abgeschlossen am 2026-10-31, alle `fertig`** (gemergt 271709c, 44aa67b, 0b19dda, 0029b16, febfe22, 5e298b7). W3 (AP-101, AP-102, AP-103) `läuft`; W4 (AP-104, AP-105, AP-111) `offen` bis W3 gemergt ist. **G2(Nachtrag 9 „Randlose Spielwelt“, RS-02) erfüllt am 2026-11-01:** AP-117 und AP-118 vollständig (§12), Vertrag `SafeInsets` eine Welle vor seinen Nutzern, keine gemeinsame Datei mit AP-119, [Mensch]-Schritt H-30 steht (ersetzt H-26), Abdeckungsmatrix ergänzt, Q-61 und Q-62 vom Nutzer bestätigt. AP-117 `bereit`. **G2(M6 „Desktop-Test“, RQ-01, RQ-02) erfüllt am 2026-11-01:** AP-121 bis AP-124 vollständig (§12), Schnitt vom Nutzer bestätigt (PE-150), Gerüst AP-121 allein in W1, keine gemeinsame Datei innerhalb einer Welle, [Mensch]-Schritte H-31 und H-32 stehen, Abdeckungsmatrix ergänzt, `electron` und `electron-builder` freigegeben (PE-145). AP-121 `bereit`. **M6 W1 bis W3 abgeschlossen am 2026-11-01** (gemergt AP-121 525b667, AP-123 5643e77, AP-122 603de37, AP-124 f92480c; Reviews Runde 1 bestanden; 1101/1101 Tests). **G2(AP-125, Fix versendbare Datei, W3b) erfüllt am 2026-11-01:** Paket vollständig (§12), Abhängigkeiten AP-121 und AP-124 gemergt, keine Dateiüberschneidung innerhalb der Welle (allein in W3b), keine neue Abhängigkeit, H-31 wird nach AP-125 neu angesetzt, H-32 hängt zusätzlich an AP-125 (PE-151). **AP-125 abgeschlossen am 2026-11-01, `fertig`** (gemergt c00ffc9, Review Runde 1 bestanden, 1101/1101 Tests, Ziel `nsis`); H-31 [Mensch] neu gefasst und `bereit`, H-32 wartet auf H-31. **G2(M7 „Schwierigkeit und Komfort“) erfüllt am 2026-11-01 für W1 bis W3:** AP-126 bis AP-132 vollständig (§12), Schnitt vom Nutzer bestätigt (PE-162), Verträge in W1 vor allen Nutzern, keine Datei doppelt innerhalb einer Welle (§8 „M7“), [Mensch]-Schritte H-33 und H-34 stehen, Abdeckungsmatrix ergänzt, keine neue Abhängigkeit. AP-133 und AP-134 (W4) brauchten zusätzlich H-33 und den Planner-Auftrag „Design übernehmen“. **M7 W1 und W2 abgeschlossen am 2026-11-01, alle `fertig`** (AP-126 8323f4b, AP-129 0497794, AP-128 cd0129d, AP-130 2cf6677; Reviews Runde 1 bestanden). **G2(M7 W3 und W4) erfüllt am 2026-11-01:** H-33 freigegeben und übernommen (PE-164, Designer-Commits f53943b und 28cdc1e), Pakettexte mit Token-Namen und Maßen ergänzt, neu AP-135 (W3), keine Datei doppelt innerhalb einer Welle (§8 „M7“: `GameScene.ts` nur AP-131 in W3 und nur AP-133 in W4, `HudScene.ts` nur AP-131, `theme.ts` nur AP-132, `FunkPanel.ts`/`logic/scaling.ts`/`Enemy.ts` nur AP-134), keine neue Abhängigkeit. W3 `bereit`: AP-132, AP-127, AP-131, AP-135. W4 `offen` bis W3 gemergt. **G2(M8 „Shop, Diamanten, Rüstung, Pets“) für W1 und W2 erfüllt am 2026-11-01:** AP-136 bis AP-139 vollständig (§12), Schnitt vom Nutzer bestätigt (PE-178), Datenmodell freigegeben (PE-180), Verträge in W1 vor allen Nutzern, keine Datei doppelt innerhalb einer Welle (§8 „M8“), [Mensch]-Schritte H-35 und H-36 stehen, Abdeckungsmatrix ergänzt, keine neue Abhängigkeit. W1 startet erst nach dem Merge von M7 W4 (PE-176). W3 bis W5 (AP-140 bis AP-145) brauchen zusätzlich H-35 und den Planner-Auftrag „Design übernehmen“ (Mockup-Verweise und Token-Namen in die Pakete). H-35 `bereit` (parallel zu M7).
 
 | Gate | Bedingung | Wer prüft | Folge |
 |---|---|---|---|
@@ -179,11 +179,11 @@ Verhalten siehe PE-34. Eigener Meilenstein M3. | nein |
 | F-28 | Doppelschuss baut sich ab (M7) | Jede Doppelschuss-Stufe hält 20 s, danach fällt sie eine Stufe zurück (2 → 1 → 0). Ein neues Doppelschuss-Item setzt die Zeit zurück. Ein kleiner Balken unter dem Item-Chip im HUD zeigt die Restzeit. Schild und Dauerfeuer unverändert (PE-156, ändert F-07) | nein |
 | F-29 | Boss-Angriffe abwehren per Quicktime (M7) | Während der Ankündigung eines Boss-Angriffs mit Schaden erscheinen 1 bis 3 Kreise um die Astronautin (je nach Stärke), um jeden zieht sich ein Ring zusammen (osu-Stil). Klick bzw. Tipp im richtigen Moment trifft den Kreis, ohne die Astronautin zu drehen. Alle Kreise getroffen: Angriff komplett abgewehrt („PARRY!“, Ton). Jeder verfehlte Kreis lässt seinen Anteil am Schaden durch. Wertung „perfekt“ ±80 ms, „gut“ ±160 ms. Ankündigung mindestens 1,2 s (PE-157, PE-158) | nein |
 | F-30 | Pausemenü: Zurück zum Hauptmenü (M7) | Im Pausemenü gibt es den Button „Hauptmenü“. Nach der Rückfrage „Runde abbrechen?“ endet die Runde ohne Belohnung (kein Gold, keine Erfahrung, keine Freischaltung) und das Hauptmenü erscheint (PE-159) | nein |
-| F-31 | Diamanten (M8, in Klärung) | Neue Währung. Jedes Level bringt beim **ersten** Sieg 1 Diamant, das letzte Level jeder Map (4, 9, 20, 25, 30, 40) 3 Diamanten, zusammen 53. Schon gewonnene Level werden einmal rückwirkend gutgeschrieben. „Fortschritt zurücksetzen“ löscht auch Diamanten, Käufe und Pets (PE-166) | nein |
-| F-32 | Shop im Hauptmenü (M8, in Klärung) | Neuer Button im Hauptmenü öffnet den Shop. Dort kauft man mit Diamanten Pet-Eier, Spieler-Rüstungsteile und Pet-Rüstungen, jedes einzeln und nur einmal. Preise: Ei 5, Rüstungsteil 3, Pet-Rüstung 2; alles zusammen kostet 60 Diamanten, verdienbar sind bis Level 40 nur 53, man muss also auswählen (PE-172, PE-173). Diamanten stehen im Hauptmenü neben dem Gold, oben im Shop und nach einem ersten Sieg auf dem Ergebnis-Bildschirm („+1“/„+3“); gewonnene Level-Kacheln tragen einen Diamant-Haken (PE-175). Nur Spielwährung, kein echtes Geld (PE-177) | nein |
-| F-33 | Spieler-Rüstung (M8, in Klärung) | Drei Sets (Diamant, Hölle, Himmel) mit je drei Teilen: Kopf, Oberteil, Hose+Schuhe als ein Teil. Jedes Teil gibt Werte und einen eigenen Spezialeffekt, wer alle drei Teile eines Sets trägt, bekommt zusätzlich einen Set-Effekt (Tabelle in PE-169). Die Rüstung ist im Hauptmenü und in der Runde sichtbar. Freie Kombination im Ausrüstungs-Menü, das sich per Klick auf das Spielerbild im Hauptmenü öffnet (PE-167, Aufbau PE-174) | nein |
-| F-34 | Pets (M8, in Klärung) | Biene, Pinguin und Capybara kämpfen in der Runde mit. Man kauft ihr Ei im Shop (jedes nur einmal) und wählt das aktive Pet im Ausrüstungs-Menü. Jede Runde startet das Pet als Ei: Erfahrung von besiegten Gegnern füllt eine Leiste, die erste volle Leiste lässt es schlüpfen, jede weitere gibt ein Power-up bis Rundenende (PE-168). Pets sind unverwundbar: Biene sticht nahe Gegner, Pinguin wirft verlangsamende Schneebälle, Capybara hat eine bremsende Schadens-Aura und heilt (PE-170) | nein |
-| F-35 | Pet-Rüstung (M8, in Klärung) | Rein kosmetische Rüstungen: jedes Pet hat eigene Rüstungen Diamant, Hölle und Himmel (9 Shop-Artikel), im Ausrüstungs-Menü für das jeweilige Pet wählbar (PE-171) | nein |
+| F-31 | Diamanten (M8) | Neue Währung. Jedes Level bringt beim **ersten** Sieg 1 Diamant, das letzte Level jeder Map (4, 9, 20, 25, 30, 40) 3 Diamanten, zusammen 53. Schon gewonnene Level werden einmal rückwirkend gutgeschrieben. „Fortschritt zurücksetzen“ löscht auch Diamanten, Käufe und Pets (PE-166) | nein |
+| F-32 | Shop im Hauptmenü (M8) | Neuer Button im Hauptmenü öffnet den Shop. Dort kauft man mit Diamanten Pet-Eier, Spieler-Rüstungsteile und Pet-Rüstungen, jedes einzeln und nur einmal. Preise: Ei 5, Rüstungsteil 3, Pet-Rüstung 2; alles zusammen kostet 60 Diamanten, verdienbar sind bis Level 40 nur 53, man muss also auswählen (PE-172, PE-173). Diamanten stehen im Hauptmenü neben dem Gold, oben im Shop und nach einem ersten Sieg auf dem Ergebnis-Bildschirm („+1“/„+3“); gewonnene Level-Kacheln tragen einen Diamant-Haken (PE-175). Nur Spielwährung, kein echtes Geld (PE-177) | nein |
+| F-33 | Spieler-Rüstung (M8) | Drei Sets (Diamant, Hölle, Himmel) mit je drei Teilen: Kopf, Oberteil, Hose+Schuhe als ein Teil. Jedes Teil gibt Werte und einen eigenen Spezialeffekt, wer alle drei Teile eines Sets trägt, bekommt zusätzlich einen Set-Effekt (Tabelle in PE-169). Die Rüstung ist im Hauptmenü und in der Runde sichtbar. Freie Kombination im Ausrüstungs-Menü, das sich per Klick auf das Spielerbild im Hauptmenü öffnet (PE-167, Aufbau PE-174) | nein |
+| F-34 | Pets (M8) | Biene, Pinguin und Capybara kämpfen in der Runde mit. Man kauft ihr Ei im Shop (jedes nur einmal) und wählt das aktive Pet im Ausrüstungs-Menü. Jede Runde startet das Pet als Ei: Erfahrung von besiegten Gegnern füllt eine Leiste, die erste volle Leiste lässt es schlüpfen, jede weitere gibt ein Power-up bis Rundenende (PE-168). Pets sind unverwundbar: Biene sticht nahe Gegner, Pinguin wirft verlangsamende Schneebälle, Capybara hat eine bremsende Schadens-Aura und heilt (PE-170) | nein |
+| F-35 | Pet-Rüstung (M8) | Rein kosmetische Rüstungen: jedes Pet hat eigene Rüstungen Diamant, Hölle und Himmel (9 Shop-Artikel), im Ausrüstungs-Menü für das jeweilige Pet wählbar (PE-171) | nein |
 
 ### Optional
 
@@ -290,9 +290,12 @@ flowchart TD
 | WeaponStats | `fireRate`, `damage`, `projectileSize`, `projectileSpeed`, `shotCount` (Standard 1) | Runde (flüchtig) | Reset bei Rundenende |
 | ActivePowers (M2b) | `doubleShotStage` (0–2), `shieldLeft` (Schadenspunkte), `rapidFireMsLeft` | Runde (flüchtig) | Reset bei Rundenende |
 | CoinRules (M2b, `coin.ts`) | `dropChance`, `magnetRadiusPx`, `collectRadiusPx`, `magnetSpeedPxPerSec` | Konfiguration | – |
+| SaveGame ab Version 3 (M8, PE-180) | zusätzlich `diamonds`, `wonLevels` (gewonnene Level, entscheidet „erster Sieg“), `owned` (gekaufte Katalog-IDs), `equippedGear` (Kopf, Oberteil, Hose+Schuhe), `activePet`, `petGear` (gewählte Rüstung je Pet). Alle Felder sind optional; ältere Stände werden beim Laden umgewandelt und bekommen rückwirkend Diamanten (PE-166) | Gerät (im SaveGame) | Reset mit SaveGame, auch Diamanten, Käufe und Pets (PE-166) |
+| GearPieceDef, PetDef, ShopItemDef (M8) | Katalog: 9 Rüstungsteile mit Werten und Effekt, 3 Set-Effekte, 3 Pets, 21 Shop-Artikel mit Preis (`config/gear.ts`, `config/pets.ts`, `config/shop.ts`) | Konfiguration | – |
+| PetRoundState, EnemyStatusState (M8) | Ei oder geschlüpft, Leiste, Power-ups; Brand und Verlangsamung am Gegner | Runde (flüchtig) | Reset bei Rundenende |
 | UpgradeLevels (M2b, `upgrade.ts`) | je Spur 0–10: `weaponFireRate`, `weaponDamage`, `playerMaxHp`, `playerTurnSpeed` | Gerät (im SaveGame) | Reset mit SaveGame |
 
-**Verträge:** TypeScript-Typen in `src/contracts/`. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern. M2b (AP-25) ergänzt Typen additiv und die Events `coins-changed` (`{ roundCoins }`) und `powers-changed` (`ActivePowers`). Rüstungen (PE-47) kommen in §4 erst mit AP-37a (Vorschlag für das Datenmodell in §16). M7 (AP-126, PE-152 bis PE-162) ergänzt additiv: `ActivePowers.doubleShotMsLeft`, `BossAttackDef.parryCircles`, die neuen Dateien `contracts/parry.ts` (Kreis, Wertung) und `contracts/tier.ts` (Gegnerstufe) sowie das Ereignis `round-abort-requested` (HUD → Spielszene).
+**Verträge:** TypeScript-Typen in `src/contracts/`. Regel: Jeder Vertrag entsteht in einem eigenen Paket mindestens eine Welle vor seinen Nutzern. M2b (AP-25) ergänzt Typen additiv und die Events `coins-changed` (`{ roundCoins }`) und `powers-changed` (`ActivePowers`). Rüstungen (PE-47) kommen in §4 erst mit AP-37a (Vorschlag für das Datenmodell in §16). M7 (AP-126, PE-152 bis PE-162) ergänzt additiv: `ActivePowers.doubleShotMsLeft`, `BossAttackDef.parryCircles`, die neuen Dateien `contracts/parry.ts` (Kreis, Wertung) und `contracts/tier.ts` (Gegnerstufe) sowie das Ereignis `round-abort-requested` (HUD → Spielszene). M8 (AP-136, PE-165 bis PE-180) ergänzt additiv: `SaveGame` Version 3 (Felder siehe Tabelle), die neuen Dateien `contracts/gear.ts` (Kauf-Rüstung, im Code `gear`, nicht `armour`), `contracts/pet.ts` und `contracts/shop.ts` sowie das Ereignis `pet-changed` (Spielszene → HUD). Diamanten, Käufe und Ausrüstung liegen nur lokal im Spielstand: kein Echtgeld, keine externen Anfragen (PE-177).
 
 **Arena-Größe (Variante B, PE-96, PE-99 bis PE-102, vom Nutzer im Interview am 2026-10-26 freigegeben; geändert durch PE-131 und PE-140):** Die Arena ist nicht mehr fest 640 × 360. Die Höhe bleibt 360, die Breite ergibt sich beim Layout aus dem Seitenverhältnis des **ganzen sichtbaren Viewports** (PE-140, vorher: des sicheren Bereichs), begrenzt auf 640..900 (PE-131). Breite und Mitte sind ein gemeinsamer Wert (Vertrag in `src/contracts` bzw. `src/config`, reine Berechnung in `src/platform/layout.ts`). Kein Code nutzt mehr feste 640/320/180 für die Arena: Gegner-Mitte, Boss-Arena und Spawn-Ring lesen den gemeinsamen Wert, Szenen nutzen `this.scale`. Die Spielbalance hängt nicht von der Breite ab (PE-100: gleiche Kontaktzeit). Menü und Ergebnis zentrieren ihren 640er-Inhalt (PE-102).
 
@@ -583,6 +586,17 @@ flowchart TD
 | M7 W3 | AP-135 (Quicktime-Werte nach Design H-33, PE-164) | `src/contracts/parry.ts`, `src/config/parry.ts`, `src/logic/parry.ts`, `tests/config/parry.test.ts`, `tests/logic/parry.test.ts` |
 | M7 W4 | AP-133 (Quicktime im Bosskampf, PE-157, PE-158, PE-160, PE-164) | `src/entities/ParryOverlay.ts` (neu), `src/entities/bosses/BossBase.ts`, `src/entities/bosses/*.ts` (nur wo der Schadensanteil an Gefahren weitergegeben wird), `src/entities/bosses/hazards.ts`, `src/scenes/GameScene.ts`, `src/platform/input.ts`, `src/platform/audio.ts` (nur neuer Ton-Schlüssel), `src/config/assets.ts` (nur Eintrag `sfx-parry`), `public/assets/sounds/parry.wav` (neu, Platzhalter), `docs/guides/sound-austauschen.md` (nur eine Zeile, falls die Liste dort einzeln geführt wird), Tests `tests/scenes/bossHazards.test.ts`, `tests/platform/audio.test.ts`, `tests/scripts/check-assets.test.ts` (nur Anzahl), neue Tests unter `tests/entities/` bzw. `tests/scenes/` (u. a. `tests/scenes/parryTokens.test.ts` neu: `PARRY_RULES` gegen die Tokens `size.parry-*` und `motion.duration.parry-approach`). Kein Haken/X als Sprite: Graphics-Rechtecke, `public/assets/sprites/**` und `ui-icons` bleiben unberührt |
 | M7 W4 | AP-134 (Stufen-Tönung und Restzeit-Balken, PE-155, PE-156, PE-160, PE-161, PE-164) | `src/entities/enemies/Enemy.ts` (Tönung und `auraDamageAt`), `src/entities/enemies/createEnemy.ts` (Tönung, `tintStep` und `shot` an `spawn`), `src/logic/scaling.ts` (nur `tintStep` und `shot` (Stufen-Schadensfaktor, V-24 (a)) in `EnemyScale`, `DEFAULT_ENEMY_SCALE`, `enemyScaleFor`; macht `GameScene.ts` unnötig, weil `spawnScaled` den ganzen `levelScale` weitergibt), `src/scenes/hud/PowerIndicators.ts`, `src/scenes/hud/FunkPanel.ts` (nur `FunkChip`: optionaler Restzeit-Streifen, der mit dem Chip wandert), `src/scenes/hud/PowerSlots.ts` (nur falls nötig: Literal `doubleShotMsLeft: 0` ist seit AP-126 drin), `src/scenes/hud/hudMath.ts` (nur falls nötig), `tests/scenes/chipMetrics.test.ts`, `tests/logic/scaling.test.ts`, neue Tests unter `tests/scenes/`. **Mit V-24 (a), vom Nutzer am 2026-11-01 freigegeben, zusätzlich:** `src/entities/enemies/ForestWitch.ts` (und andere Schützen in `src/entities/enemies/`, falls `def.projectile` dort benutzt wird), `tests/entities/enemies/**` (Bolzen- und Aura-Schaden je Stufe). `Enemy.ts` trägt zusätzlich `auraDamageAt` (nur Multiplikation mit dem Stufenfaktor) |
+| M8 (Regel) | Hinweis M8 (PE-165 bis PE-180) | Kein M8-Paket ändert `desktop/**`, `package.json`, `package-lock.json` oder `docs/design/**`. `public/assets/sprites/**`, `src/config/theme.ts` und `src/styles/tokens.css` ändert nur AP-140. Sichtbare Farben nur aus Tokens. `GameScene.ts` gehört in W2 AP-137 (nur `ResultSceneData`), in W4 AP-143 und in W5 AP-144. `MenuScene.ts` gehört nur AP-145, `Enemy.ts` nur AP-143 |
+| M8 W1 | AP-136 (Verträge und Daten) | `src/contracts/{save,events,index}.ts`, `src/contracts/{gear,pet,shop}.ts` (neu), `src/config/index.ts`, `src/config/{gear,pets,shop}.ts` (neu), `tests/contracts/contracts.test.ts`, `tests/config/{gear,pets,shop}.test.ts` (neu), dazu nur zum Grünhalten Tests, die `SaveGame` fest eintragen (Liste im Bericht) |
+| M8 W2 | AP-137 (Diamanten, Spielstand v3, Kauf und Ausrüstung) | `src/logic/{diamonds,shop}.ts` (neu), `src/logic/economy.ts`, `src/platform/storage.ts`, `src/scenes/GameScene.ts` (nur `ResultSceneData` und deren Befüllung), `tests/logic/{diamonds,shop}.test.ts` (neu), `tests/platform/storage.test.ts`, `tests/logic/roundSettlement.test.ts` |
+| M8 W2 | AP-138 (Rüstungs-Logik und Gegner-Status) | `src/logic/{gear,enemyStatus}.ts` (neu), `tests/logic/{gear,enemyStatus}.test.ts` (neu) |
+| M8 W2 | AP-139 (Pet- und Ei-Logik) | `src/logic/pets.ts` (neu), `tests/logic/pets.test.ts` (neu) |
+| M8 W3 (oder W2, sobald H-35 übernommen ist) | AP-140 (Theme- und Sprite-Sync nach H-35) | `src/config/theme.ts`, `src/styles/tokens.css`, `public/assets/sprites/**` (nur Ausgabe von `sprites:build`), `src/config/assets.ts`, `tests/config/theme.test.ts`, `tests/scripts/build-sprites.test.ts` (nur die Anzahl), `tests/config/assets.test.ts` (neuer Test der Schlüssel), `docs/guides/grafik-austauschen.md` (nur die Liste), ggf. `LICENSES.md` |
+| M8 W4 | AP-141 (Shop-Fenster) | `src/scenes/menu/ShopPanel.ts` (neu), `tests/scenes/shopPanel.test.ts` (neu) |
+| M8 W4 | AP-142 (Ausrüstungs-Fenster mit Vorschau) | `src/scenes/menu/{GearPanel,GearPreview}.ts` (neu), `tests/scenes/gearPanel.test.ts` (neu) |
+| M8 W4 | AP-143 (Rüstung in der Runde) | `src/scenes/GameScene.ts`, `src/entities/{Player,Laser,LaserPool,ItemPickup,Coin,CoinPool,ArmourRing}.ts` (nur wo ein Effekt greift), `src/entities/enemies/Enemy.ts`, `src/entities/GearOverlay.ts` (neu, falls nötig), neue Tests unter `tests/scenes/` bzw. `tests/entities/` |
+| M8 W5 | AP-144 (Pets in der Runde) | `src/entities/pets/**` (neu), `src/scenes/GameScene.ts`, `src/scenes/HudScene.ts`, `src/scenes/hud/PetBar.ts` (neu), `tests/scenes/hud.test.ts`, `tests/entities/pets/**` (neu) |
+| M8 W5 | AP-145 (Hauptmenü, Ergebnis, Doku) | `src/scenes/MenuScene.ts`, `src/scenes/ResultScene.ts`, `src/scenes/menu/LevelGrid.ts`, `tests/scenes/**` (nur Menü- und Ergebnis-Tests), `docs/balancing.md`, `docs/gegner-und-maps.md` (nur der Hinweis auf Diamanten) |
 
 ---
 
@@ -1084,6 +1098,35 @@ Ziel: Das Spiel wird deutlich schwerer (mehr Gegner, stärkere Bosse, sichtbare 
   - [ ] Gold und Erfahrung je Runde fühlen sich wie vorher an (Q-64 entschieden (a), PE-163)
   - [ ] Release: Pull Request `dev` → `stage`, Smoke-Test, Pull Request `stage` → `master`
 
+#### M8 – Shop, Diamanten, Rüstung und Pets (PE-165 bis PE-180)
+
+Ziel: Eine neue Währung, die Diamanten, gibt es für den ersten Sieg je Level. Dazu kommen ein Shop im Hauptmenü, eine kaufbare Spieler-Rüstung mit Werten und Effekten, Pets als Helfer in der Runde und Pet-Rüstungen als Kosmetik. Grundlage: Nutzerwünsche vom 2026-11-01 (Interview). M8 startet nach dem Merge von M7 W4 (PE-176); H-35 (Designer) läuft parallel zu M7.
+
+| Welle | Pakete |
+|---|---|
+| M8 W0 (parallel zu M7) | **H-35** [Mensch/Designer] Design-Nachtrag M8, danach Planner-Auftrag „Design übernehmen“ |
+| M8 W1 | **AP-136** Verträge und Daten (Spielstand v3, `gear`, `pet`, `shop`, Katalog, Startwerte) |
+| M8 W2 | **AP-137** Diamanten, Spielstand v3, Kauf und Ausrüstung. **AP-138** Rüstungs-Logik und Gegner-Status. **AP-139** Pet- und Ei-Logik. (AP-140 darf mitlaufen, sobald H-35 übernommen ist) |
+| M8 W3 | **AP-140** Theme- und Sprite-Sync nach H-35 |
+| M8 W4 | **AP-141** Shop-Fenster. **AP-142** Ausrüstungs-Fenster mit Vorschau. **AP-143** Rüstung in der Runde (opus) |
+| M8 W5 | **AP-144** Pets in der Runde. **AP-145** Einbindung ins Hauptmenü, Ergebnis und Doku |
+| M8 W6 | **H-36** [Mensch] M8-DEP: Handtest PC und iPhone, Release `dev` → `stage` → `master` |
+
+**Integration:** nach jeder Welle `npm ci` und alle Checks. Nach W4 und W5 spielt der Lead Level 0 und 40 mit `?fps=1` am PC an, mit vollem Höllen-Set und Biene auf Stufe 3, und meldet die FPS.
+
+##### M8-DEP – Abnahme [Mensch] (H-36)
+
+- **Prüfpunkte H-36 (nach W5):**
+  - [ ] Alter Spielstand: Diamanten rückwirkend gutgeschrieben (Anzahl wie in `docs/balancing.md` berechnet), gewonnene Kacheln tragen den Diamant-Haken
+  - [ ] Erster Sieg eines neuen Levels zeigt „+1“, beim letzten Level einer Map „+3“; zweiter Sieg und Niederlage geben nichts
+  - [ ] Shop: Kauf mit Rückfrage, Preis abgezogen, danach „GEKAUFT“; bei zu wenig Diamanten nicht kaufbar
+  - [ ] Ausrüstung: öffnet per Klick auf das Spielerbild, Teile frei kombinierbar, Set-Hinweis, Pet und Pet-Rüstung wählbar, Auswahl nach Neustart erhalten
+  - [ ] Rüstung im Hauptmenü und in der Runde sichtbar, Werte spürbar, Set-Effekte (Diamant-Glanz, Höllenfeuer, Himmel-Heilung) erkennbar; die Zahlen fühlen sich auch in späten Leveln fair an (RI-32)
+  - [ ] Pet startet als Ei, schlüpft früh in der Runde und kämpft (Biene sticht, Pinguin verlangsamt, Capybara mit Aura und Heilung), Power-ups bis Stufe 3 sichtbar
+  - [ ] iPhone (Homescreen-App, quer): Shop und Ausrüstung bedienbar, Pet-Leiste lesbar, Level 40 mit Pet und Rüstung flüssig (`?fps=1`)
+  - [ ] „Fortschritt zurücksetzen“ löscht auch Diamanten, Käufe und Pets
+  - [ ] Release: Pull Request `dev` → `stage`, Smoke-Test, Pull Request `stage` → `master`
+
 ---
 
 ## 10. Statusübersicht
@@ -1239,6 +1282,18 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-133 | Quicktime im Bosskampf: Kreise zeichnen, Klick verbrauchen statt Zielen, Schadensanteil an Boss-Angriffen, „PARRY!“ und Ton (PE-157, PE-158, PE-160, PE-164; Design-Review ja) | M7 | GAME | M7 W4 | AP-129, AP-131, AP-132, AP-135 | L | opus (high) | Kern | offen |
 | AP-134 | Stufen-Tönung der Gegner und Restzeit-Balken unter dem Doppelschuss-Chip (PE-155, PE-156, PE-160, PE-161, PE-164; Design-Review ja) | M7 | GAME | M7 W4 | AP-128, AP-130, AP-132 | M | sonnet (medium) | – | offen |
 | H-34 | M7-DEP: Handtest PC und iPhone (§9.2 „M7-DEP“), Release `dev` → `stage` → `master` | M7 | HUM | M7 W5 | AP-127, AP-133, AP-134 | H | – | – | offen |
+| H-35 | Designer-Nachtrag M8: Shop, Ausrüstungs-Menü, 9 Rüstungsteile (groß und als Ingame-Overlay), 3 Eier, 3 Pets, 9 Pet-Rüstungen, Pet-Leiste, Diamant-Symbol und -Anzeige, Haken auf den Kacheln (PE-176) | M8 | HUM | M8 W0 | – | H | designer | – | bereit |
+| AP-136 | M8 Verträge und Daten: `SaveGame` v3, `gear`/`pet`/`shop`, Katalog (21 Artikel, Summe 60), Werte aus PE-169/PE-170/PE-179 (Design-Review nein) | M8 | SH | M8 W1 | M7 W4 (AP-133, AP-134) | M | sonnet (medium) | – | offen |
+| AP-137 | Diamanten beim ersten Sieg, Spielstand v3 mit rückwirkender Umwandlung, Kaufen und Ausrüsten als reine Funktionen, `diamondsGained` im Ergebnis (Design-Review nein) | M8 | LOG | M8 W2 | AP-136 | M | sonnet (high) | – | offen |
+| AP-138 | Rüstungs-Logik: Werte, 9 Effekte, 3 Set-Effekte, Schadenspfad, Brand und Verlangsamung am Gegner (Design-Review nein) | M8 | LOG | M8 W2 | AP-136 | L | sonnet (high) | – | offen |
+| AP-139 | Pet- und Ei-Logik: Leiste relativ zur Gegnerzahl, Schlüpfen, Power-ups, Zielwahl (Design-Review nein) | M8 | LOG | M8 W2 | AP-136 | M | sonnet (high) | – | offen |
+| AP-140 | Theme- und Sprite-Sync nach H-35 (Design-Review nein) | M8 | ASSET | M8 W3 | AP-136, H-35 + „Design übernehmen“ | S | haiku (low) | – | offen |
+| AP-141 | Shop-Fenster mit Kauf und Rückfrage (Design-Review ja) | M8 | GAME | M8 W4 | AP-137, AP-140 | M | sonnet (high) | – | offen |
+| AP-142 | Ausrüstungs-Fenster und `GearPreview` (Design-Review ja) | M8 | GAME | M8 W4 | AP-137, AP-138, AP-140 | M | sonnet (high) | – | offen |
+| AP-143 | Rüstung in der Runde: Overlays, Werte, Effekte, Set-Effekte (Design-Review ja) | M8 | GAME | M8 W4 | AP-137, AP-138, AP-140 | L | opus (high), Opus-Grund: Kern | – | offen |
+| AP-144 | Pets in der Runde: Ei, Schlüpfen, Kampf, Power-ups, Pet-Leiste im HUD (Design-Review ja) | M8 | GAME | M8 W5 | AP-139, AP-143 | L | sonnet (high) | – | offen |
+| AP-145 | Hauptmenü (Shop-Button, Spielerbild, Diamanten), Haken auf den Kacheln, „+1/+3“ im Ergebnis, Doku (Design-Review ja) | M8 | GAME | M8 W5 | AP-137, AP-141, AP-142 | M | sonnet (high) | – | offen |
+| H-36 | M8-DEP: Handtest PC und iPhone (§9.2 „M8-DEP“), Release `dev` → `stage` → `master` | M8 | HUM | M8 W6 | AP-144, AP-145 | H | – | – | offen |
 
 ---
 
@@ -1383,6 +1438,18 @@ flowchart LR
     AP129 & AP131 & AP132 & AP135 --> AP133["AP-133 Quicktime im Bosskampf (W4)"]
     AP128 & AP130 & AP132 --> AP134["AP-134 Tönung und Restzeit-Balken (W4)"]
     AP127 & AP133 & AP134 --> H34["H-34 M7-DEP (W5)"]
+  end
+  subgraph M8["M8 – Shop, Diamanten, Rüstung, Pets"]
+    AP133 & AP134 --> AP136["AP-136 Verträge und Daten (W1)"]
+    AP136 --> AP137["AP-137 Diamanten, Spielstand v3, Kauf (W2)"] & AP138["AP-138 Rüstungs-Logik (W2)"] & AP139["AP-139 Pet-Logik (W2)"]
+    H35["H-35 Designer-Nachtrag M8 (W0)"] --> AP140["AP-140 Theme- und Sprite-Sync (W3)"]
+    AP136 --> AP140
+    AP137 & AP140 --> AP141["AP-141 Shop-Fenster (W4)"]
+    AP137 & AP138 & AP140 --> AP142["AP-142 Ausrüstungs-Fenster (W4)"]
+    AP137 & AP138 & AP140 --> AP143["AP-143 Rüstung in der Runde (W4)"]
+    AP139 & AP143 --> AP144["AP-144 Pets in der Runde (W5)"]
+    AP141 & AP142 --> AP145["AP-145 Hauptmenü, Ergebnis, Doku (W5)"]
+    AP144 & AP145 --> H36["H-36 M8-DEP (W6)"]
   end
 ```
 
@@ -5600,6 +5667,351 @@ Gemeinsame Pflichtlektüre aller M7-Pakete: §2 F-25 bis F-30, PE-152 bis PE-163
 - **Kürzbar bei Budgetnot:** Balken (≈ 0,5 h), dann zeigt nur der Chip die Stufe
 - **Commit-Typ:** `feat(AP-134): tint enemies by tier and show double shot time`
 
+### M8 – Shop, Diamanten, Rüstung und Pets (PE-165 bis PE-180)
+
+Gemeinsame Pflichtlektüre aller M8-Pakete: §2 F-31 bis F-35, PE-165 bis PE-180, §4 „Verträge“ (Absatz M8) und Zeile `SaveGame`, §8 Zeilen „M8“, Lagebericht (§0, Erkenntnisse). Pakete mit Oberfläche zusätzlich: `docs/design/design-brief.md` (Ergänzung H-35), `docs/design/tokens.json`, das passende Mockup aus `docs/design/mockups/`. Coder nutzen nur Tokens aus `src/config/theme.ts`, keine eigenen Farben, Schriften oder Abstände. Kein M8-Paket installiert Abhängigkeiten oder ändert `desktop/**`, `package.json`, `package-lock.json`, `docs/design/**`. Namen: Die Kauf-Rüstung heißt im Code `gear`, das Feuerring-Item bleibt `armour` (PE-165). Alle Zahlen stehen nur in `src/config` (Grundregel 2) und sind Startwerte für den Handtest H-36.
+
+#### AP-136 – Verträge und Daten M8
+
+- **Meilenstein, Lane, Welle:** M8 · SH · M8 W1
+- **Status:** offen (startet nach dem Merge von M7 W4, PE-176)
+- **Ziel:** Alle Typen, Katalog-Daten und Startwerte von M8 stehen bereit, damit W2 bis W5 parallel bauen können. Das Spiel verhält sich danach unverändert.
+- **Pflichtlektüre:** siehe M8 oben; `src/contracts/{save,events,index,armour,upgrade}.ts`, `src/config/{index,levels,upgrades,armour}.ts`, `src/platform/storage.ts` (nur lesen, Typ-Kompatibilität)
+- **Abhängigkeiten:** M7 W4 gemergt (AP-133, AP-134)
+- **Parallel möglich mit:** H-35
+- **Dateien (Eigentum):** §8 „M8 W1“
+- **Nicht anfassen:** Logik, Szenen, Entities, `src/platform/storage.ts` (die Umwandlung macht AP-137)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `contracts/save.ts`: `version: 1 | 2 | 3`; neue optionale Felder ab Version 3: `diamonds?: number`, `wonLevels?: number[]`, `owned?: string[]`, `equippedGear?: EquippedGear`, `activePet?: PetId | null`, `petGear?: Partial<Record<PetId, string | null>>`. Kommentar wie bei `gold`: optional, damit ältere Stände gültig bleiben.
+  2. `contracts/gear.ts` (neu): `GearSet = 'diamond' | 'hell' | 'heaven'`, `GearSlot = 'head' | 'body' | 'legs'` (legs = Hose+Schuhe), `EquippedGear = Record<GearSlot, string | null>`, `GearPieceDef` (`id`, `set`, `slot`, `label`, `stats: GearStats`, `effect: GearEffectDef`), `GearStats` (alle optional: `maxHpAdd`, `damageMul`, `fireRateMul`, `turnSpeedMul`, `damageTakenMul`), `GearEffectDef` als getaggte Union über `kind` (`blockChance`, `thorns`, `knockback`, `crit`, `burn`, `deathBlast`, `healBoost`, `pierce`, `magnet`), `GearSetBonusDef` (`set`, `kind`: `timedBlock` | `autoRing` | `regen`, Parameter) und `GearModifiers` (Summe aller Werte und Liste der aktiven Effekte, Ergebnis von AP-138).
+  3. `contracts/pet.ts` (neu): `PetId = 'bee' | 'penguin' | 'capybara'`, `PetDef` (`id`, `label`, `role`: `sting` | `snowball` | `aura`, Grundwerte), `PetRules` (`hatchFraction` 0,15, `powerUpFraction` 0,25, `maxPowerUps` 3, `powerUpDamageMul` 1,3, `powerUpSpeedMul` 1,3), `PetRoundState` (`phase`: `egg` | `hatched`, `xp`, `xpToNext`, `powerUps`), `EnemyStatusState` (Brand und Verlangsamung am Gegner: Restzeit, Stärke).
+  4. `contracts/shop.ts` (neu): `ShopCategory = 'egg' | 'gear' | 'petGear'`, `ShopItemDef` (`id`, `category`, `price`, `petId?`, `gearId?`, `set?`), `DiamondRules` (`perLevel` 1, `perMapFinal` 3).
+  5. `contracts/events.ts`: Ereignis `pet-changed` (`PetRoundState` und `petId`) von der Spielszene zum HUD. `contracts/index.ts` exportiert alles.
+  6. `config/gear.ts` (neu): die 9 Teile und 3 Set-Effekte exakt nach PE-169. Die Labels sind deutsch in Großbuchstaben, die Namen der Teile kommen aus H-35, bis dahin „DIAMANT KOPF“ usw. Brand: 3 s, 5 Schaden/s. Explosion: Radius 40 px, 15 Schaden (angenommen). Rückstoß 24 px (angenommen). Dornen 10. Diamant-Set: alle 30 s ein Block. Höllen-Set: alle 20 s Feuerring für 3 s (nutzt die `ArmourDef` des Feuerrings mit `durationMs` 3000). Himmel-Set: 1 HP je 2 s.
+  7. `config/pets.ts` (neu): Werte nach PE-170 und PE-179. Biene: Geschwindigkeit 220 px/s, Stich = 40 % des aktuellen Laserschadens, 2,5 Stiche/s. Pinguin: Schneeball alle 0,9 s, Schaden = 120 % des Laserschadens, Verlangsamung 40 % für 1,5 s. Capybara: Aura Radius 70 px, 50 % des Laserschadens je Sekunde, Verlangsamung 30 %, Heilung 2 HP alle 10 s. Power-up-Boni ab Stufe 1 (angenommen): zweite Biene, Schneeball-Radius ×1,5, Aura-Radius ×1,3.
+  8. `config/shop.ts` (neu): Katalog mit stabilen IDs: `egg-bee`, `egg-penguin`, `egg-capybara` (je 5), `gear-{set}-{slot}` (je 3, 9 Stück), `petgear-{pet}-{set}` (je 2, 9 Stück), Gesamtsumme 60 (Test). Dazu `DIAMOND_RULES`. Die letzten Level je Map werden **aus `config/levels.ts` abgeleitet** (letztes Level je Batch), nicht fest eingetragen. Textur-Schlüssel: `gear-{set}-{slot}`, `pet-{pet}`, `egg-{pet}`, `petgear-{pet}-{set}`. Das ist die Namensregel für AP-140, die Sprites selbst kommen erst mit AP-140.
+  9. `config/index.ts` exportiert die neuen Dateien.
+- **Akzeptanzkriterien:**
+  - Typen kompilieren, bestehende Tests sind grün, das Spielverhalten ist unverändert.
+  - Der Katalog ist vollständig: 3 + 9 + 9 = 21 Artikel, Summe 60.
+  - Die letzten Level je Map sind 4, 9, 20, 25, 30 und 40, die Summe aller Diamanten ist 53 (Test).
+- **Tests:** `tests/config/{gear,pets,shop}.test.ts` (neu) prüfen Vollständigkeit, eindeutige IDs, Preise, Summe 60, Diamanten 53 und die Werte nach PE-169/PE-170. `tests/contracts/contracts.test.ts` wird ergänzt.
+- **Review-Schwerpunkte:** Werte genau nach PE-169/PE-170, keine Zahl außerhalb `src/config`, keine Namenskollision mit `armour`, Rückwärts-Kompatibilität von `SaveGame`
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** medium
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-136): add contracts and data for shop, gear and pets`
+
+#### AP-137 – Diamanten, Spielstand v3, Kauf und Ausrüstung (Logik)
+
+- **Meilenstein, Lane, Welle:** M8 · LOG · M8 W2
+- **Status:** offen (nach AP-136)
+- **Ziel:** Diamanten werden beim ersten Sieg gutgeschrieben und gespeichert. Alte Spielstände werden umgewandelt und bekommen ihre Diamanten rückwirkend (PE-166). Kaufen und Ausrüsten funktionieren als reine, getestete Funktionen.
+- **Pflichtlektüre:** siehe M8 oben; `src/platform/storage.ts`, `src/logic/{economy,progression,upgrades}.ts`, `src/scenes/GameScene.ts` (nur `ResultSceneData` und die Rundenabrechnung um Z. 840), `src/scenes/menu/UpgradePanel.ts` (Vorbild für Kauf + `writeSave`, nur lesen)
+- **Abhängigkeiten:** AP-136
+- **Parallel möglich mit:** AP-138, AP-139, ggf. AP-140
+- **Dateien (Eigentum):** §8 „M8 W2“ (AP-137)
+- **Nicht anfassen:** Menü-Dateien, HUD, Entities; `progression.ts` (die Freischaltung bleibt, wie sie ist)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `logic/diamonds.ts` (neu):
+     - `diamondsForLevel(levelId)`: 1, beim letzten Level der Map 3, beides aus der Konfig.
+     - `applyFirstWin(save, levelId, result)`: Nur bei `won` und wenn `levelId` noch nicht in `wonLevels` steht, wird das Level eingetragen und die Diamanten addiert. Rückgabe: neuer Stand und `diamondsGained`.
+     - `migrateDiamonds(save)`: für Stände ohne `wonLevels`, einmalig. Alle Level unter `highestUnlockedLevel` gelten als gewonnen, Level 40 nicht. Die Diamanten sind die Summe dieser Level.
+  2. `logic/shop.ts` (neu), alles reine Funktionen ohne Speicherzugriff:
+     - `canBuy` und `buy(save, itemId)`: Kauf nur mit genug Diamanten, ohne vorhandenen Besitz und mit einer ID aus dem Katalog. Sonst bleibt der Stand unverändert, und der Grund wird zurückgegeben.
+     - `equipGear(save, slot, gearId | null)`: nur besessene Teile, der Slot muss passen.
+     - `setActivePet(save, petId | null)`: nur besessene Eier.
+     - `equipPetGear(save, petId, petGearId | null)`: nur besessene Rüstungen, die zum Pet passen.
+  3. `platform/storage.ts`, Version 3:
+     - `defaultSave()` setzt `diamonds: 0`, `wonLevels: []`, `owned: []`, leere Ausrüstung, `activePet: null` und `petGear: {}`.
+     - `parseSave` akzeptiert die Versionen 1, 2 und 3 und prüft jedes neue Feld streng: ganze Zahlen im Bereich, gültige und eindeutige Level-IDs, nur bekannte Katalog-IDs, Ausrüstung nur, wenn sie besessen ist und der Slot passt. Kaputte Felder setzen nur sich selbst zurück (wie PE-44).
+     - Stände unter Version 3 laufen durch `migrateDiamonds`.
+     - „Fortschritt zurücksetzen“ schreibt `defaultSave()` und löscht damit auch Diamanten, Käufe, Ausrüstung und Pets (PE-166). Die Aufrufstelle prüfen: Kopiert sie Felder einzeln, ist das ein Fund an den Lead.
+  4. `logic/economy.ts`: `settleRound` ruft `applyFirstWin` auf und liefert zusätzlich `diamondsGained`. Eine Debug-Runde bekommt 0 und schreibt wie bisher nichts.
+  5. `scenes/GameScene.ts`: nur `ResultSceneData` um `diamondsGained` und `diamondsTotal` ergänzen und befüllen, sonst nichts.
+- **Akzeptanzkriterien:**
+  - Erster Sieg von Level 3 → +1, von Level 4 → +3. Zweiter Sieg, Niederlage und Debug-Runde → 0.
+  - Alter Stand mit `highestUnlockedLevel` 10 → `wonLevels` 0..9, Diamanten 1+1+1+1+3+1+1+1+1+3 = 14.
+  - Ein Kauf mit zu wenig Diamanten oder ein doppelter Kauf ändert nichts.
+  - Manipulierte Stände (fremde IDs, negative Diamanten, Ausrüstung ohne Besitz) werden bereinigt.
+  - Alle Checks sind grün.
+- **Tests:** `tests/logic/{diamonds,shop}.test.ts` (neu); `tests/platform/storage.test.ts` für Version 3, Umwandlung, Bereinigung und Reset; `tests/logic/roundSettlement.test.ts` für `diamondsGained`
+- **Review-Schwerpunkte:** strenge Prüfung beim Laden (R6, keine fremden Werte übernehmen), es bleibt bei genau einem Schreibvorgang je Runde, Umwandlung nur einmal, keine doppelte Gutschrift
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `feat(AP-137): add diamonds, save v3, buying and equipping`
+
+#### AP-138 – Rüstungs-Logik und Gegner-Status
+
+- **Meilenstein, Lane, Welle:** M8 · LOG · M8 W2
+- **Status:** offen (nach AP-136)
+- **Ziel:** Aus der getragenen Rüstung entstehen Werte, Spezialeffekte und Set-Effekte als reine, getestete Funktionen. Dazu kommen Brand und Verlangsamung am Gegner, die AP-143 und AP-144 nutzen.
+- **Pflichtlektüre:** siehe M8 oben; `src/logic/{upgrades,weapon,health,armour,powers,status,rng}.ts`, `src/config/{gear,pets}.ts`
+- **Abhängigkeiten:** AP-136
+- **Parallel möglich mit:** AP-137, AP-139, ggf. AP-140
+- **Dateien (Eigentum):** §8 „M8 W2“ (AP-138)
+- **Nicht anfassen:** Entities, Szenen, `logic/status.ts` (der Spieler-Status bleibt)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `logic/gear.ts` (neu):
+     - `gearModifiers(equipped)` → `GearModifiers`. Multiplikatoren multiplizieren sich, `maxHpAdd` addiert sich. Den Set-Bonus gibt es nur bei 3 Teilen desselben Sets.
+     - `setProgress(equipped)` liefert den Hinweis „Set Hölle 2/3“.
+     - `gearTextureKeys(equipped)` liefert die Ebenen in der Reihenfolge Hose, Oberteil, Kopf.
+     - `applyGearToStats(base, modifiers)` gilt für max. HP, Schaden, Feuerrate und Drehgeschwindigkeit und wirkt **zusätzlich** zu den Gold-Upgrades.
+  2. Effekte als reine Funktionen, Zufall nur über `Rng`: `rollBlock`, `rollCrit`, `thornsDamage`, `knockbackVector`, `burnOnHit`, `deathBlastTargets` (Kreis-Test), `healAmount` (doppelt mit Himmel-Kopf), `pierceCount`, `magnetFactor`/`itemLifetimeFactor`.
+  3. Set-Effekte als kleiner Zustandsautomat `GearSetState` mit `tick(dtMs)`:
+     - `timedBlock`: alle 30 s ist ein Block bereit, `consumeBlock()` verbraucht ihn.
+     - `autoRing`: alle 20 s ein Auslöser für 3 s Feuerring.
+     - `regen`: 1 HP je 2 s, gibt ganze HP zurück.
+  4. `logic/enemyStatus.ts` (neu): Brand und Verlangsamung am Gegner mit `applyBurn`, `applySlow` und `tickEnemyStatus(dtMs)`. `tickEnemyStatus` liefert den Schaden dieses Schritts und den aktuellen Tempo-Faktor. Derselbe Effekt erneuert seine Zeit, die stärkere Verlangsamung gewinnt, nichts stapelt sich.
+  5. Die Reihenfolge im Schadenspfad (Diamant-Set-Block → Block-Chance → Schadensminderung → Schild) steht als Kommentar und als reine Funktion `resolveIncomingDamage` im Code, damit AP-143 sie genauso verdrahtet.
+- **Akzeptanzkriterien:**
+  - Jede Zeile aus PE-169 hat einen Test.
+  - Leere Ausrüstung ergibt neutrale Werte, das Spiel ohne Rüstung bleibt exakt wie vorher.
+  - Der Set-Effekt gibt es nur bei vollem Set.
+  - Zufall läuft nur über `Rng`, alles ist deterministisch testbar.
+- **Tests:** `tests/logic/{gear,enemyStatus}.test.ts` (neu)
+- **Review-Schwerpunkte:** neutrale Werte ohne Rüstung, keine Phaser-Importe, Reihenfolge im Schadenspfad
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (F-33)
+- **Commit-Typ:** `feat(AP-138): add gear modifiers, gear effects and enemy status logic`
+
+#### AP-139 – Pet- und Ei-Logik
+
+- **Meilenstein, Lane, Welle:** M8 · LOG · M8 W2
+- **Status:** offen (nach AP-136)
+- **Ziel:** Pet-Leiste, Schlüpfen, Power-ups und Zielwahl der drei Pets sind reine, getestete Funktionen (PE-168, PE-170, PE-179).
+- **Pflichtlektüre:** siehe M8 oben; `src/logic/{spawn,round,geometry,scaling}.ts`, `src/config/{levels,pets}.ts`, `docs/balancing.md` (erwartete Gegnerzahl je Runde)
+- **Abhängigkeiten:** AP-136
+- **Parallel möglich mit:** AP-137, AP-138, ggf. AP-140
+- **Dateien (Eigentum):** §8 „M8 W2“ (AP-139)
+- **Nicht anfassen:** Entities, Szenen, `logic/spawn.ts` (nur lesen; fehlt eine Funktion für die erwartete Gegnerzahl, legt AP-139 sie in `logic/pets.ts` an)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `logic/pets.ts` (neu):
+     - `expectedEnemies(level)` rechnet aus Dauer und Spawn-Abstand der Level-Daten, der Boss zählt nicht mit.
+     - `createPetRound(level)` startet in Phase `egg` mit dem Ziel `ceil(expected × hatchFraction)`.
+     - `addPetXp(state, kills)` füllt die Leiste. Ist sie voll, schlüpft das Pet bzw. es gibt ein Power-up, danach gilt das neue Ziel `ceil(expected × powerUpFraction)`. Ab 3 Power-ups bleibt die Leiste voll und zählt nicht weiter.
+  2. `petStats(def, powerUps, laserDamage)` liefert Schaden, Tempo, Radius und die Zahl der Bienen.
+  3. Zielwahl:
+     - `nearestTarget(from, enemies)` für Biene und Pinguin.
+     - `inAura(center, radius, enemies)` für das Capybara.
+     - Der Heil-Takt des Capybaras ist ein Zustand mit `tick(dtMs)`.
+  4. Die Erfahrung für die Leiste ist die Zahl der besiegten Gegner (ein Boss zählt 10, angenommen). Sie hängt nicht an Gold oder Spielerlevel.
+- **Akzeptanzkriterien:**
+  - In Level 0 und Level 40 schlüpft das Ei nach etwa 15 % der erwarteten Gegner, Stufe 3 kommt bei etwa 90 %.
+  - Ohne Pet gibt es keine Wirkung.
+  - Alle Werte kommen aus `config/pets.ts`.
+- **Tests:** `tests/logic/pets.test.ts` (neu)
+- **Review-Schwerpunkte:** keine Phaser-Importe, Grenzfälle (0 Gegner, sehr kurze Runde), Leiste nach Stufe 3
+- **Design-Review:** nein
+- **Doku-Pflichten:** keine
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (F-34)
+- **Commit-Typ:** `feat(AP-139): add pet egg, hatching and power-up logic`
+
+#### AP-140 – Theme- und Sprite-Sync nach H-35
+
+- **Meilenstein, Lane, Welle:** M8 · ASSET · M8 W3 (darf in W2 mitlaufen, sobald H-35 übernommen ist; keine gemeinsame Datei mit AP-137 bis AP-139)
+- **Status:** offen (wartet auf H-35 und den Planner-Auftrag „Design übernehmen“)
+- **Ziel:** Die neuen Tokens und Sprites aus H-35 (Rüstungsteile, Eier, Pets, Pet-Rüstungen, Diamant-Symbol) sind im Spiel verfügbar, `dev` bleibt grün.
+- **Pflichtlektüre:** siehe M8 oben; `docs/design/design-brief.md` (Ergänzung H-35), `scripts/{build-theme,build-sprites}.mjs`, `src/config/assets.ts`, `tests/scripts/build-sprites.test.ts` (Sprite-Anzahl fest eingetragen), Erkenntnisse in §18 zu `theme:build`/`sprites:build`
+- **Abhängigkeiten:** AP-136 (Textur-Schlüssel), H-35 erledigt und übernommen
+- **Parallel möglich mit:** AP-137 bis AP-139
+- **Dateien (Eigentum):** §8 „M8 W3“ (AP-140)
+- **Nicht anfassen:** `docs/design/**` (nur lesen), Szenen, Logik
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `npm run theme:build` und `npm run sprites:build` ausführen und die erzeugten Dateien committen.
+  2. `src/config/assets.ts` um die neuen Sprites mit den Schlüsseln aus AP-136 ergänzen. Die Frames folgen dem Brief, die Ingame-Overlays passen zu den Frames von `astronaut`.
+  3. Die Sprite-Anzahl im Test anpassen, `npm run assets:check` muss grün sein.
+  4. Fehlt im Export ein Schlüssel aus `config/shop.ts`, ist das ein Fund an den Lead. Nicht selbst zeichnen.
+- **Akzeptanzkriterien:** alle Checks und `assets:check` grün; jeder Katalog-Artikel hat eine Textur; der Theme-Test ist grün
+- **Tests:** die bestehenden Theme-, Sprite- und Asset-Tests; neuer Test: Jeder Schlüssel aus `config/shop.ts`/`config/pets.ts` steht in `config/assets.ts`
+- **Review-Schwerpunkte:** nur erzeugte Dateien, keine Handänderungen an Generator-Ausgaben, Lizenzhinweise (`LICENSES.md`, falls der Brief neue Quellen nennt)
+- **Design-Review:** nein
+- **Doku-Pflichten:** `docs/guides/grafik-austauschen.md` um die neuen Sprites ergänzen (nur die Liste)
+- **Aufwand:** S · **Modell:** haiku · **Effort:** low
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein
+- **Commit-Typ:** `chore(AP-140): sync theme and sprites after design H-35`
+
+#### AP-141 – Shop-Fenster
+
+- **Meilenstein, Lane, Welle:** M8 · GAME · M8 W4
+- **Status:** offen (nach AP-137 und AP-140)
+- **Ziel:** Ein Shop-Fenster mit Diamanten-Anzeige, drei Bereichen (Eier, Rüstung, Pet-Rüstung), Preisen, Besitz-Status und Kauf mit Rückfrage (F-32). Die Einbindung ins Hauptmenü macht AP-145.
+- **Pflichtlektüre:** siehe M8 oben; Shop-Mockup aus H-35; `src/scenes/menu/{UpgradePanel,ConfirmDialog,Button}.ts`, `src/logic/shop.ts`, `src/config/shop.ts`, `MENU_LOWEST` in `MenuScene.ts` (nur lesen)
+- **Abhängigkeiten:** AP-137, AP-140
+- **Parallel möglich mit:** AP-142, AP-143
+- **Dateien (Eigentum):** §8 „M8 W4“ (AP-141)
+- **Nicht anfassen:** `MenuScene.ts` (AP-145), `ConfirmDialog.ts` (nur nutzen, eigene Button-Texte gibt es seit AP-131)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Neue Datei `src/scenes/menu/ShopPanel.ts` nach dem Muster von `UpgradePanel`: Modal mit Abdunklung, ESC schließt, bedienbar mit Tastatur und Touch, passt in 640 × 360 und in den sicheren Bereich. Export `openShopPanel(scene, onClose)`.
+  2. Je Artikel: Bild (Textur aus AP-140), Name, Preis mit Diamant-Symbol und einer der Zustände „KAUFEN“, „ZU WENIG“ oder „GEKAUFT“. Die Pet-Rüstungen sind nach Pet gruppiert.
+  3. Kauf: `ConfirmDialog` mit der Frage, ob der Artikel für den Preis gekauft werden soll (Buttons „KAUFEN“/„ABBRECHEN“), danach `buy` und `writeSave`, dann neu zeichnen.
+- **Akzeptanzkriterien:**
+  - Ein Kauf zieht genau den Preis ab und speichert.
+  - Ein doppelter Kauf und ein Kauf ohne genug Diamanten sind unmöglich.
+  - Das Layout entspricht dem Mockup am PC und bei k = 1,36/1,4.
+  - Alle Checks sind grün.
+- **Tests:** `tests/scenes/shopPanel.test.ts` (neu): reine Layout- und Zustandsfunktionen wie bei den bestehenden Menü-Tests
+- **Review-Schwerpunkte:** ein Schreibvorgang je Kauf, Fokus und ESC, Lesbarkeit am iPhone
+- **Design-Review:** ja
+- **Doku-Pflichten:** keine
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (F-32)
+- **Commit-Typ:** `feat(AP-141): add shop panel`
+
+#### AP-142 – Ausrüstungs-Fenster mit Vorschau
+
+- **Meilenstein, Lane, Welle:** M8 · GAME · M8 W4
+- **Status:** offen (nach AP-137, AP-138, AP-140)
+- **Ziel:** Das Ausrüstungs-Fenster nach PE-174: die Astronautin groß mit Rüstung, das aktive Pet mit Rüstung, Zeilen für Kopf, Oberteil, Hose+Schuhe, Pet und Pet-Rüstung mit Pfeilen, dazu Werte, Effekte und Set-Hinweis. Außerdem eine wiederverwendbare Vorschau für die Spielerkarte im Hauptmenü (AP-145).
+- **Pflichtlektüre:** siehe M8 oben; Ausrüstungs-Mockup aus H-35; `src/scenes/menu/{UpgradePanel,Button}.ts`, `src/scenes/MenuScene.ts` (Spielerkarte um Z. 316, nur lesen), `src/logic/{shop,gear}.ts`
+- **Abhängigkeiten:** AP-137, AP-138, AP-140
+- **Parallel möglich mit:** AP-141, AP-143
+- **Dateien (Eigentum):** §8 „M8 W4“ (AP-142)
+- **Nicht anfassen:** `MenuScene.ts` (AP-145)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Neue Datei `src/scenes/menu/GearPanel.ts` mit Export `openGearPanel(scene, onClose)`.
+  2. Neue Datei `src/scenes/menu/GearPreview.ts`: ein Container aus `astronaut` plus den Ebenen aus `gearTextureKeys`, optional mit Pet und Pet-Rüstung. Die Größe ist ein Parameter. Idle-Animation wie im Menü, ohne Animation bei `prefersReducedMotion`.
+  3. Die Pfeile blättern nur durch eigene Teile plus „KEINS“. Jede Änderung ruft `equipGear`, `setActivePet` bzw. `equipPetGear` auf, danach `writeSave`.
+  4. Die Werte-Liste kommt aus `gearModifiers` (z. B. „+20 MAX. HP“, „−10 % SCHADEN“), dazu Kurztexte der Effekte und der Hinweis „SET HÖLLE 2/3“.
+  5. Die Zeile „Pet-Rüstung“ zeigt nur Rüstungen des aktiven Pets.
+- **Akzeptanzkriterien:**
+  - Jede Kombination ist wählbar und wird gespeichert.
+  - Ohne Käufe zeigt das Fenster „KEINS“ und einen Hinweis auf den Shop.
+  - Das Layout entspricht dem Mockup.
+  - Alle Checks sind grün.
+- **Tests:** `tests/scenes/gearPanel.test.ts` (neu): Blättern, Texte der Werte, Set-Hinweis
+- **Review-Schwerpunkte:** nur besessene Teile wählbar, Speichern je Änderung, Reihenfolge der Ebenen
+- **Design-Review:** ja
+- **Doku-Pflichten:** keine
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** nein (F-33, F-35)
+- **Commit-Typ:** `feat(AP-142): add gear panel and gear preview`
+
+#### AP-143 – Rüstung in der Runde
+
+- **Meilenstein, Lane, Welle:** M8 · GAME · M8 W4
+- **Status:** offen (nach AP-137, AP-138, AP-140)
+- **Ziel:** Die getragene Rüstung ist in der Runde als Overlay auf der Astronautin sichtbar und wirkt: Werte, 9 Spezialeffekte, 3 Set-Effekte (F-33, PE-169). Ohne Rüstung bleibt das Spiel exakt wie vorher.
+- **Pflichtlektüre:** siehe M8 oben; Mockup Ingame-Rüstung aus H-35; `src/scenes/GameScene.ts` (Rundenstart, Schadenspfad, Treffer, Tod von Gegnern, Aufnahme von Items und Münzen), `src/entities/{Player,Laser,LaserPool,ItemPickup,Coin,CoinPool,ArmourRing}.ts`, `src/entities/enemies/Enemy.ts`, `src/logic/{gear,enemyStatus,armour,upgrades}.ts`
+- **Abhängigkeiten:** AP-137, AP-138, AP-140
+- **Parallel möglich mit:** AP-141, AP-142
+- **Dateien (Eigentum):** §8 „M8 W4“ (AP-143)
+- **Nicht anfassen:** `HudScene.ts` (AP-144), Menü-Dateien, Boss-Dateien außer über die gemeinsamen Schadenspfade
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Rundenstart: Die Ausrüstung aus dem Spielstand lesen und `gearModifiers` auf die Werte anwenden (nach den Gold-Upgrades). Die Overlays sind Kind-Sprites der Astronautin und folgen Frames, Spiegelung und Waffe.
+  2. Schadenspfad (die eine Stelle über `Player.takeDamage`/`absorbDamage`) mit `resolveIncomingDamage` aus AP-138. Dornen und Rückstoß greifen bei Kontaktschaden.
+  3. Laser: kritische Treffer, Brand (über `enemyStatus` in `Enemy.ts`, Tick im Update), Durchschlag. `Enemy.ts` bekommt Brand **und** Verlangsamung, die Verlangsamung nutzen ab AP-144 die Pets.
+  4. Tod eines Gegners: kleine Explosion (Höllen-Hose), der Schaden läuft über denselben Pfad wie Laser-Treffer.
+  5. Doppelte Heilung, Münz-Magnet und Item-Liegezeit über die Faktoren aus der Konfig.
+  6. Set-Effekte: Diamant-Glanz an der Astronautin (Token aus H-35); das Höllenfeuer startet den vorhandenen Feuerring für 3 s, ohne die Abklingzeit des Feuerring-Items zu berühren; Himmel-Regeneration.
+- **Akzeptanzkriterien:**
+  - Ohne Rüstung sind die Werte identisch (Test über die Stat-Berechnung).
+  - Jeder Effekt lässt sich im Spiel auslösen.
+  - Debug-Parameter wie `?level` funktionieren weiter.
+  - Die FPS mit vollem Höllen-Set in Level 40 misst der Lead mit `?fps=1`.
+  - Alle Checks sind grün.
+- **Tests:** neue Tests unter `tests/scenes/` bzw. `tests/entities/` für die Verdrahtung; bestehende Tests grün
+- **Review-Schwerpunkte:** Reihenfolge im Schadenspfad, keine doppelten Listener oder Timer nach „Nochmal“ oder Abbruch, Brand-Ticks und Pools, Wechselwirkung mit dem Feuerring, Leistung bei vielen Gegnern (RI-28)
+- **Design-Review:** ja
+- **Doku-Pflichten:** keine
+- **Aufwand:** L · **Modell:** opus · **Effort:** high
+- **Opus-Grund:** Kern (Schadens- und Trefferpfad aller Runden)
+- **Kürzbar bei Budgetnot:** Overlay-Animation auf einen festen Frame (≈ 0,3 h)
+- **Commit-Typ:** `feat(AP-143): apply gear stats, effects and visuals in rounds`
+
+#### AP-144 – Pets in der Runde
+
+- **Meilenstein, Lane, Welle:** M8 · GAME · M8 W5
+- **Status:** offen (nach AP-139 und AP-143)
+- **Ziel:** Das aktive Pet erscheint als Ei neben der Astronautin, die Leiste im HUD füllt sich, das Pet schlüpft und kämpft, Power-ups sind sichtbar (F-34, PE-168, PE-170, PE-179). Die Pet-Rüstung liegt als Overlay darüber (F-35).
+- **Pflichtlektüre:** siehe M8 oben; Mockup für Pet und Pet-Leiste aus H-35; `src/scenes/{GameScene,HudScene}.ts`, `src/scenes/hud/*`, `src/entities/enemies/Enemy.ts` (Verlangsamung aus AP-143, nur nutzen), `src/logic/pets.ts`
+- **Abhängigkeiten:** AP-139, AP-143 (`GameScene.ts`, Verlangsamung in `Enemy.ts`)
+- **Parallel möglich mit:** AP-145
+- **Dateien (Eigentum):** §8 „M8 W5“ (AP-144)
+- **Nicht anfassen:** `Enemy.ts`, `Player.ts`, Menü- und Ergebnis-Dateien
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. Neue Entities in `src/entities/pets/`: `Pet`, `Bee`, `Penguin`, `Capybara`, `PetEgg`, `Snowball`.
+     - Das Ei wackelt vor dem Schlüpfen, danach folgt ein Schlüpf-Effekt.
+     - Die Biene fliegt und sticht.
+     - Der Pinguin wirft Schneebälle aus einem kleinen Pool.
+     - Das Capybara hat einen Aura-Kreis aus einem Token.
+     - Die Pet-Rüstung liegt als Overlay auf dem Pet.
+  2. `GameScene`: Das Pet entsteht beim Rundenstart, Kills gehen an `addPetXp`, dazu das Ereignis `pet-changed`. Der Schaden der Pets läuft über den gemeinsamen Schadenspfad, die Heilung über die Heilfunktion.
+  3. `HudScene`: Pet-Leiste mit Stufen-Anzeige nach dem Mockup, im sicheren Bereich und ohne Kollision mit den bestehenden Chips.
+  4. Pets sind unverwundbar und blockieren keine Geschosse.
+- **Akzeptanzkriterien:**
+  - Ohne aktives Pet gibt es keine Leiste und keinen Unterschied zu vorher.
+  - Jedes Pet schlüpft und kämpft wie beschrieben.
+  - Power-ups bis Stufe 3 sind sichtbar.
+  - Die FPS mit Biene Stufe 3 in Level 40 misst der Lead.
+  - Alle Checks sind grün.
+- **Tests:** `tests/scenes/hud.test.ts` (Lage der Leiste bei k = 1, 1,36, 1,4); neue Tests unter `tests/entities/pets/` für die Zustandswechsel, soweit ohne Phaser testbar
+- **Review-Schwerpunkte:** Aufräumen bei Rundenende und Abbruch, Pools, Kollisionen im HUD, Pets beeinflussen weder Quicktime noch Zielen
+- **Design-Review:** ja
+- **Doku-Pflichten:** keine
+- **Aufwand:** L · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** Schlüpf-Effekt nur als Aufblitzen (≈ 0,3 h)
+- **Commit-Typ:** `feat(AP-144): add pets with egg, hatching and power-ups to rounds`
+
+#### AP-145 – Einbindung ins Hauptmenü, Ergebnis und Doku
+
+- **Meilenstein, Lane, Welle:** M8 · GAME · M8 W5
+- **Status:** offen (nach AP-141 und AP-142)
+- **Ziel:** Shop-Button im Hauptmenü, das Spielerbild zeigt die Rüstung und öffnet die Ausrüstung, Diamanten neben dem Gold, Diamant-Haken auf gewonnenen Level-Kacheln, „+1“/„+3“ im Ergebnis (F-31, F-32, PE-174, PE-175). Die Doku ist aktuell.
+- **Pflichtlektüre:** siehe M8 oben; Mockups Hauptmenü und Ergebnis aus H-35; `src/scenes/{MenuScene,ResultScene}.ts`, `src/scenes/menu/{LevelGrid,LevelPager,ShopPanel,GearPanel,GearPreview}.ts`, Erkenntnis `MENU_LOWEST = 348` (§18)
+- **Abhängigkeiten:** AP-137 (`diamondsGained` in `ResultSceneData`), AP-141, AP-142
+- **Parallel möglich mit:** AP-144
+- **Dateien (Eigentum):** §8 „M8 W5“ (AP-145)
+- **Nicht anfassen:** `GameScene.ts`, `HudScene.ts`, `ShopPanel.ts`, `GearPanel.ts` (Fehler dort sind ein Fund an den Lead)
+- **Freigegebene Abhängigkeiten:** keine
+- **Umsetzung:**
+  1. `MenuScene`:
+     - Button „SHOP“ nach dem Mockup, Tab-Reihenfolge ergänzen.
+     - Diamanten-Anzeige neben dem Gold.
+     - Die Spielerkarte nutzt `GearPreview` und öffnet per Klick, Tipp oder Enter `openGearPanel`.
+     - Nach dem Schließen von Shop oder Ausrüstung Karte und Zähler neu zeichnen.
+     - `MENU_LOWEST` mitführen.
+  2. `LevelGrid`: kleiner Diamant-Haken auf den Kacheln aus `wonLevels`.
+  3. `ResultScene`: Bei `diamondsGained` größer 0 erscheint „+1“ bzw. „+3“ mit Diamant-Symbol und kurzer Animation, ohne Animation bei `prefersReducedMotion`.
+  4. Doku:
+     - `docs/balancing.md` bekommt einen Abschnitt „Diamanten, Shop, Rüstung, Pets“: Preise, Summe 60 gegen 53, Werte aus PE-169/PE-170, Leiste nach PE-179.
+     - `docs/gegner-und-maps.md` bekommt nur einen Hinweis auf die Diamanten je Map-Abschluss.
+- **Akzeptanzkriterien:**
+  - Der Ablauf Hauptmenü → Shop → Kauf → Ausrüstung → Runde → Ergebnis „+1“ funktioniert am PC und mit Touch.
+  - Das Menü passt in den sicheren Bereich.
+  - Alle Checks sind grün.
+- **Tests:** bestehende Menü- und Ergebnis-Tests ergänzen: Lage des Shop-Buttons, Diamant-Zähler, Auswahl der Haken als reine Funktion, Ergebnis-Text
+- **Review-Schwerpunkte:** Bedienung mit Tastatur und Touch, Neuzeichnen nach Käufen, Layout auf iPhone-Breiten
+- **Design-Review:** ja
+- **Doku-Pflichten:** `docs/balancing.md` und `docs/gegner-und-maps.md` wie oben
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high
+- **Opus-Grund:** –
+- **Kürzbar bei Budgetnot:** Animation im Ergebnis (≈ 0,2 h)
+- **Commit-Typ:** `feat(AP-145): add shop button, gear preview and diamonds to menus`
+
 ---
 
 ## 13. Menschliche Schritte
@@ -5640,6 +6052,8 @@ Gemeinsame Pflichtlektüre aller M7-Pakete: §2 F-25 bis F-30, PE-152 bis PE-163
 | H-32 | **M6-DEP (RQ-02 und Release):** Datei mit AP-124 und AP-125 neu bauen, Handy im selben WLAN, Prüfpunkte §9.2 „M6-DEP“ (H-32), Firewall-Abfrage nur für „Private Netzwerke“ zulassen, nie eine Portfreigabe im Router. **Zusätzlich (Erkenntnis AP-124):** Strg+H und F11 laufen über Menü-Accelerator und `before-input-event` (`preventDefault`); prüfen, ob eine Taste doppelt auslöst (Dialog zweimal, Vollbild springt zurück), besonders F11 im Vollbild. Danach Pull Request `dev` → `stage`, Smoke-Test, `stage` → `master` | nach AP-124, AP-125 und H-31 | – | ☐ |
 | H-33 | **Designer-Nachtrag M7 (PE-160):** Designer starten (`start-agent.ps1 … -Role designer`) und gestalten lassen: Quicktime-Kreis, zusammenziehender Ring, Rückmeldungen „PERFEKT“/„GUT“/„VERFEHLT“ und „PARRY!“ (Querformat-Mockup mit Boss), vier Stufen-Tönungen der Gegner (lesbar auf allen sechs Map-Hintergründen), Restzeit-Balken unter dem Doppelschuss-Chip, Lage des Buttons „HAUPTMENÜ“ im Pause-Overlay. Brief-Ergänzung freigeben, danach Planner-Auftrag „Design übernehmen“ (nur Änderungen). **Erledigt 2026-11-01:** Designer-Commits f53943b und 28cdc1e, Nutzer hat die Ergänzung freigegeben, „Design übernehmen“ ausgeführt (PE-164); Brief nennt zusätzlich zwei Pausen-Buttons „WEITER“ und „HAUPTMENÜ“ und die Rückfrage-Texte | ab sofort, parallel zu M7 W1/W2 | AP-132, AP-133, AP-134 (AP-131 nur die Lage des Buttons) | ☑ (erledigt 2026-11-01) |
 | H-34 | **M7-DEP:** Handtest PC und iPhone nach §9.2 „M7-DEP“ (inkl. `?fps=1` bei vielen Gegnern), Release `dev` → `stage` → `master` | nach M7 W4 | – | ☐ |
+| H-35 | **Designer-Nachtrag M8 (PE-176):** Den Designer starten (`start-agent.ps1 … -Role designer`) und gestalten lassen. **Oberflächen:** Shop-Fenster (drei Bereiche, Preis, Zustände KAUFEN/ZU WENIG/GEKAUFT), Ausrüstungs-Fenster nach PE-174, Spielerkarte im Hauptmenü mit Rüstung, Shop-Button, Diamant-Symbol und Zähler, Diamant-Haken auf den Level-Kacheln, „+1/+3“ im Ergebnis, Pet-Leiste im HUD. **Sprites:** 9 Rüstungsteile Diamant/Hölle/Himmel (groß im Menü und als Overlay passend zu den Frames von `astronaut`), Diamant-Glanz (Set-Effekt), 3 Eier, 3 Pets (Biene, Pinguin, Capybara, jeweils mit Angriff), Schneeball, Capybara-Aura, 9 Pet-Rüstungen. Danach den Brief freigeben; der Lead gibt dem Planner den Auftrag „Design übernehmen“ | parallel zu M7 W3/W4, vor M8 W3 | AP-140 bis AP-145 | ☐ |
+| H-36 | **M8-DEP:** Handtest PC und iPhone nach §9.2 „M8-DEP“, Release `dev` → `stage` → `master` | nach M8 W5 | – | ☐ |
 
 ---
 
@@ -5667,7 +6081,8 @@ Gemeinsame Pflichtlektüre aller M7-Pakete: §2 F-25 bis F-30, PE-152 bis PE-163
 | M5 Fix-Pakete aus dem Handtest auf `dev` (PE-135, PE-136, PE-137, PE-138, PE-139) | 5 (AP-112 M fertig, AP-113 M, AP-114 M, AP-115 S, AP-116 S) | ≈ 6,25 h (angenommen: je ≈ 1,5 h, AP-115 und AP-116 ≈ 0,75 bis 1 h; + Review ≈ 8 h, AP-115 und AP-116 mit Design-Review; AP-112 bereits verbraucht) | ≈ 2 (AP-112 ist fertig, AP-113, AP-114, AP-115 und AP-116 laufen parallel in W8, je etwa ein halbes bis ein ganzes Fenster; AP-113 wird bei großer Rechnung L, dann ≈ 2,5; Zeile nicht in der Gesamtzeile, wie die Nachträge) |
 | M6 Desktop-Test (RQ-01, RQ-02; PE-144 bis PE-151) | 5 (AP-121 L, AP-122 M opus, AP-123 S, AP-124 M, AP-125 M opus) | ≈ 8 h (angenommen; AP-125 ≈ 1,75 h; + Review ≈ 10 h, AP-122 mit Sicherheitsschwerpunkt, AP-125 mit Start-Beleg) | ≈ 3–4 bei 45 % Zielwert (W1 ≈ 1 Fenster, W2 ≈ 1 Fenster, W3 ≈ 0,5 Fenster, W3b ≈ 0,5–1 Fenster; RQ-02 kürzbar: AP-122, AP-124 ≈ 3 h; Zeile nicht in der Gesamtzeile, wie die Nachträge) |
 | M7 Schwierigkeit und Komfort (PE-152 bis PE-163) | 10 (AP-126 M, AP-127 L, AP-128 M, AP-129 M, AP-130 S, AP-131 M, AP-132 S, AP-133 L opus, AP-134 M, AP-135 S neu aus „Design übernehmen“; AP-126, AP-128 bis AP-130 fertig) | ≈ 12,75 h (angenommen: L ≈ 2,5 h, M ≈ 1,5 h, S ≈ 0,75 h, AP-132 ≈ 0,25 h; + Review inkl. Design-Review AP-131, AP-133, AP-134 ≈ 16,5 h) | ≈ 6 bei 30 % (W1 ≈ 0,5, W2 ≈ 1,5, W3 ≈ 1,75 (mit AP-135), W4 ≈ 2 Fenster; kürzbar: Ton/„PARRY!“ ≈ 0,3 h, Balken ≈ 0,5 h; Zeile nicht in der Gesamtzeile, wie die Nachträge) |
-| **Gesamt** | **46** | **≈ 70 h (+ Review ≈ 90 h)** | **≈ 32–38** |
+| M8 Shop, Diamanten, Rüstung, Pets (PE-165 bis PE-180) | 10 (AP-136 M, AP-137 M, AP-138 L, AP-139 M, AP-140 S, AP-141 M, AP-142 M, AP-143 L opus, AP-144 L, AP-145 M) | ≈ 17,25 h (angenommen: L ≈ 2,5 h, M ≈ 1,5 h, S ≈ 0,75 h; + Review inkl. Design-Review AP-141 bis AP-145 ≈ 22 h) | ≈ 8–9 bei 2,5 h je Fenster; dazu H-35 (Designer) |
+| **Gesamt** | **56** | **≈ 87 h (+ Review ≈ 112 h)** | **≈ 40–47** |
 
 Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h. Die Fensterzahlen oben gelten noch für 30 % Zielwert. Bei 45 % sinkt die Zahl rechnerisch auf etwa zwei Drittel, Neuberechnung nach M2b-DEP (§18). Die M2c-Zeile (PE-59) enthält AP-50 und AP-54 (je M, ca. 1,5 h), AP-51, AP-52 und AP-53 (je L, ca. 2,5 h) und AP-55 (S, ca. 0,75 h), alle angenommen. Dazu kommen drei Design-Reviews durch `ma-designer`, deren Kosten als Review-Zuschlag gerechnet sind. Optional sind die Pakete AP-55 (Regel kann später folgen) und H-13 (Sprites, Mensch). Das Risiko steht in RI-17. Die Gesamtzeile enthält die Zeilen M2c-Nachtrag und Nachtrag 2 nicht: Nachtrag 2 (PE-70 bis PE-72) bringt 4 Pakete, ≈ 6,25 h (+ Review ≈ 8 h) und ≈ 3–4 Fenster zusätzlich, Risiko RI-19.
 
@@ -5726,6 +6141,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | RI-28 | M7: Bis zu 250 gleichzeitige Gegner (vorher 150, RI-6) ruckeln auf dem iPhone | Obergrenze ist ein Datenwert; Lead misst nach W3/W4 mit `?fps=1` am PC, Nutzer in H-34 am iPhone; bei Ruckeln Folgepaket „`MAX_ENEMIES` senken, HP-Aufschlag erhöhen“ | AP-127, H-34 |
 | RI-29 | M7: Ein Tipp trifft einen Quicktime-Kreis und dreht zugleich die Astronautin, oder der Stick löst Kreise aus | Eingabe-Vorrang als reine Funktion mit Test, Review-Schwerpunkt, Prüfpunkt in H-34 | AP-133 |
 | RI-30 | M7: Mehr Gegner, Stufen und doppelte Boss-HP zusammen machen späte Level unschaffbar (Upgrades reichen nicht) | AP-127 rechnet alles zusammen (Druck-Tabelle), Gold je Runde bleibt gleich (PE-163, Q-64); Feinjustierung nach H-34 als Folgepaket | AP-127, H-34 |
+| RI-31 | M8: Rüstungs-Effekte (Brand, Explosion, Durchschlag) und Pets erhöhen die Last je Frame bei bis zu 250 Gegnern. Außerdem greift AP-143 in den Schadenspfad aller Runden | Logik rein und getestet (AP-138, AP-139), ein Schadenspfad (`resolveIncomingDamage`), opus für AP-143, FPS-Messung des Leads nach W4/W5, Prüfpunkt in H-36. Bei Ruckeln ein Folgepaket (Brand-Tick seltener, Explosionen begrenzen) | AP-138, AP-143, AP-144 |
+| RI-32 | M8: Feste Rüstungs-Zahlen (Dornen 10, Brand 5/s, Explosion 15) verlieren in späten Leveln an Wirkung, während die Pets mit dem Laserschaden skalieren (PE-179). Oder Rüstung und Pet zusammen machen frühe Level zu leicht | Werte nur in `src/config`, Nachschärfen nach H-36 als Folgepaket, Balancing-Abschnitt in `docs/balancing.md` (AP-145) | AP-136, AP-145 |
+| RI-33 | M8: manipulierter Spielstand (Diamanten, fremde IDs) | strenge Prüfung in `parseSave` (AP-137), nur lokale Daten, kein Echtgeld (PE-177). Eine Manipulation schadet nur dem eigenen Spiel | AP-137 |
 | RI-16 | AP-33 wird groß (opus, L): Spielszene, Drop, Pickup und Ringschaden in einem Paket, dazu das Rundenende. Ein Fehler in der Szene trifft alle Runden | Feuerring-Logik ist in AP-37a getestet, AP-33 verdrahtet nur. Review-Punkt Rundenende-Reihenfolge. Falls AP-33 zu groß wird, ist eine Aufteilung nur mit Freigabe des Nutzers möglich, weil PE-58 die Einbindung spätestens in W5 verlangt | AP-33, AP-37a, AP-37c |
 
 ---
@@ -5912,8 +6330,11 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-175 | **Diamant-Anzeige (Nutzer am 2026-11-01, Antwort 11a):** Hauptmenü neben dem Gold, Shop oben, Ergebnis-Bildschirm nach dem ersten Sieg „+1“ bzw. „+3“ mit kurzer Animation; gewonnene Level-Kacheln mit kleinem Diamant-Haken | zeigt, wo es noch Diamanten gibt | Nutzer am 2026-11-01 |
 | PE-176 | **Reihenfolge M8 und Design (Nutzer am 2026-11-01, Antwort 12a):** M7 W3 und W4 laufen zuerst fertig (W4 ändert `GameScene.ts`). Parallel gestaltet der Designer in einer eigenen Runde (H-35) Shop, Ausrüstungs-Menü, Rüstungsteile (groß im Menü, Overlay auf dem Ingame-Sprite), Eier, Pets, Pet-Rüstungen, Pet-Leiste und Diamant-Anzeige. M8 startet nach M7 W4 mit den Verträgen, die Oberflächen-Pakete nach H-35 und „Design übernehmen“ | weniger Merge-Risiko, UI-Pakete brauchen Tokens und Sprites | Nutzer am 2026-11-01 |
 | PE-177 | **Nur Spielwährung (angenommen vom Planner, 2026-11-01):** Diamanten gibt es nur durch Siege, es gibt keinen Kauf mit echtem Geld, keine Zufallskäufe (Lootboxen) und keine Verbindung nach außen. Der Shop speichert nur lokal im Spielstand | R1/R2: keine Zahlungs-, Jugendschutz- oder Datenschutzfragen; bei späterem App-Store-Plan neu bewerten | angenommen vom Planner |
+| PE-178 | **Schnitt M8 (Nutzer am 2026-11-01, Antwort 14a):** W0 H-35 (Designer, parallel zu M7); W1 AP-136 (Verträge); W2 AP-137, AP-138, AP-139 (Logik); W3 AP-140 (Sync, darf in W2 mitlaufen); W4 AP-141, AP-142, AP-143; W5 AP-144, AP-145; W6 H-36 | Verträge eine Welle vor ihren Nutzern, `GameScene.ts` je Welle nur in einem Paket | Nutzer am 2026-11-01 |
+| PE-179 | **Pet-Leiste relativ zur Gegnerzahl (Nutzer am 2026-11-01, Antwort 15a):** Das Ei schlüpft nach etwa 15 % der erwarteten Gegner der Runde, jedes Power-up braucht weitere 25 %. Ein Boss zählt 10 (angenommen). Der Pet-Schaden skaliert mit dem aktuellen Laserschaden (angenommen vom Planner, damit Pets auch in späten Leveln nützlich bleiben) | gleiches Tempo in allen Leveln trotz der Gegnerzahlen aus M7 | Nutzer am 2026-11-01 / Ergänzung angenommen vom Planner |
+| PE-180 | **Datenmodell M8 freigegeben (Nutzer am 2026-11-01, Antwort 13a):** `SaveGame` Version 3 mit `diamonds`, `wonLevels`, `owned`, `equippedGear`, `activePet` und `petGear`; neue Verträge `contracts/gear.ts`, `contracts/pet.ts`, `contracts/shop.ts`; Ereignis `pet-changed`; ältere Stände werden beim Laden umgewandelt (§4) | parallele Pakete brauchen feste Verträge | Nutzer am 2026-11-01 |
 | PE-164 | **Design übernommen (Brief vom 2026-11-01, Ergänzung H-33; Designer-Commits f53943b und 28cdc1e, vom Nutzer freigegeben am 2026-11-01), H-33 erledigt.** Übernommen in AP-131, AP-132, AP-133, AP-134 (Pakettexte mit Token-Namen und Maßen) und neu AP-135 (W3, S): (1) Quicktime-Werte: Kreisabstand **56** (AP-126 hatte 90), Touch-Zuschlag **4** (AP-129 hatte 8), Anlaufzeit des Rings **800 ms** fehlte im Vertrag (`approachMs`, `touchSlackPx`, reine Funktion `ringState`). (2) Pause hat zwei Buttons „WEITER“ (primary, Fokus) und „HAUPTMENÜ“ nebeneinander, Hinweis „ESC ODER P: WEITER“; Rückfrage „RUNDE ABBRECHEN?“ mit „RUNDE BEENDEN“ (danger) und „WEITERSPIELEN“ (Fokus). (3) `ConfirmDialog.ts` darf (Ausnahme zu „nur lesend“) optionale Button-Texte bekommen, Eigentum AP-131. (4) Gegner-Tönung multiplikativ `setTint` mit `game.tier-0..3`, Stufe 0 `clearTint`. (5) Restzeit-Balken als Streifen am `FunkChip` (Eigentum `FunkPanel.ts` für AP-134). Keine neuen Sprites, Schriften oder Abhängigkeiten; Haken, X und Stern als Graphics-Rechtecke. | Nutzer (Brief-Ergänzung H-33 freigegeben am 2026-11-01); Pakettexte Planner |
-| PE-165 | **Q-64 und V-24 entschieden (Nutzer am 2026-11-01, beide Option a):** (1) Gold und Erfahrung je Runde bleiben gleich, `xp`/`coin` je Gegner werden durch den Faktor der Gegnermehrung geteilt (bestätigt PE-163; AP-127 ohne Vorbedingung). (2) Hexen-Bolzen und Geist-Aura skalieren mit der Gegnerstufe über `tierFor(levelId).damageFactor` (Feld `shot` in `EnemyScale`); Umsetzung in AP-134, `ForestWitch.ts` kommt dort ins Dateieigentum (§8). | Nutzer am 2026-11-01 |
+| PE-181 | **Q-64 und V-24 entschieden (Nutzer am 2026-11-01, beide Option a):** (1) Gold und Erfahrung je Runde bleiben gleich, `xp`/`coin` je Gegner werden durch den Faktor der Gegnermehrung geteilt (bestätigt PE-163; AP-127 ohne Vorbedingung). (2) Hexen-Bolzen und Geist-Aura skalieren mit der Gegnerstufe über `tierFor(levelId).damageFactor` (Feld `shot` in `EnemyScale`); Umsetzung in AP-134, `ForestWitch.ts` kommt dort ins Dateieigentum (§8). | Nutzer am 2026-11-01 |
 
 ### Offene Fragen
 
@@ -5976,7 +6397,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-62 | Release-Reihenfolge: (a) zuerst Nachtrag 9 (AP-117, AP-118), dann **ein** Release `dev` → `stage` für H-28 (M5-DEP) und H-30 (keine Ränder), H-26 entfällt. (b) H-28 jetzt, Nachtrag 9 mit eigenem Release danach | W | H-26, H-28, H-30 | (a): ein Release statt zwei, und H-26 würde sonst Werte prüfen, die AP-117 sofort ändert | entschieden (a), Nutzer am 2026-11-01 („beide wie empfohlen“) |
 | Q-63 | Widerspruch PE-146 (Start im Vollbild) und PE-147 (Menüpunkt in der Fensterleiste): Im Vollbild ist die Menüleiste unsichtbar. (a) Menüleiste im Fenster plus Tastenkürzel **Strg+H** für den Dialog „Handy-Zugriff“ auch im Vollbild, Anleitung nennt beides. (b) Nur über F11 ins Fenster wechseln, dann Menü. (c) Doch im Fenster starten | W | F-24, PE-146, PE-147, M6 | (a): Vollbild bleibt, Zugriff ohne Umweg | entschieden (a), Nutzer am 2026-11-01 (PE-150) |
 | Q-64 | Gold und Erfahrung je Runde bei 2,5-mal so vielen Gegnern: (a) gleich lassen wie bisher (xp/coin je Gegner durch den Faktor teilen, PE-163, angenommen) (b) mitsteigen lassen (schneller Fortschritt, Upgrades billiger) (c) halb mitsteigen | W | F-25, AP-127 | (a): Wirtschaft und Preise Stufe 1–15 bleiben stimmig | **beantwortet (a), Nutzer am 2026-11-01** (PE-163 bestätigt, Pflege-Auftrag des Leads); AP-127 ist frei |
-| Q-65 | Shop-System M8 (F-31 bis F-35): konkrete Rüstungs-Effekte und Zahlen, Pet-Verhalten, Pet-Rüstungen (Umfang), Preise, Ausrüstungs-Menü, Einordnung zu M7, Schnitt | K | F-31 bis F-35, §4, M8 | im Planner-Interview | offen (Interview läuft) |
+| Q-65 | Shop-System M8 (F-31 bis F-35): konkrete Rüstungs-Effekte und Zahlen, Pet-Verhalten, Pet-Rüstungen (Umfang), Preise, Ausrüstungs-Menü, Einordnung zu M7, Schnitt | K | F-31 bis F-35, §4, M8 | im Planner-Interview | geklärt (PE-165 bis PE-180) |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -6197,6 +6618,12 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | F-29 Boss-Angriffe per Quicktime abwehren (PE-157, PE-158, PE-164) | AP-126, AP-129, AP-135, AP-133, H-33, H-34 |
 | F-30 Pausemenü „Hauptmenü“ (PE-159) | AP-126, AP-131, H-34 |
 | M7 R1–R6: keine neuen Abhängigkeiten, keine externen Requests, keine personenbezogenen Daten (Abbruch speichert nichts), R4 keine Secrets, R6 Design-Brief nur als freigegebene Gestaltung; R3 unverändert (lokal und privat) | alle M7-Pakete (Review-Checkliste) |
+| F-31 Diamanten (PE-166, PE-175) | AP-136, AP-137, AP-145, H-36 |
+| F-32 Shop im Hauptmenü (PE-172, PE-173, PE-177) | AP-136, AP-137, AP-140, AP-141, AP-145, H-35, H-36 |
+| F-33 Spieler-Rüstung (PE-165, PE-167, PE-169, PE-174) | AP-136, AP-137, AP-138, AP-140, AP-142, AP-143, AP-145, H-35, H-36 |
+| F-34 Pets (PE-168, PE-170, PE-179) | AP-136, AP-137, AP-139, AP-140, AP-142, AP-144, H-35, H-36 |
+| F-35 Pet-Rüstung (PE-171) | AP-136, AP-137, AP-140, AP-142, AP-144, H-35, H-36 |
+| M8 R1–R6: R1 kein Echtgeld, keine Lootboxen (PE-177); R2 keine personenbezogenen Daten, alles lokal im Spielstand, der Reset löscht alles (PE-166); R3 unverändert (lokal, private Weitergabe); R4 keine Secrets; R6 strenge Prüfung des Spielstands gegen Manipulation (AP-137, RI-33), keine neuen Abhängigkeiten, Design-Brief nur als freigegebene Gestaltung | AP-136, AP-137, alle M8-Pakete (Review-Checkliste) |
 
 ---
 
@@ -6529,4 +6956,5 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-11-01 | Erkenntnisse AP-129: `ParryCircleState` lokal in `parry.ts`, zusätzlich `tapCircle` und `PARRY_TOUCH_TOLERANCE_PX = 8`; Treffzeiten bei 3 Kreisen und 1200 ms: erster Kreis ≈ 410–440 ms (nicht ganz „frühestens 40 %“); `resolveParry([])` → `blocked: true`, AP-133 ruft es nur bei Angriffen mit Kreisen; zu frühes Tippen auf einen offenen Kreis = verfehlt und verbraucht ihn (osu-Stil); AP-133 übergibt die Tipp-Zeit relativ zum Ankündigungsstart in Szenenzeit und ruft `expireCircles` jeden Frame | AP-129-Bericht, Lead | AP-129, AP-133, AP-135 | Planner (Pflege) |
 | 2026-11-01 | Erkenntnisse AP-130: Stufe größer 0 mit `doubleShotMsLeft = 0` wird nicht abgebaut; das Aufheben setzt die Zeit immer; `powersKey` enthält `hudSeconds(doubleShotMsLeft)`; Testlücke `dt = 2 · S` (niedrig) | AP-130-Bericht, Lead | AP-130, AP-134 | Planner (Pflege) |
 | 2026-11-01 | **Design übernommen (Brief vom 2026-11-01, Ergänzung H-33; Designer-Commits f53943b und 28cdc1e, PE-164), H-33 erledigt, G2 für M7 W3/W4 erfüllt.** Abgleich der Pakete mit Brief, Token-Tabelle und Mockup: AP-131 (zwei Pausen-Buttons, Hinweis „ESC ODER P: WEITER“, Rückfrage-Texte, `ConfirmDialog.ts` im Eigentum nur für optionale Button-Texte), AP-132 (Token-Liste, `dev` rot bis zum Merge: `tests/config/theme.test.ts` 2 Tests), AP-133 (Darstellung Kreis/Ring/Wörter/PARRY! mit Token-Namen und Maßen, Test `parryTokens`), AP-134 (Tönung `setTint` mit `game.tier-0..3`, Streifen am `FunkChip`, Eigentum `FunkPanel.ts` und `logic/scaling.ts`), neu **AP-135** (W3, S, sonnet low): `distanceFromPlayerPx` 90 → 56, `touchSlackPx` 4 statt 8, `approachMs` 800, `ringState`. H-34 um Design-Prüfpunkte ergänzt. Keine neue Abhängigkeit (kein Schriftpaket, keine Sprites). Offen als Vorschlag: V-24 (Schaden auf Geschoss und Aura) | Nutzer (H-33 freigegeben am 2026-11-01), Auftrag „Design übernehmen“ | AP-131 bis AP-135, H-33, H-34, PE-164, V-24 | Planner (Pflege) |
-| 2026-11-01 | Entscheidungen des Nutzers übernommen: **Q-64 (a)** Gold und Erfahrung je Runde bleiben gleich (PE-163 bestätigt, AP-127 ohne Vorbedingung); **V-24 (a)** Hexen-Bolzen und Geist-Aura skalieren mit `tierFor(levelId).damageFactor` über `EnemyScale.shot`, in AP-134 (`ForestWitch.ts` und `tests/entities/enemies/**` ins Eigentum, §8 und Pakettext, Akzeptanzkriterium und Tests ergänzt). Begründung: Gold bleibt, damit die Upgrade-Preise nicht entwertet werden; Stufenfaktor statt Level-Faktor, weil die Balance von AP-91 bis AP-113 auf unskalierten Bolzen aufbaut. Keine Änderung an §2, §4, §5; PE-165 | Nutzer, Auftrag des Leads | §0, §8, §16, §17, AP-127, AP-134 | Planner (Pflege) |
+| 2026-11-01 | Entscheidungen des Nutzers übernommen: **Q-64 (a)** Gold und Erfahrung je Runde bleiben gleich (PE-163 bestätigt, AP-127 ohne Vorbedingung); **V-24 (a)** Hexen-Bolzen und Geist-Aura skalieren mit `tierFor(levelId).damageFactor` über `EnemyScale.shot`, in AP-134 (`ForestWitch.ts` und `tests/entities/enemies/**` ins Eigentum, §8 und Pakettext, Akzeptanzkriterium und Tests ergänzt). Begründung: Gold bleibt, damit die Upgrade-Preise nicht entwertet werden; Stufenfaktor statt Level-Faktor, weil die Balance von AP-91 bis AP-113 auf unskalierten Bolzen aufbaut. Keine Änderung an §2, §4, §5; PE-181 (ursprünglich PE-165, umbenannt am 2026-11-01 wegen Doppelvergabe mit dem M8-Interview) | Nutzer, Auftrag des Leads | §0, §8, §16, §17, AP-127, AP-134 | Planner (Pflege) |
+| 2026-11-01 | **M8 „Shop, Diamanten, Rüstung, Pets“ im Interview geplant:** F-31 bis F-35, PE-165 bis PE-180, §4 `SaveGame` v3 und Verträge `gear`/`pet`/`shop` (PE-180 freigegeben), §8 Zeilen M8, §9.2 M8 und M8-DEP, §10, Graph, AP-136 bis AP-145, H-35, H-36, Budget (≈ 17,25 h), RI-31 bis RI-33, Abdeckungsmatrix; F-17: Feuerring heißt im Plan „Feuerring-Item“; Q-65 geklärt. Die gleichzeitig vergebene PE-165 (Q-64/V-24) heißt jetzt PE-181 | Nutzerwunsch im Planner-Interview (Runden 1 bis 4) | AP-136 bis AP-145, H-35, H-36 | Nutzer; PE-177 und Teilwerte angenommen |
