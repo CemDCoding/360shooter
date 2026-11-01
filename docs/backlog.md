@@ -14,6 +14,7 @@ Reihenfolge = Priorität (oben zuerst). Die Priorität entscheidet der Nutzer.
 
 | ID | Titel | Prio | Größe | Status | Berührt Sicherheit/Datenschutz/Architektur |
 |---|---|---|---|---|---|
+| RQ-01 | Windows-.exe zum privaten Testen durch Freunde | mittel (Vorschlag) | M | entwurf | Architektur: Desktop-Hülle um das Spiel; neue Abhängigkeit: Werkzeug zum Verpacken; Doku: Plan §2 (Downloads) und PE-02 betroffen |
 
 **Status:** `entwurf` (im Interview) · `freigegeben` (Nutzer hat zugestimmt, wartet auf den Planner) · `übernommen` (steht im Plan) · `zurückgestellt` · `verworfen`
 **Größe:** `S` (≈ 1 Paket) · `M` (2–3 Pakete) · `L` (mehr, besser teilen)
@@ -37,3 +38,22 @@ Reihenfolge = Priorität (oben zuerst). Die Priorität entscheidet der Nutzer.
 - **Offene Fragen an den Planner:** {{technische Fragen, die der PO bewusst nicht klärt}} | keine
 - **Entscheidungen:** {{Nutzer am JJJJ-MM-TT: …}}
 -->
+
+### RQ-01 – Windows-.exe zum privaten Testen durch Freunde
+
+- **Status:** entwurf · **Prio:** mittel (Vorschlag) · **Größe:** M
+- **Angelegt:** 2026-11-01 · **Freigegeben:** –
+- **Ziel (warum):** Der Nutzer kann Freunden das Spiel zum Testen geben, ohne dass diese Node, einen Dev-Server oder einen Browser-Aufbau brauchen. Rückmeldung von Testern zu Spielgefühl und Balance.
+- **Beschreibung (was):** Der Nutzer erzeugt per Befehl eine einzelne portable Windows-`.exe` des Spiels. Freunde bekommen die Datei privat (USB, Cloud-Link, Messenger), starten sie per Doppelklick und spielen mit Maus am PC. Es gibt keine Installation. Der Spielstand (Gold, Upgrades, Level) bleibt lokal auf dem Rechner des Freundes erhalten. Eine kurze Anleitung erklärt die Windows-Warnung bei unsigniertem Programm („Weitere Informationen“ → „Trotzdem ausführen“) und wie man den Fortschritt zurücksetzt.
+- **Abnahmekriterien:**
+  - [ ] Ein dokumentierter Befehl erzeugt eine einzelne `.exe`, ohne dass der Nutzer Code ändern muss.
+  - [ ] Die `.exe` startet per Doppelklick auf einem Windows-Rechner ohne installiertes Node oder Entwicklungswerkzeug und zeigt das Hauptmenü.
+  - [ ] Eine komplette Runde (Start, Spielen, Ergebnis) funktioniert mit Maus; Sound und Stummschalt-Taste gehen.
+  - [ ] Gold, Upgrades und freigeschaltete Level bleiben nach Schließen und erneutem Start der `.exe` erhalten.
+  - [ ] Das Spiel stellt auch in der `.exe` keine externen Netzwerkanfragen und sammelt keine Daten.
+  - [ ] Eine Kurzanleitung für Freunde (Start, Windows-Warnung, Zurücksetzen) liegt im Repo.
+  - [ ] Der Web- und iPhone-Betrieb funktioniert unverändert; alle bisherigen Checks bleiben grün.
+- **Nicht im Umfang:** öffentliche Veröffentlichung oder Hosting (itch.io, GitHub-Releases), Installer, Code-Signing-Zertifikat, Auto-Updates, Mac/Linux/Android/iOS-Builds, Touch-Steuerung in der `.exe`, Impressum und Datenschutzerklärung.
+- **Berührt:** Daten ja (Spielstand lokal, wie bisher) · personenbezogene Daten nein · Recht (Impressum, Datenschutzerklärung) nein, solange die Weitergabe privat bleibt; bei öffentlichem Teilen neu zu bewerten · neue Abhängigkeit oder externer Dienst ja (Verpackungswerkzeug, vom Nutzer freizugeben; kein externer Dienst) · Architektur ja (Desktop-Hülle)
+- **Offene Fragen an den Planner:** Wahl der Hülle und des Werkzeugs; Umgang mit Fenstergröße/Vollbild; Speicherort des Spielstands; Auswirkung auf PE-02 und §2 „Downloads“ (privater Test, nicht Veröffentlichung); Lizenzen der Assets bei Weitergabe an Dritte prüfen (R1); Anpassung „Freigegebene Abhängigkeiten“.
+- **Entscheidungen:** Nutzer am 2026-11-01: Weitergabe privat (1a), portable einzelne .exe (2a), unsignierte Datei mit Anleitung zur Windows-Warnung (3a), Spielstand lokal behalten (4a).
