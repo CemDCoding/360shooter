@@ -51,7 +51,8 @@
     "files": [
       "package.json",
       "dist/**/*",
-      "build/desktop/**/*.js"
+      "build/desktop/**/*.js",
+      "!node_modules/**/*"
     ],
     "asar": true,
     "win": {

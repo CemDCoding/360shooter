@@ -109,6 +109,11 @@ describe('content security policy', () => {
     expect(hashes[0]).toMatch(/^'sha256-[A-Za-z0-9+/=]+'$/);
     expect(contentSecurityPolicy(hashes)).toContain(hashes[0]);
   });
+  it('hashes like the HTML parser: CRLF and CR count as LF', () => {
+    const lf = inlineScriptHashes('<script>\n  a();\n</script>');
+    expect(inlineScriptHashes('<script>\r\n  a();\r\n</script>')).toEqual(lf);
+    expect(inlineScriptHashes('<script>\r  a();\r</script>')).toEqual(lf);
+  });
 });
 
 describe('mimeType', () => {

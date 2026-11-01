@@ -100,11 +100,14 @@ export function isAllowedRequestUrl(requestUrl: string, allowDevtools: boolean):
   return false;
 }
 
-/** sha256 hashes of inline <script> blocks, so the CSP needs no 'unsafe-inline' for scripts. */
+/**
+ * sha256 hashes of inline <script> blocks, so the CSP needs no 'unsafe-inline' for scripts.
+ * The HTML parser turns CRLF and CR into LF before hashing, so we do the same (Windows checkout).
+ */
 export function inlineScriptHashes(html: string): string[] {
   const hashes: string[] = [];
   const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
-  for (const m of html.matchAll(re)) {
+  for (const m of html.replace(/\r\n?/g, '\n').matchAll(re)) {
     const attrs = m[1] ?? '';
     const body = m[2] ?? '';
     if (/\bsrc\s*=/i.test(attrs) || body.length === 0) continue;
