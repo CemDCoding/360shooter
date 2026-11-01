@@ -2,6 +2,8 @@
 
 Stand: 2026-11-01 (Gegnerzahlen, Skalierung, Stufen und Boss-HP nach AP-126 bis AP-128 und AP-127), aus dem Code gelesen (`src/config/enemies.ts`, `levels.ts`, `maps.ts`, `scaling.ts`, `tiers.ts`, `bosses.ts`). Zahlen ändern nur dort, nicht in dieser Datei. Erklärung der Werte: `docs/balancing.md`.
 
+Diamanten (M8): Der erste Sieg eines Levels gibt 1 Diamant, das letzte Level jeder Map (Level 4, 9, 20, 25, 30, 40) gibt 3. Zahlen und Shop: `docs/balancing.md`, Abschnitt „Diamanten, Shop, Ruestung, Pets“.
+
 Kurzbegriffe: **Batch** = Spielwelt mit eigener Map. **Level** = einzelne Runde (0 bis 40). Eine **Map** gehört zu genau einem Batch. Es gibt sechs Batches, 14 normale Gegner und sechs Bosse.
 
 ---

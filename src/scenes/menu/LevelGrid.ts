@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { LEVELS } from '../../config';
 import type { BatchId } from '../../contracts';
 import { THEME, type ColorName } from '../../config/theme';
-import { drawBevel, drawLock, drawRing, drawStar, kText, textWidth } from './kassette';
+import { drawBevel, drawLock, drawRing, kText, textWidth } from './kassette';
+import { markerFrame } from './homeLogic';
 import { groupLevels } from './levelGroups';
 import { groupRange, tileState, type TileState } from './menuLogic';
 
@@ -51,7 +52,7 @@ const TILE_STYLE: Record<TileState, TileStyle> = {
 
 /**
  * Level-Raster im Kassetten-Panel: nach Biom gruppiert mit Aufkleber und Bereich.
- * Zustände: geschafft (Minze und Stern), aktuell (Koralle, Ring, Pfeil), gesperrt (Schloss).
+ * Zustände: geschafft (Minze), Diamant-Marke unten rechts (gefüllt = gewonnen, hohl = offen), aktuell (Koralle, Ring, Pfeil), gesperrt (Schloss).
  * x, y ist die linke obere Ecke des Panels.
  */
 export class LevelGrid extends Phaser.GameObjects.Container {
@@ -62,6 +63,7 @@ export class LevelGrid extends Phaser.GameObjects.Container {
     highestUnlockedLevel: number,
     onSelect: (levelId: number) => void,
     page = 0,
+    wonLevels: readonly number[] = [],
   ) {
     super(scene, x, y);
     const g = scene.add.graphics();
@@ -87,7 +89,17 @@ export class LevelGrid extends Phaser.GameObjects.Container {
       group.cells.forEach((cell, i) => {
         const state = tileState(cell.id, highestUnlockedLevel);
         const cx = PAD_X + i * (TILE + TILE_GAP);
-        this.add(this.makeTile(scene, cx, rowY, cell.id, state, () => onSelect(cell.id)));
+        this.add(
+          this.makeTile(
+            scene,
+            cx,
+            rowY,
+            cell.id,
+            state,
+            markerFrame(cell.id, highestUnlockedLevel, wonLevels),
+            () => onSelect(cell.id),
+          ),
+        );
       });
       top = rowY + TILE + GROUP_GAP;
     }
@@ -123,6 +135,7 @@ export class LevelGrid extends Phaser.GameObjects.Container {
     y: number,
     id: number,
     state: TileState,
+    marker: 0 | 1 | null,
     onPick: () => void,
   ): Phaser.GameObjects.Container {
     const s = TILE_STYLE[state];
@@ -150,8 +163,8 @@ export class LevelGrid extends Phaser.GameObjects.Container {
     } else {
       tile.add(kText(scene, 0, 0, String(id), 2, s.fg, 0.5, 0.5));
     }
-    if (state === 'done') {
-      drawStar(g, TILE / 2 - 9, TILE / 2 - 9, 'menu.outline', 'menu.gold');
+    if (marker !== null && scene.textures.exists('diamond-marker')) {
+      tile.add(scene.add.image(TILE / 2 - 5, TILE / 2 - 5, 'diamond-marker', marker));
     }
     if (state !== 'locked') {
       tile.setSize(TILE, TILE);
@@ -170,7 +183,14 @@ export class LevelGrid extends Phaser.GameObjects.Container {
       this.add(t);
       x += 12 + textWidth(t) + 14;
     };
-    entry('GESCHAFFT', (ix) => drawStar(g, ix, y, 'menu.outline', 'menu.gold'));
+    const marker =
+      (frame: number) =>
+      (ix: number): void => {
+        if (scene.textures.exists('diamond-marker'))
+          this.add(scene.add.image(ix + 4, y + 4, 'diamond-marker', frame));
+      };
+    entry('GESCHAFFT', marker(0));
+    entry('DIAMANT OFFEN', marker(1));
     entry('AKTUELL', (ix) => {
       g.fillStyle(THEME.colors['menu.focus'].num).fillRect(ix - 2, y - 2, 12, 12);
       g.fillStyle(THEME.colors['menu.outline'].num).fillRect(ix - 1, y - 1, 10, 10);

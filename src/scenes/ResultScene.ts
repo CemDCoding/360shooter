@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
 import { ARENA } from '../config/arena';
 import { getLevel } from '../config/levels';
-import { themeColor, type ColorName } from '../config/theme';
+import { THEME, themeColor, type ColorName } from '../config/theme';
 import type { BatchId, BossId } from '../contracts';
 import { getSoundService } from '../platform/audio';
 import { hudScale } from '../platform/layout';
+import { prefersReducedMotion } from '../platform/motion';
+import { loadSave } from '../platform/storage';
 import { isValidLevelId, MAX_LEVEL_ID } from './debug';
 import type { ResultSceneData } from './GameScene';
 import { FunkButton } from './hud/FunkButton';
@@ -17,6 +19,8 @@ import {
   patternWidth,
   PIXEL_STAR,
 } from './hud/hudMath';
+import { GearPreview } from './menu/GearPreview';
+import { diamondFact, popDelays, type DiamondFact } from './menu/homeLogic';
 import { BATCH_LABELS } from './menu/levelGroups';
 import { centerOffset } from './menu/menuLogic';
 import { readSafeInsets, sideMargins } from './safeInsets';
@@ -29,6 +33,9 @@ const BAND_H = 6;
 const MAX_K = 1.4;
 const BUTTON_GAP = 12;
 const FACT_VALUE_X = 182;
+/** Hero text column: right of the 3x astronaut (96 px), and right of the pet (66 + 24 px right of the centre). */
+const HERO_TEXT_X = 96 + 18;
+const HERO_TEXT_X_PET = 48 + 66 + 24 + 14;
 const FACT_TOP = 162;
 /** Fact rows: Funk 2x line (16) plus a row gap of 8 (H-14, 6a). */
 const FACT_STEP = FUNK_GLYPH_H * 2 + 8;
@@ -137,8 +144,16 @@ export class ResultScene extends Phaser.Scene {
     const bossWon = bossId !== undefined && won && data?.bossDefeated === true;
     if (bossWon) this.createSeal(this.sideL + logLeft.width, logRightX, logY);
 
-    this.add.image(this.sideL + 48, 96, 'astronaut', 0).setScale(3);
-    const heroX = this.sideL + 96 + 18;
+    // Hero: astronaut with armour 3x and the active pet 3x (GearPreview puts the pet right and below).
+    const save = loadSave();
+    const pet = save.activePet ?? null;
+    new GearPreview(this, this.sideL + 48, pet ? 88 : 96, {
+      scale: 3,
+      equipped: save.equippedGear,
+      pet,
+      petGear: pet ? (save.petGear?.[pet] ?? null) : null,
+    });
+    const heroX = this.sideL + (pet ? HERO_TEXT_X_PET : HERO_TEXT_X);
     funkText(
       this,
       heroX,
@@ -274,7 +289,11 @@ export class ResultScene extends Phaser.Scene {
     y = row(i0 + 3, 'GOLD GESAMT');
     funkText(this, FACT_VALUE_X, y, String(goldTotal), 2, 'hud.gold').setOrigin(0, 0.5);
 
-    const noteY = FACT_TOP + (i0 + 4) * FACT_STEP;
+    // First win only (diamondsGained > 0): a DIAMANTEN row after the other rows (H-35, view 7).
+    const fact = debugRound ? null : diamondFact(data?.diamondsGained, data?.diamondsTotal);
+    if (fact) this.createDiamondRow(row(i0 + 4, 'DIAMANTEN'), fact);
+
+    const noteY = FACT_TOP + (i0 + 4 + (fact ? 1 : 0)) * FACT_STEP;
     if (debugRound) {
       // Unmissable (AP-88, Q-49): a filled banner, the round was a ?level= debug round and saved nothing.
       const text = 'DEBUG-RUNDE: GOLD UND SPIELSTAND WERDEN NICHT GESPEICHERT';
@@ -301,6 +320,36 @@ export class ResultScene extends Phaser.Scene {
         'hud.danger',
       ).setOrigin(0, 0.5);
     }
+  }
+
+  /** Diamond 2x, "+n" in a 1 px frame, then the muted note; appears in 4 steps (instantly without motion). */
+  private createDiamondRow(y: number, fact: DiamondFact): void {
+    const items: Phaser.GameObjects.GameObject[] = [];
+    if (this.textures.exists('diamond')) {
+      items.push(this.add.image(FACT_VALUE_X + 8, y, 'diamond', 0).setScale(2));
+    }
+    const color = themeColor('hud.diamond').num;
+    const bx = FACT_VALUE_X + 22;
+    const bw = measureFunk(this, fact.badge, 2) + 8;
+    const bh = FUNK_GLYPH_H * 2 + 6;
+    const frame = this.add.graphics();
+    frame.fillStyle(color, 1);
+    frame.fillRect(bx, y - bh / 2, bw, 1);
+    frame.fillRect(bx, y + bh / 2 - 1, bw, 1);
+    frame.fillRect(bx, y - bh / 2, 1, bh);
+    frame.fillRect(bx + bw - 1, y - bh / 2, 1, bh);
+    items.push(frame);
+    items.push(funkText(this, bx + 4, y, fact.badge, 2, 'hud.diamond').setOrigin(0, 0.5));
+    const noteX = bx + bw + 8;
+    items.push(funkText(this, noteX, y, fact.note, 1, 'hud.text-muted').setOrigin(0, 0.5));
+
+    const delays = popDelays(THEME.motionMs['motion.diamond-pop'], prefersReducedMotion());
+    if (delays.length <= 1) return;
+    const setAlpha = (a: number): void => {
+      for (const o of items) (o as unknown as Phaser.GameObjects.Components.Alpha).setAlpha(a);
+    };
+    setAlpha(0);
+    delays.forEach((d, i) => this.time.delayedCall(d, () => setAlpha((i + 1) / delays.length)));
   }
 
   private createButtons(width: number, height: number, levelId: number, won: boolean): void {
