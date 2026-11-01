@@ -9,3 +9,7 @@
 node_modules/
 dist/
 ma-config.json
+
+# Desktop build output
+build/desktop/
+release/
