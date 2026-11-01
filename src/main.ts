@@ -6,7 +6,8 @@ import { GameScene } from './scenes/GameScene';
 import { HudScene } from './scenes/HudScene';
 import { ResultScene } from './scenes/ResultScene';
 import { RELAYOUT_DELAYS_MS } from './platform/layout';
-import { ArenaWidthController, hostBoxFor, measureArena } from './platform/arenaLayout';
+import { ArenaWidthController, hostBoxFor, measureArena, sameInsets } from './platform/arenaLayout';
+import { SAFE_INSETS_KEY, type SafeInsets } from './contracts';
 import {
   createLayoutDebug,
   layoutDebugWanted,
@@ -26,8 +27,8 @@ const debug = createLayoutDebug(
 );
 
 /*
- * PE-109: the arena width follows the safe area's aspect ratio (arenaWidthFor), but stays fixed
- * while a round exists. The controller applies a wanted width at once outside a round, when a
+ * PE-140/PE-109: the arena width follows the aspect ratio of the whole visible area
+ * (arenaWidthFor), but stays fixed while a round exists, as do the safe insets (Q-61). The controller applies a wanted width at once outside a round, when a
  * round starts (also "Nochmal") and when it ends; menu and result scenes restart after a change.
  */
 const widths = new ArenaWidthController();
@@ -35,6 +36,14 @@ const widths = new ArenaWidthController();
 // eslint-disable-next-line prefer-const
 let game: Phaser.Game | undefined;
 let hooked = false;
+
+/** Writes the insets to the registry when they differ (same rule as the width, Q-61). */
+function publishInsets(): void {
+  if (!game) return;
+  const now = widths.currentInsets;
+  const old = game.registry.get(SAFE_INSETS_KEY) as SafeInsets | undefined;
+  if (!old || !sameInsets(old, now)) game.registry.set(SAFE_INSETS_KEY, { ...now });
+}
 
 /** Restarts open menu or result scenes so that their layout matches a new width. */
 function restartMenus(): void {
@@ -70,7 +79,7 @@ function hookGameScene(): void {
 }
 
 /**
- * Sizes #game to the arena fitted into the safe area (notch, home bar), centred there. Order
+ * Sizes #game to the whole visible area (also under notch and home bar, PE-140). Order
  * (AP-96, H-c): 1. game width, 2. #game box, 3. Phaser reads the new #game box, then fits the
  * canvas. Phaser's refresh() alone fits into the cached parent size and would keep the canvas
  * sized for the previous #game box. `widthChanged` is true when a round event applied a width.
@@ -98,10 +107,14 @@ function layoutArena(widthChanged = false): void {
   });
   // A round that ended without a seen SHUTDOWN releases its width here (H-b safety net).
   const ended = game ? widths.syncRound(roundAlive()) !== null : false;
-  const wanted = widths.want(m.wantedW) !== null;
+  const wanted = widths.want(m.wantedW, m.wantedInsets) !== null;
   const changed = widthChanged || ended || wanted;
   const width = widths.currentW ?? m.wantedW;
-  if (changed && game) game.scale.setGameSize(width, ARENA.height);
+  // Insets first: scenes restarted below read them in create().
+  publishInsets();
+  if (changed && game && game.scale.gameSize.width !== width) {
+    game.scale.setGameSize(width, ARENA.height);
+  }
   const box = hostBoxFor(m.area, width);
   host.style.right = 'auto';
   host.style.bottom = 'auto';
@@ -140,6 +153,7 @@ function layoutArena(widthChanged = false): void {
       roundRunning: widths.roundRunning,
       widthChanges: widths.changeCount,
       lastChange: widths.lastChange,
+      insetsUnits: widths.currentInsets,
     }),
   );
 }
@@ -163,6 +177,7 @@ game = new Phaser.Game({
   },
   scene: [BootScene, PreloadScene, MenuScene, GameScene, HudScene, ResultScene],
 });
+publishInsets(); // the registry exists before the scenes boot
 
 /** Re-measures and lays out; `widthChanged` only from the round events (never an Event object). */
 function relayoutWith(widthChanged: boolean): void {

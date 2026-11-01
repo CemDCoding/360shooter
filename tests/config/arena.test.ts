@@ -14,6 +14,13 @@ describe('arena config', () => {
     expect(spawnRadiusFor({ width: 900, height: 360 })).toBeGreaterThan(BASE_SPAWN_RADIUS);
   });
 
+  it('at 780x360 (iPhone 15, PE-142) the spawn ring lies outside the visible corner (+24)', () => {
+    const halfDiagonal = Math.hypot(780 / 2, 360 / 2);
+    const r = spawnRadiusFor({ width: 780, height: 360 });
+    expect(r).toBeGreaterThanOrEqual(halfDiagonal + 24 - 1e-6);
+    expect(r).toBeGreaterThan(spawnRadiusFor({ width: 640, height: 360 }));
+  });
+
   it('widths are ordered', () => {
     expect(ARENA.minWidth).toBeLessThanOrEqual(ARENA.baseWidth);
     expect(ARENA.baseWidth).toBeLessThanOrEqual(ARENA.maxWidth);

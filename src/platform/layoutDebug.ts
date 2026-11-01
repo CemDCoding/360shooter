@@ -48,6 +48,8 @@ export interface LayoutReportInput {
   roundRunning: boolean;
   widthChanges: number;
   lastChange: string | null;
+  /** Insets in arena units as the scenes see them (registry). */
+  insetsUnits?: { top: number; right: number; bottom: number; left: number };
 }
 
 const r = (n: number): string => (Number.isFinite(n) ? String(Math.round(n * 100) / 100) : '?');
@@ -60,6 +62,8 @@ export function layoutReport(i: LayoutReportInput): string[] {
     : 'vv none';
   const a = i.area;
   const c = i.canvas;
+  const iu = i.insetsUnits;
+  const units = iu ? `t${r(iu.top)} r${r(iu.right)} b${r(iu.bottom)} l${r(iu.left)}` : 'none';
   // Rest = window edge to canvas edge, left and right (CSS px).
   const canvas = c
     ? `canvas ${size(c)} @${r(c.x)},${r(c.y)} rest l${r(c.x)} r${r(i.innerW - c.x - c.width)}`
@@ -74,6 +78,7 @@ export function layoutReport(i: LayoutReportInput): string[] {
     `probe ${r(i.probe.width)}x${r(i.probe.height)} ins t${r(i.probe.top)} r${r(i.probe.right)} b${r(i.probe.bottom)} l${r(i.probe.left)}`,
     `area ${size(a)} @${r(a.x)},${r(a.y)} ins t${r(a.insets.top)} r${r(a.insets.right)} b${r(a.insets.bottom)} l${r(a.insets.left)}`,
     `avail ${r(i.availW)}x${r(i.availH)}`,
+    `ins u ${units}`,
     `host ${size(i.host)} @${r(i.host.left)},${r(i.host.top)}`,
     `game ${r(i.game.width)}x${r(i.game.height)} @${r(i.game.x)},${r(i.game.y)}`,
     canvas,
