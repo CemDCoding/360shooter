@@ -1,4 +1,4 @@
-import { RAPID_FIRE_MAX_PER_SEC } from '../config';
+import { DOUBLE_SHOT_STAGE_MS, RAPID_FIRE_MAX_PER_SEC } from '../config';
 import type { ActivePowers } from '../contracts';
 
 /** Highest double-shot stage the logic knows (contract type is `number`). */
@@ -37,10 +37,22 @@ export function absorbDamage(
   };
 }
 
-/** dtMs is pausable game time (no wall clock). */
+/** dtMs is pausable game time (no wall clock). Double shot decays one stage per DOUBLE_SHOT_STAGE_MS. */
 export function tickPowers(state: ActivePowers, dtMs: number): ActivePowers {
-  if (!(dtMs > 0) || !(state.rapidFireMsLeft > 0)) return { ...state };
-  return { ...state, rapidFireMsLeft: Math.max(0, state.rapidFireMsLeft - dtMs) };
+  if (!(dtMs > 0)) return { ...state };
+  const next = { ...state };
+  if (next.rapidFireMsLeft > 0) next.rapidFireMsLeft = Math.max(0, next.rapidFireMsLeft - dtMs);
+  if (next.doubleShotStage > 0 && next.doubleShotMsLeft > 0) {
+    let left = next.doubleShotMsLeft - dtMs;
+    let stage = next.doubleShotStage;
+    while (left <= 0 && stage > 0) {
+      stage -= 1;
+      left = stage > 0 ? left + DOUBLE_SHOT_STAGE_MS : 0;
+    }
+    next.doubleShotStage = stage;
+    next.doubleShotMsLeft = left;
+  }
+  return next;
 }
 
 export function isRapidFireActive(state: ActivePowers): boolean {

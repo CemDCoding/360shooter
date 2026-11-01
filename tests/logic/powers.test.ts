@@ -46,6 +46,36 @@ describe('tickPowers', () => {
   });
 });
 
+describe('tickPowers double shot decay', () => {
+  const S = 20_000;
+  const base = { ...emptyPowers(), doubleShotStage: 2, doubleShotMsLeft: S };
+  it('stage 2 falls to 1 after 20 s, to 0 after another 20 s', () => {
+    let s = tickPowers(base, S - 1);
+    expect(s.doubleShotStage).toBe(2);
+    s = tickPowers(s, 1);
+    expect(s.doubleShotStage).toBe(1);
+    expect(s.doubleShotMsLeft).toBe(S);
+    s = tickPowers(s, S);
+    expect(s.doubleShotStage).toBe(0);
+    expect(s.doubleShotMsLeft).toBe(0);
+  });
+  it('pause (dt 0) holds the time', () => {
+    expect(tickPowers(base, 0).doubleShotMsLeft).toBe(S);
+  });
+  it('large dt removes at most as many stages as time allows', () => {
+    const s = tickPowers(base, S + 5000);
+    expect(s.doubleShotStage).toBe(1);
+    expect(s.doubleShotMsLeft).toBe(S - 5000);
+    expect(tickPowers(base, 10 * S).doubleShotStage).toBe(0);
+  });
+  it('does not touch shield and decays alongside rapid fire', () => {
+    const s = tickPowers({ ...base, shieldLeft: 5, rapidFireMsLeft: 1000 }, 500);
+    expect(s.shieldLeft).toBe(5);
+    expect(s.rapidFireMsLeft).toBe(500);
+    expect(s.doubleShotMsLeft).toBe(S - 500);
+  });
+});
+
 describe('shotPattern', () => {
   it('stage 0 to 2', () => {
     expect(shotPattern(0)).toEqual([{ offsetPx: 0, angleDeg: 0 }]);

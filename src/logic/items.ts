@@ -1,3 +1,4 @@
+import { DOUBLE_SHOT_STAGE_MS } from '../config';
 import type { ActivePowers, ItemDef, ItemRules } from '../contracts';
 import { MAX_DOUBLE_SHOT_STAGE } from './powers';
 import type { Rng } from './rng';
@@ -26,6 +27,7 @@ export function applyPowerItem(state: ActivePowers, def: ItemDef): ActivePowers 
           MAX_DOUBLE_SHOT_STAGE,
           Math.max(0, state.doubleShotStage) + 1,
         ),
+        doubleShotMsLeft: DOUBLE_SHOT_STAGE_MS,
       };
     case 'shield':
       // No stage field in ActivePowers: stage = ceil(shieldLeft / perStack), capped via maxStacks.
