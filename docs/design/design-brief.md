@@ -1,6 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Status:** geändert am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“ in Arbeit, noch nicht freigegeben). Zuletzt freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand (2026-11-01):** H-33 Interview Runde 1 gestellt (Quicktime-Kreis, Rückmeldungen, Stufen-Tönung, Restzeit-Balken). Danach Runde 2 (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
 **Stand davor:** Ergänzung H-25 eingetragen (Feldmünzen `coin-field` 6×6 ×2 und `coin-big` 12×12, Chip-Zeile der HUD-Tabelle mit den verkleinerten Chips, Ausrichtung oben, „NIEDERLAGE“ in Brief und Mockups). Die Ergänzung setzt Nutzerentscheidungen um (Q-50, Q-53, Q-54, PE-119) und ist vom Nutzer freigegeben (2026-10-28). Nächster Schritt: Planner-Auftrag „Design übernehmen“ für AP-92 (Übergabe unter „Änderungen“, H-25).
 
@@ -406,5 +407,18 @@ Die Angriffe der Bosse sind Sache von Planner und Balancing. Braucht ein Angriff
 3. Gegner und Bosse (Logik) nach dem Plan.
 
 Keine neuen Abhängigkeiten, Schriften oder Fremd-Assets.
+
+### 2026-11-01 · Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“ (in Arbeit)
+
+**Auftrag (Plan §13 H-33, PE-160; Grundlage F-27 bis F-30, PE-155 bis PE-161):**
+
+1. Quicktime-Abwehr (F-29): 1 bis 3 Kreise um die Astronautin, zusammenziehender Ring bis zum Treffzeitpunkt, Rückmeldung „PERFEKT“/„GUT“/„VERFEHLT“ je Kreis, „PARRY!“, wenn alle getroffen sind. Querformat-Mockup mit Boss.
+2. Vier Stufen-Tönungen der Gegner (`tintStep` 0 bis 3, Stufe 0 ohne Tönung), lesbar auf allen sechs Map-Böden. Keine neuen Sprites. Zweites Merkmal ist die Größe (+3 % je Stufe, höchstens +15 %).
+3. Restzeit-Balken unter dem Doppelschuss-Chip (20 s je Stufe, nur bei Stufe 1 oder 2).
+4. Lage des Buttons „HAUPTMENÜ“ im Pause-Overlay. Die Rückfrage „Runde abbrechen?“ nutzt den vorhandenen ConfirmDialog.
+
+**Rahmen:** bleibt in der freigegebenen Richtung (Funkgerät in der Runde, Grundsätze 1–8). Varianten innerhalb des Systems, keine neuen Richtungen. Randbedingungen: Die Boss-Ankündigung (`Telegraph`) ist schon Warnrot (`red.300`), deshalb dürfen die Kreise nicht rot sein. Die Ziele sind am iPhone mindestens 18 px Radius groß (Plan), Grundsatz 5 verlangt 32×32.
+
+**Entscheidungen:** folgen nach dem Interview.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
