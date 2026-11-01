@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M8 · Rüstung, Pets, Eier, Diamant · Sprites · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .sg { max-width: 1320px; margin: 0 auto 28px; }
+  .sg h2 { font-size: 1rem; color: var(--page-fg); margin-bottom: 6px; }
+  .sg p { color: var(--page-muted); font-size: .875rem; max-width: 110ch; margin-bottom: 10px; }
+  code { color: var(--color-coral-300); }
+  canvas { image-rendering: pixelated; display: block; }
+  .group { background: var(--color-menu-surface); padding: 14px 16px; margin-bottom: 10px; }
+  .group h3 { font: 600 12px/1 var(--font-text); color: var(--page-muted); margin-bottom: 10px; letter-spacing: .04em; }
+  .row { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-end; }
+  figure { margin: 0; }
+  figcaption { color: var(--page-muted); font: 500 11px/1.4 var(--font-text); margin-top: 5px; max-width: 34ch; }
+  .frames { display: flex; gap: 6px; align-items: flex-end; }
+  .grid { background-image: linear-gradient(#ffffff10 1px, transparent 1px), linear-gradient(90deg, #ffffff10 1px, transparent 1px); }
+  .scenes { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 1300px) { .scenes { grid-template-columns: 1fr 1fr; } }
+  .err { background: #5a2236; color: #fff; padding: 8px 12px; font: 600 13px var(--font-text); display: none; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>M8 · Rüstung, Pets, Eier, Diamant (Sprites)</h1>
+  <p>Ergänzung H-35. Quelle: <code>docs/design/assets/sprites-m8.js</code> (ergänzt <code>PX_SPRITES</code>, Ladefolge <code>sprites.js</code> → <code>sprites-world.js</code> → <code>sprites-desert.js</code> → <code>sprites-m8.js</code>). Rüstungsteile sind Overlays, die genau auf den vier Frames der Astronautin liegen. Pet-Rüstungen liegen genau auf den sechs Pet-Frames.</p>
+</header>
+<div class="err" id="err"></div>
+
+<section class="sg">
+  <h2>1 · Astronautin mit Rüstung (4×, Frame 0; darunter alle vier Frames 2×)</h2>
+  <p>Die Rüstung ist ein Aufsatz auf dem Anzug (1a): Visier und Gesicht bleiben frei. Die Sets erkennt man an Form <b>und</b> Farbe (2a): Diamant hat Kristallzacken, Hölle Hörnchen und Lava-Fugen, Himmel Flügel und Heiligenschein. Ebenen von unten: Astronautin, Hose+Schuhe, Oberteil, Kopf.</p>
+  <div class="group"><div class="row" id="rigs"></div></div>
+</section>
+
+<section class="sg">
+  <h2>2 · Spiel-Szenen (2×, Ausschnitt 320×180 der Spielfläche)</h2>
+  <p>Das Pet steht oder fliegt neben der Astronautin auf der Seite, die dem Zielwinkel gegenüberliegt. Die Biene fliegt zum nächsten Gegner, der Pinguin wirft Schneebälle, und die Capybara-Aura „warme Quelle“ (8a) hat einen gepunkteten Ring mit aufsteigendem Dampf.</p>
+  <div class="scenes" id="scenes"></div>
+</section>
+
+<section class="sg">
+  <h2>3 · Spritesheets (Raster = 1 Pixel)</h2>
+  <div id="sheets"></div>
+</section>
+
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script>
+(function () {
+  const S = window.PX_SPRITES;
+  // #pets shows only the pet sheets (for close-up screenshots)
+  const PETS_ONLY = false; // true = only the pet sheets (close-up screenshots)
+  if (PETS_ONLY) document.querySelectorAll('header, section:not(:last-of-type)').forEach((n) => { n.style.display = 'none'; });
+  const NEW = Object.keys(S).filter((k) => /^(gear-|pet-|petgear-|egg-|diamond)/.test(k));
+  const errs = [];
+  for (const k of NEW) {
+    const d = S[k];
+    d.frames.forEach((rows, f) => {
+      if (rows.length !== d.frameHeight) errs.push(`${k} F${f}: ${rows.length} Zeilen`);
+      rows.forEach((r, y) => {
+        if (r.length !== d.frameWidth) errs.push(`${k} F${f} Z${y}: Breite ${r.length}`);
+        for (const ch of r) if (ch !== '.' && !d.palette[ch]) errs.push(`${k} F${f} Z${y}: Farbe '${ch}'`);
+      });
+    });
+  }
+  if (errs.length) { const e = document.getElementById('err'); e.style.display = 'block'; e.textContent = errs.slice(0, 8).join(' · '); }
+
+  const cache = {};
+  function fc(key, f) {
+    const id = key + ':' + f;
+    if (cache[id]) return cache[id];
+    const d = S[key], c = document.createElement('canvas');
+    c.width = d.frameWidth; c.height = d.frameHeight;
+    const x = c.getContext('2d');
+    d.frames[f].forEach((r, y) => [...r].forEach((ch, i) => { if (ch !== '.') { x.fillStyle = d.palette[ch]; x.fillRect(i, y, 1, 1); } }));
+    return (cache[id] = c);
+  }
+  function stack(keys, f, w, h) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); keys.forEach((k) => k && x.drawImage(fc(k, f), 0, 0)); return c;
+  }
+  const rigKeys = (gear) => ['astronaut', ...['legs', 'body', 'head'].map((s) => gear[s] && `gear-${gear[s]}-${s}`)];
+  function scaled(src, k, grid, bg) {
+    const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+    c.getContext('2d').drawImage(src, 0, 0);
+    c.style.width = src.width * k + 'px'; c.style.height = src.height * k + 'px';
+    if (grid) { c.classList.add('grid'); c.style.backgroundSize = k + 'px ' + k + 'px'; }
+    if (bg) c.style.backgroundColor = bg;
+    return c;
+  }
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
+
+  // ---------- 1 rigs ----------
+  const RIGS = [
+    ['ohne Rüstung', {}],
+    ['SET DIAMANT · Kristallhelm, Kristallpanzer, Kristallstiefel', { head: 'diamond', body: 'diamond', legs: 'diamond' }],
+    ['SET HÖLLE · Teufelshörner, Glutpanzer, Lavastiefel', { head: 'hell', body: 'hell', legs: 'hell' }],
+    ['SET HIMMEL · Heiligenschein, Engelsweste, Wolkenstiefel', { head: 'heaven', body: 'heaven', legs: 'heaven' }],
+    ['gemischt · Teufelshörner + Kristallpanzer + Wolkenstiefel', { head: 'hell', body: 'diamond', legs: 'heaven' }],
+    ['gemischt · Heiligenschein + Glutpanzer', { head: 'heaven', body: 'hell' }],
+  ];
+  const rigs = document.getElementById('rigs');
+  RIGS.forEach(([label, gear]) => {
+    const fig = el('figure');
+    fig.appendChild(scaled(stack(rigKeys(gear), 0, 32, 32), 4, true));
+    const fr = el('div', 'frames'); fr.style.marginTop = '6px';
+    for (let f = 0; f < 4; f++) fr.appendChild(scaled(stack(rigKeys(gear), f, 32, 32), 2));
+    fig.appendChild(fr); fig.appendChild(el('figcaption', '', label)); rigs.appendChild(fig);
+  });
+
+  // ---------- 2 scenes ----------
+  function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+  function silhouette(src, color) { const c = document.createElement('canvas'); c.width = src.width; c.height = src.height; const x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c; }
+  function multiplyTint(src, color) { const c = document.createElement('canvas'); c.width = src.width; c.height = src.height; const x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'multiply'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); x.globalCompositeOperation = 'destination-in'; x.drawImage(src, 0, 0); return c; }
+  const AURA = getComputedStyle(document.documentElement).getPropertyValue('--color-game-pet-aura').trim() || '#ffd98a';
+  function scene(cfg) {
+    const W = 320, H = 180, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+    x.fillStyle = cfg.base; x.fillRect(0, 0, W, H);
+    const r = rng(cfg.seed);
+    for (let ty = 0; ty < H; ty += 32) for (let tx = 0; tx < W; tx += 32) x.drawImage(fc(cfg.tiles, r() < 0.15 ? 1 + Math.floor(r() * 3) : 0), tx, ty);
+    const draw = (img, px, py, flip, s = 1) => { x.save(); x.translate(Math.round(px), Math.round(py)); if (flip) x.scale(-1, 1); x.drawImage(img, -img.width * s / 2, -img.height * s / 2, img.width * s, img.height * s); x.restore(); };
+    const put = (key, f, px, py, opt = {}) => { const img = opt.keys ? stack(opt.keys, f, S[key].frameWidth, S[key].frameHeight) : fc(key, f); if (opt.halo) { const sil = silhouette(img, '#fff4e8'); [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([dx, dy]) => draw(sil, px + dx, py + dy, opt.flip)); } draw(img, px, py, opt.flip, opt.scale); };
+    const cx = 160, cy = 92;
+    if (cfg.aura) {
+      const [ax, ay, rad] = cfg.aura;
+      x.save(); x.globalAlpha = 0.25; x.fillStyle = AURA; x.beginPath(); x.arc(ax, ay, rad, 0, 7); x.fill(); x.restore();
+      x.fillStyle = AURA; for (let a = 0; a < 64; a++) if (a % 2 === 0) x.fillRect(Math.round(ax + Math.cos(a / 64 * 6.283) * rad), Math.round(ay + Math.sin(a / 64 * 6.283) * rad), 1, 1);
+      [[ax - 24, ay - 6, 0], [ax + 18, ay - 18, 1], [ax - 6, ay + 22, 2], [ax + 30, ay + 10, 3], [ax - 34, ay + 14, 1]].forEach(([sx, sy, f]) => { x.save(); x.globalAlpha = 0.8; draw(fc('pet-steam', f), sx, sy); x.restore(); });
+    }
+    cfg.items.forEach(([key, f, px, py, opt]) => put(key, f, px, py, opt || {}));
+    const ang = Math.atan2(cfg.aim[1] - cy, cfg.aim[0] - cx), deg = ang * 180 / Math.PI, flip = Math.abs(deg) > 90, behind = deg > -160 && deg < -20;
+    const A = S.astronaut.anchors.handPoint, G = S['weapon-raygun'].anchors;
+    const hx = cx + (flip ? -(A.x - 16) : A.x - 16), hy = cy + (A.y - 16);
+    const gun = () => { x.save(); x.translate(hx, hy); x.rotate(ang); if (flip) x.scale(1, -1); x.drawImage(fc('weapon-raygun', 5), -G.grip.x, -G.grip.y); x.restore(); };
+    if (behind) gun();
+    put('astronaut', cfg.frame || 2, cx, cy, { flip, keys: rigKeys(cfg.gear) });
+    if (cfg.glint) put('gear-diamond-glint', cfg.glint - 1, cx, cy, { flip });
+    if (!behind) gun();
+    const mx = G.muzzle.x - G.grip.x, my = (G.muzzle.y - G.grip.y) * (flip ? -1 : 1);
+    const lx = hx + mx * Math.cos(ang) - my * Math.sin(ang), ly = hy + mx * Math.sin(ang) + my * Math.cos(ang);
+    x.save(); x.translate(lx + Math.cos(ang) * 22, ly + Math.sin(ang) * 22); x.rotate(ang); x.drawImage(multiplyTint(fc('laser', 0), '#ff8fae'), -8, -2); x.restore();
+    (cfg.pets || []).forEach(([key, f, px, py, opt]) => put(key, f, px, py, opt || {}));
+    const v = x.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.62);
+    v.addColorStop(0, 'rgba(0,0,8,0)'); v.addColorStop(1, `rgba(0,0,8,${cfg.vig})`); x.fillStyle = v; x.fillRect(0, 0, W, H);
+    const fig = el('figure'); fig.appendChild(scaled(c, 2)); const cap = el('figcaption', '', cfg.label); cap.style.maxWidth = '90ch'; fig.appendChild(cap); return fig;
+  }
+  const pet = (id, set, f) => ({ keys: [`pet-${id}`, set && `petgear-${id}-${set}`] });
+  const sc = document.getElementById('scenes');
+  sc.appendChild(scene({
+    label: 'Wald · Set Hölle · Biene mit Lavastachel sticht (Frame 5 + Funke), Gegner brennt (gear-burn), Lavastiefel-Explosion (gear-blast)',
+    base: '#2f5a2a', tiles: 'tiles-forest', seed: 3, vig: 0.4, aim: [262, 70], gear: { head: 'hell', body: 'hell', legs: 'hell' },
+    items: [['enemy-boar', 1, 262, 70, { flip: true }], ['gear-burn', 1, 262, 52], ['enemy-zombie-squirrel', 0, 60, 120], ['gear-blast', 1, 96, 46], ['coin-field', 0, 210, 140, { scale: 2, halo: 2 }]],
+    pets: [['pet-bee', 5, 238, 76, pet('bee', 'hell')], ['pet-sting', 0, 250, 74]],
+  }));
+  sc.appendChild(scene({
+    label: 'Wald bei Nacht · Set Diamant mit Diamant-Glanz (Set-Effekt bereit) · Pinguin mit Kristallhelm wirft Schneebälle',
+    base: '#0f1c3a', tiles: 'tiles-forest-night', seed: 11, vig: 0.6, aim: [60, 64], glint: 2, gear: { head: 'diamond', body: 'diamond', legs: 'diamond' },
+    items: [['enemy-forest-witch', 1, 56, 62], ['pet-snowball', 0, 112, 84], ['pet-snowball', 1, 84, 72], ['enemy-bear', 0, 260, 140, { flip: true }]],
+    pets: [['pet-penguin', 5, 186, 104, pet('penguin', 'diamond')]],
+  }));
+  sc.appendChild(scene({
+    label: 'Pyramiden-Oase · Set Himmel · Capybara mit Wolkenkissen: Aura „warme Quelle“ (Fläche 25 %, gepunkteter Ring, Dampf) und Herz beim Heilen',
+    base: '#1c4a3c', tiles: 'tiles-oasis', seed: 29, vig: 0.45, aim: [262, 120], gear: { head: 'heaven', body: 'heaven', legs: 'heaven' }, aura: [134, 104, 40],
+    items: [['enemy-snake', 1, 112, 132], ['enemy-mummy', 0, 270, 120, { flip: true }], ['pet-heal', 2, 160, 66]],
+    pets: [['pet-capybara', 5, 134, 104, pet('capybara', 'heaven')]],
+  }));
+  sc.appendChild(scene({
+    label: 'Wüste · Rundenstart: Das Pet ist noch ein Ei (Bienen-Ei wackelt, Frame 1), kurz vor dem Schlüpfen Risse (Frame 3), dann Schlupf (pet-hatch)',
+    base: '#755428', tiles: 'tiles-desert', seed: 5, vig: 0.4, aim: [262, 66], gear: { head: 'diamond', body: 'hell', legs: 'heaven' },
+    items: [['enemy-camel', 3, 262, 66, { flip: true }], ['enemy-armadillo', 1, 60, 140], ['egg-penguin', 3, 60, 40], ['pet-hatch', 1, 100, 40], ['egg-capybara', 0, 260, 150]],
+    pets: [['egg-bee', 1, 136, 104]],
+  }));
+
+  // ---------- 3 sheets ----------
+  const groups = [
+    ['RÜSTUNG · OVERLAYS 32×32 × 4 (auf dunklem Grund, ohne Astronautin)', ['gear-diamond-head', 'gear-diamond-body', 'gear-diamond-legs', 'gear-hell-head', 'gear-hell-body', 'gear-hell-legs', 'gear-heaven-head', 'gear-heaven-body', 'gear-heaven-legs'], 2],
+    ['RÜSTUNG · SHOP-ICONS 24×24 × 9 · DIAMANT-GLANZ 32×32 × 4', ['gear-icons', 'gear-diamond-glint'], 2],
+    ['PETS 16×16 × 6 (0–3 Ruhe/Bewegung, 4–5 Angriff bzw. Heilen)', ['pet-bee', 'pet-penguin', 'pet-capybara'], 4],
+    ['PET-RÜSTUNG · OVERLAYS 16×16 × 6', ['petgear-bee-diamond', 'petgear-bee-hell', 'petgear-bee-heaven', 'petgear-penguin-diamond', 'petgear-penguin-hell', 'petgear-penguin-heaven', 'petgear-capybara-diamond', 'petgear-capybara-hell', 'petgear-capybara-heaven'], 3],
+    ['PET-RÜSTUNG · SHOP-ICONS 16×16 × 9 (Biene, Pinguin, Capybara je Diamant, Hölle, Himmel)', ['petgear-icons'], 4],
+    ['EIER 16×16 × 4 (Ruhe, wackelt links, wackelt rechts, Risse) · SCHLUPF 24×24 × 3', ['egg-bee', 'egg-penguin', 'egg-capybara', 'pet-hatch'], 4],
+    ['ANGRIFFE UND EFFEKTE', ['pet-snowball', 'pet-sting', 'pet-steam', 'pet-heal', 'gear-burn', 'gear-blast'], 4],
+    ['DIAMANT 8×8 × 4 (Anzeige ×2) · KACHEL-MARKE 8×8 × 2 (0 erhalten, 1 noch offen)', ['diamond', 'diamond-marker'], 6],
+  ];
+  const sheets = document.getElementById('sheets');
+  groups.forEach(([title, keys, k], gi) => {
+    if (PETS_ONLY && gi < 2) return;
+    const g = el('div', 'group'); g.appendChild(el('h3', '', title));
+    const row = el('div', 'row');
+    keys.forEach((key) => {
+      const fig = el('figure'), fr = el('div', 'frames');
+      S[key].frames.forEach((_, f) => fr.appendChild(scaled(fc(key, f), k, true, key.startsWith('gear-') && !key.includes('icons') ? '#1a1420' : null)));
+      fig.appendChild(fr);
+      fig.appendChild(el('figcaption', '', `${key}.png · ${S[key].frameWidth}×${S[key].frameHeight} · ${S[key].frames.length}`));
+      row.appendChild(fig);
+    });
+    g.appendChild(row); sheets.appendChild(g);
+  });
+})();
+</script>
+</body>
+</html>

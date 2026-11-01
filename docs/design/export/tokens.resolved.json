@@ -50,6 +50,12 @@
         "800": "#2c4210",
         "950": "#0a1108"
       },
+      "ice": {
+        "100": "#e8fbff",
+        "300": "#9fe6ff",
+        "500": "#5ab4e6",
+        "700": "#2f6fa8"
+      },
       "biome": {
         "forest": "#6cc04a",
         "night": "#6a86ff",
@@ -94,7 +100,21 @@
         "muzzle-flash": "#fff3b0",
         "coin": "#ffcf4a",
         "coin-hi": "#ffe2a0",
-        "coin-lo": "#c7922a"
+        "coin-lo": "#c7922a",
+        "gear-ice-hi": "#e8fbff",
+        "gear-ice": "#9fe6ff",
+        "gear-ice-shade": "#5ab4e6",
+        "gear-ice-deep": "#2f6fa8",
+        "gear-obsidian-hi": "#5a3450",
+        "gear-obsidian": "#3a2036",
+        "gear-lava": "#ff8a3a",
+        "gear-lava-hi": "#ffd06a",
+        "gear-horn": "#e0483c",
+        "gear-horn-hi": "#ff8a70",
+        "gear-white": "#ffffff",
+        "gear-cloud": "#dfe6ff",
+        "gear-gold": "#ffd24a",
+        "gear-gold-shade": "#c8901e"
       },
       "menu": {
         "bg": "#1a0f24",
@@ -124,7 +144,10 @@
         "danger-fg": "#ff8a7b",
         "gold": "#ffcf4a",
         "focus": "#fff4e8",
-        "scrim": "#0b0610cc"
+        "scrim": "#0b0610cc",
+        "diamond": "#9fe6ff",
+        "owned-bg": "#5fe0c0",
+        "selected": "#fff4e8"
       },
       "hud": {
         "glass": "#060c05b8",
@@ -143,7 +166,8 @@
         "focus": "#e5f2d8",
         "flash": "#a8d86b80",
         "trail": "#e0c9d6",
-        "danger-dim": "#5a2236"
+        "danger-dim": "#5a2236",
+        "diamond": "#9fe6ff"
       },
       "game": {
         "laser-raygun": "#ff8fae",
@@ -167,7 +191,10 @@
         "parry-perfect": "#ffcf4a",
         "parry-good": "#a8d86b",
         "parry-miss": "#ff8a7b",
-        "parry-burst": "#5fb8ff"
+        "parry-burst": "#5fb8ff",
+        "pet-aura": "#ffd98a",
+        "gear-block": "#9fe6ff",
+        "crit": "#ffe2a0"
       }
     },
     "font": {
@@ -224,7 +251,13 @@
       "parry-line": "2px",
       "parry-ring-start": 2.5,
       "hud-timebar-h": "2px",
-      "hud-timebar-gap": "1px"
+      "hud-timebar-gap": "1px",
+      "hud-petbar-h": "20px",
+      "hud-petbar-gap": "4px",
+      "pet-offset-x": "22px",
+      "pet-offset-y": "8px",
+      "shop-tile-h": "56px",
+      "gear-preview-scale": "4"
     },
     "motion": {
       "duration": {
@@ -238,7 +271,10 @@
         "parry-approach": "800ms",
         "parry-feedback": "400ms",
         "parry-burst": "600ms",
-        "timebar-warn": "5000ms"
+        "timebar-warn": "5000ms",
+        "gear-block": "300ms",
+        "diamond-pop": "200ms",
+        "hatch": "300ms"
       },
       "banner-blinks": 3,
       "easing": {

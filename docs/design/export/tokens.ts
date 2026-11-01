@@ -51,6 +51,12 @@ export const tokens = {
       "800": "var(--color-phos-800)",
       "950": "var(--color-phos-950)"
     },
+    "ice": {
+      "100": "var(--color-ice-100)",
+      "300": "var(--color-ice-300)",
+      "500": "var(--color-ice-500)",
+      "700": "var(--color-ice-700)"
+    },
     "biome": {
       "forest": "var(--color-biome-forest)",
       "night": "var(--color-biome-night)",
@@ -95,7 +101,21 @@ export const tokens = {
       "muzzle-flash": "var(--color-sprite-muzzle-flash)",
       "coin": "var(--color-sprite-coin)",
       "coin-hi": "var(--color-sprite-coin-hi)",
-      "coin-lo": "var(--color-sprite-coin-lo)"
+      "coin-lo": "var(--color-sprite-coin-lo)",
+      "gear-ice-hi": "var(--color-sprite-gear-ice-hi)",
+      "gear-ice": "var(--color-sprite-gear-ice)",
+      "gear-ice-shade": "var(--color-sprite-gear-ice-shade)",
+      "gear-ice-deep": "var(--color-sprite-gear-ice-deep)",
+      "gear-obsidian-hi": "var(--color-sprite-gear-obsidian-hi)",
+      "gear-obsidian": "var(--color-sprite-gear-obsidian)",
+      "gear-lava": "var(--color-sprite-gear-lava)",
+      "gear-lava-hi": "var(--color-sprite-gear-lava-hi)",
+      "gear-horn": "var(--color-sprite-gear-horn)",
+      "gear-horn-hi": "var(--color-sprite-gear-horn-hi)",
+      "gear-white": "var(--color-sprite-gear-white)",
+      "gear-cloud": "var(--color-sprite-gear-cloud)",
+      "gear-gold": "var(--color-sprite-gear-gold)",
+      "gear-gold-shade": "var(--color-sprite-gear-gold-shade)"
     },
     "menu": {
       "bg": "var(--color-menu-bg)",
@@ -125,7 +145,10 @@ export const tokens = {
       "danger-fg": "var(--color-menu-danger-fg)",
       "gold": "var(--color-menu-gold)",
       "focus": "var(--color-menu-focus)",
-      "scrim": "var(--color-menu-scrim)"
+      "scrim": "var(--color-menu-scrim)",
+      "diamond": "var(--color-menu-diamond)",
+      "owned-bg": "var(--color-menu-owned-bg)",
+      "selected": "var(--color-menu-selected)"
     },
     "hud": {
       "glass": "var(--color-hud-glass)",
@@ -144,7 +167,8 @@ export const tokens = {
       "focus": "var(--color-hud-focus)",
       "flash": "var(--color-hud-flash)",
       "trail": "var(--color-hud-trail)",
-      "danger-dim": "var(--color-hud-danger-dim)"
+      "danger-dim": "var(--color-hud-danger-dim)",
+      "diamond": "var(--color-hud-diamond)"
     },
     "game": {
       "laser-raygun": "var(--color-game-laser-raygun)",
@@ -168,7 +192,10 @@ export const tokens = {
       "parry-perfect": "var(--color-game-parry-perfect)",
       "parry-good": "var(--color-game-parry-good)",
       "parry-miss": "var(--color-game-parry-miss)",
-      "parry-burst": "var(--color-game-parry-burst)"
+      "parry-burst": "var(--color-game-parry-burst)",
+      "pet-aura": "var(--color-game-pet-aura)",
+      "gear-block": "var(--color-game-gear-block)",
+      "crit": "var(--color-game-crit)"
     }
   },
   "font": {
@@ -221,7 +248,13 @@ export const tokens = {
     "parry-line": "var(--size-parry-line)",
     "parry-ring-start": "var(--size-parry-ring-start)",
     "hud-timebar-h": "var(--size-hud-timebar-h)",
-    "hud-timebar-gap": "var(--size-hud-timebar-gap)"
+    "hud-timebar-gap": "var(--size-hud-timebar-gap)",
+    "hud-petbar-h": "var(--size-hud-petbar-h)",
+    "hud-petbar-gap": "var(--size-hud-petbar-gap)",
+    "pet-offset-x": "var(--size-pet-offset-x)",
+    "pet-offset-y": "var(--size-pet-offset-y)",
+    "shop-tile-h": "var(--size-shop-tile-h)",
+    "gear-preview-scale": "var(--size-gear-preview-scale)"
   },
   "motion": {
     "duration": {
@@ -235,7 +268,10 @@ export const tokens = {
       "parry-approach": "var(--motion-duration-parry-approach)",
       "parry-feedback": "var(--motion-duration-parry-feedback)",
       "parry-burst": "var(--motion-duration-parry-burst)",
-      "timebar-warn": "var(--motion-duration-timebar-warn)"
+      "timebar-warn": "var(--motion-duration-timebar-warn)",
+      "gear-block": "var(--motion-duration-gear-block)",
+      "diamond-pop": "var(--motion-duration-diamond-pop)",
+      "hatch": "var(--motion-duration-hatch)"
     },
     "banner-blinks": "var(--motion-banner-blinks)",
     "easing": {
