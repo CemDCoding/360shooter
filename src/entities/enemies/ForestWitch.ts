@@ -80,10 +80,18 @@ export class ForestWitch extends Enemy {
     const proj = this.def.projectile;
     if (!proj) return;
     this.cooldownMs = proj.intervalMs;
-    this.boltPool.fire(this.x, this.y, this.center.x, this.center.y, proj.damage, proj.speed, {
-      spriteKey: this.boltKey,
-      onHit: proj.onHit,
-    });
+    this.boltPool.fire(
+      this.x,
+      this.y,
+      this.center.x,
+      this.center.y,
+      proj.damage * this.shotFactor,
+      proj.speed,
+      {
+        spriteKey: this.boltKey,
+        onHit: proj.onHit,
+      },
+    );
   }
 
   private resumeAnim(): void {

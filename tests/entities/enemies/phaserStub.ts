@@ -154,6 +154,8 @@ class Sprite {
   cropCalls: unknown[][] = [];
   texKey: string;
   tint: number | undefined;
+  /** How the tint is applied: multiplicative (`setTint`) or fill (`setTintFill`). */
+  tintMode: 'multiply' | 'fill' | undefined;
   body: StubBody;
 
   constructor(scene: StubScene, x: number, y: number, texture: string) {
@@ -217,10 +219,17 @@ class Sprite {
   }
   setTintFill(t: number): this {
     this.tint = t;
+    this.tintMode = 'fill';
+    return this;
+  }
+  setTint(t: number): this {
+    this.tint = t;
+    this.tintMode = 'multiply';
     return this;
   }
   clearTint(): this {
     this.tint = undefined;
+    this.tintMode = undefined;
     return this;
   }
   setRotation(r: number): this {

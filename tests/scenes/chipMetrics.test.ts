@@ -4,8 +4,11 @@ import {
   chipMetrics,
   chipShrink,
   SHRUNK_CHIPS,
+  timebarMetrics,
+  timebarState,
   type ChipId,
 } from '../../src/scenes/hud/hudMath';
+import { THEME } from '../../src/config/theme';
 import { funkScale } from '../../src/scenes/hud/FunkPanel';
 
 const KS = [1, 1.36, 1.4];
@@ -71,5 +74,51 @@ describe('chipMetrics (B3, PE-119)', () => {
     }
     expect(chipShrink('rapidFire')).toBe(1);
     expect(chipShrink('armour')).toBe(1);
+  });
+});
+
+describe('time strip of the double shot chip (AP-134)', () => {
+  it('is 4 px high at k = 1 and 5 px at k = 1.36 and 1.4, with a 1 px gap', () => {
+    expect(timebarMetrics(1)).toEqual({ barH: 2, stripH: 4, gap: 1 });
+    expect(timebarMetrics(1.36)).toEqual({ barH: 3, stripH: 5, gap: 1 });
+    expect(timebarMetrics(1.4)).toEqual({ barH: 3, stripH: 5, gap: 1 });
+  });
+
+  it('never falls below the minimum height and ignores broken k', () => {
+    expect(timebarMetrics(0.5).barH).toBe(2);
+    expect(timebarMetrics(Number.NaN).stripH).toBe(4);
+  });
+
+  it('leaves the chip height unchanged', () => {
+    for (const k of KS) {
+      expect(chipMetrics(k, chipShrink('doubleShot')).height).toBe(
+        Math.round(THEME.sizePx['size.hud-chip-h'] * k * CHIP_SHRINK),
+      );
+    }
+  });
+
+  it('fills from the left with msLeft / stage length', () => {
+    expect(timebarState(20_000, 20_000).ratio).toBe(1);
+    expect(timebarState(10_000, 20_000).ratio).toBe(0.5);
+    expect(timebarState(0, 20_000).ratio).toBe(0);
+    expect(timebarState(30_000, 20_000).ratio).toBe(1);
+    expect(timebarState(-5, 20_000).ratio).toBe(0);
+    expect(timebarState(Number.NaN, 20_000).ratio).toBe(0);
+    expect(timebarState(5, 0).ratio).toBe(0);
+  });
+
+  it('warns strictly below 5000 ms (motion.timebar-warn)', () => {
+    expect(THEME.motionMs['motion.timebar-warn']).toBe(5000);
+    expect(timebarState(5000, 20_000).warn).toBe(false);
+    expect(timebarState(4999, 20_000).warn).toBe(true);
+    expect(timebarState(20_000, 20_000).warn).toBe(false);
+  });
+
+  it('uses only tokens in FunkPanel (no hex literals)', () => {
+    const src = fs.readFileSync(
+      new URL('../../src/scenes/hud/FunkPanel.ts', import.meta.url),
+      'utf8',
+    );
+    expect(src).not.toMatch(/0x[0-9a-fA-F]{6}|#[0-9a-fA-F]{6}/);
   });
 });

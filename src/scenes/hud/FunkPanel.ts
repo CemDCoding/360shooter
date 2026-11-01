@@ -1,6 +1,12 @@
 import Phaser from 'phaser';
 import { THEME, themeColor, type ColorName } from '../../config/theme';
-import { chipMetrics, funkCase } from './hudMath';
+import {
+  chipMetrics,
+  funkCase,
+  timebarMetrics,
+  type TimebarMetrics,
+  type TimebarState,
+} from './hudMath';
 
 /** Key of the HUD bitmap font (Astro Funk, 8 px, upper case only plus a small "s"). */
 export const FUNK_FONT = 'astro-funk';
@@ -209,6 +215,8 @@ export interface ChipOptions {
   k: number;
   /** Shrink factor (1 = unchanged, CHIP_SHRINK for the small chips, B3). */
   shrink?: number;
+  /** Chip gets a rest time strip below it that moves with it (double shot, AP-134). */
+  timebar?: boolean;
 }
 
 /** Chip in the HUD row: glass panel with icon, optional bar and a Funk text. */
@@ -229,6 +237,10 @@ export class FunkChip {
   private textW = 0;
   private barRatio = 0;
   private barColor: ColorName = 'hud.accent';
+  /** Rest time strip (AP-134): own graphics below the chip, shown only while `timebar` is set. */
+  private readonly strip?: Phaser.GameObjects.Graphics;
+  private readonly stripMetrics: TimebarMetrics;
+  private timebar: TimebarState | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -255,6 +267,14 @@ export class FunkChip {
     }
     if (this.barW > 0) this.bar = scene.add.graphics();
     this.text = funkText(scene, 0, 0, '', this.textScale, 'hud.text').setOrigin(0, 0.5);
+    this.stripMetrics = timebarMetrics(k);
+    if (opts.timebar) this.strip = scene.add.graphics().setVisible(false);
+  }
+
+  /** Rest time strip: state to show it, `null` to hide it. No effect on chips without `timebar`. */
+  setTimebar(state: TimebarState | null): void {
+    this.timebar = state;
+    this.drawStrip();
   }
 
   get width(): number {
@@ -303,6 +323,7 @@ export class FunkChip {
     this.icon?.setVisible(v);
     this.bar?.setVisible(v);
     this.text.setVisible(v);
+    this.drawStrip();
   }
 
   setPosition(x: number, y: number): void {
@@ -314,10 +335,12 @@ export class FunkChip {
   /** Alpha of all parts (blink or fade). */
   setAlpha(a: number): void {
     this.panel.setAlpha(a);
+    this.strip?.setAlpha(a);
   }
 
   destroy(): void {
     this.panel.destroy();
+    this.strip?.destroy();
     this.icon?.destroy();
     this.bar?.destroy();
     this.text.destroy();
@@ -337,6 +360,30 @@ export class FunkChip {
       this.drawBar();
     }
     this.text.setPosition(cx, cy);
+    this.drawStrip();
+  }
+
+  /** Glass strip 1 px below the chip, as wide as the chip: 1 px frame, dim track, fill from the left. */
+  private drawStrip(): void {
+    const g = this.strip;
+    if (!g) return;
+    const state = this.timebar;
+    g.setVisible(this.shown && state !== null);
+    g.clear();
+    if (!state) return;
+    const { barH, stripH, gap } = this.stripMetrics;
+    const w = this.panel.width;
+    g.setPosition(this.x, this.y + this.chipH + gap);
+    const glass = themeColor('hud.glass');
+    g.fillStyle(glass.num, glass.alpha ?? 1);
+    g.fillRect(0, 0, w, stripH);
+    g.lineStyle(THEME.borderPx['border.hud'], themeColor('hud.line').num, 1);
+    g.strokeRect(0.5, 0.5, w - 1, stripH - 1);
+    const innerW = Math.max(0, w - 2);
+    g.fillStyle(themeColor('hud.line-dim').num, 1);
+    g.fillRect(1, 1, innerW, barH);
+    g.fillStyle(themeColor(state.warn ? 'hud.danger' : 'hud.accent').num, 1);
+    g.fillRect(1, 1, Math.round(innerW * state.ratio), barH);
   }
 
   private drawBar(): void {

@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import { ITEMS } from '../../config';
+import { DOUBLE_SHOT_STAGE_MS, ITEMS } from '../../config';
 import type { ActivePowers } from '../../contracts';
 import { FunkChip } from './FunkPanel';
-import { chipShrink, secondsLeft, secondsText, shieldRatio } from './hudMath';
+import { chipShrink, secondsLeft, secondsText, shieldRatio, timebarState } from './hudMath';
 
 /** Layout value (shield bar width at k = 1), candidate for the config. */
 const SHIELD_BAR_W = 24;
@@ -33,6 +33,7 @@ export class PowerIndicators {
       icon: { key: key('doubleShot') },
       k,
       shrink: chipShrink('doubleShot'),
+      timebar: true,
     });
     this.shield = new FunkChip(scene, {
       icon: { key: key('shield') },
@@ -53,6 +54,10 @@ export class PowerIndicators {
     const stage = Math.min(this.maxStage, Math.max(0, Math.floor(p.doubleShotStage) || 0));
     this.doubleShot.setVisible(stage > 0);
     if (stage > 0) this.doubleShot.setContent(`${stage}/${this.maxStage}`, 'hud.text');
+    // Rest time of the current stage (AP-134): only visible with the chip, i.e. at stage 1 or 2.
+    this.doubleShot.setTimebar(
+      stage > 0 ? timebarState(p.doubleShotMsLeft, DOUBLE_SHOT_STAGE_MS) : null,
+    );
 
     const left = Number.isFinite(p.shieldLeft) ? p.shieldLeft : 0;
     this.shield.setVisible(left > 0);
