@@ -30,7 +30,14 @@ import { BossBase } from '../entities/bosses/BossBase';
 import { rimRadii } from '../entities/bosses/rim';
 import { createBoss } from '../entities/bosses/createBoss';
 import { GiantStone } from '../entities/bosses/GiantStone';
-import { bodyCircle, resolveHazardHits, type LaserProbe } from '../entities/bosses/hazards';
+import {
+  bodyCircle,
+  resolveHazardHits,
+  type LaserProbe,
+  type ParryGroup,
+  type ParryOutcome,
+} from '../entities/bosses/hazards';
+import { ParryOverlay } from '../entities/ParryOverlay';
 import { ArmourRing } from '../entities/ArmourRing';
 import { CoinPool } from '../entities/CoinPool';
 import { ItemPickup } from '../entities/ItemPickup';
@@ -79,7 +86,7 @@ import { RoundState } from '../logic/round';
 import { SpawnDirector } from '../logic/spawn';
 import { upgradeFactors } from '../logic/upgrades';
 import { weaponStageForUpgrades } from '../logic/weaponMount';
-import { getSoundService, type SoundService } from '../platform/audio';
+import { getSoundService, PARRY_KEY, type SoundService } from '../platform/audio';
 import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
 import { VirtualStick } from './controls/VirtualStick';
@@ -225,6 +232,8 @@ export class GameScene extends Phaser.Scene {
   private bossDefeatedFlag = false;
   /** Last `invulnerable` sent with boss-hp-changed (reset in spawnBoss). */
   private bossInvulnerable = false;
+  /** Quicktime circles of the boss attacks (AP-133); destroyed in cleanup. */
+  private parryOverlay?: ParryOverlay;
 
   constructor() {
     super('GameScene');
@@ -255,6 +264,7 @@ export class GameScene extends Phaser.Scene {
     this.bossWarned = false;
     this.bossSpawned = false;
     this.bossDefeatedFlag = false;
+    this.parryOverlay = undefined;
   }
 
   create(): void {
@@ -284,7 +294,11 @@ export class GameScene extends Phaser.Scene {
     this.player = new Player(this, this.center.x, this.center.y, this.lasers, this.playerConfig);
     this.player.setDepth(10);
     this.stick = new VirtualStick(this);
-    this.aim = new AimInput(this, this.center.x, this.center.y, this.stick);
+    // A press on a quicktime circle is checked first and used up; it does not aim (AP-133).
+    this.aim = new AimInput(this, this.center.x, this.center.y, this.stick, (x, y) =>
+      this.tryParryTap(x, y),
+    );
+    this.parryOverlay = new ParryOverlay(this);
 
     this.coinPool = new CoinPool(this, COIN_RULES);
     this.coinPool.onCollected = (value) => {
@@ -436,6 +450,7 @@ export class GameScene extends Phaser.Scene {
     this.applyAreaDamage(dt);
     this.updateArmour(dt);
     this.updateBoss(time, dt);
+    this.updateParry(dt);
     this.spawnDrops();
     this.updateItems(this.playTimeMs);
     this.coinPool?.update(dt, this.player);
@@ -558,8 +573,10 @@ export class GameScene extends Phaser.Scene {
       },
       getPlayerPos: () => ({ x: this.player.x, y: this.player.y }),
       onPlayerHit: (damage) => {
-        if (!this.ended && !this.player.isDead) this.player.takeDamage(damage);
+        // A fully parried roll arrives with 0: no hit, no hurt sound (AP-133).
+        if (damage > 0 && !this.ended && !this.player.isDead) this.player.takeDamage(damage);
       },
+      onParryResolved: (outcome) => this.onParryResolved(outcome),
     });
     this.boss = boss;
     emitGameEvent(this.events, GameEvents.BossSpawned, {
@@ -591,6 +608,8 @@ export class GameScene extends Phaser.Scene {
   private onBossDefeated(bossId: NonNullable<LevelDef['bossId']>): void {
     if (this.bossDefeatedFlag || this.ended) return;
     this.bossDefeatedFlag = true;
+    // Boss death clears all quicktime circles at once (the tracker went with despawn()).
+    this.parryOverlay?.clear();
     this.sfx.play('sfx-boss-defeated');
     emitGameEvent(this.events, GameEvents.BossDefeated, { bossId });
     this.round.bossDefeated();
@@ -605,7 +624,7 @@ export class GameScene extends Phaser.Scene {
     // The ghost phase changes invulnerability without an HP change: tell the HUD (boss bar "IMMUN").
     if (boss.isInvulnerable !== this.bossInvulnerable) this.emitBossHp(boss.hp, boss.maxHp);
 
-    const parts: BossBase[] = boss instanceof GiantStone ? boss.parts : boss.active ? [boss] : [];
+    const parts = this.bossParts();
 
     // Laser vs boss body (the stone: its parts). Invulnerable (ghost fade): lasers pass through.
     if (parts.length > 0) {
@@ -631,6 +650,45 @@ export class GameScene extends Phaser.Scene {
     if (damage > 0) this.player.takeDamage(damage);
 
     this.updateBossHazards(boss);
+  }
+
+  /** Living boss bodies: the boss itself, or the stone fragments after the split. */
+  private bossParts(): BossBase[] {
+    const boss = this.boss;
+    if (!boss) return [];
+    return boss instanceof GiantStone ? boss.parts : boss.active ? [boss] : [];
+  }
+
+  /** Open quicktime groups of all living boss parts (empty without a boss or after its death). */
+  private parryGroups(): ParryGroup[] {
+    if (this.bossDefeatedFlag) return [];
+    return this.bossParts().flatMap((p) => [...p.parryGroups]);
+  }
+
+  /** Quicktime display on play time (stands still while paused, AP-133). */
+  private updateParry(dt: number): void {
+    if (this.ended) return;
+    this.parryOverlay?.update(dt, this.parryGroups(), { x: this.player.x, y: this.player.y });
+  }
+
+  /**
+   * A press at the world point (x, y) (AimInput, before aiming): true if it hit an open quicktime circle. The
+   * press is then used up and the aim of the astronaut stays as it was.
+   */
+  private tryParryTap(x: number, y: number): boolean {
+    if (this.ended || this.player.isDead || this.bossDefeatedFlag) return false;
+    const player = { x: this.player.x, y: this.player.y };
+    for (const part of this.bossParts()) {
+      if (part.tapParry({ x, y }, player)) return true;
+    }
+    return false;
+  }
+
+  /** An attack with circles hits now (from BossBase, right before its damage): grades and "PARRY!". */
+  private onParryResolved(outcome: ParryOutcome): void {
+    if (this.ended) return;
+    this.parryOverlay?.finish(outcome);
+    if (outcome.blocked) this.sfx.play(PARRY_KEY);
   }
 
   /**
@@ -829,8 +887,7 @@ export class GameScene extends Phaser.Scene {
     this.emitPowerStore();
     // Boss HP share left for the result screen (boss level only; not yet appeared = full).
     const boss = this.boss;
-    const bossParts: BossBase[] =
-      boss instanceof GiantStone ? boss.parts : boss?.active ? [boss] : [];
+    const bossParts = this.bossParts();
     const bossHpLeft = !this.level.bossId
       ? undefined
       : boss
@@ -840,6 +897,7 @@ export class GameScene extends Phaser.Scene {
           )
         : 1;
     this.despawnBoss();
+    this.parryOverlay?.clear();
 
     const before = loadSave();
     const settled = settleRound(
@@ -904,7 +962,10 @@ export class GameScene extends Phaser.Scene {
     hud?.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
     hud?.events.off(GameEvents.RoundAbortRequested, this.onAbortRequested, this);
     this.powerStore = resetPowerStore();
+    // Also after abortRound (PE-159): open circles, rings and words go away without damage or sound.
     this.despawnBoss();
+    this.parryOverlay?.destroy();
+    this.parryOverlay = undefined;
     this.player.callbacks.onHpChange = undefined;
     this.player.callbacks.onStatsChange = undefined;
     this.player.callbacks.onShieldChange = undefined;

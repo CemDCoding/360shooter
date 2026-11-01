@@ -30,6 +30,8 @@ export class RootMonster extends BossBase {
   private telegraphs: Telegraph[] | undefined;
   private pendingTrees: { x: number; y: number }[] = [];
   private ringGapStart = 0;
+  /** Bud of the running rootThrust announcement; takes the quicktime share at the impact. */
+  private pendingBud: RootSpike | undefined;
   private readonly monsterCtx: RootMonsterContext;
   private readonly random: () => number;
 
@@ -74,6 +76,7 @@ export class RootMonster extends BossBase {
     for (const s of this.spikes ?? []) s.destroy();
     if (this.spikes) this.spikes.length = 0;
     this.pendingTrees = [];
+    this.pendingBud = undefined;
   }
 
   protected override onSpawn(): void {
@@ -100,12 +103,12 @@ export class RootMonster extends BossBase {
       // The bud sits under the player at once and grows while the warning runs.
       const x = this.center.x;
       const y = this.center.y;
-      this.spikes?.push(
-        new RootSpike(this.scene, x, y, this.attackDamage('rootThrust'), {
-          mode: 'sprout',
-          sproutMs: ms,
-        }),
-      );
+      const bud = new RootSpike(this.scene, x, y, this.attackDamage('rootThrust'), {
+        mode: 'sprout',
+        sproutMs: ms,
+      });
+      this.spikes?.push(bud);
+      this.pendingBud = bud;
       this.track(Telegraph.circle(this.scene, x, y, TUNING.sprout.hitRadius, ms));
     } else if (attack.id === 'forestCall') {
       this.pendingTrees = this.pickTreePositions();
@@ -129,8 +132,13 @@ export class RootMonster extends BossBase {
     }
   }
 
-  protected override onAttack(attackId: string, damage: number): void {
-    if (attackId === 'forestCall') {
+  protected override onAttack(attackId: string, damage: number, parryFactor: number): void {
+    if (attackId === 'rootThrust') {
+      // The bud was made during the announcement with the full damage: the quicktime share of this
+      // attack goes onto exactly that bud (AP-133).
+      if (this.pendingBud) this.pendingBud.damageFactor = parryFactor;
+      this.pendingBud = undefined;
+    } else if (attackId === 'forestCall') {
       const positions = this.pendingTrees;
       this.pendingTrees = [];
       this.monsterCtx.onSummonTrees?.(positions);

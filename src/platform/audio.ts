@@ -9,6 +9,8 @@ export const BASE_VOLUME = 0.5;
 export const LASER_THROTTLE_MS = 80;
 /** Manifest key of the laser sound (see src/config/assets.ts). */
 export const LASER_KEY = 'sfx-laser';
+/** Manifest key of the parry sound: all quicktime circles of a boss attack were hit (AP-133). */
+export const PARRY_KEY = 'sfx-parry';
 
 /** Minimal sound backend (Phaser sound manager in the game, a fake in tests). */
 export interface SoundBackend {

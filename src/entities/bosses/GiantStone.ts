@@ -104,6 +104,11 @@ export class GiantStone extends BossBase {
     super.despawn();
   }
 
+  /** Quicktime circles only when the roll is really announced (AP-133). */
+  protected override canParry(attack: BossAttackDef): boolean {
+    return attack.id === 'roll' && this.phase === 'idle';
+  }
+
   protected override onTelegraph(attack: BossAttackDef): void {
     if (attack.id !== 'roll' || this.phase !== 'idle') return;
     const m = this.middle;
@@ -264,6 +269,8 @@ export class GiantStone extends BossBase {
           rng: this.userCtx.rng,
           onHpChanged: () => this.reportSum(),
           onDefeated: (fx, fy) => this.fragmentDefeated(fx, fy),
+          // Fragments roll too: their quicktime results reach the scene the same way (AP-133).
+          onParryResolved: this.userCtx.onParryResolved,
         },
         { ...this.opts, scale: 0.5 },
       );

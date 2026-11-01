@@ -1,6 +1,18 @@
 // Generic boss hazards (AP-100, PE-134): projectiles and danger zones of every boss reach the scene through
 // one interface (BossBase.getHazards()), so GameScene needs no `instanceof` per boss. No Phaser import, testable.
-import type { StatusOnHit } from '../../contracts';
+// Also holds the quicktime state of boss attacks (AP-133, ParryTracker): the parry share scales the damage of
+// exactly the attack it belongs to, so it lives next to the hazards that carry that damage.
+import { PARRY_RULES } from '../../config/parry';
+import type { ParryRules, StatusOnHit } from '../../contracts';
+import {
+  expireCircles,
+  hitCircle,
+  planCircles,
+  resolveParry,
+  tapCircle,
+  type ParryCircleState,
+} from '../../logic/parry';
+import type { Rng } from '../../logic/rng';
 
 export interface HitCircle {
   x: number;
@@ -186,5 +198,120 @@ export function resolveHazardHits<L extends HazardLaser>(
     if (!h.active || !circleHitsShape(player, h.shape)) continue;
     const damage = h.playerHit();
     if (damage > 0) hooks.hitPlayer(damage, h.onHit);
+  }
+}
+
+// ---------- Quicktime (AP-133, F-29, PE-157, PE-158) ----------
+
+/** The quicktime circles of exactly one announced boss attack. */
+export interface ParryGroup {
+  /** Unique over all bosses of the round (overlapping announcements, stone fragments). */
+  readonly id: number;
+  readonly attackId: string;
+  /** Circles with their results; hitAtMs runs on the clock of elapsedMs. */
+  circles: ParryCircleState[];
+  /** Play time since the start of the announcement (stands still while the game is paused). */
+  elapsedMs: number;
+}
+
+/** Result of a group at the impact of its attack. */
+export interface ParryOutcome {
+  group: ParryGroup;
+  /** All circles hit: the attack does no damage. */
+  blocked: boolean;
+  /** Share of the damage that still hits (misses / circles). */
+  damageFactor: number;
+  perfectCount: number;
+}
+
+/** A tap that hit an open circle. */
+export interface ParryTap {
+  group: ParryGroup;
+  index: number;
+  grade: 'perfect' | 'good' | 'miss';
+}
+
+let nextGroupId = 1;
+
+/** Moment a circle and its ring appear: hitAtMs - approachMs, at the earliest the start of the announcement. */
+export function circleAppearsAtMs(
+  circle: { hitAtMs: number },
+  rules: ParryRules = PARRY_RULES,
+): number {
+  return Math.max(0, circle.hitAtMs - rules.approachMs);
+}
+
+/** true while a circle is open and on screen. A circle that is not shown yet never takes a tap. */
+export function isCircleTappable(
+  circle: ParryCircleState,
+  elapsedMs: number,
+  rules: ParryRules = PARRY_RULES,
+): boolean {
+  return circle.result === null && elapsedMs >= circleAppearsAtMs(circle, rules);
+}
+
+/** Damage of an attack after the parry share (0 = blocked). An invalid factor counts as "not parried". */
+export function parriedDamage(damage: number, factor: number): number {
+  const f = Number.isFinite(factor) ? Math.min(1, Math.max(0, factor)) : 1;
+  return damage * f;
+}
+
+/**
+ * Quicktime state of one boss (AP-133). open() at the start of an announcement, tick() every frame with the
+ * play time, tap() for a tap or click, resolve() at the impact (removes the group; open circles count as
+ * missed), clear() when the boss leaves. Several groups can be open at the same time.
+ */
+export class ParryTracker {
+  private readonly list: ParryGroup[] = [];
+
+  constructor(private readonly rules: ParryRules = PARRY_RULES) {}
+
+  get groups(): readonly ParryGroup[] {
+    return this.list;
+  }
+
+  open(attackId: string, count: number, telegraphMs: number, rng: Rng): ParryGroup | null {
+    const circles = planCircles(count, telegraphMs, rng, this.rules);
+    if (circles.length === 0) return null;
+    const group: ParryGroup = { id: nextGroupId++, attackId, circles, elapsedMs: 0 };
+    this.list.push(group);
+    return group;
+  }
+
+  tick(dtMs: number): void {
+    if (!Number.isFinite(dtMs) || dtMs <= 0) return;
+    for (const g of this.list) {
+      g.elapsedMs += dtMs;
+      g.circles = expireCircles(g.circles, g.elapsedMs, this.rules);
+    }
+  }
+
+  /** Grades the open, visible circle under the tap (oldest group first). null: the tap hit no circle. */
+  tap(point: { x: number; y: number }, center: { x: number; y: number }): ParryTap | null {
+    for (const g of this.list) {
+      const shown = g.circles.filter((c) => isCircleTappable(c, g.elapsedMs, this.rules));
+      const hit = hitCircle(shown, point, center, this.rules);
+      if (!hit) continue;
+      g.circles = tapCircle(g.circles, hit.index, g.elapsedMs, this.rules);
+      const grade = g.circles.find((c) => c.index === hit.index)?.result ?? 'miss';
+      return { group: g, index: hit.index, grade };
+    }
+    return null;
+  }
+
+  /** The attack `attackId` hits now: removes its oldest group and returns the result (null: no circles). */
+  resolve(attackId: string): ParryOutcome | null {
+    const i = this.list.findIndex((g) => g.attackId === attackId);
+    if (i < 0) return null;
+    const [group] = this.list.splice(i, 1);
+    group.circles = group.circles.map((c) =>
+      c.result === null ? { ...c, result: 'miss' as const } : c,
+    );
+    const r = resolveParry(group.circles.map((c) => c.result));
+    return { group, ...r };
+  }
+
+  clear(): void {
+    this.list.length = 0;
   }
 }

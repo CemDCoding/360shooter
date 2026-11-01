@@ -116,6 +116,7 @@ const OWN_ASSETS: readonly AssetDef[] = [
   sound('shield-break', 'Schutzschild geht kaputt.'),
   sound('boss-warning', 'Warnung kurz bevor der Boss erscheint.'),
   sound('boss-defeated', 'Boss wird besiegt.'),
+  sound('parry', 'Boss-Angriff mit allen Quicktime-Kreisen abgewehrt (PARRY!).'),
 ];
 
 /** Festes Asset-Manifest. Designer ersetzen nur die Dateien unter public/assets. */

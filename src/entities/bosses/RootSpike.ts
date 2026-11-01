@@ -43,6 +43,8 @@ export class RootSpike extends Phaser.Physics.Arcade.Sprite {
   private readonly speed: number;
   private readonly goal: { x: number; y: number } | undefined;
   private readonly reduced: boolean;
+  /** Quicktime share of the attack (AP-133, 0..1): set at the impact for a bud made during the announcement. */
+  damageFactor = 1;
 
   constructor(
     scene: Phaser.Scene,
@@ -115,8 +117,11 @@ export class RootSpike extends Phaser.Physics.Arcade.Sprite {
   tryHit(): number {
     if (this.consumed || this.destroyed || !this.active || this.phase === 'sprout') return 0;
     this.consumed = true;
-    if (this.phase === 'creep') return this.damage;
-    return sproutDamage(this.damage, BOSS_TUNING.rootMonster.sprout.hits, this.hitsLeft);
+    if (this.phase === 'creep') return this.damage * this.damageFactor;
+    return (
+      sproutDamage(this.damage, BOSS_TUNING.rootMonster.sprout.hits, this.hitsLeft) *
+      this.damageFactor
+    );
   }
 
   /** Advances the phases. Returns true when the root is gone and should be removed. */
