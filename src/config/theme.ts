@@ -143,6 +143,17 @@ const COLORS = {
   'game.oasis-mote': { num: 0xd8ff8a, css: '#d8ff8a' },
   'game.ward': { num: 0x7ad8ff, css: '#7ad8ff' },
   'game.aura': { num: 0x5fe0c0, css: '#5fe0c0' },
+  'game.tier-0': { num: 0xffffff, css: '#ffffff' },
+  'game.tier-1': { num: 0xffe8d8, css: '#ffe8d8' },
+  'game.tier-2': { num: 0xffcfb0, css: '#ffcfb0' },
+  'game.tier-3': { num: 0xffb088, css: '#ffb088' },
+  'game.parry-fill': { num: 0x060c05, css: '#060c05', alpha: 0.722 },
+  'game.parry-circle': { num: 0xa8d86b, css: '#a8d86b' },
+  'game.parry-approach': { num: 0xe5f2d8, css: '#e5f2d8' },
+  'game.parry-perfect': { num: 0xffcf4a, css: '#ffcf4a' },
+  'game.parry-good': { num: 0xa8d86b, css: '#a8d86b' },
+  'game.parry-miss': { num: 0xff8a7b, css: '#ff8a7b' },
+  'game.parry-burst': { num: 0x5fb8ff, css: '#5fb8ff' },
 } as const satisfies Record<string, ThemeColor>;
 
 /** Abstände in px. */
@@ -173,12 +184,19 @@ const SIZE_PX = {
   'size.stick-knob': 28,
   'size.hud-slot': 40,
   'size.hud-slot-gap': 8,
+  'size.parry-radius': 20,
+  'size.parry-distance': 56,
+  'size.parry-touch-slack': 4,
+  'size.parry-line': 2,
+  'size.hud-timebar-h': 2,
+  'size.hud-timebar-gap': 1,
 } as const;
 
 /** Größen als Anzahl. */
 const SIZE_COUNT = {
   'size.energy-segments': 10,
   'size.hud-slot-icon-scale': 3,
+  'size.parry-ring-start': 2.5,
 } as const;
 
 /** Zeiten in ms. */
@@ -190,6 +208,10 @@ const MOTION_MS = {
   'motion.hit': 120,
   'motion.store-flash': 200,
   'motion.trail': 300,
+  'motion.parry-approach': 800,
+  'motion.parry-feedback': 400,
+  'motion.parry-burst': 600,
+  'motion.timebar-warn': 5000,
 } as const;
 
 /** Bewegung als Anzahl. */
