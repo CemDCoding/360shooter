@@ -12,9 +12,6 @@ export const SHOP_TABS: readonly { id: ShopTab; label: string }[] = [
   { id: 'petGear', label: 'PET-RÜSTUNG' },
 ];
 
-/** Größtes Textmaß: Kapsel-Zeilen der Infozeile (Brief H-35). */
-export const MAX_LINE_CHARS = 40;
-
 // Maße (Brief H-35, Tabelle "Shop"): Panel x 216-624, y 52-348, Innenabstand 10.
 export const SHOP_PANEL = { x: 216, y: 52, w: 408, h: 296, pad: 10 } as const;
 export const HEAD_H = 32;
@@ -162,7 +159,7 @@ export function effectText(e: GearEffectDef): string {
   }
 }
 
-/** Zustand von Name, Zeilen und Knopf der Infozeile; Zeilen sind höchstens zwei und 40 Zeichen lang. */
+/** Zustand von Name, Zeilen und Knopf der Infozeile; Zeilen sind höchstens zwei. */
 export function infoView(save: SaveGame, itemId: string | null): InfoView {
   if (!itemId) return { name: '', lines: ['WÄHLE EINEN ARTIKEL.'], button: { kind: 'none' } };
   const item = getShopItem(itemId);
@@ -236,4 +233,12 @@ export function moveFocus(index: number, key: FocusKey, f: FocusLayout): number 
 export function countDownValue(from: number, to: number, t: number): number {
   const c = Math.min(1, Math.max(0, t));
   return Math.round(from + (to - from) * c);
+}
+
+/** Breite der Infozeile für Name und Knopf: innere Breite minus Ränder (8 links, 6 rechts). */
+export const INFO_ROOM = 374;
+
+/** Maßstab des Namens: 2, außer er (Breite bei 2x) reicht mit 8 px Abstand in den Knopf; dann 1. */
+export function nameScale(nameWidth2x: number, buttonW: number): 1 | 2 {
+  return nameWidth2x > INFO_ROOM - buttonW - 8 ? 1 : 2;
 }

@@ -15,6 +15,7 @@ import {
   HEAD_H,
   infoView,
   moveFocus,
+  nameScale,
   PET_ROLE_TEXT,
   shopLayout,
   SHOP_PANEL,
@@ -232,9 +233,29 @@ export class ShopPanel extends Phaser.GameObjects.Container {
     const info = infoView(save, this.selectedId);
     const ir = lay.info;
     this.sunken(g, ir);
+    const btnLabel = info.button.kind === 'none' ? '' : info.button.label;
+    let bw = 0;
+    if (info.button.kind !== 'none') {
+      const leadKey =
+        info.button.kind === 'buy'
+          ? 'diamond'
+          : info.button.kind === 'owned'
+            ? 'ui-icons-m8'
+            : null;
+      const leadW =
+        leadKey && scene.textures.exists(leadKey)
+          ? scene.textures.getFrame(leadKey, 0).width + 6
+          : 0;
+      const probe = kText(scene, 0, 0, btnLabel, 2, 'menu.text');
+      bw = Math.max(BUTTON_MIN_W, textWidth(probe) + leadW + 20);
+      probe.destroy();
+    }
     let nameShift = 0;
     if (info.name) {
-      items.push(kText(scene, ir.x + 8, ir.y + 6, info.name, 2, 'menu.text'));
+      const nameText = kText(scene, ir.x + 8, ir.y + 6, info.name, 2, 'menu.text');
+      // Passt der Name bei 2x nicht neben den Knopf, wird er 1x gesetzt.
+      if (nameScale(textWidth(nameText), bw) === 1) nameText.setScale(1).setY(ir.y + 10);
+      items.push(nameText);
       nameShift = 22;
     }
     info.lines.forEach((line, i) => {
@@ -251,13 +272,6 @@ export class ShopPanel extends Phaser.GameObjects.Container {
     });
     const hasBuy = info.button.kind === 'buy';
     if (info.button.kind !== 'none') {
-      const leadKey = info.button.kind === 'buy' ? 'diamond' : 'ui-icons-m8';
-      const leadW = scene.textures.exists(leadKey)
-        ? scene.textures.getFrame(leadKey, 0).width + 6
-        : 0;
-      const probe = kText(scene, 0, 0, info.button.label, 2, 'menu.text');
-      const bw = Math.max(BUTTON_MIN_W, textWidth(probe) + leadW + 20);
-      probe.destroy();
       const cx = ir.x + ir.w - 6 - bw / 2;
       const cy = ir.y + ir.h / 2;
       let btn: Button;

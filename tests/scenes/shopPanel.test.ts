@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import fontXml from '../../public/assets/fonts/astro-kapsel.xml?raw';
 import shopSource from '../../src/scenes/menu/ShopPanel.ts?raw';
 import { SHOP_ITEMS } from '../../src/config/shop';
 import type { SaveGame } from '../../src/contracts';
@@ -7,7 +8,8 @@ import {
   countDownValue,
   focusCount,
   infoView,
-  MAX_LINE_CHARS,
+  nameScale,
+  INFO_ROOM,
   moveFocus,
   shopLayout,
   SHOP_PANEL,
@@ -86,7 +88,7 @@ describe('tile and info states', () => {
       for (const s of [base(), base({ diamonds: 0 }), base({ owned: [i.id] })]) {
         const v = infoView(s, i.id);
         expect(v.lines.length).toBeLessThanOrEqual(2);
-        for (const l of v.lines) expect(l.length).toBeLessThanOrEqual(MAX_LINE_CHARS);
+        for (const l of v.lines) expect(l.length).toBeLessThanOrEqual(40);
       }
   });
 
@@ -101,6 +103,31 @@ describe('tile and info states', () => {
     expect(tileView(s, 'egg-bee', 'egg-bee')).toBe('selected-owned');
     expect(tileView(s, 'egg-penguin', 'egg-penguin')).toBe('selected');
     expect(tileView(s, 'egg-penguin', null)).toBe('buyable');
+  });
+});
+
+describe('info row name never runs under the button', () => {
+  const adv = new Map<number, number>();
+  for (const m of fontXml.matchAll(/<char id="(\d+)"[^>]*xadvance="(\d+)"/g))
+    adv.set(Number(m[1]), Number(m[2]));
+  const width = (t: string, scale: number): number =>
+    [...t].reduce((n, c) => n + (adv.get(c.charCodeAt(0)) ?? 6), 0) * scale;
+
+  it('fits for all items and button states', () => {
+    for (const i of SHOP_ITEMS) {
+      const states: [string, SaveGame, number][] = [
+        ['buy', base(), 14],
+        ['short', base({ diamonds: 0 }), 0],
+        ['owned', base({ owned: [i.id] }), 14],
+      ];
+      for (const [, save, lead] of states) {
+        const v = infoView(save, i.id);
+        if (v.button.kind === 'none') continue;
+        const bw = Math.max(112, width(v.button.label, 2) + lead + 20);
+        const scale = nameScale(width(v.name, 2), bw);
+        expect(width(v.name, scale)).toBeLessThanOrEqual(INFO_ROOM - bw - 8);
+      }
+    }
   });
 });
 
