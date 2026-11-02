@@ -271,6 +271,9 @@
   --size-focus-near: 110px;
   --size-parry-keyline: 1px;
   --size-event-inset: 6px;
+  --size-event-top: 56px;
+  --size-event-bottom: 44px;
+  --size-event-corner: 28px;
   --size-event-wedge: 24px;
   --size-event-arrow: 20px;
   --size-event-dot: 2px;

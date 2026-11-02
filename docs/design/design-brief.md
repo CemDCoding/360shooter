@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-41/H-43 (2026-11-02):** Interview läuft. Interview abgeschlossen (1a–7a). Nächster Schritt: Tokens, Sprites (Krone, Marker), Mockup `mockups/m11-m12-fokus-und-wellen.html`.
+**Stand H-41/H-43 (2026-11-02):** Interview läuft. Interview abgeschlossen (1a–7a). Tokens, Sprites `assets/sprites-m11.js`, Mockup `mockups/m11-m12-fokus-und-wellen.html` und Übergabe fertig, Kontrast grün. Nächster Schritt: Freigabe durch den Nutzer (H-41 und H-43 getrennt möglich), dann Planner-Auftrag „Design übernehmen“.
 **Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. Teil 2 fertig (Bildfolgen Level 20, 25, 30, 40 in `assets/sprites-m10b.js` und `sprites-m10c.js`, Level 40 als zwei Bögen) und vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-159 bis AP-162, offener Punkt `holdsMs`).
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
@@ -879,5 +879,96 @@ Level 40, Bild 0 bis 17:
 5. **5a Ankündigungston in drei Varianten** (Funk-Stil, ≈ 250 ms, Platzhalter-Beschreibung): Schwarm schnelles Trillern aus 3 hohen Piepsern, Ring tiefes an- und abschwellendes Brummen, Zange zwei Piepser mit Abstand, der zweite tiefer. Nur zusätzlich zum Marker.
 6. **6a Elite-Kennzeichnung:** Größe ×1,25, 1-px-Umriss um die Silhouette in Eisblau-Weiß, kleine Pixel-Krone über dem Kopf (Formmerkmal ohne Farbe). Keine neuen Gegner-Sprites, nur ein Kronen-Sprite.
 7. **7a Mockup mit allen Ansichten:** Bosskampf quer ohne/mit Fokus (Kreis, Pet, Feuerring), Kreise auf allen 6 Böden, Ring-Spitze mit Elite, Schwarm und Zange, Fassungen bei „Bewegung reduzieren“, Nahansicht Elite neben Glut-Stufe 3.
+
+**Annahmen des Designers** (angenommen, Teil der Freigabe):
+- Eigene Laser gehören zu Rang 4 (treten im Fokus zurück). Liegende Items (Kräfte, Herz) bleiben bei Rang 3 (voll sichtbar), weil man sie einsammeln will.
+- Abdunkeln: Die Tinten-Ebene hat 35 % Deckkraft. Damit liegt die sRGB-Helligkeit des Bodens bei 65 %, die relative Leuchtdichte bei 46 bis 62 %.
+- „Höchstens ein Wechsel je Kreis-Phase“ (RI-43): Kommt der nächste Kreis innerhalb von 600 ms (`focus-hold`), bleibt der Fokus an.
+- Marker-Rahmen: oben 56 px (unter Energie und Timer), unten 44 px (über der Boss-Leiste), links und rechts 6 px, 28 px Abstand zu den Ecken. Die Punkte des Ring-Markers liegen unter dem HUD (das HUD hat die höhere Tiefe).
+- Marker-Sprites drehen sich nur in 90°-Schritten (Kanten bleiben scharf). Ein Schwarm schräg oben rechts sitzt am oberen Rand, und zwar dort, wo der Mittelstrahl des Sektors den Rahmen schneidet.
+- Elite-Umriss: Die Silhouette wird 4-mal (±1 px in x und y) mit `setTintFill(elite-edge)` hinter den Sprite gelegt. Das sind 4 Bilder mehr je Elite. Weil Eliten selten sind (`maxShare`), ist das am iPhone vertretbar. Kein WebGL-FX nötig.
+- Die Krone wird nicht skaliert und nicht getönt. Sie folgt dem Gegner, 2 px über seiner Oberkante.
+
+**Ergebnis:**
+- Mockup `mockups/m11-m12-fokus-und-wellen.html` mit 10 Ansichten:
+  - 1 bis 3: Bosskampf Wüste L25 heute, mit Fokus, mit Fokus und „EFFEKTE REDUZIEREN“
+  - 3b: Kreise auf allen 6 Böden (heute, neu, neu im Fokus) mit Messwerten
+  - 4: Ring-Spitze mit Elite-Mumie
+  - 5: Schwarm
+  - 6: Zange mit Elite-Fee
+  - 7: Ablauf normal und reduziert
+  - 8: Elite neben den Stufen
+  - 9: Sprites
+  - Mit `?theme=only-s2,s4` lassen sich einzelne Ansichten für Nahaufnahmen rendern.
+- Sprites `assets/sprites-m11.js`: `elite-crown` 9×7 ×1 (Farbe, nicht tönen), `event-markers` 24×24 ×2 (0 Schwarm, 1 Zange; weiß mit dunklem Umriss, getönt mit `event-marker`). Der Ring braucht kein Sprite, die Punkte zeichnet `Graphics`.
+- Tokens:
+  - Farben `color.game.focus-dim`, `parry-keyline`, `event-marker`, `event-marker-edge`, `event-pip`, `elite-edge`, `elite-crown`
+  - Größen `size.focus-near`, `parry-keyline`, `event-*` (inset, top, bottom, corner, wedge, arrow, dot, word-gap, pip, slide), `elite-scale`, `elite-edge`, `elite-crown-gap`
+  - Zeiten `motion.duration.focus-in`, `focus-out`, `focus-hold`, `event-slide`, `event-tone`
+  - Deckkraft `opacity.focus-dim`, `focus-low-near`, `focus-low-far`, `focus-low-reduced`
+  - 21 neue Paare, `contrast.js --tokens` grün. Knappstes Paar: Marker auf Wüstenboden mit 3,00:1, dazu kommt immer der Tinten-Umriss.
+- Messung 3b: Phosphor-Rand gegen Tintenlinie 12,1:1 auf allen Böden. Gegen den Boden im Fokus 6,5 bis 11,0:1, ohne Fokus 4,2 bis 10,2:1.
+- Screenshots:
+  - `screenshots/m11-m12-fokus-und-wellen-desktop.png` und `-mobile.png`
+  - Nahansichten `m11-zoom-focus-desktop.png` (1, 2), `m11-zoom-grounds-ring-desktop.png` (3b, 4), `m11-zoom-swarm-pincer-desktop.png` (5, 6), `m11-zoom-parts2-desktop.png` (7, 8, 9), `m11-zoom-parts-desktop.png` (3b mit Messung, älterer Stand von 7 bis 9)
+
+**Effekt-Rangfolge (`src/logic/effectRank.ts`):**
+
+| Rang | Was | im Fokus | mit EFFEKTE REDUZIEREN |
+|---|---|---|---|
+| 0 | Abwehr-Kreise, Ring, Rückmeldung, PARRY!, Hinweistafel, HUD, Marker | 100 % | 100 % |
+| 1 | Boss-Angriff und Telegraph, gegnerische Geschosse | 100 % | 100 % |
+| 2 | Astronautin mit Waffe und Rüstungs-Overlay am Körper | 100 % | 100 % |
+| 3 | Gegner, Boss, liegende Items | 100 % | 100 % |
+| 4 | Pet, Pet-Aura und -Geschosse, Rüstungs-Ringe (Block, Glut), Feuerring, Münzen, eigene Laser, Partikel | 40 % bis 110 px um die Astronautin, sonst 70 %. Keine neuen Partikel im Umkreis | 25 % überall |
+| 5 | Boden-Kacheln und Arena-Deko | Tinten-Ebene `focus-dim` mit 35 % darüber | wie im Fokus |
+
+**Fokus-Ablauf:** an ab Telegraph-Start des ersten Kreises, aus nach der Rückmeldung (`parry-feedback`) des letzten Kreises. Übergänge 120 ms in `Stepped(3)`, bei „Bewegung reduzieren“ sofort. `focus-hold` 600 ms verhindert Wechsel zwischen dicht folgenden Kreisen. Kein Blitz, nur ein Helligkeitswechsel je Phase.
+
+**Kreise (Kontrastregel):** Kreis, Annäherungsring, Trugkreis-Rand, Ziel-Klammern und der Außenrand des Halte-Rings bekommen innen und außen je 1 px `parry-keyline`. Am Phosphor liegt damit immer Tinte an (≥ 12:1). Die Linie außen trennt den Kreis auch von hellem Sand. Das gilt immer, nicht nur im Fokus.
+
+**Rand-Marker (`SpawnMarker`):**
+
+| Art | Form | Wort | Lage |
+|---|---|---|---|
+| Schwarm | `event-markers` Bild 0: 3 Winkel 18/12/6 px, zur Mitte schmaler | SCHWARM | Schnittpunkt des Sektor-Mittelstrahls mit dem Marker-Rahmen, zeigt nach innen |
+| Ring | 2×2-Punkte alle 6 px rund um den ganzen Marker-Rahmen | RING | Wort mittig 14 px unter der Oberkante des Rahmens |
+| Zange | `event-markers` Bild 1: Schaft und 2 Pfeilspitzen | ZANGE (je Seite) | an beiden Gruppenstrahlen, gegenüber |
+
+Das Wort steht in Funk 1× auf `hud.glass`, mit 1-px-Rand `event-marker` und Außenlinie `event-marker-edge`, 4 px zur Mitte hin vom Marker. Darunter 3 Pips (4×2), je ⅓ von `announceMs` geht einer aus. Der Marker gleitet 4 px nach innen (150 ms, 3 Stufen) und steht dann still. Mit dem Spawn verschwindet er. Kein Blinken, kein Pulsieren. Bei „Bewegung reduzieren“ steht er sofort.
+
+**Ankündigungston (Platzhalter-Beschreibung, ≈ 250 ms, Funkgerät-Stil, leiser als PARRY!):**
+- `event-swarm`: 3 kurze hohe Piepser (≈ 1600 Hz, je 50 ms, Abstand 30 ms)
+- `event-ring`: tiefes Brummen (≈ 180 Hz) mit leichtem Tremolo, an- und abschwellend
+- `event-pincer`: zwei Piepser (≈ 900 Hz, dann ≈ 600 Hz, je 70 ms, Abstand 80 ms)
+- Bleibt der Ton stumm, ist die Information trotzdem ganz da (Form und Wort).
+
+**Eliten:** Größe = Stufen-Größe × 1,25. Umriss 1 px `elite-edge` (Eisblau-Weiß, kalt). Krone `elite-crown` darüber. Die Glut-Tönung der Stufe bleibt auf dem Körper. Glut (warm, Körper) und Elite (kalt, Rand und Krone) unterscheiden sich in Farbe, Ort und Form.
+
+**Übergabe an den Planner (H-41/H-43):**
+
+| Datei | Änderung | Mockup |
+|---|---|---|
+| `src/config/theme.ts`, `src/styles/tokens.css` | `theme:build` aus `export/tokens.resolved.json`: neue Tokens oben. Für AP-173 die Fokus- und Keyline-Tokens, für AP-177 alle `event-*` und `elite-*` | – |
+| `scripts/build-sprites.mjs`, `public/assets/**`, `src/config/assets.ts` | `assets/sprites-m11.js` aufnehmen (nach `sprites-m9.js`): `elite-crown`, `event-markers` | 9 |
+| `src/logic/effectRank.ts` (neu) | Rangfolge-Tabelle oben als reine Funktion: Rang → Deckkraft aus Abstand, Fokus und reduceEffects | Tabelle oben, 2, 3 |
+| `src/scenes/GameScene.ts` | Tinten-Ebene über Kacheln und Deko, unter allem anderen. Rang 4 per Deckkraft. Übergänge nach `focus-*` | 1 bis 3 |
+| `src/entities/ParryOverlay.ts`, `src/entities/parry/**` | Fokus-Zustand melden **und** die Keylines zeichnen (Kreis, Ring, Trugkreis, Klammern, Halte-Ring) | 3b |
+| `src/entities/SpawnMarker.ts` (neu) | Marker nach Tabelle, Rahmen aus `event-top/bottom/inset/corner`, Drehung in 90°-Schritten | 4 bis 7 |
+| `src/platform/audio.ts` | Ton-Schlüssel `event-swarm`, `event-ring`, `event-pincer` mit Platzhaltern nach der Beschreibung | – |
+| `src/entities/enemies/Enemy.ts` | Elite: Größe, 4 Umriss-Kopien, Krone folgt dem Gegner | 4, 6, 8 |
+
+**Hinweise an den Planner:**
+- AP-173 darf laut Dateiliste in `ParryOverlay.ts` nur den Fokus melden. Für die Keylines muss es auch das Zeichnen der Kreise in `ParryOverlay.ts` und `src/entities/parry/**` ändern dürfen. Bitte die Dateiliste erweitern.
+- AP-178 hat weder Sprite- noch Theme-Dateien. Vorschlag: `elite-crown` und die `elite-*`-Tokens kommen mit dem Theme- und Asset-Sync von AP-177, und AP-178 nutzt sie nur.
+- Der Plan nennt für AP-177 „nur neuer Ton-Schlüssel“. Entscheidung 5a braucht drei Schlüssel (oder einen Schlüssel mit drei Varianten).
+- Keine neuen Abhängigkeiten. Keine externen Requests.
+
+**Design-Review:** AP-173 gegen 2, 3 und 3b. AP-177 gegen 4 bis 7. AP-178 gegen 4, 6 und 8.
+
+**Handtest (H-42/H-44) zusätzlich:**
+- Fokus am iPhone: wirkt der Wechsel ruhig, kein Flackern bei dicht folgenden Kreisen?
+- Sind SCHWARM, RING und ZANGE in Funk 1× am iPhone lesbar?
+- Ist die Krone bei kleinen Gegnern (Eichhörnchen, Schlange) erkennbar?
 
 - keine weiteren (erste Fassung vom 2026-10-25)

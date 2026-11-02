@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M11/M12: Quicktime-Fokus, Rand-Marker, Eliten (H-41, H-43) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .h-energy { width: 160px; height: 44px; }
+  .h-timer { display: grid; place-items: center; }
+  .h-row { top: 58px; gap: 4px; align-items: flex-start; }
+  .w-ground.desert { --g: var(--color-biome-desert-ground); --g2: var(--color-biome-desert-ground-hi); --g3: var(--color-biome-desert-ground-lo); }
+  .w-ground.pyramid { --g: var(--color-biome-pyramid-ground); --g2: var(--color-biome-pyramid-ground-hi); --g3: var(--color-biome-pyramid-ground-lo); }
+  .w-ground.oasis { --g: var(--color-biome-oasis-ground); --g2: var(--color-biome-oasis-ground-hi); --g3: var(--color-biome-oasis-ground-lo); }
+  canvas.ws { position: absolute; image-rendering: pixelated; }
+  .sheet { position: absolute; inset: 0; background: var(--color-hud-screen); }
+  .cellg { position: absolute; overflow: hidden; outline: 1px solid var(--color-hud-screen); }
+  svg.ico { display: block; shape-rendering: crispEdges; }
+
+  /* ---------- H-41 focus layer: ink over ground + deco only ---------- */
+  .focus { position: absolute; inset: 0; background: var(--color-game-focus-dim); opacity: var(--opacity-focus-dim); }
+  .tele { position: absolute; border-radius: 50%; border: 1px solid var(--color-red-300); background: color-mix(in srgb, var(--color-red-300) 22%, transparent); }
+  .laser { --laser: var(--color-game-laser-raygun); box-shadow: none; }
+  .sand { position: absolute; width: 3px; height: 1px; background: var(--color-game-sand); }
+  .firering { position: absolute; border-radius: 50%; border: 2px dashed var(--color-game-fire-ring); box-sizing: border-box; }
+  .fireball { position: absolute; width: 4px; height: 4px; background: var(--color-game-fire-ring); outline: 1px solid var(--color-ink-950); }
+  .gearring { position: absolute; border-radius: 50%; border: 2px solid var(--color-game-gear-block); box-sizing: border-box; }
+
+  /* ---------- parry circle: old (H-33) and new with ink keylines (H-41) ---------- */
+  .pc { position: absolute; width: 0; height: 0; }
+  .pc .disc { position: absolute; left: calc(var(--size-parry-radius) * -1); top: calc(var(--size-parry-radius) * -1);
+    width: calc(var(--size-parry-radius) * 2); height: calc(var(--size-parry-radius) * 2); box-sizing: border-box; border-radius: 50%;
+    background: var(--color-game-parry-fill); border: var(--size-parry-line) solid var(--color-game-parry-circle); display: grid; place-items: center; }
+  .pc .ring { position: absolute; border-radius: 50%; box-sizing: border-box; border: var(--size-parry-line) solid var(--color-game-parry-approach); }
+  .pc.key .disc, .pc.key .ring { box-shadow: 0 0 0 var(--size-parry-keyline) var(--color-game-parry-keyline), inset 0 0 0 var(--size-parry-keyline) var(--color-game-parry-keyline); }
+
+  /* ---------- H-43 markers ---------- */
+  .tag { position: absolute; transform: translate(-50%, -50%); padding: 3px 4px 2px; background: var(--color-hud-glass); border: 1px solid var(--color-game-event-marker);
+    outline: 1px solid var(--color-game-event-marker-edge); display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 0; }
+  .pips { display: flex; gap: 2px; }
+  .pips i { width: var(--size-event-pip); height: 2px; background: var(--color-game-event-pip); display: block; }
+  .pips i.off { background: transparent; box-shadow: inset 0 0 0 1px var(--color-game-event-pip); height: 2px; }
+  .dots { position: absolute; background-image: radial-gradient(var(--color-game-event-marker) 0 0); }
+  .dots.h { height: 2px; background: repeating-linear-gradient(90deg, var(--color-game-event-marker) 0 2px, transparent 2px 6px); box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-game-event-marker-edge) 60%, transparent); }
+  .dots.v { width: 2px; background: repeating-linear-gradient(180deg, var(--color-game-event-marker) 0 2px, transparent 2px 6px); box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-game-event-marker-edge) 60%, transparent); }
+  .frame { position: absolute; border: 1px dashed color-mix(in srgb, var(--color-hud-text) 35%, transparent); pointer-events: none; }
+
+  /* ---------- elite: 4 offset silhouettes in elite-edge (game: setTintFill copies at +-1 px) ---------- */
+  .elite { filter: drop-shadow(1px 0 0 var(--color-game-elite-edge)) drop-shadow(-1px 0 0 var(--color-game-elite-edge)) drop-shadow(0 1px 0 var(--color-game-elite-edge)) drop-shadow(0 -1px 0 var(--color-game-elite-edge)); }
+
+  table.rank { border-collapse: collapse; font-size: 0.8125rem; margin-top: 12px; width: 100%; max-width: 920px; }
+  table.rank th, table.rank td { border-bottom: 1px solid color-mix(in srgb, var(--page-muted) 35%, transparent); padding: 4px 8px; text-align: left; vertical-align: top; }
+  table.rank th { color: var(--page-fg); }
+  table.rank td { color: var(--page-muted); }
+  @media (prefers-reduced-motion: no-preference) { .tag { transition: transform var(--motion-duration-event-slide) steps(3); } }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>M11 · Quicktime-Fokus (H-41) · M12 · Rand-Marker und Eliten (H-43)</h1>
+  <p>Funkgerät-Stil wie <code>m7-quicktime-und-stufen.html</code>. Alle Maße in logischen Arena-px. Fokus: eine Tinten-Ebene nur über Boden und Arena-Deko, die Effekte der unteren Rangstufe verlieren Deckkraft, die Kreise bekommen innen und außen eine Tintenlinie. Marker: Form und Wort am Rand des Marker-Rahmens. Eliten: kalter Umriss und Krone.</p>
+  <dl>
+    <dt>Fokus an</dt><dd>ab der Ankündigung des ersten Kreises (Telegraph-Start) bis zum Ende der Rückmeldung des letzten Kreises (<code>parry-feedback</code>). Übergang <code>focus-in</code>/<code>focus-out</code> 120 ms in 3 Stufen, mit „Bewegung reduzieren“ sofort. Kommt der nächste Kreis innerhalb von <code>focus-hold</code> 600 ms, bleibt der Fokus an.</dd>
+    <dt>Marker-Rahmen</dt><dd>links/rechts <code>event-inset</code> 6, oben <code>event-top</code> 56 (unter Energie und Timer), unten <code>event-bottom</code> 44 (über der Boss-Leiste), alles innerhalb <code>SafeInsets</code>. Marker bleiben <code>event-corner</code> 28 von den Ecken weg. Gestrichelte Linie in den Ansichten 4 bis 6 = nur zur Erklärung, nicht im Spiel.</dd>
+    <dt>Marker-Ablauf</dt><dd>erscheint <code>announceMs</code> (≈ 1000) vor dem Spawn: gleitet 4 px nach innen (150 ms, 3 Stufen), steht dann still. Drei Pips unter dem Wort gehen nacheinander aus (je ⅓). Mit dem Spawn verschwindet der Marker ohne Effekt. Kein Blinken, kein Pulsieren; mit „Bewegung reduzieren“ steht er sofort.</dd>
+  </dl>
+  <table class="rank" aria-label="Effekt-Rangfolge im Fokus">
+    <thead><tr><th>Rang</th><th>Was</th><th>im Fokus</th><th>mit EFFEKTE REDUZIEREN</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Abwehr-Kreise, Ring, Rückmeldung, PARRY!, Hinweistafel (H-37), HUD, Marker</td><td>100 %</td><td>100 %</td></tr>
+      <tr><td>1</td><td>Boss-Angriff und Telegraph, gegnerische Geschosse</td><td>100 %</td><td>100 %</td></tr>
+      <tr><td>2</td><td>Astronautin mit Waffe und Rüstungs-Overlay am Körper</td><td>100 %</td><td>100 %</td></tr>
+      <tr><td>3</td><td>Gegner, Boss, liegende Items (Kräfte, Herz)</td><td>100 %</td><td>100 %</td></tr>
+      <tr><td>4</td><td>Pet, Pet-Aura und -Geschosse, Rüstungs-Ringe (Block, Glut), Feuerring, Münzen, eigene Laser, Partikel (Sand, Glut, Sporen, Glühwürmchen, Splitter)</td><td>40 % im Umkreis 110 (<code>focus-near</code>), sonst 70 %; keine neuen Partikel im Umkreis</td><td>25 % überall (<code>focus-low-reduced</code>)</td></tr>
+      <tr><td>5</td><td>Boden-Kacheln und Arena-Deko</td><td>Tinten-Ebene 35 % darüber (≈ 65 % Helligkeit)</td><td>wie im Fokus</td></tr>
+    </tbody>
+  </table>
+</header>
+
+<section><h2>1 · WÜSTE, LEVEL 25 · Sand-Wurm, Kreis 1 läuft, Kreis 2 erscheint · HEUTE (ohne Fokus, Kreise ohne Tintenlinie)</h2><div class="stage-wrap"><div class="stage" id="s1" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>2 · GLEICHER MOMENT MIT FOKUS (H-41) · Boden 65 %, Pet, Feuerring, Münzen, Laser und Sand nah 40 %, fern 70 %, Kreise mit Tintenlinie</h2><div class="stage-wrap"><div class="stage" id="s2" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>3 · GLEICHER MOMENT MIT FOKUS UND „EFFEKTE REDUZIEREN“ · Rang 4 überall 25 %, keine Partikel</h2><div class="stage-wrap"><div class="stage" id="s3" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>3b · KREISE AUF ALLEN SECHS BÖDEN · je oben heute, Mitte neu, unten neu im Fokus (Messwerte in der Liste darunter)</h2><div class="stage-wrap"><div class="stage" id="s3b" data-component="ParryOverlay" data-font="funk"></div></div></section>
+<p class="doc" id="rep" style="font-size:12px">Kontrastprüfung: Skript lief nicht.</p>
+<section><h2>4 · PYRAMIDEN, LEVEL 30 · RING-SPITZE mit ELITE · Marker „RING“ (2 Pips übrig), Gegner treten rundum ein, Elite-Mumie (Stufe 3) mit Krone</h2><div class="stage-wrap"><div class="stage" id="s4" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>5 · WALD BEI NACHT, LEVEL 7 · SCHWARM von oben rechts (≈ 30°-Sektor), 3 Pips</h2><div class="stage-wrap"><div class="stage" id="s5" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>6 · ELFENWALD, LEVEL 14 · ZANGE links und rechts, 1 Pip übrig, eine Elite-Fee</h2><div class="stage-wrap"><div class="stage" id="s6" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>7 · ABLAUF (2×) · Marker normal und mit „Bewegung reduzieren“, Pips, Fokus-Übergang</h2><div class="stage-wrap"><div class="stage" id="s7" data-component="SpawnMarker" data-font="funk"></div></div></section>
+<section><h2>8 · ELITE NEBEN DEN STUFEN (2×) · Stufe 0, Stufe 3 (Glut), Elite Stufe 0, Elite Stufe 3 · Wüste und Nacht</h2><div class="stage-wrap"><div class="stage" id="s8" data-component="Enemy.elite" data-font="funk"></div></div></section>
+<section><h2>9 · SPRITES (3×) · elite-crown, event-markers (weiß und getönt), Drehung je Rand</h2><div class="stage-wrap"><div class="stage" id="s9" data-component="sprites-m11" data-font="funk"></div></div></section>
+
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m11.js"></script>
+<script>
+  // ?only=s2,s4 shows just these views (for zoomed screenshots)
+  // (screenshot.js only passes ?theme=, so ?theme=only-s2,s4 works too; there are no colour themes in this project)
+  const QS = new URLSearchParams(location.search), TH = QS.get('theme') || '';
+  const ONLY = QS.get('only') || (TH.startsWith('only-') ? TH.slice(5) : null);
+  if (ONLY) { document.querySelector('header.doc').hidden = true; document.getElementById('rep').hidden = !ONLY.includes('s3b');
+    document.querySelectorAll('section').forEach((s) => { if (!ONLY.split(',').includes(s.querySelector('.stage').id)) s.remove(); }); }
+  const SPR = window.PX_SPRITES;
+  const set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+  const css = getComputedStyle(document.documentElement);
+  const tok = (n) => css.getPropertyValue(n).trim();
+  const num = (n) => parseFloat(tok(n));
+
+  const P = (t, s, c, sh) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"${sh ? ` data-sh="${sh}"` : ''}></span>`;
+  // world sprite: k key, x/y top-left, o: s scale, f frame, tint, flip, op opacity, rot deg, cls
+  const W = (k, x, y, o) => { o = o || {}; return `<canvas class="ws ${o.cls || ''}" data-k="${k}" data-s="${o.s || 1}" data-f="${o.f || 0}" ${o.tint ? `data-tint="${o.tint}"` : ''} ${o.flip ? 'data-flip="1"' : ''} style="left:${x}px;top:${y}px;${o.op != null ? `opacity:${o.op};` : ''}${o.rot ? `transform:rotate(${o.rot}deg);` : ''}"></canvas>`; };
+  const TIER = (st) => st <= 0 ? '' : `--color-game-tier-${Math.min(st, 3)}`;
+  const SC = (st) => 1 + Math.min(st * 0.03, 0.15);
+  const ELITE = num('--size-elite-scale');
+  // enemy (centre cx/cy), optional elite with crown
+  function E(k, cx, cy, st, o) {
+    o = o || {}; const d = SPR[k]; const s = SC(st) * (o.elite ? ELITE : 1);
+    const w = Math.round(d.frameWidth * s), h = Math.round(d.frameHeight * s);
+    const x = Math.round(cx - w / 2), y = Math.round(cy - h / 2);
+    let out = W(k, x, y, { tint: TIER(st), s, flip: o.flip, cls: o.elite ? 'elite' : '' });
+    if (o.elite) out += W('elite-crown', Math.round(cx - 4.5), y - num('--size-elite-crown-gap') - 7, {});
+    return `<span data-component="Enemy${o.elite ? '.elite' : ''}" aria-label="${o.elite ? 'Elite-' : ''}Gegner">${out}</span>`;
+  }
+  function segs(v) { let h = ''; for (let i = 0; i < 10; i++) { const f = v / 10 - i; h += `<i class="${f >= 1 ? '' : f > 0 ? 'half' : 'off'}"></i>`; } return h; }
+  function rig(cx, cy) { return `<div class="w-rig" style="left:${cx - 16}px;top:${cy - 16}px" data-component="Player"><span class="body spr" data-n="astronaut" data-s="1" aria-label="Astronautin"></span><span class="gun spr" data-n="raygun1" data-s="1" style="left:20px;top:7px"></span></div>`; }
+  function hud(st) {
+    return `
+      <div class="abs f-glass f-energy h-energy" style="left:8px;top:8px" role="img" aria-label="Energie ${st.energy} von 100">
+        ${P(st.energy, 3, '--color-hud-text')}<div>${P('ENERGIE', 0, '--color-hud-text-muted')}<div class="f-segs">${segs(st.energy)}</div></div></div>
+      <div class="abs f-glass h-timer" style="left:264px;top:8px;width:112px;height:40px;${st.boss ? 'border-color:var(--color-hud-danger)' : ''}">${P(st.timer, 3, st.boss ? '--color-hud-danger' : '--color-hud-text')}</div>
+      <div class="abs f-btn icon" style="left:560px;top:8px" aria-label="Ton"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs f-btn icon" style="left:600px;top:8px" aria-label="Pause"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs row h-row" style="left:8px"><div class="f-glass f-chip"><span class="spr" data-n="coin" data-s="2"></span>${P('+' + st.coins, 2, '--color-hud-gold')}</div></div>
+      ${st.bossName ? `<div class="abs" style="left:220px;top:323px;width:200px"><div class="row" style="justify-content:space-between;height:8px;margin-bottom:3px">${P(st.bossName, 0, '--color-hud-text')}${P('BOSS', 0, '--color-hud-danger')}</div><div style="height:8px;border:1px solid var(--color-hud-danger);background:var(--color-hud-glass);position:relative"><i style="position:absolute;left:1px;top:1px;bottom:1px;width:${st.bossHp * 1.96}px;background:var(--color-hud-danger)"></i></div></div>` : ''}`;
+  }
+
+  // ---- parry circle ----
+  const R = 20, DIST = 56;
+  function pc(cx, cy, o) {
+    const center = o.at ? o.at : [cx + Math.cos(o.a * Math.PI / 180) * DIST, cy + Math.sin(o.a * Math.PI / 180) * DIST];
+    const [x, y] = center.map(Math.round);
+    const ring = o.ring ? `<i class="ring" style="left:${-R * o.ring}px;top:${-R * o.ring}px;width:${2 * R * o.ring}px;height:${2 * R * o.ring}px"></i>` : '';
+    return `<div class="pc ${o.key ? 'key' : ''}" style="left:${x}px;top:${y}px" role="button" aria-label="Kreis ${o.n}, tippen, wenn der Ring den Rand erreicht" data-component="ParryOverlay.circle"><span class="disc">${P(String(o.n), 2, '--color-game-parry-circle')}</span>${ring}</div>`;
+  }
+
+  // ---- rank 4 opacity (H-41) ----
+  const CX = 320, CY = 180;
+  const NEAR = num('--size-focus-near');
+  function low(x, y, mode) {
+    if (mode === 'off') return 1;
+    if (mode === 'reduced') return num('--opacity-focus-low-reduced');
+    return Math.hypot(x - CX, y - CY) <= NEAR ? num('--opacity-focus-low-near') : num('--opacity-focus-low-far');
+  }
+
+  // ---- scene 1-3: desert boss fight ----
+  const SAND = [[60, 70], [110, 140], [150, 300], [230, 250], [260, 120], [300, 230], [350, 140], [380, 270], [420, 200], [470, 300], [520, 160], [590, 240], [610, 100], [200, 190], [340, 210], [290, 160], [180, 80], [560, 330], [90, 250], [440, 90]];
+  const COINS = [[268, 214], [356, 150], [300, 250], [395, 196], [240, 150], [120, 200], [520, 260], [460, 330], [80, 300], [580, 120], [345, 232]];
+  const LASERS = [[340, 168, -22], [372, 158, -22], [404, 146, -22], [300, 196, 160]];
+  function bossScene(mode) {
+    const focus = mode !== 'off', key = mode !== 'off';
+    const sand = mode === 'reduced' ? '' : SAND.filter(([x, y]) => !(focus && Math.hypot(x - CX, y - CY) <= NEAR && (x + y) % 3 === 0))
+      .map(([x, y]) => `<i class="sand" style="left:${x}px;top:${y}px;opacity:${low(x, y, mode)}"></i>`).join('');
+    const coins = COINS.map(([x, y]) => W('coin-field', x - 6, y - 6, { s: 2, op: low(x, y, mode) })).join('');
+    const lasers = LASERS.map(([x, y, r]) => `<i class="laser" style="left:${x}px;top:${y}px;transform:rotate(${r}deg);opacity:${low(x, y, mode)}"></i>`).join('');
+    const fb = [0, 90, 180, 270].map((a) => { const x = CX + Math.cos((a + 20) * Math.PI / 180) * 30, y = CY + Math.sin((a + 20) * Math.PI / 180) * 30; return `<i class="fireball" style="left:${Math.round(x - 2)}px;top:${Math.round(y - 2)}px;opacity:${low(x, y, mode)}"></i>`; }).join('');
+    const lo = low(CX, CY, mode);
+    return `
+      <div class="w-ground desert"></div>
+      ${focus ? '<div class="focus" data-component="GameScene.focusLayer" aria-hidden="true"></div>' : ''}
+      ${sand}${coins}
+      ${E('enemy-camel', 90, 240, 3)}${E('enemy-snake', 200, 110, 3)}${E('enemy-armadillo', 530, 270, 3, { flip: true })}${E('enemy-snake', 130, 60, 3)}${E('enemy-camel', 250, 300, 3)}${E('enemy-snake', 420, 250, 3, { flip: true })}
+      ${W('boss-sand-worm', 450, 40, { s: 1 })}
+      <div class="tele" style="left:${CX - 40}px;top:${CY - 40}px;width:80px;height:80px" aria-label="Ankündigung Sandstoß"></div>
+      <div class="firering" style="left:${CX - 30}px;top:${CY - 30}px;width:60px;height:60px;opacity:${lo}" aria-label="Feuerring"></div>${fb}
+      <div class="gearring" style="left:${CX - 18}px;top:${CY - 18}px;width:36px;height:36px;opacity:${lo}" aria-label="Rüstungs-Block"></div>
+      ${lasers}
+      ${rig(CX, CY)}
+      ${W('pet-bee', CX + 22 - 8, CY - 10 - 8, { op: lo })}
+      ${W('pet-sting', CX + 46, CY - 22, { op: low(CX + 46, CY - 22, mode) })}
+      ${pc(CX, CY, { n: 1, a: -40, ring: 1.35, key })}
+      ${pc(CX, CY, { n: 2, a: 145, ring: 2.4, key })}
+      <div class="w-vignette"></div>
+      ${hud({ energy: 61, timer: 'BOSS!', boss: true, coins: 38, bossName: 'SAND-WURM', bossHp: 47 })}`;
+  }
+  set('s1', bossScene('off'));
+  set('s2', bossScene('focus'));
+  set('s3', bossScene('reduced'));
+
+  // ---- 3b: circles on all six grounds ----
+  const grounds = [['forest', 'WALD'], ['night', 'NACHT'], ['elf', 'ELFENWALD'], ['desert', 'WÜSTE'], ['pyramid', 'PYRAMIDEN'], ['oasis', 'OASE']];
+  set('s3b', `<div class="sheet"></div>
+    ${grounds.map((g, i) => `<div class="cellg" style="left:${i * 106 + 2}px;top:8px;width:102px;height:344px">
+        <div class="w-ground ${g[0]}"></div>
+        <div class="focus" style="top:236px"></div>
+        <div class="abs" style="left:4px;top:4px">${P(g[1], 0, '--color-hud-text')}</div>
+        <div class="abs" style="left:4px;top:18px">${P('HEUTE', 0, '--color-hud-text')}</div>
+        ${pc(0, 0, { n: 1, ring: 1.4, at: [51, 70] })}
+        <div class="abs" style="left:4px;top:122px">${P('NEU', 0, '--color-hud-text')}</div>
+        ${pc(0, 0, { n: 1, ring: 1.4, at: [51, 174], key: true })}
+        <div class="abs" style="left:4px;top:240px">${P('NEU · FOKUS', 0, '--color-hud-text')}</div>
+        ${pc(0, 0, { n: 1, ring: 1.4, at: [51, 292], key: true })}
+      </div>`).join('')}`);
+
+  // ---- H-43 marker geometry ----
+  const FR = { l: num('--size-event-inset'), r: 640 - num('--size-event-inset'), t: num('--size-event-top'), b: 360 - num('--size-event-bottom') };
+  const CORNER = num('--size-event-corner');
+  function edgePoint(deg) {
+    const dx = Math.cos(deg * Math.PI / 180), dy = Math.sin(deg * Math.PI / 180);
+    const ts = [];
+    if (dx > 0) ts.push([(FR.r - CX) / dx, 'r']); if (dx < 0) ts.push([(FR.l - CX) / dx, 'l']);
+    if (dy > 0) ts.push([(FR.b - CY) / dy, 'b']); if (dy < 0) ts.push([(FR.t - CY) / dy, 't']);
+    ts.sort((a, b) => a[0] - b[0]);
+    const [tt, edge] = ts[0];
+    let x = CX + dx * tt, y = CY + dy * tt;
+    x = Math.min(Math.max(x, FR.l + CORNER), FR.r - CORNER); y = Math.min(Math.max(y, FR.t + CORNER), FR.b - CORNER);
+    if (edge === 'l') x = FR.l; if (edge === 'r') x = FR.r; if (edge === 't') y = FR.t; if (edge === 'b') y = FR.b;
+    return { x, y, edge };
+  }
+  const ROT = { t: 0, r: 90, b: 180, l: 270 }, IN = { t: [0, 1], b: [0, -1], l: [1, 0], r: [-1, 0] };
+  function pips(left) { return `<span class="pips" aria-hidden="true">${[0, 1, 2].map((i) => `<i class="${i < left ? '' : 'off'}"></i>`).join('')}</span>`; }
+  function tag(x, y, word, left) { return `<div class="tag" style="left:${Math.round(x)}px;top:${Math.round(y)}px" role="status" aria-label="${word} kommt">${P(word, 1, '--color-game-event-marker')}${pips(left)}</div>`; }
+  // frame 0 swarm, 1 pincer; slide = px still to go outward (0 = rest)
+  function marker(deg, frame, word, left, slide) {
+    const p = edgePoint(deg), [ix, iy] = IN[p.edge], s = slide || 0;
+    const cx = p.x + ix * (12 - s), cy = p.y + iy * (12 - s);
+    const tx = cx + ix * (12 + num('--size-event-word-gap') + (ix ? 18 : 9)), ty = cy + iy * (12 + num('--size-event-word-gap') + (iy ? 9 : 0));
+    return `<span data-component="SpawnMarker">${W('event-markers', Math.round(cx - 12), Math.round(cy - 12), { f: frame, tint: '--color-game-event-marker', rot: ROT[p.edge] })}${tag(tx, ty, word, left)}</span>`;
+  }
+  function ringMarker(left) {
+    const w = FR.r - FR.l, h = FR.b - FR.t;
+    return `<span data-component="SpawnMarker.ring">
+      <i class="dots h" style="left:${FR.l}px;top:${FR.t}px;width:${w}px"></i><i class="dots h" style="left:${FR.l}px;top:${FR.b - 2}px;width:${w}px"></i>
+      <i class="dots v" style="left:${FR.l}px;top:${FR.t}px;height:${h}px"></i><i class="dots v" style="left:${FR.r - 2}px;top:${FR.t}px;height:${h}px"></i>
+      ${tag(CX, FR.t + 14, 'RING', left)}</span>`;
+  }
+  const frameGuide = () => `<div class="frame" style="left:${FR.l}px;top:${FR.t}px;width:${FR.r - FR.l}px;height:${FR.b - FR.t}px" aria-hidden="true"></div>`;
+
+  // ---- 4: ring spike with elite ----
+  set('s4', `<div class="w-ground pyramid"></div>
+    ${E('enemy-mummy', 40, 110, 3)}${E('enemy-archaeologist', 600, 120, 3, { flip: true })}${E('enemy-sphinx', 140, 330, 3)}${E('enemy-mummy', 500, 335, 3, { flip: true })}
+    ${E('enemy-sand-worm', 30, 240, 3)}${E('enemy-mummy', 612, 250, 3, { flip: true })}${E('enemy-archaeologist', 420, 66, 3, { flip: true })}
+    ${E('enemy-mummy', 210, 238, 3, { elite: true })}
+    ${E('enemy-snake', 380, 130, 3, { flip: true })}${E('enemy-sphinx', 250, 120, 3)}
+    ${W('coin-field', 300, 260, { s: 2 })}${W('coin-field', 360, 200, { s: 2 })}
+    ${rig(CX, CY)}${W('pet-capybara', CX + 22 - 8, CY + 8 - 8, {})}
+    <div class="w-vignette"></div>
+    ${ringMarker(2)}
+    ${hud({ energy: 54, timer: '1:31', coins: 27 })}`);
+
+  // ---- 5: swarm ----
+  set('s5', `<div class="w-ground night"></div>
+    ${E('enemy-boar', 120, 240, 1)}${E('enemy-forest-witch', 200, 120, 1)}${E('enemy-bear', 520, 270, 1, { flip: true })}${E('enemy-zombie-squirrel', 250, 280, 1)}
+    ${rig(CX, CY)}${W('pet-penguin', CX - 22 - 8, CY + 8 - 8, {})}
+    <div class="w-vignette"></div>
+    ${frameGuide()}
+    ${marker(-38, 0, 'SCHWARM', 3)}
+    ${hud({ energy: 83, timer: '2:04', coins: 12 })}`);
+
+  // ---- 6: pincer with elite ----
+  set('s6', `<div class="w-ground elf"></div>
+    ${E('enemy-forest-spirit', 180, 120, 2)}${E('enemy-fairy', 470, 250, 2, { flip: true })}${E('enemy-cursed-tree', 130, 270, 2)}
+    ${E('enemy-fairy', 420, 140, 2, { elite: true, flip: true })}
+    ${E('enemy-zombie-squirrel', 40, 175, 2)}${E('enemy-zombie-squirrel', 600, 190, 2, { flip: true })}
+    ${rig(CX, CY)}${W('pet-bee', CX + 22 - 8, CY - 10 - 8, {})}
+    <div class="w-vignette"></div>
+    ${frameGuide()}
+    ${marker(180, 1, 'ZANGE', 1)}${marker(0, 1, 'ZANGE', 1)}
+    ${hud({ energy: 47, timer: '0:52', coins: 33 })}`);
+
+  // ---- 7: timeline sheet 2x ----
+  // cell 100 wide: edge line at top, marker slid in (slide = px still outside), tag, time label at the bottom
+  function cellMarker(x, y, frame, word, left, slide, label) {
+    return `<div class="abs" style="left:${x}px;top:${y}px;width:100px;height:90px">
+      <div class="abs" style="left:0;top:0;width:100px;height:1px;background:color-mix(in srgb,var(--color-hud-text) 40%,transparent)"></div>
+      ${W('event-markers', 38, 1 - slide, { f: frame, tint: '--color-game-event-marker' })}
+      ${tag(50, 41 - slide, word, left)}
+      <div class="abs" style="left:0;top:76px;width:100px;text-align:center">${P(label, 0, '--color-hud-text-muted')}</div></div>`;
+  }
+  const g65 = (pct) => `color-mix(in srgb, var(--color-biome-forest-ground) ${pct}%, var(--color-game-focus-dim))`;
+  set('s7', `<div class="sheet"></div>
+      <div class="abs" style="left:12px;top:6px">${P('MARKER NORMAL · GLEITET 4 PX IN 3 STUFEN, DANN STILL', 0, '--color-hud-text')}</div>
+      ${cellMarker(12, 30, 0, 'SCHWARM', 3, 4, '0 MS')}${cellMarker(124, 30, 0, 'SCHWARM', 3, 3, '50 MS')}${cellMarker(236, 30, 0, 'SCHWARM', 3, 1, '100 MS')}${cellMarker(348, 30, 0, 'SCHWARM', 3, 0, '150 MS')}${cellMarker(460, 30, 0, 'SCHWARM', 2, 0, '333 MS')}
+      <div class="abs" style="left:12px;top:126px">${P('BEWEGUNG REDUZIERT · STEHT SOFORT, NUR DIE PIPS GEHEN AUS', 0, '--color-hud-text')}</div>
+      ${cellMarker(12, 152, 1, 'ZANGE', 3, 0, '0 MS')}${cellMarker(124, 152, 1, 'ZANGE', 2, 0, '333 MS')}${cellMarker(236, 152, 1, 'ZANGE', 1, 0, '667 MS')}
+      <div class="abs" style="left:12px;top:254px">${P('FOKUS-ÜBERGANG · BODEN (WALD) IN 3 STUFEN IN 120 MS · REDUZIERT: SOFORT 65 %', 0, '--color-hud-text')}</div>
+      ${[100, 88, 77, 65].map((p, i) => `<div class="abs" style="left:${12 + i * 60}px;top:272px;width:52px;height:52px;background:${g65(p)}"></div>
+        <div class="abs" style="left:${12 + i * 60}px;top:330px;width:52px;text-align:center">${P(['0 MS', '40 MS', '80 MS', '120 MS'][i], 0, '--color-hud-text-muted')}</div>`).join('')}
+      <div class="abs" style="left:360px;top:272px;width:270px">${P('PIPS: EINER GEHT JE 1/3 VON ANNOUNCEMS AUS.', 0, '--color-hud-text-muted')}</div>
+      <div class="abs" style="left:360px;top:286px;width:270px">${P('BEIM SPAWN VERSCHWINDET DER MARKER OHNE EFFEKT.', 0, '--color-hud-text-muted')}</div>
+      <div class="abs" style="left:360px;top:300px;width:270px">${P('KEIN BLINKEN, KEIN PULSIEREN.', 0, '--color-hud-text-muted')}</div>`);
+
+  // ---- 8: elite close-up 3x ----
+  const VAR8 = [[0, false, 'S0'], [4, false, 'S3'], [0, true, 'E0'], [4, true, 'E3']];
+  const eCell = (g, k, c, i, row) => `<div class="cellg" style="left:${i * 80 + 1}px;top:${row * 86 + 2}px;width:78px;height:84px">
+      <div class="w-ground ${g}"></div>${E(k, 39, 44, c[0], { elite: c[1] })}
+      <div class="abs" style="left:3px;top:3px">${P(c[2], 0, '--color-hud-text')}</div></div>`;
+  set('s8', `<div class="sheet"></div>
+    <div class="abs" style="left:0;top:0;width:320px;height:180px;transform:scale(2);transform-origin:0 0">
+      ${VAR8.map((c, i) => eCell('desert', 'enemy-camel', c, i, 0)).join('')}
+      ${VAR8.map((c, i) => eCell('night', 'enemy-forest-witch', c, i, 1)).join('')}
+    </div>`);
+
+  // ---- 9: sprites 4x ----
+  set('s9', `<div class="sheet"></div>
+    <div class="abs" style="left:0;top:0;width:213px;height:90px;transform:scale(3);transform-origin:0 0">
+      ${W('elite-crown', 6, 10, {})}
+      ${W('event-markers', 24, 4, { f: 0 })}${W('event-markers', 52, 4, { f: 1 })}
+      ${W('event-markers', 24, 34, { f: 0, tint: '--color-game-event-marker' })}${W('event-markers', 52, 34, { f: 1, tint: '--color-game-event-marker' })}
+      ${['t', 'r', 'b', 'l'].map((e, i) => W('event-markers', 90 + i * 30, 19, { f: 0, tint: '--color-game-event-marker', rot: ROT[e] })).join('')}
+    </div>
+    <div class="abs" style="left:18px;top:200px">${P('KRONE', 0, '--color-hud-text-muted')}</div>
+    <div class="abs" style="left:72px;top:200px">${P('SCHWARM', 0, '--color-hud-text-muted')}</div>
+    <div class="abs" style="left:156px;top:200px">${P('ZANGE', 0, '--color-hud-text-muted')}</div>
+    <div class="abs" style="left:270px;top:150px">${P('DREHUNG JE RAND: OBEN 0, RECHTS 90, UNTEN 180, LINKS 270 GRAD', 0, '--color-hud-text-muted')}</div>
+    <div class="abs" style="left:18px;top:300px">${P('OBEN WEISS MIT DUNKLEM UMRISS (DATEI), UNTEN IM SPIEL MIT SETTINT EVENT-MARKER', 0, '--color-hud-text-muted')}</div>`);
+</script>
+<script>
+  // Render world sprites (same renderer as m7): data-tint = multiply (setTint), data-s = display scale.
+  (function () {
+    const S = window.PX_SPRITES, cs = getComputedStyle(document.documentElement);
+    const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const v = (n) => cs.getPropertyValue(n).trim();
+    const resolve = (n) => { let x = v(n); let guard = 0; while (x.startsWith('var(') && guard++ < 5) x = v(x.slice(4, -1)); return x; };
+    document.querySelectorAll('canvas.ws[data-k]').forEach((c) => {
+      const d = S[c.dataset.k]; if (!d) { c.width = 8; c.height = 8; return; }
+      c.width = d.frameWidth; c.height = d.frameHeight;
+      const t = c.dataset.tint ? hex(resolve(c.dataset.tint)) : [255, 255, 255];
+      const x = c.getContext('2d');
+      d.frames[+c.dataset.f || 0].forEach((r, y) => [...r].forEach((ch, i) => { if (ch === '.') return;
+        const col = hex(d.palette[ch]).map((q, k) => Math.round(q * t[k] / 255));
+        x.fillStyle = `rgb(${col})`; x.fillRect(c.dataset.flip ? d.frameWidth - 1 - i : i, y, 1, 1); }));
+      const s = +c.dataset.s || 1;
+      c.style.width = Math.round(d.frameWidth * s) + 'px'; c.style.height = Math.round(d.frameHeight * s) + 'px';
+    });
+
+    // Contrast report for view 3b: phosphor edge against keyline, plain ground and dimmed ground.
+    const lin = (q) => { q /= 255; return q <= 0.04045 ? q / 12.92 : ((q + 0.055) / 1.055) ** 2.4; };
+    const L = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    const cr = (a, b) => { const p = L(a), q = L(b); return (Math.max(p, q) + 0.05) / (Math.min(p, q) + 0.05); };
+    const a = parseFloat(v('--opacity-focus-dim')), ink = hex(resolve('--color-game-focus-dim'));
+    const edge = hex(resolve('--color-game-parry-circle')), key = hex(resolve('--color-game-parry-keyline'));
+    const out = ['forest', 'night', 'elf', 'desert', 'pyramid', 'oasis'].map((m) => {
+      const g = hex(resolve('--color-biome-' + m + '-ground')), gd = g.map((q, i) => Math.round(q * (1 - a) + ink[i] * a));
+      return `${m}: Rand/Boden ${cr(edge, g).toFixed(2)} · Rand/Boden im Fokus ${cr(edge, gd).toFixed(2)} · Rand/Tintenlinie ${cr(edge, key).toFixed(2)} · Boden im Fokus: sRGB-Helligkeit ${Math.round((1 - a) * 100)} %, rel. Leuchtdichte ${(L(gd) / L(g) * 100).toFixed(0)} %`;
+    });
+    const rep = document.getElementById('rep');
+    rep.style.cssText = 'font-size:13px;line-height:1.5;margin-bottom:24px';
+    rep.innerHTML = '<b>Messung Ansicht 3b</b> (Phosphor-Rand <code>parry-circle</code>):<br>' + out.join('<br>');
+  })();
+</script>
+</body>
+</html>
