@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  FINISHER_SCENE_KEY,
+  FINISHER_VARIANT_IDS,
+  type FinisherPlan,
+  type FinisherStartData,
   EASY_PARRY_KEY,
   GameEvents,
   MAX_UPGRADE_LEVEL,
@@ -303,5 +307,41 @@ describe('M9 contracts (AP-148)', () => {
     expect(save.easyParry).toBeUndefined();
     const on: Pick<SaveGame, 'easyParry'> = { easyParry: true };
     expect(on.easyParry).toBe(true);
+  });
+});
+
+describe('M10 contracts (AP-157)', () => {
+  it('has optional finisher save fields so old saves stay valid', () => {
+    const old: Pick<SaveGame, 'seenFinishers' | 'reduceEffects'> = {};
+    expect(old.seenFinishers).toBeUndefined();
+    expect(old.reduceEffects).toBeUndefined();
+    const fresh: Pick<SaveGame, 'seenFinishers' | 'reduceEffects'> = {
+      seenFinishers: ['stage-1'],
+      reduceEffects: true,
+    };
+    expect(fresh.seenFinishers).toEqual(['stage-1']);
+  });
+
+  it('has the scene key and start data without result for the debug start', () => {
+    expect(FINISHER_SCENE_KEY).toBe('FinisherScene');
+    expect(FINISHER_VARIANT_IDS).toHaveLength(12);
+    const plan: FinisherPlan = {
+      variantId: 'stage-1',
+      stage: 1,
+      isFinale: false,
+      steps: [{ block: 'hitstop', atMs: 0, durationMs: 100 }],
+      totalMs: 2000,
+      skippable: false,
+      reduced: false,
+    };
+    const actor = { texture: 't', x: 0, y: 0, scale: 1 };
+    const data: FinisherStartData = {
+      plan,
+      levelId: 0,
+      bossId: 'rootMonster',
+      boss: actor,
+      player: actor,
+    };
+    expect(data.result).toBeUndefined();
   });
 });

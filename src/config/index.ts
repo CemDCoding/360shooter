@@ -15,3 +15,4 @@ export * from './parry';
 export * from './gear';
 export * from './pets';
 export * from './shop';
+export * from './finishers';

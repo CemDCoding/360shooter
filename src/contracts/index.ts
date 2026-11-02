@@ -18,3 +18,4 @@ export * from './tier';
 export * from './gear';
 export * from './pet';
 export * from './shop';
+export * from './finisher';
