@@ -1,3 +1,5 @@
+import type { EnemyRole } from './wave';
+
 export type EnemyId =
   | 'cursedTree'
   | 'forestWitch'
@@ -95,4 +97,8 @@ export interface EnemyDef {
   burrow?: EnemyBurrowDef;
   /** Status effect of the contact with the player (e.g. snake poison). */
   onHit?: StatusOnHit;
+  /** Cost in the threat budget of the spawn director (RS-01.4, M12). */
+  threatCost?: number;
+  /** Role for the role caps (RS-01.4, M12). */
+  role?: EnemyRole;
 }
