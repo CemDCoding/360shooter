@@ -5,7 +5,7 @@ import { EASY_PARRY_KEY, GameEvents, type GameEventPayloads, type SafeInsets } f
 import { addMuteButton } from '../platform/audio';
 import { hudScale } from '../platform/layout';
 import { prefersReducedMotion } from '../platform/motion';
-import { loadSave, writeSave } from '../platform/storage';
+import { loadSave, setReduceEffects, writeSave } from '../platform/storage';
 import { parseDebugFps } from './debug';
 import type { HudInitData } from './GameScene';
 import { ArmourIndicator } from './hud/ArmourIndicator';
@@ -68,6 +68,8 @@ const SWITCH_BOX_PX = 8 * SWITCH_BOX_SCALE;
 const SWITCH_BOX_GAP = 8;
 const SWITCH_LABEL = 'EINFACHE ABWEHR';
 const SWITCH_NOTE = 'ALLE ABWEHREN: EIN TIPP';
+const REDUCE_LABEL = 'EFFEKTE REDUZIEREN';
+const REDUCE_NOTE = 'OHNE BLITZ UND WACKELN';
 /** Boss bar width in arena units at k = 1 (runde.html 3: 200 px, bottom centre). */
 const BOSS_BAR_W = 200;
 const BOSS_BAR_H = 8;
@@ -143,6 +145,9 @@ export class HudScene extends Phaser.Scene {
   private menuButton!: FunkButton;
   private toggleButton!: FunkButton;
   private toggleBox!: Phaser.GameObjects.Image;
+  private reduceButton!: FunkButton;
+  private reduceBox!: Phaser.GameObjects.Image;
+  private reduceEffects = false;
   private easyParry = false;
   private pauseFocus = 0;
   private abortDialog: ConfirmDialog | null = null;
@@ -190,6 +195,7 @@ export class HudScene extends Phaser.Scene {
     this.slots = new PowerSlots(this, height, this.e.bottom, this.onSlotPressed, this.e.left);
     this.petBar = null;
     this.easyParry = loadSave().easyParry === true;
+    this.reduceEffects = loadSave().reduceEffects === true;
     this.registry.set(EASY_PARRY_KEY, this.easyParry);
     this.pauseFocus = 0;
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
@@ -593,7 +599,10 @@ export class HudScene extends Phaser.Scene {
     const buttonW = labels.map((l) =>
       Math.max(FUNK_MIN_BUTTON, Math.round(measureFunk(this, l, PAUSE_BUTTON_SCALE) + 24)),
     ) as [number, number];
-    const switchLabelW = measureFunk(this, SWITCH_LABEL, PAUSE_BUTTON_SCALE);
+    const switchLabelW = Math.max(
+      measureFunk(this, SWITCH_LABEL, PAUSE_BUTTON_SCALE),
+      measureFunk(this, REDUCE_LABEL, PAUSE_BUTTON_SCALE),
+    );
     const lay = pauseLayout({
       width,
       height,
@@ -630,6 +639,14 @@ export class HudScene extends Phaser.Scene {
       0.5,
       0,
     );
+    const note2 = funkText(
+      this,
+      width / 2,
+      lay.note2Y,
+      REDUCE_NOTE,
+      lab,
+      'hud.text-muted',
+    ).setOrigin(0.5, 0);
     const [r1, r2] = lay.buttons;
     this.continueButton = new FunkButton(this, r1.x + r1.w / 2, r1.y + r1.h / 2, {
       label: labels[0],
@@ -656,22 +673,17 @@ export class HudScene extends Phaser.Scene {
       },
     });
     // Box and word are centred as one block; the state is the shape of the box, not a colour.
-    const labelW = measureFunk(this, SWITCH_LABEL, PAUSE_BUTTON_SCALE);
-    const blockW = SWITCH_BOX_PX + SWITCH_BOX_GAP + labelW;
-    const left = -blockW / 2;
-    this.toggleBox = this.add
-      .image(left + SWITCH_BOX_PX / 2, 0, SWITCH_ICON_KEY, this.easyParry ? 1 : 0)
-      .setScale(SWITCH_BOX_SCALE)
-      .setTint(themeColor('hud.text').num);
-    const toggleLabel = funkText(
-      this,
-      left + SWITCH_BOX_PX + SWITCH_BOX_GAP,
-      0,
-      SWITCH_LABEL,
-      PAUSE_BUTTON_SCALE,
-      'hud.text',
-    ).setOrigin(0, 0.5);
-    this.toggleButton.add([this.toggleBox, toggleLabel]);
+    this.toggleBox = this.addSwitchContent(this.toggleButton, SWITCH_LABEL, this.easyParry);
+    const t2 = lay.toggle2;
+    this.reduceButton = new FunkButton(this, t2.x + t2.w / 2, t2.y + t2.h / 2, {
+      width: t2.w,
+      height: t2.h,
+      onClick: () => {
+        this.setPauseFocus(3);
+        this.toggleReduceEffects();
+      },
+    });
+    this.reduceBox = this.addSwitchContent(this.reduceButton, REDUCE_LABEL, this.reduceEffects);
     return this.add
       .container(0, 0, [
         dim,
@@ -681,6 +693,8 @@ export class HudScene extends Phaser.Scene {
         this.menuButton,
         this.toggleButton,
         note,
+        this.reduceButton,
+        note2,
         hint,
       ])
       .setDepth(PAUSE_DEPTH)
@@ -696,8 +710,40 @@ export class HudScene extends Phaser.Scene {
     this.toggleBox.setFrame(this.easyParry ? 1 : 0);
   }
 
+  /** Box and word centred as one block in a switch button; the state is the box frame, not a colour. */
+  private addSwitchContent(
+    button: FunkButton,
+    label: string,
+    on: boolean,
+  ): Phaser.GameObjects.Image {
+    const blockW = SWITCH_BOX_PX + SWITCH_BOX_GAP + measureFunk(this, label, PAUSE_BUTTON_SCALE);
+    const left = -blockW / 2;
+    const box = this.add
+      .image(left + SWITCH_BOX_PX / 2, 0, SWITCH_ICON_KEY, on ? 1 : 0)
+      .setScale(SWITCH_BOX_SCALE)
+      .setTint(themeColor('hud.text').num);
+    const text = funkText(
+      this,
+      left + SWITCH_BOX_PX + SWITCH_BOX_GAP,
+      0,
+      label,
+      PAUSE_BUTTON_SCALE,
+      'hud.text',
+    ).setOrigin(0, 0.5);
+    button.add([box, text]);
+    return box;
+  }
+
+  /** Flips "reduce effects": saved at once; it acts from the next boss victory on. */
+  private toggleReduceEffects(): void {
+    if (this.abortDialog) return;
+    this.reduceEffects = !this.reduceEffects;
+    setReduceEffects(this.reduceEffects);
+    this.reduceBox.setFrame(this.reduceEffects ? 1 : 0);
+  }
+
   private pauseButtons(): FunkButton[] {
-    return [this.continueButton, this.menuButton, this.toggleButton];
+    return [this.continueButton, this.menuButton, this.toggleButton, this.reduceButton];
   }
 
   private setPauseFocus(index: number): void {
@@ -717,7 +763,8 @@ export class HudScene extends Phaser.Scene {
     } else if (action === 'press') {
       if (this.pauseFocus === 0) this.togglePause();
       else if (this.pauseFocus === 1) this.askAbort();
-      else this.toggleEasyParry();
+      else if (this.pauseFocus === 2) this.toggleEasyParry();
+      else this.toggleReduceEffects();
     }
   }
 

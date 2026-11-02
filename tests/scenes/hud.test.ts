@@ -593,7 +593,10 @@ describe('pauseLayout (H-33 view 6, H-37 view 12)', () => {
     expect(l.toggle.y).toBe(l.buttons[0].y + 32 + 8);
     expect(l.toggle.h).toBe(32);
     expect(l.noteY).toBe(l.toggle.y + 32 + 6);
-    expect(l.hintY).toBe(l.noteY + 8 + 14);
+    expect(l.toggle2.y).toBe(l.noteY + 8 + 8);
+    expect(l.toggle2.h).toBe(32);
+    expect(l.note2Y).toBe(l.toggle2.y + 32 + 6);
+    expect(l.hintY).toBe(l.note2Y + 8 + 14);
     expect(l.buttons[1].x - (l.buttons[0].x + l.buttons[0].w)).toBe(12);
   });
 
@@ -618,7 +621,7 @@ describe('pauseLayout (H-33 view 6, H-37 view 12)', () => {
     (k) => {
       const m = Math.round(8 * k);
       const { l } = lay(k, m, 480, 360);
-      for (const b of [...l.buttons, l.toggle]) {
+      for (const b of [...l.buttons, l.toggle, l.toggle2]) {
         expect(b.h).toBe(Math.round(32 * k));
         expect(b.x).toBeGreaterThanOrEqual(m);
         expect(b.x + b.w).toBeLessThanOrEqual(480 - m);
@@ -627,13 +630,24 @@ describe('pauseLayout (H-33 view 6, H-37 view 12)', () => {
       }
       expect(l.toggle.y).toBeGreaterThan(l.buttons[0].y + l.buttons[0].h);
       expect(l.noteY).toBeGreaterThan(l.toggle.y + l.toggle.h);
-      expect(l.hintY).toBeGreaterThan(l.noteY);
+      expect(l.toggle2.y).toBeGreaterThan(l.noteY);
+      expect(l.hintY).toBeGreaterThan(l.note2Y);
     },
   );
 
+  it('ends the group at about 326 at k = 1 (272 plus the second switch) and fits 640 to 900 wide', () => {
+    for (const w of [640, 768, 900]) {
+      const { l, input } = lay(1, 8, w, 360);
+      expect(l.hintY + input.hintH).toBe(326);
+      expect(l.toggle2.x).toBe(l.toggle.x);
+      expect(l.toggle2.w).toBe(l.toggle.w);
+      expect(l.toggle2.x + l.toggle2.w).toBeLessThanOrEqual(w - 8);
+    }
+  });
+
   it('moves the group up when it would reach into the bottom edge', () => {
-    const { l, input } = lay(1.4, 11, 640, 300);
-    expect(l.hintY + input.hintH).toBeLessThanOrEqual(300 - 11);
+    const { l, input } = lay(1.4, 11, 640, 345);
+    expect(l.hintY + input.hintH).toBeLessThanOrEqual(345 - 11);
     expect(l.titleY).toBeGreaterThanOrEqual(11);
   });
 
@@ -665,15 +679,16 @@ describe('pauseLayout (H-33 view 6, H-37 view 12)', () => {
   });
 
   it('a click on the switch (focus 2) leaves the next step at the first button', () => {
-    expect(nextPauseFocus(2, 1)).toBe(0);
+    expect(nextPauseFocus(3, 1)).toBe(0);
     expect(nextPauseFocus(2, -1)).toBe(1);
   });
 
-  it('walks the focus WEITER -> HAUPTMENÜ -> EINFACHE ABWEHR and wraps', () => {
+  it('walks the focus WEITER -> HAUPTMENÜ -> EINFACHE ABWEHR -> EFFEKTE REDUZIEREN and wraps', () => {
     expect(nextPauseFocus(0, 1)).toBe(1);
     expect(nextPauseFocus(1, 1)).toBe(2);
-    expect(nextPauseFocus(2, 1)).toBe(0);
-    expect(nextPauseFocus(0, -1)).toBe(2);
+    expect(nextPauseFocus(2, 1)).toBe(3);
+    expect(nextPauseFocus(3, 1)).toBe(0);
+    expect(nextPauseFocus(0, -1)).toBe(3);
     expect(nextPauseFocus(Number.NaN, 1)).toBe(1);
   });
 });

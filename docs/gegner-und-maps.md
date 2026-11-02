@@ -381,7 +381,15 @@ Märchensymbole:
 | Beine (`legs4`, `legs2`, `legs3`) | Rätsel der Sphinx: vier, zwei, drei Beine, eines ist richtig |
 | Sand (`sand`) | Trugkreis im Sandsturm, nicht antippen |
 
-**Einfache Abwehr:** Im Pausemenü gibt es den Schalter „EINFACHE ABWEHR“ (Kästchen leer = aus, gefüllt mit Haken = an; die Hinweiszeile lautet „ALLE ABWEHREN: EIN TIPP“). Ist er an, ist jeder Kreis ein normaler Tipp-Kreis mit seinem Symbol: kein Halte-Ring, keine Ziel-Klammern oder Linie, keine Fähnchen oder Taktpunkte, keine Hinweistafel und keine Trugkreise. Welche Wahl-Kreise erscheinen, regelt weiter die Logik. Der Schalter wird im Spielstand gespeichert (Feld `easyParry`, alter Spielstand ohne Feld = aus), gilt ab dem nächsten Angriff und wird mit „Fortschritt zurücksetzen“ ausgeschaltet. Im Menü bedienbar mit Tippen, Klick oder Enter; die Reihenfolge des Fokus ist WEITER, HAUPTMENÜ, EINFACHE ABWEHR (Pfeiltasten oder Tab wechseln).
+**Einfache Abwehr:** Im Pausemenü gibt es den Schalter „EINFACHE ABWEHR“ (Kästchen leer = aus, gefüllt mit Haken = an; die Hinweiszeile lautet „ALLE ABWEHREN: EIN TIPP“). Ist er an, ist jeder Kreis ein normaler Tipp-Kreis mit seinem Symbol: kein Halte-Ring, keine Ziel-Klammern oder Linie, keine Fähnchen oder Taktpunkte, keine Hinweistafel und keine Trugkreise. Welche Wahl-Kreise erscheinen, regelt weiter die Logik. Der Schalter wird im Spielstand gespeichert (Feld `easyParry`, alter Spielstand ohne Feld = aus), gilt ab dem nächsten Angriff und wird mit „Fortschritt zurücksetzen“ ausgeschaltet. Im Menü bedienbar mit Tippen, Klick oder Enter; die Reihenfolge des Fokus ist WEITER, HAUPTMENÜ, EINFACHE ABWEHR, EFFEKTE REDUZIEREN (Pfeiltasten oder Tab wechseln).
+
+**Boss-Finisher (M10):** Nach jedem Boss-Sieg läuft vor dem Ergebnis eine kurze Sequenz („BEZWUNGEN!“).
+- **Stufen je Batch:** Jeder Batch hat eine eigene Stufe 1 bis 6 (Dauer 2,0 / 2,5 / 3,0 / 3,5 / 4,0 / 4,0 s); sie gilt für alle Boss-Siege des Batches außer dem Finale.
+- **Finale:** Die letzten Level der Batches (4, 9, 20, 25, 30, 40) haben eine eigene Sequenz mit dem Namen des Schlussschlags (WURZELBRECHER, MONDSCHNITT, STERNENHAMMER, SONNENSPEER, GRABESLICHT, LETZTER STERN).
+- **Überspringen:** Eine Sequenz lässt sich überspringen, sobald sie einmal vollständig gesehen wurde (Feld `seenFinishers` im Spielstand), und frühestens 400 ms nach dem Start.
+- **Effekte reduzieren:** Der Schalter „EFFEKTE REDUZIEREN“ im Pausemenü (Hinweiszeile „OHNE BLITZ UND WACKELN“, Kästchen leer = aus, gefüllt mit Haken = an) entfernt Zwischenbild, Blitz und Wackeln aus der Sequenz und kürzt die Haltezeiten der Bilder. Er steht im Spielstand (Feld `reduceEffects`, alter Spielstand ohne Feld = aus), wirkt ab dem nächsten Boss-Sieg und wird mit „Fortschritt zurücksetzen“ ausgeschaltet.
+- **Blitz-Grenze:** In jedem Zeitfenster von 1000 ms beginnen höchstens 3 Blitze oder Zwischenbilder (WCAG 2.3.1); ein Test prüft das für alle Sequenzen, normal und reduziert.
+- **Debug:** `?finisher=n` (n = 0 bis 40, ungültig ergibt Level 0) spielt die Sequenz des Levels n direkt ab; es hat Vorrang vor `?level`.
 
 ---
 
