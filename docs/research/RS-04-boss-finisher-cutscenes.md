@@ -68,7 +68,7 @@ Die Zahlen sind Startwerte für den Handtest, keine Quelle belegt eine „richti
 - **Plan-Bezug:** §2 neue Pflicht F-38 (ändert den Ablauf von F-05/PE-76: Sieg sofort, Ergebnis nach der Sequenz), §4 neue Szene und Vertrag, neues Paket.
 - **Größe:** L
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: neue Szene, neuer Vertrag (Finisher-Ablauf), Pause der Spielszene; keine neue Abhängigkeit
-- **Status:** freigegeben (2026-11-02)
+- **Status:** übernommen (freigegeben 2026-11-02)
 
 ### RS-04.2 – Sechs Eskalationsstufen für normale Boss-Siege
 - **Vorschlag:** Je Batch eine Stufe nach der Tabelle in Ergebnis 2: Stufe 1 Hitstop, Zoom, Wackeln, Schriftzug (≈ 2 s); jede Stufe fügt Bausteine hinzu (Zeitlupe, Kinobalken, Speedlines, Farbhintergrund, Impact Frame, Porträt-Einblendung, Panels, Partikel) bis Stufe 6 (≈ 4 s). Dauer und Stärke sind Startwerte in `config`, Abnahme im Handtest. Neue Bilder nur: Porträt-Streifen der Astronautin und je Boss ein Treffer-Bild.
@@ -76,7 +76,7 @@ Die Zahlen sind Startwerte für den Handtest, keine Quelle belegt eine „richti
 - **Plan-Bezug:** §2 F-38, neues Paket, Designer-Nachtrag (wenige Sprites, Tokens für Farben der Hintergründe und Kinobalken)
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** freigegeben (2026-11-02)
+- **Status:** übernommen (freigegeben 2026-11-02)
 
 ### RS-04.3 – Handanimierte Batch-Finale (Level 4, 9, 20, 25, 30, 40)
 - **Vorschlag:** Im letzten Level jedes Batches ersetzt eine handgezeichnete Bildfolge pro Boss den Mittelteil der Stufen-Sequenz (Finisher-Pose der Astronautin, Schlusstreffer mit Impact Frame, endgültiger Zerfall des Bosses), ≈ 5–8 s. Level 40 (Pharao) ist das Finale des Spiels: längste Folge, alle Bausteine, ≈ 10–12 s. Gestaltung durch den Designer mit eigenem Brief (Bildzahl, Bildrate, Maße für 640..900 × 360), Einbau über die Sprite-Pipeline, neue Platzhalter-Töne mit Lizenzeintrag. Nur eigene Gestaltung, keine Motive, Posen, Namen oder Töne aus Naruto oder anderen Spielen.
@@ -84,7 +84,7 @@ Die Zahlen sind Startwerte für den Handtest, keine Quelle belegt eine „richti
 - **Plan-Bezug:** §2 F-38, Designer-Nachtrag, [Mensch]-Schritt Freigabe der Bildfolgen, neue Pakete Asset-Sync und Einbau, §5 Asset-Lizenzen
 - **Größe:** L
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Recht: Abgrenzung zu fremden Werken (vom Nutzer zu prüfen); Aufwand Designer hoch
-- **Status:** freigegeben (2026-11-02)
+- **Status:** übernommen (freigegeben 2026-11-02)
 
 ### RS-04.4 – Überspringen nach dem ersten Ansehen
 - **Vorschlag:** Jede Sequenz-Variante (Stufe × normal/Finale) läuft beim ersten Mal ganz. Danach zeigt ein Hinweis „TIPPEN: WEITER“ (innerhalb `SafeInsets`), Tipp, Klick oder Taste springt direkt zum Ergebnis. Gemerkt in einem optionalen SaveGame-Feld (z. B. `seenFinishers`, Liste der Varianten-IDs) im Spielstand v3 ohne neue Version, „Fortschritt zurücksetzen“ löscht es. Der erste Tipp darf nicht aus einem Quicktime-Tipp des Bosskampfs stammen (kurze Sperre am Anfang).
@@ -92,7 +92,7 @@ Die Zahlen sind Startwerte für den Handtest, keine Quelle belegt eine „richti
 - **Plan-Bezug:** §2 F-38, §4 SaveGame-Feld, Abnahmekriterium im Einbau-Paket
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Datenmodell: neues optionales SaveGame-Feld (nur lokal, keine personenbezogenen Daten)
-- **Status:** freigegeben (2026-11-02)
+- **Status:** übernommen (freigegeben 2026-11-02)
 
 ### RS-04.5 – „Effekte reduzieren“ und Blitz-Grenze als Test
 - **Vorschlag:** Schalter „EFFEKTE REDUZIEREN“ im Pausemenü (wie „Einfache Abwehr“, Standard aus, im SaveGame, z. B. `reduceEffects`): ohne Impact Frames und Kamera-Flash, ohne Wackeln, Zeitlupe und Zoom bleiben. Unabhängig vom Schalter gilt für jeden Ablauf: höchstens 3 großflächige Helligkeitswechsel-Paare pro Sekunde, keine schnell blinkenden satten Rottöne. Ein Vitest prüft das für alle Abläufe aus `config` (gleitendes 1-s-Fenster über die Bausteine `impactFrame`/`flash`).
@@ -100,7 +100,7 @@ Die Zahlen sind Startwerte für den Handtest, keine Quelle belegt eine „richti
 - **Plan-Bezug:** §5 neue Regel (Fotosensitivität), §2 F-38, Abnahmekriterium; Pausemenü-Layout (`pauseLayout.ts`) berührt
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Datenmodell: neues optionales SaveGame-Feld; Sicherheit (Gesundheit): Blitz-Grenze
-- **Status:** freigegeben (2026-11-02)
+- **Status:** übernommen (freigegeben 2026-11-02)
 
 ## Vertrauen und Lücken
 
