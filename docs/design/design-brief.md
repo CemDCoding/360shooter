@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Runde 1 beantwortet (1b 2b 3a 4a), Runde 2 (Porträt, Treffer-Bild, Effektstil, Hinweis und Schalter) gestellt.
+**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Runde 1 (1b 2b 3a 4a) und Runde 2 (5a 6a 7a 8a) beantwortet, Runde 3 (Ablauf der Finale, Schlusstreffer, Namen, Level 40) gestellt.
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
@@ -657,5 +657,16 @@ Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Revi
 2. **2b Vollbild 320×180 bei zweifacher Größe** (640×360, so groß wie die schmalste Arena). Bei breiteren Arenen bis 900 füllen Farbhintergrund bzw. Kinobalken die Seiten. Hinweis an Planner und Nutzer: Das sind ≈ 60 bis 80 Vollbilder (RI-38). Ich setze sie aus Ebenen zusammen (Hintergrund, Figur, Effekt), damit Qualität und Raster einheitlich bleiben. Lieferung in zwei Teilen ist möglich (PE-198).
 3. **3a Schriftzug in zwei Ebenen, Schrift Kapsel:** „BEZWUNGEN!“ in allen Stufen, in den Finale zusätzlich ein eigener Name des Schlusstreffers je Boss (Vorschläge in Runde 3). Ausnahme von Grundsatz 2: In der Finisher-Sequenz steht Kapsel für Schriftzüge, Funk für den Hinweis.
 4. **4a Farben:** Impact Frames immer schwarz-weiß. Der Farbhintergrund nimmt ab Stufe 3 einen satten Ton des Bosses. Koralle steht für die Astronautin. Rot nur als kleiner Akzent.
+5. **5a Porträt als Augenstreifen:** Streifen 320×40 über die ganze Breite, schräg hereingeschoben. Er zeigt nur Visier und Augen, ernst, mit der Spiegelung des Bosses im Visier.
+6. **6a Treffer-Bild als Nahaufnahme des Kerns:** ≈ 96×96, zweifach vergrößert vor dem Farbhintergrund. Je Boss mit Riss, aufgerissenem Auge oder Maul, starr.
+7. **7a Harte Pixel-Grafik:**
+   - Radiale Speedlines als 1 bis 2 px breite Keile.
+   - Impact Frame invertiert Schwarz und Weiß.
+   - Manga-Panels: 2 bis 3 schräge Felder mit 2-px-Rand.
+   - Zerfall: Pixelblöcke fliegen nach außen und verglühen.
+   - Kein Glühen und kein Bloom. Das Ganze funktioniert auch ohne WebGL.
+8. **8a Hinweis und Schalter:**
+   - „TIPPEN: WEITER“ steht unten rechts innerhalb `SafeInsets`, in Funk, auf einem Glasschild mit Pfeil. Er erscheint nach 400 ms und blinkt nicht.
+   - Der Schalter „EFFEKTE REDUZIEREN“ steht unter „EINFACHE ABWEHR“ und hat denselben Aufbau. Hinweiszeile: „OHNE BLITZ UND WACKELN“.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
