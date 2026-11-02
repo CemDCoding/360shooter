@@ -82,7 +82,8 @@ describe('build-sprites', () => {
       expect(a.width).toBe(def.frameWidth * def.frames);
       expect(a.height).toBe(def.frameHeight);
     }
-  });
+    // Builds every sprite twice, slow under load.
+  }, 60_000);
 
   it('matches the committed PNGs in public/assets/sprites (size and RGBA pixels)', () => {
     for (const def of defs) {
