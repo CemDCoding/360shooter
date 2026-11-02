@@ -65,6 +65,8 @@ describe('no respawn burst after the boss dies (k)', () => {
     const level = getLevel(5)!;
     const d = new SpawnDirector(level, rng(), 600);
     d.tick(16, 0); // opening wave
+    // The boss comes at the end of the round (AP-175): jump into the boss phase, where no fill runs.
+    d.tick((level.durationSec - 30) * 1000, level.maxEnemies);
     let bossAlive = true;
     let requested = 0;
     // Boss fight: the scene never ticks the director.
@@ -74,7 +76,8 @@ describe('no respawn burst after the boss dies (k)', () => {
     expect(requested).toBe(0);
     bossAlive = false;
     let after = 0;
-    for (let t = 0; t < level.spawnIntervalMs * 10; t += 16) {
+    const intervalMs = d.currentIntervalMs; // ramped interval at the end of the round
+    for (let t = 0; t < intervalMs * 10; t += 16) {
       const n = shouldSpawnNormalEnemies(bossAlive) ? d.tick(16, 0, bossAlive).length : 0;
       expect(n).toBeLessThanOrEqual(1);
       after += n;

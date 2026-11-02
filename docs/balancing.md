@@ -805,3 +805,32 @@ Gegner-HP wirkt auf den Level-Faktor `hp` der Gegner, der Spawn-Abstand auf `spa
 - Items zu stark: `perStack` oder `maxStacks` in `items.ts` senken, bei Dauerfeuer `durationMs`.
 - Mehr Items: `dropChance` in `items.ts` erhoehen.
 - Handtest-Ziel (M2-DEP): Level 0 gut schaffbar, Level 20 nur mit Items.
+
+## Wellen-Rhythmus (M12)
+
+AP-175 (RS-01.1, RS-01.2, RS-01.4, RS-01.6, PE-216 bis PE-221, PE-227). Der `SpawnDirector` in `src/logic/spawn.ts` liest Zyklus, Mindestbelegung und Rollen-Caps aus `src/config/waves.ts` (`WAVE_PLANS`, `ROLE_CAPS`, `ELITE_RULES`), nicht aus `LevelDef`. Auch die Formkonstanten der Kurve, der Mindestbelegung, des Budgets und der Eliten-Auswahl stehen dort (`BUILD_FROM`, `BUILD_TO`, `PEAK_FACTOR`, `FILL_INTERVAL_MS`, `BUDGET_MARGIN`, `PEAK_RESERVE_SEC`, `BANK_SEC`, `MAX_BACKLOG`, `ELITE_CHANCE_PEAK`, `ELITE_CHANCE_OTHER`, `ROLE_CAP_HEADROOM`; Startwerte RS-01).
+
+**Regel: Druck ueber Anzahl, Rhythmus und Eliten, nicht ueber HP.** Der Rhythmus verschiebt Spawns nur in der Zeit. Die Spawns je Runde bleiben die der linearen Grundrampe (Abstand x1,0 auf x0,6), das Gegner-Tempo bleibt je Level fest, `LEVEL_SCALING` bleibt unberuehrt. `balanceModel` rechnet das Mittel der Kurve (`pacingMean`, = 1) und den Elite-Anteil (`eliteShare`, bis AP-178 0) ein; Druck, Gold je Minute und Saegezahn aus M11 bleiben damit unveraendert.
+
+**Zyklen.** Ein Zyklus ist Aufbau, Spitze (`PEAK_SEC` 6 s) und Atempause (`RELAX_SEC` 10 s). 3-Minuten-Level haben 3 Zyklen zu 49 s, 5-Minuten-Level 5 zu 53 s; der letzte endet an der Boss-Warnung (33 s vor Rundenende, Rest der Rundung geht in die letzte Atempause). Ab der Boss-Warnung laeuft die alte Grundrampe ohne Rhythmus, ohne Budget und ohne Mindestbelegung (Boss-Phase unveraendert).
+
+| Phase | Rate (x Grundrampe) |
+|---|---|
+| Aufbau | steigt linear von `BUILD_FROM` 0,5 auf `BUILD_TO` 1,0, mal Normierung |
+| Spitze | `PEAK_FACTOR` 2,0, mal Normierung |
+| Atempause | `RELAX_RATE` 0,25 (fest) |
+| Wachstum | Aufbau und Spitze je Zyklus +`GROWTH_PER_CYCLE` (10 %) |
+
+Die Normierung (`pacingCurve`, je Level einmal) macht die Spawns bis zur Boss-Warnung gleich denen der Grundrampe; wirksam liegt die Spitze bei etwa 2,1- bis 2,9-mal, der Aufbau bei etwa 0,5- bis 1,5-mal der Grundrampe. Test: Spawns je Minute aller 41 Level innerhalb ±5 %.
+
+**Mindestbelegung.** `minAlive` = 30 % von `maxEnemies`, hoechstens 60 (`waves.ts`). Liegt die Zahl lebender Gegner darunter, kommt hoechstens ein Gegner je `FILL_INTERVAL_MS` (250 ms), auch in der Atempause; `maxEnemies` gilt immer. Diese Spawns werden aus dem Fahrplan vorgezogen (hoechstens `minAlive` im Voraus), sie kommen also nur zusaetzlich, wenn die Spielerin schneller toetet, als der Fahrplan liefert.
+
+**Bedrohungsbudget.** Jeder Gegner kostet `threatCost` (1 schnell, 2 Baum, 3 Schuetze, Aura, Tank). Einnahme je Sekunde = `BUDGET_MARGIN` (1,6) x mittlere Kosten des Pools / aktueller Spawn-Abstand: sie waechst ueber die Runde und mit dem Level. Ausserhalb der Spitze bleiben `PEAK_RESERVE_SEC` (8 s) Einnahmen gespart, die Spitze darf sie ausgeben; das Konto haelt hoechstens `BANK_SEC` (30 s). Gezogen wird weiter aus dem Beutel (AP-166), aber nur Bezahlbares unter dem Rollen-Cap; uebersprungene Marken bleiben im Beutel. Fehlt Budget, wartet der Spawn (hoechstens `MAX_BACKLOG` 10 stauen sich).
+
+**Rollen-Caps.** Cap einer Rolle = max(`ROLE_CAPS`, aufgerundet `ROLE_CAP_HEADROOM` (2) x Pool-Anteil der Rolle x (lebende Gegner + 1)). Im kleinen Feld gelten also hoechstens 3 Schuetzen, 4 Aura-Gegner, 6 Tanks gleichzeitig; im dichten Feld waechst der Cap mit, sodass eine Rolle nie mehr als doppelt so oft lebt, wie ihr Anteil erwarten laesst. Nahkampf und schnelle Gegner ohne Grenze. Der Director zaehlt seine Gegner je Rolle. Meldet die Szene jeden Abgang mit `noteRemoved`, ist die Zaehlung genau; sonst verteilt er den Rueckgang von `aliveCount` gleichmaessig auf die Rollen (Schaetzung). Ist nur noch der gesperrte Typ der Abwechslungsregel frei, weicht die Regel dem Cap.
+
+**Wirkung der Caps auf die Anteile (AP-166).** Ein fester Tank-Cap von 6 haette in Level 0 bis 2 (Wildschwein und Baer zusammen 44 % des Pools) den Baum bei 20 bis 35 lebenden Gegnern auf 72 bis 80 % statt 56 % geschoben. Mit dem mitwachsenden Cap bleiben die Spawn-Anteile aller 41 Level innerhalb ±2 Prozentpunkten der Pool-Gewichte (Simulation mit genauer Abgangsmeldung, Spielerin toetet alle 0,8 / 1,5 / 3 Spawn-Abstaende; Level 0 bis 2 mit 20 Runden, groesste Abweichung 1,7 Prozentpunkte, uebrige Level mit 6 Runden, hoechstens etwa 1,2). Die Restabweichung ist Ziehungsrauschen und tritt ohne Caps genauso auf. Das Modell rechnet daher weiter mit den Pool-Anteilen.
+
+**Ereignis-Spawns und Rueckgabe von `tick`.** Ereignis-Spawns (AP-176) kommen zusaetzlich zum Fahrplan des Directors; AP-177 muss sie gegen die regulaeren Spawns verrechnen, sonst steigt die Spawnzahl je Runde. Das Array, das `tick` zurueckgibt, wird beim naechsten Aufruf wiederverwendet: sofort lesen, nicht speichern.
+
+**Eliten (Auswahl, wirksam ab AP-178).** Nur bei `ELITE_RULES.enabled` ab `fromLevel`: ein bezahlbarer regulaerer Spawn wird mit 15 % (Spitze) bzw. 3 % (sonst) zur Elite, kostet `costMul`-fach und nur, solange Eliten hoechstens `maxShare` der Lebenden sind. Der Director setzt `SpawnRequest.elite`; Werte und Darstellung folgen in AP-178.

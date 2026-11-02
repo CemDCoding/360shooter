@@ -9,12 +9,13 @@ import { BATCH_STARTS, LEVELS, LEVEL_COUNT, MAX_ENEMIES_WANTED } from '../config
 import { getPet } from '../config/pets';
 import { LEVEL_SCALING } from '../config/scaling';
 import { COST_BASE, COST_GROWTH, UPGRADES } from '../config/upgrades';
+import { ELITE_RULES } from '../config/waves';
 import { WEAPON_BASE } from '../config/weapon';
 import type { BossId, EnemyId, EnemyPoolEntry, LevelDef, PetId, UpgradeLevels } from '../contracts';
 import { MAX_UPGRADE_LEVEL } from '../contracts';
 import { availableAttacks, bossForLevel, scaledHp, variantForLevel } from './boss';
 import { petStats } from './pets';
-import { MIN_INTERVAL_FACTOR, openingCount } from './spawn';
+import { MIN_INTERVAL_FACTOR, openingCount, pacingSpawnFactor } from './spawn';
 import { tierFor } from './tier';
 
 const clampLevel = (levelId: number): number =>
@@ -64,7 +65,35 @@ function pressureFactor(enemyId: EnemyId): number {
   return f;
 }
 
-/** Spawns je Runde ohne Obergrenze (Eroeffnungswelle plus Spawns, Abstand sinkt auf `MIN_INTERVAL_FACTOR`). */
+const pacingCache: number[] = [];
+
+/**
+ * Mittel der Wellen-Rhythmus-Kurve (M12, AP-175, RS-01.6): Spawns der Runde mit Phasen durch Spawns der linearen
+ * Grundrampe. Der Director normiert Aufbau und Spitze je Level, der Wert ist daher 1 (bis auf Rundung).
+ */
+export function pacingMean(levelId: number): number {
+  const id = clampLevel(levelId);
+  pacingCache[id] ??= pacingSpawnFactor(LEVELS[id]);
+  return pacingCache[id];
+}
+
+/**
+ * Elite-Anteil im Referenz-Druck (M12, RS-01.5, RS-01.6): bei eingeschalteten Eliten ab `fromLevel` die Obergrenze
+ * `maxShare` (obere Naeherung), sonst 0. Bis AP-178 ausgeschaltet.
+ */
+export function eliteShare(levelId: number): number {
+  const id = clampLevel(levelId);
+  return ELITE_RULES.enabled && id >= ELITE_RULES.fromLevel ? ELITE_RULES.maxShare : 0;
+}
+
+/** Faktor auf die mittleren Lebenspunkte durch Eliten (`hpMul`-fach). */
+const eliteHpFactor = (levelId: number): number =>
+  1 + eliteShare(levelId) * (ELITE_RULES.hpMul - 1);
+
+/**
+ * Spawns je Runde ohne Obergrenze (Eroeffnungswelle plus Spawns, Abstand sinkt auf `MIN_INTERVAL_FACTOR`), mal dem
+ * Mittel der Wellen-Rhythmus-Kurve (AP-175).
+ */
 function rawSpawns(level: LevelDef): number {
   const durMs = level.durationSec * 1000;
   let t = level.spawnIntervalMs;
@@ -73,14 +102,16 @@ function rawSpawns(level: LevelDef): number {
     n += 1;
     t += level.spawnIntervalMs * (1 - (1 - MIN_INTERVAL_FACTOR) * Math.min(1, t / durMs));
   }
-  return n;
+  return n * pacingMean(level.id);
 }
 
 /** Druck ohne Upgrades: HP aller neuen Gegner je Sekunde durch die Basis-DPS der Waffe (Definition "Kennzahlen"). */
 export function basePressure(levelId: number): number {
   const level = LEVELS[clampLevel(levelId)];
   const minutes = level.durationSec / 60;
-  const meanHp = poolMean(level.enemyPool, (id) => tieredHp(id, level.id) * pressureFactor(id));
+  const meanHp =
+    poolMean(level.enemyPool, (id) => tieredHp(id, level.id) * pressureFactor(id)) *
+    eliteHpFactor(level.id);
   const hpPerMin = (rawSpawns(level) / minutes) * capShare(level) * meanHp;
   return hpPerMin / 60 / (WEAPON_BASE.fireRatePerSec * WEAPON_BASE.damage);
 }
