@@ -15,7 +15,7 @@ describe('pets config (PE-168, PE-170, PE-179)', () => {
       maxPowerUps: 3,
       bossWeight: 10,
       powerUpDamageMul: 1.3,
-      powerUpSpeedMul: 1.3,
+      powerUpSpeedMul: 1.0,
     });
   });
 
@@ -44,7 +44,7 @@ describe('pets config (PE-168, PE-170, PE-179)', () => {
     expect(getPet('capybara')).toMatchObject({
       role: 'aura',
       auraRadiusPx: 70,
-      damageFractionPerSec: 0.5,
+      damageFractionPerSec: 1.6,
       slow: 0.3,
       healHp: 2,
       healIntervalMs: 10000,

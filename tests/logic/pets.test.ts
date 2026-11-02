@@ -127,7 +127,9 @@ describe('petStats', () => {
     const s2 = petStats(bee, 2, 10);
     expect(s2.count).toBe(1 + bee.extraBees);
     expect(s2.damage).toBeCloseTo(10 * bee.damageFraction * PET_RULES.powerUpDamageMul ** 2);
-    expect(s2.speedPxPerSec).toBeCloseTo(bee.speedPxPerSec * PET_RULES.powerUpSpeedMul ** 2);
+    expect(s2.speedPxPerSec).toBeCloseTo(bee.speedPxPerSec);
+    expect(s2.cooldownMs).toBeCloseTo(1000 / bee.stingsPerSec);
+    expect(PET_RULES.powerUpDamageMul ** PET_RULES.maxPowerUps).toBeCloseTo(2.2, 1);
   });
   it('penguin: slow, radius from level 1, power-ups clamp at max', () => {
     const p = getPet('penguin');

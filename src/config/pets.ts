@@ -13,7 +13,7 @@ export const PET_RULES: PetRules = {
   /** A boss counts 10 enemies for the bar (assumed, PE-179). */
   bossWeight: 10,
   powerUpDamageMul: 1.3,
-  powerUpSpeedMul: 1.3,
+  powerUpSpeedMul: 1.0,
 };
 
 export const PETS: readonly PetDef[] = [
@@ -41,7 +41,7 @@ export const PETS: readonly PetDef[] = [
     label: 'CAPYBARA',
     role: 'aura',
     auraRadiusPx: 70,
-    damageFractionPerSec: 0.5,
+    damageFractionPerSec: 1.6,
     slow: 0.3,
     healHp: 2,
     healIntervalMs: 10000,
