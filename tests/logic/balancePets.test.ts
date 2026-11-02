@@ -9,6 +9,7 @@ import { petDps, petShare, referenceDps } from '../../src/logic/balanceModel';
 interface Known {
   pet: PetId;
   levels: readonly number[];
+  side: 'over' | 'under';
   ist: string;
   paket: string;
 }
@@ -17,13 +18,14 @@ const range = (from: number, to: number): number[] =>
   Array.from({ length: to - from + 1 }, (_, i) => from + i);
 const ids = range(0, LEVEL_COUNT - 1);
 
+// AP-169: Power-ups nur auf den Schaden (1,3 hoch 3 = 2,2-fach), Capybara damageFractionPerSec 0,5 -> 1,6 (Lead-Freigabe).
+// Capybara liegt danach im Band (0,21 bis 0,39) und ist nicht mehr gelistet.
 const KNOWN_OUT_OF_BAND: readonly Known[] = [
-  // Zu stark: Power-ups wirken auf Schaden und Rate (1,3 hoch 6 = 4,8-fach), AP-169 (RS-05.4) senkt auf etwa 2,2-fach.
-  { pet: 'bee', levels: ids, ist: '0,43 bis 0,64', paket: 'AP-169' },
-  { pet: 'penguin', levels: range(0, 18), ist: '0,40 bis 0,54', paket: 'AP-169' },
-  // Zu schwach gegen ein Ziel: die Aura trifft den Boss nur einmal (RS-05 Abschnitt 4). Auch nach AP-169 unter 20 %;
-  // die Entscheidung ueber die Aura-Staerke gegen Bosse faellt in AP-170.
-  { pet: 'capybara', levels: ids, ist: '0,08 bis 0,17', paket: 'AP-170' },
+  // Biene: das Modell rechnet Doppelschuss mit 1,5 im Mittel; nur Level 0 bis 6 bleiben darueber (ohne Doppelschuss
+  // 0,34 bis 0,55). Entscheidung ueber damageFraction der Biene oder das Band beim Nutzer (Meldung an den Lead).
+  { pet: 'bee', levels: range(0, 6), side: 'over', ist: '0,40 bis 0,45', paket: 'AP-169' },
+  // Pinguin: Schneeball-Schaden waechst langsamer als der Laser, ab Level 31 knapp unter 20 %.
+  { pet: 'penguin', levels: range(31, 40), side: 'under', ist: '0,18 bis 0,20', paket: 'AP-169' },
 ];
 
 describe('balance pets: share of the damage against the boss (AP-167, RS-05.4)', () => {
@@ -37,10 +39,12 @@ describe('balance pets: share of the damage against the boss (AP-167, RS-05.4)',
       });
       const want = KNOWN_OUT_OF_BAND.filter((k) => k.pet === pet).flatMap((k) => k.levels);
       expect(out, pet).toEqual([...want].sort((a, b) => a - b));
-      // Ist-Grenze der Pauschaleintraege: Biene und Pinguin zu stark, Capybara zu schwach.
-      for (const i of out) {
-        if (pet === 'capybara') expect(petShare(i, pet), `${pet} ${i}`).toBeLessThan(min);
-        else expect(petShare(i, pet), `${pet} ${i}`).toBeGreaterThan(max);
+      // Richtung der Eintraege: zu stark (over) oder zu schwach (under).
+      for (const k of KNOWN_OUT_OF_BAND.filter((e) => e.pet === pet)) {
+        for (const i of k.levels) {
+          if (k.side === 'under') expect(petShare(i, pet), `${pet} ${i}`).toBeLessThan(min);
+          else expect(petShare(i, pet), `${pet} ${i}`).toBeGreaterThan(max);
+        }
       }
     }
   });
@@ -62,17 +66,17 @@ describe('balance pets: share of the damage against the boss (AP-167, RS-05.4)',
     }
   });
 
-  it('puts the bee at about 55 to 60 percent without double shot around level 20 (RS-05 section 4)', () => {
+  it('puts the bee at about 40 percent without double shot around level 20 (AP-169, power-ups on damage only)', () => {
     const s = petShare(20, 'bee', { doubleShot: false });
-    expect(s).toBeGreaterThan(0.5);
-    expect(s).toBeLessThan(0.66);
+    expect(s).toBeGreaterThan(0.3);
+    expect(s).toBeLessThan(0.5);
     expect(petShare(20, 'bee')).toBeLessThan(s);
   });
 
-  it('ranks the pets bee, penguin, capybara against a single target', () => {
+  it('ranks the bee above penguin and capybara against a single target', () => {
     for (const i of [0, 20, 40]) {
       expect(petShare(i, 'bee')).toBeGreaterThan(petShare(i, 'penguin'));
-      expect(petShare(i, 'penguin')).toBeGreaterThan(petShare(i, 'capybara'));
+      expect(petShare(i, 'bee')).toBeGreaterThan(petShare(i, 'capybara'));
     }
   });
 });
