@@ -11,6 +11,10 @@ export const LASER_THROTTLE_MS = 80;
 export const LASER_KEY = 'sfx-laser';
 /** Manifest key of the parry sound: all quicktime circles of a boss attack were hit (AP-133). */
 export const PARRY_KEY = 'sfx-parry';
+/** Manifest key of the pebble preview: a sequence circle lights up in the announcement (M9, AP-151). */
+export const PEBBLE_KEY = 'sfx-pebble';
+/** Manifest key of the beat: one beat of the beat circles (M9, AP-151). Never the only information. */
+export const BEAT_KEY = 'sfx-beat';
 
 /** Minimal sound backend (Phaser sound manager in the game, a fake in tests). */
 export interface SoundBackend {

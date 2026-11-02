@@ -3,13 +3,14 @@ import { animKey } from '../../config/assets';
 import { ARENA } from '../../config/arena';
 import { BOSSES, BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
-import type {
-  ArenaRect,
-  BossAttackDef,
-  BossDef,
-  BossId,
-  BossVariant,
-  EnemyId,
+import {
+  EASY_PARRY_KEY,
+  type ArenaRect,
+  type BossAttackDef,
+  type BossDef,
+  type BossId,
+  type BossVariant,
+  type EnemyId,
 } from '../../contracts';
 import {
   AttackScheduler,
@@ -21,10 +22,12 @@ import {
   type SchedulerRng,
 } from '../../logic/boss';
 import { applyDamage, auraDamage, isDead } from '../../logic/health';
+import type { ParryCircleState } from '../../logic/parry';
 import {
   ParryTracker,
   parriedDamage,
   type BossHazard,
+  type ParryAnchor,
   type ParryGroup,
   type ParryOutcome,
 } from './hazards';
@@ -33,6 +36,7 @@ export type {
   BossHazard,
   HazardShape,
   LaserProbe,
+  ParryAnchor,
   ParryGroup,
   ParryOutcome,
   ParryTap,
@@ -189,6 +193,23 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     return [];
   }
 
+  /**
+   * Where a circle of `attack` sits (M9 hook for the boss packages): angle around the player and, for drag, the
+   * target. Default: as planned by planCircles. Called once per circle when the announcement starts.
+   */
+  protected parryAnchor(attack: BossAttackDef, circle: ParryCircleState): ParryAnchor {
+    void attack;
+    return circle.target
+      ? { angleDeg: circle.angleDeg, target: { ...circle.target } }
+      : { angleDeg: circle.angleDeg };
+  }
+
+  /** The circles of `attack` are planned (M9 hook for hints of the bosses). Default: nothing. */
+  protected onParryPlanned(attack: BossAttackDef, circles: readonly ParryCircleState[]): void {
+    void attack;
+    void circles;
+  }
+
   /** Open quicktime groups of this boss (read by the scene for ParryOverlay). */
   get parryGroups(): readonly ParryGroup[] {
     return this.parry.groups;
@@ -196,11 +217,53 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
 
   /**
    * A tap or click at `point` (world coordinates); `center` is the player. Returns true if it hit an open
-   * circle: the tap is used up and must not aim.
+   * circle: the tap is used up and must not aim. (M7 name; no pointer to follow.)
    */
   tapParry(point: { x: number; y: number }, center: { x: number; y: number }): boolean {
+    return this.pressParry(point, center);
+  }
+
+  /**
+   * A press of pointer `pointerId` at `point` (M9): true if it hit an open circle or the target of a selected
+   * drag circle. A hold or drag circle stays with that pointer until releaseParry / cancelParry.
+   */
+  pressParry(
+    point: { x: number; y: number },
+    center: { x: number; y: number },
+    pointerId?: number,
+  ): boolean {
     if (!this.active) return false;
-    return this.parry.tap(point, center) !== null;
+    return this.parry.press(point, center, pointerId) !== null;
+  }
+
+  /** true if this pointer holds or drags a circle of this boss. */
+  holdsParry(pointerId: number): boolean {
+    return this.active && this.parry.holds(pointerId);
+  }
+
+  /** Pointer move: a dragged circle follows the pointer. */
+  moveParry(pointerId: number, point: { x: number; y: number }): void {
+    if (this.active) this.parry.move(pointerId, point);
+  }
+
+  /** Pointer up: ends a hold or drops a dragged circle. */
+  releaseParry(
+    pointerId: number,
+    point: { x: number; y: number },
+    center: { x: number; y: number },
+  ): void {
+    if (this.active) this.parry.release(pointerId, point, center);
+  }
+
+  /** The pointer went up during a pause: let go of its circle without a grade. */
+  cancelParry(pointerId: number): void {
+    this.parry.cancel(pointerId);
+  }
+
+  /** "Einfache Abwehr" from the registry (AP-152 writes it), read at the start of every announcement. */
+  private easyParry(): boolean {
+    const registry = (this.scene as Partial<Phaser.Scene> | undefined)?.registry;
+    return registry?.get?.(EASY_PARRY_KEY) === true;
   }
 
   /** Movement hook, runs every frame while the boss lives. */
@@ -264,7 +327,15 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
       const withCircles = attack.damage > 0 && attack.parryCircles > 0 && this.canParry(attack);
       this.onTelegraph(attack);
       if (withCircles && this.active) {
-        this.parry.open(attack.id, attack.parryCircles, ev.telegraphMs, this.parryRng);
+        const group = this.parry.open(
+          attack.id,
+          attack,
+          ev.telegraphMs,
+          this.parryRng,
+          this.easyParry(),
+          (c) => this.parryAnchor(attack, c),
+        );
+        if (group) this.onParryPlanned(attack, group.circles);
       }
     } else {
       const outcome = this.parry.resolve(ev.attackId);

@@ -113,7 +113,13 @@ import type { RoundResult } from '../logic/progression';
 import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
 import { SpawnDirector } from '../logic/spawn';
-import { getSoundService, PARRY_KEY, type SoundService } from '../platform/audio';
+import {
+  BEAT_KEY,
+  getSoundService,
+  PARRY_KEY,
+  PEBBLE_KEY,
+  type SoundService,
+} from '../platform/audio';
 import { AimInput } from '../platform/input';
 import { loadSave, writeSave } from '../platform/storage';
 import { VirtualStick } from './controls/VirtualStick';
@@ -357,10 +363,14 @@ export class GameScene extends Phaser.Scene {
     const activePet = save.activePet ?? null;
     this.createPet(activePet, activePet ? (save.petGear?.[activePet] ?? null) : null);
     this.stick = new VirtualStick(this);
-    // A press on a quicktime circle is checked first and used up; it does not aim (AP-133).
-    this.aim = new AimInput(this, this.center.x, this.center.y, this.stick, (x, y) =>
-      this.tryParryTap(x, y),
-    );
+    // A press on a quicktime circle is checked first and used up; it does not aim (AP-133). That pointer then
+    // holds or drags the circle until it goes up (M9).
+    this.aim = new AimInput(this, this.center.x, this.center.y, this.stick, {
+      press: (id, x, y) => this.tryParryTap(x, y, id),
+      move: (id, x, y) => this.moveParry(id, x, y),
+      release: (id, x, y) => this.releaseParry(id, x, y),
+      cancel: (id) => this.cancelParry(id),
+    });
     this.parryOverlay = new ParryOverlay(this);
 
     this.coinPool = new CoinPool(this, withMagnetFactor(COIN_RULES, magnetFactor(this.gear)));
@@ -920,20 +930,42 @@ export class GameScene extends Phaser.Scene {
   /** Quicktime display on play time (stands still while paused, AP-133). */
   private updateParry(dt: number): void {
     if (this.ended) return;
-    this.parryOverlay?.update(dt, this.parryGroups(), { x: this.player.x, y: this.player.y });
+    const cues =
+      this.parryOverlay?.update(dt, this.parryGroups(), { x: this.player.x, y: this.player.y }) ??
+      [];
+    // M9 sounds always come with a picture (lit pebble, filled beat dot), never alone.
+    for (const cue of cues) this.sfx.play(cue === 'pebble' ? PEBBLE_KEY : BEAT_KEY);
   }
 
   /**
    * A press at the world point (x, y) (AimInput, before aiming): true if it hit an open quicktime circle. The
    * press is then used up and the aim of the astronaut stays as it was.
    */
-  private tryParryTap(x: number, y: number): boolean {
+  private tryParryTap(x: number, y: number, pointerId?: number): boolean {
     if (this.ended || this.player.isDead || this.bossDefeatedFlag) return false;
     const player = { x: this.player.x, y: this.player.y };
     for (const part of this.bossParts()) {
-      if (part.tapParry({ x, y }, player)) return true;
+      if (part.pressParry({ x, y }, player, pointerId)) return true;
     }
     return false;
+  }
+
+  /** Pointer of a hold or drag circle moved (M9): a dragged circle follows it. */
+  private moveParry(pointerId: number, x: number, y: number): void {
+    if (this.ended) return;
+    for (const part of this.bossParts()) part.moveParry(pointerId, { x, y });
+  }
+
+  /** Pointer of a circle went up (M9): ends a hold, drops a dragged circle. */
+  private releaseParry(pointerId: number, x: number, y: number): void {
+    if (this.ended) return;
+    const player = { x: this.player.x, y: this.player.y };
+    for (const part of this.bossParts()) part.releaseParry(pointerId, { x, y }, player);
+  }
+
+  /** Pointer went up during a pause (M9): its circle is let go without a grade. */
+  private cancelParry(pointerId: number): void {
+    for (const part of this.bossParts()) part.cancelParry(pointerId);
   }
 
   /** An attack with circles hits now (from BossBase, right before its damage): grades and "PARRY!". */

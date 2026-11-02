@@ -16,6 +16,62 @@ export interface StickSource {
  */
 export type TapClaim = (x: number, y: number) => boolean;
 
+/**
+ * Pointer hand-off to the quicktime circles (M9, AP-151). Every pointer is identified by its pointerId, so a
+ * second finger can hold or drag a circle while the first one keeps the stick.
+ */
+export interface ParryPointerHandler {
+  /** Press at the world point: true if it hit a circle or a drag target (the press is used up). */
+  press(pointerId: number, x: number, y: number): boolean;
+  /** Move of a pointer that pressed a circle (drag). */
+  move(pointerId: number, x: number, y: number): void;
+  /** Up of a pointer that pressed a circle (end of a hold, drop of a drag). */
+  release(pointerId: number, x: number, y: number): void;
+  /** The pointer went up while the scene was paused: that release does not count. */
+  cancel(pointerId: number): void;
+}
+
+/**
+ * Which pointers pressed a quicktime circle and are still down (pure, testable). The stick pointer is never in
+ * here: routePointer sends it to the stick before a circle is asked.
+ */
+export class CirclePointers {
+  private readonly ids = new Set<number>();
+
+  claim(pointerId: number): void {
+    this.ids.add(pointerId);
+  }
+
+  has(pointerId: number): boolean {
+    return this.ids.has(pointerId);
+  }
+
+  /** Pointer up: true if it had pressed a circle (then the circle gets the release). */
+  free(pointerId: number): boolean {
+    return this.ids.delete(pointerId);
+  }
+
+  /** Pointers that are no longer down (after a pause): removed and returned for cancel. */
+  dropReleased(isDown: (pointerId: number) => boolean): number[] {
+    const gone = [...this.ids].filter((id) => !isDown(id));
+    for (const id of gone) this.ids.delete(id);
+    return gone;
+  }
+
+  clear(): void {
+    this.ids.clear();
+  }
+
+  get size(): number {
+    return this.ids.size;
+  }
+}
+
+/** What happens on pointer up: a circle pointer releases its circle, anything else does nothing. */
+export function routePointerUp(pointerId: number, circles: CirclePointers): 'release' | 'none' {
+  return circles.free(pointerId) ? 'release' : 'none';
+}
+
 /** Where a pointer event goes. */
 export type PointerRoute = 'stick' | 'parry' | 'held' | 'ignore' | 'aim';
 
@@ -31,14 +87,17 @@ export interface PointerRouteInput {
 }
 
 /**
- * Priority of one pointer event (AP-133): the stick first (it never aims by tap and never presses a circle),
- * then a press on an open quicktime circle (used up, the aim stays), then the rest of a press that hit a
- * circle (no aiming until release), then the old rule (other fingers do not aim while the stick is held).
+ * Priority of one pointer event (AP-133, M9): the moves of a pointer that pressed a circle stay with that
+ * circle (hold, drag; no aiming until release), then the stick (it never aims by tap and never presses a
+ * circle), then a press on an open quicktime circle (used up, the aim stays), then the old rule (other fingers
+ * do not aim while the stick is held).
  * `claim` is only asked for a press and only after the stick check.
  */
 export function routePointer(input: PointerRouteInput, claim: () => boolean): PointerRoute {
+  // A pointer that holds or drags a circle keeps it, even when it passes over the stick area (M9). The stick's
+  // own pointer can never hold a circle: its press went to the stick.
+  if (input.heldOnCircle && !input.down) return 'held';
   if (input.onStick) return 'stick';
-  if (input.heldOnCircle) return 'held';
   if (input.down && claim()) return 'parry';
   if (input.stickHeld) return 'ignore';
   return 'aim';
@@ -47,7 +106,8 @@ export function routePointer(input: PointerRouteInput, claim: () => boolean): Po
 /**
  * Unified aim input. Mouse: target follows the pointer (no click needed).
  * Touch: target is the last touch point and persists after release.
- * A press on a quicktime circle (claimTap) is used up and does not aim.
+ * A press on a quicktime circle is used up and does not aim; that pointer then holds or drags the circle until
+ * it goes up (M9). The handler is either the M7 TapClaim or a ParryPointerHandler.
  */
 export class AimInput {
   private lastAngle = 0;
@@ -56,8 +116,9 @@ export class AimInput {
   private readonly scene: Phaser.Scene;
   private readonly cx: number;
   private readonly cy: number;
-  /** Pointer that pressed a circle; its moves do not aim until it is released. */
-  private circlePointerId: number | null = null;
+  /** Pointers that pressed a circle; their moves do not aim until they are released. */
+  private readonly circles = new CirclePointers();
+  private readonly parry?: ParryPointerHandler;
   private readonly onContextMenu = (e: Event) => e.preventDefault();
 
   constructor(
@@ -65,8 +126,12 @@ export class AimInput {
     cx: number,
     cy: number,
     stick?: StickSource,
-    private readonly claimTap?: TapClaim,
+    parry?: TapClaim | ParryPointerHandler,
   ) {
+    this.parry =
+      typeof parry === 'function'
+        ? { press: (_id, x, y) => parry(x, y), move: () => {}, release: () => {}, cancel: () => {} }
+        : parry;
     this.stick = stick;
     this.scene = scene;
     this.cx = cx;
@@ -75,6 +140,7 @@ export class AimInput {
     scene.input.on('pointerdown', this.onDown, this);
     scene.input.on('pointerup', this.onUp, this);
     scene.input.on('pointerupoutside', this.onUp, this);
+    scene.events.on(Phaser.Scenes.Events.RESUME, this.onResume, this);
     scene.input.mouse?.disableContextMenu();
     const canvas = scene.game.canvas;
     canvas.addEventListener('contextmenu', this.onContextMenu);
@@ -104,7 +170,15 @@ export class AimInput {
   }
 
   private onUp(pointer: Phaser.Input.Pointer): void {
-    if (pointer.id === this.circlePointerId) this.circlePointerId = null;
+    if (routePointerUp(pointer.id, this.circles) === 'release')
+      this.parry?.release(pointer.id, pointer.worldX, pointer.worldY);
+  }
+
+  /** After a pause: pointers that went up meanwhile let go of their circles without a grade. */
+  private onResume(): void {
+    const pointers = this.scene.input.manager?.pointers ?? [];
+    const down = (id: number) => pointers.some((p) => p.id === id && p.isDown);
+    for (const id of this.circles.dropReleased(down)) this.parry?.cancel(id);
   }
 
   private route(pointer: Phaser.Input.Pointer, down: boolean): void {
@@ -116,11 +190,12 @@ export class AimInput {
         onStick:
           !!stick && (pointer.id === stick.pointerId || stick.contains(pointer.x, pointer.y)),
         stickHeld: stick?.held ?? false,
-        heldOnCircle: !down && pointer.id === this.circlePointerId && pointer.isDown,
+        heldOnCircle: !down && this.circles.has(pointer.id) && pointer.isDown,
       },
-      () => this.claimTap?.(pointer.worldX, pointer.worldY) ?? false,
+      () => this.parry?.press(pointer.id, pointer.worldX, pointer.worldY) ?? false,
     );
-    if (route === 'parry') this.circlePointerId = pointer.id;
+    if (route === 'parry') this.circles.claim(pointer.id);
+    if (route === 'held') this.parry?.move(pointer.id, pointer.worldX, pointer.worldY);
     if (route !== 'aim') return;
     this.pointerAngle = angleFromCenter(pointer.x, pointer.y, this.cx, this.cy);
   }
@@ -130,6 +205,8 @@ export class AimInput {
     this.scene.input.off('pointerdown', this.onDown, this);
     this.scene.input.off('pointerup', this.onUp, this);
     this.scene.input.off('pointerupoutside', this.onUp, this);
+    this.scene.events.off(Phaser.Scenes.Events.RESUME, this.onResume, this);
+    this.circles.clear();
     this.scene.game.canvas.removeEventListener('contextmenu', this.onContextMenu);
   }
 }
