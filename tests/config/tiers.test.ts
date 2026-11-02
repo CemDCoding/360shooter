@@ -5,6 +5,7 @@ describe('TIER_RULES (AP-126, PE-155, PE-161)', () => {
   it('has the agreed values', () => {
     expect(TIER_RULES).toEqual({
       hpPerStage: 0.08,
+      hpPerStageByBatch: { forest: 0.05 },
       damagePerStage: 0.05,
       scalePerStage: 0.03,
       maxScaleBonus: 0.15,

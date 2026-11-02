@@ -36,8 +36,16 @@ export const BALANCE_BANDS = {
   pressure: { min: 0.75, max: 1.8 } as Band,
   /** Level 40 ist das Maximum und liegt in diesem Band. */
   finalLevelPressure: { min: 1.7, max: 1.8 } as Band,
-  /** Groesster Schritt des Referenz-Drucks von einem Level zum naechsten innerhalb eines Batches (+12 %). */
-  maxStepInBatch: 1.12,
+  /**
+   * Groesster Schritt des Referenz-Drucks von einem Level zum naechsten innerhalb eines Batches, je Abschnitt (AP-168,
+   * PE-225, Q-81 (a)): Level 0 bis 4 +22 % (Zielzahlen RS-05.2), Level 21 bis 30 +15 % (bleiben unveraendert, Q-78 (a)),
+   * alle uebrigen Level +12 %. Der erste passende Eintrag gilt, `maxStepForLevel` liest ihn.
+   */
+  maxStepBySection: [
+    { first: 0, last: 4, max: 1.22 },
+    { first: 21, last: 30, max: 1.15 },
+    { first: 0, last: 40, max: 1.12 },
+  ] as readonly { first: number; last: number; max: number }[],
   /** Gold je Minute weicht hoechstens so viel (Anteil) vom Nachbarlevel ab. */
   goldPerMinuteTolerance: 0.1,
   /** Boss-Dauer der Referenzspielerin ohne Pet, erstes Level eines Batches. */
@@ -51,3 +59,9 @@ export const BALANCE_BANDS = {
   /** Anteil des Pets am Schaden gegen den Boss (Pet mit allen Power-ups). */
   petShare: { min: 0.2, max: 0.4 } as Band,
 } as const;
+
+/** Groesster erlaubter Druck-Schritt zum Vorgaenger fuer ein Level (Faktor, z. B. 1,22), nach `BALANCE_BANDS.maxStepBySection`. */
+export function maxStepForLevel(levelId: number): number {
+  const s = BALANCE_BANDS.maxStepBySection.find((x) => levelId >= x.first && levelId <= x.last);
+  return s ? s.max : 1.12;
+}

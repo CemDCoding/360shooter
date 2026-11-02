@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BALANCE_BANDS, LEVELS, LEVEL_COUNT } from '../../src/config';
+import { BALANCE_BANDS, LEVELS, LEVEL_COUNT, maxStepForLevel } from '../../src/config';
 import {
   basePressure,
   goldPerMinute,
@@ -40,27 +40,27 @@ const ids = range(0, LEVEL_COUNT - 1);
 const sameBatch = (i: number): boolean => LEVELS[i].batch === LEVELS[i - 1].batch;
 
 const KNOWN_OUT_OF_BAND = {
-  /** Referenz-Druck ausserhalb 0,75 bis 1,8 (RS-05: Level 4 und Oase). */
-  pressure: [
-    { levels: [4], ist: '2,11', paket: 'AP-168' },
-    { levels: range(33, 40), ist: '1,86 bis 3,99', paket: 'AP-168' },
-  ],
-  /** Level 40 liegt nicht in 1,7 bis 1,8. */
-  finalPressure: [{ levels: [40], ist: '3,99', paket: 'AP-168' }],
+  /** Referenz-Druck ausserhalb 0,75 bis 1,8: nach AP-168 keine Ausreisser mehr (Level 4 und Oase geglaettet). */
+  pressure: [] as readonly Known[],
+  /** Level 40 liegt in 1,7 bis 1,8 (1,799): kein Eintrag mehr. */
+  finalPressure: [] as readonly Known[],
   /**
-   * Schritt zum Vorgaenger im selben Batch ueber +12 %. Wald 1 bis 4 und Oase 32 bis 36 sind AP-168. ACHTUNG: Die Zahlen
-   * aus RS-05.2 fuer Level 0 bis 4 (0,77 / 0,91 / 1,11 / 1,31 / 1,54) ergeben selbst +18 bis +22 % je Schritt; Level 23
-   * und 27 bis 29 (Wueste, Pyramiden) bleiben nach AP-168 unveraendert. Beides widerspricht dem Band und braucht eine
-   * Entscheidung des Planners (Q-78, Band lockern oder Level 21 bis 30 aendern).
+   * Schritt zum Vorgaenger im selben Batch ueber dem Band des Abschnitts (PE-225: Level 0 bis 4 1,22, Level 21 bis 30
+   * 1,15, sonst 1,12). Level 23 (Wueste) liegt mit 1,1513 (+15,13 %) knapp ueber 1,15. Das ist KEIN Rundungsfall (der
+   * Wert ist 1,1513, nicht 1,1500): Level 21 bis 30 bleiben nach Q-78 (a) unveraendert, das Band wird nicht angehoben.
+   * Dem Lead gemeldet; Entscheidung beim Nutzer.
    */
-  step: [
-    { levels: [1, 2, 3, 4], ist: '1,23 bis 1,34', paket: 'AP-168 / Q-78' },
-    { levels: [23], ist: '1,151', paket: 'Q-78' },
-    { levels: [27, 28, 29], ist: '1,122 bis 1,129', paket: 'Q-78' },
-    { levels: range(32, 36), ist: '1,124 bis 1,140', paket: 'AP-168' },
+  step: [{ levels: [23], ist: '1,1513 gegen 1,15', paket: 'Q-78' }],
+  /**
+   * Gold je Minute weicht mehr als 10 % vom Nachbarlevel im selben Batch ab. Level 3: +13,1 % (180 s zu 300 s, die
+   * Rundenlaenge aendert Gold je Minute, AP-167). Level 4: +11,1 % gegen Level 3 (gleich lang). Gold je Runde bleibt
+   * durch AP-168 unveraendert (xp/coin folgen dem Gegnerzahl-Faktor), die Spreizung stammt aus der Pool-Mischung und den
+   * Level-Werten und liegt ausserhalb dieses Pakets (Spielwerte Gold, Entscheidung des Nutzers).
+   */
+  gold: [
+    { levels: [3], ist: '+13,1 % (180 s zu 300 s)', paket: 'AP-168' },
+    { levels: [4], ist: '+11,1 % (gleich lang)', paket: 'AP-168' },
   ],
-  /** Gold je Minute weicht mehr als 10 % vom Nachbarlevel (andere Laenge, gleicher Batch) ab. */
-  gold: [{ levels: [3], ist: '+13,4 % (180 s zu 300 s)', paket: 'AP-168' }],
 } as const satisfies Record<string, readonly Known[]>;
 
 describe('balance model: reference player (AP-167)', () => {
@@ -95,11 +95,11 @@ describe('balance model: reference player (AP-167)', () => {
   it('matches the numbers of RS-05 section 0 within 10 percent', () => {
     const rs: [number, number][] = [
       [0, 0.77],
-      [4, 2.12],
+      [4, 1.54], // AP-168: Zielzahl RS-05.2 (vorher 2,12, Spitze behoben)
       [9, 1.68],
       [21, 0.93],
       [30, 1.8],
-      [40, 3.99],
+      [40, 1.8], // AP-168: Zielzahl RS-05.2 (vorher 3,99, Steilwand behoben)
     ];
     for (const [level, want] of rs) {
       expect(referencePressure(level) / want, `level ${level}`).toBeGreaterThan(0.9);
@@ -115,7 +115,7 @@ describe('balance model: reference player (AP-167)', () => {
 });
 
 describe('balance model: difficulty curve targets (RS-05.1)', () => {
-  const { pressure, finalLevelPressure, maxStepInBatch } = BALANCE_BANDS;
+  const { pressure, finalLevelPressure } = BALANCE_BANDS;
 
   it('keeps the reference pressure in 0.75 to 1.8, except the known levels', () => {
     const out = ids.filter((i) => {
@@ -133,11 +133,21 @@ describe('balance model: difficulty curve targets (RS-05.1)', () => {
     expectExactly(out, KNOWN_OUT_OF_BAND.finalPressure, 'final pressure');
   });
 
-  it('limits the step inside a batch to +12 percent, except the known levels', () => {
+  it('limits the step inside a batch to the band of its section (PE-225), except the known levels', () => {
     const out = range(1, 40).filter(
-      (i) => sameBatch(i) && referencePressure(i) / referencePressure(i - 1) > maxStepInBatch,
+      (i) => sameBatch(i) && referencePressure(i) / referencePressure(i - 1) > maxStepForLevel(i),
     );
     expectExactly(out, KNOWN_OUT_OF_BAND.step, 'step');
+  });
+
+  it('uses the section bands 1.22 (levels 0-4), 1.15 (levels 21-30) and 1.12 otherwise (PE-225)', () => {
+    expect(maxStepForLevel(1)).toBe(1.22);
+    expect(maxStepForLevel(4)).toBe(1.22);
+    expect(maxStepForLevel(5)).toBe(1.12);
+    expect(maxStepForLevel(21)).toBe(1.15);
+    expect(maxStepForLevel(30)).toBe(1.15);
+    expect(maxStepForLevel(31)).toBe(1.12);
+    expect(maxStepForLevel(40)).toBe(1.12);
   });
 
   it('starts every batch below the end of the previous one (sawtooth)', () => {
@@ -161,12 +171,11 @@ describe('balance model: gold per minute (RS-05.1)', () => {
     expect(goldPerMinute(40)).toBeGreaterThan(goldPerMinute(0) * 10);
   });
 
-  it('keeps 3-minute and 5-minute levels of one batch within 10 percent, except the known level', () => {
+  it('keeps gold per minute within 10 percent of every neighbour in the batch, except the known levels (PE-224)', () => {
     const tol = BALANCE_BANDS.goldPerMinuteTolerance;
     const out = range(1, 40).filter(
       (i) =>
         sameBatch(i) &&
-        LEVELS[i].durationSec !== LEVELS[i - 1].durationSec &&
         Math.abs(goldPerMinute(i) / goldPerMinute(i - 1) - 1) > tol,
     );
     expectExactly(out, KNOWN_OUT_OF_BAND.gold, 'gold');

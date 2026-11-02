@@ -15,17 +15,20 @@ import {
 
 /** First level of M5 (desert): from here the enemies get stronger (PE-129, AP-105). */
 const M5_FIRST = 21;
+/** First level of the oasis (AP-168: M5_HP falls here, PE-209). */
+const OASIS_FIRST = 31;
 
 /**
  * hp, xp/coin and contact before AP-127 (Stand AP-113), index = level id. AP-166 (PE-207) lowered hp, xp and contact of
  * level 0 to 2 (HP_BEFORE_AP127 0.44 / 0.46 / 0.5 -> 0.36 / 0.38 / 0.42, XP 0.443 / 0.467 / 0.49 -> 0.393 / 0.415 / 0.435,
  * contact 0.92 / 0.98 / 1.02 -> 0.89 / 0.95 / 0.99) to pay for the larger share of boar and bear; the new values are
  * the reference here, the budget check against the old state lives in balance.test.ts.
+ * AP-168 (PE-209, RS-05.2): hp of level 31 to 40 is lowered (the tier carries the rise, no double counting).
  */
 const HP_BEFORE_AP127 = [
   0.36, 0.38, 0.42, 0.54, 0.6, 0.714, 0.71, 0.7, 0.7, 0.7, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81,
   0.81, 0.81, 0.81, 0.81, 0.806, 0.85, 0.917, 0.984, 1.043, 1.054, 1.122, 1.191, 1.279, 1.344,
-  1.385, 1.472, 1.563, 1.663, 1.772, 1.891, 2.022, 2.147, 2.272, 2.422,
+  1.25, 1.209, 1.186, 1.156, 1.138, 1.122, 1.112, 1.106, 1.098, 1.093,
 ];
 const COIN_BEFORE_AP127 = [
   0.462, 0.488, 0.512, 0.57, 0.621, 0.781, 0.779, 0.783, 0.78, 0.781, 0.781, 0.783, 0.781, 0.778,
@@ -91,16 +94,18 @@ describe('LEVEL_SCALING', () => {
 
   it('compensates the mixed pool of level 0 to 2: hp, xp and contact below the old values, coin unchanged (AP-166)', () => {
     const OLD = [
-      { hp: 0.44, xp: 0.443 / 1.5, coin: 0.462 / 1.5, contact: 0.92 },
-      { hp: 0.46, xp: 0.467 / 1.75, coin: 0.488 / 1.75, contact: 0.98 },
-      { hp: 0.5, xp: 0.49 / 2, coin: 0.512 / 2, contact: 1.02 },
+      { hp: 0.44, xp: 0.443, coin: 0.462, contact: 0.92 },
+      { hp: 0.46, xp: 0.467, coin: 0.488, contact: 0.98 },
+      { hp: 0.5, xp: 0.49, coin: 0.512, contact: 1.02 },
     ];
     OLD.forEach((o, i) => {
       const s = LEVEL_SCALING[i];
+      // xp und coin sind durch den Gegnerzahl-Faktor geteilt (AP-168: Faktor Level 1 bis 2 geaendert, Gold je Runde gleich).
+      const f = ENEMY_COUNT_FACTOR[i];
       expect(s.hp, `hp ${i}`).toBeLessThan(o.hp);
-      expect(s.xp, `xp ${i}`).toBeLessThan(o.xp);
+      expect(s.xp, `xp ${i}`).toBeLessThan(o.xp / f);
       expect(s.contact, `contact ${i}`).toBeLessThan(o.contact);
-      expect(s.coin, `coin ${i}`).toBeCloseTo(o.coin, 4);
+      expect(s.coin, `coin ${i}`).toBeCloseTo(o.coin / f, 4);
     });
   });
 
@@ -156,8 +161,12 @@ describe('LEVEL_SCALING', () => {
       const prev = LEVEL_SCALING[i - 1];
       expect(s.hp, `level ${i}`).toBeGreaterThan(0.77);
       // Ohne Aufschlag liegt Level 21 knapp unter dem hp von Level 20 (0,81, AP-113), ab Level 22 steigt es.
-      if (i > M5_FIRST) expect(baseHp(i), `level ${i}`).toBeGreaterThan(baseHp(i - 1));
-      if (i > M5_FIRST) expect(s.hp, `level ${i}`).toBeGreaterThan(prev.hp);
+      // Level 31 bis 40 (AP-168, PE-209): hp faellt, die Gegnerstufe traegt den Anstieg (Referenz-Druck in balanceModel.test.ts).
+      if (i > M5_FIRST && i < OASIS_FIRST) {
+        expect(baseHp(i), `level ${i}`).toBeGreaterThan(baseHp(i - 1));
+        expect(s.hp, `level ${i}`).toBeGreaterThan(prev.hp);
+      }
+      if (i > OASIS_FIRST) expect(baseHp(i), `level ${i}`).toBeLessThan(baseHp(i - 1));
       expect(s.contact, `level ${i}`).toBeGreaterThanOrEqual(0.77 * CONTACT_COMPENSATION);
       expect(s.contact, `level ${i}`).toBeLessThanOrEqual(CONTACT_COMPENSATION);
       expect(s.contact, `level ${i}`).toBeGreaterThanOrEqual(prev.contact);
@@ -167,7 +176,8 @@ describe('LEVEL_SCALING', () => {
     // Ohne Aufschlag hoechstens 2,5-fache Lebenspunkte: Stufe 15 der Spuren Feuerrate und Schaden bringt das 6,25-fache.
     // Mit dem Aufschlag der Obergrenze (AP-127, x1,5) sind es 3,633 (Druck siehe docs/balancing.md).
     expect(baseHp(LEVEL_COUNT - 1)).toBeLessThanOrEqual(2.5);
-    expect(LEVEL_SCALING[LEVEL_COUNT - 1].hp).toBeCloseTo(3.633, 3);
+    // AP-168: 1,093 mal der Aufschlag 1,5 (vorher 3,633).
+    expect(LEVEL_SCALING[LEVEL_COUNT - 1].hp).toBeCloseTo(1.6395, 3);
   });
 
   it('keeps the coin drop chance of level 40 below 20 percent', () => {

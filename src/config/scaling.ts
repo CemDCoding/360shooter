@@ -61,11 +61,13 @@ const M5_FIRST = 21;
 
 /**
  * Level 21 bis 40 (AP-105), Index 0 = Level 21: `hp` traegt die Druck-Kurve (etwa +7,5 % je Level,
- * Batch-Sprung etwa +9,5 %).
+ * Batch-Sprung etwa +9,5 %). Level 31 bis 40 (AP-168, PE-209, RS-05.2): fallend statt steigend, weil die Gegnerstufe
+ * (+8 % je Level, tierFor) den Anstieg schon traegt (vorher doppelt gezaehlt); der Referenz-Druck steigt so linear von
+ * etwa 1,30 auf 1,80. Level 21 bis 30 unveraendert (Q-78 (a)).
  */
 const M5_HP: readonly number[] = [
-  0.806, 0.85, 0.917, 0.984, 1.043, 1.054, 1.122, 1.191, 1.279, 1.344, 1.385, 1.472, 1.563, 1.663,
-  1.772, 1.891, 2.022, 2.147, 2.272, 2.422,
+  0.806, 0.85, 0.917, 0.984, 1.043, 1.054, 1.122, 1.191, 1.279, 1.344, 1.25, 1.209, 1.186, 1.156,
+  1.138, 1.122, 1.112, 1.106, 1.098, 1.093,
 ];
 
 /** `coin` (= `xp`) ab Level 21: 1,2 plus 0,05 je Level, damit eine Upgrade-Spur bis etwa Level 35 Stufe 15 erreicht. */

@@ -39,12 +39,13 @@ const SHORT_LEVELS: readonly number[] = [
 ];
 
 /**
- * Gegnerzahl-Faktor je Level (M7, AP-127, F-25, PE-152, PE-153): Level 0 1,5, Level 1 1,75, Level 2 2,0,
- * Level 3 2,25, ab Level 4 2,5. Der Spawn-Abstand wird durch den Faktor geteilt, `MAX_ENEMIES` mit ihm
+ * Gegnerzahl-Faktor je Level (M7, AP-127, F-25, PE-152, PE-153): Level 0 1,5, Level 1 1,6, Level 2 1,75,
+ * Level 3 1,9, Level 4 2,0, ab Level 5 2,5 (Level 1 bis 4 seit AP-168, PE-209, RS-05.2: sanfterer Anstieg, vorher
+ * 1,75 / 2,0 / 2,25 / 2,5). Der Spawn-Abstand wird durch den Faktor geteilt, `MAX_ENEMIES` mit ihm
  * multipliziert (hoechstens `MAX_ENEMIES_CAP`). Die HP je Gegner bleiben gleich, `xp` und `coin` in
  * LEVEL_SCALING werden durch den Faktor geteilt (PE-163). Index = Level-ID.
  */
-const COUNT_RAMP: readonly number[] = [1.5, 1.75, 2, 2.25];
+const COUNT_RAMP: readonly number[] = [1.5, 1.64, 1.72, 1.94, 2.15];
 const COUNT_FACTOR_FULL = 2.5;
 export const ENEMY_COUNT_FACTOR: readonly number[] = Array.from(
   { length: LEVEL_COUNT },
