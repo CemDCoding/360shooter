@@ -1,14 +1,56 @@
 import Phaser from 'phaser';
 import { BOSS_TUNING } from '../../config/bosses';
-import type { BossAttackDef } from '../../contracts';
+import { PARRY_RULES } from '../../config/parry';
+import type { BossAttackDef, ParryRules } from '../../contracts';
+import { circlePosition, type ParryCircleState } from '../../logic/parry';
 import { ringSpikeAngles, treePositions } from './bossGeometry';
-import { BossBase, type BossContext } from './BossBase';
+import { BossBase, type BossContext, type ParryAnchor } from './BossBase';
 import { bodyShape, type BossHazard } from './hazards';
 import { RootSpike } from './RootSpike';
 import { Telegraph } from './Telegraph';
 
 const TUNING = BOSS_TUNING.rootMonster;
 const FULL_TURN = Math.PI * 2;
+const RAD_TO_DEG = 180 / Math.PI;
+/** Angle between two neighbouring quicktime circles of the root monster (AP-153); 70 degrees = 64 px apart. */
+const CIRCLE_STEP_DEG = 70;
+/** Fallback body radius when the sprite has no size yet. */
+const FALLBACK_BODY_RADIUS = 24;
+
+/** Angles (degrees) of `count` circles in a fan centred on `baseDeg`. */
+export function circleFan(baseDeg: number, count: number, stepDeg: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < count; i++) out.push(baseDeg + (i - (count - 1) / 2) * stepDeg);
+  return out;
+}
+
+/**
+ * Centre angle of a circle fan around the player (AP-153, fairness): `preferredDeg` if no circle of the fan
+ * would sit under the boss body, otherwise the direction away from the body (never hidden by the boss).
+ */
+export function fanBaseAngle(
+  preferredDeg: number,
+  count: number,
+  stepDeg: number,
+  player: { x: number; y: number },
+  body: { x: number; y: number; radius: number },
+  rules: ParryRules = PARRY_RULES,
+): number {
+  const clear = circleFan(preferredDeg, count, stepDeg).every((angleDeg) => {
+    const p = circlePosition({ angleDeg }, player, rules);
+    return Math.hypot(p.x - body.x, p.y - body.y) >= body.radius + rules.circleRadiusPx;
+  });
+  if (clear) return preferredDeg;
+  return Math.atan2(player.y - body.y, player.x - body.x) * RAD_TO_DEG;
+}
+
+/** Angle (degrees) from the boss to the player, i.e. the side of the player that faces away from the boss. */
+export function awayFromBodyDeg(
+  player: { x: number; y: number },
+  body: { x: number; y: number },
+): number {
+  return Math.atan2(player.y - body.y, player.x - body.x) * RAD_TO_DEG;
+}
 
 export interface RootMonsterContext extends BossContext {
   /** The boss calls cursed trees: the scene spawns one cursedTree per position. */
@@ -95,6 +137,31 @@ export class RootMonster extends BossBase {
         spikes.splice(i, 1);
       }
     }
+  }
+
+  /**
+   * Circle places (AP-153). rootThrust: the bud sits under the player, so the hold and the tap circle fan out on
+   * the side facing away from the boss. rootRing: the circles sit on the closing ring, on the side opposite
+   * the gap (the ring is chosen in onTelegraph, which runs before the circles are planned); they step aside
+   * only if the boss body would hide one.
+   */
+  protected override parryAnchor(attack: BossAttackDef, circle: ParryCircleState): ParryAnchor {
+    if (attack.id !== 'rootThrust' && attack.id !== 'rootRing') {
+      return super.parryAnchor(attack, circle);
+    }
+    const count = attack.parryPattern?.steps.length ?? attack.parryCircles;
+    const body = {
+      x: this.x,
+      y: this.y,
+      radius: Math.max(this.width, this.height) / 2 || FALLBACK_BODY_RADIUS,
+    };
+    const preferred =
+      attack.id === 'rootRing'
+        ? (this.ringGapStart + TUNING.ring.gapRad / 2) * RAD_TO_DEG + 180
+        : awayFromBodyDeg(this.center, body);
+    const base = fanBaseAngle(preferred, count, CIRCLE_STEP_DEG, this.center, body);
+    const angles = circleFan(base, count, CIRCLE_STEP_DEG);
+    return { angleDeg: angles[circle.index] ?? circle.angleDeg };
   }
 
   protected override onTelegraph(attack: BossAttackDef): void {
