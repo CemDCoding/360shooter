@@ -205,6 +205,26 @@ export function burstRadius(ms: number, reduced: boolean): number {
   return BURST_START_R + (BURST_END_R - BURST_START_R) * t;
 }
 
+/**
+ * drag: the circle was selected by tap (replacement): second ring and smaller target box. A circle that a
+ * pointer holds (it has a drag position from the press on) is "grabbed", not selected (brief H-37 5a).
+ */
+export function isDragSelected(
+  c: Pick<ParryCircleState, 'index' | 'pressedAtMs'>,
+  drags: Readonly<Record<number, Point>> | undefined,
+): boolean {
+  return c.pressedAtMs !== undefined && drags?.[c.index] === undefined;
+}
+
+/**
+ * Glyph scale of a word label `shownMs` after its grade: 2x, one step bigger for a short pop at the start unless
+ * motion is reduced. null: no pop (a lasting word like "LOS!"), so the lasting size is the same in both modes.
+ */
+export function wordScale(shownMs: number | null, reduced: boolean): number {
+  const pop = shownMs !== null && !reduced && shownMs < POP_MS ? 1 : 0;
+  return WORD_SCALE + pop;
+}
+
 /** One circle as the overlay shows it. */
 export interface CircleView {
   index: number;
@@ -548,11 +568,12 @@ export class ParryOverlay {
       const frame = holdSymbolFrame(c.symbol, filled ?? 0, HOLD_SEGMENTS, this.reduced);
       this.symbol(key, used, frame, cx, cy, 'game.parry-symbol', v);
       if (filled !== null && filled >= HOLD_SEGMENTS)
-        this.word(`${key}:w`, used, 'LOS!', v, player, 0);
+        // "LOS!" stays 2x as long as the ring is full: no pop (brief H-37, mockup 9a).
+        this.word(`${key}:w`, used, 'LOS!', v, player, null);
       return;
     }
 
-    if (kind === 'drag' && c && c.pressedAtMs !== undefined && !e.drags[v.index]) {
+    if (kind === 'drag' && c && isDragSelected(c, e.drags)) {
       // Selected by tap (replacement): second 1 px ring.
       g.lineStyle(BORDER, themeColor('game.parry-circle').num, 1);
       g.strokeCircle(cx, cy, SELECT_RING_R - BORDER / 2);
@@ -670,7 +691,7 @@ export class ParryOverlay {
     if (!t) return;
     const tx = Math.round(t.x);
     const ty = Math.round(t.y);
-    const selected = c.pressedAtMs !== undefined && !e.drags[c.index];
+    const selected = isDragSelected(c, e.drags);
     const boxR = targetBoxR(selected ? e.elapsedMs - (c.pressedAtMs ?? 0) : null, this.reduced);
     const g = this.gfx;
     g.fillStyle(themeColor('game.parry-link').num, 1);
@@ -800,11 +821,10 @@ export class ParryOverlay {
     word: ParryWord,
     v: CircleView,
     player: Point,
-    shownMs: number,
+    shownMs: number | null,
   ): void {
     const color = WORD_COLOR[word];
-    const pop = !this.reduced && shownMs < POP_MS ? 1 : 0;
-    const scale = WORD_SCALE + pop;
+    const scale = wordScale(shownMs, this.reduced);
     const size = this.labelSize(word, scale, WORD_PAD);
     const at = wordCenter(player, v.angleDeg, size, this.scene.scale);
     this.label(key, used, word, scale, color, color, at, size);

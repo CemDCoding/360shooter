@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PARRY_RULES } from '../../src/config/parry';
 import type { ParryPatternDef } from '../../src/contracts';
 import { ParryTracker } from '../../src/entities/bosses/hazards';
 import { circlePosition, targetPosition, type ParryCircleState } from '../../src/logic/parry';
+
+// ParryOverlay.ts imports Phaser for the drawing class only; isDragSelected is pure.
+vi.mock('phaser', () => ({ default: {} }));
+const { isDragSelected } = await import('../../src/entities/ParryOverlay');
 
 // AP-151: the M9 building blocks in the boss tracker (pointer by pointer, play time, words noted for display).
 const center = { x: 320, y: 180 };
@@ -164,6 +168,36 @@ describe('ParryTracker drag (AP-151)', () => {
     t.release(2, target, center);
     expect(circle(t, 0).result).not.toBeNull();
     expect(t.groups[0].drags?.[0]).toBeUndefined();
+  });
+
+  it('grabbed from the press on (no flicker); a release without a move still selects', () => {
+    const t = open(pattern);
+    const c = circle(t, 0);
+    runTo(t, c.hitAtMs);
+    const p = at(c);
+    t.press(p, center, 2);
+    // Right after the press: grabbed at the press point, not "selected by tap".
+    expect(t.groups[0].drags?.[0]).toEqual({ x: p.x, y: p.y });
+    expect(isDragSelected(circle(t, 0), t.groups[0].drags)).toBe(false);
+    t.move(2, { x: p.x + 3, y: p.y + 4 });
+    expect(t.groups[0].drags?.[0]).toEqual({ x: p.x + 3, y: p.y + 4 });
+    expect(isDragSelected(circle(t, 0), t.groups[0].drags)).toBe(false);
+    // Second circle: release without any move = tap replacement (selected).
+    const u = open(pattern);
+    const d = circle(u, 0);
+    runTo(u, d.hitAtMs);
+    u.press(at(d), center, 5);
+    u.release(5, at(d), center);
+    expect(u.groups[0].drags?.[0]).toBeUndefined();
+    expect(isDragSelected(circle(u, 0), u.groups[0].drags)).toBe(true);
+  });
+
+  it('a press without a pointer (M7 tap) selects at once', () => {
+    const t = open(pattern);
+    const c = circle(t, 0);
+    runTo(t, c.hitAtMs);
+    t.press(at(c), center);
+    expect(isDragSelected(circle(t, 0), t.groups[0].drags)).toBe(true);
   });
 
   it('release on the circle selects it; a tap on the target then drops it (replacement)', () => {

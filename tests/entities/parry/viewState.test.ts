@@ -5,8 +5,22 @@ import type { ParryCircleState } from '../../../src/logic/parry';
 // ParryOverlay.ts imports Phaser for the drawing class only; the display state is pure.
 vi.mock('phaser', () => ({ default: {} }));
 
-const { ParryViewState, openCircleLook, WORD_COLOR } =
+const { ParryViewState, openCircleLook, WORD_COLOR, wordScale } =
   await import('../../../src/entities/ParryOverlay');
+
+describe('word size (brief H-37: Funk 2x, pop only as a short pulse)', () => {
+  it('"LOS!" (no pop) stays 2x with and without reduced motion', () => {
+    expect(wordScale(null, false)).toBe(2);
+    expect(wordScale(null, true)).toBe(2);
+  });
+
+  it('graded words pop one step for motion.fast, then 2x; reduced motion never pops', () => {
+    expect(wordScale(0, false)).toBe(3);
+    expect(wordScale(80, false)).toBe(2);
+    expect(wordScale(400, false)).toBe(2);
+    expect(wordScale(0, true)).toBe(2);
+  });
+});
 
 // AP-151: M9 words, motif of "PARRY!" and the sound cues of the overlay (never the only information).
 const c = (over: Partial<ParryCircleState>): ParryCircleState => ({

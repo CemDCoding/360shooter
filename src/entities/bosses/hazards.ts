@@ -378,6 +378,11 @@ export class ParryTracker {
         (kind === 'drag' || (kind === 'hold' && after.holding === true))
       ) {
         this.grabs.set(pointerId, { groupId: g.id, index: hit.index });
+        // A drag circle is "grabbed" from the press on (at the press point), not "selected by tap": no second
+        // ring, no bracket step and no flicker before the first move (brief H-37 5a). A release without a move
+        // still selects it (tap replacement), see release().
+        if (kind === 'drag')
+          g.drags = { ...(g.drags ?? {}), [hit.index]: { x: point.x, y: point.y } };
       }
       return { group: g, index: hit.index, grade: after.result };
     }
