@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ läuft. Runde 1 (Symbolsprache) beantwortet, nächste Runde: Ziehen, Kieselspur, Takt, Wahl/Rätsel. Danach Motivbild, Schalter, Mockup `mockups/m9-maerchen-quicktimes.html`, Tokens, Freigabe.
+**Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ läuft. Runden 1 (Symbolsprache) und 2 (Ziehen, Kieselspur, Takt, Wahl) beantwortet, nächste Runde: Motivbild, Rückmeldungen, Schalter, reduzierte Bewegung. Danach Mockup `mockups/m9-maerchen-quicktimes.html`, Tokens, Freigabe.
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
@@ -580,5 +580,9 @@ Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Revi
 - 2a **Trugkreis:** welliger Pixel-Umriss, keine Glasfüllung, **kein schrumpfender Ring**. Gestrichelt bleibt „VERFEHLT“ vorbehalten.
 - 3a **Symbole einfarbig Phosphor** auf den Kreisen. Farbige Märchenbilder nur im Motivbild beim „PARRY!“.
 - 4a **Blüten-Halt:** Drücken, wenn der Ring schließt. Danach füllt sich innen ein Segmentring in 8 Pixel-Stufen, das Symbol öffnet sich in 3 Frames (Knospe → halb → Blüte bzw. Sonne geht auf). Bei vollem Ring erscheint „LOS!“ am Kreis.
+- 5a **Bann-Zug:** Ziel als hohler Kreis mit vier Funk-Zielklammern und eigenem Symbol (leuchtendes Wurmglied bzw. Steinbahn), gepunktete Linie vom Seil- bzw. Kiesel-Kreis zum Ziel. Beim Ziehen folgt der Kreis dem Finger. Ersatz per Tipp: der angetippte Kreis bekommt einen doppelten Rand, die Klammern rücken eine Stufe ans Ziel heran (kein Blinken).
+- 6a **Kieselspur:** Beim Aufleuchten bekommt jeder Kiesel sein Nummern-Fähnchen, das stehen bleibt, bis er getippt ist (Lesen statt Merken, passt zu 4b).
+- 7a **Schlummertakt:** Kopf-Symbol mit offenen Augen, nach einem Treffer schließen sich die Augen und ein „z“ steigt auf. Drei Taktpunkte unter der Astronautin füllen sich mit jedem Schlag (stummes Metronom).
+- 8a **Wahl:** Hinweistafel aus Glas über der Astronautin (Platz von „PARRY!“): Waage neigt sich in zwei Stufen bzw. Rätselbild (krabbelndes Kind, aufrechter Mensch, Greis mit Stock), bleibt bis zum Ende stehen. Beine auf den Kreisen als zählbare Striche mit Füßen (4, 2, 3), keine Ziffern.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
