@@ -128,7 +128,11 @@ import {
   type SoundService,
 } from '../platform/audio';
 import { AimInput } from '../platform/input';
-import { loadSave, writeSave } from '../platform/storage';
+import { markFinisherSeen, loadSave, writeSave } from '../platform/storage';
+import { prefersReducedMotion } from '../platform/motion';
+import { buildFinisher } from '../logic/finisher';
+import { FINISHER_SCENE_KEY, type FinisherActor, type FinisherStartData } from '../contracts';
+import type { SaveGame } from '../contracts/save';
 import { VirtualStick } from './controls/VirtualStick';
 import { parseDebugLevel, resolveLevelId } from './debug';
 import { energyRatio, hudSeconds, powerBlock, powersKey } from './hud/hudMath';
@@ -1214,6 +1218,17 @@ export class GameScene extends Phaser.Scene {
             boss.maxHp,
           )
         : 1;
+    // The finisher scene shows a copy of the boss, so its look is read before the real one is hidden (AP-161).
+    const bossActor: FinisherActor | undefined = boss
+      ? {
+          texture: boss.texture.key,
+          frame: boss.frame.name,
+          x: boss.x,
+          y: boss.y,
+          scale: boss.scaleX,
+          flipX: boss.flipX,
+        }
+      : undefined;
     this.despawnBoss();
     this.parryOverlay?.clear();
 
@@ -1251,7 +1266,44 @@ export class GameScene extends Phaser.Scene {
       bossHpLeft: this.bossDefeatedFlag ? 0 : bossHpLeft,
     };
     this.scene.stop(HUD_KEY);
+    const bossId = this.level.bossId;
+    if (result === 'won' && this.bossDefeatedFlag && bossId && bossActor) {
+      // Already settled and saved above: reloading during the sequence loses nothing (AP-161).
+      this.startFinisher(data, bossId, bossActor, before);
+      return;
+    }
     this.scene.start('ResultScene', data);
+  }
+
+  /** Boss victory: the finisher sequence runs over the paused round, then it opens the result (AP-161). */
+  private startFinisher(
+    result: ResultSceneData,
+    bossId: string,
+    boss: FinisherActor,
+    save: SaveGame,
+  ): void {
+    const plan = buildFinisher(this.level.id, {
+      reduceEffects: save.reduceEffects === true || prefersReducedMotion(),
+      seen: save.seenFinishers ?? [],
+    });
+    markFinisherSeen(plan.variantId);
+    const data: FinisherStartData<ResultSceneData> = {
+      plan,
+      levelId: this.level.id,
+      bossId,
+      boss,
+      player: {
+        texture: this.player.texture.key,
+        frame: this.player.frame.name,
+        x: this.player.x,
+        y: this.player.y,
+        scale: this.player.scaleX,
+        flipX: this.player.flipX,
+      },
+      result,
+    };
+    this.scene.pause();
+    this.scene.launch(FINISHER_SCENE_KEY, data);
   }
 
   private readonly onAbortRequested = (): void => {
