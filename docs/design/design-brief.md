@@ -1,6 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand H-41/H-43 (2026-11-02):** Interview läuft. Runde 1 beantwortet (1a 2a 3a 4a). Nächster Schritt: Runde 2 (Ton, Elite-Kennzeichnung, Mockups), dann Tokens und Mockup.
 **Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. Teil 2 fertig (Bildfolgen Level 20, 25, 30, 40 in `assets/sprites-m10b.js` und `sprites-m10c.js`, Level 40 als zwei Bögen) und vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-159 bis AP-162, offener Punkt `holdsMs`).
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
@@ -861,5 +862,19 @@ Level 40, Bild 0 bis 17:
 **Handtest H-40 zusätzlich:**
 - Rückblick-Panels in Level 40 am iPhone lesbar?
 - Wirkt der Sonnenaufgang als Abschluss des Spiels?
+
+### 2026-11-02 · Ergänzung H-41 „M11: Quicktime-Fokus“ und H-43 „M12: Rand-Marker, Ankündigungston, Eliten“ (in Arbeit)
+
+**Auftrag:** H-41 (RS-05.7, PE-214, Q-77 (a)) und H-43 (RS-01.3, RS-01.5, PE-218, PE-220, Q-80 (a)) aus dem Plan. Beide betreffen die Runden-Ansicht und `theme.ts`, deshalb ein Interview, zwei getrennt freigebbare Teile.
+
+**Rahmen (fest, aus dem Plan):**
+- H-41: Abdunkeln auf ≈ 60–70 % Helligkeit, Übergang ≤ 120 ms, ohne Übergang bei „Bewegung reduzieren“. Untere Effekt-Rangstufen ≈ 40 % bis ≈ 110 px um die Astronautin. Kreis und Ring ≥ 4,5:1 gegen die schwächste angrenzende Bodenfarbe aller 6 Maps. Keine Blitze (§5), höchstens ein Wechsel je Kreis-Phase (RI-43). Nur Deckkraft und eine Ebene.
+- H-43: Rand-Marker je Ereignisart (Schwarm ≈ 30°-Sektor, Ring rundum, Zange zwei gegenüberliegende Gruppen), ≈ 1 s sichtbar (`announceMs`), ohne Blitz, Ersatz bei „Bewegung reduzieren“, innerhalb `SafeInsets`. Kurzer Ankündigungston. Elite-Kennzeichnung für alle Gegner, Größe ×≈ 1,25 plus Umriss oder Aura, unterscheidbar von der Stufen-Tönung F-27 (die nutzt schon warme Tönung + Größe), möglichst ohne neue Gegner-Sprites.
+
+**Entscheidungen (Nutzer, 2026-11-02):**
+1. **1a Abdunkeln nur von Boden und Arena-Deko.** Eine Tinten-Ebene über Map und Boss-Arena-Deko. Gegner, Boss-Angriffe, Astronautin und HUD bleiben voll hell.
+2. **2a Rangstufen mit Nahbereich.** Untere Stufe (Pet, Rüstung, Feuerring, Münzen, Partikel) im Umkreis von 110 px um die Astronautin auf 40 %, außerhalb auf 70 %. Keine neuen Partikel im Nahbereich. Gegner bleiben bei 100 %.
+3. **3a Doppelter Rand der Kreise.** Außen 1 px Tinte, dann 2 px Phosphor, innen 1 px Tinte. Gilt für Kreis und Annäherungsring.
+4. **4a Rand-Marker mit Form und Wort.** Schwarm: schmaler Keil mit 3 Pfeilen, „SCHWARM“. Ring: gepunktete Linie an allen 4 Rändern, „RING“. Zange: zwei gegenüberliegende Doppelpfeile, „ZANGE“. Warnrot mit Tinten-Umriss, Wort in Funk 1×.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
