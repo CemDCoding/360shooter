@@ -52,15 +52,15 @@ Spawn-Gewichte (je höher, desto häufiger; Anteil am Pool). Die Gewichte sind j
 
 ### Level-Tabelle
 
-Dauer: 180 s oder 300 s (die erste Hälfte eines Batches, aufgerundet, dauert 180 s). Der Spawn-Abstand gilt zu Beginn der Runde und sinkt im Lauf der Runde auf 60 % (also mehr Gegner). `Max.` ist die Obergrenze gleichzeitig lebender Gegner (höchstens 250, AP-127). Seit AP-127 (M7) kommen etwa 2,5-mal so viele Gegner: Der Spawn-Abstand ist der frühere Wert geteilt durch den Gegnerzahl-Faktor (Level 0 1,5, Level 1 1,75, Level 2 2,0, Level 3 2,25, ab Level 4 2,5), `Max.` der frühere Wert mal Faktor. Ab Level 15 greift die Obergrenze 250, dort haben die Gegner dafür mehr HP (siehe 2.2). Ab Level 21 sinkt der Spawn-Abstand nur noch um 2 ms je Level (210 auf 172 ms). Stärker werden die Gegner selbst (siehe 2.2).
+Dauer: 180 s oder 300 s (die erste Hälfte eines Batches, aufgerundet, dauert 180 s). Der Spawn-Abstand gilt zu Beginn der Runde und sinkt im Lauf der Runde auf 60 % (also mehr Gegner). `Max.` ist die Obergrenze gleichzeitig lebender Gegner (höchstens 250, AP-127). Seit AP-127 (M7) kommen etwa 2,5-mal so viele Gegner: Der Spawn-Abstand ist der frühere Wert geteilt durch den Gegnerzahl-Faktor (Level 0 1,5, Level 1 1,64, Level 2 1,72, Level 3 1,94, Level 4 2,15, ab Level 5 2,5; Level 1 bis 4 seit AP-168 flacher), `Max.` der frühere Wert mal Faktor. Ab Level 15 greift die Obergrenze 250, dort haben die Gegner dafür mehr HP (siehe 2.2). Ab Level 21 sinkt der Spawn-Abstand nur noch um 2 ms je Level (210 auf 172 ms). Stärker werden die Gegner selbst (siehe 2.2).
 
 | Level | Map | Dauer | Spawn-Abstand (ms) | Max. Gegner | Boss |
 |---|---|---|---|---|---|
 | 0 | Wald | 180 s | 1000 | 38 | Baummonster |
-| 1 | Wald | 180 s | 829 | 49 | Baummonster |
-| 2 | Wald | 180 s | 700 | 62 | Baummonster |
-| 3 | Wald | 300 s | 604 | 77 | Baummonster |
-| 4 | Wald | 300 s | 532 | 93 | Baummonster |
+| 1 | Wald | 180 s | 884 | 46 | Baummonster |
+| 2 | Wald | 180 s | 814 | 53 | Baummonster |
+| 3 | Wald | 300 s | 701 | 66 | Baummonster |
+| 4 | Wald | 300 s | 619 | 80 | Baummonster |
 | 5 | Wald bei Nacht | 180 s | 348 | 130 | Waldgeist |
 | 6 | Wald bei Nacht | 180 s | 336 | 138 | Waldgeist |
 | 7 | Wald bei Nacht | 180 s | 324 | 143 | Waldgeist |
@@ -197,17 +197,17 @@ Je Level werden HP, XP, Münz-Drop und Kontaktschaden mit Faktoren multipliziert
 
 **Seit AP-127 (M7, mehr Gegner):** HP und Kontaktschaden je Gegner bleiben, XP und Münz-Drop sind durch den Gegnerzahl-Faktor geteilt, damit Gold und Erfahrung je Runde gleich bleiben. Ab Level 15 kommt ein HP-Aufschlag dazu (gewünschte durch mögliche gleichzeitige Gegner, Level 15 ×1,04 bis Level 40 ×1,5); XP und Münz-Drop steigen dort im selben Verhältnis. Die Tabelle zeigt die Werte mit Aufschlag.
 
-**Gegnerstufen (AP-128, PE-161):** Zusätzlich zur Tabelle bekommt jeder normale Gegner je Level-Index im Batch (Stufe) +8 % HP und +5 % Kontaktschaden (ohne Deckel) und wird um 3 % je Stufe größer (höchstens +15 %). Stufe 0 ist das erste Level eines Batches; Level 4 und 9 haben Stufe 4, Level 20 Stufe 10 (+80 % HP, +50 % Schaden), Level 40 Stufe 9 (+72 % HP). Werte in `src/config/tiers.ts`, Druck je Level in `docs/balancing.md`.
+**Gegnerstufen (AP-128, PE-161):** Zusätzlich zur Tabelle bekommt jeder normale Gegner je Level-Index im Batch (Stufe) +8 % HP (im Wald, Level 0 bis 4, seit AP-168 +5 %) und +5 % Kontaktschaden (ohne Deckel) und wird um 3 % je Stufe größer (höchstens +15 %). Stufe 0 ist das erste Level eines Batches; Level 4 und 9 haben Stufe 4 (Level 4 im Wald +20 % HP, Level 9 +32 % HP), Level 20 Stufe 10 (+80 % HP, +50 % Schaden), Level 40 Stufe 9 (+72 % HP). Werte in `src/config/tiers.ts`, Druck je Level in `docs/balancing.md`.
 
-Ab Level 21 (AP-105) bleibt die Gegnerzahl fast gleich, dafür werden die Gegner selbst stärker: Die HP-Kurve wächst um etwa 7,5 % je Level (der Sprung an einer Batch-Grenze beträgt etwa 9,5 %). XP und Münzen steigen um 0,05 je Level ab 1,2, damit eine Upgrade-Spur bis etwa Level 35 die Stufe 15 erreicht. Der Kontaktschaden wächst wie die angenommenen Lebenspunkte der Spielerin (ab AP-113 mit dem Ausgleichsfaktor 2 für den Einmaltreffer).
+Ab Level 21 (AP-105) bleibt die Gegnerzahl fast gleich, dafür werden die Gegner selbst stärker: Die HP-Kurve wächst bis Level 30 um etwa 7,5 % je Level (der Sprung an einer Batch-Grenze beträgt etwa 9,5 %). In Level 31 bis 40 fällt `hp` seit AP-168 von 1,25 auf 1,093, weil die Gegnerstufe den Anstieg schon trägt (Tabelle zeigt den Wert mit HP-Aufschlag). XP und Münzen steigen um 0,05 je Level ab 1,2, damit eine Upgrade-Spur bis etwa Level 35 die Stufe 15 erreicht. Der Kontaktschaden wächst wie die angenommenen Lebenspunkte der Spielerin (ab AP-113 mit dem Ausgleichsfaktor 2 für den Einmaltreffer).
 
 | Level | HP | XP | Münze | Kontakt |
 |---|---|---|---|---|
-| 0 | 0,44 | 0,2953 | 0,308 | 0,92 |
-| 1 | 0,46 | 0,2669 | 0,2789 | 0,98 |
-| 2 | 0,5 | 0,245 | 0,256 | 1,02 |
-| 3 | 0,54 | 0,2427 | 0,2533 | 1,14 |
-| 4 | 0,6 | 0,238 | 0,2484 | 1,24 |
+| 0 | 0,36 | 0,262 | 0,308 | 0,89 |
+| 1 | 0,38 | 0,253 | 0,2976 | 0,95 |
+| 2 | 0,42 | 0,2529 | 0,2977 | 0,99 |
+| 3 | 0,54 | 0,2814 | 0,2938 | 1,14 |
+| 4 | 0,6 | 0,2767 | 0,2888 | 1,24 |
 | 5 | 0,714 | 0,3124 | 0,3124 | 1,54 |
 | 6 | 0,71 | 0,3116 | 0,3116 | 1,54 |
 | 7 | 0,7 | 0,3132 | 0,3132 | 1,54 |
@@ -234,18 +234,18 @@ Ab Level 21 (AP-105) bleibt die Gegnerzahl fast gleich, dafür werden die Gegner
 | 28 | 1,644 | 0,8556 | 0,8556 | 1,682 |
 | 29 | 1,78 | 0,8909 | 0,8909 | 1,702 |
 | 30 | 1,882 | 0,924 | 0,924 | 1,722 |
-| 31 | 1,956 | 0,9602 | 0,9602 | 1,743 |
-| 32 | 2,09 | 0,994 | 0,994 | 1,763 |
-| 33 | 2,238 | 1,031 | 1,031 | 1,783 |
-| 34 | 2,395 | 1,0656 | 1,0656 | 1,803 |
-| 35 | 2,573 | 1,1035 | 1,1035 | 1,824 |
-| 36 | 2,761 | 1,1388 | 1,1388 | 1,844 |
-| 37 | 2,976 | 1,1776 | 1,1776 | 1,864 |
-| 38 | 3,178 | 1,2136 | 1,2136 | 1,884 |
-| 39 | 3,39 | 1,2533 | 1,2533 | 1,905 |
-| 40 | 3,633 | 1,29 | 1,29 | 1,925 |
+| 31 | 1,765 | 0,9602 | 0,9602 | 1,743 |
+| 32 | 1,717 | 0,994 | 0,994 | 1,763 |
+| 33 | 1,698 | 1,031 | 1,031 | 1,783 |
+| 34 | 1,665 | 1,0656 | 1,0656 | 1,803 |
+| 35 | 1,652 | 1,1035 | 1,1035 | 1,824 |
+| 36 | 1,638 | 1,1388 | 1,1388 | 1,844 |
+| 37 | 1,637 | 1,1776 | 1,1776 | 1,864 |
+| 38 | 1,637 | 1,2136 | 1,2136 | 1,884 |
+| 39 | 1,638 | 1,2533 | 1,2533 | 1,905 |
+| 40 | 1,64 | 1,29 | 1,29 | 1,925 |
 
-Beispiele (mit Stufe, gerundet wie im Spiel): Ein Verfluchter Baum hat auf Level 0 50 × 0,44 = 22 HP und auf Level 20 50 × 1,053 × 1,8 = 95 HP. Eine Sphinx hat auf Level 26 160 × 1,433 = 229 HP und auf Level 40 160 × 3,633 × 1,72 = 1000 HP. Ein Armadillo hat auf Level 21 90 × 1,057 = 95 HP.
+Beispiele (mit Stufe, gerundet wie im Spiel): Ein Verfluchter Baum hat auf Level 0 50 × 0,36 = 18 HP und auf Level 20 50 × 1,053 × 1,8 = 95 HP. Eine Sphinx hat auf Level 26 160 × 1,433 = 229 HP und auf Level 40 160 × 1,64 × 1,72 = 451 HP (vor AP-168: 1000 HP). Ein Armadillo hat auf Level 21 90 × 1,057 = 95 HP.
 
 ### 2.3 Bosse
 
