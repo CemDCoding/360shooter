@@ -31,6 +31,9 @@ import {
   type ProgressionRules,
   type SaveGame,
   type WeaponStats,
+  type EliteRules,
+  type PacingDef,
+  type SpawnEventDef,
 } from '../../src/contracts';
 
 describe('contracts', () => {
@@ -363,5 +366,51 @@ describe('M10 contracts (AP-157)', () => {
     expect(fresh.reducedHoldsMs).toEqual([150, 0]);
     expect(fresh.firstFrame).toBe(3);
     expect(fresh.titleKind).toBe('name');
+  });
+
+  it('has optional M12 wave fields so old data stay valid (AP-174)', () => {
+    const level: LevelDef = {
+      id: 0,
+      batch: 'forest',
+      durationSec: 180,
+      enemyPool: [{ enemyId: 'cursedTree', weight: 1 }],
+      spawnIntervalMs: 1000,
+      maxEnemies: 10,
+    };
+    expect(level.minAlive).toBeUndefined();
+    expect(level.pacing).toBeUndefined();
+    expect(level.events).toBeUndefined();
+    const pacing: PacingDef = {
+      cycleSec: 49,
+      peakSec: 6,
+      relaxSec: 10,
+      relaxRate: 0.25,
+      growthPerCycle: 0.1,
+    };
+    const event: SpawnEventDef = { kind: 'ring', atSec: 50, count: 8, announceMs: 1000 };
+    const elite: EliteRules = {
+      enabled: false,
+      fromLevel: 3,
+      hpMul: 3,
+      damageMul: 1.5,
+      scaleMul: 1.25,
+      costMul: 6,
+      maxShare: 0.1,
+      guaranteedDrop: true,
+    };
+    const full: LevelDef = { ...level, minAlive: 5, pacing, events: [event] };
+    expect(full.events).toHaveLength(1);
+    expect(elite.enabled).toBe(false);
+    const enemy: EnemyDef = {
+      id: 'cursedTree',
+      hp: 1,
+      speed: 1,
+      contactDamage: 1,
+      behavior: 'chase',
+      xp: 1,
+      spriteKey: 's',
+    };
+    expect(enemy.threatCost).toBeUndefined();
+    expect(enemy.role).toBeUndefined();
   });
 });

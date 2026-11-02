@@ -11,6 +11,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 5,
     coinValue: 1,
     spriteKey: 'enemy-cursed-tree',
+    role: 'melee',
+    threatCost: 2,
   },
   forestWitch: {
     id: 'forestWitch',
@@ -21,6 +23,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 10,
     coinValue: 4,
     spriteKey: 'enemy-forest-witch',
+    role: 'shooter',
+    threatCost: 3,
     projectile: { damage: 8, speed: 120, intervalMs: 2000, keepDistance: 140 },
   },
   zombieSquirrel: {
@@ -32,6 +36,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 4,
     coinValue: 1,
     spriteKey: 'enemy-zombie-squirrel',
+    role: 'fast',
+    threatCost: 1,
   },
   forestSpirit: {
     id: 'forestSpirit',
@@ -42,6 +48,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 8,
     coinValue: 4,
     spriteKey: 'enemy-forest-spirit',
+    role: 'aura',
+    threatCost: 3,
     aura: { radius: 48, dps: 12 },
   },
   // M5 (AP-105, F-19, PE-127). Old maps: boar and bear from level 0, fairy from level 5. Boar and bear
@@ -57,6 +65,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 7,
     coinValue: 1,
     spriteKey: 'enemy-boar',
+    role: 'tank',
+    threatCost: 3,
     charge: {
       telegraphMs: 800,
       dashSpeed: 150,
@@ -74,6 +84,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 7,
     coinValue: 1,
     spriteKey: 'enemy-bear',
+    role: 'tank',
+    threatCost: 3,
   },
   fairy: {
     id: 'fairy',
@@ -85,6 +97,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 4,
     coinValue: 2,
     spriteKey: 'enemy-fairy',
+    role: 'fast',
+    threatCost: 1,
   },
   // Desert, pyramids, oasis (PE-123, PE-127).
   mummy: {
@@ -96,6 +110,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 10,
     coinValue: 4,
     spriteKey: 'enemy-mummy',
+    role: 'shooter',
+    threatCost: 3,
     // Wrap: slows the turning of the player for 2 s (PE-127).
     projectile: {
       damage: 12,
@@ -115,6 +131,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 6,
     coinValue: 2,
     spriteKey: 'enemy-sand-worm',
+    role: 'fast',
+    threatCost: 1,
     burrow: { underMs: 1800, surfaceMs: 2500, surfaceDistance: 90, telegraphMs: 800 },
   },
   armadillo: {
@@ -126,6 +144,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 8,
     coinValue: 3,
     spriteKey: 'enemy-armadillo',
+    role: 'tank',
+    threatCost: 3,
     // Rolls: half damage while dashing (PE-127).
     charge: {
       telegraphMs: 900,
@@ -144,6 +164,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 10,
     coinValue: 4,
     spriteKey: 'enemy-camel',
+    role: 'shooter',
+    threatCost: 3,
     projectile: {
       damage: 8,
       speed: 110,
@@ -161,6 +183,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 5,
     coinValue: 2,
     spriteKey: 'enemy-snake',
+    role: 'fast',
+    threatCost: 1,
     // Poison: 3 s damage over time (PE-127).
     onHit: { poison: { dps: 3, durationMs: 3000 } },
   },
@@ -174,6 +198,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 10,
     coinValue: 4,
     spriteKey: 'enemy-archaeologist',
+    role: 'shooter',
+    threatCost: 3,
     projectile: { damage: 8, speed: 120, intervalMs: 2000, keepDistance: 140 },
   },
   sphinx: {
@@ -185,6 +211,8 @@ export const ENEMIES: Readonly<Record<EnemyId, EnemyDef>> = {
     xp: 15,
     coinValue: 5,
     spriteKey: 'enemy-sphinx',
+    role: 'tank',
+    threatCost: 3,
   },
 };
 
