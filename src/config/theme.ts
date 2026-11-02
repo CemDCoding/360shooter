@@ -187,6 +187,13 @@ const COLORS = {
   'game.pet-aura': { num: 0xffd98a, css: '#ffd98a' },
   'game.gear-block': { num: 0x9fe6ff, css: '#9fe6ff' },
   'game.crit': { num: 0xffe2a0, css: '#ffe2a0' },
+  'game.focus-dim': { num: 0x0b0610, css: '#0b0610' },
+  'game.parry-keyline': { num: 0x0b0610, css: '#0b0610' },
+  'game.event-marker': { num: 0xff8a7b, css: '#ff8a7b' },
+  'game.event-marker-edge': { num: 0x0b0610, css: '#0b0610' },
+  'game.event-pip': { num: 0xff8a7b, css: '#ff8a7b' },
+  'game.elite-edge': { num: 0xe8fbff, css: '#e8fbff' },
+  'game.elite-crown': { num: 0xe8fbff, css: '#e8fbff' },
   'finisher.ink': { num: 0x0b0610, css: '#0b0610' },
   'finisher.paper': { num: 0xffffff, css: '#ffffff' },
   'finisher.letterbox': { num: 0x0b0610, css: '#0b0610' },
@@ -263,6 +270,20 @@ const SIZE_PX = {
   'size.finisher-panel-edge': 2,
   'size.finisher-skip-inset': 8,
   'size.finisher-shard': 4,
+  'size.focus-near': 110,
+  'size.parry-keyline': 1,
+  'size.event-inset': 6,
+  'size.event-top': 56,
+  'size.event-bottom': 44,
+  'size.event-corner': 28,
+  'size.event-wedge': 24,
+  'size.event-arrow': 20,
+  'size.event-dot': 2,
+  'size.event-word-gap': 4,
+  'size.event-pip': 4,
+  'size.event-slide': 4,
+  'size.elite-edge': 1,
+  'size.elite-crown-gap': 2,
 } as const;
 
 /** Größen als Anzahl. */
@@ -278,6 +299,7 @@ const SIZE_COUNT = {
   'size.finisher-speedlines': 28,
   'size.finisher-title-scale': 4,
   'size.finisher-name-scale': 3,
+  'size.elite-scale': 1.25,
 } as const;
 
 /** Zeiten in ms. */
@@ -307,6 +329,11 @@ const MOTION_MS = {
   'motion.finisher-shatter': 600,
   'motion.finisher-frame': 100,
   'motion.finisher-skip': 400,
+  'motion.focus-in': 120,
+  'motion.focus-out': 120,
+  'motion.focus-hold': 600,
+  'motion.event-slide': 150,
+  'motion.event-tone': 250,
 } as const;
 
 /** Bewegung als Anzahl. */
@@ -327,6 +354,10 @@ const OPACITY = {
   'hover': 0.18,
   'blink': 0.55,
   'aura': 0.25,
+  'focus-dim': 0.35,
+  'focus-low-near': 0.4,
+  'focus-low-far': 0.7,
+  'focus-low-reduced': 0.25,
 } as const;
 
 /** Schrift: Familien (Fallback-Reihenfolge), Skalierungsstufen, Zeichenabstand und Zeilenabstand in px. */

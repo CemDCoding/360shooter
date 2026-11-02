@@ -109,7 +109,7 @@ describe('OPACITY', () => {
     expect(OPACITY.hover).toBe(0.18);
     expect(OPACITY.blink).toBe(0.55);
     expect(OPACITY.aura).toBe(0.25);
-    expect(Object.keys(OPACITY).sort()).toEqual(['aura', 'blink', 'dim', 'ghost', 'hover']);
+    expect(Object.keys(OPACITY).sort()).toEqual(['aura', 'blink', 'dim', 'focus-dim', 'focus-low-far', 'focus-low-near', 'focus-low-reduced', 'ghost', 'hover']);
   });
 
   it('matches the design export', () => {
