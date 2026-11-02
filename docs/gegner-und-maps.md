@@ -333,6 +333,55 @@ Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er a
 - Die Spielerin hat einen Trefferradius von 14 für die Fairness-Berechnung.
 - Der Abstand zum Arenarand ist 16.
 
+**Abwehr je Angriff (M9, PE-190):** Jeder Angriff mit Abwehr kündigt sich mit Kreisen an. Zeitfenster (±80 ms perfekt, ±160 ms gut), Schaden und Abklingzeit bleiben, nur die Art der Aufgabe wechselt. Bei mehr Kreisen sinkt der Schadensanteil je Kreis. Die Angriffe `quarrel` und `heartScale` sind eigene Zusatzangriffe (je 15 Schaden), die ein Boss erst nutzt, wenn seine Klasse sie freischaltet (`optIn`).
+
+| Boss | Angriff | Märchen | Abwehr (Kreise, Symbol) |
+|---|---|---|---|
+| Baummonster | `rootThrust` | Dornröschen: Dornenknospe | 1 Halt-Kreis `rose`, 1 Tipp-Kreis `rose` |
+| Baummonster | `rootRing` | Dornröschen: Dornenhecke | 2 Tipp-Kreise `rose`, 1 Trugkreis `spindle` |
+| Waldgeist | `orbFan` | Hänsel und Gretel: Mondkiesel | Kieselspur: 2 Kreise `pebble` in Reihenfolge |
+| Waldgeist | `decoys` | Erlkönigs Töchter (8 Schaden) | 1 echter Tipp-Kreis `ghost`, 2 Trugkreise `mist` |
+| Riesen-Stein | `roll` | Morgenlicht | 1 Halt-Kreis `sun`, 2 Tipp-Kreise |
+| Riesen-Stein | `quarrel` | Riesenzank (Zusatz, 15 Schaden) | 2 Zieh-Kreise `pebble` |
+| Sand-Wurm | `burrow` | unverändert | 3 Tipp-Kreise (Seite der Sandspur) |
+| Sand-Wurm | `coil` | Fessel der Göttinnen | 2 Zieh-Kreise `rope` |
+| Wächter-Hund | `guardBark` | Schlaflied | 3 Takt-Kreise `head` im festen Takt |
+| Wächter-Hund | `heartScale` | Herzenswaage (Zusatz, 15 Schaden) | 2 Wahlrunden je ein richtiger Kreis (`heart` oder `feather`) |
+| Pharao | `goldCurse` | Rätsel der Sphinx | 1 aus 3 Wahl-Kreisen (`legs4`, `legs2`, `legs3`), der richtige wechselt je Angriff |
+| Pharao | `sandstorm` | Sandsturm | 1 Tipp-Kreis, 1 Trugkreis `sand` |
+
+`spikeVolley`, `forestCall`, `fade`, `runeShield`, `summonMummies` und `sarcophagus` haben keine Abwehr oder bleiben unverändert.
+
+**Quicktime-Bausteine und Einfache Abwehr (M9):**
+
+| Baustein | Aufgabe |
+|---|---|
+| Tipp | Genau im Moment des Aufpralls antippen. |
+| Halt | Drücken, wenn der Ring schließt, halten, bis die Knospe aufgeht, dann loslassen. |
+| Trugkreis | Nicht antippen. Er ist nur an Symbol und Umriss (kein Ring, welliger oder besonderer Rand) zu erkennen, nie nur an der Farbe. Antippen zählt als Fehler. |
+| Kieselspur | Aufleuchtende Kreise merken (Nummern-Fähnchen, Ton) und in dieser Reihenfolge antippen. |
+| Zug | Den Kreis auf das angezeigte Ziel ziehen. |
+| Wahl | Aus mehreren Kreisen den richtigen antippen. |
+| Takt | Mehrere Kreise im festen Takt antippen. |
+
+Märchensymbole:
+
+| Symbol | Bedeutung |
+|---|---|
+| Rose (`rose`) | Dornröschen: Dornenknospe und Dornenhecke |
+| Spindel (`spindle`) | Trugkreis in der Dornenhecke, nicht antippen |
+| Kiesel (`pebble`) | Hänsel und Gretel (Kieselspur); beim Riesenzank der Stein zum Ziehen |
+| Geist (`ghost`) | der echte Waldgeist, antippen |
+| Nebel (`mist`) | Trugbilder der Erlkönigs Töchter, nicht antippen |
+| Sonne (`sun`) | Morgenlicht des Riesen-Steins (Halt) |
+| Seil (`rope`) | Fessel der Göttinnen (ziehen) |
+| Kopf (`head`) | Schlaflied des Wächter-Hundes (Takt) |
+| Herz (`heart`) und Feder (`feather`) | Herzenswaage: das richtige der beiden wählen |
+| Beine (`legs4`, `legs2`, `legs3`) | Rätsel der Sphinx: vier, zwei, drei Beine, eines ist richtig |
+| Sand (`sand`) | Trugkreis im Sandsturm, nicht antippen |
+
+**Einfache Abwehr:** Im Pausemenü gibt es den Schalter „EINFACHE ABWEHR“ (Kästchen leer = aus, gefüllt mit Haken = an; die Hinweiszeile lautet „ALLE ABWEHREN: EIN TIPP“). Ist er an, ist jeder Kreis ein normaler Tipp-Kreis mit seinem Symbol: kein Halte-Ring, keine Ziel-Klammern oder Linie, keine Fähnchen oder Taktpunkte, keine Hinweistafel und keine Trugkreise. Welche Wahl-Kreise erscheinen, regelt weiter die Logik. Der Schalter wird im Spielstand gespeichert (Feld `easyParry`, alter Spielstand ohne Feld = aus), gilt ab dem nächsten Angriff und wird mit „Fortschritt zurücksetzen“ ausgeschaltet. Im Menü bedienbar mit Tippen, Klick oder Enter; die Reihenfolge des Fokus ist WEITER, HAUPTMENÜ, EINFACHE ABWEHR (Pfeiltasten oder Tab wechseln).
+
 ---
 
 ## Quellen

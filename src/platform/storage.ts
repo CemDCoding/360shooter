@@ -46,6 +46,7 @@ export function defaultSave(): SaveGame {
     equippedGear: { head: null, body: null, legs: null },
     activePet: null,
     petGear: {},
+    easyParry: false,
   };
 }
 
@@ -89,6 +90,8 @@ export function parseSave(data: unknown): SaveGame | null {
     playerLevel: d.playerLevel,
     highestUnlockedLevel: d.highestUnlockedLevel,
     muted: d.muted,
+    // Only a real boolean counts, anything else (or a missing field) is off (AP-152).
+    easyParry: d.easyParry === true,
   };
   // Below version 3 the diamonds are granted retroactively, once (PE-166).
   if (d.version !== 3)

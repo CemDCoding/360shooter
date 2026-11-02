@@ -7,7 +7,7 @@ import { BOSSES } from '../../src/config/bosses';
 import { STORABLE_POWERS } from '../../src/config/powerStore';
 import { THEME } from '../../src/config/theme';
 import { slotStatus } from '../../src/logic/powerStore';
-import { pauseLayout } from '../../src/scenes/hud/pauseLayout';
+import { nextPauseFocus, pauseLayout } from '../../src/scenes/hud/pauseLayout';
 import {
   petBarFilled,
   petBarLook,
@@ -566,7 +566,7 @@ describe('phone HUD layout (H-23, AP-86)', () => {
   });
 });
 
-describe('pauseLayout (H-33, view 6)', () => {
+describe('pauseLayout (H-33 view 6, H-37 view 12)', () => {
   const lay = (k: number, e: number, w: number, h: number) => {
     const lab = 8 * (k <= 1 ? 1 : Math.max(2, Math.ceil(k)));
     const input = {
@@ -577,19 +577,34 @@ describe('pauseLayout (H-33, view 6)', () => {
       titleH: 8 * Math.round(4 * k),
       infoH: lab,
       hintH: lab,
+      noteH: lab,
       buttonW: [96, 144] as [number, number],
+      switchMinW: 220,
     };
     return { l: pauseLayout(input), input };
   };
 
-  it('uses the mockup stack at k = 1: top 112, gaps 12, 20, 14, buttons 32 high 12 apart', () => {
+  it('uses the mockup stack at k = 1: top 92, gaps 12, 20, 8, 6, 14, buttons 32 high 12 apart', () => {
     const { l } = lay(1, 8, 640, 360);
-    expect(l.titleY).toBe(112);
-    expect(l.infoY).toBe(112 + 32 + 12);
+    expect(l.titleY).toBe(92);
+    expect(l.infoY).toBe(92 + 32 + 12);
     expect(l.buttons[0].y).toBe(l.infoY + 8 + 20);
     expect(l.buttons[0].h).toBe(32);
-    expect(l.hintY).toBe(l.buttons[0].y + 32 + 14);
+    expect(l.toggle.y).toBe(l.buttons[0].y + 32 + 8);
+    expect(l.toggle.h).toBe(32);
+    expect(l.noteY).toBe(l.toggle.y + 32 + 6);
+    expect(l.hintY).toBe(l.noteY + 8 + 14);
     expect(l.buttons[1].x - (l.buttons[0].x + l.buttons[0].w)).toBe(12);
+  });
+
+  it('spans the switch over the whole button group width, or wider if its content needs it', () => {
+    const { l, input } = lay(1, 8, 640, 360);
+    expect(l.toggle.x).toBe(l.buttons[0].x);
+    expect(l.toggle.w).toBe(96 + 12 + 144);
+    const wide = pauseLayout({ ...input, switchMinW: 300 });
+    expect(wide.toggle.w).toBe(300);
+    expect(wide.toggle.x + wide.toggle.w / 2).toBe(320);
+    expect(wide.buttons[0].x).toBe(wide.toggle.x + 24);
   });
 
   it('centres the button pair', () => {
@@ -603,20 +618,22 @@ describe('pauseLayout (H-33, view 6)', () => {
     (k) => {
       const m = Math.round(8 * k);
       const { l } = lay(k, m, 480, 360);
-      for (const b of l.buttons) {
+      for (const b of [...l.buttons, l.toggle]) {
         expect(b.h).toBe(Math.round(32 * k));
         expect(b.x).toBeGreaterThanOrEqual(m);
         expect(b.x + b.w).toBeLessThanOrEqual(480 - m);
         expect(b.y).toBeGreaterThanOrEqual(m);
         expect(b.y + b.h).toBeLessThanOrEqual(360 - m);
       }
-      expect(l.hintY).toBeGreaterThan(l.buttons[0].y + l.buttons[0].h);
+      expect(l.toggle.y).toBeGreaterThan(l.buttons[0].y + l.buttons[0].h);
+      expect(l.noteY).toBeGreaterThan(l.toggle.y + l.toggle.h);
+      expect(l.hintY).toBeGreaterThan(l.noteY);
     },
   );
 
   it('moves the group up when it would reach into the bottom edge', () => {
-    const { l, input } = lay(1.4, 11, 640, 220);
-    expect(l.hintY + input.hintH).toBeLessThanOrEqual(220 - 11);
+    const { l, input } = lay(1.4, 11, 640, 300);
+    expect(l.hintY + input.hintH).toBeLessThanOrEqual(300 - 11);
     expect(l.titleY).toBeGreaterThanOrEqual(11);
   });
 
@@ -629,9 +646,20 @@ describe('pauseLayout (H-33, view 6)', () => {
       titleH: 32,
       infoH: 8,
       hintH: 8,
+      noteH: 8,
       buttonW: [96, 144],
+      switchMinW: 220,
     });
     expect(l.buttons[0].x).toBeGreaterThanOrEqual(60);
+    expect(l.toggle.x).toBeGreaterThanOrEqual(60);
+  });
+
+  it('walks the focus WEITER -> HAUPTMENÜ -> EINFACHE ABWEHR and wraps', () => {
+    expect(nextPauseFocus(0, 1)).toBe(1);
+    expect(nextPauseFocus(1, 1)).toBe(2);
+    expect(nextPauseFocus(2, 1)).toBe(0);
+    expect(nextPauseFocus(0, -1)).toBe(2);
+    expect(nextPauseFocus(Number.NaN, 1)).toBe(1);
   });
 });
 
