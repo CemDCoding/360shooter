@@ -59,6 +59,42 @@ export const ROLE_CAPS: Readonly<Partial<Record<EnemyRole, number>>> = {
   tank: 6,
 };
 
+/**
+ * Role caps grow with the field (AP-175): the cap of a role is the larger of `ROLE_CAPS` and `ROLE_CAP_HEADROOM` times
+ * its expected count (pool share x living enemies). So a role never comes in clumps of more than twice its share,
+ * and the pool shares (AP-166) hold within 2 percentage points also in dense fields (RS-01.4, measured in
+ * tests/logic/spawn.test.ts).
+ */
+export const ROLE_CAP_HEADROOM = 2;
+
+/**
+ * Shape of the spawn rate curve before normalisation (RS-01.1, AP-175): the build-up rises linearly from `BUILD_FROM`
+ * to `BUILD_TO`, the peak holds `PEAK_FACTOR` (x linear base ramp). The director scales build-up and peak per level so
+ * that the spawns of the whole round stay those of the base ramp; the relax phase keeps `RELAX_RATE` exactly.
+ */
+export const BUILD_FROM = 0.5;
+export const BUILD_TO = 1;
+export const PEAK_FACTOR = 2;
+
+/** Minimum occupancy: at most one fill spawn per this many ms (RS-01.2). */
+export const FILL_INTERVAL_MS = 250;
+
+/**
+ * Threat budget (RS-01.4, AP-175): income per second = `BUDGET_MARGIN` x mean threat cost of the pool x base spawn
+ * rate (rises over the round and with the level). Outside the peak `PEAK_RESERVE_SEC` seconds of income stay saved,
+ * the peak may spend them. The account holds at most `BANK_SEC` seconds of income.
+ */
+export const BUDGET_MARGIN = 1.6;
+export const PEAK_RESERVE_SEC = 8;
+export const BANK_SEC = 30;
+
+/** Spawns that may queue up while the budget is short; more are dropped (no catch-up, like the cap). */
+export const MAX_BACKLOG = 10;
+
+/** Chance that an affordable regular spawn becomes an elite: in the peak and elsewhere (RS-01.5, AP-175). */
+export const ELITE_CHANCE_PEAK = 0.15;
+export const ELITE_CHANCE_OTHER = 0.03;
+
 /** Elite rules (RS-01.5). Switched off until AP-178 (PE-220). */
 export const ELITE_RULES: EliteRules = {
   enabled: false,

@@ -2,9 +2,20 @@ import { BOSS_SPAWN_RATE_FACTOR } from '../config/bosses';
 import { ENEMIES } from '../config/enemies';
 import { MIX_LAST_LEVEL } from '../config/levels';
 import {
+  BANK_SEC,
   BOSS_WARNING_SEC,
+  BUDGET_MARGIN,
+  BUILD_FROM,
+  BUILD_TO,
+  ELITE_CHANCE_OTHER,
+  ELITE_CHANCE_PEAK,
   ELITE_RULES,
+  FILL_INTERVAL_MS,
+  MAX_BACKLOG,
+  PEAK_FACTOR,
+  PEAK_RESERVE_SEC,
   ROLE_CAPS,
+  ROLE_CAP_HEADROOM,
   WAVE_PLANS,
   minAliveOf,
   pacingOf,
@@ -42,40 +53,11 @@ const BAG_TOKENS = 100;
 /** Radius der Eroeffnungswelle als Anteil des Spawn-Radius (Startwert, angenommen; AP-56). */
 export const OPENING_RADIUS_FACTOR = 0.65;
 
-// Wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4). Start values, explained in docs/balancing.md
-// "Wellen-Rhythmus (M12)". The pacing data itself (cycle, peak, relax, growth, minimum occupancy, caps) is in
-// config/waves.ts.
+// Wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4). All values are in config/waves.ts, explained in
+// docs/balancing.md "Wellen-Rhythmus (M12)".
 
-/** Integration step of the rate curve (ms): a frame of 16 ms is one step, a long dt is split. */
+/** Integration step of the rate curve (ms, numerics only): a frame of 16 ms is one step, a long dt is split. */
 export const PACING_STEP_MS = 50;
-
-/**
- * Shape of the rate curve before normalisation: the build-up rises linearly from `BUILD_FROM` to `BUILD_TO`, the peak
- * holds `PEAK_FACTOR`. Build-up and peak are scaled per level so that the spawns of the whole round stay those of the
- * linear base ramp (the relax phase keeps `relaxRate` exactly).
- */
-export const BUILD_FROM = 0.5;
-export const BUILD_TO = 1;
-export const PEAK_FACTOR = 2;
-
-/** Minimum occupancy: at most one fill spawn per this many ms (RS-01.2). */
-export const FILL_INTERVAL_MS = 250;
-
-/**
- * Threat budget (RS-01.4): income per second = `BUDGET_MARGIN` x mean threat cost of the pool x base spawn rate (rises
- * over the round and with the level). Outside the peak `PEAK_RESERVE_SEC` seconds of income stay saved, the peak may
- * spend them. The account holds at most `BANK_SEC` seconds of income.
- */
-export const BUDGET_MARGIN = 1.6;
-export const PEAK_RESERVE_SEC = 8;
-export const BANK_SEC = 30;
-
-/** Spawns that may queue up while the budget is short; more are dropped (no catch-up, like the cap). */
-export const MAX_BACKLOG = 10;
-
-/** Chance that an affordable regular spawn becomes an elite: in the peak and elsewhere (RS-01.5). */
-export const ELITE_CHANCE_PEAK = 0.15;
-export const ELITE_CHANCE_OTHER = 0.03;
 
 /** Phase of the wave rhythm; `boss` = from the boss warning on (unchanged base ramp, no pacing). */
 export type WavePhase = 'build' | 'peak' | 'relax' | 'boss';
@@ -227,6 +209,7 @@ export class SpawnDirector {
   private readonly costOf: number[] = [];
   private readonly roleOf: number[] = [];
   private readonly capOf: number[];
+  private readonly roleShare: number[];
   private readonly roleCount: number[];
   private readonly meanCost: number;
   private readonly eliteOn: boolean;
@@ -269,6 +252,10 @@ export class SpawnDirector {
     this.seen = this.active.map(() => false);
     this.unseen = this.active.length;
     this.capOf = ROLES.map((r) => ROLE_CAPS[r] ?? Number.POSITIVE_INFINITY);
+    this.roleShare = ROLES.map(() => 0);
+    for (let k = 0; k < this.active.length; k++) {
+      this.roleShare[this.roleOf[k]] += this.weightOf[k] / this.totalWeight;
+    }
     this.roleCount = ROLES.map(() => 0);
     this.meanCost = this.totalWeight > 0 ? costSum / this.totalWeight : 0;
     // Minimum occupancy and pacing from WAVE_PLANS (PE-227); never above the cap.
@@ -307,6 +294,14 @@ export class SpawnDirector {
   /** Living enemies of a role as the director counts them (exact with `noteRemoved`, else estimated). */
   roleAlive(role: EnemyRole): number {
     return this.roleCount[roleIndex(role)];
+  }
+
+  /**
+   * Current cap of a role (RS-01.4, AP-175): the larger of `ROLE_CAPS` and `ROLE_CAP_HEADROOM` x pool share x
+   * (living + 1), so the cap grows with the field and the pool shares hold on average.
+   */
+  roleCap(role: EnemyRole): number {
+    return this.capFor(roleIndex(role));
   }
 
   /** Living elites as the director counts them. */
@@ -446,7 +441,13 @@ export class SpawnDirector {
   /** Under the role cap (with a little room for the estimate's rounding) and affordable. */
   private allowed(k: number, spend: number): boolean {
     const r = this.roleOf[k];
-    return this.roleCount[r] + 1 <= this.capOf[r] + 1e-9 && this.costOf[k] <= spend;
+    return this.roleCount[r] + 1 <= this.capFor(r) + 1e-9 && this.costOf[k] <= spend;
+  }
+
+  private capFor(r: number): number {
+    const base = this.capOf[r];
+    if (base === Number.POSITIVE_INFINITY) return base;
+    return Math.max(base, Math.ceil(ROLE_CAP_HEADROOM * this.roleShare[r] * (this.tracked + 1)));
   }
 
   /**

@@ -4,18 +4,19 @@ import { EnemyPool } from '../../src/entities/enemies/createEnemy';
 import type { EliteRules, EnemyId, EnemyRole, LevelDef } from '../../src/contracts';
 import { LEVELS } from '../../src/config/levels';
 import {
+  BANK_SEC,
   BOSS_WARNING_SEC,
+  BUDGET_MARGIN,
   ELITE_RULES,
+  FILL_INTERVAL_MS,
   PEAK_SEC,
   RELAX_SEC,
   ROLE_CAPS,
+  ROLE_CAP_HEADROOM,
   WAVE_PLANS,
   cyclesOf,
 } from '../../src/config/waves';
 import {
-  BANK_SEC,
-  BUDGET_MARGIN,
-  FILL_INTERVAL_MS,
   FIRST_APPEARANCE_BY,
   MAX_RUN,
   MIN_INTERVAL_FACTOR,
@@ -399,6 +400,7 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
   interface SimResult {
     spawns: Spawned[];
     maxRole: Record<EnemyRole, number>;
+    capViolations: number;
     belowMinAlive: number;
     eliteShareViolations: number;
     budgetMin: number;
@@ -422,6 +424,7 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
     const world: Living[] = [];
     const spawns: Spawned[] = [];
     const maxRole = zeroRoles();
+    let capViolations = 0;
     const dt = 50;
     const windowMs = (level.durationSec - BOSS_WARNING_SEC) * 1000;
     const floor = Math.min(d.minimumAlive, level.maxEnemies);
@@ -454,6 +457,11 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
       const counts = zeroRoles();
       for (const w of world) counts[roleOf(w.id)] += 1;
       for (const r of ROLE_LIST) maxRole[r] = Math.max(maxRole[r], counts[r]);
+      // A spawned role may not exceed its cap (the cap only grows with the field, so checking after the tick holds).
+      for (const r of reqs) {
+        const role = roleOf(r.enemyId);
+        if (opts.report && counts[role] > d.roleCap(role)) capViolations += 1;
+      }
       // Counted once the field has reached the minimum (the opening wave is smaller, the fill needs a moment).
       if (world.length >= floor) reached = true;
       // A kill right after a fill may leave the field one short until the next fill slot (FILL_INTERVAL_MS).
@@ -463,7 +471,7 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
       } else belowSince = -1;
       budgetMin = Math.min(budgetMin, d.threatBudget);
     }
-    return { spawns, maxRole, belowMinAlive, eliteShareViolations, budgetMin };
+    return { spawns, maxRole, capViolations, belowMinAlive, eliteShareViolations, budgetMin };
   }
 
   /** Spawns of a round with the linear base ramp before AP-175 (same count as the balance model). */
@@ -576,30 +584,53 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
     expect(fills).toBeGreaterThanOrEqual(10_000 / FILL_INTERVAL_MS - 2);
   });
 
+  it('role cap = max(ROLE_CAPS, ROLE_CAP_HEADROOM x pool share x living), roles without an entry have none', () => {
+    const level = lvl(0);
+    const d = new SpawnDirector(level, testRng(1), 600);
+    // Small field: the fixed cap of RS-01.4 applies.
+    expect(d.roleCap('tank')).toBe(ROLE_CAPS.tank);
+    expect(d.roleCap('melee')).toBe(Number.POSITIVE_INFINITY);
+    const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
+    const tankShare =
+      level.enemyPool
+        .filter((e) => ENEMIES[e.enemyId].role === 'tank')
+        .reduce((s, e) => s + e.weight, 0) / total;
+    // Nobody dies: the field fills up to the level cap.
+    let alive = 0;
+    for (let t = 0; t < 90_000; t += 50) alive += d.tick(50, alive).length;
+    expect(alive).toBeGreaterThan(20);
+    expect(d.roleCap('tank')).toBe(
+      Math.max(ROLE_CAPS.tank ?? 0, Math.ceil(ROLE_CAP_HEADROOM * tankShare * (alive + 1))),
+    );
+    expect(d.roleCap('tank')).toBeGreaterThan(ROLE_CAPS.tank ?? 0);
+  });
+
   it('never exceeds a role cap, with exact reports and with the estimate from the living count', () => {
     for (const id of [0, 2, 5, 12, 20, 21, 26, 31, 40]) {
       const level = lvl(id);
       const res = simulate(level, { killEveryMs: 1500, report: true, seed: id + 5 });
-      for (const [role, cap] of Object.entries(ROLE_CAPS) as [EnemyRole, number][]) {
-        expect(res.maxRole[role], `level ${id} ${role}`).toBeLessThanOrEqual(cap);
-      }
+      expect(res.capViolations, `level ${id}`).toBe(0);
       // Without reports the director spreads the deaths evenly; its own count stays under the caps.
       const d = new SpawnDirector(level, testRng(id), 600);
       let alive = 0;
       for (let t = 0; t < 120_000; t += 50) {
+        const before = ROLE_LIST.map((r) => d.roleAlive(r));
         alive = Math.max(0, alive + d.tick(50, alive).length - (t % 1000 === 0 ? 3 : 0));
-        for (const [role, cap] of Object.entries(ROLE_CAPS) as [EnemyRole, number][]) {
-          expect(d.roleAlive(role), `level ${id} ${role}`).toBeLessThanOrEqual(cap + 1e-9);
-        }
+        ROLE_LIST.forEach((r, i) => {
+          // A role only grows while it is under its cap.
+          if (d.roleAlive(r) > before[i] + 1e-9) {
+            expect(d.roleAlive(r), `level ${id} ${r}`).toBeLessThanOrEqual(d.roleCap(r) + 1e-9);
+          }
+        });
       }
     }
   });
 
-  /** Spawn shares of a level over six simulated rounds. */
-  function shares(level: LevelDef, killEveryMs: number): Map<EnemyId, number> {
+  /** Spawn shares of a level over `seeds` simulated rounds with exact reports. */
+  function shares(level: LevelDef, killEveryMs: number, seeds = 6): Map<EnemyId, number> {
     const counts = new Map<EnemyId, number>();
     let n = 0;
-    for (let seed = 1; seed <= 6; seed++) {
+    for (let seed = 1; seed <= seeds; seed++) {
       for (const s of simulate(level, { killEveryMs, report: true, seed }).spawns) {
         counts.set(s.enemyId, (counts.get(s.enemyId) ?? 0) + 1);
         n += 1;
@@ -620,14 +651,34 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
     }
   });
 
-  it('level 0 to 2 with a full field: the tank cap (6) holds and shifts the mix to the tree (known conflict with AP-166, reported)', () => {
-    for (const id of [0, 1, 2]) {
-      const got = shares(lvl(id), 1000);
-      // Boar and bear together are 44 % of the pool; at 6 living tanks they come less often.
-      expect(got.get('cursedTree') ?? 0, `level ${id}`).toBeGreaterThan(0.56);
-      expect((got.get('boar') ?? 0) + (got.get('bear') ?? 0), `level ${id}`).toBeGreaterThan(0.15);
+  /** Largest deviation (percentage points) of the spawn shares from the pool weights, over three kill speeds. */
+  function worstShareDeviation(level: LevelDef, seeds: number): { pp: number; at: string } {
+    const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
+    let worst = { pp: 0, at: '' };
+    // Fast, medium and slow player: the field stays thin, fills up or sits at the level cap.
+    for (const f of [0.8, 1.5, 3]) {
+      const got = shares(level, level.spawnIntervalMs * f, seeds);
+      for (const e of level.enemyPool) {
+        const pp = Math.abs((got.get(e.enemyId) ?? 0) - e.weight / total) * 100;
+        if (pp > worst.pp) worst = { pp, at: `level ${level.id} kill x${f} ${e.enemyId}` };
+      }
     }
-  });
+    return worst;
+  }
+
+  it('level 0 to 2 (tree, boar, bear) with a full field: the tank cap grows with the field, shares stay within 2 pp of AP-166', () => {
+    for (const id of [0, 1, 2]) {
+      const worst = worstShareDeviation(lvl(id), 20);
+      expect(worst.pp, worst.at).toBeLessThanOrEqual(2);
+    }
+  }, 120_000);
+
+  it('every level from 3 on (shooter, aura and tank caps) keeps the shares of AP-166 within 2 pp', () => {
+    for (const level of LEVELS.slice(3)) {
+      const worst = worstShareDeviation(level, 6);
+      expect(worst.pp, worst.at).toBeLessThanOrEqual(2);
+    }
+  }, 300_000);
 
   it('spends saved threat budget in the peaks and never goes below zero', () => {
     // Level 3 and 4: forest pool, no role cap full at the minimum occupancy, so the budget decides.
