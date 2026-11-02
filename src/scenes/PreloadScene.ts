@@ -1,6 +1,10 @@
 import Phaser from 'phaser';
 import { ASSETS, animKey } from '../config/assets';
+import { FINISHER_SCENE_KEY } from '../contracts';
+import { prefersReducedMotion } from '../platform/motion';
+import { loadSave } from '../platform/storage';
 import { resolveStartTarget } from './debug';
+import { debugFinisherData } from './finisher/startData';
 import { drawBar, drawBevel, kText } from './menu/kassette';
 
 export class PreloadScene extends Phaser.Scene {
@@ -69,7 +73,14 @@ export class PreloadScene extends Phaser.Scene {
     else {
       const target = resolveStartTarget(window.location.search);
       if (target.scene === 'GameScene') this.scene.start('GameScene', { levelId: target.levelId });
-      else this.scene.start('MenuScene');
+      else if (target.scene === 'FinisherScene') {
+        // Debug start ?finisher=n (AP-160): no result, the scene ends in the menu.
+        const reduce = prefersReducedMotion() || loadSave().reduceEffects === true;
+        this.scene.start(
+          FINISHER_SCENE_KEY,
+          debugFinisherData(target.levelId, this.scale.width, this.scale.height, reduce),
+        );
+      } else this.scene.start('MenuScene');
     }
   }
 

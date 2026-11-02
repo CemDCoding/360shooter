@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isValidLevelId,
   MAX_LEVEL_ID,
+  parseDebugFinisher,
   parseDebugFps,
   parseDebugLevel,
   resolveLevelId,
@@ -88,5 +89,24 @@ describe('resolveStartTarget', () => {
     expect(resolveStartTarget('?level=abc')).toEqual(game(0));
     expect(resolveStartTarget('?level=1.5')).toEqual(game(0));
     expect(resolveStartTarget('?level=5&fps=1')).toEqual(game(5));
+  });
+  it('starts the finisher with ?finisher=n, clamped like ?level, and it wins over ?level', () => {
+    const fin = (levelId: number) => ({ scene: 'FinisherScene', levelId });
+    expect(resolveStartTarget('?finisher=4')).toEqual(fin(4));
+    expect(resolveStartTarget('?finisher=40')).toEqual(fin(40));
+    expect(resolveStartTarget('?finisher=99')).toEqual(fin(40));
+    expect(resolveStartTarget('?finisher=abc')).toEqual(fin(0));
+    expect(resolveStartTarget('?level=3&finisher=9')).toEqual(fin(9));
+  });
+});
+
+describe('parseDebugFinisher', () => {
+  it('reads ?finisher=n with the ?level rules', () => {
+    expect(parseDebugFinisher('')).toBeNull();
+    expect(parseDebugFinisher('?level=5')).toBeNull();
+    expect(parseDebugFinisher('?finisher=25')).toBe(25);
+    expect(parseDebugFinisher('?finisher=-1')).toBe(0);
+    expect(parseDebugFinisher('?finisher=1.5')).toBe(0);
+    expect(parseDebugFinisher('?finisher=%3Cscript%3E')).toBe(0);
   });
 });

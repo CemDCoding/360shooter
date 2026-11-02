@@ -5,6 +5,7 @@ import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
 import { HudScene } from './scenes/HudScene';
 import { ResultScene } from './scenes/ResultScene';
+import { FinisherScene } from './scenes/FinisherScene';
 import { RELAYOUT_DELAYS_MS } from './platform/layout';
 import { ArenaWidthController, hostBoxFor, measureArena, sameInsets } from './platform/arenaLayout';
 import { SAFE_INSETS_KEY, type SafeInsets } from './contracts';
@@ -175,7 +176,8 @@ game = new Phaser.Game({
     default: 'arcade',
     arcade: { gravity: { x: 0, y: 0 } },
   },
-  scene: [BootScene, PreloadScene, MenuScene, GameScene, HudScene, ResultScene],
+  // FinisherScene after HudScene: it draws over the paused round and its HUD (M10, AP-160).
+  scene: [BootScene, PreloadScene, MenuScene, GameScene, HudScene, ResultScene, FinisherScene],
 });
 publishInsets(); // the registry exists before the scenes boot
 
