@@ -203,6 +203,27 @@
         "pet-aura": "#ffd98a",
         "gear-block": "#9fe6ff",
         "crit": "#ffe2a0"
+      },
+      "finisher": {
+        "ink": "#0b0610",
+        "paper": "#ffffff",
+        "letterbox": "#0b0610",
+        "speedline": "#fff4e8",
+        "title": "#fff4e8",
+        "title-shadow": "#0b0610",
+        "name": "#ffa0ae",
+        "beam-core": "#ffffff",
+        "beam-rim": "#ff6b8a",
+        "beam-glow": "#bf3458",
+        "cutin-band": "#0b0610",
+        "cutin-edge": "#ff6b8a",
+        "skip-text": "#e5f2d8",
+        "bg-forest": "#1d4a17",
+        "bg-night": "#2a1458",
+        "bg-elf": "#1c3470",
+        "bg-desert": "#6a3a0e",
+        "bg-pyramid": "#0c4a4c",
+        "bg-oasis": "#5c4206"
       }
     },
     "font": {
@@ -277,7 +298,18 @@
       "pet-offset-x": "22px",
       "pet-offset-y": "8px",
       "shop-tile-h": "56px",
-      "gear-preview-scale": "4"
+      "gear-preview-scale": "4",
+      "finisher-letterbox": "40px",
+      "finisher-frame-scale": 2,
+      "finisher-portrait-h": "40px",
+      "finisher-zoom": 2,
+      "finisher-shake": "6px",
+      "finisher-speedlines": 28,
+      "finisher-panel-edge": "2px",
+      "finisher-title-scale": 4,
+      "finisher-name-scale": 3,
+      "finisher-skip-inset": "8px",
+      "finisher-shard": "4px"
     },
     "motion": {
       "duration": {
@@ -297,7 +329,15 @@
         "timebar-warn": "5000ms",
         "gear-block": "300ms",
         "diamond-pop": "200ms",
-        "hatch": "300ms"
+        "hatch": "300ms",
+        "finisher-hitstop": "120ms",
+        "finisher-impact": "100ms",
+        "finisher-bars": "160ms",
+        "finisher-cutin": "600ms",
+        "finisher-title": "200ms",
+        "finisher-shatter": "600ms",
+        "finisher-frame": "100ms",
+        "finisher-skip": "400ms"
       },
       "banner-blinks": 3,
       "easing": {

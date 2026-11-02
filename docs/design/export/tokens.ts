@@ -204,6 +204,27 @@ export const tokens = {
       "pet-aura": "var(--color-game-pet-aura)",
       "gear-block": "var(--color-game-gear-block)",
       "crit": "var(--color-game-crit)"
+    },
+    "finisher": {
+      "ink": "var(--color-finisher-ink)",
+      "paper": "var(--color-finisher-paper)",
+      "letterbox": "var(--color-finisher-letterbox)",
+      "speedline": "var(--color-finisher-speedline)",
+      "title": "var(--color-finisher-title)",
+      "title-shadow": "var(--color-finisher-title-shadow)",
+      "name": "var(--color-finisher-name)",
+      "beam-core": "var(--color-finisher-beam-core)",
+      "beam-rim": "var(--color-finisher-beam-rim)",
+      "beam-glow": "var(--color-finisher-beam-glow)",
+      "cutin-band": "var(--color-finisher-cutin-band)",
+      "cutin-edge": "var(--color-finisher-cutin-edge)",
+      "skip-text": "var(--color-finisher-skip-text)",
+      "bg-forest": "var(--color-finisher-bg-forest)",
+      "bg-night": "var(--color-finisher-bg-night)",
+      "bg-elf": "var(--color-finisher-bg-elf)",
+      "bg-desert": "var(--color-finisher-bg-desert)",
+      "bg-pyramid": "var(--color-finisher-bg-pyramid)",
+      "bg-oasis": "var(--color-finisher-bg-oasis)"
     }
   },
   "font": {
@@ -274,7 +295,18 @@ export const tokens = {
     "pet-offset-x": "var(--size-pet-offset-x)",
     "pet-offset-y": "var(--size-pet-offset-y)",
     "shop-tile-h": "var(--size-shop-tile-h)",
-    "gear-preview-scale": "var(--size-gear-preview-scale)"
+    "gear-preview-scale": "var(--size-gear-preview-scale)",
+    "finisher-letterbox": "var(--size-finisher-letterbox)",
+    "finisher-frame-scale": "var(--size-finisher-frame-scale)",
+    "finisher-portrait-h": "var(--size-finisher-portrait-h)",
+    "finisher-zoom": "var(--size-finisher-zoom)",
+    "finisher-shake": "var(--size-finisher-shake)",
+    "finisher-speedlines": "var(--size-finisher-speedlines)",
+    "finisher-panel-edge": "var(--size-finisher-panel-edge)",
+    "finisher-title-scale": "var(--size-finisher-title-scale)",
+    "finisher-name-scale": "var(--size-finisher-name-scale)",
+    "finisher-skip-inset": "var(--size-finisher-skip-inset)",
+    "finisher-shard": "var(--size-finisher-shard)"
   },
   "motion": {
     "duration": {
@@ -294,7 +326,15 @@ export const tokens = {
       "timebar-warn": "var(--motion-duration-timebar-warn)",
       "gear-block": "var(--motion-duration-gear-block)",
       "diamond-pop": "var(--motion-duration-diamond-pop)",
-      "hatch": "var(--motion-duration-hatch)"
+      "hatch": "var(--motion-duration-hatch)",
+      "finisher-hitstop": "var(--motion-duration-finisher-hitstop)",
+      "finisher-impact": "var(--motion-duration-finisher-impact)",
+      "finisher-bars": "var(--motion-duration-finisher-bars)",
+      "finisher-cutin": "var(--motion-duration-finisher-cutin)",
+      "finisher-title": "var(--motion-duration-finisher-title)",
+      "finisher-shatter": "var(--motion-duration-finisher-shatter)",
+      "finisher-frame": "var(--motion-duration-finisher-frame)",
+      "finisher-skip": "var(--motion-duration-finisher-skip)"
     },
     "banner-blinks": "var(--motion-banner-blinks)",
     "easing": {

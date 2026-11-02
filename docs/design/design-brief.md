@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 in Arbeit: Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`.
+**Status:** geändert am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1, wartet auf die Freigabe des Nutzers). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün) und wartet auf die Freigabe des Nutzers. Danach folgt Teil 2: Bildfolgen Level 20, 25, 30, 40.
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
@@ -640,7 +640,7 @@ Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Revi
 
 Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Review für AP-151 gegen `screenshots/m9-zoom-states-a-desktop.png`, `-states-b-desktop.png` und die Szenen 1–8, für AP-152 gegen Ansicht 12, für AP-150 gegen `m9-zoom-sprites-desktop.png`. Handtest H-38 zusätzlich: Symbole bei 14 px am iPhone erkennbar (vor allem Beine 4/2/3 und Feder), Rätselbild in der Tafel erkennbar, Tafel stört den Timer nicht.
 
-### 2026-11-02 · Ergänzung H-39 „M10: Boss-Finisher“ (Interview läuft)
+### 2026-11-02 · Ergänzung H-39 „M10: Boss-Finisher“ (Teil 1 wartet auf Freigabe)
 
 **Auftrag:** H-39 aus dem Plan (M10, RS-04.2, RS-04.3, PE-195 bis PE-201). Gestaltet werden die Bausteine der Finisher-Sequenz (`hitstop`, `slowmo`, `zoom`, `shake`, `letterbox`, `speedlines`, `bgColor`, `impactFrame`, `flash`, `cutIn`, `panels`, `particles`, `shatter`, `title`, `frames`), die Farben `finisher.*`, der Schriftzug, der Porträt-Streifen der Astronautin, ein Treffer-Bild je Boss, die Bildfolgen der 6 Batch-Finale (Level 4, 9, 20, 25, 30, 40), der Hinweis „TIPPEN: WEITER“ und der Schalter „EFFEKTE REDUZIEREN“ im Pausemenü.
 
@@ -686,5 +686,109 @@ Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Revi
 **Lieferung in zwei Teilen (PE-198):**
 - Teil 1: Bausteine, Tokens, Porträt-Streifen, Treffer-Bilder aller 6 Bosse, Bildfolgen Level 4 und 9 als Muster.
 - Teil 2 nach dem Okay des Nutzers: Level 20, 25, 30, 40.
+
+**Annahmen des Designers** (angenommen, Teil der Freigabe):
+- Der Schriftzug „BEZWUNGEN!“ steht oben, 12 px unter dem oberen Kinobalken, an derselben Stelle wie der Name des Schlusstreffers. Unten hätte er die Figur verdeckt. Name und Schriftzug erscheinen nie gleichzeitig.
+- In Stufe 1 und 2 (ohne Farbhintergrund) liegt das Treffer-Bild auf der Szene, die mit 85 % Tinte abgedunkelt ist. Der Boss ist dabei ausgeblendet.
+- Die Astronautin der Bildfolgen ist eine neue, größere Fassung (≈ 60 px). Gezeichnet ist sie im Raster 1:1 der Bildfolge, also im Spiel doppelt groß. Die Bosse sind wie im Spiel doppelt groß in der Bildfolge eingesetzt und damit im Spiel vierfach.
+- „Effekte reduzieren“ entfernt auch den weißen Treffer-Blitz des Bosses (Baustein `flash`), wie es PE-200 vorsieht.
+
+**Ergebnis Teil 1:**
+- Mockup `mockups/m10-boss-finisher.html` mit 19 Ansichten:
+  - Stufen-Bretter 1 bis 6 mit je 4 Momenten.
+  - Bildfolgen Level 4 und 9 (1×) und ausgewählte Bilder in 2×.
+  - Treffer-Bilder, Porträt-Streifen, Splitter.
+  - Pause mit Schalter.
+  - Breite Arena 900.
+- Sprites `assets/sprites-m10.js`. Laufzeit im Browser ≈ 150 ms, Grenze im Build-Skript 1000 ms.
+- Tokens `color.finisher.*`, `size.finisher-*`, `motion.duration.finisher-*`. 21 neue Paare, `contrast.js --tokens` grün.
+- Screenshots:
+  - `screenshots/m10-boss-finisher-desktop.png` und `-mobile.png`
+  - Nahansichten `m10-zoom-desktop.png` (Finale 2×), `m10-zoom-stages-desktop.png` (Stufen 1, 4, 5), `m10-zoom-parts-desktop.png` (Treffer-Bilder, Streifen, Pause, breite Arena), `m10-zoom-hits-desktop.png` (Bildfolge Level 4 und Treffer-Bilder, letzter Stand)
+
+**Sprites (`assets/sprites-m10.js`):**
+
+| Schlüssel | Maße × Bilder | Inhalt | im Spiel |
+|---|---|---|---|
+| `finisher-portrait` | 160×20 × 6 | Visier und Augen der ernsten Astronautin. Bild = Boss in der Spiegelung (0 Baummonster, 1 Waldgeist, 2 Riesen-Stein, 3 Sand-Wurm, 4 Wächter-Hund, 5 Pharao) | 2× im Band `finisher.cutin-band`, mittig |
+| `finisher-hit` | 96×96 × 6 | Nahaufnahme des Bosses beim Schlusstreffer: Riss, ein Auge aufgerissen. Reihenfolge wie oben | 2×, Mitte der Arena |
+| `finisher-shards` | 4×4 × 18 | Splitter, 3 je Boss (Index = Boss × 3 + 0..2) | 2× bis 3×, Partikel |
+| `finisher-finale-4` | 320×180 × 11 | Bildfolge Level 4, Baummonster | 2×, mittig |
+| `finisher-finale-9` | 320×180 × 11 | Bildfolge Level 9, Waldgeist | 2×, mittig |
+
+**Bausteine (`FinisherStep`), Gestaltung:**
+
+| Baustein | Gestaltung | Tokens |
+|---|---|---|
+| `hitstop` | Boss und Astronautin frieren ein | `motion.duration.finisher-hitstop` 120 ms |
+| `flash` | Boss kurz weiß (setTintFill), wie der Treffer-Blitz im Spiel | `finisher.paper`, `duration.hit` |
+| `zoom` | Kamera auf den Boss, nur ganzzahlig 1 → 2 | `size.finisher-zoom` |
+| `shake` | Wackeln 6 px, halbiert sich alle 80 ms | `size.finisher-shake` |
+| `slowmo` | Zeitlupe 0,3 (Startwert in `config`), keine eigene Grafik | – |
+| `letterbox` | zwei Tintenbalken je 40 px über die ganze Breite, gleiten in 160 ms in 3 Stufen herein | `finisher.letterbox`, `size.finisher-letterbox`, `duration.finisher-bars` |
+| `bgColor` | Fläche im Ton des Bosses über die ganze Arena | `finisher.bg-forest`, `-night`, `-elf`, `-desert`, `-pyramid`, `-oasis` |
+| `speedlines` | 28 radiale Keile zum Treffpunkt, 1 px breit ab 48 px Abstand, 2 px am Rand. Mit Graphics, ohne Verlauf | `finisher.speedline`, `size.finisher-speedlines` |
+| `impactFrame` | Zweiton-Bild: Hintergrund Papier, Boss und Astronautin als Silhouetten in Tinte, Speedlines in Tinte. Danach invertiert (Tinte, Silhouetten in Papier) | `finisher.ink`, `finisher.paper`, `duration.finisher-impact` 100 ms |
+| `cutIn` | Band 40 px in Tinte mit 2-px-Rand in Koralle, mittig. Darin `finisher-portrait` 2×. Fährt in 120 ms schräg herein, hält 360 ms, fährt in 120 ms nach rechts hinaus | `finisher.cutin-band`, `finisher.cutin-edge`, `size.finisher-portrait-h`, `duration.finisher-cutin` |
+| `panels` | 3 schräge Felder mit 2-px-Rand in Tinte: Porträt, Treffer-Bild (1×) und Strahl. Erscheinen nacheinander je 120 ms | `size.finisher-panel-edge` |
+| `particles` / `shatter` | Splitter `finisher-shards` fliegen vom Treffpunkt nach außen, werden zu Glut (Koralle) und verschwinden | `duration.finisher-shatter` 600 ms (Stufe 6: 900) |
+| `title` | „BEZWUNGEN!“ Kapsel ×4, Name Kapsel ×3 in `finisher.name`, harter Schatten 1 Schrift-px. Erscheinen in 2 Stufen (×6 → ×4), ohne Einblenden | `finisher.title`, `finisher.name`, `finisher.title-shadow`, `size.finisher-title-scale`, `size.finisher-name-scale`, `duration.finisher-title` |
+| `frames` | Bildfolge 2× mittig. In breiteren Arenen füllen `bgColor` und `speedlines` die Seiten, die Kinobalken laufen über die ganze Breite | `size.finisher-frame-scale` |
+| Hinweis | „TIPPEN: WEITER“ (Funk ×1) mit Pfeil auf `hud.glass`, 1-px-Rahmen `hud.line`. Steht unten rechts, 8 px über dem unteren Balken innerhalb `SafeInsets`. Erscheint nach `skipLockMs` und nur bei gesehenen Varianten. Blinkt nicht | `finisher.skip-text`, `size.finisher-skip-inset`, `duration.finisher-skip` |
+
+**Ablauf der Stufen (Startwerte für `config/finishers.ts`, Zeiten in ms ab Boss-Tod):**
+
+| Stufe | Ablauf |
+|---|---|
+| 1 (≈ 2000) | 0 `hitstop` 120 + `flash` 120 + `zoom` · 120 Treffer-Bild 400 (Szene 85 % Tinte) · 520 `shake` 300, Boss verschwindet wie bisher · 1000 `title` bis 2000 |
+| 2 (≈ 2500) | wie 1, zusätzlich 0 `letterbox` · 120 `slowmo` bis 900 · Treffer-Bild 520–1000 · `title` 1500 |
+| 3 (≈ 3000) | wie 2, zusätzlich 120 `bgColor` + `speedlines` und der Strahl der Astronautin über den Farbhintergrund. Treffer-Bild auf `bgColor` · `title` 2000 |
+| 4 (≈ 3500) | wie 3, zusätzlich 200 `cutIn` 600 · 900 `impactFrame` hell 100, 1000 dunkel 100 · 1100 Treffer-Bild 500 · `title` 2300 |
+| 5 (≈ 4000) | wie 4, zusätzlich 1000 `panels` 800 · 2200 `shatter` 600 + `particles` · `title` 2900 |
+| 6 (≈ 4000) | alles: `cutIn`, `panels`, zwei `impactFrame`-Paare im Abstand von mindestens 400 ms, `shatter` 900 · `title` 3000 |
+
+Höchstens 3 Hell-Dunkel-Paare je Sekunde (Vitest aus PE-200). Ein `impactFrame`-Paar zählt als ein Paar.
+
+**Batch-Finale (Level 4 und 9 in Teil 1):** `letterbox` · `cutIn` 0–600 · `frames` · Name zu Bild 5 · „BEZWUNGEN!“ zu Bild 10.
+
+| Bild | Inhalt | Haltezeit L4 | Haltezeit L9 |
+|---|---|---|---|
+| 0 | Totale: Astronautin vor dem Boss | 500 | 600 |
+| 1 | Strahler lädt in Koralle | 300 | 400 |
+| 2 | Zielen, Wind, Boss ragt rechts ins Bild | 300 | 300 |
+| 3 | Sprung mit Nachbildern auf dem Farbhintergrund | 200 | 200 |
+| 4 | Boss brüllt (Wurzeln peitschen bzw. Maske schreit) | 300 | 400 |
+| 5 | Strahl in der Luft durch den Boss, Name erscheint | 400 | 500 |
+| 6 | Impact hell (entfällt bei „Effekte reduzieren“) | 100 | 100 |
+| 7 | Impact dunkel (entfällt ebenso) | 100 | 100 |
+| 8 | Risse aus Licht bzw. Zerfaserung | 300 | 400 |
+| 9 | Bersten zu Splittern und Glut bzw. Nebel ins Mondlicht | 400 | 600 |
+| 10 | Ende: Astronautin von hinten im Gegenlicht, „BEZWUNGEN!“ | 900 | 1000 |
+
+Summe der Bilder: L4 3800 ms, L9 4600 ms. Mit Cut-in und Schriftzug sind das ≈ 5 s bzw. ≈ 6 s (PE-198). Bei „Effekte reduzieren“ hält Bild 5 um 200 ms länger.
+
+**Übergabe an den Planner (H-39, Teil 1):**
+
+| Paket | Aufgabe |
+|---|---|
+| „Design übernehmen“ | Haltezeiten je Bild: Der Vertrag `FinisherStep` kennt bei `frames` nur Bildzahl und Bildrate. Mein Vorschlag ist ein optionales Feld `holdsMs` (eine Zahl je Bild) in AP-157 bzw. AP-159. Ohne dieses Feld gilt gleichmäßig 350 ms je Bild, dann dauern die Impact-Bilder aber zu lange. Die Entscheidung liegt beim Planner. |
+| AP-159 | `npm run theme:build` (neue Tokens) und `sprites:build`. Neue Quelle `docs/design/assets/sprites-m10.js` kommt ans Ende der Quellenliste in `scripts/build-sprites.mjs` (Ladefolge wie im Dateikopf). Neue Schlüssel `finisher-portrait`, `finisher-hit`, `finisher-shards`, `finisher-finale-4`, `finisher-finale-9` in `src/config/assets.ts` eintragen, die Sprite-Zahl in `build-sprites.test.ts` anpassen. In `frames` der Finale 4 und 9 Bildzahl 11 und die Haltezeiten aus der Tabelle eintragen. Platzhalter-Töne (Aufladen, Schlusstreffer, Signal) über `generate-placeholders.mjs` mit Lizenzeintrag. |
+| AP-160 | Bausteine nach der Tabelle oben, nur Tokens. Impact Frames über Silhouetten-Kopien (setTintFill) von Boss und Astronautin auf `finisher.paper` bzw. `finisher.ink`. Bildfolgen 2× mittig, bei breiter Arena füllen `bgColor` und `speedlines` die Seiten. Der Hinweis liegt innerhalb `SafeInsets`. |
+| AP-162 | Schalter „EFFEKTE REDUZIEREN“ unter „EINFACHE ABWEHR“, gleicher Aufbau (Kästchen `ui-icons-m9`, Hinweiszeile „OHNE BLITZ UND WACKELN“), siehe Ansicht 18. |
+
+Hinweise:
+- **Texturgröße:** Ein Bogen mit 11 Bildern ist 3520 px breit. Ab 13 Bildern wird die Grenze von 4096 px überschritten, die auf älteren iPhones gilt. Level 40 (16 bis 20 Bilder) kommt deshalb in Teil 2 als zwei Bögen (`finisher-finale-40a`, `-40b`).
+- Keine neuen Schriften oder Abhängigkeiten, keine externen Requests.
+
+**Design-Review:**
+- AP-160 gegen die Ansichten 1 bis 6, 8 bis 11, 13 bis 15 und 19.
+- AP-162 gegen Ansicht 18.
+- AP-159 gegen die Ansichten 7, 12, 16 und 17.
+
+**Handtest H-40 zusätzlich:**
+- Ist die ernste Astronautin am iPhone erkennbar?
+- Ist der Spiegel-Boss im Porträt-Streifen erkennbar?
+- Wirken die Impact Frames nicht zu grell?
+- Läuft die Bildfolge flüssig (`?fps=1`)?
 
 - keine weiteren (erste Fassung vom 2026-10-25)

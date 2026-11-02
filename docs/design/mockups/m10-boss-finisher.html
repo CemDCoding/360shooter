@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<script>/* review aid: ?v=<id> shows only the section with that element id */ addEventListener('DOMContentLoaded',()=>{const ZOOM='';const q=new URLSearchParams(location.search).get('v')||location.hash.slice(1)||ZOOM;if(!q)return;document.querySelectorAll('section').forEach(s=>{if(!q.split(',').some(id=>s.querySelector('#'+id)))s.style.display='none';});});</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M10: Boss-Finisher (H-39) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .w-ground.desert { --g: var(--color-biome-desert-ground); --g2: var(--color-biome-desert-ground-hi); --g3: var(--color-biome-desert-ground-lo); }
+  .w-ground.pyramid { --g: var(--color-biome-pyramid-ground); --g2: var(--color-biome-pyramid-ground-hi); --g3: var(--color-biome-pyramid-ground-lo); }
+  .w-ground.oasis { --g: var(--color-biome-oasis-ground); --g2: var(--color-biome-oasis-ground-hi); --g3: var(--color-biome-oasis-ground-lo); }
+  canvas.ws { position: absolute; image-rendering: pixelated; }
+  canvas.ws.in { position: static; }
+
+  /* storyboard: 4 cells of 320x180, each holds a 640x360 scene at 0.5 */
+  .cell4 { position: absolute; width: 320px; height: 180px; overflow: hidden; outline: 2px solid var(--color-finisher-ink); }
+  .cell4 > .sc { position: absolute; left: 0; top: 0; width: 640px; height: 360px; transform: scale(.5); transform-origin: 0 0; overflow: hidden; }
+  .cell4 > .tag { position: absolute; left: 4px; top: 4px; padding: 3px 4px; background: var(--color-hud-glass); border: 1px solid var(--color-hud-line); line-height: 0; z-index: 5; }
+
+  .fill { position: absolute; inset: 0; }
+  .bars::before, .bars::after { content: ''; position: absolute; left: 0; right: 0; height: var(--size-finisher-letterbox); background: var(--color-finisher-letterbox); z-index: 3; }
+  .bars::before { top: 0; } .bars::after { bottom: 0; }
+  svg.fx { position: absolute; left: 0; top: 0; width: 640px; height: 360px; shape-rendering: crispEdges; }
+  .band { position: absolute; left: 0; right: 0; height: var(--size-finisher-portrait-h); background: var(--color-finisher-cutin-band); box-shadow: 0 -2px 0 var(--color-finisher-cutin-edge), 0 2px 0 var(--color-finisher-cutin-edge); display: grid; place-items: center; z-index: 2; }
+  .ttl { position: absolute; left: 0; right: 0; display: flex; justify-content: center; z-index: 4; }
+  .skip { position: absolute; right: var(--size-finisher-skip-inset); bottom: calc(var(--size-finisher-letterbox) + var(--size-finisher-skip-inset)); padding: 4px 6px; background: var(--color-hud-glass); border: var(--border-hud) solid var(--color-hud-line); display: flex; align-items: center; gap: 6px; line-height: 0; z-index: 5; }
+  .panel { position: absolute; overflow: hidden; }
+  .scrim { position: absolute; inset: 0; background: color-mix(in srgb, var(--color-finisher-ink) 62%, transparent); }
+
+  .film { display: grid; grid-template-columns: repeat(auto-fill, 320px); gap: 16px 12px; margin-bottom: 8px; }
+  .film figure { margin: 0; }
+  .film figcaption { font-size: 12px; line-height: 16px; color: var(--page-muted); margin-top: 4px; }
+  .film figcaption b { color: var(--page-fg, inherit); }
+  .film canvas.ws { position: static; outline: 1px solid #000; }
+  .grid2 { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+  .grid2 figure { margin: 0; } .grid2 figcaption { font-size: 12px; color: var(--page-muted); margin-top: 4px; }
+  .grid2 canvas.ws { position: static; }
+  .wide-wrap { position: relative; width: 100%; max-width: 1280px; overflow: hidden; }
+  .stage.wide { width: 900px; }
+  .pause { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; }
+  .pause .grp { display: inline-flex; flex-direction: column; gap: 8px; align-items: stretch; }
+  .pause .btns { display: flex; gap: 12px; }
+  .pause .f-btn.toggle { justify-content: center; gap: 8px; }
+  .pause .sub { display: flex; justify-content: center; line-height: 0; }
+  .perf { font-size: 12px; color: var(--page-muted); }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>M10 · Boss-Finisher · Ergänzung H-39 (Teil 1)</h1>
+  <p>Ernstes Anime nach jedem Boss-Sieg. Stufe 1 bis 6 je Batch, überwiegend Effekte. Die Batch-Finale (Level 4, 9, 20, 25, 30, 40) bekommen eine Bildfolge 320×180, im Spiel doppelt groß. Teil 1 enthält alle Bausteine, Porträt, Treffer-Bilder und die Bildfolgen von Level 4 und 9. Pixelquelle: <code>assets/sprites-m10.js</code>. Alle Maße in Arena-px (640×360, randlos bis 900 breit).</p>
+  <dl>
+    <dt>Farben</dt><dd>Impact Frames nur Tinte und Papier (<code>finisher.ink</code>, <code>finisher.paper</code>). Ein satter Ton je Boss (<code>finisher.bg-*</code>). Koralle gehört der Astronautin (Strahl, Name). Rot nur als kleiner Akzent.</dd>
+    <dt>Schrift</dt><dd>Kapsel für „BEZWUNGEN!“ (×4) und den Namen des Schlusstreffers (×3), harter Tintenschatten. Funk nur für „TIPPEN: WEITER“.</dd>
+    <dt>Reduziert</dt><dd>„EFFEKTE REDUZIEREN“ und „Bewegung reduzieren“ des Systems lassen Impact Frames, Blitz und Wackeln weg. In Bildfolgen werden die Bilder 6 und 7 übersprungen, Bild 5 hält so lange.</dd>
+  </dl>
+  <p class="perf" id="perf"></p>
+</header>
+
+<section><h2>1 · STUFE 1 · WALD (Level 0–3) · Hitstop + Zoom ×2 · Treffer-Bild · Wackeln · BEZWUNGEN! (≈ 2 s)</h2><div class="stage-wrap"><div class="stage" id="st1" data-component="FinisherScene" data-font="funk"></div></div></section>
+<section><h2>2 · STUFE 2 · WALD BEI NACHT (Level 5–8) · + Zeitlupe, Kinobalken (≈ 2,5 s)</h2><div class="stage-wrap"><div class="stage" id="st2" data-component="FinisherScene" data-font="funk"></div></div></section>
+<section><h2>3 · STUFE 3 · ELFENWALD (Level 10–19) · + Speedlines, Farbhintergrund (≈ 3 s)</h2><div class="stage-wrap"><div class="stage" id="st3" data-component="FinisherScene" data-font="funk"></div></div></section>
+<section><h2>4 · STUFE 4 · WÜSTE (Level 21–24) · + Porträt-Streifen, Impact Frame (≈ 3,5 s)</h2><div class="stage-wrap"><div class="stage" id="st4" data-component="FinisherScene" data-font="funk"></div></div></section>
+<section><h2>5 · STUFE 5 · PYRAMIDEN (Level 26–29) · + Manga-Panels, Splittern (≈ 4 s)</h2><div class="stage-wrap"><div class="stage" id="st5" data-component="FinisherScene" data-font="funk"></div></div></section>
+<section><h2>6 · STUFE 6 · PYRAMIDEN-OASE (Level 31–39) · alles, längster Zerfall (≈ 4 s)</h2><div class="stage-wrap"><div class="stage" id="st6" data-component="FinisherScene" data-font="funk"></div></div></section>
+
+<section><h2>7 · FINALE LEVEL 4 · BAUMMONSTER · Bildfolge <code>finisher-finale-4</code> (11 Bilder, 1×)</h2><div class="film" id="film4"></div></section>
+<section><h2>8 · FINALE LEVEL 4 · Schlusstreffer im Spiel (2×): Bild 5, Kinobalken, Name „WURZELBRECHER“</h2><div class="stage-wrap"><div class="stage" id="f4a" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>9 · FINALE LEVEL 4 · Impact Frame (2×): Bild 6</h2><div class="stage-wrap"><div class="stage" id="f4b" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>10 · FINALE LEVEL 4 · Zerfall (2×): Bild 9</h2><div class="stage-wrap"><div class="stage" id="f4c" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>11 · FINALE LEVEL 4 · Ende (2×): Bild 10, „BEZWUNGEN!“, Hinweis ab dem zweiten Ansehen</h2><div class="stage-wrap"><div class="stage" id="f4d" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+
+<section><h2>12 · FINALE LEVEL 9 · WALDGEIST · Bildfolge <code>finisher-finale-9</code> (11 Bilder, 1×)</h2><div class="film" id="film9"></div></section>
+<section><h2>13 · FINALE LEVEL 9 · Schlusstreffer (2×): Bild 5, Name „MONDSCHNITT“</h2><div class="stage-wrap"><div class="stage" id="f9a" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>14 · FINALE LEVEL 9 · Zerfaserung (2×): Bild 9</h2><div class="stage-wrap"><div class="stage" id="f9b" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>15 · FINALE LEVEL 9 · Ende (2×): Bild 10</h2><div class="stage-wrap"><div class="stage" id="f9c" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+
+<section><h2>16 · TREFFER-BILDER <code>finisher-hit</code> (96×96, 2×) auf dem Farbhintergrund des Bosses</h2><div class="grid2" id="hits"></div></section>
+<section><h2>17 · PORTRÄT-STREIFEN <code>finisher-portrait</code> (160×20, 2×) mit Spiegelung je Boss · Splitter <code>finisher-shards</code> (4×4, 4×)</h2><div class="grid2" id="strips"></div></section>
+<section><h2>18 · PAUSE · Schalter „EFFEKTE REDUZIEREN“ unter „EINFACHE ABWEHR“, Fokus auf dem neuen Schalter</h2><div class="stage-wrap"><div class="stage" id="pause" data-component="HudScene.pause" data-font="funk"></div></div></section>
+<section><h2>19 · BREITE ARENA 900×360 · Bild 5 mittig, Farbhintergrund und Kinobalken über die volle Breite, Hinweis in den SafeInsets</h2><div class="wide-wrap"><div class="stage wide" id="wide" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+
+<script>
+  const P = (t, s, c, sh) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"${sh ? ` data-sh="${sh}"` : ''}></span>`;
+  const K = (t, s, c, sh) => `<span class="px" data-f="kapsel" data-t="${t}" data-s="${s}" data-c="${c}"${sh ? ` data-sh="${sh}"` : ''}></span>`;
+  const W = (k, x, y, o) => { o = o || {}; return `<canvas class="ws${o.in ? ' in' : ''}" data-k="${k}" data-s="${o.s || 1}" data-f="${o.f || 0}"${o.tint ? ` data-tint="${o.tint}"` : ''}${o.fill ? ` data-fill="${o.fill}"` : ''}${o.flip ? ' data-flip="1"' : ''} style="${o.in ? '' : `left:${x}px;top:${y}px;`}${o.style || ''}"></canvas>`; };
+  const set = (id, h) => { document.getElementById(id).innerHTML = h; };
+
+  const BOSS = [
+    { k: 'boss-root-monster', sz: 64, ground: 'forest', bg: '--color-finisher-bg-forest', name: 'WURZELBRECHER' },
+    { k: 'boss-forest-ghost', sz: 48, ground: 'night', bg: '--color-finisher-bg-night', name: 'MONDSCHNITT' },
+    { k: 'boss-giant-stone', sz: 64, ground: 'elf', bg: '--color-finisher-bg-elf', name: 'STERNENHAMMER' },
+    { k: 'boss-sand-worm', sz: 64, ground: 'desert', bg: '--color-finisher-bg-desert', name: 'SONNENSPEER' },
+    { k: 'boss-guardian-dog', sz: 64, ground: 'pyramid', bg: '--color-finisher-bg-pyramid', name: 'GRABESLICHT' },
+    { k: 'boss-pharaoh', sz: 64, ground: 'oasis', bg: '--color-finisher-bg-oasis', name: 'LETZTER STERN' },
+  ];
+
+  // deterministic random for the mockup
+  function rnd(seed) { let a = seed >>> 0; return () => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; }; }
+  // radial speedlines: wedges from r0 to the edge, width 1 -> 2 px (token finisher-speedlines)
+  function speed(cx, cy, col, seed, n, r0) {
+    const r = rnd(seed); n = n || 28; r0 = r0 || 48; let p = '';
+    for (let i = 0; i < n; i++) {
+      const a = ((i + r() * 0.7) / n) * Math.PI * 2, c = Math.cos(a), s = Math.sin(a), R = 800, w = 1 + r() * 1.2, q = r0 + r() * 40;
+      p += `<polygon points="${cx + c * q},${cy + s * q} ${cx + c * R - s * w * 4},${cy + s * R + c * w * 4} ${cx + c * R + s * w * 4},${cy + s * R - c * w * 4}"/>`;
+    }
+    return `<svg class="fx" viewBox="0 0 640 360" aria-hidden="true" fill="var(${col})">${p}</svg>`;
+  }
+  const fillBg = (v) => `<div class="fill" style="background:var(${v})"></div>`;
+  const bossAt = (b, cx, cy, s, o) => W(b.k, cx - b.sz * s / 2, cy - b.sz * s / 2, Object.assign({ s }, o || {}));
+  const astroAt = (x, y, s, o) => W('astronaut', x, y, Object.assign({ s }, o || {})) + W('weapon-raygun', x + 20 * s, y + 7 * s, Object.assign({ s }, o || {}));
+  const laser = (x0, y, x1) => `<div class="abs" style="left:${x0}px;top:${y - 3}px;width:${x1 - x0}px;height:6px;background:var(--color-finisher-beam-core);box-shadow:0 -3px 0 var(--color-finisher-beam-rim),0 3px 0 var(--color-finisher-beam-rim);z-index:1"></div>`;
+  const title = (y) => `<div class="ttl" style="top:${y}px">${K('BEZWUNGEN!', 4, '--color-finisher-title', '--color-finisher-title-shadow')}</div>`;
+  const nameT = (n, y) => `<div class="ttl" style="top:${y}px">${K(n, 3, '--color-finisher-name', '--color-finisher-title-shadow')}</div>`;
+  const ARROW = `<svg width="10" height="14" viewBox="0 0 5 7" fill="var(--color-finisher-skip-text)" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="1" height="7"/><rect x="1" y="1" width="1" height="5"/><rect x="2" y="2" width="1" height="3"/><rect x="3" y="3" width="1" height="1"/></svg>`;
+  const skip = (style) => `<div class="skip" role="button" aria-label="Tippen: weiter" data-component="FinisherScene.skipHint" style="${style || ''}">${P('TIPPEN: WEITER', 0, '--color-finisher-skip-text')}${ARROW}</div>`;
+  const band = (i, y) => `<div class="band" style="top:${y}px" data-component="FinisherScene.cutIn">${W('finisher-portrait', 0, 0, { f: i, s: 2, in: 1 })}</div>`;
+  const hitImg = (i, cx, cy) => W('finisher-hit', cx - 96, cy - 96, { f: i, s: 2 });
+  const shards = (i, cx, cy, n, spread, seed) => { const r = rnd(seed); let h = ''; for (let k = 0; k < n; k++) { const a = r() * Math.PI * 2, d = 20 + r() * spread; h += W('finisher-shards', Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d * 0.8), { f: i * 3 + (k % 3), s: 2 + (k % 3 === 0 ? 1 : 0) }); } return h; };
+  const ember = (cx, cy, n, spread, seed) => { const r = rnd(seed); let h = ''; for (let k = 0; k < n; k++) { const a = r() * Math.PI * 2, d = 30 + r() * spread; h += `<i class="abs" style="left:${Math.round(cx + Math.cos(a) * d)}px;top:${Math.round(cy + Math.sin(a) * d * 0.8)}px;width:4px;height:4px;background:var(${k % 2 ? '--color-finisher-beam-rim' : '--color-finisher-name'})"></i>`; } return h; };
+  function panels(i) { // three slanted manga panels with 2 px ink edges
+    const b = BOSS[i];
+    const P1 = '0,0 330,0 300,170 0,170', P2 = '340,0 640,0 640,170 310,170', P3 = '0,180 640,180 640,360 0,360';
+    return `<div class="panel" style="inset:0;clip-path:polygon(0 0,330px 0,300px 170px,0 170px);background:var(--color-finisher-cutin-band)">${W('finisher-portrait', 4, 65, { f: i, s: 2 })}</div>
+      <div class="panel" style="inset:0;clip-path:polygon(340px 0,640px 0,640px 170px,310px 170px);background:var(${b.bg})">${speed(480, 85, '--color-finisher-speedline', 70 + i, 20, 60)}${W('finisher-hit', 432, 37, { f: i, s: 1 })}</div>
+      <div class="panel" style="inset:0;clip-path:polygon(0 180px,640px 180px,640px 360px,0 360px);background:var(--color-finisher-ink)">${speed(470, 270, '--color-finisher-beam-glow', 80 + i, 22, 40)}${laser(120, 270, 470)}${astroAt(40, 230, 2)}${bossAt(b, 500, 270, 2)}</div>
+      <svg class="fx" viewBox="0 0 640 360" fill="none" stroke="var(--color-finisher-ink)" stroke-width="4" aria-hidden="true"><polygon points="${P1}"/><polygon points="${P2}"/><polygon points="${P3}"/></svg>`;
+  }
+
+  // moments of a stage board, each a 640x360 scene
+  const M = {
+    hit: (i, o) => { const b = BOSS[i]; return `<div class="w-ground ${b.ground}"></div>${o.bg ? fillBg(b.bg) + speed(400, 170, '--color-finisher-speedline', 10 + i) : ''}
+      ${o.after ? bossAt(b, 360, 170, 4, { style: 'opacity:.25' }) + bossAt(b, 380, 170, 4, { style: 'opacity:.45' }) : ''}
+      ${bossAt(b, 400, 170, 4, { fill: o.flash ? '--color-finisher-paper' : '' })}${astroAt(40, 214, 4)}${o.laser ? laser(240, 262, 400) : ''}<div class="w-vignette"></div>`; },
+    hitimg: (i, o) => { const b = BOSS[i]; return o.bg ? `${fillBg(b.bg)}${speed(320, 180, '--color-finisher-speedline', 20 + i)}${hitImg(i, 320, 180)}`
+      : `<div class="w-ground ${b.ground}"></div><div class="scrim" style="background:color-mix(in srgb, var(--color-finisher-ink) 85%, transparent)"></div>${hitImg(i, 320, 180)}`; },
+    shake: (i, o) => { const b = BOSS[i]; return `${o.bg ? fillBg(b.bg) : `<div class="w-ground ${b.ground}"></div>`}${bossAt(b, 394, 176, 4, { style: 'opacity:.35' })}${bossAt(b, 406, 166, 4, { style: 'opacity:.55' })}${o.bg ? '' : '<div class="w-vignette"></div>'}`; },
+    impact: (i) => { const b = BOSS[i]; return `${fillBg('--color-finisher-paper')}${speed(400, 170, '--color-finisher-ink', 30 + i, 30, 70)}${bossAt(b, 400, 170, 4, { fill: '--color-finisher-ink' })}${astroAt(40, 214, 4, { fill: '--color-finisher-ink' })}`; },
+    cutin: (i) => { const b = BOSS[i]; return `${fillBg(b.bg)}${speed(320, 180, '--color-finisher-speedline', 40 + i)}${band(i, 160)}`; },
+    panels: (i) => panels(i),
+    shatter: (i, o) => { const b = BOSS[i]; return `${fillBg(b.bg)}${speed(400, 170, '--color-finisher-speedline', 50 + i, 20, 90)}${shards(i, 384, 160, o.long ? 70 : 40, o.long ? 260 : 170, 60 + i)}${ember(384, 160, o.long ? 24 : 12, 200, 90 + i)}`; },
+    title: (i, o) => { const b = BOSS[i]; return `${o.bg ? fillBg(b.bg) : `<div class="w-ground ${b.ground}"></div><div class="scrim"></div>`}${o.shards ? shards(i, 384, 160, 14, 260, 99 + i) : ''}${title(52)}${skip(o.bars ? '' : 'bottom:8px')}`; },
+  };
+  const TAGS = { hit: 'HITSTOP + ZOOM', hitimg: 'TREFFER-BILD', shake: 'WACKELN, BOSS WEG', impact: 'IMPACT FRAME', cutin: 'PORTRÄT', panels: 'MANGA-PANELS', shatter: 'SPLITTERN', title: 'BEZWUNGEN!' };
+  function board(id, i, cells) {
+    set(id, cells.map(([m, o], n) => { o = o || {}; const x = (n % 2) * 320, y = Math.floor(n / 2) * 180;
+      return `<div class="cell4" style="left:${x}px;top:${y}px"><div class="sc ${o.bars ? 'bars' : ''}">${M[m](i, o)}</div><span class="tag">${P((n + 1) + ' · ' + TAGS[m], 0, '--color-hud-text')}</span></div>`; }).join(''));
+  }
+  board('st1', 0, [['hit', { flash: 1 }], ['hitimg', {}], ['shake', {}], ['title', {}]]);
+  board('st2', 1, [['hit', { flash: 1, bars: 1, after: 1 }], ['hitimg', { bars: 1 }], ['shake', { bars: 1 }], ['title', { bars: 1 }]]);
+  board('st3', 2, [['hit', { bg: 1, laser: 1, bars: 1 }], ['hitimg', { bg: 1, bars: 1 }], ['shake', { bg: 1, bars: 1 }], ['title', { bg: 1, bars: 1 }]]);
+  board('st4', 3, [['cutin', { bars: 1 }], ['impact', { bars: 1 }], ['hitimg', { bg: 1, bars: 1 }], ['title', { bg: 1, bars: 1 }]]);
+  board('st5', 4, [['cutin', { bars: 1 }], ['panels', { bars: 1 }], ['shatter', { bars: 1 }], ['title', { bg: 1, bars: 1, shards: 1 }]]);
+  board('st6', 5, [['panels', { bars: 1 }], ['impact', { bars: 1 }], ['shatter', { bars: 1, long: 1 }], ['title', { bg: 1, bars: 1, shards: 1 }]]);
+
+  // film strips with holds
+  const ACT = ['Aufladen · Totale', 'Aufladen · Strahler lädt', 'Aufladen · Zielen', 'Ansturm · Sprung', 'Ansturm · Boss brüllt', 'Schlusstreffer · Strahl + Name', 'Schlusstreffer · Impact hell', 'Schlusstreffer · Impact dunkel', 'Zerfall 1', 'Zerfall 2', 'Ende · BEZWUNGEN!'];
+  const HOLD4 = [500, 300, 300, 200, 300, 400, 100, 100, 300, 400, 900];
+  const HOLD9 = [600, 400, 300, 200, 400, 500, 100, 100, 400, 600, 1000];
+  function film(id, key, holds) {
+    set(id, holds.map((h, f) => `<figure>${W(key, 0, 0, { f, s: 1, in: 1 })}<figcaption><b>Bild ${f}</b> · ${ACT[f]} · ${h} ms${f === 6 || f === 7 ? ' · <b>Impact, entfällt bei „Effekte reduzieren“</b>' : ''}</figcaption></figure>`).join(''));
+  }
+  film('film4', 'finisher-finale-4', HOLD4);
+  film('film9', 'finisher-finale-9', HOLD9);
+  const frame = (key, f) => W(key, 0, 0, { f, s: 2 });
+  set('f4a', `<div class="fill bars">${frame('finisher-finale-4', 5)}</div>${nameT('WURZELBRECHER', 52)}`);
+  set('f4b', `<div class="fill bars">${frame('finisher-finale-4', 6)}</div>`);
+  set('f4c', `<div class="fill bars">${frame('finisher-finale-4', 9)}</div>`);
+  set('f4d', `<div class="fill bars">${frame('finisher-finale-4', 10)}</div>${title(52)}${skip()}`);
+  set('f9a', `<div class="fill bars">${frame('finisher-finale-9', 5)}</div>${nameT('MONDSCHNITT', 52)}`);
+  set('f9b', `<div class="fill bars">${frame('finisher-finale-9', 9)}</div>`);
+  set('f9c', `<div class="fill bars">${frame('finisher-finale-9', 10)}</div>${title(52)}${skip()}`);
+
+  set('hits', BOSS.map((b, i) => `<figure><div style="position:relative;width:224px;height:224px;background:var(${b.bg})">${W('finisher-hit', 16, 16, { f: i, s: 2 })}</div><figcaption>${i} · ${b.k.replace('boss-', '')} · ${b.bg.replace('--color-', '')}</figcaption></figure>`).join(''));
+  set('strips', BOSS.map((b, i) => `<figure><div style="background:var(--color-finisher-cutin-band);box-shadow:0 -2px 0 var(--color-finisher-cutin-edge),0 2px 0 var(--color-finisher-cutin-edge);line-height:0">${W('finisher-portrait', 0, 0, { f: i, s: 2, in: 1 })}</div><figcaption>${i} · Spiegelung ${b.k.replace('boss-', '')}</figcaption></figure>`).join('')
+    + `<figure><div style="display:flex;gap:6px;padding:8px;background:var(--color-finisher-bg-pyramid)">${Array.from({ length: 18 }, (_, f) => W('finisher-shards', 0, 0, { f, s: 4, in: 1 })).join('')}</div><figcaption>finisher-shards · 6 Bosse × 3</figcaption></figure>`);
+
+  set('pause', `<div class="w-ground desert"></div>${W('boss-sand-worm', 420, 60, { s: 2 })}${astroAt(304, 164, 1)}<div class="w-vignette"></div><div class="f-scrim"></div>
+    <div class="pause" style="top:64px" data-component="HudScene.pauseOverlay">
+      ${P('– PAUSE –', 3, '--color-hud-text')}
+      <div style="height:12px"></div>${P('LEVEL 23 · WÜSTE · BOSS!', 0, '--color-hud-text-muted')}
+      <div style="height:18px"></div>
+      <div class="grp">
+        <div class="btns">
+          <div class="f-btn primary" role="button" aria-label="Weiter">${P('WEITER', 2, '--color-hud-accent')}</div>
+          <div class="f-btn" role="button" aria-label="Hauptmenü, Runde abbrechen">${P('HAUPTMENÜ', 2, '--color-hud-text')}</div>
+        </div>
+        <div class="f-btn toggle" role="switch" aria-checked="false" aria-label="Einfache Abwehr, aus">${W('ui-icons-m9', 0, 0, { f: 0, s: 2, in: 1, tint: '--color-hud-text' })}${P('EINFACHE ABWEHR', 2, '--color-hud-text')}</div>
+        <div class="sub">${P('ALLE ABWEHREN: EIN TIPP', 0, '--color-hud-text-muted')}</div>
+        <div class="f-btn toggle is-focus" role="switch" aria-checked="true" aria-label="Effekte reduzieren, an" data-component="HudScene.reduceEffectsToggle">${W('ui-icons-m9', 0, 0, { f: 1, s: 2, in: 1, tint: '--color-hud-text' })}${P('EFFEKTE REDUZIEREN', 2, '--color-hud-text')}</div>
+        <div class="sub">${P('OHNE BLITZ UND WACKELN', 0, '--color-hud-text-muted')}</div>
+      </div>
+      <div style="height:14px"></div>${P('ESC ODER P: WEITER', 0, '--color-hud-text-muted')}
+    </div>`);
+
+  set('wide', `${fillBg('--color-finisher-bg-forest')}${speed(450, 180, '--color-finisher-speedline', 7, 28, 330)}<div class="fill bars"><div class="abs" style="left:130px;top:0">${frame('finisher-finale-4', 5)}</div></div>${nameT('WURZELBRECHER', 52)}${skip('right:52px')}
+    <div class="abs" style="left:0;top:0;width:44px;height:360px;outline:1px dashed var(--color-hud-line);outline-offset:-1px" aria-hidden="true"></div><div class="abs" style="right:0;top:0;width:44px;height:360px;outline:1px dashed var(--color-hud-line);outline-offset:-1px" aria-hidden="true"></div>`);
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script>window.__t0 = performance.now(); window.onerror = (m, s, l) => { window.__err = 1; document.getElementById('perf').textContent = 'FEHLER: ' + m + ' (Zeile ' + l + ')'; };</script>
+<script src="../assets/sprites-m10.js"></script>
+<script>
+  (function () {
+    if (!window.__err) document.getElementById('perf').textContent = 'sprites-m10.js gebaut in ' + Math.round(performance.now() - window.__t0) + ' ms (Grenze im Build-Skript: 1000 ms).';
+    const S = window.PX_SPRITES, css = getComputedStyle(document.documentElement);
+    const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const v = (n) => css.getPropertyValue(n).trim();
+    const col = (n) => { let s = v(n); for (let i = 0; i < 5 && s.startsWith('var('); i++) s = v(s.slice(4, -1).trim()); return s; };
+    document.querySelectorAll('canvas.ws[data-k]').forEach((c) => {
+      const d = S[c.dataset.k]; if (!d) { c.width = 8; c.height = 8; return; }
+      c.width = d.frameWidth; c.height = d.frameHeight;
+      const t = c.dataset.tint ? hex(col(c.dataset.tint)) : [255, 255, 255];
+      const fillC = c.dataset.fill ? col(c.dataset.fill) : null;
+      const x = c.getContext('2d');
+      d.frames[+c.dataset.f || 0].forEach((r, y) => [...r].forEach((ch, i) => { if (ch === '.') return;
+        if (fillC) x.fillStyle = fillC;
+        else { const q = hex(d.palette[ch]).map((p, k) => Math.round(p * t[k] / 255)); x.fillStyle = `rgb(${q})`; }
+        x.fillRect(c.dataset.flip ? d.frameWidth - 1 - i : i, y, 1, 1); }));
+      const s = +c.dataset.s || 1;
+      c.style.width = Math.round(d.frameWidth * s) + 'px'; c.style.height = Math.round(d.frameHeight * s) + 'px';
+    });
+    // the 900 px stage scales on its own width
+    const fitWide = () => document.querySelectorAll('.wide-wrap').forEach((w) => { const st = w.querySelector('.stage'); const k = Math.min(1.4, w.clientWidth / 900); st.style.transform = 'scale(' + k + ')'; w.style.height = 360 * k + 'px'; });
+    fitWide(); addEventListener('resize', fitWide);
+  })();
+</script>
+</body>
+</html>
