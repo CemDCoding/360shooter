@@ -36,6 +36,11 @@ export class ArmourRing {
     this.gfx?.setVisible(false);
   }
 
+  /** Quicktime focus (AP-173): the fire ring is a rank 4 effect, the scene sets its opacity. */
+  setEffectAlpha(alpha: number): void {
+    this.gfx?.setAlpha(alpha);
+  }
+
   /** Call every frame with the player position. */
   setCenter(x: number, y: number): void {
     this.gfx?.setPosition(x, y);

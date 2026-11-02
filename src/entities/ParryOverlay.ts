@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PARRY_RULES } from '../config/parry';
 import { OPACITY, THEME, themeColor, type ColorName } from '../config/theme';
 import type { ParryGrade, ParryRules } from '../contracts';
+import { FocusSwitch } from '../logic/effectRank';
 import { ringState, targetPosition, type ParryCircleState } from '../logic/parry';
 import { hudScale } from '../platform/layout';
 import { prefersReducedMotion } from '../platform/motion';
@@ -24,6 +25,7 @@ import {
   FLAG,
   FLAG_OFFSET,
   HOLD_SEGMENTS,
+  KEYLINE,
   SELECT_RING_R,
   SLEEP_Z_OFFSET,
   beatDotRects,
@@ -33,7 +35,10 @@ import {
   flagShown,
   holdFilled,
   holdSegmentArc,
+  keylineOffsets,
+  keylineRect,
   linkDots,
+  ringKeylines,
   resultWord,
   sleepRise,
   symbolLit,
@@ -67,6 +72,11 @@ const BURST_RING_DEPTH = 9.5;
 /** The choice hint board lies under the circles (brief H-37: circles above the board in depth). */
 const BOARD_DEPTH = PARRY_DEPTH - 0.5;
 const SPRITE_DEPTH = PARRY_DEPTH + 0.05;
+/** Ink copies behind a sprite edge: above the circle graphics, below the edge sprite itself. */
+const KEYLINE_SPRITE_DEPTH = SPRITE_DEPTH - 0.01;
+/** Ink of the keylines on both sides of every circle part (brief H-41 3a, always, not only in focus). */
+const KEYLINE_COLOR: ColorName = 'game.parry-keyline';
+const KEYLINE_OFFSETS = keylineOffsets();
 
 const RADIUS = THEME.sizePx['size.parry-radius'];
 const LINE = THEME.sizePx['size.parry-line'];
@@ -280,6 +290,18 @@ export class ParryViewState {
   /** Motif frame of each burst (same order as bursts), null without a motif. */
   burstMotifs: (number | null)[] = [];
   private cues: ParryCue[] = [];
+  /** Quicktime focus (AP-173): on while a group is shown (announcement to feedback), with focus-hold. */
+  private readonly focus = new FocusSwitch();
+
+  /** True while the quicktime focus is on (the scene asks for it every frame, Q-77 (a)). */
+  get focused(): boolean {
+    return this.focus.active;
+  }
+
+  /** Advances the focus on play time: busy while any group is listed (open circles or their feedback). */
+  tickFocus(dtMs: number): void {
+    this.focus.update(dtMs, this.entries.size > 0);
+  }
 
   /** Takes over the open groups of the bosses. Groups that vanished without an impact (boss gone) go away. */
   sync(groups: readonly ParryGroup[]): void {
@@ -358,6 +380,8 @@ export class ParryViewState {
     this.bursts = [];
     this.burstMotifs = [];
     this.cues = [];
+    // Boss death and round end end the focus at once (no hold).
+    this.focus.reset();
   }
 
   get isEmpty(): boolean {
@@ -429,6 +453,8 @@ export function openCircleLook(
 
 interface ImageOpts {
   tint?: ColorName | null;
+  /** Fill the whole shape with the tint (ink copies of the keylines) instead of multiplying it. */
+  fill?: boolean;
   scale?: number;
   alpha?: number;
   depth?: number;
@@ -477,8 +503,17 @@ export class ParryOverlay {
   update(dtMs: number, groups: readonly ParryGroup[], player: Point): ParryCue[] {
     this.state.advance(dtMs);
     this.state.sync(groups);
+    this.state.tickFocus(dtMs);
     this.redraw(player);
     return this.state.takeCues();
+  }
+
+  /**
+   * Quicktime focus as a query (AP-173, plan §4 "Quicktime-Fokus", Q-77 (a)): on from the announcement of the
+   * first circle until the feedback of the last one plus focus-hold; off at once after clear().
+   */
+  get focused(): boolean {
+    return this.state.focused;
   }
 
   destroy(): void {
@@ -547,9 +582,7 @@ export class ParryOverlay {
 
     if (kind === 'decoy') {
       // Wavy edge, no glass, no ring (brief H-37 2a).
-      this.image(`${key}:edge`, used, DECOY_EDGE_SHEET, DECOY_EDGE_FRAME, cx, cy, {
-        tint: 'game.parry-decoy',
-      });
+      this.decoyEdge(key, used, DECOY_EDGE_FRAME, cx, cy, 'game.parry-decoy', 1);
       this.symbol(key, used, symbolFrame(c?.symbol), cx, cy, 'game.parry-decoy', v);
       return;
     }
@@ -558,8 +591,10 @@ export class ParryOverlay {
 
     this.disc(cx, cy, 'game.parry-circle', true);
     if (look.ringScale !== null) {
+      const outerR = RADIUS * look.ringScale;
+      this.ringKeylines(cx, cy, outerR);
       g.lineStyle(LINE, themeColor('game.parry-approach').num, 1);
-      g.strokeCircle(cx, cy, RADIUS * look.ringScale - LINE / 2);
+      g.strokeCircle(cx, cy, outerR - LINE / 2);
     }
 
     if (kind === 'hold' && c) {
@@ -621,19 +656,14 @@ export class ParryOverlay {
     if (kind === 'decoy') {
       if (c?.tapped === true) {
         // Touched: the edge breaks, the symbol goes, "TRUG!" (brief H-37 10a).
-        this.image(`${key}:edge`, used, DECOY_EDGE_SHEET, DECOY_BROKEN_FRAME, cx, cy, {
-          tint: 'game.parry-miss',
-        });
+        this.decoyEdge(key, used, DECOY_BROKEN_FRAME, cx, cy, 'game.parry-miss', 1);
         if (word) this.word(`${key}:w`, used, word, v, player, v.shownMs);
         return;
       }
       // Avoided: fades out silently in motion.base (reduced motion: gone at once).
       const alpha = decoyFade(v.shownMs, this.reduced);
       if (alpha <= 0) return;
-      this.image(`${key}:edge`, used, DECOY_EDGE_SHEET, DECOY_EDGE_FRAME, cx, cy, {
-        tint: 'game.parry-decoy',
-        alpha,
-      });
+      this.decoyEdge(key, used, DECOY_EDGE_FRAME, cx, cy, 'game.parry-decoy', alpha);
       const f = symbolFrame(c?.symbol);
       if (f !== null)
         this.image(`${key}:s`, used, SYMBOL_SHEET, f, cx, cy, { tint: 'game.parry-decoy', alpha });
@@ -696,9 +726,15 @@ export class ParryOverlay {
     const g = this.gfx;
     g.fillStyle(themeColor('game.parry-link').num, 1);
     for (const d of linkDots(at, { x: tx, y: ty }, boxR)) g.fillRect(d.x - 1, d.y - 1, 2, 2);
-    g.fillStyle(themeColor('game.parry-target').num, 1);
-    for (const [x, y, w, h] of bracketRects(tx, ty, Math.round(boxR), undefined, LINE))
+    const brackets = bracketRects(tx, ty, Math.round(boxR), undefined, LINE);
+    // Keylines: ink rectangles 1 px larger behind every bracket bar, then the bars on top.
+    g.fillStyle(themeColor(KEYLINE_COLOR).num, 1);
+    for (const r of brackets) {
+      const [x, y, w, h] = keylineRect(r);
       g.fillRect(x, y, w, h);
+    }
+    g.fillStyle(themeColor('game.parry-target').num, 1);
+    for (const [x, y, w, h] of brackets) g.fillRect(x, y, w, h);
     const f = targetFrame(c.kind, c.symbol);
     if (f !== null)
       this.image(`${key}:t`, used, SYMBOL_SHEET, f, tx, ty, { tint: 'game.parry-target' });
@@ -707,6 +743,7 @@ export class ParryOverlay {
   /** hold: inner ring with 8 steps clockwise from the top, filled steps in game.parry-hold. */
   private holdRing(cx: number, cy: number, filled: number): void {
     const g = this.gfx;
+    this.ringKeylines(cx, cy, THEME.sizePx['size.parry-hold-r']);
     for (let i = 0; i < HOLD_SEGMENTS; i++) {
       const arc = holdSegmentArc(i);
       g.lineStyle(
@@ -837,7 +874,41 @@ export class ParryOverlay {
       const fill = themeColor('game.parry-fill');
       g.fillStyle(fill.num, fill.alpha ?? 1).fillCircle(cx, cy, RADIUS);
     }
+    this.ringKeylines(cx, cy, RADIUS);
     g.lineStyle(LINE, themeColor(edge).num, 1).strokeCircle(cx, cy, RADIUS - LINE / 2);
+  }
+
+  /**
+   * Keylines of a LINE px ring whose outer side lies on `outerR` (brief H-41 3a): 1 px ink directly outside and
+   * directly inside, always (not only in focus). Phosphor then always touches ink (>= 12:1).
+   */
+  private ringKeylines(cx: number, cy: number, outerR: number): void {
+    const k = ringKeylines(outerR, LINE);
+    const g = this.gfx;
+    g.lineStyle(KEYLINE, themeColor(KEYLINE_COLOR).num, 1);
+    g.strokeCircle(cx, cy, k.outer);
+    if (k.inner > 0) g.strokeCircle(cx, cy, k.inner);
+  }
+
+  /** Wavy decoy edge (sprite) with its keylines: four ink copies shifted by 1 px behind it (brief H-41 3a). */
+  private decoyEdge(
+    key: string,
+    used: Set<string>,
+    frame: number,
+    cx: number,
+    cy: number,
+    tint: ColorName,
+    alpha: number,
+  ): void {
+    KEYLINE_OFFSETS.forEach(([dx, dy], i) =>
+      this.image(`${key}:edge-k${i}`, used, DECOY_EDGE_SHEET, frame, cx + dx, cy + dy, {
+        tint: KEYLINE_COLOR,
+        fill: true,
+        alpha,
+        depth: KEYLINE_SPRITE_DEPTH,
+      }),
+    );
+    this.image(`${key}:edge`, used, DECOY_EDGE_SHEET, frame, cx, cy, { tint, alpha });
   }
 
   /** "Missed": dashed edge, no fill. */
@@ -936,7 +1007,8 @@ export class ParryOverlay {
     img.setScale(scale);
     img.setDepth(opts.depth ?? SPRITE_DEPTH);
     img.setAlpha(opts.alpha ?? 1);
-    if (opts.tint) img.setTint(themeColor(opts.tint).num);
+    if (opts.tint && opts.fill) img.setTintFill(themeColor(opts.tint).num);
+    else if (opts.tint) img.setTint(themeColor(opts.tint).num);
     else img.clearTint();
     img.setPosition(
       Math.round(x - (img.width * scale) / 2),

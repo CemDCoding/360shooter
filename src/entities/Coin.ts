@@ -52,7 +52,10 @@ export class Coin extends Phaser.Physics.Arcade.Sprite {
     if (!this.halos) {
       const color = themeColor(COIN_VISUAL.outlineColorToken).num;
       this.halos = OFFSETS.map(() =>
-        this.scene.add.sprite(this.x, this.y, this.texture.key, this.frame.name).setTintFill(color),
+        this.scene.add
+          .sprite(this.x, this.y, this.texture.key, this.frame.name)
+          .setTintFill(color)
+          .setAlpha(this.alpha),
       );
     }
     const px = COIN_VISUAL.outlinePx;
@@ -64,6 +67,13 @@ export class Coin extends Phaser.Physics.Arcade.Sprite {
       h.setScale(this.scaleX);
       h.setDepth(this.depth - 0.1);
     });
+  }
+
+  /** Quicktime focus (AP-173): coins are a rank 4 effect, the scene sets the opacity of coin and outline. */
+  setEffectAlpha(alpha: number): void {
+    if (this.alpha === alpha) return;
+    this.setAlpha(alpha);
+    this.halos?.forEach((h) => h.setAlpha(alpha));
   }
 
   /** Magnet step towards the player; collects when close enough. */
