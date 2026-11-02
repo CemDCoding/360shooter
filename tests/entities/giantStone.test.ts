@@ -109,7 +109,8 @@ const { BOSSES, BOSS_TUNING } = await import('../../src/config/bosses');
 const { PARRY_RULES } = await import('../../src/config/parry');
 const { scaledDamage, variantForLevel } = await import('../../src/logic/boss');
 const { circlePosition, targetPosition } = await import('../../src/logic/parry');
-const { angleDegOf, deltaDeg, spacingDeg } = await import('../../src/entities/bosses/bossGeometry');
+const { angleDegOf, deltaDeg, polarPoint, spacingDeg } =
+  await import('../../src/entities/bosses/bossGeometry');
 
 type Stone = InstanceType<typeof GiantStone>;
 
@@ -334,24 +335,48 @@ describe('GiantStone Riesenzank (AP-154)', () => {
     expect(follower.parryGroups).toHaveLength(0);
   });
 
-  it('all hit: both stones roll only to their clash point, clear of the player, without damage', () => {
-    const resolved: ParryOutcome[] = [];
-    const whole = makeStone(LEVEL_EXTRA, {
-      onParryResolved: (o: ParryOutcome) => resolved.push(o),
+  // Lanes 40°, 90° and 160° apart (design review AP-154; at 20° the two targets overlap, no quarrel): the stones meet outside the circle ring and touch.
+  for (const [gap, from] of [
+    [40, 340],
+    [90, 315],
+    [160, 190],
+  ] as const) {
+    it(`all hit, lanes ${gap}° apart: both stones roll into each other outside the circle ring, no damage`, () => {
+      const resolved: ParryOutcome[] = [];
+      const hits: number[] = [];
+      const whole = makeStone(LEVEL_EXTRA, {
+        onParryResolved: (o: ParryOutcome) => resolved.push(o),
+        getPlayerPos: () => CENTER,
+        onPlayerHit: (d: number) => hits.push(d),
+      });
+      whole.spawn(600, 180);
+      const [leader, follower] = split(whole, [
+        polarPoint(CENTER, from, 150),
+        polarPoint(CENTER, from + gap, 150),
+      ]);
+      announce(leader, 'quarrel', LEVEL_EXTRA).run(true);
+      expect(resolved.at(-1)?.blocked).toBe(true);
+      const r = T.baseRadius * 0.5;
+      const ring = PARRY_RULES.distanceFromPlayerPx + PARRY_RULES.circleRadiusPx + r;
+      const [ta, tb] = [inner(leader).target, inner(follower).target];
+      expect(Math.hypot(ta.x - tb.x, ta.y - tb.y)).toBeCloseTo(2 * r, 6);
+      for (const s of [leader, follower]) {
+        expect(inner(s).phase).toBe('rolling');
+        expect(inner(s).pendingDamage).toBe(0);
+        const t = inner(s).target;
+        expect(Math.hypot(t.x - CENTER.x, t.y - CENTER.y)).toBeGreaterThanOrEqual(ring);
+      }
+      // Let both roll until they bounce off: the player is never hit on the way.
+      for (let i = 0; i < 200; i++) {
+        for (const s of [leader, follower]) {
+          if (inner(s).phase === 'rolling') inner(s).behave(16);
+        }
+      }
+      expect(inner(leader).phase).toBe('retreating');
+      expect(inner(follower).phase).toBe('retreating');
+      expect(hits).toEqual([]);
     });
-    whole.spawn(600, 180);
-    const [leader, follower] = split(whole);
-    announce(leader, 'quarrel', LEVEL_EXTRA).run(true);
-    expect(resolved.at(-1)?.blocked).toBe(true);
-    const minDist = T.baseRadius * 0.5 + BOSS_TUNING.playerHitRadius;
-    for (const s of [leader, follower]) {
-      expect(inner(s).phase).toBe('rolling');
-      expect(inner(s).pendingDamage).toBe(0);
-      const t = inner(s).target;
-      expect(Math.hypot(t.x - CENTER.x, t.y - CENTER.y)).toBeGreaterThan(minDist);
-      expect(Math.abs(deltaDeg(angleDegOf(CENTER, t), angleDegOf(CENTER, s)))).toBeLessThan(1e-6);
-    }
-  });
+  }
 
   it('missed: both stones roll to the player with half the damage each', () => {
     const whole = makeStone(LEVEL_EXTRA);

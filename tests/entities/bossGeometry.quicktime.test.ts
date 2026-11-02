@@ -5,7 +5,7 @@ import {
   angleDegOf,
   boxDistance,
   boxFits,
-  clashDistance,
+  clashPoints,
   coilAnchors,
   coilAngles,
   deltaDeg,
@@ -124,22 +124,48 @@ describe('safe zone of drag targets (AP-154)', () => {
   });
 });
 
-describe('Riesenzank: stones clash before the player (AP-154)', () => {
+describe('Riesenzank: stones clash outside the circle ring (AP-154)', () => {
   const r = BOSS_TUNING.giantStone.baseRadius * 0.5;
-  const min = r + BOSS_TUNING.playerHitRadius + 4;
+  const ring = P.distanceFromPlayerPx + P.circleRadiusPx + r;
+  const hit = r + BOSS_TUNING.playerHitRadius;
+  const dist = (p: Point, q: Point): number => Math.hypot(p.x - q.x, p.y - q.y);
+  /** Closest approach of the straight roll from `from` to `to` to the player at C. */
+  const pathMin = (from: Point, to: Point): number => {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const len2 = dx * dx + dy * dy;
+    const t =
+      len2 > 0 ? Math.max(0, Math.min(1, ((C.x - from.x) * dx + (C.y - from.y) * dy) / len2)) : 0;
+    return dist(C, { x: from.x + dx * t, y: from.y + dy * t });
+  };
 
-  it('stones from opposite sides stop clear of the player', () => {
-    expect(clashDistance(180, r, min)).toBe(min);
-  });
+  for (const gap of [20, 90, 160, 180]) {
+    for (const start of [0, 75, 200, 310]) {
+      for (const [da, db] of [
+        [250, 250],
+        [180, 260],
+      ] as const) {
+        it(`lanes ${gap}° apart (start ${start}°, ${da}/${db} px): stones touch, ring stays clear`, () => {
+          const a = polarPoint(C, start, da);
+          const b = polarPoint(C, start + gap, db);
+          const [sa, sb] = clashPoints(C, a, b, r, ring);
+          expect(dist(sa, sb)).toBeCloseTo(2 * r, 6);
+          expect(dist(C, sa)).toBeGreaterThanOrEqual(ring);
+          expect(dist(C, sb)).toBeGreaterThanOrEqual(ring);
+          // Only just outside the ring: they really roll in toward each other.
+          expect(Math.min(dist(C, sa), dist(C, sb))).toBeLessThan(ring + 2);
+          expect(pathMin(a, sa)).toBeGreaterThan(hit);
+          expect(pathMin(b, sb)).toBeGreaterThan(hit);
+        });
+      }
+    }
+  }
 
-  it('closer lanes clash further out, where the stones touch', () => {
-    const d = clashDistance(30, r, min);
-    expect(d).toBeCloseTo(r / Math.sin(Math.PI / 12));
-    expect(d).toBeGreaterThan(min);
-    const a = polarPoint(C, 0, d);
-    const b = polarPoint(C, 30, d);
-    expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeCloseTo(2 * r);
-    expect(clashDistance(0, r, min)).toBe(Infinity);
+  it('stones on the same spot still get two touching stops', () => {
+    const p = polarPoint(C, 40, 200);
+    const [sa, sb] = clashPoints(C, p, p, r, ring);
+    expect(dist(sa, sb)).toBeCloseTo(2 * r, 6);
+    expect(dist(C, sa)).toBeGreaterThanOrEqual(ring);
   });
 });
 

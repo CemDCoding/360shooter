@@ -475,14 +475,54 @@ export function fitDistance(
 }
 
 /**
- * Distance from the player where two stones of `radius` rolling in on lanes `gapDeg` apart touch each other,
- * never below `minDist` (so they bounce off each other before they reach the player).
+ * Stop points of two stones of `radius` that clash with each other: they touch (exactly 2·radius apart, on the
+ * line from `a` to `b`) at a meeting point straight out from `center`, across that line on its side, pushed out
+ * just far enough that both stops keep at least `minDist` from `center`.
  */
-export function clashDistance(gapDeg: number, radius: number, minDist: number): number {
-  const halfGap = (Math.min(180, Math.abs(gapDeg)) * Math.PI) / 360;
-  const s = Math.sin(halfGap);
-  const d = s > 1e-6 ? Math.max(0, radius) / s : Infinity;
-  return Math.max(minDist, d);
+export function clashPoints(
+  center: Point,
+  a: Point,
+  b: Point,
+  radius: number,
+  minDist: number,
+): [Point, Point] {
+  const r = Math.max(0, radius);
+  const mx = (a.x + b.x) / 2 - center.x;
+  const my = (a.y + b.y) / 2 - center.y;
+  const ml = Math.hypot(mx, my);
+  let wx = b.x - a.x;
+  let wy = b.y - a.y;
+  const wl = Math.hypot(wx, wy);
+  let ux: number;
+  let uy: number;
+  if (wl > 1e-6) {
+    wx /= wl;
+    wy /= wl;
+    // Push out across the line a-b (toward its side of the player), never along it: rolling along it would
+    // lead one stone through the player when the lanes are nearly opposite.
+    const along = mx * wx + my * wy;
+    const px = mx - along * wx;
+    const py = my - along * wy;
+    const pl = Math.hypot(px, py);
+    ux = pl > 1e-6 ? px / pl : -wy;
+    uy = pl > 1e-6 ? py / pl : wx;
+  } else {
+    ux = ml > 1e-6 ? mx / ml : 1;
+    uy = ml > 1e-6 ? my / ml : 0;
+    wx = -uy;
+    wy = ux;
+  }
+  const stops = (d: number): [Point, Point] => [
+    { x: center.x + ux * d - wx * r, y: center.y + uy * d - wy * r },
+    { x: center.x + ux * d + wx * r, y: center.y + uy * d + wy * r },
+  ];
+  const far = (p: Point): boolean => Math.hypot(p.x - center.x, p.y - center.y) >= minDist;
+  const maxD = Math.max(0, minDist) + r + 1;
+  for (let d = 0; d < maxD; d++) {
+    const s = stops(d);
+    if (far(s[0]) && far(s[1])) return s;
+  }
+  return stops(maxD);
 }
 
 export interface DragAnchorOptions {

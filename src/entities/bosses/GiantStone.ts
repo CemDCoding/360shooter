@@ -12,11 +12,10 @@ import { rimRadii } from './rim';
 import {
   angleDegOf,
   clampToArena,
-  clashDistance,
+  clashPoints,
   deltaDeg,
   fragmentPositions,
   normDeg,
-  polarPoint,
   quarrelAnchors,
   safeZone,
   spacingDeg,
@@ -35,8 +34,6 @@ const P = PARRY_RULES;
 const FREEZE_MS = 300;
 /** Riesenzank: each pebble circle sits this far beside the lane of its stone, away from the other lane. */
 const QUARREL_SIDE_DEG = 30;
-/** Riesenzank parried: the stones stop at least this far from the player's hit circle. */
-const CLASH_CLEAR_PX = 4;
 /** Mirror of the stick edge margin (VirtualStick EDGE_MARGIN): drag targets stay off the stick. */
 const STICK_EDGE = 24;
 const STICK_CATCH_R = Math.max(STICK_CATCH_DIAMETER, THEME.sizePx['size.stick']) / 2;
@@ -286,7 +283,7 @@ export class GiantStone extends BossBase {
 
   /**
    * Impact of the quarrel: both stones roll at once, each with half the (parried) damage. All circles hit: they
-   * roll only to the point where they clash with each other and bounce off there, clear of the player.
+   * roll toward each other and clash (touching) outside the circle ring, clear of the player, then bounce off.
    */
   private quarrelHits(damage: number, parryFactor: number): void {
     if (this.phase !== 'quarrel') return;
@@ -300,17 +297,11 @@ export class GiantStone extends BossBase {
         this.freezeLeftMs = FREEZE_MS;
         return;
       }
-      const gap = deltaDeg(angleDegOf(m, this), angleDegOf(m, other));
-      const clash = clashDistance(
-        gap,
-        this.radius,
-        this.radius + BOSS_TUNING.playerHitRadius + CLASH_CLEAR_PX,
-      );
-      for (const s of stones) {
-        const lane = angleDegOf(m, s);
-        const dist = Math.min(clash, Math.hypot(s.x - m.x, s.y - m.y));
-        s.startRoll(polarPoint(m, lane, dist), 0);
-      }
+      // They meet outside the circle ring and touch there (design review AP-154).
+      const minDist = P.distanceFromPlayerPx + P.circleRadiusPx + this.radius;
+      const [a, b] = clashPoints(m, this, other, this.radius, minDist);
+      this.startRoll(clampToArena(a, this.arena), 0);
+      other.startRoll(clampToArena(b, other.arena), 0);
       return;
     }
     for (const s of stones) s.startRoll(m, damage / 2);
