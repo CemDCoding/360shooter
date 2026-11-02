@@ -99,7 +99,7 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein (neues Modul in `src/logic`, neue Konfigurationsdatei)
 - **Risiken:** Annahmen der Referenzspielerin (Trefferquote, Items) sind geschätzt; nach H-36/H-38 nachjustieren.
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-02)
 
 ### RS-05.2 – Kurve glätten: Wald-Finale und Doppelzählung ab Level 21
 - **Vorschlag:** (a) **Level 1 bis 4:** Gegnerzahl-Faktor 1,5 / 1,6 / 1,75 / 1,9 / 2,0 (statt bis 2,5), Stufen-HP im Wald +5 % statt +8 % je Stufe (ab Level 5 wieder 2,5 bzw. +8 %). Referenz-Druck dann etwa 0,77 / 0,91 / 1,11 / 1,31 / 1,54. `xp` und `coin` passen sich über den Faktor von selbst an. (b) **Level 31 bis 40:** `M5_HP` so setzen, dass der Referenz-Druck linear von 1,30 auf 1,80 steigt: etwa 1,250 / 1,209 / 1,186 / 1,156 / 1,138 / 1,122 / 1,112 / 1,106 / 1,098 / 1,093 (heute 1,385 bis 2,422), die Stufe trägt den Anstieg wie in Level 5 bis 20. (c) Level 21 bis 30 bleiben (0,93 bis 1,80), optional `hp` je Batch flach (dann 0,93 bis 1,41).
@@ -108,7 +108,7 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
 - **Risiken:** Oase fühlt sich „weicher“ an, als der Nutzer es nach M7 gewohnt ist (gewollt laut 1a); Tests aus AP-127 („Druck mindestens 2,3-mal alt“) widersprechen und müssen geändert werden; `TIER_RULES` kennt heute vermutlich keinen Wert je Batch (Coder prüft).
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-02)
 
 ### RS-05.3 – Boss-HP an die erwartbare DPS koppeln, Ankündigungs-Anteil begrenzen
 - **Vorschlag:** (a) Boss-HP je Level = Zielzeit · Referenz-DPS (Laser der Referenzspielerin · 0,9 · 1,5 für Doppelschuss im Mittel, plus Pet-Anteil nach RS-05.4). Zielzeit: Batch-Start etwa 20 bis 28 s, Batch-Ende 30 bis 38 s, Level 40 etwa 45 s. Richtwerte ohne Pet: Level 0 1 080, 4 1 990, 9 3 250, 20 6 460, 21 4 780, 25 7 650, 30 9 640, 31 7 360, 40 14 120 (heute 1 000 bis 7 989; ab Level 21 etwa ×2,2 bis ×2,4). Umsetzung als `baseHp` je Boss plus eigener Schritt je Index oder als Tabelle je Level. (b) Ankündigungs-Anteil je Boss höchstens 0,40: Abklingzeit der schnellen Angriffe verlängern (z. B. `rootThrust` 3,5 → 5 s, `orbFan` 3,5 → 5 s, `spikeVolley` 4 → 5,5 s, `goldCurse` 4,5 → 6 s); Telegraph-Zeiten (≥ 1,2 s, PE-157) bleiben. (c) Test: Boss-Dauer der Referenzspielerin im Zielband, jeder Angriff des Levels erscheint bei Zielzeit mindestens einmal.
@@ -117,7 +117,7 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
 - **Risiken:** Ohne Doppelschuss dauern späte Kämpfe bis etwa 70 s (Timer läuft weiter, PE-18), das kann zäh wirken. RS-05.6 fängt Niederlagen ab. Werte nach H-38 nachjustieren (RI-40 „nicht zu leicht“).
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-02)
 
 ### RS-05.4 – Pet-Power-ups nur auf den Schaden, Pet-Anteil begrenzen
 - **Vorschlag:** `PET_RULES.powerUpSpeedMul` 1,3 → 1,0 (oder beide Faktoren 1,15), so dass 3 Power-ups etwa 2,2-fach statt 4,8-fach ergeben. Ziel-Band im Test (RS-05.1): Anteil des Pets am Gesamtschaden der Referenzspielerin mit 3 Power-ups 20 bis 40 % gegen ein Ziel (Boss). Capybara-Aura gegen viele Gegner zusätzlich auf höchstens N Ziele je Tick begrenzen (Startwert 8), wenn der Test sie als Ausreißer meldet.
@@ -126,7 +126,7 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
 - **Risiken:** Pets fühlen sich schwächer an als im ersten Handtest; ändert nicht den Ei-Rhythmus. Mit RS-05.3 zusammen einstellen.
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-02)
 
 ### RS-05.5 – Rüstungs-Effekte relativ zum Laserschaden
 - **Vorschlag:** Dornen, Brand und Explosion als Anteil am aktuellen Laserschaden statt fester Zahlen: Dornen 1,0 ·, Brand 0,5 · je Sekunde, Explosion 1,5 · Laserschaden. Bei Grundwaffe (10 Schaden) entspricht das genau den heutigen Werten 10 / 5 / 15, später wachsen sie mit den Upgrades. Feuerring-Item (20/s) unverändert.
@@ -135,7 +135,7 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
 - **Risiken:** Höllen-Set wird spät deutlich stärker; Brand und Explosion zählen nicht im Referenz-Druck (bewusst Bonus).
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-02)
 
 ### RS-05.6 – Verdeckter „Rückenwind“ nach Niederlagen
 - **Vorschlag:** Neues optionales Feld im Spielstand v3 (`assist`: Stufe 0 bis 3 je Level-ID). Nach der 2. Niederlage in Folge im selben Level +1 Stufe, nach jeder weiteren Niederlage +1, höchstens 3; ein Sieg setzt das Level auf 0. Je Stufe: Gegner-HP ·0,92, Spawn-Abstand ·1,06, Boss-HP ·0,90, Boss-Schaden ·0,90 (Stufe 3: HP 0,78, Boss 0,73). Untergrenze: der Referenz-Druck fällt nie unter den des ersten Levels im Batch. Gold, Erfahrung, Diamanten und die Abwehr-Zeitfenster bleiben unverändert, nichts wird angezeigt. Abbruch über das Pausemenü (F-30) zählt nicht als Niederlage. „Fortschritt zurücksetzen“ löscht das Feld. Reine Funktion in `src/logic/assist.ts`, angewendet beim Rundenstart.
@@ -144,7 +144,7 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Datenmodell: neues optionales SaveGame-Feld (nur lokal, keine personenbezogenen Daten)
 - **Risiken:** Bemerkt der Nutzer die Anpassung, kann sie sich wie „geschenkt“ anfühlen [Q3 zeigt eher das Gegenteil]; Handtester messen mit `?level` andere Werte als nach Niederlagen (Debug-Anzeige der Stufe nur mit `?fps=1` empfehlenswert).
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-02)
 
 ### RS-05.7 – Quicktime-Fokus: Effektdichte-Regel während der Abwehr
 - **Vorschlag:** Ergänzung zu AP-165. Solange ein Abwehr-Kreis aktiv ist (Ankündigung bis Auflösung): (a) Map-Hintergrund und Boss-Arena-Deko auf etwa 60 bis 70 % Helligkeit abdunkeln (Token für Abdunkelung und Übergang ≤ 120 ms, mit „Bewegung reduzieren“ ohne Übergang); (b) Effekte der unteren Rangstufen (Pet, Rüstung, Feuerring, Münzen, Partikel) auf etwa 40 % Deckkraft und ohne neue Partikel-Emissionen im Ring um die Spielerin bis etwa 110 px (Kreis-Abstand 56 + Ringstart 2,5 · 20); (c) Kontrastregel im Design-System: Kreis und Ring mindestens 4,5:1 gegen die **schwächste** angrenzende Hintergrundfarbe, Umriss hell und dunkel; (d) „EFFEKTE REDUZIEREN“ (M10) senkt diese Effekte zusätzlich dauerhaft in der Runde. Rangfolge der Effekte als reine Funktion mit Test (Tiefe und Deckkraft je Rangstufe).
@@ -153,7 +153,7 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: neuer Ablauf „Fokus-Zustand“ zwischen Abwehr und Effekten (Event oder Abfrage); Design: neue Tokens
 - **Risiken:** Abdunkeln selbst ist ein Helligkeitswechsel. Er bleibt weich und großflächig unter der Grenze von 3 Blitzen/s (§5), ist aber im Handtest zu prüfen. Mehr Zeichenaufrufe am iPhone sind nicht zu erwarten (Deckkraft statt neuer Objekte).
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-02)
 
 ## Vertrauen und Lücken
 
@@ -186,3 +186,4 @@ Boss-HP heute = `baseHp` · (1 + 0,15 · Index im Batch). Laser-DPS der Referenz
 
 ## Entscheidungen
 - Nutzer am 2026-11-02: Rückfragen beantwortet: 1a (Fairness mit realistisch erspielten Upgrades, Druck-Band), 2b (Rückenwind verdeckt), Diamanten-Knappheit bleibt.
+- Nutzer am 2026-11-02: RS-05.1 bis RS-05.7 freigegeben
