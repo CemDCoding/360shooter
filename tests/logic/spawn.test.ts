@@ -1,14 +1,32 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ENEMIES, LEVEL_SCALING, getLevel } from '../../src/config';
 import { EnemyPool } from '../../src/entities/enemies/createEnemy';
-import type { EnemyId, LevelDef } from '../../src/contracts';
+import type { EliteRules, EnemyId, EnemyRole, LevelDef } from '../../src/contracts';
+import { LEVELS } from '../../src/config/levels';
 import {
+  BOSS_WARNING_SEC,
+  ELITE_RULES,
+  PEAK_SEC,
+  RELAX_SEC,
+  ROLE_CAPS,
+  WAVE_PLANS,
+  cyclesOf,
+} from '../../src/config/waves';
+import {
+  BANK_SEC,
+  BUDGET_MARGIN,
+  FILL_INTERVAL_MS,
   FIRST_APPEARANCE_BY,
   MAX_RUN,
+  MIN_INTERVAL_FACTOR,
   OPENING_RADIUS_FACTOR,
   SpawnDirector,
   openingCount,
+  pacingCurve,
+  pacingFactorAt,
+  pacingPhaseAt,
   type SpawnRequest,
+  type WavePhase,
 } from '../../src/logic/spawn';
 
 /** Kleine deterministische Test-RNG (mulberry32). */
@@ -140,9 +158,10 @@ describe('SpawnDirector', () => {
     const regular = spawns.slice(openingCount(level));
     expect(regular.length).toBeGreaterThan(0);
     expect(regular.every((s) => s.radius === 600)).toBe(true);
+    // AP-175: field at the minimum occupancy, so no fill spawn comes in between.
     const d = new SpawnDirector(level, testRng(1), 600);
     d.tick(100, 0);
-    expect(d.tick(level.spawnIntervalMs - 500, 0)).toHaveLength(0);
+    expect(d.tick(level.spawnIntervalMs - 500, d.minimumAlive)).toHaveLength(0);
   });
 
   it('is deterministic for the same seed', () => {
@@ -173,7 +192,7 @@ describe('SpawnDirector', () => {
       const d = new SpawnDirector(level, testRng(5), 600);
       d.tick(1, 0); // opening wave
       let n = 0;
-      for (let t = 0; t < 120_000; t += 100) n += d.tick(100, 0, boss).length;
+      for (let t = 0; t < 120_000; t += 100) n += d.tick(100, d.minimumAlive, boss).length;
       return n;
     };
     const normal = count(false);
@@ -184,19 +203,20 @@ describe('SpawnDirector', () => {
 });
 
 describe('spawn density of level 0 to 4 (AP-91)', () => {
-  /** Zeitpunkte aller Spawns einer Runde, Schritt 20 ms. */
-  function spawnTimes(level: LevelDef, seed: number): number[] {
+  /** Zeitpunkte aller Spawns einer Runde, Schritt 20 ms; `alive` lebende Gegner (Standard: Mindestbelegung). */
+  function spawnTimes(level: LevelDef, seed: number, alive?: number): number[] {
     const d = new SpawnDirector(level, testRng(seed), 600);
     const times: number[] = [];
     for (let t = 0; t < level.durationSec * 1000; t += 20) {
-      for (let k = d.tick(20, 0).length; k > 0; k--) times.push(t);
+      for (let k = d.tick(20, alive ?? d.minimumAlive).length; k > 0; k--) times.push(t);
     }
     return times;
   }
 
-  it('has no gap longer than 1.1 s between two spawns in level 0 to 4 (AP-127)', () => {
+  // AP-175: the relax phase pauses on purpose (RS-01.1); an empty field is filled by the minimum occupancy.
+  it('has no gap longer than 1.1 s between two spawns in level 0 to 4 while the field is empty (AP-127, AP-175)', () => {
     for (let id = 0; id <= 4; id++) {
-      const times = spawnTimes(lvl(id), 11);
+      const times = spawnTimes(lvl(id), 11, 0);
       let last = 0;
       let maxGap = 0;
       for (const t of times) {
@@ -359,9 +379,329 @@ describe('SpawnDirector: variety in level 0 to 2 (AP-166, PE-207)', () => {
     expect(calls).toBe(1 + openingCount(lvl(3)));
   });
 
-  it('keeps the SpawnRequest shape and the tick signature', () => {
+  it('keeps the SpawnRequest shape (plus elite, AP-175) and the tick signature', () => {
     const d = new SpawnDirector(lvl(0), testRng(3), 600);
     const [first] = d.tick(100, 0, false);
-    expect(Object.keys(first).sort()).toEqual(['angle', 'enemyId', 'radius']);
+    expect(Object.keys(first).sort()).toEqual(['angle', 'elite', 'enemyId', 'radius']);
+    expect(SpawnDirector.prototype.tick.length).toBe(2);
+  });
+});
+
+describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', () => {
+  interface Living {
+    id: EnemyId;
+    elite: boolean;
+  }
+  interface Spawned extends SpawnRequest {
+    t: number;
+    phase: WavePhase;
+  }
+  interface SimResult {
+    spawns: Spawned[];
+    maxRole: Record<EnemyRole, number>;
+    belowMinAlive: number;
+    eliteShareViolations: number;
+    budgetMin: number;
+  }
+  const ROLE_LIST: EnemyRole[] = ['melee', 'fast', 'shooter', 'tank', 'aura'];
+  const roleOf = (id: EnemyId): EnemyRole => ENEMIES[id].role ?? 'melee';
+  const zeroRoles = (): Record<EnemyRole, number> =>
+    Object.fromEntries(ROLE_LIST.map((r) => [r, 0])) as Record<EnemyRole, number>;
+
+  /**
+   * A small world: the player kills one random living enemy every `killEveryMs`. With `report` the scene tells the
+   * director about each removal (exact role caps), otherwise only the living count reaches the director.
+   */
+  function simulate(
+    level: LevelDef,
+    opts: { killEveryMs: number; report?: boolean; seed?: number; rules?: EliteRules },
+  ): SimResult {
+    const seed = opts.seed ?? 1;
+    const d = new SpawnDirector(level, testRng(seed), 600, opts.rules);
+    const killRng = testRng(seed + 1000);
+    const world: Living[] = [];
+    const spawns: Spawned[] = [];
+    const maxRole = zeroRoles();
+    const dt = 50;
+    const windowMs = (level.durationSec - BOSS_WARNING_SEC) * 1000;
+    const floor = Math.min(d.minimumAlive, level.maxEnemies);
+    let belowMinAlive = 0;
+    let reached = false;
+    let belowSince = -1;
+    let eliteShareViolations = 0;
+    let budgetMin = Number.POSITIVE_INFINITY;
+    let nextKill = opts.killEveryMs;
+    for (let t = 0; t < level.durationSec * 1000; t += dt) {
+      if (t >= nextKill) {
+        nextKill += opts.killEveryMs;
+        if (world.length > 0) {
+          const [gone] = world.splice(Math.floor(killRng.next() * world.length), 1);
+          if (opts.report) d.noteRemoved(gone.id, gone.elite);
+        }
+      }
+      const reqs = d.tick(dt, world.length);
+      const phase = d.phase;
+      for (const r of reqs) {
+        world.push({ id: r.enemyId, elite: r.elite === true });
+        spawns.push({ ...r, t, phase });
+        if (r.elite) {
+          const elites = world.filter((w) => w.elite).length;
+          if (elites > (opts.rules ?? ELITE_RULES).maxShare * world.length + 1e-9) {
+            eliteShareViolations += 1;
+          }
+        }
+      }
+      const counts = zeroRoles();
+      for (const w of world) counts[roleOf(w.id)] += 1;
+      for (const r of ROLE_LIST) maxRole[r] = Math.max(maxRole[r], counts[r]);
+      // Counted once the field has reached the minimum (the opening wave is smaller, the fill needs a moment).
+      if (world.length >= floor) reached = true;
+      // A kill right after a fill may leave the field one short until the next fill slot (FILL_INTERVAL_MS).
+      if (reached && t + dt < windowMs && world.length < floor) {
+        if (belowSince < 0) belowSince = t;
+        if (t - belowSince > FILL_INTERVAL_MS) belowMinAlive += 1;
+      } else belowSince = -1;
+      budgetMin = Math.min(budgetMin, d.threatBudget);
+    }
+    return { spawns, maxRole, belowMinAlive, eliteShareViolations, budgetMin };
+  }
+
+  /** Spawns of a round with the linear base ramp before AP-175 (same count as the balance model). */
+  function baseRampCount(level: LevelDef): number {
+    const durMs = level.durationSec * 1000;
+    let t = level.spawnIntervalMs;
+    let n = Math.min(openingCount(level), level.maxEnemies);
+    while (t < durMs) {
+      n += 1;
+      t += level.spawnIntervalMs * (1 - (1 - MIN_INTERVAL_FACTOR) * Math.min(1, t / durMs));
+    }
+    return n;
+  }
+
+  it('runs build-up, peak and relax per cycle, 3 cycles in 3 minutes, 5 in 5 minutes, the last ends at the boss warning', () => {
+    for (const level of [lvl(0), lvl(3), lvl(12), lvl(40)]) {
+      const d = new SpawnDirector(level, testRng(1), 600);
+      const runs: { phase: WavePhase; from: number; cycle: number }[] = [];
+      for (let t = 100; t <= level.durationSec * 1000; t += 100) {
+        d.tick(100, d.minimumAlive);
+        if (runs.length === 0 || runs[runs.length - 1].phase !== d.phase) {
+          runs.push({ phase: d.phase, from: t, cycle: d.cycle });
+        }
+      }
+      const cycles = cyclesOf(level.durationSec);
+      expect(cycles, `level ${level.id}`).toBe(level.durationSec === 180 ? 3 : 5);
+      const want: WavePhase[] = [];
+      for (let c = 0; c < cycles; c++) want.push('build', 'peak', 'relax');
+      want.push('boss');
+      expect(
+        runs.map((r) => r.phase),
+        `level ${level.id}`,
+      ).toEqual(want);
+      expect(runs.filter((r) => r.phase === 'build').map((r) => r.cycle)).toEqual(
+        Array.from({ length: cycles }, (_, c) => c),
+      );
+      const boss = runs[runs.length - 1];
+      expect(
+        Math.abs(boss.from - (level.durationSec - BOSS_WARNING_SEC) * 1000),
+      ).toBeLessThanOrEqual(100);
+      expect(boss.cycle).toBe(-1);
+      for (let i = 0; i < runs.length - 1; i++) {
+        const len = runs[i + 1].from - runs[i].from;
+        if (runs[i].phase === 'peak') {
+          expect(Math.abs(len - PEAK_SEC * 1000)).toBeLessThanOrEqual(100);
+        }
+        if (runs[i].phase === 'relax') expect(len).toBeGreaterThanOrEqual(RELAX_SEC * 1000 - 100);
+      }
+    }
+  });
+
+  it('puts every planned event of WAVE_PLANS into a peak (fits AP-176)', () => {
+    for (const level of LEVELS) {
+      const curve = pacingCurve(level);
+      for (const e of WAVE_PLANS[level.id].events) {
+        expect(pacingPhaseAt(curve, e.atSec), `level ${level.id} at ${e.atSec}`).toBe('peak');
+      }
+    }
+  });
+
+  it('peak is the highest rate, relax runs at relaxRate, every cycle is higher, the boss phase keeps the base ramp', () => {
+    for (const level of LEVELS) {
+      const c = pacingCurve(level);
+      const { cycleSec, peakSec, relaxRate } = c.pacing;
+      let lastPeak = 0;
+      for (let k = 0; k < c.cycles; k++) {
+        const start = k * cycleSec;
+        const buildEnd = pacingFactorAt(c, start + c.buildSec - 0.01);
+        const buildStart = pacingFactorAt(c, start + 0.01);
+        const peak = pacingFactorAt(c, start + c.buildSec + peakSec / 2);
+        const relax = pacingFactorAt(c, start + c.buildSec + peakSec + 1);
+        expect(buildEnd, `level ${level.id} cycle ${k}`).toBeGreaterThan(buildStart);
+        expect(peak, `level ${level.id} cycle ${k}`).toBeGreaterThan(buildEnd);
+        expect(relax).toBe(relaxRate);
+        expect(peak, `level ${level.id} cycle ${k}`).toBeGreaterThan(lastPeak);
+        lastPeak = peak;
+      }
+      expect(pacingFactorAt(c, c.windowSec + 1)).toBe(1);
+    }
+  });
+
+  it('keeps the spawns per minute of every level within 5 percent of the base ramp', () => {
+    for (const level of LEVELS) {
+      const d = new SpawnDirector(level, testRng(level.id + 1), 600);
+      let n = 0;
+      for (let t = 0; t < level.durationSec * 1000; t += 50) n += d.tick(50, d.minimumAlive).length;
+      const ratio = n / baseRampCount(level);
+      expect(ratio, `level ${level.id}`).toBeGreaterThan(0.95);
+      expect(ratio, `level ${level.id}`).toBeLessThan(1.05);
+    }
+  });
+
+  it('never drops below the minimum occupancy (except at the cap), also in the relax phase', () => {
+    for (const id of [0, 2, 5, 12, 25, 40]) {
+      const level = lvl(id);
+      expect(WAVE_PLANS[id].minAlive).toBeGreaterThan(0);
+      const res = simulate(level, { killEveryMs: 400, report: true, seed: id + 3 });
+      expect(res.belowMinAlive, `level ${id}`).toBe(0);
+    }
+  });
+
+  it('fills at most one enemy per 250 ms', () => {
+    const level = lvl(12);
+    const d = new SpawnDirector(level, testRng(8), 600);
+    d.tick(1, level.maxEnemies); // no opening wave
+    let fills = 0;
+    for (let t = 0; t < 10_000; t += 10) fills += d.tick(10, 0).length;
+    // 10 s at 4 per second; the regular spawns are taken from the schedule ahead (none extra).
+    expect(fills).toBeLessThanOrEqual(10_000 / FILL_INTERVAL_MS + 2);
+    expect(fills).toBeGreaterThanOrEqual(10_000 / FILL_INTERVAL_MS - 2);
+  });
+
+  it('never exceeds a role cap, with exact reports and with the estimate from the living count', () => {
+    for (const id of [0, 2, 5, 12, 20, 21, 26, 31, 40]) {
+      const level = lvl(id);
+      const res = simulate(level, { killEveryMs: 1500, report: true, seed: id + 5 });
+      for (const [role, cap] of Object.entries(ROLE_CAPS) as [EnemyRole, number][]) {
+        expect(res.maxRole[role], `level ${id} ${role}`).toBeLessThanOrEqual(cap);
+      }
+      // Without reports the director spreads the deaths evenly; its own count stays under the caps.
+      const d = new SpawnDirector(level, testRng(id), 600);
+      let alive = 0;
+      for (let t = 0; t < 120_000; t += 50) {
+        alive = Math.max(0, alive + d.tick(50, alive).length - (t % 1000 === 0 ? 3 : 0));
+        for (const [role, cap] of Object.entries(ROLE_CAPS) as [EnemyRole, number][]) {
+          expect(d.roleAlive(role), `level ${id} ${role}`).toBeLessThanOrEqual(cap + 1e-9);
+        }
+      }
+    }
+  });
+
+  /** Spawn shares of a level over six simulated rounds. */
+  function shares(level: LevelDef, killEveryMs: number): Map<EnemyId, number> {
+    const counts = new Map<EnemyId, number>();
+    let n = 0;
+    for (let seed = 1; seed <= 6; seed++) {
+      for (const s of simulate(level, { killEveryMs, report: true, seed }).spawns) {
+        counts.set(s.enemyId, (counts.get(s.enemyId) ?? 0) + 1);
+        n += 1;
+      }
+    }
+    for (const [id, c] of counts) counts.set(id, c / n);
+    return counts;
+  }
+
+  it('keeps the shares of AP-166 within 2 percentage points with rhythm, budget and caps while the tank cap is not full (level 0, fast player)', () => {
+    const level = lvl(0);
+    const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
+    const got = shares(level, 400);
+    for (const e of level.enemyPool) {
+      expect(Math.abs((got.get(e.enemyId) ?? 0) - e.weight / total), e.enemyId).toBeLessThanOrEqual(
+        0.02,
+      );
+    }
+  });
+
+  it('level 0 to 2 with a full field: the tank cap (6) holds and shifts the mix to the tree (known conflict with AP-166, reported)', () => {
+    for (const id of [0, 1, 2]) {
+      const got = shares(lvl(id), 1000);
+      // Boar and bear together are 44 % of the pool; at 6 living tanks they come less often.
+      expect(got.get('cursedTree') ?? 0, `level ${id}`).toBeGreaterThan(0.56);
+      expect((got.get('boar') ?? 0) + (got.get('bear') ?? 0), `level ${id}`).toBeGreaterThan(0.15);
+    }
+  });
+
+  it('spends saved threat budget in the peaks and never goes below zero', () => {
+    // Level 3 and 4: forest pool, no role cap full at the minimum occupancy, so the budget decides.
+    for (const id of [3, 4]) {
+      const level = lvl(id);
+      const d = new SpawnDirector(level, testRng(id), 600);
+      const atStart: number[] = [];
+      const atEnd: number[] = [];
+      let prev: WavePhase = d.phase;
+      for (let t = 0; t < level.durationSec * 1000; t += 50) {
+        d.tick(50, d.minimumAlive);
+        expect(d.threatBudget).toBeGreaterThanOrEqual(0);
+        if (d.phase === 'peak' && prev !== 'peak') atStart.push(d.threatBudget);
+        if (d.phase !== 'peak' && prev === 'peak') atEnd.push(d.threatBudget);
+        prev = d.phase;
+      }
+      expect(atStart.length).toBe(cyclesOf(level.durationSec));
+      atStart.forEach((b, i) => expect(atEnd[i], `level ${id} cycle ${i}`).toBeLessThan(b));
+      expect(simulate(level, { killEveryMs: 300, seed: id }).budgetMin).toBeGreaterThanOrEqual(0);
+    }
+    // The income grows with the level (denser spawns, BUDGET_MARGIN x mean cost per spawn).
+    expect(BUDGET_MARGIN).toBeGreaterThan(1);
+    expect(BANK_SEC).toBeGreaterThan(0);
+    const start = (id: number): number => new SpawnDirector(lvl(id), testRng(1), 600).threatBudget;
+    expect(start(40)).toBeGreaterThan(start(0));
+  });
+
+  it('marks no elite while ELITE_RULES is switched off', () => {
+    expect(ELITE_RULES.enabled).toBe(false);
+    for (const id of [0, 3, 12, 40]) {
+      const res = simulate(lvl(id), { killEveryMs: 500, seed: id });
+      expect(res.spawns.some((s) => s.elite)).toBe(false);
+    }
+  });
+
+  it('marks elites when enabled: from fromLevel, single ones, preferably in peaks, at most maxShare of the living', () => {
+    const rules: EliteRules = { ...ELITE_RULES, enabled: true };
+    expect(
+      simulate(lvl(rules.fromLevel - 1), { killEveryMs: 700, rules }).spawns.some((s) => s.elite),
+    ).toBe(false);
+    let peakSpawns = 0;
+    let peakElites = 0;
+    let otherSpawns = 0;
+    let otherElites = 0;
+    for (const id of [rules.fromLevel, 12, 30, 40]) {
+      const res = simulate(lvl(id), { killEveryMs: 700, report: true, rules, seed: id });
+      expect(res.eliteShareViolations, `level ${id}`).toBe(0);
+      const elites = res.spawns.filter((s) => s.elite).length;
+      expect(elites, `level ${id}`).toBeGreaterThan(0);
+      expect(elites / res.spawns.length, `level ${id}`).toBeLessThanOrEqual(rules.maxShare);
+      for (const s of res.spawns) {
+        if (s.phase === 'peak') {
+          peakSpawns += 1;
+          if (s.elite) peakElites += 1;
+        } else {
+          otherSpawns += 1;
+          if (s.elite) otherElites += 1;
+        }
+      }
+    }
+    expect(peakElites / peakSpawns).toBeGreaterThan(otherElites / otherSpawns);
+  });
+
+  it('allocates nothing per frame: the output array is reused and stays empty without spawns', () => {
+    const level = lvl(12);
+    const d = new SpawnDirector(level, testRng(2), 600);
+    const first = d.tick(16, level.maxEnemies);
+    expect(d.tick(16, level.maxEnemies)).toBe(first);
+    expect(first).toHaveLength(0);
+  });
+
+  it('is deterministic for the same seed with the rhythm and the budget', () => {
+    const a = simulate(lvl(21), { killEveryMs: 500, seed: 4 }).spawns;
+    const b = simulate(lvl(21), { killEveryMs: 500, seed: 4 }).spawns;
+    expect(a).toEqual(b);
   });
 });

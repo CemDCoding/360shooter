@@ -23,7 +23,13 @@ import { ARMOUR_RULES } from '../../src/config/armour';
 import { scaledDropRate } from '../../src/logic/items';
 import { upgradeCost, upgradeFactors } from '../../src/logic/upgrades';
 import { computeWeaponStats } from '../../src/logic/weapon';
-import { MIN_INTERVAL_FACTOR, openingCount } from '../../src/logic/spawn';
+import {
+  MIN_INTERVAL_FACTOR,
+  SpawnDirector,
+  openingCount,
+  pacingSpawnFactor,
+} from '../../src/logic/spawn';
+import { ELITE_RULES } from '../../src/config/waves';
 import { enemyScaleFor } from '../../src/logic/scaling';
 import { tierFor } from '../../src/logic/tier';
 
@@ -690,3 +696,35 @@ describe('balance: level 21 to 40 (AP-105, PE-129)', () => {
     expect(upgradedPressure(M5_FIRST)).toBeLessThan(1);
   });
 });
+
+describe('balance: wave rhythm keeps the pressure rules (M12, AP-175, RS-01.6)', () => {
+  /** Fixed rng for the director (only the request shape matters here). */
+  const rng = (): { next(): number } => {
+    let i = 0;
+    return { next: () => ((i = (i * 7919 + 17) % 1000), i / 1000) };
+  };
+
+  it('keeps the enemy speed fixed per level: no speed factor in the level scale, none in the spawn requests', () => {
+    for (const level of LEVELS) {
+      expect(Object.keys(enemyScaleFor(level.id)), `level ${level.id}`).not.toContain('speed');
+      const d = new SpawnDirector(level, rng(), 600);
+      for (let t = 0; t < level.durationSec * 1000; t += 100) {
+        for (const req of d.tick(100, d.minimumAlive)) {
+          expect(
+            Object.keys(req).every((k) => REQUEST_KEYS.has(k)),
+            `level ${level.id}`,
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('puts the pressure into count, rhythm and elites, not into hp: the pacing mean is 1 and elites stay off', () => {
+    for (const level of LEVELS) {
+      expect(Math.abs(pacingSpawnFactor(level) - 1), `level ${level.id}`).toBeLessThan(1e-9);
+    }
+    expect(ELITE_RULES.enabled).toBe(false);
+  });
+});
+
+const REQUEST_KEYS = new Set(['enemyId', 'angle', 'radius', 'elite', 'eventId']);

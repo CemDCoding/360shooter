@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { BALANCE_BANDS, LEVELS, LEVEL_COUNT, maxStepForLevel } from '../../src/config';
+import { ELITE_RULES } from '../../src/config/waves';
 import {
   basePressure,
+  eliteShare,
   goldPerMinute,
+  pacingMean,
   goldPerWin,
   referenceGoldBefore,
   referenceLoadout,
@@ -112,6 +115,17 @@ describe('balance model: reference player (AP-167)', () => {
   it('pressure without upgrades is larger than the reference pressure', () => {
     for (const i of range(1, 40)) expect(basePressure(i)).toBeGreaterThan(referencePressure(i));
   });
+
+  it('counts the pacing mean and the elite share into the pressure (M12, AP-175, RS-01.6)', () => {
+    for (const i of ids) {
+      // Build-up and peak are normalised per level: the wave rhythm moves spawns in time, not their number.
+      expect(Math.abs(pacingMean(i) - 1), `level ${i}`).toBeLessThan(1e-9);
+      // Upper bound maxShare from fromLevel; switched off until AP-178.
+      const on = ELITE_RULES.enabled && i >= ELITE_RULES.fromLevel;
+      expect(eliteShare(i), `level ${i}`).toBe(on ? ELITE_RULES.maxShare : 0);
+    }
+    expect(ELITE_RULES.enabled).toBe(false);
+  });
 });
 
 describe('balance model: difficulty curve targets (RS-05.1)', () => {
@@ -174,9 +188,7 @@ describe('balance model: gold per minute (RS-05.1)', () => {
   it('keeps gold per minute within 10 percent of every neighbour in the batch, except the known levels (PE-224)', () => {
     const tol = BALANCE_BANDS.goldPerMinuteTolerance;
     const out = range(1, 40).filter(
-      (i) =>
-        sameBatch(i) &&
-        Math.abs(goldPerMinute(i) / goldPerMinute(i - 1) - 1) > tol,
+      (i) => sameBatch(i) && Math.abs(goldPerMinute(i) / goldPerMinute(i - 1) - 1) > tol,
     );
     expectExactly(out, KNOWN_OUT_OF_BAND.gold, 'gold');
   });
