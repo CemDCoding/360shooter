@@ -60,7 +60,7 @@ import {
 // "Bausteine", mockup m9-maerchen-quicktimes.html views 1-11 and 13). World object: does not scale with the HUD
 // factor k.
 
-/** Over enemies, boss projectiles (2), the player (10) and the fire ring (15), under the HUD scene (stick, pause). */
+/** Over enemies, boss projectiles (2), the player (10) and the fire ring (15), under the stick (50/51, created in GameScene) and the pause layer (HudScene, 100); circles sit far from the stick. */
 export const PARRY_DEPTH = 20;
 /** The shield ring of "PARRY!" lies under the astronaut, like in the mockup. */
 const BURST_RING_DEPTH = 9.5;
