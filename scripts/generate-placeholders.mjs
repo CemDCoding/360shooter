@@ -31,6 +31,10 @@ const SOUNDS = {
   'sfx-parry': { f0: 1000, f1: 1800, dur: 0.18, wave: 'square' },
   'sfx-pebble': { f0: 500, f1: 350, dur: 0.1, wave: 'sine' },
   'sfx-beat': { f0: 220, f1: 200, dur: 0.08, wave: 'square' },
+  'sfx-finisher-charge': { f0: 200, f1: 900, dur: 0.7, wave: 'saw' },
+  'sfx-finisher-hit': { f0: 1200, f1: 120, dur: 0.4, wave: 'square' },
+  'sfx-finisher-signal': { f0: 700, f1: 760, dur: 0.5, wave: 'sine' },
+  'sfx-finisher-dawn': { f0: 330, f1: 440, dur: 1.2, wave: 'sine' },
 };
 function makeWav(spec) {
   const rate = 44100;

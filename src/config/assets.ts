@@ -156,6 +156,22 @@ const OWN_ASSETS: readonly AssetDef[] = [
   sprite('parry-riddle', 24, 24, 3, 'Quicktime: Raetsel-Symbole.'),
   sprite('parry-scale', 32, 24, 3, 'Quicktime: Waage.'),
   sprite('ui-icons-m9', 8, 8, 3, 'Oberflaechen-Symbole M9.'),
+  sprite(
+    'finisher-portrait',
+    160,
+    20,
+    6,
+    'Finisher: Visier-Streifen der Astronautin (Bild = Boss).',
+  ),
+  sprite('finisher-hit', 96, 96, 6, 'Finisher: Nahaufnahme des Bosses beim Schlusstreffer.'),
+  sprite('finisher-shards', 4, 4, 18, 'Finisher: Splitter (3 je Boss).'),
+  sprite('finisher-finale-4', 320, 180, 11, 'Finisher: Bildfolge Level 4 (Baummonster).'),
+  sprite('finisher-finale-9', 320, 180, 11, 'Finisher: Bildfolge Level 9 (Waldgeist).'),
+  sprite('finisher-finale-20', 320, 180, 11, 'Finisher: Bildfolge Level 20 (Riesen-Stein).'),
+  sprite('finisher-finale-25', 320, 180, 11, 'Finisher: Bildfolge Level 25 (Sand-Wurm).'),
+  sprite('finisher-finale-30', 320, 180, 11, 'Finisher: Bildfolge Level 30 (Waechter-Hund).'),
+  sprite('finisher-finale-40a', 320, 180, 9, 'Finisher: Bildfolge Level 40, Bogen a (Bild 0-8).'),
+  sprite('finisher-finale-40b', 320, 180, 9, 'Finisher: Bildfolge Level 40, Bogen b (Bild 9-17).'),
   font(
     'astro-kapsel',
     'Bitmap-Schrift "Astro Kapsel": dicke Schrift fuer Titel, Menue und grosse Zahlen.',
@@ -175,6 +191,10 @@ const OWN_ASSETS: readonly AssetDef[] = [
   sound('parry', 'Boss-Angriff mit allen Quicktime-Kreisen abgewehrt (PARRY!).'),
   sound('pebble', 'Quicktime: Kieselvorschau.'),
   sound('beat', 'Quicktime: Takt.'),
+  sound('finisher-charge', 'Finisher: Aufladen.'),
+  sound('finisher-hit', 'Finisher: Schlusstreffer.'),
+  sound('finisher-signal', 'Finisher: Signal.'),
+  sound('finisher-dawn', 'Finisher: ruhiger Schlusston, Sonnenaufgang Level 40.'),
 ];
 
 /** Festes Asset-Manifest. Designer ersetzen nur die Dateien unter public/assets. */

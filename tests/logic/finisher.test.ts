@@ -195,9 +195,9 @@ describe('plan building', () => {
     expect(times).toEqual([...times].sort((a, b) => a - b));
   });
 
-  it('drops frames blocks with frameCount 0 and keeps the finale duration', () => {
+  it('keeps the frames block of the finale and its duration (frameCount 0 blocks are dropped by the builder)', () => {
     const plan = buildFinisher(4, NONE);
-    expect(plan.steps.some((s) => s.block === 'frames')).toBe(false);
+    expect(plan.steps.some((s) => s.block === 'frames')).toBe(true);
     expect(plan.totalMs).toBe(FINISHER_FINALES[4].totalMs);
     expect(plan.totalMs).toBeGreaterThan(FINISHER_STAGES[1].totalMs);
   });

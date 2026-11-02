@@ -187,6 +187,25 @@ const COLORS = {
   'game.pet-aura': { num: 0xffd98a, css: '#ffd98a' },
   'game.gear-block': { num: 0x9fe6ff, css: '#9fe6ff' },
   'game.crit': { num: 0xffe2a0, css: '#ffe2a0' },
+  'finisher.ink': { num: 0x0b0610, css: '#0b0610' },
+  'finisher.paper': { num: 0xffffff, css: '#ffffff' },
+  'finisher.letterbox': { num: 0x0b0610, css: '#0b0610' },
+  'finisher.speedline': { num: 0xfff4e8, css: '#fff4e8' },
+  'finisher.title': { num: 0xfff4e8, css: '#fff4e8' },
+  'finisher.title-shadow': { num: 0x0b0610, css: '#0b0610' },
+  'finisher.name': { num: 0xffa0ae, css: '#ffa0ae' },
+  'finisher.beam-core': { num: 0xffffff, css: '#ffffff' },
+  'finisher.beam-rim': { num: 0xff6b8a, css: '#ff6b8a' },
+  'finisher.beam-glow': { num: 0xbf3458, css: '#bf3458' },
+  'finisher.cutin-band': { num: 0x0b0610, css: '#0b0610' },
+  'finisher.cutin-edge': { num: 0xff6b8a, css: '#ff6b8a' },
+  'finisher.skip-text': { num: 0xe5f2d8, css: '#e5f2d8' },
+  'finisher.bg-forest': { num: 0x1d4a17, css: '#1d4a17' },
+  'finisher.bg-night': { num: 0x2a1458, css: '#2a1458' },
+  'finisher.bg-elf': { num: 0x1c3470, css: '#1c3470' },
+  'finisher.bg-desert': { num: 0x6a3a0e, css: '#6a3a0e' },
+  'finisher.bg-pyramid': { num: 0x0c4a4c, css: '#0c4a4c' },
+  'finisher.bg-oasis': { num: 0x5c4206, css: '#5c4206' },
 } as const satisfies Record<string, ThemeColor>;
 
 /** Abstände in px. */
@@ -238,6 +257,12 @@ const SIZE_PX = {
   'size.pet-offset-x': 22,
   'size.pet-offset-y': 8,
   'size.shop-tile-h': 56,
+  'size.finisher-letterbox': 40,
+  'size.finisher-portrait-h': 40,
+  'size.finisher-shake': 6,
+  'size.finisher-panel-edge': 2,
+  'size.finisher-skip-inset': 8,
+  'size.finisher-shard': 4,
 } as const;
 
 /** Größen als Anzahl. */
@@ -248,6 +273,11 @@ const SIZE_COUNT = {
   'size.parry-hold-segments': 8,
   'size.parry-hint-scale': 2,
   'size.gear-preview-scale': 4,
+  'size.finisher-frame-scale': 2,
+  'size.finisher-zoom': 2,
+  'size.finisher-speedlines': 28,
+  'size.finisher-title-scale': 4,
+  'size.finisher-name-scale': 3,
 } as const;
 
 /** Zeiten in ms. */
@@ -269,6 +299,14 @@ const MOTION_MS = {
   'motion.gear-block': 300,
   'motion.diamond-pop': 200,
   'motion.hatch': 300,
+  'motion.finisher-hitstop': 120,
+  'motion.finisher-impact': 100,
+  'motion.finisher-bars': 160,
+  'motion.finisher-cutin': 600,
+  'motion.finisher-title': 200,
+  'motion.finisher-shatter': 600,
+  'motion.finisher-frame': 100,
+  'motion.finisher-skip': 400,
 } as const;
 
 /** Bewegung als Anzahl. */
