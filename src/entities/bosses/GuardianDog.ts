@@ -20,7 +20,9 @@ import {
   SPARK_COLOR,
   WARD_ALPHA,
   WARD_COLOR,
+  SCALE_PANS,
   headAngle,
+  placeAngle,
   scaleAngle,
 } from './dogStyle';
 import type { BossHazard, LaserProbe, ParryAnchor } from './hazards';
@@ -164,7 +166,11 @@ export class GuardianDog extends BossBase {
     }
     if (attack.id === 'heartScale') {
       const deg = scaleAngle(circle.symbol, circle.group, circle.index);
-      if (deg !== null) return { angleDeg: deg };
+      if (deg !== null) {
+        const all = SCALE_PANS.flatMap((p) => [p.heart, p.feather]);
+        const place = { player: this.center, arena: this.arena, sheet: 'parry-scale' } as const;
+        return { angleDeg: placeAngle(deg, all, place) };
+      }
     }
     return super.parryAnchor(attack, circle);
   }

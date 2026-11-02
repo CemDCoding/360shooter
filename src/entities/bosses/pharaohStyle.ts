@@ -17,8 +17,11 @@ export function stormStyle(levelId: number): { color: number; strength: number }
 
 // --- Quicktime anchors (M9, AP-155, brief H-37) ---
 
-/** Riddle circles by the leg count symbol: fixed places in the upper half, 65 degrees apart (no overlap). */
-export const RIDDLE_DEG: Readonly<Record<string, number>> = { legs4: 205, legs2: 270, legs3: 335 };
+/**
+ * Riddle circles by the leg count symbol: fixed places in the lower half like the mockup (the board hangs above
+ * the astronaut), 60 degrees apart (no overlap). Mirrored and clamped by placeAngles() near the screen top.
+ */
+export const RIDDLE_DEG: Readonly<Record<string, number>> = { legs4: 150, legs2: 90, legs3: 30 };
 
 /** goldCurse: angle of a riddle circle by its symbol, or null (default angle). */
 export function riddleAngle(symbol: string | undefined): number | null {

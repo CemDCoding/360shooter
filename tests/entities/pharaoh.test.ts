@@ -481,3 +481,83 @@ describe('Pharaoh quicktime anchors (AP-155)', async () => {
     expect(decoy).toBe(sandDecoyAngle(tap));
   });
 });
+
+describe('Quicktime placement near hint board and screen edge (AP-155)', async () => {
+  const { PARRY_RULES } = await import('../../src/config/parry');
+  const { RIDDLE_DEG } = await import('../../src/entities/bosses/pharaohStyle');
+  const { SCALE_PANS, placeAngles } = await import('../../src/entities/bosses/dogStyle');
+  const { hintBoardRect, hintBoardSize, hudTimerBottom, HUD_MAX_K } =
+    await import('../../src/entities/parry/hintBoard');
+
+  const R = PARRY_RULES.distanceFromPlayerPx;
+  const r = PARRY_RULES.circleRadiusPx + PARRY_RULES.touchSlackPx;
+  const arena = { width: 640, height: 360 };
+  const diff = (a: number, b: number): number => {
+    const d = Math.abs(a - b) % 360;
+    return Math.min(d, 360 - d);
+  };
+  const minSep = (2 * Math.asin(r / R) * 180) / Math.PI;
+  const sets = [
+    { sheet: 'parry-riddle' as const, all: Object.values(RIDDLE_DEG) },
+    { sheet: 'parry-scale' as const, all: SCALE_PANS.flatMap((p) => [p.heart, p.feather]) },
+  ];
+
+  function check(sheet: 'parry-riddle' | 'parry-scale', all: number[], y: number, k: number) {
+    const player = { x: 320, y };
+    const out = placeAngles(all, { player, arena, sheet });
+    const board = hintBoardRect(player, hintBoardSize(sheet), hudTimerBottom(k, 0), arena.width);
+    const pts = out.map((a) => ({
+      x: player.x + R * Math.cos((a * Math.PI) / 180),
+      y: player.y + R * Math.sin((a * Math.PI) / 180),
+    }));
+    return { out, board, pts };
+  }
+
+  it.each([120, 181, 200, 260])(
+    'astronaut at y %i: circles inside the screen, clear of the board',
+    (y) => {
+      for (const { sheet, all } of sets) {
+        for (const k of [1, HUD_MAX_K]) {
+          const { board, pts } = check(sheet, all, y, k);
+          for (const p of pts) {
+            expect(p.x).toBeGreaterThanOrEqual(r - 1e-6);
+            expect(p.x).toBeLessThanOrEqual(arena.width - r + 1e-6);
+            expect(p.y).toBeGreaterThanOrEqual(r - 1e-6);
+            expect(p.y).toBeLessThanOrEqual(arena.height - r + 1e-6);
+            const dx = Math.max(board.x - p.x, 0, p.x - (board.x + board.w));
+            const dy = Math.max(board.y - p.y, 0, p.y - (board.y + board.h));
+            expect(Math.hypot(dx, dy)).toBeGreaterThanOrEqual(PARRY_RULES.circleRadiusPx - 1e-6);
+          }
+        }
+      }
+    },
+  );
+
+  it('keeps the gaps and the hint side while mirroring', () => {
+    for (const y of [60, 120, 181, 260]) {
+      for (const { sheet, all } of sets) {
+        const { out } = check(sheet, all, y, 1);
+        for (let i = 0; i < out.length; i++)
+          for (let j = i + 1; j < out.length; j++)
+            expect(diff(out[i], out[j])).toBeGreaterThanOrEqual(minSep - 1e-6);
+      }
+    }
+  });
+
+  it('astronaut high at the top (y 60): circles stay on screen, below the astronaut', () => {
+    for (const { sheet, all } of sets) {
+      const { pts } = check(sheet, all, 60, 1);
+      for (const p of pts) {
+        expect(p.y).toBeGreaterThanOrEqual(r - 1e-6);
+        expect(p.y).toBeGreaterThanOrEqual(60 - 1e-6);
+      }
+    }
+  });
+
+  it('astronaut low at the bottom (y 340): the set flips up and stays on screen', () => {
+    for (const { sheet, all } of sets) {
+      const { pts } = check(sheet, all, 340, 1);
+      for (const p of pts) expect(p.y).toBeLessThanOrEqual(arena.height - r + 1e-6);
+    }
+  });
+});

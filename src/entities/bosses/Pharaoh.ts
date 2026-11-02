@@ -18,7 +18,8 @@ import {
 } from './bossGeometry';
 import type { BossHazard, ParryAnchor } from './hazards';
 import { PharaohOrb } from './PharaohOrb';
-import { HIDDEN_ALPHA, riddleAngle, sandDecoyAngle, stormStyle } from './pharaohStyle';
+import { placeAngle } from './dogStyle';
+import { HIDDEN_ALPHA, RIDDLE_DEG, riddleAngle, sandDecoyAngle, stormStyle } from './pharaohStyle';
 import { rimRadii } from './rim';
 import { Telegraph } from './Telegraph';
 
@@ -137,7 +138,10 @@ export class Pharaoh extends BossBase {
   protected override parryAnchor(attack: BossAttackDef, circle: ParryCircleState): ParryAnchor {
     if (attack.id === 'goldCurse') {
       const deg = riddleAngle(circle.symbol);
-      if (deg !== null) return { angleDeg: deg };
+      if (deg !== null) {
+        const place = { player: this.center, arena: this.arena, sheet: 'parry-riddle' } as const;
+        return { angleDeg: placeAngle(deg, Object.values(RIDDLE_DEG), place) };
+      }
     } else if (attack.id === 'sandstorm') {
       // The tap circle comes first in the pattern; it keeps its planned angle.
       if (circle.kind === 'decoy') return { angleDeg: sandDecoyAngle(this.sandTapDeg) };
