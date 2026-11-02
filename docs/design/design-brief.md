@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ läuft. Interview abgeschlossen (Entscheidungen 1a–12a). Nächster Schritt: Mockup `mockups/m9-maerchen-quicktimes.html`, Tokens, Freigabe.
+**Status:** geändert am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“ wartet auf die Freigabe des Nutzers). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ läuft. Interview abgeschlossen (Entscheidungen 1a–12a). Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Freigabe durch den Nutzer, danach Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
 **Stand (2026-10-31):** Ergänzung „Wüste und Level-Seiten“ ist vom Nutzer freigegeben (2026-10-31, siehe „Änderungen“). Nächster Schritt: Planner-Auftrag „Design übernehmen“, einschließlich der Erweiterung von `docs/gegner-und-maps.md`.
@@ -568,7 +568,7 @@ Keine neuen Sprites, Schriften oder Abhängigkeiten. Der Haken und das X sind 7�
 
 Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Review für AP-141, AP-142, AP-144 und AP-145 gegen `screenshots/m8-shop-und-ausruestung-desktop.png` und die Nahansichten; AP-143 gegen `screenshots/m8-sprites-desktop.png`. Handtest H-36: Rüstung bei allen Zielwinkeln und Frames (kein Versatz), Pets im Gedränge erkennbar, Shop-Texte am iPhone lesbar (Kapsel 1×).
 
-### 2026-11-02 · Ergänzung H-37 „M9: Märchen-Quicktimes“ (in Arbeit)
+### 2026-11-02 · Ergänzung H-37 „M9: Märchen-Quicktimes“ (wartet auf Freigabe)
 
 **Auftrag (Plan M9 W0, RS-03.9, PE-187 bis PE-193):** Symbole und Zustände aller Quicktime-Bausteine (`tap`, `hold`, `decoy`, `sequence`, `drag`, `choice`, `beat`), Wertung je Kreis, Motivbild beim „PARRY!“, Schalter „EINFACHE ABWEHR“ im Pausemenü. Symbol-Schlüssel im Code (AP-148): `rose`, `spindle`, `pebble`, `ghost`, `mist`, `sun`, `rope`, `head`, `heart`, `feather`, `legs4`, `legs2`, `legs3`, `sand`.
 
@@ -589,5 +589,54 @@ Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Revi
 - 11a **Schalter im Pausemenü:** dritter Funk-Button in Gruppenbreite unter WEITER und HAUPTMENÜ, „☐ EINFACHE ABWEHR“ bzw. „☑ EINFACHE ABWEHR“, darunter Hinweiszeile „ALLE ABWEHREN: EIN TIPP“. Fokus-Reihenfolge nach HAUPTMENÜ.
 - 12a **Einfache Abwehr:** Symbol bleibt auf dem normalen Tipp-Kreis. Kein Segmentring, keine Zielklammern, keine Fähnchen, keine Hinweistafel, keine Trugkreise.
 - (angenommen) **Bewegung reduziert:** Ringe schrumpfen weiter (Information). Knospe springt ohne Zwischenframes, „z“ steht still, Waage zeigt sofort die Endneigung, Klammern springen statt zu gleiten, kein Glühen, kein Aufploppen.
+- (angenommen) **Hinweisbilder in 2×** (Waage 64×48, Rätsel 48×48): bewusste Ausnahme von Grundsatz 3 wie beim Boss, weil das Rätsel in 1× am iPhone nicht erkennbar ist.
+- (angenommen) **Kästchen „an“** ist gefüllt mit ausgespartem Haken, „aus“ ist hohl. Die Funk-Schrift hat kein Kästchen-Zeichen, deshalb ist es eine Grafik (`ui-icons-m9`).
+- (angenommen) **Schlafender Kopf:** Ohren hängen seitlich, Augen sind Striche. Damit ist er auch ohne das „z“ vom wachen Kopf unterscheidbar.
+
+**Ergebnis:** Mockup `mockups/m9-maerchen-quicktimes.html` (Ansichten 1–13), Pixelquelle `assets/sprites-m9.js`, Screenshots `screenshots/m9-maerchen-quicktimes-desktop.png` und `-mobile.png`, Nahansichten `m9-zoom-states-a-desktop.png` (Halten, Trugkreis), `m9-zoom-states-b-desktop.png` (Kieselspur, Takt, Wahl), `m9-zoom-sprites-desktop.png` (alle neuen Sprites), `m9-zoom-desktop.png` (Ansicht 2, Erlkönigs Töchter).
+
+**Neue Sprites** (`assets/sprites-m9.js`, Format wie `sprites-m8.js`, Ladefolge danach). Einfarbige Blätter sind weiß mit dunklem Umriss `o` (= `hud.screen`) und werden per `setTint` getönt, der Umriss bleibt dunkel:
+
+| Schlüssel | Größe × Frames | Inhalt |
+|---|---|---|
+| `parry-symbols` | 14×14 × 21 | 0 rose-bud, 1 rose-half, 2 rose, 3 spindle, 4 pebble, 5 ghost, 6 mist, 7 sun-low, 8 sun-mid, 9 sun, 10 rope, 11 head, 12 head-asleep, 13 heart, 14 feather, 15 legs4, 16 legs2, 17 legs3, 18 sand, 19 link (Wurmglied, Ziel), 20 lane (Steinbahn, Ziel) |
+| `parry-decoy-edge` | 44×44 × 2 | 0 welliger Rand (10 Wellen, 2 px, um r 20), 1 zerbrochen („TRUG!“) |
+| `parry-motifs` | 16×16 × 10, farbig | 0 rose, 1 pebble, 2 ghost, 3 sun, 4 stones, 5 rope, 6 sleep, 7 feather, 8 sphinx, 9 mirage |
+| `parry-riddle` | 24×24 × 3 | 0 krabbelndes Kind (4 Beine), 1 aufrechter Mensch (2), 2 Greis mit Stock (3) |
+| `parry-scale` | 32×24 × 3 | Waage: 0 gerade, 1 geneigt, 2 stark geneigt. Herz-Schale links sinkt, Feder-Schale rechts steigt |
+| `ui-icons-m9` | 8×8 × 3 | 0 Kästchen aus, 1 Kästchen an, 2 „z“ |
+
+**Symbol-Schlüssel → Frame** (Schlüssel aus AP-148 bleiben): `rose` → 2 (bei `hold`: 0 → 1 → 2 nach Haltefortschritt, Wechsel bei 3/8 und 8/8) · `sun` → 9 (bei `hold`: 7 → 8 → 9) · `spindle` 3 · `pebble` 4 · `ghost` 5 · `mist` 6 · `rope` 10 · `head` 11, nach Treffer 12 · `heart` 13 · `feather` 14 · `legs4/2/3` 15/16/17 · `sand` 18. Ziel-Symbol beim Ziehen: Sand-Wurm `link` 19, Riesenzank `lane` 20. Kreis ohne `symbol` zeigt wie bisher die Nummer.
+
+**Bausteine (`ParryOverlay`, Weltobjekte, skalieren nicht mit k, Basis H-33):**
+
+| Art | Darstellung |
+|---|---|
+| alle | Symbol 14×14 mittig im Kreis, Tönung `game.parry-symbol`. PERFEKT/GUT/VERFEHLT wie H-33: Stern bzw. Haken bzw. X ersetzen das Symbol für 400 ms. |
+| `hold` | Innerer Ring `size.parry-hold-r` 15 (2 px, r 13–15), `size.parry-hold-segments` 8 Stufen, im Uhrzeigersinn ab oben, 1 px Lücke. Leer `game.parry-hold-track`, gefüllt `game.parry-hold`. Füllt sich linear über `holdMs` ab dem Druck. Symbol-Frame nach Fortschritt (siehe oben). Bei 8/8 Wort „LOS!“ (`hud.text`). Loslassen vor dem Fenster: „ZU FRÜH“ + X + gestrichelter Rand. Ersatz per zwei Tipps: gleiche Anzeige, der zweite Tipp ersetzt das Loslassen. |
+| `decoy` | Keine Scheibe, keine Füllung, **kein Ring**. Sprite `parry-decoy-edge` Frame 0, Tönung `game.parry-decoy`, Symbol `spindle`/`mist`/`sand` in derselben Tönung. Angetippt: Frame 1 in `game.parry-miss` und Wort „TRUG!“, Symbol weg, 400 ms. Ignoriert: blendet bei `hitAtMs + goodWindowMs` in `motion.duration.base` (150 ms) aus, ohne Wort. Reduzierte Bewegung: sofort weg. |
+| `sequence` | Fähnchen `size.parry-flag` 10×10 oben links am Kreis (Box −24/−24 bis −14/−14 von der Mitte), Fläche `game.parry-flag`, Ziffer Funk 1× `hud.screen`. Erscheint, wenn der Kiesel in der Ankündigung aufleuchtet (`litAtMs`), und bleibt, bis der Kreis gewertet ist. Beim Aufleuchten ist das Symbol 300 ms `game.parry-hold` (hell), danach wieder `game.parry-symbol`. Falsche Reihenfolge: „FALSCH“ + X. |
+| `drag` | Ziel: vier L-Klammern (`size.parry-target-bracket` 6, 2 px, `game.parry-target`) auf der Box mit `size.parry-target-radius` 24, Ziel-Symbol mittig. Keine Kreislinie, keine Fläche. Gepunktete Linie `game.parry-link`, 2×2-Punkt alle 4 px (`size.parry-link-dot`), vom Kreisrand (r + 3) bis zur Klammer-Box. Beim Ziehen folgen Kreis, Ring und Linie dem Zeiger. Ersatz per Tipp: angetippter Kreis bekommt einen zweiten 1-px-Ring (r 23, `game.parry-circle`), die Klammern rücken um `size.parry-target-step` 4 nach innen (Box r 20) in `motion.duration.parry-target-step` 80 ms, bei reduzierter Bewegung springen sie. |
+| `beat` | Kopf-Symbol 11. Nach Treffer Frame 12 in der Gradfarbe (statt Stern bzw. Haken) und „z“ (`ui-icons-m9` Frame 2, 2×, `hud.text`) rechts oben am Kreis (Versatz +14/−30), steigt in `motion.duration.parry-sleep` 400 ms um 6 px, bei reduzierter Bewegung steht es still. Taktpunkte: 3 Quadrate `size.parry-beat-dot` 4×4, Abstand 4, Mitte 24 px unter der Astronautin, 1-px-Rahmen `game.parry-beat`, gefüllt ab dem jeweiligen Schlag (`beatMs`), unabhängig vom Treffer. |
+| `choice` | Hinweistafel: Glas `hud.glass`, 1-px-Rahmen `hud.line`, 2 px Innenabstand, Bild in 2× (`size.parry-hint-scale`), Mitte `size.parry-hint-y` 102 über der Astronautin. Waage: `parry-scale` Frame 0 → 1 → 2 in `motion.duration.parry-tilt` 300 ms (reduziert: sofort Frame 2). Rätsel: `parry-riddle` Frame nach der richtigen Beinzahl (legs4 → 0, legs2 → 1, legs3 → 2). Tafel steht vom Start der Ankündigung bis zur Wertung des letzten Kreises. Kreise liegen in der Tiefe über der Tafel. Rückt die Tafel-Oberkante näher als 4 px an den HUD-Timer, rückt sie nach unten. Falsche Wahl: „FALSCH“ + X. |
+
+**PARRY! mit Motiv:** `parry-motifs` 16×16 links im PARRY!-Schild, Abstand 6 zum Wort, sonst wie H-33. Zuordnung: Dornenknospe und Dornenhecke → rose · Mondkiesel → pebble · Erlkönigs Töchter → ghost · Morgenlicht → sun · Riesenzank → stones · Fessel der Göttinnen → rope · Schlaflied → sleep · Herzenswaage → feather · Rätsel der Sphinx → sphinx · Sandsturm → mirage. Angriffe ohne Motiv (z. B. `burrow`) zeigen PARRY! wie bisher. Gilt auch bei „Einfacher Abwehr“ (kein Spielvorteil).
+
+**Pause:** Unter WEITER/HAUPTMENÜ ein FunkButton über die ganze Gruppenbreite (Abstand 8): Kästchen (`ui-icons-m9` 0/1, 2×, `hud.text`) + „EINFACHE ABWEHR“ Funk 2× `hud.text`, Rolle Schalter. Darunter 6 px „ALLE ABWEHREN: EIN TIPP“ (Funk 1×, `hud.text-muted`), dann 14 px „ESC ODER P: WEITER“. Fokus-Reihenfolge WEITER → HAUPTMENÜ → EINFACHE ABWEHR. Tippen schaltet um, die Pause bleibt offen. Mit k = 1 beginnt der Block bei y ≈ 92 (Titel) und endet bei ≈ 290.
+
+**Einfache Abwehr in der Runde:** jeder Kreis ist ein normaler Tipp-Kreis mit seinem Symbol. Kein Halte-Ring, keine Klammern oder Linie, keine Fähnchen, keine Taktpunkte, keine Hinweistafel, keine Trugkreise. Welche `choice`-Kreise erscheinen, regelt die Logik aus AP-149 (Mockup Ansicht 13).
+
+**Neue Tokens:** `color.game.parry-symbol`, `-decoy`, `-hold`, `-hold-track`, `-target`, `-link`, `-flag`, `-beat`; `size.parry-symbol`, `-hold-r`, `-hold-segments`, `-target-radius`, `-target-bracket`, `-target-step`, `-link-dot`, `-flag`, `-beat-dot`, `-hint-y`, `-hint-scale`, `-motif`; `motion.duration.parry-target-step`, `-sleep`, `-tilt`. 19 neue `$pairs` (Trugkreis und Ziel auf allen sechs Böden), `contrast.js --tokens` grün (schlechtester Fall Trugkreis auf Wüste 4,16:1), Exporte (css, ts, json) neu gebaut.
+
+**Übergabe H-37 an den Planner:**
+
+| Datei / Paket | Änderung |
+|---|---|
+| AP-150 Theme- und Asset-Sync | `npm run theme:build` (neue Tokens oben). `npm run sprites:build` mit `docs/design/assets/sprites-m9.js` (Ladefolge nach `sprites-m8.js`, 6 neue Sprite-Schlüssel). `build-sprites.test.ts` Sprite-Anzahl anpassen. Lizenz-Eintrag „eigene Arbeit“ wie bei M8. `size.parry-target-radius` 24 entspricht `PARRY_RULES.dragTargetRadiusPx`. |
+| AP-151 `ParryOverlay.ts` (Bausteine in der Runde) | nach Tabelle „Bausteine“ und „PARRY! mit Motiv“, Ansichten 1–11. Symbol-Zuordnung als Tabelle im Code (nicht in `bosses.ts`). Wörter „LOS!“, „TRUG!“, „FALSCH“, „ZU FRÜH“ als Labels wie H-33 (Funk 2×, Glasschild, radial außen). |
+| AP-152 Schalter und Doku | `HudScene.ts` Pause nach Absatz „Pause“, Ansicht 12. Doku: Symbole und Einfache Abwehr kurz in der Spielanleitung. |
+| AP-153 bis AP-155 (Bosse) | nutzen nur die Overlay-Bausteine, kein eigenes Zeichnen. Motiv je Angriff nach Zuordnung oben. |
+
+Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Review für AP-151 gegen `screenshots/m9-zoom-states-a-desktop.png`, `-states-b-desktop.png` und die Szenen 1–8, für AP-152 gegen Ansicht 12, für AP-150 gegen `m9-zoom-sprites-desktop.png`. Handtest H-38 zusätzlich: Symbole bei 14 px am iPhone erkennbar (vor allem Beine 4/2/3 und Feder), Rätselbild in der Tafel erkennbar, Tafel stört den Timer nicht.
 
 - keine weiteren (erste Fassung vom 2026-10-25)

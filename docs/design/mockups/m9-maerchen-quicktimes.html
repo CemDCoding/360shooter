@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<script>/* review aid: ?v=s4 or #s4 shows only that view */ addEventListener('DOMContentLoaded',()=>{const ZOOM='';const q=new URLSearchParams(location.search).get('v')||location.hash.slice(1)||ZOOM;if(!q)return;document.querySelectorAll('section,header.doc').forEach(s=>{if(!s.querySelector('#'+q))s.style.display='none';});});</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M9: Märchen-Quicktimes (H-37) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .h-energy { width: 160px; height: 44px; }
+  .h-timer { display: grid; place-items: center; }
+  .h-row { top: 58px; gap: 4px; align-items: flex-start; }
+  .w-ground.desert { --g: var(--color-biome-desert-ground); --g2: var(--color-biome-desert-ground-hi); --g3: var(--color-biome-desert-ground-lo); }
+  .w-ground.pyramid { --g: var(--color-biome-pyramid-ground); --g2: var(--color-biome-pyramid-ground-hi); --g3: var(--color-biome-pyramid-ground-lo); }
+  .w-ground.oasis { --g: var(--color-biome-oasis-ground); --g2: var(--color-biome-oasis-ground-hi); --g3: var(--color-biome-oasis-ground-lo); }
+  canvas.ws { position: absolute; image-rendering: pixelated; }
+  canvas.ws.in { position: static; }
+  .tele { position: absolute; border-radius: 50%; border: 1px solid var(--color-red-300); background: color-mix(in srgb, var(--color-red-300) 22%, transparent); }
+
+  /* ---------- ParryOverlay (H-33 base) ---------- */
+  .pc { position: absolute; width: 0; height: 0; }
+  .pc .disc { position: absolute; left: calc(var(--size-parry-radius) * -1); top: calc(var(--size-parry-radius) * -1);
+    width: calc(var(--size-parry-radius) * 2); height: calc(var(--size-parry-radius) * 2); box-sizing: border-box; border-radius: 50%;
+    background: var(--color-game-parry-fill); border: var(--size-parry-line) solid var(--color-game-parry-circle); display: grid; place-items: center; }
+  .pc .ring { position: absolute; border-radius: 50%; box-sizing: border-box; border: var(--size-parry-line) solid var(--color-game-parry-approach); }
+  .pc.perfect .disc { border-color: var(--color-game-parry-perfect); box-shadow: 0 0 6px var(--color-game-parry-perfect); }
+  .pc.good .disc { border-color: var(--color-game-parry-good); }
+  .pc.miss .disc { border-color: var(--color-game-parry-miss); border-style: dashed; background: transparent; }
+  .lbl { position: absolute; transform: translate(-50%, -50%); padding: 3px 4px; background: var(--color-hud-glass); border: var(--border-hud) solid currentColor; line-height: 0; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .burst { position: absolute; border-radius: 50%; box-sizing: border-box; border: var(--size-parry-line) solid var(--color-game-parry-burst); background: color-mix(in srgb, var(--color-game-parry-burst) 15%, transparent); }
+  svg.ico { display: block; shape-rendering: crispEdges; }
+
+  /* ---------- H-37 additions ---------- */
+  .pc .hold { position: absolute; left: -20px; top: -20px; }                      /* inner 8-step ring, pixel canvas 40x40 */
+  .pc .sym { position: absolute; left: calc(var(--size-parry-symbol) / -2); top: calc(var(--size-parry-symbol) / -2); }
+  .pc .edge { position: absolute; left: -22px; top: -22px; }                      /* decoy wavy edge 44x44 */
+  .pc .sel { position: absolute; left: -23px; top: -23px; width: 46px; height: 46px; border-radius: 50%; box-sizing: border-box; border: 1px solid var(--color-game-parry-circle); }
+  .pc .flag { position: absolute; left: -24px; top: -24px; width: var(--size-parry-flag); height: var(--size-parry-flag); background: var(--color-game-parry-flag); display: grid; place-items: center; line-height: 0; }
+  .pc .zz { position: absolute; left: 14px; top: -30px; }
+  .tgt { position: absolute; width: 0; height: 0; }
+  .tgt i { position: absolute; width: var(--size-parry-target-bracket); height: var(--size-parry-target-bracket); border: 0 solid var(--color-game-parry-target); }
+  .tgt .tl { border-left-width: 2px; border-top-width: 2px; } .tgt .tr { border-right-width: 2px; border-top-width: 2px; }
+  .tgt .bl { border-left-width: 2px; border-bottom-width: 2px; } .tgt .br { border-right-width: 2px; border-bottom-width: 2px; }
+  .tgt .tsym { position: absolute; left: -7px; top: -7px; }
+  svg.link { position: absolute; left: 0; top: 0; width: 640px; height: 360px; shape-rendering: crispEdges; pointer-events: none; }
+  .beats { position: absolute; display: flex; gap: var(--size-parry-beat-dot); }
+  .beats > i { width: var(--size-parry-beat-dot); height: var(--size-parry-beat-dot); box-sizing: border-box; border: 1px solid var(--color-game-parry-beat); background: color-mix(in srgb, var(--color-hud-screen) 60%, transparent); display: block; }
+  .beats > i.on { background: var(--color-game-parry-beat); }
+  .hint { position: absolute; transform: translate(-50%, -50%); padding: 2px; background: var(--color-hud-glass); border: var(--border-hud) solid var(--color-hud-line); line-height: 0; }
+
+  .pause { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; }
+  .pause .grp { display: inline-flex; flex-direction: column; gap: 8px; align-items: stretch; }
+  .pause .btns { display: flex; gap: 12px; }
+  .pause .f-btn.toggle { justify-content: center; gap: 8px; }
+  .sheet { position: absolute; inset: 0; background: var(--color-hud-screen); }
+  .cellg { position: absolute; overflow: hidden; outline: 1px solid var(--color-hud-screen); }
+  .cell { position: absolute; width: 64px; height: 86px; }
+  .cap { position: absolute; left: 0; width: 64px; text-align: center; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>M9 · Märchen-Quicktimes · Ergänzung H-37</h1>
+  <p>Baut auf dem Quicktime-Kreis aus H-33 auf (<code>m7-quicktime-und-stufen.html</code>). Alle Maße in logischen Arena-px, die Kreise gehören zur Welt und skalieren nicht mit <code>k</code>. Pixelquelle aller neuen Bilder: <code>assets/sprites-m9.js</code>.</p>
+  <dl>
+    <dt>Symbol</dt><dd>Einfarbiges Märchensymbol 14×14 (<code>parry-symbols</code>, getönt mit <code>game.parry-symbol</code>) ersetzt die Nummer. Ohne Symbol bleibt die Nummer (z. B. Morgenlicht Kreis 2/3).</dd>
+    <dt>Trugkreis</dt><dd>Welliger Rand (<code>parry-decoy-edge</code>), keine Glasfüllung, kein Ring. Antippen: „TRUG!“, Rand zerfällt. Ignoriert: blendet still aus.</dd>
+    <dt>Halten</dt><dd>Innerer Ring in 8 Stufen, Symbol öffnet sich in 3 Frames, bei vollem Ring „LOS!“. Zu früh gelöst: „ZU FRÜH“.</dd>
+    <dt>Ziehen</dt><dd>Ziel mit vier Klammern und Symbol, gepunktete Linie. Ersatz per Tipp: Kreis doppelt umrandet, Klammern rücken 4 px heran.</dd>
+    <dt>Kieselspur, Takt, Wahl</dt><dd>Nummern-Fähnchen bleiben stehen · Köpfe schlafen ein, drei Taktpunkte · Hinweistafel über der Astronautin, Beine als zählbare Striche.</dd>
+    <dt>Belohnung, Schalter</dt><dd>Farbiges Motiv 16×16 im PARRY!-Schild · „EINFACHE ABWEHR“ als dritter Button im Pausemenü.</dd>
+  </dl>
+</header>
+
+<section><h2>1 · WALD, LEVEL 4 · Baummonster „Dornenknospe“: Kreis 1 wird gehalten (5/8, Knospe halb offen), Kreis 2 Rose läuft</h2><div class="stage-wrap"><div class="stage" id="s1" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>2 · WALD BEI NACHT, LEVEL 9 · Waldgeist „Erlkönigs Töchter“: ein echter Geist (Ring), zwei Nebel-Trugkreise (welliger Rand, kein Ring)</h2><div class="stage-wrap"><div class="stage" id="s2" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>3 · WALD BEI NACHT, LEVEL 9 · Waldgeist „Mondkiesel“: Fähnchen 1 und 2 stehen, Kiesel 1 GUT, Kiesel 2 läuft</h2><div class="stage-wrap"><div class="stage" id="s3" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>4 · ELFENWALD, LEVEL 20 · Riesen-Stein „Riesenzank“: links per Tipp gewählt (Klammern gerückt), rechts wird gezogen</h2><div class="stage-wrap"><div class="stage" id="s4" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>5 · PYRAMIDEN, LEVEL 30 · Wächter-Hund „Schlaflied“: Kopf 1 schläft (PERFEKT, z), Kopf 2 läuft, Kopf 3 erscheint · Taktpunkte 2/3</h2><div class="stage-wrap"><div class="stage" id="s5" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>6 · PYRAMIDEN, LEVEL 30 · Wächter-Hund „Herzenswaage“: Tafel zeigt die Waage geneigt, Feder oben = richtig</h2><div class="stage-wrap"><div class="stage" id="s6" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>7 · PYRAMIDEN-OASE, LEVEL 40 · Pharao „Rätsel der Sphinx“: Tafel zeigt das krabbelnde Kind, richtig sind die 4 Beine</h2><div class="stage-wrap"><div class="stage" id="s7" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>8 · PYRAMIDEN-OASE, LEVEL 40 · PARRY! mit Motivbild (Sphinx)</h2><div class="stage-wrap"><div class="stage" id="s8" data-component="GameScene" data-font="funk"></div></div></section>
+<section><h2>9a · ZUSTÄNDE (2×) · Halten, Trugkreis</h2><div class="stage-wrap"><div class="stage" id="s9a" data-component="ParryOverlay" data-font="funk"></div></div></section>
+<section><h2>9b · ZUSTÄNDE (2×) · Kieselspur, Takt, Wahl</h2><div class="stage-wrap"><div class="stage" id="s9b" data-component="ParryOverlay" data-font="funk"></div></div></section>
+<section><h2>10 · SPRITES (3×) · parry-symbols, parry-motifs, parry-riddle, parry-scale, parry-decoy-edge, ui-icons-m9</h2><div class="stage-wrap"><div class="stage" id="s10" data-component="sprites-m9" data-font="funk"></div></div></section>
+<section><h2>11 · AUF ALLEN SECHS BÖDEN (1×) · Trugkreis, Ziel mit Klammern, Halte-Kreis 4/8</h2><div class="stage-wrap"><div class="stage" id="s11" data-component="ParryOverlay" data-font="funk"></div></div></section>
+<section><h2>12 · PAUSE · Schalter „EINFACHE ABWEHR“ eingeschaltet, Fokus auf dem Schalter</h2><div class="stage-wrap"><div class="stage" id="s12" data-component="HudScene.pause" data-font="funk"></div></div></section>
+<section><h2>13 · WALD, LEVEL 4 · EINFACHE ABWEHR aktiv: „Dornenhecke“ als zwei Tipp-Kreise mit Rose, keine Spindel</h2><div class="stage-wrap"><div class="stage" id="s13" data-component="GameScene" data-font="funk"></div></div></section>
+
+<script>
+  const P = (t, s, c, sh) => `<span class="px" data-t="${t}"${s ? ` data-s="${s}"` : ''} data-c="${c}"${sh ? ` data-sh="${sh}"` : ''}></span>`;
+  const W = (k, x, y, o) => { o = o || {}; return `<canvas class="ws${o.in ? ' in' : ''}${o.cls ? ' ' + o.cls : ''}" data-k="${k}" data-s="${o.s || 1}" data-f="${o.f || 0}" ${o.tint ? `data-tint="${o.tint}"` : ''} ${o.flip ? 'data-flip="1"' : ''} style="${o.in || o.cls ? '' : `left:${x}px;top:${y}px;`}${o.style || ''}"></canvas>`; };
+  function segs(v) { let h = ''; for (let i = 0; i < 10; i++) { const f = v / 10 - i; h += `<i class="${f >= 1 ? '' : f > 0 ? 'half' : 'off'}"></i>`; } return h; }
+  function rig(cx, cy) { return `<div class="w-rig" style="left:${cx - 16}px;top:${cy - 16}px" data-component="Player"><span class="body spr" data-n="astronaut" data-s="1" aria-label="Astronautin"></span><span class="gun spr" data-n="raygun1" data-s="1" style="left:20px;top:7px"></span></div>`; }
+
+  const ICON = {
+    check: ['......#', '.....##', '#...##.', '##.##..', '.###...', '..#....', '.......'],
+    x: ['#.....#', '##...##', '.##.##.', '..###..', '.##.##.', '##...##', '#.....#'],
+  };
+  const ico = (n, color, s) => { s = s || 2; const r = ICON[n]; let rects = ''; r.forEach((row, y) => [...row].forEach((c, x) => { if (c === '#') rects += `<rect x="${x}" y="${y}" width="1" height="1"/>`; }));
+    return `<svg class="ico" width="${7 * s}" height="${7 * s}" viewBox="0 0 7 7" fill="var(${color})" aria-hidden="true">${rects}</svg>`; };
+  const star = (s) => `<span class="spr" data-n="star" data-s="${s || 2}" style="--px-s:var(--color-game-parry-perfect);--px-o:var(--color-hud-screen)"></span>`;
+
+  // parry-symbols frame index (see sprites-m9.js)
+  const SYM = ['rose-bud', 'rose-half', 'rose', 'spindle', 'pebble', 'ghost', 'mist', 'sun-low', 'sun-mid', 'sun', 'rope', 'head', 'head-asleep', 'heart', 'feather', 'legs4', 'legs2', 'legs3', 'sand', 'link', 'lane'];
+  const MOTIF = ['rose', 'pebble', 'ghost', 'sun', 'stones', 'rope', 'sleep', 'feather', 'sphinx', 'mirage'];
+  const sym = (n, tint) => W('parry-symbols', 0, 0, { f: SYM.indexOf(n), tint: tint || '--color-game-parry-symbol', cls: 'sym' });
+  const zIcon = () => W('ui-icons-m9', 0, 0, { f: 2, s: 2, tint: '--color-hud-text', cls: 'zz' });
+
+  // ---- circle: o = { a | at, kind, sym, st, ring, p (hold steps 0-8), flag, sel, word, n } ----
+  const R = 20, DIST = 56;
+  const WORDS = { perfect: ['PERFEKT', '--color-game-parry-perfect'], good: ['GUT', '--color-game-parry-good'], miss: ['VERFEHLT', '--color-game-parry-miss'],
+    trug: ['TRUG!', '--color-game-parry-miss'], falsch: ['FALSCH', '--color-game-parry-miss'], frueh: ['ZU FRÜH', '--color-game-parry-miss'], los: ['LOS!', '--color-hud-text'] };
+  function pos(cx, cy, o) { return (o.at ? o.at : [cx + Math.cos(o.a * Math.PI / 180) * DIST, cy + Math.sin(o.a * Math.PI / 180) * DIST]).map(Math.round); }
+  function pc(cx, cy, o) {
+    const [x, y] = pos(cx, cy, o);
+    const decoy = o.kind === 'decoy';
+    let inner = '';
+    if (o.st === 'perfect' && o.sym !== 'head') inner = star(2);
+    else if (o.st === 'good' && o.sym !== 'head') inner = ico('check', '--color-game-parry-good');
+    else if (['miss', 'falsch', 'frueh'].includes(o.st)) inner = ico('x', '--color-game-parry-miss');
+    else if (o.sym === 'head' && (o.st === 'perfect' || o.st === 'good')) inner = sym('head-asleep', o.st === 'perfect' ? '--color-game-parry-perfect' : '--color-game-parry-good');
+    else if (o.kind === 'hold') inner = sym(o.p >= 8 ? (o.sym === 'sun' ? 'sun' : 'rose') : o.p >= 3 ? (o.sym === 'sun' ? 'sun-mid' : 'rose-half') : (o.sym === 'sun' ? 'sun-low' : 'rose-bud'), o.lit ? '--color-game-parry-hold' : null);
+    else if (o.sym) inner = sym(o.sym, o.lit ? '--color-game-parry-hold' : null);
+    else inner = P(String(o.n), 2, '--color-game-parry-circle');
+    const ring = o.ring ? `<i class="ring" style="left:${-R * o.ring}px;top:${-R * o.ring}px;width:${2 * R * o.ring}px;height:${2 * R * o.ring}px"></i>` : '';
+    const hold = o.kind === 'hold' && o.p != null && !['miss', 'frueh', 'perfect', 'good'].includes(o.st) ? `<canvas class="hold" width="40" height="40" data-p="${o.p}"></canvas>` : '';
+    const body = decoy
+      ? `${W('parry-decoy-edge', 0, 0, { f: o.st === 'trug' ? 1 : 0, tint: o.st === 'trug' ? '--color-game-parry-miss' : '--color-game-parry-decoy', cls: 'edge' })}${o.st === 'trug' ? '' : sym(o.sym, '--color-game-parry-decoy')}`
+      : `<span class="disc">${inner.includes('class="ws') ? '' : inner}</span>${hold}${inner.includes('class="ws') ? inner : ''}`;
+    const flag = o.flag ? `<span class="flag">${P(String(o.flag), 0, '--color-hud-screen')}</span>` : '';
+    const sel = o.sel ? '<i class="sel"></i>' : '';
+    const z = o.sym === 'head' && (o.st === 'perfect' || o.st === 'good') ? zIcon() : '';
+    let lbl = '';
+    const wkey = o.word || o.st;
+    if (WORDS[wkey] && !o.noLabel) {
+      const a = o.at ? -90 : o.a, d = R + 14;
+      const lx = Math.round(Math.cos(a * Math.PI / 180) * d), ly = Math.round(Math.sin(a * Math.PI / 180) * d);
+      lbl = `<span class="lbl" style="left:${lx}px;top:${ly}px;color:var(${WORDS[wkey][1]})">${P(WORDS[wkey][0], 2, WORDS[wkey][1])}</span>`;
+    }
+    const st = ['miss', 'falsch', 'frueh'].includes(o.st) ? 'miss' : o.st;
+    return `<div class="pc ${st || ''}" style="left:${x}px;top:${y}px" role="button" aria-label="${o.aria || 'Abwehrkreis'}" data-component="ParryOverlay.${o.kind || 'tap'}">${body}${ring}${sel}${flag}${z}${lbl}</div>`;
+  }
+  // drag target: brackets on the bounding box (radius 24, or 20 when the circle is selected)
+  function tgt(x, y, s, symName) {
+    const r = s ? 20 : 24, b = 6;
+    return `<div class="tgt" style="left:${x}px;top:${y}px" role="img" aria-label="Ziel" data-component="ParryOverlay.target">
+      <i class="tl" style="left:${-r}px;top:${-r}px"></i><i class="tr" style="left:${r - b}px;top:${-r}px"></i>
+      <i class="bl" style="left:${-r}px;top:${r - b}px"></i><i class="br" style="left:${r - b}px;top:${r - b}px"></i>
+      ${W('parry-symbols', 0, 0, { f: SYM.indexOf(symName), tint: '--color-game-parry-target', cls: 'tsym' })}</div>`;
+  }
+  function dots(pairs) { // dotted line: 2x2 dot every 4 px
+    return `<svg class="link" aria-hidden="true">${pairs.map(([x0, y0, x1, y1]) => { const n = Math.floor(Math.hypot(x1 - x0, y1 - y0) / 4); let r = '';
+      for (let i = 0; i <= n; i++) r += `<rect x="${Math.round(x0 + (x1 - x0) * i / n) - 1}" y="${Math.round(y0 + (y1 - y0) * i / n) - 1}" width="2" height="2"/>`; return r; }).join('')}</svg>`.replace('<svg class="link"', '<svg class="link" fill="var(--color-game-parry-link)"');
+  }
+  // dotted line from circle edge to the bracket box edge
+  function linkLine(c, t, rt) { const dx = t[0] - c[0], dy = t[1] - c[1], d = Math.hypot(dx, dy); return [c[0] + dx / d * 23, c[1] + dy / d * 23, t[0] - dx / d * (rt + 2), t[1] - dy / d * (rt + 2)]; }
+  const beats = (cx, cy, on) => `<div class="beats" style="left:${cx - 10}px;top:${cy + 22}px" role="img" aria-label="Takt ${on} von 3" data-component="ParryOverlay.beats">${[0, 1, 2].map((i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</div>`;
+  const hint = (cx, cy, inner) => `<div class="hint" style="left:${cx}px;top:${cy - 102}px" role="img" data-component="ParryOverlay.hint">${inner}</div>`;
+
+  // ---- hud ----
+  const chipDouble = (v) => `<div class="f-glass f-chip"><span class="spr" data-n="double" data-s="2" style="--px-L:var(--color-hud-accent);--px-o:var(--color-hud-screen)"></span>${P(v, 2, '--color-hud-text')}</div>`;
+  function hud(st) {
+    return `
+      <div class="abs f-glass f-energy h-energy" style="left:8px;top:8px" role="img" aria-label="Energie ${st.energy} von 100">
+        ${P(st.energy, 3, '--color-hud-text')}<div>${P('ENERGIE', 0, '--color-hud-text-muted')}<div class="f-segs">${segs(st.energy)}</div></div></div>
+      <div class="abs f-glass h-timer" style="left:264px;top:8px;width:112px;height:40px;${st.boss ? 'border-color:var(--color-hud-danger)' : ''}">${P(st.timer, 3, st.boss ? '--color-hud-danger' : '--color-hud-text')}</div>
+      <div class="abs f-btn icon" style="left:560px;top:8px" aria-label="Ton"><span class="spr" data-n="speaker" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs f-btn icon" style="left:600px;top:8px" aria-label="Pause"><span class="spr" data-n="pause" data-s="2" style="--px-o:var(--color-hud-accent);--px-k:var(--color-hud-screen)"></span></div>
+      <div class="abs row h-row" style="left:8px"><div class="f-glass f-chip"><span class="spr" data-n="coin" data-s="2"></span>${P('+' + st.coins, 2, '--color-hud-gold')}</div>${(st.chips || []).join('')}</div>
+      ${st.bossName ? `<div class="abs" style="left:220px;top:323px;width:200px"><div class="row" style="justify-content:space-between;height:8px;margin-bottom:3px">${P(st.bossName, 0, '--color-hud-text')}${P('BOSS', 0, '--color-hud-danger')}</div><div style="height:8px;border:1px solid var(--color-hud-danger);background:var(--color-hud-glass);position:relative"><i style="position:absolute;left:1px;top:1px;bottom:1px;width:${st.bossHp * 1.96}px;background:var(--color-hud-danger)"></i></div></div>` : ''}`;
+  }
+  const CX = 320, CY = 180;
+  const tele = (r) => `<div class="tele" style="left:${CX - r}px;top:${CY - r}px;width:${2 * r}px;height:${2 * r}px" aria-label="Ankündigung"></div>`;
+  const set = (id, h) => { document.getElementById(id).innerHTML = h; };
+
+  // 1 · root monster, Dornenknospe
+  set('s1', `<div class="w-ground forest"></div>
+    ${W('enemy-cursed-tree', 80, 210)}${W('enemy-boar', 150, 120)}${W('enemy-zombie-squirrel', 210, 280)}
+    ${W('boss-root-monster', 440, 70)}
+    ${tele(36)}${rig(CX, CY)}
+    ${pc(CX, CY, { a: -140, kind: 'hold', sym: 'rose', p: 5, aria: 'Haltekreis Rose, gedrückt, 5 von 8' })}
+    ${pc(CX, CY, { a: 30, sym: 'rose', ring: 1.8, aria: 'Kreis Rose, tippen, wenn der Ring den Rand erreicht' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 72, timer: 'BOSS!', boss: true, coins: 31, bossName: 'BAUMMONSTER', bossHp: 64, chips: [chipDouble('2/2')] })}`);
+
+  // 2 · forest ghost, Erlkönigs Töchter
+  set('s2', `<div class="w-ground night"></div>
+    ${W('enemy-forest-witch', 90, 230)}${W('enemy-bear', 500, 240, { flip: 1 })}
+    ${W('boss-forest-ghost', 430, 60)}${W('boss-forest-ghost', 120, 70, { style: 'opacity:.55' })}${W('boss-forest-ghost', 470, 210, { style: 'opacity:.55' })}
+    ${tele(36)}${rig(CX, CY)}
+    ${pc(CX, CY, { a: -60, sym: 'ghost', ring: 1.5, aria: 'Kreis echter Geist, tippen' })}
+    ${pc(CX, CY, { a: 200, kind: 'decoy', sym: 'mist', aria: 'Trugkreis Nebel, nicht tippen' })}
+    ${pc(CX, CY, { a: 70, kind: 'decoy', sym: 'mist', aria: 'Trugkreis Nebel, nicht tippen' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 54, timer: 'BOSS!', boss: true, coins: 22, bossName: 'WALDGEIST', bossHp: 41 })}`);
+
+  // 3 · Mondkiesel
+  set('s3', `<div class="w-ground night"></div>
+    ${W('enemy-cursed-tree', 70, 230)}${W('enemy-fairy', 520, 110)}
+    ${W('boss-forest-ghost', 440, 210)}
+    ${W('boss-ghost-orb', 400, 205)}${W('boss-ghost-orb', 395, 225)}
+    ${tele(36)}${rig(CX, CY)}
+    ${pc(CX, CY, { a: -110, sym: 'pebble', st: 'good', flag: 1, aria: 'Kiesel 1: gut' })}
+    ${pc(CX, CY, { a: 20, sym: 'pebble', ring: 1.3, flag: 2, aria: 'Kiesel 2, als zweites tippen' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 61, timer: 'BOSS!', boss: true, coins: 27, bossName: 'WALDGEIST', bossHp: 70 })}`);
+
+  // 4 · Riesenzank (drag)
+  const c1 = pos(CX, CY, { a: 200 }), t1 = [c1[0] - 50, c1[1] + 30];
+  const c2 = [CX + 72, CY - 8], t2 = [CX + 132, CY + 44]; // dragged circle on its way to the target
+  set('s4', `<div class="w-ground elf"></div>
+    ${W('enemy-forest-spirit', 110, 60)}${W('enemy-fairy', 520, 90)}
+    ${W('boss-giant-stone', 520, 230, { s: 0.5 })}${W('boss-giant-stone', 60, 250, { s: 0.5 })}
+    ${dots([linkLine(c1, t1, 20), linkLine(c2, t2, 24)])}
+    ${tgt(t1[0], t1[1], true, 'lane')}${tgt(t2[0], t2[1], false, 'lane')}
+    ${rig(CX, CY)}
+    ${pc(CX, CY, { at: c1, kind: 'drag', sym: 'pebble', ring: 1.4, sel: true, noLabel: true, aria: 'Kiesel gewählt, jetzt Ziel tippen' })}
+    ${pc(CX, CY, { at: c2, kind: 'drag', sym: 'pebble', ring: 1.15, noLabel: true, aria: 'Kiesel wird gezogen' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 47, timer: 'BOSS!', boss: true, coins: 40, bossName: 'RIESEN-STEIN', bossHp: 46 })}`);
+
+  // 5 · Schlaflied (beat)
+  set('s5', `<div class="w-ground pyramid"></div>
+    ${W('enemy-mummy', 90, 220)}${W('enemy-archaeologist', 500, 250, { flip: 1 })}
+    ${W('boss-guardian-dog', 440, 40)}
+    ${tele(36)}${rig(CX, CY)}${beats(CX, CY, 2)}
+    ${pc(CX, CY, { a: -150, sym: 'head', st: 'perfect', aria: 'Kopf 1 schläft: perfekt' })}
+    ${pc(CX, CY, { a: -40, sym: 'head', ring: 1.25, aria: 'Kopf 2, im Takt tippen' })}
+    ${pc(CX, CY, { a: 70, sym: 'head', ring: 2.25, aria: 'Kopf 3 erscheint' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 66, timer: 'BOSS!', boss: true, coins: 35, bossName: 'WÄCHTER-HUND', bossHp: 58 })}`);
+
+  // 6 · Herzenswaage (choice)
+  set('s6', `<div class="w-ground pyramid"></div>
+    ${W('enemy-mummy', 70, 230)}${W('enemy-sphinx', 500, 230)}
+    ${W('boss-guardian-dog', 450, 40)}
+    ${tele(36)}${rig(CX, CY)}
+    ${hint(CX, CY, W('parry-scale', 0, 0, { f: 2, s: 2, in: 1, tint: '--color-hud-text' }))}
+    ${pc(CX, CY, { a: 160, sym: 'heart', ring: 1.5, aria: 'Kreis Herz' })}
+    ${pc(CX, CY, { a: 20, sym: 'feather', ring: 1.5, aria: 'Kreis Feder' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 66, timer: 'BOSS!', boss: true, coins: 35, bossName: 'WÄCHTER-HUND', bossHp: 30 })}`);
+
+  // 7 · Rätsel der Sphinx (choice)
+  set('s7', `<div class="w-ground oasis"></div>
+    ${W('enemy-snake', 90, 240)}${W('enemy-archaeologist', 520, 250, { flip: 1 })}
+    ${W('boss-pharaoh', 450, 40)}
+    ${tele(36)}${rig(CX, CY)}
+    ${hint(CX, CY, W('parry-riddle', 0, 0, { f: 0, s: 2, in: 1, tint: '--color-hud-text' }))}
+    ${pc(CX, CY, { a: 150, sym: 'legs4', ring: 1.6, aria: 'Kreis vier Beine' })}
+    ${pc(CX, CY, { a: 30, sym: 'legs2', ring: 1.6, aria: 'Kreis zwei Beine' })}
+    ${pc(CX, CY, { a: 90, sym: 'legs3', ring: 1.6, aria: 'Kreis drei Beine' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 39, timer: 'BOSS!', boss: true, coins: 52, bossName: 'PHARAO', bossHp: 77 })}`);
+
+  // 8 · PARRY! with motif
+  set('s8', `<div class="w-ground oasis"></div>
+    ${W('enemy-snake', 90, 240)}${W('enemy-mummy', 520, 240, { flip: 1 })}
+    ${W('boss-pharaoh', 450, 40)}
+    <div class="burst" style="left:${CX - 40}px;top:${CY - 40}px;width:80px;height:80px" aria-hidden="true"></div>
+    ${rig(CX, CY)}
+    ${pc(CX, CY, { a: 150, sym: 'legs4', st: 'perfect', noLabel: true })}
+    <span class="lbl" style="left:${CX}px;top:${CY - 62}px;color:var(--color-game-parry-burst);padding:5px 6px" role="status" aria-label="Angriff abgewehrt, Rätsel gelöst">${W('parry-motifs', 0, 0, { f: MOTIF.indexOf('sphinx'), in: 1 })}${P('PARRY!', 3, '--color-hud-text')}</span>
+    <div class="w-vignette"></div>
+    ${hud({ energy: 39, timer: 'BOSS!', boss: true, coins: 52, bossName: 'PHARAO', bossHp: 77 })}`);
+
+  // 9 · state sheets (2x), 5 columns x 2 rows of 64x86
+  const cell = (i, label, html) => `<div class="cell" style="left:${(i % 5) * 64}px;top:${2 + Math.floor(i / 5) * 88}px">${html}<div class="cap" style="top:64px">${P(label, 0, '--color-hud-text-muted')}</div></div>`;
+  const C = (o) => pc(0, 0, Object.assign({ at: [32, 44] }, o));
+  const sheet = (id, cells) => set(id, `<div class="sheet"></div><div class="abs" style="left:0;top:0;width:320px;height:180px;transform:scale(2);transform-origin:0 0">${cells.map((c, i) => cell(i, c[0], C(c[1]))).join('')}</div>`);
+  sheet('s9a', [
+    ['RING LÄUFT', { kind: 'hold', sym: 'rose', ring: 1.6 }], ['GEHALTEN 3/8', { kind: 'hold', sym: 'rose', p: 3 }], ['VOLL: LOS!', { kind: 'hold', sym: 'rose', p: 8, word: 'los' }],
+    ['ZU FRÜH', { kind: 'hold', sym: 'rose', st: 'frueh' }], ['SONNE 6/8', { kind: 'hold', sym: 'sun', p: 6 }],
+    ['SPINDEL', { kind: 'decoy', sym: 'spindle' }], ['NEBEL', { kind: 'decoy', sym: 'mist' }], ['SAND', { kind: 'decoy', sym: 'sand' }],
+    ['ANGETIPPT', { kind: 'decoy', sym: 'spindle', st: 'trug' }], ['ECHT: ROSE', { sym: 'rose', ring: 1.3 }],
+  ]);
+  sheet('s9b', [
+    ['LEUCHTET', { sym: 'pebble', flag: 1, lit: true }], ['WARTET', { sym: 'pebble', flag: 2, ring: 1.6 }], ['FALSCH', { sym: 'pebble', flag: 1, st: 'falsch' }],
+    ['KOPF WACH', { sym: 'head', ring: 1.4 }], ['SCHLÄFT', { sym: 'head', st: 'good' }],
+    ['4 BEINE', { sym: 'legs4', ring: 1.3 }], ['2 BEINE', { sym: 'legs2', ring: 1.3 }], ['3 BEINE', { sym: 'legs3', ring: 1.3 }],
+    ['HERZ', { sym: 'heart', ring: 1.3 }], ['FEDER', { sym: 'feather', ring: 1.3 }],
+  ]);
+
+  // 10 · sprite sheet (3x)
+  const lab = (x, y, t) => `<div class="abs" style="left:${x}px;top:${y}px">${P(t, 0, '--color-hud-text-muted')}</div>`;
+  set('s10', `<div class="sheet"></div>
+    ${lab(8, 0, 'PARRY-SYMBOLS 14X14 · GETÖNT GAME.PARRY-SYMBOL')}
+    ${SYM.map((n, i) => `${W('parry-symbols', 8 + (i % 11) * 57, 22 + Math.floor(i / 11) * 64, { f: i, s: 3, tint: '--color-game-parry-symbol' })}${lab(8 + (i % 11) * 57, 66 + Math.floor(i / 11) * 64, String(i))}`).join('')}
+    ${lab(8, 152, 'PARRY-MOTIFS 16X16 · FARBIG')}
+    ${MOTIF.map((n, i) => `${W('parry-motifs', 8 + i * 62, 166, { f: i, s: 3 })}${lab(8 + i * 62, 216, n.toUpperCase())}`).join('')}
+    ${lab(8, 236, 'RIDDLE 24X24 · SCALE 32X24 · DECOY-EDGE 44X44 · UI-ICONS-M9 8X8 (2X)')}
+    ${[0, 1, 2].map((i) => W('parry-riddle', 8 + i * 60, 252, { f: i, s: 2, tint: '--color-hud-text' })).join('')}
+    ${[0, 1, 2].map((i) => W('parry-scale', 190 + i * 72, 256, { f: i, s: 2, tint: '--color-hud-text' })).join('')}
+    ${[0, 1].map((i) => W('parry-decoy-edge', 412 + i * 96, 252, { f: i, s: 2, tint: i ? '--color-game-parry-miss' : '--color-game-parry-decoy' })).join('')}
+    ${[0, 1, 2].map((i) => W('ui-icons-m9', 600, 252 + i * 24, { f: i, s: 2, tint: '--color-hud-text' })).join('')}`);
+
+  // 11 · six grounds
+  const grounds = [['forest', 'WALD'], ['night', 'NACHT'], ['elf', 'ELFENWALD'], ['desert', 'WÜSTE'], ['pyramid', 'PYRAMIDEN'], ['oasis', 'OASE']];
+  set('s11', `<div class="sheet"></div>
+    ${grounds.map((g, i) => `<div class="cellg" style="left:${i * 106 + 2}px;top:20px;width:102px;height:320px">
+        <div class="w-ground ${g[0]}"></div>
+        <div class="abs" style="left:4px;top:4px">${P(g[1], 0, '--color-hud-text')}</div>
+        ${pc(0, 0, { at: [51, 66], kind: 'decoy', sym: 'spindle' })}
+        ${tgt(51, 160, false, 'link')}
+        ${pc(0, 0, { at: [51, 254], kind: 'hold', sym: 'sun', p: 4 })}
+      </div>`).join('')}`);
+
+  // 12 · pause with toggle
+  set('s12', `<div class="w-ground oasis"></div>
+    ${W('enemy-mummy', 120, 220)}${W('enemy-archaeologist', 470, 110, { flip: 1 })}${W('enemy-snake', 200, 90)}
+    ${rig(CX, CY)}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 66, timer: '2:08', coins: 19 })}
+    <div class="f-scrim"></div>
+    <div class="pause" style="top:92px" data-component="HudScene.pauseOverlay">
+      ${P('– PAUSE –', 3, '--color-hud-text')}
+      <div style="height:12px"></div>${P('LEVEL 34 · PYRAMIDEN-OASE · 2:08 ÜBRIG', 0, '--color-hud-text-muted')}
+      <div style="height:20px"></div>
+      <div class="grp">
+        <div class="btns">
+          <div class="f-btn primary" role="button" aria-label="Weiter">${P('WEITER', 2, '--color-hud-accent')}</div>
+          <div class="f-btn" role="button" aria-label="Hauptmenü, Runde abbrechen">${P('HAUPTMENÜ', 2, '--color-hud-text')}</div>
+        </div>
+        <div class="f-btn toggle is-focus" role="switch" aria-checked="true" aria-label="Einfache Abwehr, an" data-component="HudScene.easyParryToggle">${W('ui-icons-m9', 0, 0, { f: 1, s: 2, in: 1, tint: '--color-hud-text' })}${P('EINFACHE ABWEHR', 2, '--color-hud-text')}</div>
+      </div>
+      <div style="height:6px"></div>${P('ALLE ABWEHREN: EIN TIPP', 0, '--color-hud-text-muted')}
+      <div style="height:14px"></div>${P('ESC ODER P: WEITER', 0, '--color-hud-text-muted')}
+    </div>`);
+
+  // 13 · easy parry: Dornenhecke as plain taps
+  set('s13', `<div class="w-ground forest"></div>
+    ${W('enemy-cursed-tree', 80, 210)}${W('enemy-forest-witch', 520, 240, { flip: 1 })}
+    ${W('boss-root-monster', 440, 70)}
+    ${tele(36)}${rig(CX, CY)}
+    ${pc(CX, CY, { a: -120, sym: 'rose', ring: 1.2, aria: 'Kreis Rose, tippen' })}
+    ${pc(CX, CY, { a: 10, sym: 'rose', ring: 2.0, aria: 'Kreis Rose, tippen' })}
+    <div class="w-vignette"></div>
+    ${hud({ energy: 72, timer: 'BOSS!', boss: true, coins: 31, bossName: 'BAUMMONSTER', bossHp: 38 })}`);
+</script>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/pixel.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script>
+  (function () {
+    const S = window.PX_SPRITES, css = getComputedStyle(document.documentElement);
+    const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const v = (n) => css.getPropertyValue(n).trim();
+    // resolve var(--x) chains to a hex value
+    const col = (n) => { let s = v(n); for (let i = 0; i < 5 && s.startsWith('var('); i++) s = v(s.slice(4, -1).trim()); return s; };
+    document.querySelectorAll('canvas.ws[data-k]').forEach((c) => {
+      const d = S[c.dataset.k]; if (!d) { c.width = 8; c.height = 8; return; }
+      c.width = d.frameWidth; c.height = d.frameHeight;
+      const t = c.dataset.tint ? hex(col(c.dataset.tint)) : [255, 255, 255];
+      const x = c.getContext('2d');
+      d.frames[+c.dataset.f || 0].forEach((r, y) => [...r].forEach((ch, i) => { if (ch === '.') return;
+        const q = hex(d.palette[ch]).map((p, k) => Math.round(p * t[k] / 255));
+        x.fillStyle = `rgb(${q})`; x.fillRect(c.dataset.flip ? d.frameWidth - 1 - i : i, y, 1, 1); }));
+      const s = +c.dataset.s || 1;
+      c.style.width = Math.round(d.frameWidth * s) + 'px'; c.style.height = Math.round(d.frameHeight * s) + 'px';
+    });
+    // inner hold ring: radius 13-15, 8 segments clockwise from the top, 1 px gap between segments
+    const on = col('--color-game-parry-hold'), off = col('--color-game-parry-hold-track');
+    document.querySelectorAll('canvas.hold').forEach((c) => {
+      const p = +c.dataset.p, x = c.getContext('2d');
+      for (let y = 0; y < 40; y++) for (let i = 0; i < 40; i++) {
+        const dx = i + 0.5 - 20, dy = y + 0.5 - 20, d = Math.hypot(dx, dy);
+        if (d < 13 || d >= 15) continue;
+        const a = (Math.atan2(dx, -dy) + 2 * Math.PI) % (2 * Math.PI), seg = Math.floor(a / (Math.PI / 4));
+        const edge = Math.min(a - seg * Math.PI / 4, (seg + 1) * Math.PI / 4 - a) * d;
+        if (edge < 0.8) continue;
+        x.fillStyle = seg < p ? on : off; x.fillRect(i, y, 1, 1);
+      }
+    });
+  })();
+</script>
+</body>
+</html>
