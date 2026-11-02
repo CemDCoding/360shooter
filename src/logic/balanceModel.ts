@@ -54,7 +54,7 @@ function pressureFactor(enemyId: EnemyId): number {
   }
   if (e.burrow) {
     const b = e.burrow;
-    f *= 1 + 0.5 * (b.underMs / (b.underMs + b.surfaceMs));
+    f *= 1 + REFERENCE_PLAYER.burrowLossShare * (b.underMs / (b.underMs + b.surfaceMs));
   }
   const slow = e.projectile?.onHit?.slow;
   if (slow && e.projectile) {

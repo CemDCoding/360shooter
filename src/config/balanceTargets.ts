@@ -21,6 +21,8 @@ export const REFERENCE_PLAYER = {
   spawnRadiusPx: 380,
   /** Anteil der Kampfzeit, in dem sich die Spielerin zum naechsten Ziel dreht (Wickel der Mumie, AP-105). */
   aimShare: 0.5,
+  /** Anteil der Abtauchzeit eines Eingraben-Gegners, die der Spielerin an Schusszeit verloren geht (AP-105). */
+  burrowLossShare: 0.5,
 } as const;
 
 export interface Band {

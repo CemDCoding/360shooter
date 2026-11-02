@@ -68,6 +68,9 @@ describe('balance boss: duration (AP-167, RS-05.3)', () => {
       return d < b.min || d > b.max;
     });
     expectExactly(out, KNOWN_OUT_OF_BAND.duration, 'duration');
+    // Pauschaleintrag: alle Level liegen unter dem Band (Ist-Grenze), nicht darueber.
+    for (const i of out)
+      expect(bossDuration(i), `level ${i}`).toBeLessThan(bossDurationBand(i).min);
   });
 
   it('matches the table of RS-05 section 2 without double shot within 10 percent', () => {

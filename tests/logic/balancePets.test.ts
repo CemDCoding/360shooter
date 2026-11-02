@@ -37,6 +37,11 @@ describe('balance pets: share of the damage against the boss (AP-167, RS-05.4)',
       });
       const want = KNOWN_OUT_OF_BAND.filter((k) => k.pet === pet).flatMap((k) => k.levels);
       expect(out, pet).toEqual([...want].sort((a, b) => a - b));
+      // Ist-Grenze der Pauschaleintraege: Biene und Pinguin zu stark, Capybara zu schwach.
+      for (const i of out) {
+        if (pet === 'capybara') expect(petShare(i, pet), `${pet} ${i}`).toBeLessThan(min);
+        else expect(petShare(i, pet), `${pet} ${i}`).toBeGreaterThan(max);
+      }
     }
   });
 

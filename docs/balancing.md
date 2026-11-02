@@ -578,6 +578,7 @@ AP-167 (PE-208, RS-05.1). Das Spiel ist dadurch **unveraendert**: neu sind nur `
 
 - Gold: jedes Level einmal gewonnen, ab Level 10 zusaetzlich eine Niederlage je Level (halbes Gold, `GOLD_KEEP_ON_LOSS`). Zaehlt das Gold **vor** dem Level, das gerechnet wird (Level 0 hat keine Upgrades).
 - Kaeufe: 35 % des Goldes auf Feuerrate, 35 % auf Schaden, 30 % auf Leben und Drehtempo (je Haelfte). Die Stufe hat eine Nachkommastelle (ganze Stufen nach `upgradeCost`, dazu der bezahlte Teil der naechsten), so ist die Kurve glatt.
+- Wirksame HP: Ansturm, Rollen, Eingraben (die Haelfte der Abtauchzeit geht verloren, `burrowLossShare` 0,5) und Wickel (Anteil `aimShare` 0,5) wie in `balance.test.ts`.
 - Schadens-Faktor = (1 + 0,1 x Stufe Feuerrate) x (1 + 0,1 x Stufe Schaden), Items und Trefferquote gleichen sich beim Druck grob aus (Annahme, im Handtest pruefen).
 - **Referenz-Druck** = Druck (Definition wie in "Kennzahlen": HP aller neuen Gegner je Sekunde durch die Basis-DPS 40, mit Gegnerstufe, Obergrenze und wirksamen HP) geteilt durch den Schadens-Faktor.
 - Boss: Trefferquote 0,9 (grosses Ziel), Doppelschuss im Mittel Faktor 1,5 (Stufe 1 = 2, Stufe 2 = 3), Pet mit 3 Power-ups (nur fuer den Pet-Anteil, die Boss-Dauer rechnet ohne Pet).
