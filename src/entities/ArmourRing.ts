@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { THEME } from '../config/theme';
 import type { ArmourDef } from '../contracts/armour';
 
-const RING_DEPTH = 50;
+/** Over the player (10), under the quicktime circles (PARRY_DEPTH 20): the circles must stay readable (AP-165). */
+export const RING_DEPTH = 15;
 const RING_COLOR = THEME.colors['game.fire-ring'].num;
 const RING_STROKE_PX = 2;
 const DASH_PX = 6;
