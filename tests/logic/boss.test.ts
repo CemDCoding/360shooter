@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOSSES, MIN_TELEGRAPH_MS } from '../../src/config/bosses';
+import { BOSSES, BOSS_HP_BY_LEVEL, MIN_TELEGRAPH_MS } from '../../src/config/bosses';
 import { LEVELS, LEVEL_COUNT } from '../../src/config/levels';
 import {
   AttackScheduler,
@@ -44,10 +44,11 @@ describe('variantForLevel', () => {
     });
   });
 
-  it('raises HP by 15 % and damage by 10 % per index', () => {
+  it('takes the HP from the level table and raises damage by 10 % per index (AP-170)', () => {
     const v = variantForLevel(8);
     expect(v.index).toBe(3);
-    expect(v.hpMultiplier).toBeCloseTo(1.45);
+    expect(v.hpMultiplier).toBeCloseTo(BOSS_HP_BY_LEVEL[8] / BOSSES.forestGhost.baseHp);
+    expect(scaledHp(BOSSES.forestGhost, v)).toBe(BOSS_HP_BY_LEVEL[8]);
     expect(v.damageMultiplier).toBeCloseTo(1.3);
   });
 
@@ -75,7 +76,7 @@ describe('variantForLevel', () => {
   it('scales HP and damage', () => {
     const def = BOSSES.rootMonster;
     expect(scaledHp(def, variantForLevel(0))).toBe(def.baseHp);
-    expect(scaledHp(def, variantForLevel(4))).toBe(Math.round(def.baseHp * 1.6));
+    expect(scaledHp(def, variantForLevel(4))).toBe(BOSS_HP_BY_LEVEL[4]);
     expect(scaledDamage(10, variantForLevel(2))).toBe(12);
   });
 });
@@ -118,6 +119,7 @@ describe('boss data', () => {
 });
 
 describe('AttackScheduler', () => {
+  const FIRST_COOLDOWN_MS = BOSSES.rootMonster.attacks[0].cooldownMs;
   function collect(sched: AttackScheduler, totalMs: number, stepMs = 50): AttackEvent[] {
     const out: AttackEvent[] = [];
     for (let t = 0; t < totalMs; t += stepMs) out.push(...sched.tick(stepMs));
@@ -127,7 +129,7 @@ describe('AttackScheduler', () => {
   it('starts nothing before the first cooldown is over', () => {
     const def = BOSSES.rootMonster;
     const s = new AttackScheduler(def, variantForLevel(0), fixedRng());
-    expect(collect(s, 3400)).toEqual([]);
+    expect(collect(s, FIRST_COOLDOWN_MS - 100)).toEqual([]);
   });
 
   it('announces first and executes exactly telegraphMs later', () => {
@@ -135,7 +137,7 @@ describe('AttackScheduler', () => {
     const s = new AttackScheduler(def, variantForLevel(0), fixedRng());
     let now = 0;
     const seen: { e: AttackEvent; at: number }[] = [];
-    for (; now < 6000;) {
+    for (; now < FIRST_COOLDOWN_MS + 2500;) {
       now += 10;
       for (const e of s.tick(10)) seen.push({ e, at: now });
     }
@@ -199,7 +201,10 @@ describe('AttackScheduler', () => {
 
   it('scales the damage with the variant', () => {
     const def = BOSSES.rootMonster;
-    const events = collect(new AttackScheduler(def, variantForLevel(4), fixedRng()), 5000);
+    const events = collect(
+      new AttackScheduler(def, variantForLevel(4), fixedRng()),
+      FIRST_COOLDOWN_MS + 1500,
+    );
     const hit = events.find((e) => e.type === 'execute');
     expect(hit?.damage).toBe(scaledDamage(15, variantForLevel(4)));
   });
@@ -208,7 +213,7 @@ describe('AttackScheduler', () => {
     const s = new AttackScheduler(BOSSES.rootMonster, variantForLevel(0), fixedRng());
     expect(s.tick(Number.NaN)).toEqual([]);
     expect(s.tick(-5)).toEqual([]);
-    collect(s, 3500);
+    collect(s, FIRST_COOLDOWN_MS + 100);
     expect(s.busy).toBe(true);
     s.cancel();
     expect(s.busy).toBe(false);

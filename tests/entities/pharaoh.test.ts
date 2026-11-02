@@ -245,11 +245,10 @@ describe('Pharaoh (AP-104)', () => {
     expect(ids(40)).toContain('sandstorm');
   });
 
-  it('HP curve over 10 levels (PE-33): index 9 at level 40 gives +135 %', () => {
+  it('HP of the final level comes from the level table (AP-170): 45 s target', () => {
     expect(variantForLevel(31).index).toBe(0);
     expect(variantForLevel(40).index).toBe(9);
-    expect(variantForLevel(40).hpMultiplier).toBeCloseTo(2.35);
-    expect(scaledHp(BOSSES.pharaoh, variantForLevel(40))).toBe(7990);
+    expect(scaledHp(BOSSES.pharaoh, variantForLevel(40))).toBe(14_130);
   });
 
   it('floats on its path around the player and stays clear of her', () => {

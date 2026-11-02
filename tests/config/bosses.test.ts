@@ -2,7 +2,9 @@ import { ARENA } from '../../src/config/arena';
 import { ASSETS } from '../../src/config/assets';
 import { rimRadii } from '../../src/entities/bosses/rim';
 import { describe, expect, it } from 'vitest';
+import { BATCH_STARTS, LEVEL_COUNT } from '../../src/config/levels';
 import {
+  BOSS_HP_BY_LEVEL,
   BOSS_SPAWN_REMAINING_MS,
   BOSS_TUNING,
   BOSS_WARNING_REMAINING_MS,
@@ -169,9 +171,9 @@ describe('M5 bosses (AP-97, PE-128)', () => {
   });
 
   it('starts in the range of the old bosses and grows from batch to batch', () => {
-    expect(BOSSES.giantSandWorm.baseHp).toBe(2000);
-    expect(BOSSES.guardianDog.baseHp).toBe(2600);
-    expect(BOSSES.pharaoh.baseHp).toBe(3400);
+    expect(BOSSES.giantSandWorm.baseHp).toBeGreaterThan(BOSSES.giantStone.baseHp);
+    expect(BOSSES.guardianDog.baseHp).toBeGreaterThan(BOSSES.giantSandWorm.baseHp);
+    expect(BOSSES.pharaoh.baseHp).toBeGreaterThan(BOSSES.guardianDog.baseHp);
     for (const id of Object.keys(expected) as (keyof typeof expected)[]) {
       expect(BOSSES[id].baseDamage, id).toBeGreaterThan(0);
       expect(BOSSES[id].baseDamage, id).toBeLessThanOrEqual(20);
@@ -191,16 +193,56 @@ describe('M5 bosses (AP-97, PE-128)', () => {
 });
 
 describe('M7 boss data (AP-126, PE-154, PE-157)', () => {
-  it('doubles the base HP', () => {
+  it('sets the base HP to the HP of the first level of the boss (AP-170)', () => {
     const hp = Object.fromEntries(Object.values(BOSSES).map((b) => [b.id, b.baseHp]));
     expect(hp).toEqual({
-      rootMonster: 1000,
-      forestGhost: 1200,
-      giantStone: 1600,
-      giantSandWorm: 2000,
-      guardianDog: 2600,
-      pharaoh: 3400,
+      rootMonster: BOSS_HP_BY_LEVEL[0],
+      forestGhost: BOSS_HP_BY_LEVEL[5],
+      giantStone: BOSS_HP_BY_LEVEL[10],
+      giantSandWorm: BOSS_HP_BY_LEVEL[21],
+      guardianDog: BOSS_HP_BY_LEVEL[26],
+      pharaoh: BOSS_HP_BY_LEVEL[31],
     });
+  });
+
+  it('has one HP per level, positive and rising inside a batch (AP-170)', () => {
+    expect(BOSS_HP_BY_LEVEL).toHaveLength(LEVEL_COUNT);
+    for (let i = 0; i < LEVEL_COUNT; i++) {
+      expect(BOSS_HP_BY_LEVEL[i], `level ${i}`).toBeGreaterThan(0);
+      if (i > 0 && !BATCH_STARTS.some((b) => b.first === i)) {
+        expect(BOSS_HP_BY_LEVEL[i], `level ${i}`).toBeGreaterThan(BOSS_HP_BY_LEVEL[i - 1]);
+      }
+    }
+  });
+
+  it('keeps telegraph times, damage and circles of AP-170 unchanged', () => {
+    // [telegraphMs, damage, parryCircles] je Angriff, Stand vor AP-170 (nur Abklingzeiten wurden verlaengert).
+    const want: Record<string, [number, number, number]> = {
+      'rootMonster.rootThrust': [1200, 15, 2],
+      'rootMonster.forestCall': [1200, 0, 0],
+      'rootMonster.rootRing': [1500, 15, 2],
+      'forestGhost.orbFan': [1800, 10, 2],
+      'forestGhost.fade': [1000, 0, 0],
+      'forestGhost.decoys': [1200, 8, 1],
+      'giantStone.roll': [1200, 20, 3],
+      'giantStone.quarrel': [1400, 15, 2],
+      'giantSandWorm.burrow': [1200, 18, 3],
+      'giantSandWorm.spikeVolley': [1200, 10, 1],
+      'giantSandWorm.coil': [1500, 15, 2],
+      'guardianDog.runeShield': [1000, 0, 0],
+      'guardianDog.guardBark': [1200, 15, 3],
+      'guardianDog.summonMummies': [1200, 0, 0],
+      'guardianDog.heartScale': [1800, 15, 2],
+      'pharaoh.goldCurse': [1800, 10, 1],
+      'pharaoh.sarcophagus': [1200, 0, 0],
+      'pharaoh.sandstorm': [1500, 8, 1],
+    };
+    const got = Object.fromEntries(
+      Object.values(BOSSES).flatMap((b) =>
+        b.attacks.map((a) => [`${b.id}.${a.id}`, [a.telegraphMs, a.damage, a.parryCircles]]),
+      ),
+    );
+    expect(got).toEqual(want);
   });
 
   it('announces damaging attacks at least 1200 ms and sets the circles by damage', () => {

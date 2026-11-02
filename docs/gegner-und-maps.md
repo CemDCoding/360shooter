@@ -249,7 +249,7 @@ Beispiele (mit Stufe, gerundet wie im Spiel): Ein Verfluchter Baum hat auf Level
 
 ### 2.3 Bosse
 
-Pro Batch gibt es einen Boss, insgesamt sechs. Seit AP-126 (PE-154) haben alle Bosse die doppelte Basis-HP; die Gegnerstufen (2.2) gelten nicht für Bosse. Die anderen Level des Batches nutzen ihn als Variante: **HP +15 % und Schaden +10 % pro Level-Index im Batch** (Index 0 ist das erste Level des Batches). Ab dem **3. Level des Batches (Index 2)** kommt ein zusätzlicher Angriff dazu (in der Tabelle als „Zusatz“ markiert).
+Pro Batch gibt es einen Boss, insgesamt sechs. Seit AP-126 (PE-154) haben alle Bosse die doppelte Basis-HP; die Gegnerstufen (2.2) gelten nicht für Bosse. Die anderen Level des Batches nutzen ihn als Variante: **Schaden +10 % pro Level-Index im Batch** (Index 0 ist das erste Level des Batches). Die **HP stehen seit AP-170 je Level in einer Tabelle** (`BOSS_HP_BY_LEVEL` in `src/config/bosses.ts`) und folgen der Zielzeit: HP = Zielzeit × Referenz-DPS (Mitte des Bands, Batch-Anfang 24 s, Batch-Ende 34 s, Level 40 45 s; Herleitung und Tabelle Level → HP → Dauer in `docs/balancing.md`, Abschnitt „Bosse nach Zielzeit (AP-170)“). Ab dem **3. Level des Batches (Index 2)** kommt ein zusätzlicher Angriff dazu (in der Tabelle als „Zusatz“ markiert).
 
 **Ablauf:** Die Warnung „Boss kommt!“ erscheint 33 s vor Rundenende, der Boss selbst 30 s vor Rundenende. Beim Boss-Auftritt verschwinden alle normalen Gegner und ihre Geschosse sofort, ohne Münze und XP (PE-137). Im Boss-Kampf spawnt kein normaler Gegner nach, solange der Boss lebt (Q-58). Jeder Angriff wird mindestens 700 ms vorher angekündigt, und die Spielerin hat mindestens 1000 ms Reaktionszeit.
 
@@ -262,9 +262,9 @@ Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er a
 | ID | `rootMonster` | `forestGhost` | `giantStone` |
 | Sprite | `boss-root-monster` | `boss-forest-ghost` | `boss-giant-stone` |
 | Map / Level | Wald, 0 bis 4 | Wald bei Nacht, 5 bis 9 | Elfenwald, 10 bis 20 |
-| Basis-HP (seit AP-126 doppelt, PE-154) | 1000 | 1200 | 1600 |
+| Basis-HP (HP des ersten Levels, AP-170) | 1300 | 1700 | 2650 |
 | Basis-Schaden | 10 | 8 | 12 |
-| HP am letzten Level im Batch | 1000 × (1 + 0,15 × 4) = 1600 | 1200 × (1 + 0,15 × 4) = 1920 | 1600 × (1 + 0,15 × 10) = 4000 |
+| HP am letzten Level im Batch (AP-170) | 2260 (Level 4) | 3460 (Level 9) | 6290 (Level 20) |
 
 **Wüsten-Bosse (AP-100, AP-103, AP-104)**
 
@@ -273,28 +273,28 @@ Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er a
 | ID | `giantSandWorm` | `guardianDog` | `pharaoh` |
 | Sprite | `boss-sand-worm` (Kopf), `boss-sand-worm-body` (Glieder) | `boss-guardian-dog` | `boss-pharaoh`, `boss-pharaoh-orb` (Goldkugel) |
 | Map / Level | Wüste, 21 bis 25 | Pyramiden, 26 bis 30 | Pyramiden-Oase, 31 bis 40 |
-| Basis-HP (seit AP-126 doppelt, PE-154) | 2000 | 2600 | 3400 |
+| Basis-HP (HP des ersten Levels, AP-170) | 4590 | 5440 | 6310 |
 | Basis-Schaden | 12 | 14 | 14 |
-| HP am letzten Level im Batch | 2000 × (1 + 0,15 × 4) = 3200 | 2600 × (1 + 0,15 × 4) = 4160 | 3400 × (1 + 0,15 × 9) = 7990 |
+| HP am letzten Level im Batch (AP-170) | 7440 (Level 25) | 8630 (Level 30) | 14 130 (Level 40; Level 39: 10 110) |
 
-**Angriffe:**
+**Angriffe:** (Abklingzeiten der schnellen Angriffe seit AP-170 verlängert, damit die Ankündigungen höchstens 40 % des Kampfes einnehmen; Ankündigungszeiten, Schaden und Kreise unverändert)
 
 | Boss | Angriff | Wirkung | Abklingzeit | Ankündigung | Schaden | Zusatz |
 |---|---|---|---|---|---|---|
-| Baummonster | `rootThrust` | Wurzeln brechen unter der Spielerin aus der Erde. | 3500 ms | 1000 ms | 15 | nein |
+| Baummonster | `rootThrust` | Wurzeln brechen unter der Spielerin aus der Erde. | 6000 ms | 1000 ms | 15 | nein |
 | Baummonster | `forestCall` | Ruft 3 bis 5 verfluchte Bäume. | 10 000 ms | 1200 ms | 0 | nein |
 | Baummonster | `rootRing` | Ring aus Wurzeln mit einer sichtbaren Lücke. | 9000 ms | 1500 ms | 15 | ja |
-| Waldgeist | `orbFan` | Fächer aus Geisterkugeln. | 3500 ms | 900 ms | 10 | nein |
+| Waldgeist | `orbFan` | Fächer aus Geisterkugeln. | 6500 ms | 900 ms | 10 | nein |
 | Waldgeist | `fade` | Wird halb durchsichtig und kurz unverwundbar. | 9000 ms | 1000 ms | 0 | nein |
 | Waldgeist | `decoys` | Teilt sich kurz in 2 Attrappen. | 12 000 ms | 1000 ms | 0 | ja |
 | Riesen-Stein | `roll` | Rollt entlang einer Warnlinie zur Mitte und springt zurück. | 6000 ms | 1200 ms | 20 | nein |
 | Sand-Wurm | `burrow` | Taucht ab (unverwundbar); beim Eingraben bleibt nur der abgedimmte Kopf sichtbar, die Körperglieder sind ausgeblendet und ohne Hitbox (PE-138). Eine Sandspur wandert zur Spielerin, der Wurm bricht neben ihr im angekündigten Kreis aus. Der Sandhügel am Ende der Spur schwächt den Ausbruch, wenn man ihn beschießt. | 7000 ms | 1200 ms | 18 | nein |
-| Sand-Wurm | `spikeVolley` | Fächer aus Hautstacheln (abschießbar wie die Geisterkugeln). | 4000 ms | 900 ms | 10 | nein |
+| Sand-Wurm | `spikeVolley` | Fächer aus Hautstacheln (abschießbar wie die Geisterkugeln). | 7000 ms | 900 ms | 10 | nein |
 | Sand-Wurm | `coil` | Der Körper umkreist die Spielerin als Ring mit Lücke und drückt zu. Nur der Kopf ist verwundbar. | 12 000 ms | 1500 ms | 15 | ja |
 | Wächter-Hund | `runeShield` | Unverwundbar, bis 3 schwebende Runen abgeschossen sind. | 14 000 ms | 1000 ms | 0 | nein |
 | Wächter-Hund | `guardBark` | Schallwellen-Ring mit Lücke. | 5000 ms | 1200 ms | 15 | nein |
 | Wächter-Hund | `summonMummies` | Ruft 3 Mumien. | 12 000 ms | 1200 ms | 0 | ja |
-| Pharao | `goldCurse` | Spirale aus Goldkugeln. | 4500 ms | 1000 ms | 10 | nein |
+| Pharao | `goldCurse` | Spirale aus Goldkugeln. | 8000 ms | 1000 ms | 10 | nein |
 | Pharao | `sarcophagus` | Verschwindet und taucht an einem angekündigten Ort wieder auf. | 9000 ms | 1200 ms | 0 | nein |
 | Pharao | `sandstorm` | Der Rand verdunkelt sich, Geschosse kommen von außen. | 14 000 ms | 1500 ms | 8 | ja |
 

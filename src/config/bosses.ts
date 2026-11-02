@@ -8,8 +8,22 @@ export const MIN_TELEGRAPH_MS = 700;
 export const BOSS_WARNING_REMAINING_MS = 33_000;
 export const BOSS_SPAWN_REMAINING_MS = 30_000;
 
-/** HP +15 % and damage +10 % per level index inside the batch (PE-33). */
-export const BOSS_HP_STEP = 0.15;
+/**
+ * Boss HP per level (AP-170, RS-05.3): target time x reference DPS of `balanceModel.referenceDps` (no pet, double shot
+ * mean 1.5), target time = middle of `BALANCE_BANDS.bossDuration*`, rounded to 10. Replaces "+15 % per index" (PE-33/PE-154).
+ * A table is simpler than a base value plus step: the reference DPS grows unevenly (upgrades, batch jumps).
+ * `baseHp` of a boss is the HP of its first level. Change this table together with the balance tests.
+ */
+// prettier-ignore
+export const BOSS_HP_BY_LEVEL: readonly number[] = [
+  1300, 1490, 1700, 1940, 2260, // Wald 0-4
+  1700, 2090, 2480, 2900, 3460, // Nacht 5-9
+  2650, 3010, 3340, 3680, 4000, 4320, 4660, 5070, 5490, 5900, 6290, // Elfenwald 10-20
+  4590, 5240, 5890, 6590, 7440, // Wueste 21-25
+  5440, 6180, 6950, 7710, 8630, // Pyramiden 26-30
+  6310, 6710, 7130, 7560, 8010, 8470, 8990, 9540, 10_110, 14_130, // Oase 31-40
+];
+/** Damage +10 % per level index inside the batch (PE-33). */
 export const BOSS_DAMAGE_STEP = 0.1;
 /** First index inside the batch with the extra attack (3rd level of the batch). */
 export const BOSS_EXTRA_ATTACK_INDEX = 2;
@@ -21,14 +35,14 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   rootMonster: {
     id: 'rootMonster',
     name: 'Verwurzeltes Baummonster',
-    baseHp: 1000,
+    baseHp: 1300,
     baseDamage: 10,
     spriteKey: 'boss-root-monster',
     attacks: [
       // Roots break out under the player after the warning.
       {
         id: 'rootThrust',
-        cooldownMs: 3500,
+        cooldownMs: 6000,
         telegraphMs: 1200,
         damage: 15,
         parryCircles: 2,
@@ -70,14 +84,14 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   forestGhost: {
     id: 'forestGhost',
     name: 'Waldgeist',
-    baseHp: 1200,
+    baseHp: 1700,
     baseDamage: 8,
     spriteKey: 'boss-forest-ghost',
     attacks: [
       // Fan of ghost orbs.
       {
         id: 'orbFan',
-        cooldownMs: 3500,
+        cooldownMs: 6500,
         telegraphMs: 1800,
         damage: 10,
         parryCircles: 2,
@@ -119,7 +133,7 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   giantStone: {
     id: 'giantStone',
     name: 'Riesen-Stein',
-    baseHp: 1600,
+    baseHp: 2650,
     baseDamage: 12,
     spriteKey: 'boss-giant-stone',
     attacks: [
@@ -158,7 +172,7 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   giantSandWorm: {
     id: 'giantSandWorm',
     name: 'Riesen-Sand-Wurm',
-    baseHp: 2000,
+    baseHp: 4590,
     baseDamage: 12,
     spriteKey: 'boss-sand-worm',
     attacks: [
@@ -175,7 +189,7 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
       // Fan of skin spikes (shootable like the ghost orbs).
       {
         id: 'spikeVolley',
-        cooldownMs: 4000,
+        cooldownMs: 7000,
         telegraphMs: 1200,
         damage: 10,
         parryCircles: 1,
@@ -201,7 +215,7 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   guardianDog: {
     id: 'guardianDog',
     name: 'Antiker Wächter-Hund',
-    baseHp: 2600,
+    baseHp: 5440,
     baseDamage: 14,
     spriteKey: 'boss-guardian-dog',
     attacks: [
@@ -262,14 +276,14 @@ export const BOSSES: Readonly<Record<BossId, BossDef>> = {
   pharaoh: {
     id: 'pharaoh',
     name: 'Pharao',
-    baseHp: 3400,
+    baseHp: 6310,
     baseDamage: 14,
     spriteKey: 'boss-pharaoh',
     attacks: [
       // Spiral of gold orbs.
       {
         id: 'goldCurse',
-        cooldownMs: 4500,
+        cooldownMs: 8000,
         telegraphMs: 1800,
         damage: 10,
         parryCircles: 1,
