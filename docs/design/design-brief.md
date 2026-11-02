@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Runde 1 (1b 2b 3a 4a) und Runde 2 (5a 6a 7a 8a) beantwortet, Runde 3 (Ablauf der Finale, Schlusstreffer, Namen, Level 40) gestellt.
+**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 in Arbeit: Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`.
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
@@ -668,5 +668,23 @@ Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Revi
 8. **8a Hinweis und Schalter:**
    - „TIPPEN: WEITER“ steht unten rechts innerhalb `SafeInsets`, in Funk, auf einem Glasschild mit Pfeil. Er erscheint nach 400 ms und blinkt nicht.
    - Der Schalter „EFFEKTE REDUZIEREN“ steht unter „EINFACHE ABWEHR“ und hat denselben Aufbau. Hinweiszeile: „OHNE BLITZ UND WACKELN“.
+9. **9a Vier Akte je Finale:**
+   - Aufladen: ernste Pose, Strahler lädt in Koralle, Augenstreifen.
+   - Ansturm mit Speedlines.
+   - Schlusstreffer als schwarz-weißer Impact Frame mit Namen.
+   - Zerfall auf die Art des Bosses, am Ende „BEZWUNGEN!“.
+   Die Grundform ist gleich, die Bilder sind je Boss eigen. 8 bis 12 Bilder.
+10. **10a Schlusstreffer ist ein überladener Strahlerschuss:** weißer Kern, Rand in Koralle, quer durchs Bild.
+11. **11a Namen:** L4 WURZELBRECHER, L9 MONDSCHNITT, L20 STERNENHAMMER, L25 SONNENSPEER, L30 GRABESLICHT, L40 LETZTER STERN.
+12. **12a Level 40:**
+   - Rückblick: die fünf früheren Bosse als Panels.
+   - Die vier Akte, länger: Der Pharao bäumt sich auf, ein zweiter Schuss folgt.
+   - Zerfall zu Sand im Wind, Sonnenaufgang über der Oase.
+   - Ruhiges Schlussbild: Astronautin von hinten im Gegenlicht, „LETZTER STERN“, dann „BEZWUNGEN!“.
+   16 bis 20 Bilder.
+
+**Lieferung in zwei Teilen (PE-198):**
+- Teil 1: Bausteine, Tokens, Porträt-Streifen, Treffer-Bilder aller 6 Bosse, Bildfolgen Level 4 und 9 als Muster.
+- Teil 2 nach dem Okay des Nutzers: Level 20, 25, 30, 40.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
