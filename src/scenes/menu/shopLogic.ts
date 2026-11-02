@@ -141,15 +141,15 @@ export function effectText(e: GearEffectDef): string {
     case 'blockChance':
       return `${Math.round(e.chance * 100)}% BLOCKT EINEN TREFFER`;
     case 'thorns':
-      return `DORNEN: ${e.damage} SCHADEN ZURÜCK`;
+      return `DORNEN: ${e.damageFactor} × LASER ZURÜCK`;
     case 'knockback':
       return 'STÖSST GEGNER ZURÜCK';
     case 'crit':
       return `${Math.round(e.chance * 100)}% KRITISCH, SCHADEN x${e.mul}`;
     case 'burn':
-      return `BRENNT ${e.durationMs / 1000} S, ${e.dps} SCHADEN/S`;
+      return `BRENNT ${e.durationMs / 1000} S, ${e.dpsFactor} × LASER/S`;
     case 'deathBlast':
-      return 'GEGNER EXPLODIEREN KLEIN';
+      return `GEGNER EXPLODIEREN: ${e.damageFactor} × LASER`;
     case 'healBoost':
       return `HEILUNG x${e.mul}`;
     case 'pierce':

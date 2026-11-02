@@ -282,8 +282,8 @@ export class GameScene extends Phaser.Scene {
   private gearOverlay?: GearOverlay;
   private blasts?: GearBlastPool;
   private pendingBlasts: PendingBlast[] = [];
-  /** Burn of the hell body piece, null without it (then no burn loop runs). */
-  private burn: { durationMs: number; dps: number } | null = null;
+  /** True with the burn of the hell body piece (else no burn loop runs). */
+  private hasBurn = false;
   /** Hell set fire ring, separate from the fire-ring item: its cooldown is never touched (PE-169). */
   private setRingMsLeft = 0;
   /** Item ring or set ring is shown (one ring picture for both). */
@@ -332,7 +332,7 @@ export class GameScene extends Phaser.Scene {
     this.gearOverlay = undefined;
     this.blasts = undefined;
     this.pendingBlasts = [];
-    this.burn = null;
+    this.hasBurn = false;
     this.setRingMsLeft = 0;
     this.ringShown = false;
     this.itemRules = ITEM_RULES;
@@ -354,7 +354,7 @@ export class GameScene extends Phaser.Scene {
     const equipped = save.equippedGear ?? NO_GEAR;
     this.gear = gearModifiers(equipped);
     this.gearSets = new GearSetState(this.gear.setBonuses);
-    this.burn = burnOnHit(this.gear);
+    this.hasBurn = this.gear.effects.some((e) => e.kind === 'burn');
     this.itemRules = withLifetimeFactor(ITEM_RULES, itemLifetimeFactor(this.gear));
     this.playerConfig = playerConfigFor(save.upgrades, this.gear);
 
@@ -618,7 +618,9 @@ export class GameScene extends Phaser.Scene {
   private laserHitsEnemy(enemy: Enemy, damage: number): boolean {
     const crit = rollCrit(this.gear, this.rng);
     const killed = this.damageEnemy(enemy, damage * crit, crit > 1 ? 'crit' : 'hit');
-    if (!killed && this.burn) enemy.applyBurn(this.burn);
+    // Burn is a share of the laser damage of the hit (without crit factor), RS-05.5.
+    const burn = killed || !this.hasBurn ? null : burnOnHit(this.gear, damage);
+    if (burn) enemy.applyBurn(burn);
     return killed;
   }
 
@@ -655,7 +657,7 @@ export class GameScene extends Phaser.Scene {
     for (const { x, y } of blasts) {
       // Above enemies and items, below the astronaut and her weapon (depth - 1).
       this.blasts?.play(x, y, this.player.depth - 2);
-      const hit = deathBlastTargets(this.gear, x, y, targets);
+      const hit = deathBlastTargets(this.gear, x, y, targets, this.player.stats.damage);
       for (const t of hit.targets) {
         if (t.enemy.active) this.damageEnemy(t.enemy, hit.damage);
       }
@@ -664,7 +666,7 @@ export class GameScene extends Phaser.Scene {
 
   /** Burn ticks of the hell body piece through the enemy damage path (rewards); no flash per tick. */
   private applyBurnDamage(): void {
-    if (!this.burn) return;
+    if (!this.hasBurn) return;
     for (const e of this.enemyPool.enemies) {
       if (!e.active) continue;
       const d = e.takeBurnDamage();
@@ -752,7 +754,7 @@ export class GameScene extends Phaser.Scene {
    * away from the player and damaged over the enemy damage path (rewards). No-op without the pieces.
    */
   private contactRecoil(enemy: Enemy): void {
-    const thorns = thornsDamage(this.gear);
+    const thorns = thornsDamage(this.gear, this.player.stats.damage);
     const push = knockbackVector(this.gear, this.player.x, this.player.y, enemy.x, enemy.y);
     if (thorns <= 0 && push.x === 0 && push.y === 0) return;
     const { x, y } = enemy;

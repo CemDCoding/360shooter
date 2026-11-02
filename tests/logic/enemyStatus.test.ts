@@ -13,7 +13,7 @@ describe('enemy burn', () => {
   it('hell body burn deals 5/s for 3 s, 15 in total', () => {
     const piece = getGearPiece('gear-hell-body');
     expect(piece).toBeDefined();
-    const burn = burnOnHit(gearModifiers({ head: null, body: 'gear-hell-body', legs: null }));
+    const burn = burnOnHit(gearModifiers({ head: null, body: 'gear-hell-body', legs: null }), 10);
     if (!burn) throw new Error('burn missing');
     let s = applyBurn(createEnemyStatus(), burn);
     let total = 0;

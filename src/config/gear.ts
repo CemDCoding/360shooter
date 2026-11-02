@@ -20,13 +20,18 @@ export const PET_GEAR_SET_LABELS: Readonly<Record<GearSet, string>> = {
   heaven: 'HIMMEL',
 };
 
-/** Burn from the hell body piece: 3 s, 5 damage per second. */
-const BURN = { durationMs: 3000, dps: 5 };
-/** Small explosion of defeated enemies (assumed). */
-const DEATH_BLAST = { radiusPx: 40, damage: 15 };
+/**
+ * Armour effects scale with the current laser damage (RS-05.5, PE-212): factors of the laser damage,
+ * which gives 10 / 5 per second / 15 with the base weapon (10 damage).
+ */
+/** Burn from the hell body piece: 3 s, 0.5 x laser damage per second. */
+const BURN = { durationMs: 3000, dpsFactor: 0.5 };
+/** Small explosion of defeated enemies (assumed): 1.5 x laser damage. */
+const DEATH_BLAST = { radiusPx: 40, damageFactor: 1.5 };
 /** Knockback on contact in px (assumed). */
 const KNOCKBACK_PX = 24;
-const THORNS_DAMAGE = 10;
+/** Thorns: 1.0 x laser damage. */
+const THORNS_DAMAGE_FACTOR = 1.0;
 
 /** Texture key of a piece (naming rule for AP-140). */
 export function gearTextureKey(set: GearSet, slot: GearSlot): string {
@@ -51,7 +56,7 @@ export const GEAR_PIECES: readonly GearPieceDef[] = [
     'body',
     'KRISTALLPANZER',
     { damageTakenMul: 0.9 },
-    { kind: 'thorns', damage: THORNS_DAMAGE },
+    { kind: 'thorns', damageFactor: THORNS_DAMAGE_FACTOR },
   ),
   piece(
     'diamond',
