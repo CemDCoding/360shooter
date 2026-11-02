@@ -25,7 +25,7 @@ export interface PetPlayer extends Located {
 /** The round as the pet sees it; damage and healing go through the scene's paths. */
 export interface PetWorld<E extends Located> {
   readonly player: PetPlayer;
-  /** Living enemies of the pool (bosses are not in it, like the fire ring, Q-23). */
+  /** Living targets: active pool enemies plus living, vulnerable boss parts (AP-164, PE-205). */
   readonly enemies: readonly E[];
   readonly stats: PetStats;
   radiusOf(enemy: E): number;

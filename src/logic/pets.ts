@@ -149,6 +149,31 @@ export function nearestTarget<T extends Located>(from: Located, enemies: readonl
   return best;
 }
 
+/** Boss-Koerper aus Sicht des Pets (AP-164, PE-205): BossBase passt strukturell. */
+export interface PetBossPart extends Located {
+  readonly active: boolean;
+  readonly isInvulnerable: boolean;
+}
+
+/** Lebender, verwundbarer Boss-Teil: nur so einer ist ein Pet-Ziel (Geist-Phase und Tote nicht). */
+export function isBossTarget(part: PetBossPart): boolean {
+  return part.active && !part.isInvulnerable;
+}
+
+/**
+ * Fuellt `out` (wiederverwendet, kein Muell je Frame) mit den aktiven Pool-Gegnern und den lebenden,
+ * verwundbaren Boss-Teilen (AP-164, PE-205). In der Boss-Runde ist der Pool leer: ohne die Boss-Teile
+ * hatte das Pet kein Ziel.
+ */
+export function collectPetTargets<
+  E extends Located & { readonly active: boolean },
+  B extends PetBossPart,
+>(out: (E | B)[], pool: readonly E[], bossParts: readonly B[]): void {
+  out.length = 0;
+  for (const e of pool) if (e.active) out.push(e);
+  for (const b of bossParts) if (isBossTarget(b)) out.push(b);
+}
+
 /** Alle Gegner in der Aura (Rand zaehlt mit). */
 export function inAura<T extends Located>(
   center: Located,

@@ -32,6 +32,8 @@ describe('pet wiring in the GameScene', () => {
     expect(upd).toContain('this.damageEnemy(e, amount, flash)');
     expect(upd).toContain('this.player.heal(hp)');
     expect(upd).toContain('e.applySlow(effect)');
+    expect(upd).toContain('e.takeDamage(amount)');
+    expect(upd).toContain('collectPetTargets');
   });
 
   it('sends the pet state to a new HUD and cleans up on shutdown', () => {
