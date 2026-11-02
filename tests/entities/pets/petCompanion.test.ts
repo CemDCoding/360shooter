@@ -155,3 +155,57 @@ describe('SnowballPool', () => {
     expect(objects.every((o) => o.destroyed)).toBe(true);
   });
 });
+
+// AP-164 (PE-205): every pet reaches a boss stand-in (radiusOf = body radius) and hurts it through takeDamage.
+describe('pets against a boss stand-in', () => {
+  class FakeBoss {
+    hp = 1000;
+    constructor(
+      public x: number,
+      public y: number,
+      readonly factor = 1,
+    ) {}
+    takeDamage(amount: number): boolean {
+      this.hp -= amount * this.factor;
+      return this.hp <= 0;
+    }
+  }
+
+  function fight(id: 'bee' | 'penguin' | 'capybara', boss: FakeBoss) {
+    const { scene } = fakeScene();
+    const def = getPet(id);
+    const c = new PetCompanion<FakeBoss>(scene, def, null, player);
+    c.setRound({ ...ROUND, phase: 'hatched' });
+    const w: PetWorld<FakeBoss> = {
+      player,
+      enemies: [boss],
+      stats: petStats(def, 0, 10),
+      radiusOf: () => 40,
+      damage: (e, a) => void e.takeDamage(a),
+      slow: () => undefined,
+      heal: () => undefined,
+    };
+    for (let i = 0; i < 40; i++) c.update(16, w);
+    for (let i = 0; i < 200; i++) c.update(50, w);
+  }
+
+  it.each([
+    ['bee', 450, 180],
+    ['penguin', 520, 180],
+    ['capybara', 350, 180],
+  ] as const)('%s damages a boss at (%i, %i)', (id, x, y) => {
+    const boss = new FakeBoss(x, y);
+    fight(id, boss);
+    expect(boss.hp).toBeLessThan(1000);
+  });
+
+  it('takeDamage applies the armour factor to pet damage', () => {
+    const plain = new FakeBoss(520, 180, 1);
+    const stone = new FakeBoss(520, 180, 0.5);
+    fight('penguin', plain);
+    fight('penguin', stone);
+    const dealt = 1000 - plain.hp;
+    expect(dealt).toBeGreaterThan(0);
+    expect(1000 - stone.hp).toBeCloseTo(dealt / 2, 5);
+  });
+});

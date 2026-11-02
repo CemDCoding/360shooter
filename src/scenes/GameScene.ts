@@ -87,7 +87,14 @@ import {
   thornsDamage,
 } from '../logic/gear';
 import { rollCoinDrop } from '../logic/coins';
-import { addPetXp, createPetRound, killWeight, petStats, type PetRound } from '../logic/pets';
+import {
+  addPetXp,
+  collectPetTargets,
+  createPetRound,
+  killWeight,
+  petStats,
+  type PetRound,
+} from '../logic/pets';
 import { getPet } from '../config/pets';
 import {
   DEFAULT_ENEMY_SCALE,
@@ -194,6 +201,11 @@ function armourKey(a: ActiveArmour): string {
 const NO_GEAR: EquippedGear = { head: null, body: null, legs: null };
 /** Status sink for a contact hit the gear blocked: the collected effects are dropped. */
 const NO_STATUS_TARGET = { applyStatus: (): void => undefined };
+/** Shared empty list for pet targets in rounds without a boss (no garbage per frame). */
+const NO_BOSS_PARTS: readonly BossBase[] = [];
+
+/** What the pet can target: pool enemies and boss parts (AP-164). */
+type PetTarget = Enemy | BossBase;
 
 interface PendingDrop {
   x: number;
@@ -277,9 +289,9 @@ export class GameScene extends Phaser.Scene {
   /** Pet bar of the active pet (AP-144); null without a pet (then nothing pet-related runs). */
   private petRound: PetRound | null = null;
   /** Egg or hatched pet beside the astronaut; destroyed in cleanup. */
-  private pet?: PetCompanion<Enemy>;
-  /** Living enemies handed to the pet each frame (one reused array, no garbage per frame). */
-  private petTargets: Enemy[] = [];
+  private pet?: PetCompanion<PetTarget>;
+  /** Pool enemies and living boss parts handed to the pet each frame (one reused array). */
+  private petTargets: PetTarget[] = [];
 
   constructor() {
     super('GameScene');
@@ -427,7 +439,7 @@ export class GameScene extends Phaser.Scene {
   private createPet(petId: PetId | null, petGearId: string | null): void {
     if (!petId) return;
     this.petRound = createPetRound(this.level);
-    this.pet = new PetCompanion<Enemy>(
+    this.pet = new PetCompanion<PetTarget>(
       this,
       getPet(petId),
       petGearKeyFor(petId, petGearId),
@@ -458,7 +470,8 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * Egg, hatch and fight on play time. Pet damage goes through damageEnemy (rewards, bar), healing through
-   * Player.heal. Only pool enemies are targets: bosses are not in the pool (like the fire ring, Q-23).
+   * Player.heal. Targets: pool enemies and living,
+   * vulnerable boss parts (PE-205); a boss takes the damage via takeDamage (armour factor) and is never slowed.
    */
   private updatePet(dt: number): void {
     const pet = this.pet;
@@ -466,16 +479,24 @@ export class GameScene extends Phaser.Scene {
     if (!pet || !round || this.player.isDead) return;
     const targets = this.petTargets;
     targets.length = 0;
-    for (const e of this.enemyPool.enemies) if (e.active) targets.push(e);
-    const world: PetWorld<Enemy> = {
+    collectPetTargets(
+      targets,
+      this.enemyPool.enemies,
+      this.boss ? this.bossParts() : NO_BOSS_PARTS,
+    );
+    const world: PetWorld<PetTarget> = {
       player: this.player,
       enemies: targets,
       stats: petStats(pet.def, round.powerUps, this.player.stats.damage),
       radiusOf: (e) => (e.body as Phaser.Physics.Arcade.Body | null)?.halfWidth ?? 0,
       damage: (e, amount, flash) => {
-        if (e.active && !this.ended && amount > 0) this.damageEnemy(e, amount, flash);
+        if (!e.active || this.ended || !(amount > 0)) return;
+        if (e instanceof BossBase) e.takeDamage(amount);
+        else this.damageEnemy(e, amount, flash);
       },
-      slow: (e, effect) => e.applySlow(effect),
+      slow: (e, effect) => {
+        if (!(e instanceof BossBase)) e.applySlow(effect);
+      },
       heal: (hp) => this.player.heal(hp),
     };
     pet.update(dt, world);
