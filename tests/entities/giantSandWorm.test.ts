@@ -386,3 +386,120 @@ describe('GiantSandWorm (AP-100)', () => {
     });
   });
 });
+
+// --- Fairy-tale quicktimes (AP-154): burrow side, Fessel der Göttinnen ---
+
+const { PARRY_RULES } = await import('../../src/config/parry');
+const { circlePosition, targetPosition } = await import('../../src/logic/parry');
+const geo = await import('../../src/entities/bosses/bossGeometry');
+const { scaledDamage, variantForLevel } = await import('../../src/logic/boss');
+
+type PlannedCircle = {
+  index: number;
+  kind?: 'tap' | 'hold' | 'decoy' | 'sequence' | 'drag' | 'choice' | 'beat';
+  symbol?: string;
+  angleDeg: number;
+  hitAtMs: number;
+  target?: { angleDeg: number; distancePx: number };
+};
+
+interface ParryInternals {
+  handle(ev: {
+    type: 'telegraph' | 'execute';
+    attackId: string;
+    telegraphMs: number;
+    damage: number;
+    executeAtMs: number;
+  }): void;
+  parry: { tick(dt: number): void };
+  parryGroups: readonly { circles: PlannedCircle[] }[];
+  pressParry(p: { x: number; y: number }, c: { x: number; y: number }, id?: number): boolean;
+  releaseParry(id: number, p: { x: number; y: number }, c: { x: number; y: number }): void;
+  coil: { gapStart: number } | null;
+}
+
+const REACH = PARRY_RULES.circleRadiusPx + PARRY_RULES.touchSlackPx;
+const SPACING = geo.spacingDeg(REACH, PARRY_RULES.distanceFromPlayerPx);
+
+/** Announces `id` through the base class (circles included); `run(solve)` solves all circles, then the impact. */
+function announceParry(worm: WormInternals, id: string, levelId: number) {
+  const w = worm as unknown as ParryInternals;
+  const a = attack(id);
+  const ev = {
+    attackId: id,
+    telegraphMs: a.telegraphMs,
+    damage: scaledDamage(a.damage, variantForLevel(levelId)),
+    executeAtMs: 0,
+  };
+  w.handle({ type: 'telegraph', ...ev });
+  return {
+    w,
+    run(solve: boolean) {
+      let at = 0;
+      if (solve) {
+        const circles = [...w.parryGroups[0].circles].sort((x, y) => x.hitAtMs - y.hitAtMs);
+        circles.forEach((c, i) => {
+          w.parry.tick(c.hitAtMs - at);
+          at = c.hitAtMs;
+          expect(w.pressParry(circlePosition(c, CENTER), CENTER, i + 1)).toBe(true);
+          if (c.kind === 'drag') w.releaseParry(i + 1, targetPosition(c, CENTER)!, CENTER);
+        });
+      }
+      w.parry.tick(a.telegraphMs - at);
+      w.handle({ type: 'execute', ...ev });
+    },
+  };
+}
+
+describe('GiantSandWorm quicktimes (AP-154)', () => {
+  it('burrow: the three tap circles lie on the side where the sand trail arrives', () => {
+    const worm = makeWorm();
+    const { w } = announceParry(worm, 'burrow', 21);
+    const circles = w.parryGroups[0].circles;
+    expect(circles).toHaveLength(3);
+    expect(circles.every((c) => (c.kind ?? 'tap') === 'tap' && c.symbol === undefined)).toBe(true);
+    // The worm dived at the right of the player: the trail arrives at 0 degrees.
+    const angles = circles.map((c) => c.angleDeg);
+    expect(angles).toEqual(geo.spreadAngles(0, 3, 30, SPACING));
+    expect(geo.deltaDeg(0, angles[1])).toBeCloseTo(0);
+    for (const a of angles)
+      expect(Math.abs(geo.deltaDeg(0, a))).toBeLessThanOrEqual(SPACING + 1e-9);
+  });
+
+  it('coil: two rope drag circles with their targets on links of the ring', () => {
+    const worm = makeWorm(23);
+    const { w } = announceParry(worm, 'coil', 23);
+    const circles = w.parryGroups[0].circles;
+    expect(circles).toHaveLength(2);
+    const links = geo
+      .coilAngles(W.segmentCount, w.coil!.gapStart, W.coil.gapRad)
+      .links.map((a) => geo.normDeg((a * 180) / Math.PI));
+    for (const c of circles) {
+      expect(c.kind).toBe('drag');
+      expect(c.symbol).toBe('rope');
+      expect(c.target!.distancePx).toBe(W.coil.radius);
+      expect(links.some((l) => Math.abs(geo.deltaDeg(l, c.target!.angleDeg)) < 1e-9)).toBe(true);
+      // Never outside the arena or under the HUD timer.
+      const t = targetPosition(c, CENTER)!;
+      expect(t.y - PARRY_RULES.dragTargetRadiusPx).toBeGreaterThan(40);
+      expect(t.x - PARRY_RULES.dragTargetRadiusPx).toBeGreaterThanOrEqual(16);
+    }
+    expect(Math.abs(geo.deltaDeg(circles[0].angleDeg, circles[1].angleDeg))).toBeGreaterThanOrEqual(
+      SPACING - 1e-9,
+    );
+  });
+
+  it('coil: all rope circles on their links loosen the ring at once, no damage', () => {
+    const worm = makeWorm(23);
+    announceParry(worm, 'coil', 23).run(true);
+    expect(worm.isCoiling).toBe(false);
+    expect(runFor(worm, 3000)).toBe(0);
+  });
+
+  it('coil: missed rope circles leave the squeeze as before', () => {
+    const worm = makeWorm(23);
+    announceParry(worm, 'coil', 23).run(false);
+    expect(worm.isCoiling).toBe(true);
+    expect(runFor(worm, 2500)).toBeGreaterThan(0);
+  });
+});

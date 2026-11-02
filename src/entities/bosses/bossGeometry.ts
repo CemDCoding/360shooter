@@ -358,3 +358,264 @@ export function bandAlphas(bands: number, strength: number): number[] {
   for (let i = 0; i < bands; i++) out.push((s * (bands - i)) / bands);
   return out;
 }
+
+// --- Fairy-tale quicktimes (AP-154, RS-03.5, RS-03.6): anchors of circles and drag targets. ---
+// Angles in degrees like ParryCircle.angleDeg (0 = right, clockwise on screen because y points down).
+
+/** A circle the target boxes must stay clear of (stick catch area, quicktime circles). */
+export interface AvoidCircle extends Point {
+  r: number;
+}
+
+/** Where drag targets may lie: inside the rectangle, outside every avoid circle. */
+export interface SafeZone {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  avoid: readonly AvoidCircle[];
+}
+
+/** Circle angle and drag target of one quicktime circle (same shape as ParryAnchor). */
+export interface DragAnchor {
+  angleDeg: number;
+  target: { angleDeg: number; distancePx: number };
+}
+
+/** Angle in [0, 360). */
+export function normDeg(a: number): number {
+  return ((a % 360) + 360) % 360;
+}
+
+/** Signed shortest turn from `from` to `to` in degrees, in (-180, 180]. */
+export function deltaDeg(from: number, to: number): number {
+  const d = normDeg(to - from);
+  return d > 180 ? d - 360 : d;
+}
+
+/** Direction from `center` to `p` in degrees [0, 360). */
+export function angleDegOf(center: Point, p: Point): number {
+  return normDeg((Math.atan2(p.y - center.y, p.x - center.x) * 180) / Math.PI);
+}
+
+/** Point at `distance` from `center` in direction `deg`. */
+export function polarPoint(center: Point, deg: number, distance: number): Point {
+  const rad = (deg * Math.PI) / 180;
+  return { x: center.x + Math.cos(rad) * distance, y: center.y + Math.sin(rad) * distance };
+}
+
+/** Smallest angle between two circles at `distancePx` whose tap areas (`reachPx`) must not overlap. */
+export function spacingDeg(reachPx: number, distancePx: number): number {
+  const ratio = Math.min(1, Math.max(0, reachPx) / Math.max(1, distancePx));
+  return (2 * Math.asin(ratio) * 180) / Math.PI;
+}
+
+/** `count` angles centred on `centerDeg`, `stepDeg` apart (burrow: the side where the sand trail arrives). */
+export function sideAngles(centerDeg: number, count: number, stepDeg: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < count; i++) out.push(normDeg(centerDeg + (i - (count - 1) / 2) * stepDeg));
+  return out;
+}
+
+/**
+ * `count` angles centred on `centerDeg` that spread over +-`halfSpreadDeg`, but never closer than `minStepDeg`
+ * (then they spread wider: no overlapping tap areas).
+ */
+export function spreadAngles(
+  centerDeg: number,
+  count: number,
+  halfSpreadDeg: number,
+  minStepDeg: number,
+): number[] {
+  const step = count > 1 ? Math.max((2 * halfSpreadDeg) / (count - 1), minStepDeg) : 0;
+  return sideAngles(centerDeg, count, step);
+}
+
+/** Safe zone of the arena: minus the margin, below `topPx` (HUD), outside the avoid circles (stick). */
+export function safeZone(arena: ArenaRect, topPx: number, avoid: readonly AvoidCircle[]): SafeZone {
+  return {
+    left: arena.margin,
+    top: Math.max(arena.margin, topPx),
+    right: arena.width - arena.margin,
+    bottom: arena.height - arena.margin,
+    avoid,
+  };
+}
+
+/** Distance from `p` to the square box with centre `c` and half size `half` (0 inside). */
+export function boxDistance(p: Point, c: Point, half: number): number {
+  const dx = Math.max(0, Math.abs(p.x - c.x) - half);
+  const dy = Math.max(0, Math.abs(p.y - c.y) - half);
+  return Math.hypot(dx, dy);
+}
+
+/** true if the square box (centre `p`, half size `half`) lies inside the zone and clear of every avoid circle. */
+export function boxFits(p: Point, half: number, zone: SafeZone): boolean {
+  if (p.x - half < zone.left || p.x + half > zone.right) return false;
+  if (p.y - half < zone.top || p.y + half > zone.bottom) return false;
+  return zone.avoid.every((a) => boxDistance(a, p, half) >= a.r);
+}
+
+/**
+ * Largest distance from `wantedPx` down to `minPx` (1 px steps) at which a target box in direction `deg` fits
+ * the zone; null if none fits.
+ */
+export function fitDistance(
+  center: Point,
+  deg: number,
+  wantedPx: number,
+  minPx: number,
+  half: number,
+  zone: SafeZone,
+): number | null {
+  for (let d = Math.floor(wantedPx); d >= Math.ceil(minPx); d--) {
+    if (boxFits(polarPoint(center, deg, d), half, zone)) return d;
+  }
+  return null;
+}
+
+/**
+ * Stop points of two stones of `radius` that clash with each other: they touch (exactly 2·radius apart, on the
+ * line from `a` to `b`) at a meeting point straight out from `center`, across that line on its side, pushed out
+ * just far enough that both stops keep at least `minDist` from `center`.
+ */
+export function clashPoints(
+  center: Point,
+  a: Point,
+  b: Point,
+  radius: number,
+  minDist: number,
+): [Point, Point] {
+  const r = Math.max(0, radius);
+  const mx = (a.x + b.x) / 2 - center.x;
+  const my = (a.y + b.y) / 2 - center.y;
+  const ml = Math.hypot(mx, my);
+  let wx = b.x - a.x;
+  let wy = b.y - a.y;
+  const wl = Math.hypot(wx, wy);
+  let ux: number;
+  let uy: number;
+  if (wl > 1e-6) {
+    wx /= wl;
+    wy /= wl;
+    // Push out across the line a-b (toward its side of the player), never along it: rolling along it would
+    // lead one stone through the player when the lanes are nearly opposite.
+    const along = mx * wx + my * wy;
+    const px = mx - along * wx;
+    const py = my - along * wy;
+    const pl = Math.hypot(px, py);
+    ux = pl > 1e-6 ? px / pl : -wy;
+    uy = pl > 1e-6 ? py / pl : wx;
+  } else {
+    ux = ml > 1e-6 ? mx / ml : 1;
+    uy = ml > 1e-6 ? my / ml : 0;
+    wx = -uy;
+    wy = ux;
+  }
+  const stops = (d: number): [Point, Point] => [
+    { x: center.x + ux * d - wx * r, y: center.y + uy * d - wy * r },
+    { x: center.x + ux * d + wx * r, y: center.y + uy * d + wy * r },
+  ];
+  const far = (p: Point): boolean => Math.hypot(p.x - center.x, p.y - center.y) >= minDist;
+  const maxD = Math.max(0, minDist) + r + 1;
+  for (let d = 0; d < maxD; d++) {
+    const s = stops(d);
+    if (far(s[0]) && far(s[1])) return s;
+  }
+  return stops(maxD);
+}
+
+export interface DragAnchorOptions {
+  /** Distance of the quicktime circles from the player. */
+  circleDist: number;
+  /** Turn of each circle away from its target direction. */
+  sideDeg: number;
+  /** Tap reach of a circle; target boxes keep at least this far from every circle centre. */
+  circleReach: number;
+  /** Smallest angle between two circles (spacingDeg). */
+  minSpacingDeg: number;
+  /** Half size of a target box. */
+  half: number;
+  zone: SafeZone;
+}
+
+/** Target box as an avoid circle for the next box (circumscribed, so two boxes never overlap). */
+function boxAvoid(p: Point, half: number): AvoidCircle {
+  return { x: p.x, y: p.y, r: half * Math.SQRT2 };
+}
+
+/**
+ * Riesenzank: one drag circle per stone, its target on the lane of that stone (direction `lanes[i]` from the
+ * player, as far as `targetDist` and at least `minTargetDist`). Each circle turns `sideDeg` away from the other
+ * lane, so the two circles keep at least 2 * sideDeg apart. null: the targets do not fit (the quarrel is skipped).
+ */
+export function quarrelAnchors(
+  center: Point,
+  lanes: readonly [number, number],
+  targetDist: number,
+  minTargetDist: number,
+  o: DragAnchorOptions,
+): [DragAnchor, DragAnchor] | null {
+  const [a, b] = lanes;
+  const s = deltaDeg(a, b) >= 0 ? 1 : -1;
+  const circles = [normDeg(a - s * o.sideDeg), normDeg(b + s * o.sideDeg)];
+  if (Math.abs(deltaDeg(circles[0], circles[1])) < o.minSpacingDeg) return null;
+  const circleAvoid = circles.map((deg) => ({
+    ...polarPoint(center, deg, o.circleDist),
+    r: o.circleReach,
+  }));
+  const zoneA: SafeZone = { ...o.zone, avoid: [...o.zone.avoid, ...circleAvoid] };
+  const dA = fitDistance(center, a, targetDist, minTargetDist, o.half, zoneA);
+  if (dA === null) return null;
+  const zoneB: SafeZone = {
+    ...zoneA,
+    avoid: [...zoneA.avoid, boxAvoid(polarPoint(center, a, dA), o.half)],
+  };
+  const dB = fitDistance(center, b, targetDist, minTargetDist, o.half, zoneB);
+  if (dB === null) return null;
+  return [
+    { angleDeg: circles[0], target: { angleDeg: normDeg(a), distancePx: dA } },
+    { angleDeg: circles[1], target: { angleDeg: normDeg(b), distancePx: dB } },
+  ];
+}
+
+/**
+ * Fessel der Göttinnen: `count` drag circles whose targets lie on links of the coil (`linkDegs` at `linkDist`).
+ * Links are tried in order from `startIndex`; each circle sits `sideDeg` beside its link (first +, then -). A
+ * pick is kept only if its box fits the zone, the circle keeps minSpacingDeg to the circles before and no box
+ * comes closer than the circle reach to any circle. null: not enough links fit.
+ */
+export function coilAnchors(
+  center: Point,
+  linkDegs: readonly number[],
+  linkDist: number,
+  count: number,
+  startIndex: number,
+  o: DragAnchorOptions,
+): DragAnchor[] | null {
+  const out: DragAnchor[] = [];
+  const circles: Point[] = [];
+  const boxes: Point[] = [];
+  const n = linkDegs.length;
+  for (let k = 0; k < n && out.length < count; k++) {
+    const link = normDeg(linkDegs[(((startIndex + k) % n) + n) % n]);
+    const box = polarPoint(center, link, linkDist);
+    for (const side of [1, -1]) {
+      const deg = normDeg(link + side * o.sideDeg);
+      const circle = polarPoint(center, deg, o.circleDist);
+      const spaced = out.every((x) => Math.abs(deltaDeg(x.angleDeg, deg)) >= o.minSpacingDeg);
+      const clearOfBoxes = boxes.every((b) => boxDistance(circle, b, o.half) >= o.circleReach);
+      const avoid: AvoidCircle[] = [
+        ...o.zone.avoid,
+        ...[...circles, circle].map((c) => ({ ...c, r: o.circleReach })),
+        ...boxes.map((b) => boxAvoid(b, o.half)),
+      ];
+      if (!spaced || !clearOfBoxes || !boxFits(box, o.half, { ...o.zone, avoid })) continue;
+      out.push({ angleDeg: deg, target: { angleDeg: link, distancePx: linkDist } });
+      circles.push(circle);
+      boxes.push(box);
+      break;
+    }
+  }
+  return out.length === count ? out : null;
+}

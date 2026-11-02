@@ -1,22 +1,35 @@
 import Phaser from 'phaser';
 import { BOSS_TUNING, MIN_REACTION_MS } from '../../config/bosses';
+import { PARRY_RULES } from '../../config/parry';
+import { THEME } from '../../config/theme';
 import type { BossAttackDef } from '../../contracts';
 import { NO_TINT } from '../../logic/boss';
+import type { ParryCircleState } from '../../logic/parry';
 import { prefersReducedMotion } from '../../platform/motion';
-import { BossBase, type BossContext } from './BossBase';
+import { STICK_CATCH_DIAMETER } from '../../scenes/hud/hudMath';
+import { NO_SAFE_INSETS, readSafeInsets, stickCenter } from '../../scenes/safeInsets';
+import { HINT_TIMER_GAP, HUD_MAX_K, hudTimerBottom } from '../parry/hintBoard';
+import { BossBase, type BossContext, type ParryAnchor } from './BossBase';
 import {
+  angleDegOf,
+  coilAnchors,
   coilAngles,
   coilRadius,
   ellipseAngle,
   ellipsePoint,
   emergePoint,
   followChain,
+  safeZone,
+  spacingDeg,
+  spreadAngles,
   sproutDamage,
   stepToward,
   straightChain,
   volleySpeed,
   weakenedShare,
+  type DragAnchor,
   type Point,
+  type SafeZone,
 } from './bossGeometry';
 import type { BossHazard } from './hazards';
 import { rimRadii } from './rim';
@@ -35,6 +48,20 @@ const SPARK_DEPTH = 3;
 const MAX_SPARKS = 8;
 /** Length of the spike warning lines relative to the distance to the player. */
 const WARN_LINE_FACTOR = 1.2;
+const P = PARRY_RULES;
+const CIRCLE_REACH = P.circleRadiusPx + P.touchSlackPx;
+/** Smallest angle between two circles whose tap areas do not overlap (as planCircles). */
+const MIN_SPACING_DEG = spacingDeg(CIRCLE_REACH, P.distanceFromPlayerPx);
+/**
+ * burrow: the circles lie on the side where the sand trail arrives, trail angle +-30 degrees (PE-190). Where three
+ * circles do not fit into +-30 without overlapping tap areas, they keep the minimum spacing (fairness first).
+ */
+const BURROW_SIDE_DEG = 30;
+/** coil: each rope circle sits this far beside the link that is its target. */
+const COIL_SIDE_DEG = 30;
+/** Mirror of the stick edge margin (VirtualStick EDGE_MARGIN): drag targets stay off the stick. */
+const STICK_EDGE = 24;
+const STICK_CATCH_R = Math.max(STICK_CATCH_DIAMETER, THEME.sizePx['size.stick']) / 2;
 
 interface Dive {
   from: Point;
@@ -76,6 +103,9 @@ interface Coil {
  * - coil (extra attack): the links form a ring with a visible gap around the player and squeeze. Only the head
  *   is vulnerable; head hits weaken the coil and break it up. Lasers bounce off links with a spark (no flash).
  * The scene reaches spikes, mound, break-out and links through getHazards() (PE-134).
+ * Fairy-tale quicktimes (AP-154, PE-190): the burrow tap circles lie on the side where the sand trail arrives;
+ * Fessel der Göttinnen (`coil`) puts two rope drag circles beside the ring with their targets on links. All rope
+ * circles hit: the ring loosens at once instead of squeezing.
  */
 export class GiantSandWorm extends BossBase {
   private links: Phaser.GameObjects.Sprite[] | undefined;
@@ -95,6 +125,10 @@ export class GiantSandWorm extends BossBase {
   private wiggleMs = 0;
   private wiggleFrame = 0;
   private hasTailFrame = false;
+  /** burrow: circle angles by index on the side where the trail arrives (set at the announcement). */
+  private burrowAngles: number[] = [];
+  /** coil: rope circles and their link targets by index (null: no room, the planned anchors stay). */
+  private coilPlan: DragAnchor[] | null = null;
   private readonly random: () => number;
   private readonly reduced: boolean;
 
@@ -190,6 +224,13 @@ export class GiantSandWorm extends BossBase {
     const ms = attack.telegraphMs;
     if (attack.id === 'burrow') {
       this.startDive(ms);
+      const to = this.dive?.to ?? this.center;
+      this.burrowAngles = spreadAngles(
+        angleDegOf(this.center, to),
+        attack.parryCircles,
+        BURROW_SIDE_DEG,
+        MIN_SPACING_DEG,
+      );
     } else if (attack.id === 'spikeVolley') {
       this.holding = true;
       const base = this.angleToCenter();
@@ -233,10 +274,54 @@ export class GiantSandWorm extends BossBase {
           { start: gapStart, size: T.coil.gapRad },
         ),
       );
+      this.coilPlan = this.planCoil(attack.parryCircles);
     }
   }
 
-  protected override onAttack(attackId: string, damage: number): void {
+  /**
+   * burrow: the tap circles on the side where the sand trail arrives. coil: rope circles beside links of the ring,
+   * their targets on those links (the overlay draws brackets with the link symbol). Other attacks: as planned.
+   */
+  protected override parryAnchor(attack: BossAttackDef, circle: ParryCircleState): ParryAnchor {
+    if (attack.id === 'burrow') {
+      const deg = this.burrowAngles[circle.index];
+      if (deg !== undefined) return { angleDeg: deg };
+    } else if (attack.id === 'coil') {
+      const plan = this.coilPlan?.[circle.index];
+      if (plan) return { angleDeg: plan.angleDeg, target: { ...plan.target } };
+    }
+    return super.parryAnchor(attack, circle);
+  }
+
+  /** Link targets of the coil at the ring radius of the announcement (the ring squeezes only after the impact). */
+  private planCoil(count: number): DragAnchor[] | null {
+    const coil = this.coil;
+    if (!coil) return null;
+    const links = coilAngles(T.segmentCount, coil.gapStart, T.coil.gapRad).links.map(
+      (a) => (a * 180) / Math.PI,
+    );
+    // Start a quarter round from the head, so the targets lie away from the head at the gap.
+    return coilAnchors(this.center, links, T.coil.radius, count, Math.round(links.length / 4), {
+      circleDist: P.distanceFromPlayerPx,
+      sideDeg: COIL_SIDE_DEG,
+      circleReach: CIRCLE_REACH,
+      minSpacingDeg: MIN_SPACING_DEG,
+      half: P.dragTargetRadiusPx,
+      zone: this.targetZone(),
+    });
+  }
+
+  /** Where drag targets may lie: arena minus margin, below the HUD timer, off the stick (brief H-37). */
+  private targetZone(): SafeZone {
+    const registry = (this.scene as Partial<Phaser.Scene> | undefined)?.registry;
+    const ins = registry?.get ? readSafeInsets(registry) : NO_SAFE_INSETS;
+    const stick = stickCenter(this.arena.width, this.arena.height, STICK_CATCH_R, STICK_EDGE, ins);
+    return safeZone(this.arena, hudTimerBottom(HUD_MAX_K, ins.top) + HINT_TIMER_GAP, [
+      { ...stick, r: STICK_CATCH_R },
+    ]);
+  }
+
+  protected override onAttack(attackId: string, damage: number, parryFactor = 1): void {
     if (attackId === 'burrow') {
       this.breakOut(damage);
     } else if (attackId === 'spikeVolley') {
@@ -262,6 +347,12 @@ export class GiantSandWorm extends BossBase {
     } else if (attackId === 'coil') {
       const coil = this.coil;
       if (!coil) return; // broken up during the announcement
+      this.coilPlan = null;
+      // Fessel der Göttinnen parried (all rope circles on their links, PE-158): the ring loosens at once.
+      if (parryFactor <= 0) {
+        this.endCoil();
+        return;
+      }
       coil.damage = damage;
       coil.phase = 'squeeze';
       coil.elapsedMs = 0;
@@ -630,6 +721,8 @@ export class GiantSandWorm extends BossBase {
     this.coil = null;
     this.invulnerable = false;
     this.wiggleMs = 0;
+    this.burrowAngles = [];
+    this.coilPlan = null;
   }
 
   /** Keeps a telegraph so despawn() can cancel it; finished ones are dropped. */
