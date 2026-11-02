@@ -9,7 +9,11 @@ import {
   flagShown,
   holdFilled,
   holdSegmentArc,
+  KEYLINE,
+  keylineOffsets,
+  keylineRect,
   linkDots,
+  ringKeylines,
   resultWord,
   sleepRise,
   symbolLit,
@@ -133,5 +137,32 @@ describe('beat, sequence, decoy, sleep', () => {
     expect(decoyFade(0, true)).toBe(0);
     expect(sleepRise(400, false)).toBe(6);
     expect(sleepRise(400, true)).toBe(0);
+  });
+});
+
+describe('keylines (AP-173, brief H-41 3a)', () => {
+  it('1 px ink directly outside and inside a 2 px ring: ink, phosphor, ink', () => {
+    expect(KEYLINE).toBe(1);
+    // Circle: edge 18-20 px, ink 20-21 and 17-18.
+    expect(ringKeylines(20, 2)).toEqual({ outer: 20.5, inner: 17.5 });
+    // Approach ring at scale 1.5: edge 28-30.
+    expect(ringKeylines(30, 2)).toEqual({ outer: 30.5, inner: 27.5 });
+  });
+
+  it('bracket bars get an ink rectangle 1 px larger on every side', () => {
+    const bars = bracketRects(100, 100, 24, undefined, 2);
+    for (const r of bars) {
+      const [x, y, w, h] = keylineRect(r);
+      expect([x, y, w, h]).toEqual([r[0] - 1, r[1] - 1, r[2] + 2, r[3] + 2]);
+    }
+  });
+
+  it('sprite edges get four ink copies shifted by 1 px', () => {
+    expect(keylineOffsets()).toEqual([
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+    ]);
   });
 });

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { WeaponStats } from '../contracts';
+import { lowAlphaAt, type FocusView } from '../logic/effectRank';
 import { shotPattern } from '../logic/powers';
 import { Laser } from './Laser';
 
@@ -49,6 +50,17 @@ export class LaserPool {
   /** Returns a laser to the pool (e.g. after it hit something). */
   release(laser: Laser): void {
     laser.deactivate();
+  }
+
+  /**
+   * Quicktime focus (AP-173): own lasers are a rank 4 effect. Sets the opacity of every pooled laser from its
+   * distance to the astronaut (inactive ones too, so a recycled laser starts with the current value).
+   */
+  setEffectAlpha(view: FocusView): void {
+    for (const child of this.group.getChildren()) {
+      const laser = child as Laser;
+      laser.setAlpha(lowAlphaAt(view, laser.x, laser.y));
+    }
   }
 
   /** Recycles lasers beyond their range. Call once per frame. */

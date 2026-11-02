@@ -107,6 +107,42 @@ export function targetBoxR(selectedMs: number | null, reduced: boolean): number 
 }
 
 /** Rectangles (x, y, w, h) of the four L brackets of a target box with half size r around (cx, cy). */
+/** Width of the ink keylines on both sides of every circle part (brief H-41 3a, PE-226). */
+export const KEYLINE = THEME.sizePx['size.parry-keyline'];
+
+/**
+ * Keylines of a ring stroke `line` px wide whose outer side lies on `outerR`: centre radii of the two
+ * `key` px ink strokes directly outside and directly inside it (brief H-41: ink, phosphor, ink).
+ */
+export function ringKeylines(
+  outerR: number,
+  line: number,
+  key = KEYLINE,
+): { outer: number; inner: number } {
+  return { outer: outerR + key / 2, inner: outerR - line - key / 2 };
+}
+
+/** Ink rectangle behind a filled rectangle (x, y, w, h): `key` px larger on every side. */
+export function keylineRect(
+  [x, y, w, h]: readonly [number, number, number, number],
+  key = KEYLINE,
+): [number, number, number, number] {
+  return [x - key, y - key, w + 2 * key, h + 2 * key];
+}
+
+/**
+ * Whole-pixel offsets of the ink copies behind a sprite edge (wavy decoy edge): shifted by `key` px in the four
+ * directions they give the edge an ink line outside and inside, like the coin outline (AP-70).
+ */
+export function keylineOffsets(key = KEYLINE): [number, number][] {
+  return [
+    [-key, 0],
+    [key, 0],
+    [0, -key],
+    [0, key],
+  ];
+}
+
 export function bracketRects(
   cx: number,
   cy: number,

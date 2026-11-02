@@ -127,6 +127,14 @@ export class GearOverlay {
     this.updateRing(target, dtMs);
   }
 
+  /**
+   * Quicktime focus (AP-173): the block ring is a rank 4 effect (armour ring), the scene sets its opacity. The
+   * pieces on the body and the glint stay at 100 % (rank 2).
+   */
+  setEffectAlpha(alpha: number): void {
+    this.ring?.setAlpha(alpha);
+  }
+
   /** The diamond set block stopped a hit: ring from 16 to 28 px. */
   playBlock(): void {
     if (this.ring) this.ringMs = 0;
@@ -177,8 +185,11 @@ export class GearBlastPool {
     }
   }
 
-  /** Plays one explosion at (x, y); does nothing without the texture. */
-  play(x: number, y: number, depth: number): void {
+  /**
+   * Plays one explosion at (x, y); does nothing without the texture. `alpha`: opacity of this particle effect
+   * (rank 4 in the quicktime focus, AP-173).
+   */
+  play(x: number, y: number, depth: number, alpha = 1): void {
     if (!this.scene.textures.exists(BLAST_KEY)) return;
     let sprite = this.sprites.find((s) => !s.visible);
     if (!sprite) {
@@ -189,6 +200,7 @@ export class GearBlastPool {
       sprite = created;
     }
     sprite.setPosition(x, y).setDepth(depth).setVisible(true);
+    sprite.alpha = alpha;
     if (this.scene.anims.exists(BLAST_ANIM)) sprite.play(BLAST_ANIM);
     else sprite.setVisible(false);
   }

@@ -130,6 +130,17 @@ import {
 import { AimInput } from '../platform/input';
 import { markFinisherSeen, loadSave, writeSave } from '../platform/storage';
 import { NO_ASSIST, assistFactors, assistStage, recordResult } from '../logic/assist';
+import {
+  FOCUS_DIM_DEPTH,
+  FocusFade,
+  allowsNewParticle,
+  createFocusView,
+  dimAlpha,
+  isNeutral,
+  lowAlphaAt,
+} from '../logic/effectRank';
+import { PARRY_FOCUS } from '../config/parry';
+import { themeColor } from '../config/theme';
 import { prefersReducedMotion } from '../platform/motion';
 import { buildFinisher } from '../logic/finisher';
 import { FINISHER_SCENE_KEY, type FinisherActor, type FinisherStartData } from '../contracts';
@@ -302,6 +313,14 @@ export class GameScene extends Phaser.Scene {
   private pet?: PetCompanion<PetTarget>;
   /** Pool enemies and living boss parts handed to the pet each frame (one reused array). */
   private petTargets: PetTarget[] = [];
+  /** Quicktime focus (AP-173): one ink layer over floor and arena decoration, created once per round. */
+  private focusDim?: Phaser.GameObjects.Rectangle;
+  private readonly focusFade = new FocusFade();
+  /** Focus as applied this frame (one object, updated in place). */
+  private readonly focusView = createFocusView();
+  /** The rank 4 effects already show their own opacity (nothing to fade until the focus or the switch). */
+  private focusNeutral = true;
+  private reducedMotion = false;
 
   constructor() {
     super('GameScene');
@@ -345,6 +364,9 @@ export class GameScene extends Phaser.Scene {
     this.petRound = null;
     this.pet = undefined;
     this.petTargets = [];
+    this.focusDim = undefined;
+    this.focusFade.reset();
+    this.focusNeutral = true;
   }
 
   create(): void {
@@ -366,6 +388,15 @@ export class GameScene extends Phaser.Scene {
 
     // Fixed seed per level: same floor layout every round.
     this.background = new MapBackground(this, this.level.batch, this.level.id * 7919 + 1);
+    // Quicktime focus (AP-173): ink layer directly over the floor, under everything else; hidden until a circle.
+    this.focusDim = this.add
+      .rectangle(0, 0, width, height, themeColor(PARRY_FOCUS.dimColor).num)
+      .setOrigin(0, 0)
+      .setDepth(FOCUS_DIM_DEPTH)
+      .setAlpha(0)
+      .setVisible(false);
+    this.reducedMotion = prefersReducedMotion();
+    this.focusView.reduce = save.reduceEffects === true;
 
     this.lasers = new LaserPool(this);
     this.lasers.pierce = pierceCount(this.gear);
@@ -423,6 +454,8 @@ export class GameScene extends Phaser.Scene {
 
     document.addEventListener('visibilitychange', this.onVisibilityChange);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
+    // "EFFEKTE REDUZIEREN" can change in the pause menu: read it again when the round resumes.
+    this.events.on(Phaser.Scenes.Events.RESUME, this.onResume, this);
 
     const hudData: HudInitData = {
       levelId: this.level.id,
@@ -672,8 +705,10 @@ export class GameScene extends Phaser.Scene {
       targets.push({ x: e.x, y: e.y, radius: r, enemy: e });
     }
     for (const { x, y } of blasts) {
-      // Above enemies and items, below the astronaut and her weapon (depth - 1).
-      this.blasts?.play(x, y, this.player.depth - 2);
+      // Above enemies and items, below the astronaut and her weapon (depth - 1). Quicktime focus (AP-173): no new
+      // particles near the astronaut, rank 4 opacity elsewhere.
+      if (allowsNewParticle(this.focusView, x, y))
+        this.blasts?.play(x, y, this.player.depth - 2, lowAlphaAt(this.focusView, x, y));
       const hit = deathBlastTargets(this.gear, x, y, targets, this.player.stats.damage);
       for (const t of hit.targets) {
         if (t.enemy.active) this.damageEnemy(t.enemy, hit.damage);
@@ -713,6 +748,7 @@ export class GameScene extends Phaser.Scene {
     this.spawnDrops();
     this.updateItems(this.playTimeMs);
     this.coinPool?.update(dt, this.player);
+    this.updateFocus(dt);
     this.emitPowers();
 
     // Order matters (AP-06): death before the timer, so a loss wins over a simultaneous timeout.
@@ -971,6 +1007,46 @@ export class GameScene extends Phaser.Scene {
   private parryGroups(): ParryGroup[] {
     if (this.bossDefeatedFlag) return [];
     return this.bossParts().flatMap((p) => [...p.parryGroups]);
+  }
+
+  /**
+   * Quicktime focus (AP-173, brief H-41): asks the overlay every frame (no event, Q-77 (a)), steps the ink layer
+   * over the floor (focus-in/-out in 3 steps, at once with reduced motion) and sets the opacity of the rank 4
+   * effects (pet, armour rings, fire ring, coins, own lasers). Only opacity: no objects are created here.
+   */
+  private updateFocus(dt: number): void {
+    const level = this.focusFade.step(this.parryOverlay?.focused === true, dt, this.reducedMotion);
+    const view = this.focusView;
+    view.level = level;
+    view.x = this.player.x;
+    view.y = this.player.y;
+    this.focusDim?.setAlpha(dimAlpha(level)).setVisible(level > 0);
+    const neutral = isNeutral(view);
+    // One last pass when the focus ends restores the own opacity; then nothing to do until the next circle.
+    if (neutral && this.focusNeutral) return;
+    this.focusNeutral = neutral;
+    const near = lowAlphaAt(view, view.x, view.y);
+    this.armourRing?.setEffectAlpha(near);
+    this.gearOverlay?.setEffectAlpha(near);
+    this.pet?.setEffectAlpha(view);
+    this.lasers.setEffectAlpha(view);
+    for (const coin of this.coinPool?.coins ?? [])
+      coin.setEffectAlpha(lowAlphaAt(view, coin.x, coin.y));
+  }
+
+  /**
+   * Round end: the ink layer goes at once, so no dimmed floor stays under the finisher or the next screen. (Boss
+   * death without round end: the overlay's clear() turns the focus off, the layer fades out.)
+   */
+  private endFocus(): void {
+    this.focusFade.reset();
+    this.focusView.level = 0;
+    this.focusDim?.setAlpha(0).setVisible(false);
+  }
+
+  private onResume(): void {
+    if (this.ended) return;
+    this.focusView.reduce = loadSave().reduceEffects === true;
   }
 
   /** Quicktime display on play time (stands still while paused, AP-133). */
@@ -1252,6 +1328,7 @@ export class GameScene extends Phaser.Scene {
       : undefined;
     this.despawnBoss();
     this.parryOverlay?.clear();
+    this.endFocus();
 
     const before = loadSave();
     const settled = settleRound(
@@ -1360,6 +1437,8 @@ export class GameScene extends Phaser.Scene {
 
   private cleanup(): void {
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    this.events.off(Phaser.Scenes.Events.RESUME, this.onResume, this);
+    this.focusDim = undefined;
     const hud = this.scene.get(HUD_KEY);
     hud?.events.off(Phaser.Scenes.Events.CREATE, this.sendHudStartState, this);
     hud?.events.off(POWER_SLOT_PRESSED, this.onPowerSlotPressed, this);
