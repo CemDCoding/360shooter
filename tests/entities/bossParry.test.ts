@@ -189,6 +189,12 @@ function announce(
           y: CENTER.y + Math.sin(rad) * PARRY_RULES.distanceFromPlayerPx,
         };
         expect(boss.tapParry(p, CENTER)).toBe(true);
+        // M9 (AP-151): a hold circle ends with a second tap at its release moment (two-tap replacement).
+        if (c.kind === 'hold' && c.releaseAtMs !== undefined) {
+          i.parry.tick(c.releaseAtMs - at);
+          at = c.releaseAtMs;
+          expect(boss.tapParry(p, CENTER)).toBe(true);
+        }
       }
       i.parry.tick(a.telegraphMs - at);
       i.handle({ type: 'execute', ...ev });
