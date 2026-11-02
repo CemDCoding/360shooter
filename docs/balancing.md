@@ -570,6 +570,91 @@ Set-Effekt bei allen drei Teilen: Diamant = alle 30 s ein Block, Hoelle = alle 2
 
 **Pet-Leiste (PE-179):** Das Pet startet jede Runde als Ei. Besiegte Gegner fuellen die Leiste (ein Boss zaehlt wie 10 Gegner, `bossWeight`). Die erste volle Leiste (12 % der erwarteten Gegner der Runde, `hatchFraction` 0,12; PE-194, vorher 0,15) laesst das Pet schluepfen, jede weitere Leiste (25 %, `powerUpFraction` 0,25) gibt ein Power-up bis Rundenende, hoechstens 3 (`maxPowerUps`). Jedes Power-up macht Schaden und Tempo 1,3-fach; Zusatzboni: zweite Biene, Schneeball-Radius 1,5-fach, Aura-Radius 1,3-fach. Richtwert Schluepfzeit 30 bis 60 s Spielzeit (Startwert fuer den Handtest); die Schluepfzeit haengt an der Leveldauer (ideal etwa `hatchFraction` x Dauer x 1,277 s: 180-s-Level ca. 22 bis 28 s, 300-s-Level ca. 41 bis 44 s ohne Laufwege). Die Leiste sitzt mittig unter dem Timer (Abstand 4).
 
+## Referenzspielerin und Ziel-Baender (M11)
+
+AP-167 (PE-208, RS-05.1). Das Spiel ist dadurch **unveraendert**: neu sind nur `src/config/balanceTargets.ts` (Annahmen und Baender), `src/logic/balanceModel.ts` (reine Rechnung) und die Tests `balanceModel`, `balanceBoss`, `balancePets` in `tests/logic/`. Die Werte sind Startwerte RS-05.1, nach H-42 nachjustieren. AP-168 bis AP-170 richten ihre Werte an diesen Baendern aus.
+
+**Annahmen der Referenzspielerin** (`REFERENCE_PLAYER`):
+
+- Gold: jedes Level einmal gewonnen, ab Level 10 zusaetzlich eine Niederlage je Level (halbes Gold, `GOLD_KEEP_ON_LOSS`). Zaehlt das Gold **vor** dem Level, das gerechnet wird (Level 0 hat keine Upgrades).
+- Kaeufe: 35 % des Goldes auf Feuerrate, 35 % auf Schaden, 30 % auf Leben und Drehtempo (je Haelfte). Die Stufe hat eine Nachkommastelle (ganze Stufen nach `upgradeCost`, dazu der bezahlte Teil der naechsten), so ist die Kurve glatt.
+- Schadens-Faktor = (1 + 0,1 x Stufe Feuerrate) x (1 + 0,1 x Stufe Schaden), Items und Trefferquote gleichen sich beim Druck grob aus (Annahme, im Handtest pruefen).
+- **Referenz-Druck** = Druck (Definition wie in "Kennzahlen": HP aller neuen Gegner je Sekunde durch die Basis-DPS 40, mit Gegnerstufe, Obergrenze und wirksamen HP) geteilt durch den Schadens-Faktor.
+- Boss: Trefferquote 0,9 (grosses Ziel), Doppelschuss im Mittel Faktor 1,5 (Stufe 1 = 2, Stufe 2 = 3), Pet mit 3 Power-ups (nur fuer den Pet-Anteil, die Boss-Dauer rechnet ohne Pet).
+- **Boss-Dauer** = Boss-HP (`scaledHp`) / Referenz-DPS (40 x Schadens-Faktor x 0,9 x 1,5). **Ankuendigungs-Anteil** = Summe (Anzahl x Warnzeit) der Angriffe des Levels innerhalb der Kampfdauer / Kampfdauer; ein Angriff erscheint zuerst nach seiner Abklingzeit, danach alle Abklingzeit plus Warnzeit; Opt-in-Angriffe (Riesenzank, Herzenswaage) zaehlen nicht, Zusatzangriffe ab Index 2 im Batch. **Pet-Anteil** = Pet-DPS / (Pet-DPS + Laser-DPS), das Pet trifft den Boss immer (Capybara: eine Aura-Wirkung, ein Ziel).
+
+**Baender** (`BALANCE_BANDS`, Test-Datei in Klammern):
+
+| Groesse | Band | Test |
+|---|---|---|
+| Referenz-Druck je Level | 0,75 bis 1,8 | balanceModel |
+| Level 40 | Maximum, 1,7 bis 1,8 | balanceModel |
+| Schritt im Batch | hoechstens +12 % | balanceModel |
+| Batch-Anfang | unter dem Ende des vorigen Batches (Saegezahn) | balanceModel |
+| Gold je Minute | hoechstens 10 % Unterschied zwischen 180-s- und 300-s-Level desselben Batches | balanceModel |
+| Boss-Dauer | Batch-Anfang 20 bis 28 s, Batch-Ende 30 bis 38 s (dazwischen linear nach Index im Batch), Level 40: 40 bis 50 s | balanceBoss |
+| Ankuendigungs-Anteil | hoechstens 0,40 | balanceBoss |
+| Jeder Angriff des Levels | erscheint bei der unteren Bandgrenze der Boss-Dauer mindestens einmal | balanceBoss |
+| Pet-Anteil (3 Power-ups) | 20 bis 40 % | balancePets |
+
+**Bekannte Ausreisser (`KNOWN_OUT_OF_BAND`).** Jeder Test hat eine Liste mit Level, Ist-Wert und zustaendigem Paket und prueft, dass **genau** diese Level ausserhalb liegen: ein neuer Ausreisser schlaegt fehl, ein behobener auch (dann den Eintrag streichen). Heute: Druck Level 4 und 33 bis 40 sowie Level 40 im Band 1,7 bis 1,8 (AP-168); Schritte +12 % in Level 1 bis 4 und 32 bis 36 (AP-168), Level 23 und 27 bis 29 (offen, Q-78); Gold je Minute Level 3 (AP-168); Boss-Dauer alle 41 Level zu kurz (AP-170); Ankuendigungs-Anteil Level 2 bis 4, 7 bis 9, 35 bis 38 und 40 (AP-170); Pet-Anteil Biene alle Level, Pinguin Level 0 bis 18 (AP-169), Capybara alle Level zu schwach gegen ein Ziel (AP-170).
+
+**Tabelle der 41 Level** (gerechnet, nicht gemessen; Stufe = Schaden und Feuerrate je Spur, Stufe L+H = Leben und Drehtempo je Spur; Pet-Anteil: Biene / Pinguin / Capybara mit Doppelschuss):
+
+| Level | Stufe Schaden | Stufe Leben | Referenz-Druck | Gold je Minute | Boss-Dauer s | Ankuendigung | Pet-Anteil |
+|---|---|---|---|---|---|---|---|
+| 0 | 0,0 | 0,0 | 0,76 | 1,9 | 18,5 | 0,26 | 0,64 / 0,54 / 0,17 |
+| 1 | 0,2 | 0,1 | 1,02 | 2,1 | 20,5 | 0,29 | 0,64 / 0,54 / 0,17 |
+| 2 | 0,4 | 0,2 | 1,36 | 2,3 | 22,2 | 0,41 | 0,63 / 0,53 / 0,16 |
+| 3 | 0,7 | 0,3 | 1,67 | 2,6 | 23,6 | 0,48 | 0,63 / 0,53 / 0,16 |
+| 4 | 1,1 | 0,5 | 2,11 | 2,9 | 24,1 | 0,47 | 0,62 / 0,52 / 0,16 |
+| 5 | 1,4 | 0,7 | 1,62 | 9,0 | 17,0 | 0,38 | 0,61 / 0,51 / 0,15 |
+| 6 | 2,1 | 1,1 | 1,59 | 9,3 | 17,5 | 0,37 | 0,60 / 0,50 / 0,14 |
+| 7 | 2,6 | 1,4 | 1,62 | 9,7 | 18,3 | 0,42 | 0,59 / 0,49 / 0,14 |
+| 8 | 3,1 | 1,7 | 1,67 | 10,1 | 18,9 | 0,40 | 0,58 / 0,48 / 0,13 |
+| 9 | 3,7 | 2,2 | 1,68 | 10,6 | 18,9 | 0,40 | 0,57 / 0,46 / 0,13 |
+| 10 | 4,3 | 2,6 | 1,29 | 15,7 | 14,5 | 0,17 | 0,56 / 0,45 / 0,12 |
+| 11 | 4,9 | 3,1 | 1,29 | 15,9 | 15,3 | 0,16 | 0,54 / 0,44 / 0,12 |
+| 12 | 5,4 | 3,5 | 1,33 | 16,1 | 16,2 | 0,15 | 0,54 / 0,44 / 0,12 |
+| 13 | 5,9 | 3,9 | 1,34 | 16,3 | 17,0 | 0,14 | 0,53 / 0,43 / 0,11 |
+| 14 | 6,3 | 4,2 | 1,38 | 16,5 | 17,9 | 0,13 | 0,52 / 0,42 / 0,11 |
+| 15 | 6,6 | 4,5 | 1,43 | 16,7 | 18,8 | 0,13 | 0,52 / 0,42 / 0,11 |
+| 16 | 7,0 | 4,8 | 1,47 | 17,1 | 19,6 | 0,12 | 0,51 / 0,41 / 0,11 |
+| 17 | 7,4 | 5,2 | 1,51 | 17,3 | 20,1 | 0,12 | 0,51 / 0,41 / 0,10 |
+| 18 | 7,8 | 5,6 | 1,54 | 17,6 | 20,5 | 0,12 | 0,50 / 0,40 / 0,10 |
+| 19 | 8,2 | 5,9 | 1,55 | 17,8 | 21,0 | 0,11 | 0,50 / 0,40 / 0,10 |
+| 20 | 8,5 | 6,2 | 1,61 | 18,0 | 21,6 | 0,17 | 0,49 / 0,39 / 0,10 |
+| 21 | 8,8 | 6,5 | 0,93 | 33,6 | 10,4 | 0,34 | 0,49 / 0,39 / 0,10 |
+| 22 | 9,1 | 6,8 | 1,02 | 35,4 | 11,6 | 0,31 | 0,48 / 0,38 / 0,10 |
+| 23 | 9,4 | 7,1 | 1,18 | 37,1 | 12,8 | 0,28 | 0,48 / 0,38 / 0,09 |
+| 24 | 9,7 | 7,3 | 1,31 | 38,8 | 13,9 | 0,37 | 0,48 / 0,38 / 0,09 |
+| 25 | 10,1 | 7,7 | 1,45 | 40,7 | 14,6 | 0,35 | 0,47 / 0,37 / 0,09 |
+| 26 | 10,5 | 8,1 | 1,15 | 53,0 | 11,5 | 0,10 | 0,47 / 0,37 / 0,09 |
+| 27 | 10,8 | 8,4 | 1,30 | 55,3 | 12,8 | 0,19 | 0,46 / 0,36 / 0,09 |
+| 28 | 11,1 | 8,6 | 1,46 | 57,8 | 14,1 | 0,26 | 0,46 / 0,36 / 0,09 |
+| 29 | 11,3 | 8,9 | 1,64 | 60,1 | 15,4 | 0,30 | 0,46 / 0,36 / 0,09 |
+| 30 | 11,7 | 9,2 | 1,80 | 62,6 | 16,4 | 0,28 | 0,45 / 0,35 / 0,09 |
+| 31 | 12,1 | 9,6 | 1,44 | 66,2 | 12,9 | 0,37 | 0,45 / 0,35 / 0,08 |
+| 32 | 12,2 | 9,8 | 1,65 | 68,9 | 14,6 | 0,33 | 0,45 / 0,35 / 0,08 |
+| 33 | 12,4 | 10,0 | 1,86 | 71,6 | 16,3 | 0,39 | 0,44 / 0,35 / 0,08 |
+| 34 | 12,6 | 10,2 | 2,11 | 74,4 | 17,8 | 0,35 | 0,44 / 0,34 / 0,08 |
+| 35 | 12,8 | 10,4 | 2,37 | 77,2 | 19,3 | 0,42 | 0,44 / 0,34 / 0,08 |
+| 36 | 13,0 | 10,5 | 2,66 | 80,0 | 20,8 | 0,45 | 0,44 / 0,34 / 0,08 |
+| 37 | 13,3 | 10,8 | 2,97 | 82,9 | 22,0 | 0,42 | 0,43 / 0,34 / 0,08 |
+| 38 | 13,6 | 11,1 | 3,28 | 86,0 | 23,2 | 0,40 | 0,43 / 0,34 / 0,08 |
+| 39 | 13,9 | 11,4 | 3,61 | 89,1 | 24,3 | 0,38 | 0,43 / 0,33 / 0,08 |
+| 40 | 14,1 | 11,6 | 3,99 | 92,3 | 25,5 | 0,44 | 0,43 / 0,33 / 0,08 |
+
+**Vergleich mit RS-05.** Referenz-Druck, Upgrade-Stufen und Boss-Dauern ohne Doppelschuss stimmen mit den Zahlen aus RS-05 auf wenige Prozent ueberein (Level 4: 2,11 gegen 2,12, Level 40: 3,99 gegen 3,99, Level 21: 0,93, Level 30: 1,80; Test `balanceModel`, `balanceBoss`). Abweichungen und Unterschiede in der Lesart:
+
+- **Boss-Dauer:** RS-05 nennt "5 bis 16 s ab Level 21 mit Doppelschuss" fuer Doppelschuss Stufe 1 und 2 (Faktor 2 und 3). Mit dem Mittel 1,5 ergeben sich 10,4 bis 16,4 s fuer Level 21 bis 30 und 12,9 bis 25,5 s fuer Level 31 bis 40. Auch im Wald, Nachtwald und Elfenwald liegt die Dauer unter dem Band (14,5 bis 24,1 s), nicht nur ab Level 21.
+- **Biene:** ohne Doppelschuss 53 bis 73 % (RS-05: 55 bis 60 % um Level 20, hier 59 %), mit Doppelschuss im Mittel 1,5 etwa 43 bis 64 %.
+- **Ankuendigungs-Anteil:** hier mit endlicher Kampfdauer und Wiederholzeit (Abklingzeit plus Warnzeit) gerechnet, nicht als Warnzeit durch Abklingzeit wie in RS-05; es sind 3 Bosse betroffen (Baummonster, Waldgeist, Pharao) statt 4.
+- **Schritt im Batch:** das Band (+12 %) widerspricht den Zielzahlen aus RS-05.2 fuer Level 0 bis 4 (+18 bis +22 % je Schritt) und dem Stand von Level 23 und 27 bis 29, die AP-168 nicht aendert. Der Planner entscheidet (Q-78).
+- **Gold je Minute:** ueber Batch-Grenzen springt der Wert (Level 4 zu 5 etwa dreifach, Level 20 zu 21 etwa 1,9-fach, weil 300-s- zu 180-s-Level), das ist gewollt; das Band gilt nur fuer Nachbarn innerhalb eines Batches mit anderer Laenge.
+
+Tests: `tests/logic/balanceModel.test.ts` (Kurve, Saegezahn, Gold), `tests/logic/balanceBoss.test.ts` (Boss-Dauer, Ankuendigung, Angriffe), `tests/logic/balancePets.test.ts` (Pet-Anteil). Die Baender aus AP-127 in `tests/logic/balance.test.ts` bleiben unveraendert gueltig.
+
 ## Nachjustieren: Beispiele
 
 - Level 0 zu schwer: in `levels.ts` den Faktor von Level 0 (`COUNT_RAMP`) senken oder in `scaling.ts` `hp` von Level 0 senken; der Test verlangt mindestens 1,4-mal den Druck vor AP-127.

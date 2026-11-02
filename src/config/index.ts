@@ -16,3 +16,4 @@ export * from './gear';
 export * from './pets';
 export * from './shop';
 export * from './finishers';
+export * from './balanceTargets';
