@@ -5,7 +5,9 @@ import {
   SAVE_KEY,
   defaultSave,
   loadSave,
+  markFinisherSeen,
   resetSave,
+  setReduceEffects,
   writeSave,
   type StorageLike,
 } from '../../src/platform/storage';
@@ -37,6 +39,8 @@ const v3Defaults = {
   activePet: null,
   petGear: {},
   easyParry: false,
+  seenFinishers: [] as string[],
+  reduceEffects: false,
 };
 
 const valid: SaveGame = {
@@ -179,6 +183,8 @@ describe('save v1/v2', () => {
       'petGear',
       'playerLevel',
       'playerXp',
+      'reduceEffects',
+      'seenFinishers',
       'upgrades',
       'version',
       'wonLevels',
@@ -341,5 +347,66 @@ describe('easyParry (AP-152)', () => {
     writeSave({ ...valid, easyParry: true }, s);
     resetSave(s);
     expect(loadSave(s).easyParry).toBe(false);
+  });
+});
+
+describe('seenFinishers and reduceEffects (AP-161)', () => {
+  it('defaults are empty / false, also for an old save without the fields', () => {
+    expect(defaultSave().seenFinishers).toEqual([]);
+    expect(defaultSave().reduceEffects).toBe(false);
+    const l = loadSave(memory(JSON.stringify(v1)));
+    expect(l.seenFinishers).toEqual([]);
+    expect(l.reduceEffects).toBe(false);
+  });
+  it('round-trips valid values and drops duplicates', () => {
+    const s = memory();
+    const save = {
+      ...valid,
+      seenFinishers: ['stage-1', 'finale-4', 'stage-1'],
+      reduceEffects: true,
+    };
+    expect(writeSave(save, s)).toBe(true);
+    const l = loadSave(s);
+    expect(l.seenFinishers).toEqual(['stage-1', 'finale-4']);
+    expect(l.reduceEffects).toBe(true);
+  });
+  it.each([null, 'stage-1', 5, {}, true])('treats %j as no seen list', (bad) => {
+    const l = loadSave(memory(JSON.stringify({ ...valid, seenFinishers: bad })));
+    expect(l.seenFinishers).toEqual([]);
+    expect(l.gold).toBe(120);
+  });
+  it('drops foreign ids and non-strings', () => {
+    const raw = { ...valid, seenFinishers: ['stage-2', 'evil', 7, null, '__proto__'] };
+    expect(loadSave(memory(JSON.stringify(raw))).seenFinishers).toEqual(['stage-2']);
+  });
+  it.each([1, 'true', null, [], {}, 0])('treats reduceEffects %j as false', (bad) => {
+    const l = loadSave(memory(JSON.stringify({ ...valid, reduceEffects: bad })));
+    expect(l.reduceEffects).toBe(false);
+  });
+  it('markFinisherSeen adds once and ignores invalid ids', () => {
+    const s = memory(JSON.stringify(valid));
+    expect(markFinisherSeen('stage-3', s)).toBe(true);
+    markFinisherSeen('stage-3', s);
+    markFinisherSeen('nope', s);
+    const l = loadSave(s);
+    expect(l.seenFinishers).toEqual(['stage-3']);
+    expect(l.gold).toBe(120);
+  });
+  it('setReduceEffects stores the flag and keeps the rest', () => {
+    const s = memory(JSON.stringify(valid));
+    expect(setReduceEffects(true, s)).toBe(true);
+    expect(loadSave(s).reduceEffects).toBe(true);
+    setReduceEffects(false, s);
+    expect(loadSave(s).reduceEffects).toBe(false);
+    expect(loadSave(s).gold).toBe(120);
+  });
+  it('reset clears both fields', () => {
+    const s = memory();
+    markFinisherSeen('stage-1', s);
+    setReduceEffects(true, s);
+    resetSave(s);
+    const l = loadSave(s);
+    expect(l.seenFinishers).toEqual([]);
+    expect(l.reduceEffects).toBe(false);
   });
 });

@@ -7,6 +7,7 @@ import { GEAR_SLOTS, getGearPiece } from '../config/gear';
 import { PET_IDS } from '../config/pets';
 import { eggItemId, getShopItem } from '../config/shop';
 import { MAX_DIAMONDS, migrateDiamonds } from '../logic/diamonds';
+import { isFinisherVariantId, markSeen } from '../logic/finisher';
 
 export const SAVE_KEY = '360shooter.save.v1';
 
@@ -47,6 +48,8 @@ export function defaultSave(): SaveGame {
     activePet: null,
     petGear: {},
     easyParry: false,
+    seenFinishers: [],
+    reduceEffects: false,
   };
 }
 
@@ -60,6 +63,13 @@ function defaultStorage(): StorageLike | null {
 
 function isIntInRange(v: unknown, min: number, max: number): v is number {
   return typeof v === 'number' && Number.isInteger(v) && v >= min && v <= max;
+}
+
+function parseSeenFinishers(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const v of raw) if (isFinisherVariantId(v) && !out.includes(v)) out.push(v);
+  return out;
 }
 
 /** Validates unknown data; returns a clean SaveGame (only known fields) or null. */
@@ -92,6 +102,9 @@ export function parseSave(data: unknown): SaveGame | null {
     muted: d.muted,
     // Only a real boolean counts, anything else (or a missing field) is off (AP-152).
     easyParry: d.easyParry === true,
+    // Strict (AP-161, R6): only valid, unique variant ids; only a real boolean counts.
+    seenFinishers: parseSeenFinishers(d.seenFinishers),
+    reduceEffects: d.reduceEffects === true,
   };
   // Below version 3 the diamonds are granted retroactively, once (PE-166).
   if (d.version !== 3)
@@ -181,4 +194,25 @@ export function resetSave(storage: StorageLike | null = defaultStorage()): void 
   } catch {
     // ignore
   }
+}
+
+/** Marks a finisher variant as seen (AP-161); an invalid id changes nothing. Returns true if written. */
+export function markFinisherSeen(
+  variantId: string,
+  storage: StorageLike | null = defaultStorage(),
+): boolean {
+  const save = loadSave(storage);
+  return writeSave(
+    { ...save, seenFinishers: markSeen(save.seenFinishers ?? [], variantId) },
+    storage,
+  );
+}
+
+/** Stores the switch "reduce effects" (AP-161, used by AP-162). Returns true if written. */
+export function setReduceEffects(
+  on: boolean,
+  storage: StorageLike | null = defaultStorage(),
+): boolean {
+  const save = loadSave(storage);
+  return writeSave({ ...save, reduceEffects: on === true }, storage);
 }
