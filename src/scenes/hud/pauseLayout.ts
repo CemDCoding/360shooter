@@ -104,3 +104,25 @@ export function nextPauseFocus(current: number, step: 1 | -1): number {
   const c = Number.isInteger(current) && current >= 0 && current < PAUSE_FOCUS_COUNT ? current : 0;
   return (c + step + PAUSE_FOCUS_COUNT) % PAUSE_FOCUS_COUNT;
 }
+
+export type PauseMenuAction = 'next' | 'prev' | 'tab' | 'tabBack' | 'press' | null;
+
+/** Maps a key of the pause menu to an action. Auto-repeat is ignored (no flicker, no save per repeat). */
+export function pauseMenuKey(key: unknown, repeat: boolean, shift: boolean): PauseMenuAction {
+  if (repeat) return null;
+  switch (key) {
+    case 'ArrowDown':
+    case 'ArrowRight':
+      return 'next';
+    case 'ArrowUp':
+    case 'ArrowLeft':
+      return 'prev';
+    case 'Tab':
+      return shift ? 'tabBack' : 'tab';
+    case 'Enter':
+    case ' ':
+      return 'press';
+    default:
+      return null;
+  }
+}

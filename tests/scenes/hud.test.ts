@@ -7,7 +7,7 @@ import { BOSSES } from '../../src/config/bosses';
 import { STORABLE_POWERS } from '../../src/config/powerStore';
 import { THEME } from '../../src/config/theme';
 import { slotStatus } from '../../src/logic/powerStore';
-import { nextPauseFocus, pauseLayout } from '../../src/scenes/hud/pauseLayout';
+import { nextPauseFocus, pauseLayout, pauseMenuKey } from '../../src/scenes/hud/pauseLayout';
 import {
   petBarFilled,
   petBarLook,
@@ -614,7 +614,7 @@ describe('pauseLayout (H-33 view 6, H-37 view 12)', () => {
   });
 
   it.each([1, 1.36, 1.4])(
-    'keeps both buttons round(32k) high and inside the safe area at k = %s',
+    'keeps buttons and switch round(32k) high and inside the safe area at k = %s',
     (k) => {
       const m = Math.round(8 * k);
       const { l } = lay(k, m, 480, 360);
@@ -652,6 +652,21 @@ describe('pauseLayout (H-33 view 6, H-37 view 12)', () => {
     });
     expect(l.buttons[0].x).toBeGreaterThanOrEqual(60);
     expect(l.toggle.x).toBeGreaterThanOrEqual(60);
+  });
+
+  it('ignores held keys and maps Enter, Space, arrows and Tab', () => {
+    expect(pauseMenuKey('Enter', true, false)).toBeNull();
+    expect(pauseMenuKey(' ', true, false)).toBeNull();
+    expect(pauseMenuKey('Enter', false, false)).toBe('press');
+    expect(pauseMenuKey(' ', false, false)).toBe('press');
+    expect(pauseMenuKey('ArrowDown', false, false)).toBe('next');
+    expect(pauseMenuKey('Tab', false, true)).toBe('tabBack');
+    expect(pauseMenuKey('x', false, false)).toBeNull();
+  });
+
+  it('a click on the switch (focus 2) leaves the next step at the first button', () => {
+    expect(nextPauseFocus(2, 1)).toBe(0);
+    expect(nextPauseFocus(2, -1)).toBe(1);
   });
 
   it('walks the focus WEITER -> HAUPTMENÜ -> EINFACHE ABWEHR and wraps', () => {

@@ -39,7 +39,7 @@ import {
   PIXEL_LOCK,
   type Rect,
 } from './hud/hudMath';
-import { nextPauseFocus, pauseLayout } from './hud/pauseLayout';
+import { nextPauseFocus, pauseLayout, pauseMenuKey } from './hud/pauseLayout';
 import { chipRowRight, PetBar, petBarRect } from './hud/PetBar';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
@@ -650,7 +650,10 @@ export class HudScene extends Phaser.Scene {
     this.toggleButton = new FunkButton(this, t.x + t.w / 2, t.y + t.h / 2, {
       width: t.w,
       height: t.h,
-      onClick: () => this.toggleEasyParry(),
+      onClick: () => {
+        this.setPauseFocus(2);
+        this.toggleEasyParry();
+      },
     });
     // Box and word are centred as one block; the state is the shape of the box, not a colour.
     const labelW = measureFunk(this, SWITCH_LABEL, PAUSE_BUTTON_SCALE);
@@ -705,26 +708,16 @@ export class HudScene extends Phaser.Scene {
   /** Pause menu keys: arrows and TAB move the focus, ENTER and SPACE press the focused item. */
   private onMenuKey(ev: KeyboardEvent): void {
     if (this.abortDialog || this.dialogKeyGuard || !this.scene.isPaused(GAME_KEY)) return;
-    switch (ev?.key) {
-      case 'ArrowDown':
-      case 'ArrowRight':
-        this.setPauseFocus(nextPauseFocus(this.pauseFocus, 1));
-        break;
-      case 'ArrowUp':
-      case 'ArrowLeft':
-        this.setPauseFocus(nextPauseFocus(this.pauseFocus, -1));
-        break;
-      case 'Tab':
-        ev.preventDefault?.();
-        this.setPauseFocus(nextPauseFocus(this.pauseFocus, ev.shiftKey ? -1 : 1));
-        break;
-      case 'Enter':
-      case ' ':
-        if (this.pauseFocus === 0) this.togglePause();
-        else if (this.pauseFocus === 1) this.askAbort();
-        else this.toggleEasyParry();
-        break;
-      default:
+    const action = pauseMenuKey(ev?.key, ev?.repeat === true, ev?.shiftKey === true);
+    if (action === 'tab') ev.preventDefault?.();
+    if (action === 'next' || action === 'tab') {
+      this.setPauseFocus(nextPauseFocus(this.pauseFocus, 1));
+    } else if (action === 'prev' || action === 'tabBack') {
+      this.setPauseFocus(nextPauseFocus(this.pauseFocus, -1));
+    } else if (action === 'press') {
+      if (this.pauseFocus === 0) this.togglePause();
+      else if (this.pauseFocus === 1) this.askAbort();
+      else this.toggleEasyParry();
     }
   }
 
