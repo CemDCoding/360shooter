@@ -3,6 +3,7 @@ import {
   FINISHER_SCENE_KEY,
   FINISHER_VARIANT_IDS,
   type FinisherPlan,
+  type FinisherStep,
   type FinisherStartData,
   EASY_PARRY_KEY,
   GameEvents,
@@ -343,5 +344,24 @@ describe('M10 contracts (AP-157)', () => {
       player: actor,
     };
     expect(data.result).toBeUndefined();
+  });
+
+  it('has optional per-frame hold fields (PE-203) so old steps stay valid', () => {
+    const old: FinisherStep = { block: 'frames', atMs: 0, durationMs: 100, frameCount: 2, fps: 10 };
+    expect(old.holdsMs).toBeUndefined();
+    expect(old.reducedHoldsMs).toBeUndefined();
+    expect(old.firstFrame).toBeUndefined();
+    expect(old.titleKind).toBeUndefined();
+    const fresh: FinisherStep = {
+      ...old,
+      holdsMs: [100, 50],
+      reducedHoldsMs: [150, 0],
+      firstFrame: 3,
+      titleKind: 'name',
+    };
+    expect(fresh.holdsMs).toEqual([100, 50]);
+    expect(fresh.reducedHoldsMs).toEqual([150, 0]);
+    expect(fresh.firstFrame).toBe(3);
+    expect(fresh.titleKind).toBe('name');
   });
 });

@@ -34,6 +34,17 @@ export interface FinisherStep {
   /** Number of hand-drawn frames of a `frames` block, 0 = block is skipped. */
   frameCount?: number;
   fps?: number;
+  /** Hold time (ms) per frame of a `frames` block, length = `frameCount`; takes precedence over `fps`. */
+  holdsMs?: readonly number[];
+  /**
+   * Hold times (ms) with "reduce effects", same length as `holdsMs`; 0 = frame is dropped.
+   * Frames with 0 are impact frames and count for the flash rule.
+   */
+  reducedHoldsMs?: readonly number[];
+  /** First frame of the strip used by a `frames` block (e.g. boss index in `finisher-hit`); default 0. */
+  firstFrame?: number;
+  /** Title kind: the word "BEZWUNGEN!" or the name of the final-hit boss; default 'title'. */
+  titleKind?: 'title' | 'name';
   /** Title text. */
   text?: string;
 }
