@@ -68,6 +68,7 @@ Hinweis: Die `.exe` **nur privat** weitergeben, zum Beispiel per USB-Stick, Clou
 An die Adresse anhängen, z. B. `http://localhost:5173/?level=5`:
 
 - `?level=0` bis `?level=40`: startet direkt dieses Level (ungültig ergibt Level 0)
+- `?finisher=0` bis `?finisher=40`: spielt die Boss-Finisher-Sequenz dieses Levels ab (Vorrang vor `?level`)
 - `?fps=1`: zeigt die FPS-Anzeige
 - `?assets=1`: zeigt alle Sprites mit Animation
 
