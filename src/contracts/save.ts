@@ -12,6 +12,10 @@ export interface SaveGame {
   gold?: number;
   /** Ab M9; optional wie gold, keine neue Version (PE-189). Schalter EINFACHE ABWEHR. */
   easyParry?: boolean;
+  /** Ab M10; optional wie easyParry, keine neue Version (PE-199). Bereits ganz gesehene Finisher-Varianten-IDs. */
+  seenFinishers?: string[];
+  /** Ab M10; optional wie easyParry, keine neue Version (PE-200). Schalter EFFEKTE REDUZIEREN. */
+  reduceEffects?: boolean;
   /** Ab Version 2; optional wie gold. */
   upgrades?: UpgradeLevels;
   /** Ab Version 3; optional wie gold. Diamanten (nur Spielwaehrung, PE-177). */
