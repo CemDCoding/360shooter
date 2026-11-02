@@ -356,7 +356,7 @@ export class MenuScene extends Phaser.Scene {
       .fillRect(px, py, 64, 2)
       .fillRect(px, py, 2, 64);
     this.buildPreview(save, px + 32, py + 32);
-    this.drawPortraitButton(px, py);
+    this.makePortraitButton(px, py);
 
     const level = Math.max(save.playerLevel, levelForXp(save.playerXp, PROGRESSION));
     const base = xpForLevel(level, PROGRESSION);
@@ -419,6 +419,7 @@ export class MenuScene extends Phaser.Scene {
     const pet = save.activePet ?? null;
     this.preview = new GearPreview(this, cx, cy, {
       scale: 2,
+      fit: { w: 64, h: 64 },
       equipped: save.equippedGear,
       pet,
       petGear: pet ? (save.petGear?.[pet] ?? null) : null,
@@ -426,38 +427,13 @@ export class MenuScene extends Phaser.Scene {
     this.preview.setSize(64, 64);
   }
 
-  /** Das ganze Porträt ist der Knopf; Aufkleber „ÄNDERN“ überlappt die untere rechte Ecke. */
-  private drawPortraitButton(px: number, py: number): void {
-    const open = (): void => this.openGear();
-    const stickerG = this.add.graphics().setDepth(2);
-    const label = kText(this, 0, 0, 'Ändern', 1, 'menu.sticker-fg');
-    label.setDepth(2);
-    const hasIcon = this.textures.exists('ui-icons-m8');
-    const sw = 5 + (hasIcon ? 8 + 4 : 0) + textWidth(label) + 5;
-    const sh = 14;
-    const sx = px + 64 + 8 - sw;
-    const sy = py + 64 - 8;
-    stickerG.fillStyle(THEME.colors['menu.outline'].num).fillRect(sx, sy, sw + 4, sh + 4);
-    stickerG.fillStyle(THEME.colors['menu.outline'].num).fillRect(sx + 2, sy + 2, sw + 4, sh + 4);
-    stickerG.fillStyle(THEME.colors['menu.sticker-bg'].num).fillRect(sx, sy, sw, sh);
-    let tx = sx + 5;
-    if (hasIcon) {
-      this.add
-        .image(tx + 4, sy + sh / 2, 'ui-icons-m8', 0)
-        .setTint(THEME.colors['menu.sticker-fg'].num)
-        .setDepth(2);
-      tx += 8 + 4;
-    }
-    label.setPosition(tx, sy + 4);
-    const tap = (x: number, y: number, w: number, h: number): void => {
-      const zone = this.add
-        .zone(x + w / 2, y + h / 2, w, h)
-        .setDepth(2)
-        .setInteractive({ useHandCursor: true });
-      zone.on('pointerup', open);
-    };
-    tap(px, py, 64, 64);
-    tap(sx, sy, sw, sh);
+  /** Das ganze Porträt (64x64) ist der einzige Knopf für das Ausrüstungsfenster. */
+  private makePortraitButton(px: number, py: number): void {
+    this.add
+      .zone(px + 32, py + 32, 64, 64)
+      .setDepth(2)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerup', () => this.openGear());
     this.portraitRing = this.add.graphics().setDepth(3);
     this.portraitRing.setData('rect', { x: px, y: py });
   }

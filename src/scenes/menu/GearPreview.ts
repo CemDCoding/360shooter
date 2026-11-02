@@ -1,10 +1,8 @@
 import Phaser from 'phaser';
 import type { EquippedGear, PetId } from '../../contracts';
 import { prefersReducedMotion } from '../../platform/motion';
-import { previewLayers } from './gearPanelLogic';
+import { previewLayers, previewPetPlacement, type PreviewFit } from './gearPanelLogic';
 
-/** Pet sits right and below the astronaut, in units of the preview scale (mockup: 88 / 68 px at 4x). */
-const PET_OFFSET = { x: 22, y: 17 };
 const IDLE_MS = 450;
 
 export interface GearPreviewOptions {
@@ -14,6 +12,8 @@ export interface GearPreviewOptions {
   pet?: PetId | null;
   petGear?: string | null;
   flipX?: boolean;
+  /** Optional frame (px, centred on the astronaut): the pet is placed fully inside it. */
+  fit?: PreviewFit;
 }
 
 /**
@@ -21,7 +21,7 @@ export interface GearPreviewOptions {
  * Origin is the centre of the astronaut. Idle frames 0-1 unless reduced motion is on.
  */
 export class GearPreview extends Phaser.GameObjects.Container {
-  private readonly opts: Required<GearPreviewOptions>;
+  private readonly opts: Required<Omit<GearPreviewOptions, 'fit'>> & { fit?: PreviewFit };
   private readonly baseSprites: Phaser.GameObjects.Sprite[] = [];
   private idleFrame = 0;
   private idleTimer: Phaser.Time.TimerEvent | null = null;
@@ -34,6 +34,7 @@ export class GearPreview extends Phaser.GameObjects.Container {
       pet: options.pet ?? null,
       petGear: options.petGear ?? null,
       flipX: options.flipX ?? false,
+      fit: options.fit,
     };
     this.build();
     if (!prefersReducedMotion() && this.baseSprites.length > 0) {
@@ -65,8 +66,11 @@ export class GearPreview extends Phaser.GameObjects.Container {
       if (s) this.baseSprites.push(s);
     }
     if (layers.pet) {
-      const dx = PET_OFFSET.x * this.opts.scale * (this.opts.flipX ? -1 : 1);
-      const dy = PET_OFFSET.y * this.opts.scale;
+      const { x: dx, y: dy } = previewPetPlacement(
+        this.opts.scale,
+        this.opts.flipX,
+        this.opts.fit,
+      );
       this.layer(layers.pet, dx, dy);
       if (layers.petGear) this.layer(layers.petGear, dx, dy);
     }

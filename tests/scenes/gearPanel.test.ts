@@ -10,7 +10,9 @@ import {
   gearSummary,
   nextFocusRow,
   nothingOwned,
+  PET_OFFSET,
   previewLayers,
+  previewPetPlacement,
   rowOptions,
   setSticker,
   statLines,
@@ -225,6 +227,25 @@ describe('previewLayers', () => {
     });
     expect(previewLayers(none, 'penguin', 'petgear-bee-hell').petGear).toBeNull();
     expect(previewLayers(none, null, 'petgear-bee-hell').petGear).toBeNull();
+  });
+});
+
+describe('previewPetPlacement', () => {
+  it('keeps the default offset without a fit (window 4, result 3)', () => {
+    expect(PET_OFFSET).toEqual({ x: 22, y: 17 });
+    expect(previewPetPlacement(4, false)).toEqual({ x: 88, y: 68 });
+    expect(previewPetPlacement(3, true)).toEqual({ x: -66, y: 51 });
+  });
+  it('places the pet fully inside the 64x64 card frame, margin >= 2 px, face mostly free', () => {
+    for (const flipX of [false, true]) {
+      const p = previewPetPlacement(2, flipX, { w: 64, h: 64 });
+      const half = 16; // 16x16 pet at scale 2
+      expect(32 - (Math.abs(p.x) + half)).toBeGreaterThanOrEqual(2);
+      expect(32 - (p.y + half)).toBeGreaterThanOrEqual(2);
+      expect(Math.sign(p.x)).toBe(flipX ? -1 : 1);
+      // pet top edge at or below the astronaut centre line: head half stays uncovered
+      expect(p.y - half).toBeGreaterThanOrEqual(-2);
+    }
   });
 });
 

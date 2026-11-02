@@ -294,3 +294,36 @@ export function previewLayers(
       : null;
   return { gear: gearTextureKeys(equipped), pet: pet ? `pet-${pet}` : null, petGear };
 }
+
+/** Default pet offset from the astronaut centre, in units of the preview scale (mockup: 88 / 68 px at 4x). */
+export const PET_OFFSET = { x: 22, y: 17 };
+/** Pet sprite edge in source pixels. */
+export const PET_SIZE = 16;
+/** Minimum gap between the pet and the frame edge in the fitted placement, in px. */
+export const PET_FIT_MARGIN = 2;
+
+export interface PreviewFit {
+  w: number;
+  h: number;
+}
+
+/**
+ * Pet centre relative to the astronaut centre, in px. Without `fit` the default offset applies
+ * (window and result screen). With `fit` (frame centred on the astronaut) the pet sits in front of
+ * the astronaut at the bottom right of the frame, PET_FIT_MARGIN px from the edges, so it lies
+ * fully inside. With flipX the pet moves to the bottom left. The pet top edge stays at or below
+ * the frame centre line, so it never covers the upper (head) half of the astronaut.
+ */
+export function previewPetPlacement(
+  scale: number,
+  flipX: boolean,
+  fit?: PreviewFit,
+): { x: number; y: number } {
+  const sign = flipX ? -1 : 1;
+  if (!fit) return { x: PET_OFFSET.x * scale * sign, y: PET_OFFSET.y * scale };
+  const half = (PET_SIZE * scale) / 2;
+  return {
+    x: (fit.w / 2 - PET_FIT_MARGIN - half) * sign,
+    y: fit.h / 2 - PET_FIT_MARGIN - half,
+  };
+}
