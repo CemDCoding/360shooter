@@ -2,6 +2,7 @@ import type { EquippedGear } from '../contracts/gear';
 import type { PetId } from '../contracts/pet';
 import type { SaveGame } from '../contracts/save';
 import { MAX_UPGRADE_LEVEL, type UpgradeLevels, type UpgradeTrack } from '../contracts/upgrade';
+import { MAX_ASSIST_LOSSES } from '../config/assist';
 import { LEVEL_COUNT } from '../config/levels';
 import { GEAR_SLOTS, getGearPiece } from '../config/gear';
 import { PET_IDS } from '../config/pets';
@@ -72,6 +73,16 @@ function parseSeenFinishers(raw: unknown): string[] {
   return out;
 }
 
+function parseAssistLosses(raw: unknown): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out;
+  for (const [k, v] of Object.entries(raw)) {
+    if (!/^\d{1,2}$/.test(k) || !isIntInRange(Number(k), 0, LEVEL_COUNT - 1)) continue;
+    if (isIntInRange(v, 1, MAX_ASSIST_LOSSES)) out[String(Number(k))] = v;
+  }
+  return out;
+}
+
 /** Validates unknown data; returns a clean SaveGame (only known fields) or null. */
 export function parseSave(data: unknown): SaveGame | null {
   if (typeof data !== 'object' || data === null || Array.isArray(data)) return null;
@@ -106,6 +117,9 @@ export function parseSave(data: unknown): SaveGame | null {
     seenFinishers: parseSeenFinishers(d.seenFinishers),
     reduceEffects: d.reduceEffects === true,
   };
+  // Strict (AP-172, R6): only level ids 0..LEVEL_COUNT-1 with whole numbers 1..MAX_ASSIST_LOSSES; empty = no field.
+  const assistLosses = parseAssistLosses(d.assistLosses);
+  if (Object.keys(assistLosses).length > 0) base.assistLosses = assistLosses;
   // Below version 3 the diamonds are granted retroactively, once (PE-166).
   if (d.version !== 3)
     return migrateDiamonds({ ...parseShopFields({}, base), wonLevels: undefined });

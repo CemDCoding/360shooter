@@ -769,6 +769,33 @@ Die Richtwerte aus dem Plan (5 / 5 / 5,5 / 6 s) reichten nach der HP-Aenderung n
 **Ohne Doppelschuss** dauert der laengste Kampf 67,5 s (Level 40), sonst bis 51,1 s; die Erwartung bis etwa 70 s (RI-41) ist eingehalten (Test `balanceBoss`). Mit einem Pet verkuerzt sich die Dauer um den Pet-Anteil (Tabelle oben). Die Quicktimes aus M9 kommen damit je Kampf mehrmals zum Zug (RS-05.3, PE-210).
 
 
+## Rueckenwind (AP-172)
+
+Nach wiederholten Niederlagen im selben Level wird der naechste Versuch unbemerkt etwas leichter (RS-05.6, PE-213, F-40).
+
+**Regeln**
+
+- Zaehler: `SaveGame.assistLosses` = Niederlagen in Folge je Level-ID (optional, keine neue Spielstand-Version, nur lokal, keine personenbezogenen Daten). Ein Sieg loescht den Eintrag des Levels, ein Abbruch ueber das Pausemenue aendert nichts (kein Ergebnis, kein Schreibzugriff), "Spielstand loeschen" entfernt alles.
+- Stufe = min(3, max(0, Niederlagen - 1)): 0 bis 5 Niederlagen ergeben 0, 0, 1, 2, 3, 3. Die erste Niederlage bleibt folgenlos.
+- Debug-Runden (`?level=`) nutzen keinen Rueckenwind und zaehlen nicht.
+
+**Faktoren je Stufe** (multiplikativ, `config/assist.ts`)
+
+| Groesse | je Stufe | Stufe 3 |
+| --- | --- | --- |
+| Gegner-HP | 0,92 | 0,779 |
+| Spawn-Abstand | 1,06 | 1,191 |
+| Boss-HP | 0,90 | 0,729 |
+| Boss-Schaden (Angriffe und Koerper) | 0,90 | 0,729 |
+
+Gegner-HP wirkt auf den Level-Faktor `hp` der Gegner, der Spawn-Abstand auf `spawnIntervalMs` des SpawnDirectors, die Boss-Faktoren ueber optionale Faktoren der Boss-Erzeugung (Standard 1; sie multiplizieren `hpMultiplier` und `damageMultiplier` der Variante). Gold, Erfahrung, Diamanten, Muenz-Drop, Kontaktschaden und das Abwehr-Zeitfenster bleiben unveraendert. Weil weniger Gegner erscheinen, faellt der Gold- und Erfahrungsertrag einer Runde minimal; die Werte je Gegner bleiben.
+
+**Untergrenze:** Der Referenz-Druck (HP je Sekunde, `referencePressure`, geteilt durch den Spawn-Faktor) faellt nie unter den des ersten Levels im Batch. Reicht der HP-Faktor dafuer nicht, wird er angehoben (`assistFactors`). Test fuer alle 41 Level. Folge: Im ersten Level eines Batches (0, 5, 10, 21, 26, 31) bleibt der Gegner-Druck unveraendert (Gegner-HP 1, Spawn-Abstand 1); dort wirken nur die Boss-Faktoren. Wo der HP-Faktor allein nicht reicht, wird stattdessen der Spawn-Abstand verkuerzt.
+
+**Warum verdeckt:** Wer mehrfach scheitert, soll weder Mitleid noch eine Abkuerzung sehen. Eine Anzeige oder ein Hinweis wuerde den Sieg entwerten und den Wunsch nach "ehrlicher" Schwierigkeit verletzen; das Verfahren ist nur eine leichte Daempfung, die den Frust vor dem naechsten Versuch senkt. Sichtbar ist die Stufe nur bei `?fps=1` (Debug-Zeile, Anhang "A1" bis "A3").
+
+**Nachjustieren:** Faktoren und Obergrenze stehen in `config/assist.ts`.
+
 ## Nachjustieren: Beispiele
 
 - Level 0 zu schwer: in `levels.ts` den Faktor von Level 0 (`COUNT_RAMP`) senken oder in `scaling.ts` `hp` von Level 0 senken; der Test verlangt mindestens 1,4-mal den Druck vor AP-127.

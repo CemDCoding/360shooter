@@ -156,6 +156,7 @@ export class HudScene extends Phaser.Scene {
 
   private blinks = new Map<string, Phaser.Tweens.Tween>();
   private fpsText?: Phaser.GameObjects.BitmapText;
+  private assistStage = 0;
   private gameEvents?: Phaser.Events.EventEmitter;
 
   constructor() {
@@ -177,6 +178,7 @@ export class HudScene extends Phaser.Scene {
     this.resetBossBarState(1);
     this.energyLow = false;
     this.levelId = Number.isFinite(data?.levelId) ? data.levelId : 0;
+    this.assistStage = Number.isInteger(data?.assistStage) ? Math.max(0, data.assistStage ?? 0) : 0;
 
     const k = Math.min(
       MAX_K,
@@ -241,8 +243,11 @@ export class HudScene extends Phaser.Scene {
   }
 
   update(): void {
-    if (this.fpsText)
-      setFunk(this.fpsText, `${Math.round(this.game.loop.actualFps)} FPS`, 'hud.accent');
+    if (this.fpsText) {
+      // Debug line only (?fps=1): the hidden assist stage (AP-172) is never shown otherwise.
+      const assist = this.assistStage > 0 ? ` A${this.assistStage}` : '';
+      setFunk(this.fpsText, `${Math.round(this.game.loop.actualFps)} FPS${assist}`, 'hud.accent');
+    }
   }
 
   /** Boss overtime: the timer shows "BOSS!" (on while the timer is over and the boss lives, AP-20). */

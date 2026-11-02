@@ -129,6 +129,7 @@ import {
 } from '../platform/audio';
 import { AimInput } from '../platform/input';
 import { markFinisherSeen, loadSave, writeSave } from '../platform/storage';
+import { NO_ASSIST, assistFactors, assistStage, recordResult } from '../logic/assist';
 import { prefersReducedMotion } from '../platform/motion';
 import { buildFinisher } from '../logic/finisher';
 import { FINISHER_SCENE_KEY, type FinisherActor, type FinisherStartData } from '../contracts';
@@ -154,6 +155,8 @@ export interface HudInitData {
   hp: number;
   maxHp: number;
   remainingSec: number;
+  /** Hidden assist stage (AP-172); the HUD shows it only with ?fps=1. */
+  assistStage?: number;
 }
 
 export interface ResultSceneData {
@@ -258,6 +261,9 @@ export class GameScene extends Phaser.Scene {
   private lastShieldLeft = 0;
   /** Debug round via `?level=n`: the save game is never written (PE-49). */
   private debugRound = false;
+  /** Hidden assist (AP-172): stage and factors of this attempt, set in create(). */
+  private assistStage = 0;
+  private assist = NO_ASSIST;
   private readonly contactStatus = new ContactStatus();
   /** Play clock (ms): sum of running frame times, stands still while paused (PE-29). */
   private playTimeMs = 0;
@@ -400,7 +406,17 @@ export class GameScene extends Phaser.Scene {
 
     this.round = new RoundState(this.level);
     const spawnRadius = spawnRadiusFor(this.scale);
-    this.spawner = new SpawnDirector(this.level, this.rng, spawnRadius);
+    // Hidden assist (AP-172): after repeated defeats in this level the attempt is a bit easier; debug rounds never.
+    this.assistStage = this.debugRound
+      ? 0
+      : assistStage(save.assistLosses?.[String(this.level.id)] ?? 0);
+    this.assist = assistFactors(this.level.id, this.assistStage);
+    this.levelScale = { ...this.levelScale, hp: this.levelScale.hp * this.assist.enemyHp };
+    this.spawner = new SpawnDirector(
+      { ...this.level, spawnIntervalMs: this.level.spawnIntervalMs * this.assist.spawnInterval },
+      this.rng,
+      spawnRadius,
+    );
 
     this.bindPlayerCallbacks();
     this.addColliders();
@@ -413,6 +429,7 @@ export class GameScene extends Phaser.Scene {
       hp: this.player.hp,
       maxHp: this.playerConfig.maxHp,
       remainingSec: Math.ceil(this.round.remainingMs / 1000),
+      assistStage: this.assistStage,
     };
     // The HUD starts with zeros and reads no state: send start values once it exists (AP-34).
     const hud = this.scene.get(HUD_KEY);
@@ -847,6 +864,8 @@ export class GameScene extends Phaser.Scene {
       },
       center: this.center,
       rng: this.rng,
+      hpFactor: this.assist.bossHp,
+      damageFactor: this.assist.bossDamage,
       onHpChanged: (hp, maxHp) => this.emitBossHp(hp, maxHp),
       onDefeated: () => this.onBossDefeated(bossId),
       onSummonTrees: (positions) => {
@@ -1246,7 +1265,17 @@ export class GameScene extends Phaser.Scene {
     );
     const xpGained = settled.xpGained;
     // Exactly one write per round; a debug round writes nothing (PE-40, PE-49).
-    const saved = settled.shouldWrite ? writeSave(settled.next) : false;
+    // The assist counter (AP-172) rides on the same single write; an abort never gets here.
+    const saved = settled.shouldWrite
+      ? writeSave({
+          ...settled.next,
+          assistLosses: recordResult(
+            before.assistLosses,
+            this.level.id,
+            result === 'won' ? 'win' : 'loss',
+          ),
+        })
+      : false;
     const stored = settled.shown;
 
     emitGameEvent(this.events, GameEvents.RoundEnded, { result, xpGained });

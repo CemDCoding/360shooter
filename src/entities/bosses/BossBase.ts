@@ -52,6 +52,11 @@ const FALLBACK_ARENA: ArenaRect = {
   margin: BOSS_TUNING.arena.margin,
 };
 
+/** Optional assist factor: only finite values above 0 count, anything else is 1. */
+function factorOrOne(f: number | undefined): number {
+  return typeof f === 'number' && Number.isFinite(f) && f > 0 ? f : 1;
+}
+
 export interface BossContext {
   /**
    * Real arena size plus the inner margin (PE-101). Bosses, trees and warnings stay inside it.
@@ -76,6 +81,10 @@ export interface BossContext {
    * final grades and, if `blocked`, the "PARRY!" effect with the sound.
    */
   onParryResolved?: (outcome: ParryOutcome) => void;
+  /** Hidden assist (AP-172): factor on the boss HP, default 1. */
+  hpFactor?: number;
+  /** Hidden assist (AP-172): factor on all boss damage (attacks and body), default 1. */
+  damageFactor?: number;
 }
 
 /**
@@ -113,7 +122,12 @@ export abstract class BossBase extends Phaser.Physics.Arcade.Sprite {
     const def = BOSSES[bossId];
     super(scene, -200, -200, def.spriteKey);
     this.def = def;
-    this.variant = variantForLevel(levelId);
+    const base = variantForLevel(levelId);
+    this.variant = {
+      ...base,
+      hpMultiplier: base.hpMultiplier * factorOrOne(ctx.hpFactor),
+      damageMultiplier: base.damageMultiplier * factorOrOne(ctx.damageFactor),
+    };
     this.maxHp = scaledHp(def, this.variant);
     this.hp = this.maxHp;
     this.contactDps = scaledDamage(def.baseDamage, this.variant);

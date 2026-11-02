@@ -16,6 +16,8 @@ export interface SaveGame {
   seenFinishers?: string[];
   /** Ab M10; optional wie easyParry, keine neue Version (PE-200). Schalter EFFEKTE REDUZIEREN. */
   reduceEffects?: boolean;
+  /** Ab M11; optional wie easyParry, keine neue Version (PE-213). Niederlagen in Folge je Level-ID (verdeckter Rueckenwind). */
+  assistLosses?: Record<string, number>;
   /** Ab Version 2; optional wie gold. */
   upgrades?: UpgradeLevels;
   /** Ab Version 3; optional wie gold. Diamanten (nur Spielwaehrung, PE-177). */
