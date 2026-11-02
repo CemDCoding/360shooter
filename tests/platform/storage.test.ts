@@ -36,6 +36,7 @@ const v3Defaults = {
   equippedGear: { head: null, body: null, legs: null },
   activePet: null,
   petGear: {},
+  easyParry: false,
 };
 
 const valid: SaveGame = {
@@ -169,6 +170,7 @@ describe('save v1/v2', () => {
     expect(Object.keys(raw).sort()).toEqual([
       'activePet',
       'diamonds',
+      'easyParry',
       'equippedGear',
       'gold',
       'highestUnlockedLevel',
@@ -311,5 +313,33 @@ describe('save v3 (AP-137)', () => {
     const s = memory(JSON.stringify(rich));
     resetSave(s);
     expect(loadSave(s)).toEqual(defaultSave());
+  });
+});
+
+describe('easyParry (AP-152)', () => {
+  it('is false in the default save and in an old save without the field', () => {
+    expect(defaultSave().easyParry).toBe(false);
+    expect(loadSave(memory(JSON.stringify(v1))).easyParry).toBe(false);
+    const old: Partial<SaveGame> = { ...valid };
+    delete old.easyParry;
+    expect(loadSave(memory(JSON.stringify(old))).easyParry).toBe(false);
+  });
+  it('round-trips true', () => {
+    const s = memory();
+    expect(writeSave({ ...valid, easyParry: true }, s)).toBe(true);
+    expect(loadSave(s).easyParry).toBe(true);
+  });
+  it.each([1, 'true', null, [], {}, 0])('treats %j as false', (bad) => {
+    expect(loadSave(memory(JSON.stringify({ ...valid, easyParry: bad }))).easyParry).toBe(false);
+  });
+  it('keeps the rest of the save when the field is broken', () => {
+    const l = loadSave(memory(JSON.stringify({ ...valid, easyParry: 'x' })));
+    expect(l.gold).toBe(120);
+  });
+  it('reset turns it off again', () => {
+    const s = memory();
+    writeSave({ ...valid, easyParry: true }, s);
+    resetSave(s);
+    expect(loadSave(s).easyParry).toBe(false);
   });
 });

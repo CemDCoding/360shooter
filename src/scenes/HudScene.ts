@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 import { getLevel } from '../config/levels';
 import { OPACITY, THEME, themeColor, type ColorName } from '../config/theme';
-import { GameEvents, type GameEventPayloads, type SafeInsets } from '../contracts';
+import { EASY_PARRY_KEY, GameEvents, type GameEventPayloads, type SafeInsets } from '../contracts';
 import { addMuteButton } from '../platform/audio';
 import { hudScale } from '../platform/layout';
 import { prefersReducedMotion } from '../platform/motion';
+import { loadSave, writeSave } from '../platform/storage';
 import { parseDebugFps } from './debug';
 import type { HudInitData } from './GameScene';
 import { ArmourIndicator } from './hud/ArmourIndicator';
@@ -38,7 +39,7 @@ import {
   PIXEL_LOCK,
   type Rect,
 } from './hud/hudMath';
-import { pauseLayout } from './hud/pauseLayout';
+import { nextPauseFocus, pauseLayout, pauseMenuKey } from './hud/pauseLayout';
 import { chipRowRight, PetBar, petBarRect } from './hud/PetBar';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
@@ -60,6 +61,13 @@ const HUD_NUMBER_SCALE = 3;
 const PAUSE_DEPTH = 100;
 /** Funk scale of the pause button labels (H-33: 2x). */
 const PAUSE_BUTTON_SCALE = 2;
+/** Switch box: frame 0 = empty, frame 1 = filled with a cut-out tick (ui-icons-m9, 8 px, drawn 2x). */
+const SWITCH_ICON_KEY = 'ui-icons-m9';
+const SWITCH_BOX_SCALE = 2;
+const SWITCH_BOX_PX = 8 * SWITCH_BOX_SCALE;
+const SWITCH_BOX_GAP = 8;
+const SWITCH_LABEL = 'EINFACHE ABWEHR';
+const SWITCH_NOTE = 'ALLE ABWEHREN: EIN TIPP';
 /** Boss bar width in arena units at k = 1 (runde.html 3: 200 px, bottom centre). */
 const BOSS_BAR_W = 200;
 const BOSS_BAR_H = 8;
@@ -132,6 +140,11 @@ export class HudScene extends Phaser.Scene {
   private pauseOverlay!: Phaser.GameObjects.Container;
   private pauseInfo!: Phaser.GameObjects.BitmapText;
   private continueButton!: FunkButton;
+  private menuButton!: FunkButton;
+  private toggleButton!: FunkButton;
+  private toggleBox!: Phaser.GameObjects.Image;
+  private easyParry = false;
+  private pauseFocus = 0;
   private abortDialog: ConfirmDialog | null = null;
   private dialogKeyGuard = false;
   private levelId = 0;
@@ -176,6 +189,9 @@ export class HudScene extends Phaser.Scene {
     this.createBossUi(width, height, k);
     this.slots = new PowerSlots(this, height, this.e.bottom, this.onSlotPressed, this.e.left);
     this.petBar = null;
+    this.easyParry = loadSave().easyParry === true;
+    this.registry.set(EASY_PARRY_KEY, this.easyParry);
+    this.pauseFocus = 0;
     this.pauseOverlay = this.createPauseOverlay(width, height, k);
 
     if (parseDebugFps(window.location.search)) {
@@ -196,6 +212,7 @@ export class HudScene extends Phaser.Scene {
     this.dialogKeyGuard = false;
     this.input.keyboard?.on('keydown-ESC', this.onPauseKey, this);
     this.input.keyboard?.on('keydown-P', this.onPauseKey, this);
+    this.input.keyboard?.on('keydown', this.onMenuKey, this);
 
     const game = this.scene.get(GAME_KEY);
     this.gameEvents = game.events;
@@ -576,6 +593,7 @@ export class HudScene extends Phaser.Scene {
     const buttonW = labels.map((l) =>
       Math.max(FUNK_MIN_BUTTON, Math.round(measureFunk(this, l, PAUSE_BUTTON_SCALE) + 24)),
     ) as [number, number];
+    const switchLabelW = measureFunk(this, SWITCH_LABEL, PAUSE_BUTTON_SCALE);
     const lay = pauseLayout({
       width,
       height,
@@ -584,7 +602,9 @@ export class HudScene extends Phaser.Scene {
       titleH: FUNK_GLYPH_H * titleScale,
       infoH: FUNK_GLYPH_H * lab,
       hintH: FUNK_GLYPH_H * lab,
+      noteH: FUNK_GLYPH_H * lab,
       buttonW,
+      switchMinW: switchLabelW + SWITCH_BOX_PX + SWITCH_BOX_GAP + 24,
     });
     const title = funkText(
       this,
@@ -606,6 +626,10 @@ export class HudScene extends Phaser.Scene {
       lab,
       'hud.text-muted',
     ).setOrigin(0.5, 0);
+    const note = funkText(this, width / 2, lay.noteY, SWITCH_NOTE, lab, 'hud.text-muted').setOrigin(
+      0.5,
+      0,
+    );
     const [r1, r2] = lay.buttons;
     this.continueButton = new FunkButton(this, r1.x + r1.w / 2, r1.y + r1.h / 2, {
       label: labels[0],
@@ -615,17 +639,86 @@ export class HudScene extends Phaser.Scene {
       height: r1.h,
       onClick: () => this.togglePause(),
     });
-    const menuButton = new FunkButton(this, r2.x + r2.w / 2, r2.y + r2.h / 2, {
+    this.menuButton = new FunkButton(this, r2.x + r2.w / 2, r2.y + r2.h / 2, {
       label: labels[1],
       textScale: PAUSE_BUTTON_SCALE,
       width: r2.w,
       height: r2.h,
       onClick: () => this.askAbort(),
     });
+    const t = lay.toggle;
+    this.toggleButton = new FunkButton(this, t.x + t.w / 2, t.y + t.h / 2, {
+      width: t.w,
+      height: t.h,
+      onClick: () => {
+        this.setPauseFocus(2);
+        this.toggleEasyParry();
+      },
+    });
+    // Box and word are centred as one block; the state is the shape of the box, not a colour.
+    const labelW = measureFunk(this, SWITCH_LABEL, PAUSE_BUTTON_SCALE);
+    const blockW = SWITCH_BOX_PX + SWITCH_BOX_GAP + labelW;
+    const left = -blockW / 2;
+    this.toggleBox = this.add
+      .image(left + SWITCH_BOX_PX / 2, 0, SWITCH_ICON_KEY, this.easyParry ? 1 : 0)
+      .setScale(SWITCH_BOX_SCALE)
+      .setTint(themeColor('hud.text').num);
+    const toggleLabel = funkText(
+      this,
+      left + SWITCH_BOX_PX + SWITCH_BOX_GAP,
+      0,
+      SWITCH_LABEL,
+      PAUSE_BUTTON_SCALE,
+      'hud.text',
+    ).setOrigin(0, 0.5);
+    this.toggleButton.add([this.toggleBox, toggleLabel]);
     return this.add
-      .container(0, 0, [dim, title, this.pauseInfo, this.continueButton, menuButton, hint])
+      .container(0, 0, [
+        dim,
+        title,
+        this.pauseInfo,
+        this.continueButton,
+        this.menuButton,
+        this.toggleButton,
+        note,
+        hint,
+      ])
       .setDepth(PAUSE_DEPTH)
       .setVisible(false);
+  }
+
+  /** Flips the switch: save, tell the round through the registry, redraw the box. The pause stays open. */
+  private toggleEasyParry(): void {
+    if (this.abortDialog) return;
+    this.easyParry = !this.easyParry;
+    this.registry.set(EASY_PARRY_KEY, this.easyParry);
+    writeSave({ ...loadSave(), easyParry: this.easyParry });
+    this.toggleBox.setFrame(this.easyParry ? 1 : 0);
+  }
+
+  private pauseButtons(): FunkButton[] {
+    return [this.continueButton, this.menuButton, this.toggleButton];
+  }
+
+  private setPauseFocus(index: number): void {
+    this.pauseFocus = index;
+    this.pauseButtons().forEach((b, i) => b.setFocused(i === index));
+  }
+
+  /** Pause menu keys: arrows and TAB move the focus, ENTER and SPACE press the focused item. */
+  private onMenuKey(ev: KeyboardEvent): void {
+    if (this.abortDialog || this.dialogKeyGuard || !this.scene.isPaused(GAME_KEY)) return;
+    const action = pauseMenuKey(ev?.key, ev?.repeat === true, ev?.shiftKey === true);
+    if (action === 'tab') ev.preventDefault?.();
+    if (action === 'next' || action === 'tab') {
+      this.setPauseFocus(nextPauseFocus(this.pauseFocus, 1));
+    } else if (action === 'prev' || action === 'tabBack') {
+      this.setPauseFocus(nextPauseFocus(this.pauseFocus, -1));
+    } else if (action === 'press') {
+      if (this.pauseFocus === 0) this.togglePause();
+      else if (this.pauseFocus === 1) this.askAbort();
+      else this.toggleEasyParry();
+    }
   }
 
   private togglePause(): void {
@@ -674,13 +767,13 @@ export class HudScene extends Phaser.Scene {
     parts.push(`${formatTime(this.timerSec)} ÜBRIG`);
     setFunk(this.pauseInfo, parts.join(' · '), 'hud.text-muted');
     this.pauseOverlay.setVisible(true);
-    this.continueButton.setFocused(true);
+    this.setPauseFocus(0);
     this.slots?.setPaused(true);
   }
 
   private onGameResumed(): void {
     this.closeAbortDialog();
-    this.continueButton.setFocused(false);
+    this.pauseButtons().forEach((b) => b.setFocused(false));
     this.pauseOverlay.setVisible(false);
     this.slots?.setPaused(false);
   }
@@ -825,6 +918,7 @@ export class HudScene extends Phaser.Scene {
   private cleanup(): void {
     this.input.keyboard?.off('keydown-ESC', this.onPauseKey, this);
     this.input.keyboard?.off('keydown-P', this.onPauseKey, this);
+    this.input.keyboard?.off('keydown', this.onMenuKey, this);
     this.abortDialog?.destroy();
     this.abortDialog = null;
     for (const t of this.blinks.values()) t.stop();
