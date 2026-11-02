@@ -332,3 +332,91 @@ describe('GuardianDog (AP-103)', () => {
     expect(dog.isInvulnerable).toBe(false);
   });
 });
+
+describe('GuardianDog quicktime anchors (AP-155)', async () => {
+  const { planCircles } = await import('../../src/logic/parry');
+  const { PARRY_RULES } = await import('../../src/config/parry');
+  const { HEAD_SPREAD_DEG, SCALE_PANS, headAngle, scaleAngle } =
+    await import('../../src/entities/bosses/dogStyle');
+
+  const diff = (a: number, b: number): number => {
+    const d = Math.abs(a - b) % 360;
+    return Math.min(d, 360 - d);
+  };
+  const reach = PARRY_RULES.circleRadiusPx + PARRY_RULES.touchSlackPx;
+  const minSep = (2 * Math.asin(reach / PARRY_RULES.distanceFromPlayerPx) * 180) / Math.PI;
+
+  interface Anchoring {
+    optInAttacks(): readonly string[];
+    parryAnchor(a: BossAttackDef, c: unknown): { angleDeg: number };
+  }
+
+  it('heads: left, middle, right of the dog direction, wide enough not to overlap', () => {
+    expect(HEAD_SPREAD_DEG).toBeGreaterThanOrEqual(minSep);
+    expect(headAngle(100, 0)).toBeCloseTo(100 - HEAD_SPREAD_DEG);
+    expect(headAngle(100, 1)).toBe(100);
+    expect(headAngle(100, 2)).toBeCloseTo(100 + HEAD_SPREAD_DEG);
+    expect(headAngle(10, 0)).toBeGreaterThanOrEqual(0);
+    expect(headAngle(350, 2)).toBeLessThan(360);
+    expect(headAngle(0, 9)).toBe(headAngle(0, 2));
+    expect(headAngle(0, Number.NaN)).toBe(headAngle(0, 0));
+  });
+
+  it('scale: heart pan left, feather pan right, four pans keep their distance', () => {
+    for (const round of [1, 2]) {
+      const heart = scaleAngle('heart', round, 0) as number;
+      const feather = scaleAngle('feather', round, 0) as number;
+      expect(Math.cos((heart * Math.PI) / 180)).toBeLessThan(0);
+      expect(Math.cos((feather * Math.PI) / 180)).toBeGreaterThan(0);
+    }
+    const all = SCALE_PANS.flatMap((p) => [p.heart, p.feather]);
+    for (let i = 0; i < all.length; i++)
+      for (let j = i + 1; j < all.length; j++)
+        expect(diff(all[i], all[j])).toBeGreaterThanOrEqual(minSep);
+    expect(scaleAngle('tap', 1, 0)).toBeNull();
+    expect(scaleAngle(undefined, undefined, 0)).toBeNull();
+    // Easy parry: plain feather taps without a round number, the order picks the round.
+    expect(scaleAngle('feather', undefined, 1)).toBe(SCALE_PANS[1].feather);
+  });
+
+  it('heartScale is an optIn attack the dog unlocks', () => {
+    const { dog } = makeDog();
+    expect((dog as unknown as Anchoring).optInAttacks()).toEqual(['heartScale']);
+  });
+
+  it('planned heartScale circles land on their pans, apart from each other', () => {
+    const a = attack('heartScale');
+    const circles = planCircles(a, a.telegraphMs, { next: () => 0.37 });
+    const { dog } = makeDog();
+    const anchored = circles.map((c) => ({
+      c,
+      deg: (dog as unknown as Anchoring).parryAnchor(a, c).angleDeg,
+    }));
+    expect(anchored).toHaveLength(4);
+    for (const { c, deg } of anchored) {
+      expect(deg).toBe(SCALE_PANS[(c.group ?? 1) - 1][c.symbol as 'heart' | 'feather']);
+      if (c.correct) expect(c.symbol).toBe('feather');
+    }
+    for (let i = 0; i < anchored.length; i++)
+      for (let j = i + 1; j < anchored.length; j++)
+        expect(diff(anchored[i].deg, anchored[j].deg)).toBeGreaterThanOrEqual(minSep);
+  });
+
+  it('guardBark circles sit at the three heads in beat order', () => {
+    const { dog } = makeDog();
+    const a = attack('guardBark');
+    const circles = planCircles(a, a.telegraphMs, { next: () => 0.5 });
+    expect(circles).toHaveLength(3);
+    // Dog on the rim right of the player: direction 0 degrees.
+    const degs = circles.map((c) => (dog as unknown as Anchoring).parryAnchor(a, c).angleDeg);
+    expect(degs).toEqual([headAngle(0, 0), headAngle(0, 1), headAngle(0, 2)]);
+  });
+
+  it('heartScale announces and hits like the bark wave (damage reaches the player)', () => {
+    const { dog } = makeDog();
+    dog.onTelegraph(attack('heartScale'));
+    dog.onAttack('heartScale', 15);
+    expect(dog.getHazards().length).toBeGreaterThan(0);
+    expect(runFor(dog, 12_000)).toBeGreaterThan(0);
+  });
+});
