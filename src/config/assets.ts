@@ -150,6 +150,12 @@ const OWN_ASSETS: readonly AssetDef[] = [
   sprite('diamond', 8, 8, 4, 'Diamant (Waehrung).'),
   sprite('diamond-marker', 8, 8, 2, 'Diamant-Marker in der Karte.'),
   sprite('ui-icons-m8', 8, 8, 2, 'Oberflaechen-Symbole M8.'),
+  sprite('parry-symbols', 14, 14, 21, 'Quicktime-Symbole (einfarbig, wird getoent).'),
+  sprite('parry-decoy-edge', 44, 44, 2, 'Quicktime: Rand der Taeuschungs-Kreise.'),
+  sprite('parry-motifs', 16, 16, 10, 'Quicktime: Motivbilder der Maerchen (farbig).'),
+  sprite('parry-riddle', 24, 24, 3, 'Quicktime: Raetsel-Symbole.'),
+  sprite('parry-scale', 32, 24, 3, 'Quicktime: Waage.'),
+  sprite('ui-icons-m9', 8, 8, 3, 'Oberflaechen-Symbole M9.'),
   font(
     'astro-kapsel',
     'Bitmap-Schrift "Astro Kapsel": dicke Schrift fuer Titel, Menue und grosse Zahlen.',
@@ -167,6 +173,8 @@ const OWN_ASSETS: readonly AssetDef[] = [
   sound('boss-warning', 'Warnung kurz bevor der Boss erscheint.'),
   sound('boss-defeated', 'Boss wird besiegt.'),
   sound('parry', 'Boss-Angriff mit allen Quicktime-Kreisen abgewehrt (PARRY!).'),
+  sound('pebble', 'Quicktime: Kieselvorschau.'),
+  sound('beat', 'Quicktime: Takt.'),
 ];
 
 /** Festes Asset-Manifest. Designer ersetzen nur die Dateien unter public/assets. */

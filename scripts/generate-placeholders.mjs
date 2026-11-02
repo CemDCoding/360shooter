@@ -29,6 +29,8 @@ const SOUNDS = {
   'sfx-boss-defeated': { f0: 800, f1: 100, dur: 0.8, wave: 'saw' },
   'sfx-shield-break': { f0: 700, f1: 150, dur: 0.3, wave: 'saw' },
   'sfx-parry': { f0: 1000, f1: 1800, dur: 0.18, wave: 'square' },
+  'sfx-pebble': { f0: 500, f1: 350, dur: 0.1, wave: 'sine' },
+  'sfx-beat': { f0: 220, f1: 200, dur: 0.08, wave: 'square' },
 };
 function makeWav(spec) {
   const rate = 44100;

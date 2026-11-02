@@ -61,6 +61,12 @@ Beispiel: `astronaut.png` hat 4 Frames mit je 32 x 32 Pixel. Die Datei ist also 
 | tiles-elf-forest.png      | 32 x 32             | 4      | 128 x 32                      | Kacheln der Map "Elfenwald"               | Vier Kachel-Varianten. Reihenfolge der Datei lassen        |
 | weapon-raygun.png         | 24 x 16             | 6      | 144 x 16                      | Die Strahlenpistole, nach rechts zeigend  | Je Ausbaustufe 2 Frames (Ruhe, Schuss): Frame 1 und 2 Stufe 1, 3 und 4 Stufe 2, 5 und 6 Stufe 3 |
 | ui-icons.png              | 16 x 16             | 4      | 64 x 16                       | Symbole der Oberfläche                    | Frame 1: Ton an. Frame 2: Ton aus. Frame 3: Pause. Frame 4: Schloss           |
+| parry-symbols.png         | 14 x 14             | 21     | 294 x 14                      | Quicktime: Symbole der Kreise (einfarbig weiss mit dunklem Rand, wird getönt) | Frame 1 bis 21: Reihenfolge der Datei lassen |
+| parry-decoy-edge.png      | 44 x 44             | 2      | 88 x 44                       | Quicktime: Rand der Täuschungs-Kreise     | Frame 1 bis 2: Reihenfolge der Datei lassen |
+| parry-motifs.png          | 16 x 16             | 10     | 160 x 16                      | Quicktime: Motivbilder der Märchen (farbig) | Frame 1 bis 10: Reihenfolge der Datei lassen |
+| parry-riddle.png          | 24 x 24             | 3      | 72 x 24                       | Quicktime: Rätsel-Symbole                 | Frame 1 bis 3: Reihenfolge der Datei lassen |
+| parry-scale.png           | 32 x 24             | 3      | 96 x 24                       | Quicktime: Waage                          | Frame 1 bis 3: Reihenfolge der Datei lassen |
+| ui-icons-m9.png           | 8 x 8               | 3      | 24 x 8                        | Symbole der Oberfläche (M9)               | Frame 1 bis 3: Reihenfolge der Datei lassen |
 | enemy-mummy.png           | 32 x 32             | 4      | 128 x 32                      | Gegner: Mumie                             | Frame 1 bis 4: Animation der Reihe nach |
 | mummy-wrap.png            | 16 x 8              | 2      | 32 x 8                        | Gegner-Schuss: Mumienbinde                | Frame 1 bis 2: Animation der Reihe nach |
 | enemy-sand-worm.png       | 24 x 24             | 4      | 96 x 24                       | Gegner: Sandwurm                          | Frame 1 bis 4: Animation der Reihe nach |

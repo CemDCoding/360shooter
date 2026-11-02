@@ -1,5 +1,5 @@
 // Baut die Ingame-Sprites aus den Pixeldaten des Designs
-// (docs/design/assets/sprites.js, sprites-world.js, sprites-desert.js und sprites-m8.js, window.PX_SPRITES)
+// (docs/design/assets/sprites.js, sprites-world.js, sprites-desert.js, sprites-m8.js und sprites-m9.js, window.PX_SPRITES)
 // nach public/assets/sprites/<key>.png (RGBA, Frames waagerecht nebeneinander).
 // Die Framegroesse und -zahl werden gegen ASSETS (src/config/assets.ts) geprueft.
 // Nur Node-Bordmittel, kein Netz. Die Ausgabe ist deterministisch (gleicher Lauf, gleiche Bytes).
@@ -14,13 +14,14 @@ import { deflateSync } from 'node:zlib';
 import { ASSETS } from '../src/config/assets.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-// Reihenfolge ist wichtig: sprites-world.js, sprites-desert.js und sprites-m8.js ergaenzen window.PX_SPRITES aus sprites.js.
+// Reihenfolge ist wichtig: sprites-world.js, sprites-desert.js, sprites-m8.js und sprites-m9.js ergaenzen window.PX_SPRITES aus sprites.js.
 // PX_TOOLKIT aus sprites-desert.js ist kein Sprite-Schluessel und wird ignoriert (gebaut werden nur Manifest-Schluessel).
 const SOURCES = [
   join(root, 'docs', 'design', 'assets', 'sprites.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-world.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-desert.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-m8.js'),
+  join(root, 'docs', 'design', 'assets', 'sprites-m9.js'),
 ];
 const OUT_DIR = join(root, 'public', 'assets', 'sprites');
 
