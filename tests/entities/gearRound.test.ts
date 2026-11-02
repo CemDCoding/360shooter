@@ -178,7 +178,7 @@ describe('enemy burn, slow, crit flash and recoil (AP-143)', () => {
     e.spawn(100, 100);
     return e;
   };
-  const burn = burnOnHit(gearModifiers(HELL))!;
+  const burn = burnOnHit(gearModifiers(HELL), 10)!;
 
   it('burns for 3 s at 5 per second, the scene takes the damage', () => {
     const e = make();

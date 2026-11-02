@@ -70,7 +70,7 @@ describe('damage path of the player (AP-143)', () => {
     const b = body(game, 'applyAreaDamage');
     expect(b.indexOf('this.contactRecoil(enemy)')).toBeGreaterThan(b.indexOf('if (dealt > 0)'));
     const r = body(game, 'contactRecoil');
-    expect(r).toContain('thornsDamage(this.gear)');
+    expect(r).toContain('thornsDamage(this.gear, this.player.stats.damage)');
     expect(r).toContain('knockbackVector(this.gear');
     expect(r).toContain('this.onEnemyKilled(enemy, x, y)');
   });
@@ -93,12 +93,13 @@ describe('laser hits (AP-143)', () => {
     expect(b).toContain('rollCrit(this.gear, this.rng)');
     expect(b).toContain("crit > 1 ? 'crit' : 'hit'");
     expect(b).toContain('this.damageEnemy(');
-    expect(b).toContain('enemy.applyBurn(this.burn)');
+    expect(b).toContain('burnOnHit(this.gear, damage)');
+    expect(b).toContain('enemy.applyBurn(burn)');
   });
 
   it('burn ticks and blasts deal damage over damageEnemy and only exist with the pieces', () => {
     const burn = body(game, 'applyBurnDamage');
-    expect(burn).toContain('if (!this.burn) return');
+    expect(burn).toContain('if (!this.hasBurn) return');
     expect(burn).toContain("this.damageEnemy(e, d, 'none')");
     const blast = body(game, 'updateBlasts');
     expect(blast).toContain('deathBlastTargets(this.gear');
@@ -136,7 +137,7 @@ describe('no leftovers after "Nochmal" or abort (AP-143)', () => {
       'this.pendingBlasts = []',
       'this.setRingMsLeft = 0',
       'this.ringShown = false',
-      'this.burn = null',
+      'this.hasBurn = false',
     ]) {
       expect(b).toContain(s);
     }

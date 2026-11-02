@@ -5,6 +5,7 @@ import { SHOP_ITEMS } from '../../src/config/shop';
 import type { SaveGame } from '../../src/contracts';
 import { buy } from '../../src/logic/shop';
 import {
+  effectText,
   countDownValue,
   focusCount,
   infoView,
@@ -167,5 +168,15 @@ describe('ShopPanel source', () => {
   });
   it('avoids reserved container field names', () => {
     expect(shopSource).not.toMatch(/private (readonly )?(w|count|next|prev|active)\b/);
+  });
+});
+
+describe('armour effect texts (AP-171)', () => {
+  it('thorns, burn and blast show the laser factor', () => {
+    expect(effectText({ kind: 'thorns', damageFactor: 1 })).toContain('1 × LASER');
+    expect(effectText({ kind: 'burn', durationMs: 3000, dpsFactor: 0.5 })).toContain('0.5 × LASER');
+    expect(effectText({ kind: 'deathBlast', radiusPx: 40, damageFactor: 1.5 })).toContain(
+      '1.5 × LASER',
+    );
   });
 });

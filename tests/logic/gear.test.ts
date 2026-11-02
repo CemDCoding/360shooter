@@ -152,7 +152,8 @@ describe('PE-169 diamond pieces', () => {
   it('body: -10 % damage taken and thorns 10', () => {
     const m = one('body', 'gear-diamond-body');
     expect(m.damageTakenMul).toBeCloseTo(0.9);
-    expect(thornsDamage(m)).toBe(10);
+    expect(thornsDamage(m, 10)).toBe(10);
+    expect(thornsDamage(m, 40)).toBe(40);
   });
   it('legs: +10 max HP and knockback away from the player', () => {
     const m = one('legs', 'gear-diamond-legs');
@@ -187,7 +188,8 @@ describe('PE-169 hell pieces', () => {
   it('body: +10 % damage and burn 3 s at 5/s', () => {
     const m = one('body', 'gear-hell-body');
     expect(m.damageMul).toBeCloseTo(1.1);
-    expect(burnOnHit(m)).toEqual({ durationMs: 3000, dps: 5 });
+    expect(burnOnHit(m, 10)).toEqual({ durationMs: 3000, dps: 5 });
+    expect(burnOnHit(m, 40)).toEqual({ durationMs: 3000, dps: 20 });
   });
   it('legs: +5 % damage and death blast (circle test)', () => {
     const m = one('legs', 'gear-hell-legs');
@@ -197,8 +199,9 @@ describe('PE-169 hell pieces', () => {
       { id: 'edge', x: 50, y: 0, radius: 10 },
       { id: 'out', x: 0, y: 60, radius: 10 },
     ];
-    const r = deathBlastTargets(m, 0, 0, targets);
+    const r = deathBlastTargets(m, 0, 0, targets, 10);
     expect(r.damage).toBe(15);
+    expect(deathBlastTargets(m, 0, 0, targets, 40).damage).toBe(60);
     expect(r.targets.map((t) => t.id)).toEqual(['in', 'edge']);
   });
   it('set: fire ring every 20 s for 3 s', () => {
@@ -248,10 +251,10 @@ describe('neutral effects without gear', () => {
     expect(rollBlock(m, rng)).toBe(false);
     expect(rollCrit(m, rng)).toBe(1);
     expect(rng.draws).toBe(0);
-    expect(thornsDamage(m)).toBe(0);
+    expect(thornsDamage(m, 10)).toBe(0);
     expect(knockbackVector(m, 0, 0, 10, 0)).toEqual({ x: 0, y: 0 });
-    expect(burnOnHit(m)).toBeNull();
-    expect(deathBlastTargets(m, 0, 0, [{ x: 0, y: 0, radius: 5 }])).toEqual({
+    expect(burnOnHit(m, 10)).toBeNull();
+    expect(deathBlastTargets(m, 0, 0, [{ x: 0, y: 0, radius: 5 }], 10)).toEqual({
       damage: 0,
       targets: [],
     });

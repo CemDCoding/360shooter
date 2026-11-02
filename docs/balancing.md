@@ -548,16 +548,16 @@ Alle Zahlen stehen nur im Code (`config/shop.ts`, `config/gear.ts`, `config/pets
 
 Verdienbar sind bis Level 40 nur 53 Diamanten, 7 fehlen zum Komplettkauf: man muss auswaehlen (PE-172, PE-173). Diamanten sind reine Spielwaehrung (PE-177).
 
-**Ruestung (PE-169):**
+**Ruestung (PE-169):** Dornen, Brand und Explosion skalieren mit dem aktuellen Laserschaden der Runde (inkl. Upgrades, ohne Doppelschuss, ohne Krit; AP-171, RS-05.5, PE-212). Bei Laserschaden 10 genau 10 / 5 / 15, bei 40 genau 40 / 20 / 60. Der Brand-Schaden pro Sekunde wird beim Anlegen des Brandes aus dem Schaden des Treffers festgelegt.
 
 | Set | Teil | Wert | Spezialeffekt |
 |---|---|---|---|
 | Diamant | Kristallhelm | +10 Leben | 10 % Block |
-| Diamant | Kristallpanzer | 10 % weniger Schaden | Dornen 10 |
+| Diamant | Kristallpanzer | 10 % weniger Schaden | Dornen 1,0 x Laserschaden (Grundwaffe 10) |
 | Diamant | Kristallstiefel | +10 Leben | Rueckstoss 24 px |
 | Hoelle | Teufelshoerner | +10 % Schaden | 10 % Krit (doppelter Schaden) |
-| Hoelle | Glutpanzer | +10 % Schaden | Brand 3 s, 5 Schaden/s |
-| Hoelle | Lavastiefel | +5 % Schaden | Explosion Radius 40 px, 15 Schaden |
+| Hoelle | Glutpanzer | +10 % Schaden | Brand 3 s, 0,5 x Laserschaden/s (Grundwaffe 5) |
+| Hoelle | Lavastiefel | +5 % Schaden | Explosion Radius 40 px, 1,5 x Laserschaden (Grundwaffe 15) |
 | Himmel | Heiligenschein | +10 % Drehtempo | doppelte Heilung |
 | Himmel | Engelsweste | +10 % Feuerrate | Schuss durchschlaegt 1 weiteres Ziel |
 | Himmel | Wolkenstiefel | +10 % Drehtempo | Magnet und Item-Dauer 1,5-fach |

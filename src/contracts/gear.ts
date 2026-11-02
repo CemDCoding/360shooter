@@ -19,11 +19,11 @@ export interface GearStats {
 /** Special effect of a single piece (tagged union over `kind`). */
 export type GearEffectDef =
   | { kind: 'blockChance'; chance: number }
-  | { kind: 'thorns'; damage: number }
+  | { kind: 'thorns'; damageFactor: number }
   | { kind: 'knockback'; px: number }
   | { kind: 'crit'; chance: number; mul: number }
-  | { kind: 'burn'; durationMs: number; dps: number }
-  | { kind: 'deathBlast'; radiusPx: number; damage: number }
+  | { kind: 'burn'; durationMs: number; dpsFactor: number }
+  | { kind: 'deathBlast'; radiusPx: number; damageFactor: number }
   | { kind: 'healBoost'; mul: number }
   | { kind: 'pierce'; extraTargets: number }
   | { kind: 'magnet'; magnetMul: number; itemLifetimeMul: number };

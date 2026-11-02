@@ -144,8 +144,9 @@ export function rollCrit(m: GearModifiers, rng: Rng): number {
 }
 
 /** Diamond body: damage to an enemy that touches the player (0 without the piece). */
-export function thornsDamage(m: GearModifiers): number {
-  return effectOf(m, 'thorns')?.damage ?? 0;
+export function thornsDamage(m: GearModifiers, laserDamage: number): number {
+  const e = effectOf(m, 'thorns');
+  return e ? e.damageFactor * sane(laserDamage) : 0;
 }
 
 /** Diamond legs: push of an enemy on contact, away from the player; zero vector without the piece. */
@@ -165,9 +166,12 @@ export function knockbackVector(
 }
 
 /** Hell body: burn applied by a laser hit, or null without the piece. */
-export function burnOnHit(m: GearModifiers): { durationMs: number; dps: number } | null {
+export function burnOnHit(
+  m: GearModifiers,
+  laserDamage: number,
+): { durationMs: number; dps: number } | null {
   const e = effectOf(m, 'burn');
-  return e ? { durationMs: e.durationMs, dps: e.dps } : null;
+  return e ? { durationMs: e.durationMs, dps: e.dpsFactor * sane(laserDamage) } : null;
 }
 
 export interface BlastTarget {
@@ -186,11 +190,12 @@ export function deathBlastTargets<T extends BlastTarget>(
   x: number,
   y: number,
   targets: readonly T[],
+  laserDamage: number,
 ): { damage: number; targets: T[] } {
   const e = effectOf(m, 'deathBlast');
   if (!e) return { damage: 0, targets: [] };
   return {
-    damage: e.damage,
+    damage: e.damageFactor * sane(laserDamage),
     targets: targets.filter((t) => circlesOverlap(x, y, e.radiusPx, t.x, t.y, sane(t.radius))),
   };
 }

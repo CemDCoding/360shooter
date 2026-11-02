@@ -49,7 +49,7 @@ describe('gear config (PE-169)', () => {
     });
     expect(byId('gear-diamond-body')).toMatchObject({
       stats: { damageTakenMul: 0.9 },
-      effect: { kind: 'thorns', damage: 10 },
+      effect: { kind: 'thorns', damageFactor: 1 },
     });
     expect(byId('gear-diamond-legs')).toMatchObject({
       stats: { maxHpAdd: 10 },
@@ -64,11 +64,11 @@ describe('gear config (PE-169)', () => {
     });
     expect(byId('gear-hell-body')).toMatchObject({
       stats: { damageMul: 1.1 },
-      effect: { kind: 'burn', durationMs: 3000, dps: 5 },
+      effect: { kind: 'burn', durationMs: 3000, dpsFactor: 0.5 },
     });
     expect(byId('gear-hell-legs')).toMatchObject({
       stats: { damageMul: 1.05 },
-      effect: { kind: 'deathBlast', radiusPx: 40, damage: 15 },
+      effect: { kind: 'deathBlast', radiusPx: 40, damageFactor: 1.5 },
     });
   });
 

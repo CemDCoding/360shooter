@@ -167,7 +167,7 @@ function effectText(e: GearEffectDef): string {
     case 'blockChance':
       return `BLOCK ${Math.round(e.chance * 100)} %`;
     case 'thorns':
-      return `DORNEN ${e.damage}`;
+      return e.damageFactor === 1 ? 'DORNEN × LASER' : `DORNEN ${e.damageFactor} × LASER`;
     case 'knockback':
       return 'RÜCKSTOSS';
     case 'crit':
