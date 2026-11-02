@@ -1,4 +1,5 @@
 import { BOSS_SPAWN_RATE_FACTOR } from '../config/bosses';
+import { MIX_LAST_LEVEL } from '../config/levels';
 import type { EnemyId, LevelDef } from '../contracts';
 
 /** Minimale RNG-Schnittstelle: Zahl in [0, 1). */
@@ -16,6 +17,15 @@ export interface SpawnRequest {
 /** Faktor auf das Spawn-Intervall am Rundenende (Start: 1,0). */
 export const MIN_INTERVAL_FACTOR = 0.6;
 
+/** Most enemies of the same type in a row in level 0 to 2 (AP-166, PE-207). */
+export const MAX_RUN = 3;
+
+/** Every available type has spawned at the latest at this spawn of the round (AP-166, PE-207). */
+export const FIRST_APPEARANCE_BY = 8;
+
+/** Tokens per bag of the variety rule: share resolution of 1 % (AP-166). */
+const BAG_TOKENS = 100;
+
 /** Radius der Eroeffnungswelle als Anteil des Spawn-Radius (Startwert, angenommen; AP-56). */
 export const OPENING_RADIUS_FACTOR = 0.65;
 
@@ -30,6 +40,16 @@ export class SpawnDirector {
   private cooldownMs: number;
   private readonly totalWeight: number;
   private readonly durationMs: number;
+  // Variety rule state (AP-166); allocated once, no per-call allocations.
+  private readonly varied: boolean;
+  private readonly active: number[] = [];
+  private readonly quota: number[] = [];
+  private readonly left: number[];
+  private readonly seen: boolean[];
+  private unseen: number;
+  private spawned = 0;
+  private lastIndex = -1;
+  private run = 0;
 
   /**
    * @param spawnRadius Ring knapp ausserhalb des Sichtfelds (Pixel vom Zentrum)
@@ -42,6 +62,19 @@ export class SpawnDirector {
     this.durationMs = level.durationSec * 1000;
     this.totalWeight = level.enemyPool.reduce((s, e) => s + Math.max(0, e.weight), 0);
     this.cooldownMs = level.spawnIntervalMs;
+    // Variety rule (AP-166, PE-207): only level 0 to 2 with at least two types. Level 3 and up draw independently as before.
+    for (let j = 0; j < level.enemyPool.length; j++) {
+      if (level.enemyPool[j].weight > 0) this.active.push(j);
+    }
+    this.varied = level.id <= MIX_LAST_LEVEL && this.active.length >= 2;
+    for (const j of this.active) {
+      this.quota.push(
+        Math.max(1, Math.round((level.enemyPool[j].weight / this.totalWeight) * BAG_TOKENS)),
+      );
+    }
+    this.left = this.quota.slice();
+    this.seen = this.active.map(() => false);
+    this.unseen = this.active.length;
   }
 
   /** Aktuelles Intervall: sinkt linear von x1,0 auf x0,6 ueber die Rundendauer. */
@@ -65,7 +98,7 @@ export class SpawnDirector {
         const start = this.rng.next() * Math.PI * 2;
         for (let i = 0; i < n; i++) {
           out.push({
-            enemyId: this.pickEnemy(),
+            enemyId: this.pickEnemy(n - i),
             angle: (start + (i * Math.PI * 2) / n) % (Math.PI * 2),
             radius: this.spawnRadius * OPENING_RADIUS_FACTOR,
           });
@@ -92,7 +125,73 @@ export class SpawnDirector {
     return out;
   }
 
-  private pickEnemy(): EnemyId {
+  /** @param openingLeft spawns of the opening wave still to place including this one (0 outside the opening). */
+  private pickEnemy(openingLeft = 0): EnemyId {
+    if (!this.varied) return this.pickWeighted();
+    let k = -1;
+    if (this.unseen > 0) {
+      // Every type shows up early: spread over the opening wave, at the latest at spawn FIRST_APPEARANCE_BY.
+      const force =
+        openingLeft > 0
+          ? this.rng.next() * openingLeft < this.unseen
+          : this.spawned >= FIRST_APPEARANCE_BY - 1;
+      if (force) {
+        let r = Math.floor(this.rng.next() * this.unseen);
+        for (let j = 0; j < this.active.length; j++) {
+          if (this.seen[j]) continue;
+          if (r-- === 0) {
+            k = j;
+            break;
+          }
+        }
+        if (this.left[k] <= 0) this.refillBag();
+        this.left[k] -= 1;
+      }
+    }
+    if (k < 0) k = this.drawFromBag();
+    if (k === this.lastIndex) this.run += 1;
+    else {
+      this.lastIndex = k;
+      this.run = 1;
+    }
+    if (!this.seen[k]) {
+      this.seen[k] = true;
+      this.unseen -= 1;
+    }
+    this.spawned += 1;
+    return this.level.enemyPool[this.active[k]].enemyId;
+  }
+
+  private refillBag(): void {
+    for (let j = 0; j < this.left.length; j++) this.left[j] += this.quota[j];
+  }
+
+  /**
+   * Draws from the "bag" (remaining tokens per type, refilled when empty): the long-run shares equal the pool shares,
+   * and a type that already came MAX_RUN times in a row is skipped. Leftover tokens are never discarded, so the
+   * shares stay unbiased.
+   */
+  private drawFromBag(): number {
+    const blocked = this.run >= MAX_RUN ? this.lastIndex : -1;
+    let sum = 0;
+    for (let j = 0; j < this.left.length; j++) if (j !== blocked) sum += this.left[j];
+    if (sum <= 0) {
+      this.refillBag();
+      for (let j = 0; j < this.left.length; j++) if (j !== blocked) sum += this.left[j];
+    }
+    let r = this.rng.next() * sum;
+    let pick = -1;
+    for (let j = 0; j < this.left.length; j++) {
+      if (j === blocked) continue;
+      pick = j;
+      r -= this.left[j];
+      if (r < 0) break;
+    }
+    this.left[pick] -= 1;
+    return pick;
+  }
+
+  private pickWeighted(): EnemyId {
     let r = this.rng.next() * this.totalWeight;
     for (const entry of this.level.enemyPool) {
       r -= Math.max(0, entry.weight);

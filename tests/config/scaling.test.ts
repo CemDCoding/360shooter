@@ -16,9 +16,14 @@ import {
 /** First level of M5 (desert): from here the enemies get stronger (PE-129, AP-105). */
 const M5_FIRST = 21;
 
-/** hp, xp/coin and contact before AP-127 (Stand AP-113), index = level id. */
+/**
+ * hp, xp/coin and contact before AP-127 (Stand AP-113), index = level id. AP-166 (PE-207) lowered hp, xp and contact of
+ * level 0 to 2 (HP_BEFORE_AP127 0.44 / 0.46 / 0.5 -> 0.36 / 0.38 / 0.42, XP 0.443 / 0.467 / 0.49 -> 0.393 / 0.415 / 0.435,
+ * contact 0.92 / 0.98 / 1.02 -> 0.89 / 0.95 / 0.99) to pay for the larger share of boar and bear; the new values are
+ * the reference here, the budget check against the old state lives in balance.test.ts.
+ */
 const HP_BEFORE_AP127 = [
-  0.44, 0.46, 0.5, 0.54, 0.6, 0.714, 0.71, 0.7, 0.7, 0.7, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81,
+  0.36, 0.38, 0.42, 0.54, 0.6, 0.714, 0.71, 0.7, 0.7, 0.7, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81, 0.81,
   0.81, 0.81, 0.81, 0.81, 0.806, 0.85, 0.917, 0.984, 1.043, 1.054, 1.122, 1.191, 1.279, 1.344,
   1.385, 1.472, 1.563, 1.663, 1.772, 1.891, 2.022, 2.147, 2.272, 2.422,
 ];
@@ -28,7 +33,7 @@ const COIN_BEFORE_AP127 = [
   1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2, 2.05, 2.1, 2.15,
 ];
 /** xp before AP-127: like coin, except level 0 to 4 (AP-113, pool mix with boar and bear). */
-const XP_BEFORE_AP127 = [0.443, 0.467, 0.49, 0.546, 0.595, ...COIN_BEFORE_AP127.slice(5)];
+const XP_BEFORE_AP127 = [0.393, 0.415, 0.435, 0.546, 0.595, ...COIN_BEFORE_AP127.slice(5)];
 
 /** Level factor before AP-127: hp without the cap bonus, xp and coin times the effective count factor. */
 const baseHp = (id: number): number => LEVEL_SCALING[id].hp / CAP_HP_BONUS[id];
@@ -77,7 +82,26 @@ describe('LEVEL_SCALING', () => {
       expect(LEVEL_SCALING[i].hp, `level ${i}`).toBeGreaterThan(LEVEL_SCALING[i - 1].hp);
     }
     expect(LEVEL_SCALING[0].hp).toBeLessThan(1);
-    expect(LEVEL_SCALING[0].hp).toBeGreaterThanOrEqual(0.4);
+    // AP-166 (PE-207): level 0 to 2 pay for the larger share of boar and bear with weaker trees, floor 15 hp after scaling.
+    expect(LEVEL_SCALING[0].hp).toBeGreaterThanOrEqual(0.3);
+    for (let i = 0; i <= 2; i++) {
+      expect(ENEMIES.cursedTree.hp * LEVEL_SCALING[i].hp, `level ${i}`).toBeGreaterThanOrEqual(15);
+    }
+  });
+
+  it('compensates the mixed pool of level 0 to 2: hp, xp and contact below the old values, coin unchanged (AP-166)', () => {
+    const OLD = [
+      { hp: 0.44, xp: 0.443 / 1.5, coin: 0.462 / 1.5, contact: 0.92 },
+      { hp: 0.46, xp: 0.467 / 1.75, coin: 0.488 / 1.75, contact: 0.98 },
+      { hp: 0.5, xp: 0.49 / 2, coin: 0.512 / 2, contact: 1.02 },
+    ];
+    OLD.forEach((o, i) => {
+      const s = LEVEL_SCALING[i];
+      expect(s.hp, `hp ${i}`).toBeLessThan(o.hp);
+      expect(s.xp, `xp ${i}`).toBeLessThan(o.xp);
+      expect(s.contact, `contact ${i}`).toBeLessThan(o.contact);
+      expect(s.coin, `coin ${i}`).toBeCloseTo(o.coin, 4);
+    });
   });
 
   it('gives whole hit points for the cursed tree in level 0 to 4', () => {
@@ -111,7 +135,7 @@ describe('LEVEL_SCALING', () => {
       expect(s.xp, `xp level ${i}`).toBeCloseTo(XP_BEFORE_AP127[i] * reward, 4);
     }
     // contact unveraendert: Level 0 bis 4 wie AP-113, ab Level 5 ab 0,77 mal Ausgleich (oben).
-    expect(LEVEL_SCALING.slice(0, 5).map((s) => s.contact)).toEqual([0.92, 0.98, 1.02, 1.14, 1.24]);
+    expect(LEVEL_SCALING.slice(0, 5).map((s) => s.contact)).toEqual([0.89, 0.95, 0.99, 1.14, 1.24]);
   });
 
   it('raises hp by wanted over possible enemies where the cap of 250 bites (AP-127, PE-152)', () => {

@@ -1,6 +1,7 @@
 // Balancing (AP-15, Level 5-20 neu in AP-23, alle Level neu eingestellt in AP-56): alle Level-Werte stehen hier, Erklaerung in docs/balancing.md.
 // Level 21-40 (M5): Kurve eingestellt in AP-105 (PE-129), Level 0-20 mit Wildschwein, Baer und Fee (PE-125).
 // M7 (AP-127, PE-152, PE-153): etwa 2,5-mal so viele Gegner, Obergrenze 250.
+// AP-166 (PE-207): Level 0 bis 2 haben einen eigenen, gemischteren Pool (POOL_OVERRIDE_LEVELS_0_2).
 import type { BatchId, BossId, EnemyPoolEntry, LevelDef } from '../contracts';
 
 export const LEVEL_COUNT = 41;
@@ -102,7 +103,7 @@ export const MAX_ENEMIES_WANTED: readonly number[] = BASE_MAX_ENEMIES.map((max, 
 const MAX_ENEMIES: readonly number[] = MAX_ENEMIES_WANTED.map((w) => Math.min(MAX_ENEMIES_CAP, w));
 
 /**
- * Spawn-Pool je Batch (F-19, PE-125). Der Pool haengt am Batch. Die alten Gewichte sind vervielfacht
+ * Spawn-Pool je Batch (F-19, PE-125). Der Pool haengt am Batch (Ausnahme Level 0 bis 2, siehe unten). Die alten Gewichte sind vervielfacht
  * (gleiche Anteile untereinander). AP-113 (PE-136, Q-56): Anteil am Pool Wald je Wildschwein und Baer 5,5 %, Wald bei
  * Nacht je 4,9 % und Fee 10,1 %, Elfenwald Fee 5,3 % (vorher 2,4 / 0,7 / 4,1 / 0,9 %). Die Gewichte mit LEVEL_SCALING
  * halten Druck, Gold und Erfahrung von Level 0 bis 20 im Band (AP-105, AP-113).
@@ -150,11 +151,31 @@ const POOL_OF_BATCH: Readonly<Record<BatchId, readonly EnemyPoolEntry[]>> = {
   ],
 };
 
+/**
+ * Last level with the mixed pool and the variety rule in `SpawnDirector` (AP-166, PE-207). Exception to "the pool hangs
+ * at the batch" (PE-125): levels 0 to 2 use `POOL_OVERRIDE_LEVELS_0_2`, levels 3 and 4 keep the batch pool of `forest`.
+ */
+export const MIX_LAST_LEVEL = 2;
+
+/**
+ * Pool of level 0 to 2 (AP-166, PE-207, user feedback "too boring, mix the available enemies more"): only 3 enemy types
+ * are unlocked there, the tree made up 89 % of the pool. Now tree 56 %, boar 22 %, bear 22 % (the tree stays the most
+ * frequent). The harder boar and bear are paid for by `hp`, `xp` and `contact` of LEVEL_SCALING level 0 to 2, so hp, gold
+ * and xp per level stay within 4 % (docs/balancing.md, "Mischung der Gegner in Level 0 bis 2").
+ */
+export const POOL_OVERRIDE_LEVELS_0_2: readonly EnemyPoolEntry[] = [
+  { enemyId: 'cursedTree', weight: 112 },
+  { enemyId: 'boar', weight: 44 },
+  { enemyId: 'bear', weight: 44 },
+];
+
 export const LEVELS: readonly LevelDef[] = Array.from({ length: LEVEL_COUNT }, (_, id) => ({
   id,
   batch: batchOf(id),
   durationSec: SHORT_LEVELS.includes(id) ? 180 : 300,
-  enemyPool: POOL_OF_BATCH[batchOf(id)].map((e) => ({ ...e })),
+  enemyPool: (id <= MIX_LAST_LEVEL ? POOL_OVERRIDE_LEVELS_0_2 : POOL_OF_BATCH[batchOf(id)]).map(
+    (e) => ({ ...e }),
+  ),
   spawnIntervalMs: SPAWN_INTERVAL_MS[id],
   maxEnemies: MAX_ENEMIES[id],
   bossId: BOSS_OF_BATCH[batchOf(id)],

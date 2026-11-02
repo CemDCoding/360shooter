@@ -5,6 +5,10 @@
 // AP-105: hp in Level 0 bis 4 um einen Baum-Lebenspunkt gesenkt, das gleicht Wildschwein und Baer aus (PE-125).
 // AP-113 (PE-136): Wildschwein, Baer und Fee erscheinen deutlich haeufiger; hp, xp und coin sind neu eingestellt, contact
 // ist wegen des Einmaltreffers (AP-112) doppelt so hoch (CONTACT_COMPENSATION).
+// AP-166 (PE-207): Level 0 bis 2 haben mehr Wildschwein und Baer (Pool 56 / 22 / 22 %, levels.ts). hp, xp und contact
+// dieser drei Level sind gesenkt (Baum 18 / 21 / 24 statt 22 / 25 / 29 Lebenspunkte, xp mal 0,888, contact mal 0,969), coin
+// bleibt (alle drei Typen geben 1 Muenze): mittlere wirksame HP, Kontaktschaden, Gold und Erfahrung je Spawn bleiben
+// innerhalb 4 % (docs/balancing.md).
 // Level 5 bis 20 (AP-95): etwa 1,3-mal so viele Gegner, hp und contact 0,77, xp und coin = alte durch neue Gegnerzahl.
 // Level 21 bis 40 (AP-105, PE-129): die Gegner selbst werden staerker (hp ueber 0,77 hinaus).
 // M7 (AP-127, PE-152, PE-163): etwa 2,5-mal so viele Gegner (ENEMY_COUNT_FACTOR in levels.ts). `hp` und `contact` je Gegner
@@ -34,9 +38,9 @@ export const CONTACT_COMPENSATION = 2;
  * und Baer 7), `contact` ist die alte Skala mal `CONTACT_COMPENSATION`.
  */
 const DENSE: readonly LevelScaling[] = [
-  { hp: 0.44, xp: 0.443, coin: 0.462, contact: 0.92 },
-  { hp: 0.46, xp: 0.467, coin: 0.488, contact: 0.98 },
-  { hp: 0.5, xp: 0.49, coin: 0.512, contact: 1.02 },
+  { hp: 0.36, xp: 0.393, coin: 0.462, contact: 0.89 },
+  { hp: 0.38, xp: 0.415, coin: 0.488, contact: 0.95 },
+  { hp: 0.42, xp: 0.435, coin: 0.512, contact: 0.99 },
   { hp: 0.54, xp: 0.546, coin: 0.57, contact: 1.14 },
   { hp: 0.6, xp: 0.595, coin: 0.621, contact: 1.24 },
 ];

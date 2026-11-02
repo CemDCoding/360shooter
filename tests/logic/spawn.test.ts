@@ -3,6 +3,8 @@ import { ENEMIES, LEVEL_SCALING, getLevel } from '../../src/config';
 import { EnemyPool } from '../../src/entities/enemies/createEnemy';
 import type { EnemyId, LevelDef } from '../../src/contracts';
 import {
+  FIRST_APPEARANCE_BY,
+  MAX_RUN,
   OPENING_RADIUS_FACTOR,
   SpawnDirector,
   openingCount,
@@ -58,13 +60,15 @@ function run(level: LevelDef, seconds: number, alive = 0, seed = 1): SpawnReques
 }
 
 describe('SpawnDirector', () => {
-  it('level 0 spawns only the forest pool, mostly trees (AP-97: boar and bear added)', () => {
+  it('level 0 spawns only the forest pool, the tree is the most frequent type (AP-97, AP-166: mixed pool 56 / 22 / 22)', () => {
     const spawns = run(lvl(0), 180);
     expect(spawns.length).toBeGreaterThan(50);
     const allowed = new Set<EnemyId>(['cursedTree', 'boar', 'bear']);
     expect(spawns.every((s) => allowed.has(s.enemyId))).toBe(true);
-    const trees = spawns.filter((s) => s.enemyId === 'cursedTree').length;
-    expect(trees / spawns.length).toBeGreaterThan(0.6);
+    const count = (id: EnemyId): number => spawns.filter((s) => s.enemyId === id).length;
+    expect(count('cursedTree')).toBeGreaterThan(count('boar'));
+    expect(count('cursedTree')).toBeGreaterThan(count('bear'));
+    expect(count('cursedTree') / spawns.length).toBeGreaterThan(0.45);
   });
 
   it('level 12 spawns all enemy types of its pool', () => {
@@ -246,6 +250,7 @@ describe('EnemyPool.spawn hit point scaling (AP-90, AP-91)', () => {
       const hp = pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[id]).hp;
       expect(hp, `level ${id}`).toBeGreaterThan(prev);
       expect(hp, `level ${id}`).toBeLessThan(ENEMIES.cursedTree.hp);
+      expect(hp, `level ${id}`).toBeGreaterThanOrEqual(15); // AP-166: floor of the tree hp after scaling
       prev = hp;
     }
     // Ab Level 5 (AP-95) ebenfalls skaliert, gerundet mit Minimum 1.
@@ -254,5 +259,109 @@ describe('EnemyPool.spawn hit point scaling (AP-90, AP-91)', () => {
       expect(pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[id]).hp, `level ${id}`).toBe(expected);
     }
     expect(pool().spawn('cursedTree', 0, 0, LEVEL_SCALING[5]).hp).toBeGreaterThan(prev);
+  });
+});
+
+describe('SpawnDirector: variety in level 0 to 2 (AP-166, PE-207)', () => {
+  const SEEDS = Array.from({ length: 20 }, (_, i) => i + 1);
+  const types = (level: LevelDef): number => new Set(level.enemyPool.map((e) => e.enemyId)).size;
+  const longestRun = (spawns: SpawnRequest[]): number => {
+    let best = 0;
+    let cur = 0;
+    let prev: EnemyId | null = null;
+    for (const s of spawns) {
+      cur = s.enemyId === prev ? cur + 1 : 1;
+      prev = s.enemyId;
+      best = Math.max(best, cur);
+    }
+    return best;
+  };
+
+  it('shows every available type in the first 30 s and never more than 3 of a type in a row', () => {
+    for (const id of [0, 1, 2]) {
+      const level = lvl(id);
+      for (const seed of SEEDS) {
+        const spawns = run(level, 30, 0, seed);
+        expect(
+          new Set(spawns.map((s) => s.enemyId)).size,
+          `level ${id} seed ${seed}`,
+        ).toBeGreaterThanOrEqual(types(level));
+        expect(longestRun(spawns), `level ${id} seed ${seed}`).toBeLessThanOrEqual(MAX_RUN);
+      }
+    }
+  });
+
+  it('puts every type into the opening wave when it is large enough', () => {
+    for (const id of [0, 1, 2]) {
+      const level = lvl(id);
+      expect(openingCount(level)).toBeGreaterThanOrEqual(types(level));
+      for (const seed of SEEDS) {
+        const d = new SpawnDirector(level, testRng(seed), 600);
+        const opening = d.tick(1, 0).slice(0, openingCount(level));
+        expect(new Set(opening.map((s) => s.enemyId)).size, `level ${id} seed ${seed}`).toBe(
+          types(level),
+        );
+      }
+    }
+  });
+
+  it('spawns a type that has not come yet at the latest as the 8th spawn, even with a one-enemy opening wave', () => {
+    const level = lvl(1);
+    for (const seed of SEEDS) {
+      // Only one free slot at the start: the opening wave is cut to 1 spawn, the rest comes from the timer.
+      const d = new SpawnDirector(level, testRng(seed), 600);
+      const out: SpawnRequest[] = [...d.tick(1, level.maxEnemies - 1)];
+      for (let t = 0; out.length < FIRST_APPEARANCE_BY && t < 60_000; t += 100) {
+        out.push(...d.tick(100, 0));
+      }
+      const firstEight = out.slice(0, FIRST_APPEARANCE_BY).map((s) => s.enemyId);
+      expect(new Set(firstEight).size, `seed ${seed}`).toBe(types(level));
+    }
+  });
+
+  it('keeps the long-run shares within 2 percentage points of the pool weights (5000 draws per level)', () => {
+    for (const id of [0, 1, 2]) {
+      const level = lvl(id);
+      const total = level.enemyPool.reduce((s, e) => s + e.weight, 0);
+      const counts = new Map<EnemyId, number>();
+      const d = new SpawnDirector(level, testRng(99), 600);
+      let n = 0;
+      while (n < 5000) {
+        for (const s of d.tick(100, 0)) {
+          counts.set(s.enemyId, (counts.get(s.enemyId) ?? 0) + 1);
+          n += 1;
+        }
+      }
+      for (const e of level.enemyPool) {
+        const share = (counts.get(e.enemyId) ?? 0) / n;
+        expect(Math.abs(share - e.weight / total), `${e.enemyId} level ${id}`).toBeLessThanOrEqual(
+          0.02,
+        );
+        expect(share, `${e.enemyId} level ${id}`).toBeGreaterThanOrEqual(0.1);
+      }
+    }
+  });
+
+  it('leaves level 3 and up on independent weighted draws (long runs still occur, no extra random numbers)', () => {
+    expect(longestRun(run(lvl(3), 300, 0, 5))).toBeGreaterThan(MAX_RUN);
+    let calls = 0;
+    const d = new SpawnDirector(
+      lvl(3),
+      {
+        next: () => {
+          calls += 1;
+          return 0.5;
+        },
+      },
+      600,
+    );
+    d.tick(1, 0);
+    expect(calls).toBe(1 + openingCount(lvl(3)));
+  });
+
+  it('keeps the SpawnRequest shape and the tick signature', () => {
+    const d = new SpawnDirector(lvl(0), testRng(3), 600);
+    const [first] = d.tick(100, 0, false);
+    expect(Object.keys(first).sort()).toEqual(['angle', 'enemyId', 'radius']);
   });
 });
