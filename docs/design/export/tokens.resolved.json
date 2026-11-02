@@ -202,7 +202,14 @@
         "parry-beat": "#a8d86b",
         "pet-aura": "#ffd98a",
         "gear-block": "#9fe6ff",
-        "crit": "#ffe2a0"
+        "crit": "#ffe2a0",
+        "focus-dim": "#0b0610",
+        "parry-keyline": "#0b0610",
+        "event-marker": "#ff8a7b",
+        "event-marker-edge": "#0b0610",
+        "event-pip": "#ff8a7b",
+        "elite-edge": "#e8fbff",
+        "elite-crown": "#e8fbff"
       },
       "finisher": {
         "ink": "#0b0610",
@@ -309,7 +316,19 @@
       "finisher-title-scale": 4,
       "finisher-name-scale": 3,
       "finisher-skip-inset": "8px",
-      "finisher-shard": "4px"
+      "finisher-shard": "4px",
+      "focus-near": "110px",
+      "parry-keyline": "1px",
+      "event-inset": "6px",
+      "event-wedge": "24px",
+      "event-arrow": "20px",
+      "event-dot": "2px",
+      "event-word-gap": "4px",
+      "event-pip": "4px",
+      "event-slide": "4px",
+      "elite-scale": 1.25,
+      "elite-edge": "1px",
+      "elite-crown-gap": "2px"
     },
     "motion": {
       "duration": {
@@ -337,7 +356,12 @@
         "finisher-title": "200ms",
         "finisher-shatter": "600ms",
         "finisher-frame": "100ms",
-        "finisher-skip": "400ms"
+        "finisher-skip": "400ms",
+        "focus-in": "120ms",
+        "focus-out": "120ms",
+        "focus-hold": "600ms",
+        "event-slide": "150ms",
+        "event-tone": "250ms"
       },
       "banner-blinks": 3,
       "easing": {
@@ -350,7 +374,11 @@
       "ghost": 0.6,
       "hover": 0.18,
       "blink": 0.55,
-      "aura": 0.25
+      "aura": 0.25,
+      "focus-dim": 0.35,
+      "focus-low-near": 0.4,
+      "focus-low-far": 0.7,
+      "focus-low-reduced": 0.25
     }
   }
 }

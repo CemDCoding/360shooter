@@ -175,6 +175,13 @@
   --color-game-pet-aura: #ffd98a;
   --color-game-gear-block: var(--color-ice-300);
   --color-game-crit: var(--color-gold-200);
+  --color-game-focus-dim: var(--color-ink-950);
+  --color-game-parry-keyline: var(--color-ink-950);
+  --color-game-event-marker: var(--color-red-300);
+  --color-game-event-marker-edge: var(--color-ink-950);
+  --color-game-event-pip: var(--color-red-300);
+  --color-game-elite-edge: var(--color-ice-100);
+  --color-game-elite-crown: var(--color-ice-100);
   --color-finisher-ink: var(--color-ink-950);
   --color-finisher-paper: #ffffff;
   --color-finisher-letterbox: var(--color-ink-950);
@@ -261,6 +268,18 @@
   --size-finisher-name-scale: 3;
   --size-finisher-skip-inset: 8px;
   --size-finisher-shard: 4px;
+  --size-focus-near: 110px;
+  --size-parry-keyline: 1px;
+  --size-event-inset: 6px;
+  --size-event-wedge: 24px;
+  --size-event-arrow: 20px;
+  --size-event-dot: 2px;
+  --size-event-word-gap: 4px;
+  --size-event-pip: 4px;
+  --size-event-slide: 4px;
+  --size-elite-scale: 1.25;
+  --size-elite-edge: 1px;
+  --size-elite-crown-gap: 2px;
   --motion-duration-fast: 80ms;
   --motion-duration-base: 150ms;
   --motion-duration-slow: 300ms;
@@ -286,6 +305,11 @@
   --motion-duration-finisher-shatter: 600ms;
   --motion-duration-finisher-frame: 100ms;
   --motion-duration-finisher-skip: 400ms;
+  --motion-duration-focus-in: 120ms;
+  --motion-duration-focus-out: 120ms;
+  --motion-duration-focus-hold: 600ms;
+  --motion-duration-event-slide: 150ms;
+  --motion-duration-event-tone: 250ms;
   --motion-banner-blinks: 3;
   --motion-easing-pixel: steps(3);
   --motion-easing-out: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -294,4 +318,8 @@
   --opacity-hover: 0.18;
   --opacity-blink: 0.55;
   --opacity-aura: 0.25;
+  --opacity-focus-dim: 0.35;
+  --opacity-focus-low-near: 0.4;
+  --opacity-focus-low-far: 0.7;
+  --opacity-focus-low-reduced: 0.25;
 }

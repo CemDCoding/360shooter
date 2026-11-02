@@ -203,7 +203,14 @@ export const tokens = {
       "parry-beat": "var(--color-game-parry-beat)",
       "pet-aura": "var(--color-game-pet-aura)",
       "gear-block": "var(--color-game-gear-block)",
-      "crit": "var(--color-game-crit)"
+      "crit": "var(--color-game-crit)",
+      "focus-dim": "var(--color-game-focus-dim)",
+      "parry-keyline": "var(--color-game-parry-keyline)",
+      "event-marker": "var(--color-game-event-marker)",
+      "event-marker-edge": "var(--color-game-event-marker-edge)",
+      "event-pip": "var(--color-game-event-pip)",
+      "elite-edge": "var(--color-game-elite-edge)",
+      "elite-crown": "var(--color-game-elite-crown)"
     },
     "finisher": {
       "ink": "var(--color-finisher-ink)",
@@ -306,7 +313,19 @@ export const tokens = {
     "finisher-title-scale": "var(--size-finisher-title-scale)",
     "finisher-name-scale": "var(--size-finisher-name-scale)",
     "finisher-skip-inset": "var(--size-finisher-skip-inset)",
-    "finisher-shard": "var(--size-finisher-shard)"
+    "finisher-shard": "var(--size-finisher-shard)",
+    "focus-near": "var(--size-focus-near)",
+    "parry-keyline": "var(--size-parry-keyline)",
+    "event-inset": "var(--size-event-inset)",
+    "event-wedge": "var(--size-event-wedge)",
+    "event-arrow": "var(--size-event-arrow)",
+    "event-dot": "var(--size-event-dot)",
+    "event-word-gap": "var(--size-event-word-gap)",
+    "event-pip": "var(--size-event-pip)",
+    "event-slide": "var(--size-event-slide)",
+    "elite-scale": "var(--size-elite-scale)",
+    "elite-edge": "var(--size-elite-edge)",
+    "elite-crown-gap": "var(--size-elite-crown-gap)"
   },
   "motion": {
     "duration": {
@@ -334,7 +353,12 @@ export const tokens = {
       "finisher-title": "var(--motion-duration-finisher-title)",
       "finisher-shatter": "var(--motion-duration-finisher-shatter)",
       "finisher-frame": "var(--motion-duration-finisher-frame)",
-      "finisher-skip": "var(--motion-duration-finisher-skip)"
+      "finisher-skip": "var(--motion-duration-finisher-skip)",
+      "focus-in": "var(--motion-duration-focus-in)",
+      "focus-out": "var(--motion-duration-focus-out)",
+      "focus-hold": "var(--motion-duration-focus-hold)",
+      "event-slide": "var(--motion-duration-event-slide)",
+      "event-tone": "var(--motion-duration-event-tone)"
     },
     "banner-blinks": "var(--motion-banner-blinks)",
     "easing": {
@@ -347,7 +371,11 @@ export const tokens = {
     "ghost": "var(--opacity-ghost)",
     "hover": "var(--opacity-hover)",
     "blink": "var(--opacity-blink)",
-    "aura": "var(--opacity-aura)"
+    "aura": "var(--opacity-aura)",
+    "focus-dim": "var(--opacity-focus-dim)",
+    "focus-low-near": "var(--opacity-focus-low-near)",
+    "focus-low-far": "var(--opacity-focus-low-far)",
+    "focus-low-reduced": "var(--opacity-focus-low-reduced)"
   }
 } as const;
 
