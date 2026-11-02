@@ -67,6 +67,16 @@ Beispiel: `astronaut.png` hat 4 Frames mit je 32 x 32 Pixel. Die Datei ist also 
 | parry-riddle.png          | 24 x 24             | 3      | 72 x 24                       | Quicktime: Rätsel-Symbole                 | Frame 1 bis 3: Reihenfolge der Datei lassen |
 | parry-scale.png           | 32 x 24             | 3      | 96 x 24                       | Quicktime: Waage                          | Frame 1 bis 3: Reihenfolge der Datei lassen |
 | ui-icons-m9.png           | 8 x 8               | 3      | 24 x 8                        | Symbole der Oberfläche (M9)               | Frame 1 bis 3: Reihenfolge der Datei lassen |
+| finisher-portrait.png     | 160 x 20            | 6      | 960 x 20           | Visier-Streifen der Astronautin, Bild = Boss (Finisher) | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-hit.png          | 96 x 96             | 6      | 576 x 96           | Nahaufnahme des Bosses beim Schlusstreffer (Finisher) | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-shards.png       | 4 x 4               | 18     | 72 x 4             | Splitter, 3 je Boss (Finisher)            | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-finale-4.png     | 320 x 180           | 11     | 3520 x 180         | Bildfolge Level 4 (Finisher)              | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-finale-9.png     | 320 x 180           | 11     | 3520 x 180         | Bildfolge Level 9 (Finisher)              | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-finale-20.png    | 320 x 180           | 11     | 3520 x 180         | Bildfolge Level 20 (Finisher)             | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-finale-25.png    | 320 x 180           | 11     | 3520 x 180         | Bildfolge Level 25 (Finisher)             | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-finale-30.png    | 320 x 180           | 11     | 3520 x 180         | Bildfolge Level 30 (Finisher)             | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-finale-40a.png   | 320 x 180           | 9      | 2880 x 180         | Bildfolge Level 40, Bild 0 bis 8 (Finisher) | Frames von links nach rechts, Reihenfolge der Datei lassen |
+| finisher-finale-40b.png   | 320 x 180           | 9      | 2880 x 180         | Bildfolge Level 40, Bild 9 bis 17 (Finisher) | Frames von links nach rechts, Reihenfolge der Datei lassen |
 | enemy-mummy.png           | 32 x 32             | 4      | 128 x 32                      | Gegner: Mumie                             | Frame 1 bis 4: Animation der Reihe nach |
 | mummy-wrap.png            | 16 x 8              | 2      | 32 x 8                        | Gegner-Schuss: Mumienbinde                | Frame 1 bis 2: Animation der Reihe nach |
 | enemy-sand-worm.png       | 24 x 24             | 4      | 96 x 24                       | Gegner: Sandwurm                          | Frame 1 bis 4: Animation der Reihe nach |

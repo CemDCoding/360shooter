@@ -45,6 +45,10 @@ Alle Dateien liegen in `public/assets/sounds/`. Die Namen stammen aus der Asset-
 | parry.wav         | Alle Quicktime-Kreise getroffen, der Boss-Angriff ist abgewehrt (PARRY!) | 0,1 bis 0,3 s |
 | pebble.wav        | Quicktime: Kieselvorschau (die Optik trägt die Information, der Ton nie allein) | 0,05 bis 0,2 s |
 | beat.wav          | Quicktime: Takt (die Optik trägt die Information, der Ton nie allein) | 0,05 bis 0,2 s |
+| finisher-charge.wav | Boss-Finisher: Aufladen | 0,5 bis 1 s |
+| finisher-hit.wav  | Boss-Finisher: Schlusstreffer | 0,2 bis 0,6 s |
+| finisher-signal.wav | Boss-Finisher: Signal | 0,3 bis 0,8 s |
+| finisher-dawn.wav | Boss-Finisher Level 40: ruhiger Schlusston zum Sonnenaufgang | 1 bis 2 s |
 
 Der Laser-Sound spielt sehr oft. Mach ihn deshalb besonders kurz und nicht zu laut.
 

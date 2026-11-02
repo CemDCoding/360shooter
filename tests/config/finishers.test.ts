@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { buildFinisher, isFlashSafe } from '../../src/logic/finisher';
 import { FINISHER_VARIANT_IDS, type FinisherBlock, type FinisherStep } from '../../src/contracts';
 import {
   FINISHER_FINALES,
+  FINISHER_NAMES,
   FINISHER_RULES,
   FINISHER_STAGES,
   type FinisherTemplate,
@@ -39,11 +41,11 @@ describe('finisher variants (AP-157, PE-197, PE-198)', () => {
       const prev = kinds(FINISHER_STAGES[(s - 1) as 1].steps);
       const cur = kinds(FINISHER_STAGES[s as 2].steps);
       for (const k of prev) expect(cur.has(k)).toBe(true);
-      expect(cur.size).toBeGreaterThan(prev.size);
+      if (s < 6) expect(cur.size).toBeGreaterThan(prev.size);
     }
   });
 
-  it('keeps stage durations in the band of the short form', () => {
+  it('keeps stage durations in the band of the brief H-39', () => {
     const want = { 1: 2000, 2: 2500, 3: 3000, 4: 3500, 5: 4000, 6: 4000 } as const;
     for (const s of STAGES) {
       expect(Math.abs(FINISHER_STAGES[s].totalMs - want[s])).toBeLessThanOrEqual(500);
@@ -55,37 +57,98 @@ describe('finisher variants (AP-157, PE-197, PE-198)', () => {
     for (const l of Object.keys(want).map(Number)) {
       expect(Math.abs(FINISHER_FINALES[l].totalMs - want[l])).toBeLessThanOrEqual(500);
     }
+    expect(FINISHER_FINALES[40].totalMs).toBe(10500);
     expect(FINISHER_FINALES[40].totalMs).toBeGreaterThanOrEqual(10000);
     expect(FINISHER_FINALES[40].totalMs).toBeLessThanOrEqual(12000);
   });
 
-  it('finales use the stage of their batch, a frames placeholder and the finale title', () => {
+  it('stages show the hit image of their boss and use the stage background', () => {
+    const bg = ['forest', 'night', 'elf', 'desert', 'pyramid', 'oasis'];
+    for (const s of STAGES) {
+      const steps = FINISHER_STAGES[s].steps;
+      const hit = steps.find((x) => x.block === 'frames');
+      expect(hit).toMatchObject({ texture: 'finisher-hit', frameCount: 1, firstFrame: s - 1 });
+      expect(hit?.holdsMs?.[0]).toBe(hit?.durationMs);
+      expect(steps.find((x) => x.block === 'title')?.text).toBe('BEZWUNGEN!');
+      if (s >= 3)
+        expect(steps.find((x) => x.block === 'bgColor')?.color).toBe(`finisher.bg-${bg[s - 1]}`);
+      if (s >= 4) {
+        expect(steps.find((x) => x.block === 'cutIn')).toMatchObject({
+          texture: 'finisher-portrait',
+          firstFrame: s - 1,
+        });
+      }
+    }
+    const pairs = FINISHER_STAGES[6].steps.filter((x) => x.block === 'impactFrame');
+    expect(pairs).toHaveLength(2);
+    expect(pairs[1].atMs - pairs[0].atMs).toBeGreaterThanOrEqual(400);
+    expect(pairs.every((p) => p.durationMs === 200)).toBe(true);
+  });
+
+  it('finales follow the brief: sheets, holds, name and title (AP-159)', () => {
+    const textures: Record<number, string[]> = {
+      4: ['finisher-finale-4'],
+      9: ['finisher-finale-9'],
+      20: ['finisher-finale-20'],
+      25: ['finisher-finale-25'],
+      30: ['finisher-finale-30'],
+      40: ['finisher-finale-40a', 'finisher-finale-40b'],
+    };
     const stageOf: Record<number, number> = { 4: 1, 9: 2, 20: 3, 25: 4, 30: 5, 40: 6 };
+    const sums: Record<number, number> = {
+      4: 3800,
+      9: 4600,
+      20: 4600,
+      25: 5450,
+      30: 6350,
+      40: 9300,
+    };
     for (const l of FINALE_LEVELS) {
       const f = FINISHER_FINALES[l];
       expect(f.isFinale).toBe(true);
       expect(f.stage).toBe(stageOf[l]);
       const frames = f.steps.filter((s) => s.block === 'frames');
-      expect(frames).toHaveLength(1);
-      expect(frames[0].frameCount).toBe(0);
-      expect(frames[0].texture).toMatch(/^finisher-final-[A-Za-z]+$/);
-      expect(f.steps.find((s) => s.block === 'title')?.text).toBe('ENDE!');
-      // All block kinds of the stage stay in the finale.
-      for (const k of kinds(FINISHER_STAGES[f.stage].steps))
-        expect(kinds(f.steps).has(k)).toBe(true);
+      expect(frames.map((s) => s.texture)).toEqual(textures[l]);
+      let end = 600;
+      for (const fr of frames) {
+        expect(fr.atMs).toBe(end); // no gap between sheets
+        expect(fr.holdsMs).toHaveLength(fr.frameCount ?? -1);
+        expect(fr.reducedHoldsMs).toHaveLength(fr.frameCount ?? -1);
+        expect(fr.durationMs).toBe(fr.holdsMs?.reduce((a, b) => a + b, 0));
+        end += fr.durationMs;
+      }
+      expect(end - 600).toBe(sums[l]);
+      const titles = f.steps.filter((s) => s.block === 'title');
+      expect(titles.map((t) => t.titleKind)).toEqual(['name', 'title']);
+      expect(titles[0].text).toBe(FINISHER_NAMES[l]);
+      expect(titles[1].text).toBe('BEZWUNGEN!');
+      expect(titles[0].atMs + titles[0].durationMs).toBeLessThanOrEqual(titles[1].atMs);
+      expect(f.steps.find((s) => s.block === 'cutIn')).toMatchObject({ atMs: 0, durationMs: 600 });
     }
-    expect(
-      new Set(
-        FINALE_LEVELS.map(
-          (l) => FINISHER_FINALES[l].steps.find((s) => s.block === 'frames')?.texture,
-        ),
-      ).size,
-    ).toBe(6);
+    expect(FINISHER_NAMES).toEqual({
+      4: 'WURZELBRECHER',
+      9: 'MONDSCHNITT',
+      20: 'STERNENHAMMER',
+      25: 'SONNENSPEER',
+      30: 'GRABESLICHT',
+      40: 'LETZTER STERN',
+    });
   });
 
-  it('stage 6 uses every block kind except frames', () => {
-    expect(kinds(FINISHER_STAGES[6].steps).size).toBe(14);
-    expect(kinds(FINISHER_STAGES[6].steps).has('frames')).toBe(false);
+  it('level 40 has two sheets of 9 pictures with the impact pictures 8, 9 and 13', () => {
+    const [a, b] = FINISHER_FINALES[40].steps.filter((s) => s.block === 'frames');
+    expect(a.frameCount).toBe(9);
+    expect(b.frameCount).toBe(9);
+    expect(a.atMs + a.durationMs).toBe(b.atMs);
+    const reduced = [...(a.reducedHoldsMs ?? []), ...(b.reducedHoldsMs ?? [])];
+    expect(reduced.flatMap((h, i) => (h === 0 ? [i] : []))).toEqual([8, 9, 13]);
+    expect(reduced[7]).toBe(600);
+    expect(reduced[12]).toBe(700);
+  });
+
+  it('stage 6 uses every block kind', () => {
+    expect(kinds(FINISHER_STAGES[6].steps).size).toBe(15);
+    expect(FINISHER_STAGES[6].steps.length).toBeGreaterThan(FINISHER_STAGES[5].steps.length);
   });
 });
 
@@ -114,6 +177,40 @@ describe('finisher step validity (AP-157)', () => {
         const n = flashes.filter((b) => b.atMs >= a.atMs && b.atMs < a.atMs + flashWindowMs).length;
         expect(n).toBeLessThanOrEqual(flashMaxPerWindow);
       }
+    }
+  });
+});
+
+describe('finisher plans from the brief H-39 (AP-159)', () => {
+  const levels = [0, 4, 5, 9, 10, 20, 21, 25, 26, 30, 31, 40];
+
+  it('every plan is flash-safe with and without reduceEffects', () => {
+    for (const l of levels) {
+      for (const reduceEffects of [false, true]) {
+        const plan = buildFinisher(l, { reduceEffects, seen: [] });
+        expect(isFlashSafe(plan)).toBe(true);
+      }
+    }
+  });
+
+  it('finale plans keep their bands and reduced plans stay shorter or equal in blocks', () => {
+    const want: Record<number, number> = {
+      4: 5000,
+      9: 6000,
+      20: 6000,
+      25: 7000,
+      30: 8000,
+      40: 10500,
+    };
+    for (const l of FINALE_LEVELS) {
+      const plan = buildFinisher(l, { reduceEffects: false, seen: [] });
+      expect(Math.abs(plan.totalMs - want[l])).toBeLessThanOrEqual(500);
+      const red = buildFinisher(l, { reduceEffects: true, seen: [] });
+      const names = red.steps.filter((s) => s.block === 'title').map((s) => s.titleKind);
+      expect(names).toEqual(['name', 'title']);
+      expect(red.steps.some((s) => ['impactFrame', 'flash', 'shake'].includes(s.block))).toBe(
+        false,
+      );
     }
   });
 });

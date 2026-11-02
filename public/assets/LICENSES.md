@@ -94,6 +94,16 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sprites/parry-riddle.png             | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m9.js`, erzeugt mit `npm run sprites:build`)                     | eigene Arbeit des Projekts |
 | sprites/parry-scale.png              | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m9.js`, erzeugt mit `npm run sprites:build`)                     | eigene Arbeit des Projekts |
 | sprites/ui-icons-m9.png              | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m9.js`, erzeugt mit `npm run sprites:build`)                     | eigene Arbeit des Projekts |
+| sprites/finisher-portrait.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10.js`, erzeugt mit `npm run sprites:build`)                    | eigene Arbeit des Projekts |
+| sprites/finisher-hit.png             | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10.js`, erzeugt mit `npm run sprites:build`)                    | eigene Arbeit des Projekts |
+| sprites/finisher-shards.png          | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10.js`, erzeugt mit `npm run sprites:build`)                    | eigene Arbeit des Projekts |
+| sprites/finisher-finale-4.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10.js`, erzeugt mit `npm run sprites:build`)                    | eigene Arbeit des Projekts |
+| sprites/finisher-finale-9.png        | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10.js`, erzeugt mit `npm run sprites:build`)                    | eigene Arbeit des Projekts |
+| sprites/finisher-finale-20.png       | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10b.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
+| sprites/finisher-finale-25.png       | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10b.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
+| sprites/finisher-finale-30.png       | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10b.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
+| sprites/finisher-finale-40a.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10c.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
+| sprites/finisher-finale-40b.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10c.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
 | fonts/astro-kapsel.png, .xml         | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | fonts/astro-funk.png, .xml           | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | sounds/laser.wav                     | selbst erzeugt                                                                                                                    | selbst erzeugt             |
@@ -110,6 +120,10 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sounds/parry.wav                     | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 | sounds/pebble.wav                    | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 | sounds/beat.wav                      | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/finisher-charge.wav           | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/finisher-hit.wav              | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/finisher-signal.wav           | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/finisher-dawn.wav             | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 
 ## App-Icons (`public/icons/`)
 
