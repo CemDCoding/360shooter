@@ -43,6 +43,8 @@ Alle Dateien liegen in `public/assets/sounds/`. Die Namen stammen aus der Asset-
 | boss-warning.wav  | Warnung, kurz bevor der Boss erscheint | 0,5 bis 1 s      |
 | boss-defeated.wav | Der Boss wird besiegt                | 0,5 bis 2 s      |
 | parry.wav         | Alle Quicktime-Kreise getroffen, der Boss-Angriff ist abgewehrt (PARRY!) | 0,1 bis 0,3 s |
+| pebble.wav        | Quicktime: Kieselvorschau (die Optik trägt die Information, der Ton nie allein) | 0,05 bis 0,2 s |
+| beat.wav          | Quicktime: Takt (die Optik trägt die Information, der Ton nie allein) | 0,05 bis 0,2 s |
 
 Der Laser-Sound spielt sehr oft. Mach ihn deshalb besonders kurz und nicht zu laut.
 

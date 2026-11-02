@@ -1,4 +1,5 @@
 {
+  "assets/sounds/beat.wav": "2203be7fef2d02a71ef1cc0a6c459dec2778c928e66400c95cef5a07cdfe9f10",
   "assets/sounds/boss-defeated.wav": "3db838eec82cf47fdfc6e97a2c5231a695273d19971e444358252774b5fea985",
   "assets/sounds/boss-warning.wav": "a1a0cfce48141424e13deb3cda25f5c3bc6acc8406d7cfe697280ab7d72bfedf",
   "assets/sounds/coin.wav": "34d777adc62f7a8708cfa599a0b0db78c49cda936218d4b3386c45f11d05f988",
@@ -7,6 +8,7 @@
   "assets/sounds/item-pickup.wav": "1cabbe451d87695b6408fc026b214e493bb7d24220f5ad05a17da73bb1a8aa3e",
   "assets/sounds/laser.wav": "631e93bc8cc6bee07ecceb2e7200cffeabf0a3219c7fc59db94a2320c2e6c1a2",
   "assets/sounds/parry.wav": "20a27b1be7188b8779db438b8e0e73fd866a7c4bd72b55cacfc8d42f100f46b9",
+  "assets/sounds/pebble.wav": "026e112ed82d4ed897eb2da3826846ba07c16cbff3d4cdb26fb223e91dfca0bd",
   "assets/sounds/player-hurt.wav": "862d7b70de47167f06c66166eac7c3cff34e90c8e9b78e89948cc7e6ee9aa967",
   "assets/sounds/round-lost.wav": "c6f9a8689ece4c8ba08914a100e881adb60c62ea5e00db68e56bb28e0cf9006d",
   "assets/sounds/round-won.wav": "7f684d2f72149628c06ea5cb061b3f9082b8aa1f4a39fb2789a52f7520ff60d0",
