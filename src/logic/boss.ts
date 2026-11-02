@@ -1,4 +1,9 @@
-import { BOSSES, BOSS_DAMAGE_STEP, BOSS_EXTRA_ATTACK_INDEX, BOSS_HP_STEP } from '../config/bosses';
+import {
+  BOSSES,
+  BOSS_DAMAGE_STEP,
+  BOSS_EXTRA_ATTACK_INDEX,
+  BOSS_HP_BY_LEVEL,
+} from '../config/bosses';
 import { getLevel } from '../config/levels';
 import { THEME } from '../config/theme';
 import type { BossAttackDef, BossDef, BossId, BossVariant } from '../contracts';
@@ -36,12 +41,16 @@ export function indexInBatch(levelId: number): number {
   return levelId - 31;
 }
 
-/** HP +15 %, damage +10 % per index, tint per index, extra attack from index 2 (PE-33). */
+/**
+ * HP from the level table (AP-170, as multiplier of the boss baseHp), damage +10 % per index, tint per index,
+ * extra attack from index 2 (PE-33).
+ */
 export function variantForLevel(levelId: number): BossVariant {
   const index = indexInBatch(levelId);
+  const baseHp = bossForLevel(levelId)?.baseHp ?? BOSS_HP_BY_LEVEL[levelId];
   return {
     index,
-    hpMultiplier: 1 + BOSS_HP_STEP * index,
+    hpMultiplier: BOSS_HP_BY_LEVEL[levelId] / baseHp,
     damageMultiplier: 1 + BOSS_DAMAGE_STEP * index,
     tint: index === 0 ? NO_TINT : TINTS[(index - 1) % TINTS.length],
     extraAttack: index >= BOSS_EXTRA_ATTACK_INDEX,

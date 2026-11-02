@@ -8,6 +8,7 @@ import {
   bossHp,
   levelAttacks,
 } from '../../src/logic/balanceModel';
+import { availableAttacks, bossForLevel, variantForLevel } from '../../src/logic/boss';
 
 // AP-167 (PE-208, RS-05.1, RS-05.3): Boss-Dauer und Ankuendigungs-Anteil der Referenzspielerin (ohne Pet, Doppelschuss im
 // Mittel 1,5). Heute verletzte Baender stehen in KNOWN_OUT_OF_BAND (genau diese Level muessen ausserhalb liegen).
@@ -33,18 +34,10 @@ function expectExactly(actual: readonly number[], known: readonly Known[], what:
 
 const ids = range(0, LEVEL_COUNT - 1);
 
+// AP-170: Boss-HP nach Zielzeit und laengere Abklingzeiten, beide Listen sind leer.
 const KNOWN_OUT_OF_BAND = {
-  /**
-   * Boss-Dauer ausserhalb des Zielbands. Alle 41 Level liegen darunter (RS-05.3: Boss-HP ab Level 21 etwa mal 2,2 bis
-   * 2,4, im Wald, Nachtwald und Elfenwald zum Batch-Ende mal 1,6 bis 1,7).
-   */
-  duration: [{ levels: ids, ist: '10,4 bis 25,5 s', paket: 'AP-170' }],
-  /** Ankuendigungs-Anteil ueber 0,40: Baummonster (2 bis 4), Waldgeist (7 bis 9), Pharao (35 bis 38, 40). */
-  announce: [
-    { levels: range(2, 4), ist: '0,41 bis 0,48 (Baummonster)', paket: 'AP-170' },
-    { levels: range(7, 9), ist: '0,40 bis 0,42 (Waldgeist)', paket: 'AP-170' },
-    { levels: [35, 36, 37, 38, 40], ist: '0,40 bis 0,45 (Pharao)', paket: 'AP-170' },
-  ],
+  duration: [],
+  announce: [],
 } as const satisfies Record<string, readonly Known[]>;
 
 describe('balance boss: duration (AP-167, RS-05.3)', () => {
@@ -68,26 +61,27 @@ describe('balance boss: duration (AP-167, RS-05.3)', () => {
       return d < b.min || d > b.max;
     });
     expectExactly(out, KNOWN_OUT_OF_BAND.duration, 'duration');
-    // Pauschaleintrag: alle Level liegen unter dem Band (Ist-Grenze), nicht darueber.
-    for (const i of out)
-      expect(bossDuration(i), `level ${i}`).toBeLessThan(bossDurationBand(i).min);
   });
 
-  it('matches the table of RS-05 section 2 without double shot within 10 percent', () => {
-    // Dauer ohne Doppelschuss und ohne Pet (RS-05 Abschnitt 2).
-    const rs: [number, number][] = [
-      [21, 16],
-      [25, 22],
-      [26, 17],
-      [30, 25],
-      [31, 19],
-      [40, 38],
-    ];
-    for (const [level, want] of rs) {
-      const d = bossDuration(level, { doubleShot: false });
-      expect(d / want, `level ${level}`).toBeGreaterThan(0.9);
-      expect(d / want, `level ${level}`).toBeLessThan(1.1);
+  it('puts the duration near the middle of the band (AP-170, target time)', () => {
+    for (const i of ids) {
+      const b = bossDurationBand(i);
+      expect(bossDuration(i), `level ${i}`).toBeCloseTo((b.min + b.max) / 2, 0);
     }
+  });
+
+  it('keeps the duration without double shot below 70 s (RI-41)', () => {
+    for (const i of ids)
+      expect(bossDuration(i, { doubleShot: false }), `level ${i}`).toBeLessThan(70);
+  });
+
+  it('is longer by the double shot mean without double shot (AP-170: up to about 70 s)', () => {
+    // Die Tabelle aus RS-05 Abschnitt 2 galt fuer die alten Boss-HP; seit AP-170 gilt die Zielzeit.
+    for (const level of [0, 21, 40]) {
+      const ratio = bossDuration(level, { doubleShot: false }) / bossDuration(level);
+      expect(ratio, `level ${level}`).toBeCloseTo(1.5, 6);
+    }
+    expect(bossDuration(40, { doubleShot: false })).toBeCloseTo(67.5, 0);
   });
 
   it('is shorter with double shot and with a pet', () => {
@@ -116,6 +110,24 @@ describe('balance boss: announcements (AP-167, RS-05.3)', () => {
     for (const i of ids) {
       const t = bossDurationBand(i).min;
       for (const a of levelAttacks(i)) {
+        expect(
+          attackCount(a.cooldownMs, a.telegraphMs, t),
+          `level ${i} ${a.id}`,
+        ).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it('shows every attack including opt-in ones at the target time (AP-170)', () => {
+    for (const i of ids) {
+      const t = bossDuration(i);
+      const def = bossForLevel(i)!;
+      const attacks = availableAttacks(
+        def,
+        variantForLevel(i),
+        def.attacks.filter((a) => a.optIn).map((a) => a.id),
+      );
+      for (const a of attacks) {
         expect(
           attackCount(a.cooldownMs, a.telegraphMs, t),
           `level ${i} ${a.id}`,
