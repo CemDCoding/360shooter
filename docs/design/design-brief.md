@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen; Teil 2 folgt). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. In Arbeit: Teil 2, Bildfolgen Level 20, 25, 30, 40 (Level 40 als zwei Bögen).
+**Status:** geändert am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 2 wartet auf die Freigabe des Nutzers; Teil 1 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. Teil 2 fertig (Bildfolgen Level 20, 25, 30, 40 in `assets/sprites-m10b.js` und `sprites-m10c.js`, Level 40 als zwei Bögen) und wartet auf die Freigabe des Nutzers. Danach: Planner-Auftrag „Design übernehmen“ (AP-159 bis AP-162).
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
 **Stand H-35 (2026-11-01):** H-35 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (Übergabe H-35 für AP-136 und AP-140 bis AP-145).
 **Stand (2026-11-01):** H-33 ist vom Nutzer freigegeben (2026-11-01). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (nur Änderungen H-33: AP-132 Theme-Sync, Ausnahme `ConfirmDialog.ts` für AP-131, `approachMs` im Vertrag). Davor: (Pause-Button, Rückfrage-Dialog), dann Mockup `mockups/m7-quicktime-und-stufen.html`, Tokens, Freigabe.
@@ -640,7 +640,7 @@ Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Revi
 
 Keine neuen Schriften oder Abhängigkeiten, keine externen Requests. Design-Review für AP-151 gegen `screenshots/m9-zoom-states-a-desktop.png`, `-states-b-desktop.png` und die Szenen 1–8, für AP-152 gegen Ansicht 12, für AP-150 gegen `m9-zoom-sprites-desktop.png`. Handtest H-38 zusätzlich: Symbole bei 14 px am iPhone erkennbar (vor allem Beine 4/2/3 und Feder), Rätselbild in der Tafel erkennbar, Tafel stört den Timer nicht.
 
-### 2026-11-02 · Ergänzung H-39 „M10: Boss-Finisher“ (Teil 1 freigegeben am 2026-11-02, Teil 2 in Arbeit)
+### 2026-11-02 · Ergänzung H-39 „M10: Boss-Finisher“ (Teil 1 freigegeben am 2026-11-02, Teil 2 wartet auf Freigabe)
 
 **Auftrag:** H-39 aus dem Plan (M10, RS-04.2, RS-04.3, PE-195 bis PE-201). Gestaltet werden die Bausteine der Finisher-Sequenz (`hitstop`, `slowmo`, `zoom`, `shake`, `letterbox`, `speedlines`, `bgColor`, `impactFrame`, `flash`, `cutIn`, `panels`, `particles`, `shatter`, `title`, `frames`), die Farben `finisher.*`, der Schriftzug, der Porträt-Streifen der Astronautin, ein Treffer-Bild je Boss, die Bildfolgen der 6 Batch-Finale (Level 4, 9, 20, 25, 30, 40), der Hinweis „TIPPEN: WEITER“ und der Schalter „EFFEKTE REDUZIEREN“ im Pausemenü.
 
@@ -790,5 +790,76 @@ Hinweise:
 - Ist der Spiegel-Boss im Porträt-Streifen erkennbar?
 - Wirken die Impact Frames nicht zu grell?
 - Läuft die Bildfolge flüssig (`?fps=1`)?
+
+**Teil 2 (2026-11-02): Bildfolgen Level 20, 25, 30, 40**
+
+Gleiche Grundform wie Teil 1. Eigen sind jeweils Ort, Boss und Zerfall.
+
+| Level | Schlüssel | Bilder | Ort | Zerfall | Ende |
+|---|---|---|---|---|---|
+| 20 Riesen-Stein „STERNENHAMMER“ | `finisher-finale-20` | 11 | Elfenwald, violett mit Kristallen | Risse aus Türkis-Licht, Bersten in Steinsplitter und Kristallglut | Geröll mit glimmenden Kristallen |
+| 25 Sand-Wurm „SONNENSPEER“ | `finisher-finale-25` | 11 | Wüste bei Abendsonne. Der Wurm ist gespiegelt und schaut zur Astronautin | Risse aus Glut, der Wurm rieselt zu Sand | Sandhügel, die letzten Stacheln versinken |
+| 30 Wächter-Hund „GRABESLICHT“ | `finisher-finale-30` | 11 | Grabkammer mit Fackeln und Hieroglyphen (Ankh, Auge, Wasser, Vogel). Der Hund ist gespiegelt, beim Brüllen flammt sein Schutzzauber auf | Goldrisse, der Hund steigt als Staub auf | Nur das goldene Halsband liegt noch da |
+| 40 Pharao „LETZTER STERN“ | `finisher-finale-40a` (Bild 0–8), `finisher-finale-40b` (Bild 9–17) | 18 | Oase bei Nacht, am Ende Sonnenaufgang | Zweiter Schuss, die Maske birst, Sand im Wind | Astronautin von hinten vor der aufgehenden Sonne, die goldene Maske halb im Sand |
+
+Haltezeiten in ms, Bild 0 bis 10, Impact-Bilder fett:
+- L20: 600 · 400 · 300 · 200 · 400 · 500 · **100 · 100** · 400 · 600 · 1000. Summe 4600, mit Cut-in und Schriftzug ≈ 6 s.
+- L25: 700 · 400 · 400 · 250 · 400 · 600 · **100 · 100** · 500 · 700 · 1300. Summe 5450, gesamt ≈ 7 s.
+- L30: 800 · 500 · 400 · 250 · 500 · 700 · **100 · 100** · 600 · 900 · 1500. Summe 6350, gesamt ≈ 8 s.
+
+Level 40, Bild 0 bis 17:
+
+| Bild | Inhalt | Haltezeit |
+|---|---|---|
+| 0 | Rückblick: Baummonster, Waldgeist, Riesen-Stein in schrägen Panels | 900 |
+| 1 | Rückblick: Sand-Wurm, Wächter-Hund, daneben groß der Pharao | 900 |
+| 2 | Totale an der Oase mit Goldkugeln | 500 |
+| 3 | Strahler lädt | 300 |
+| 4 | Zielen | 300 |
+| 5 | Sprung | 200 |
+| 6 | Pharao ruft Goldkugeln | 400 |
+| 7 | Strahl 1 | 400 |
+| **8** | Impact hell (letztes Bild von Bogen a) | 100 |
+| **9** | Impact dunkel | 100 |
+| 10 | Der Pharao bäumt sich auf, Goldrisse | 700 |
+| 11 | Zweites Aufladen | 400 |
+| 12 | Strahl 2, breiter. Name „LETZTER STERN“ | 500 |
+| **13** | Impact hell 2 | 100 |
+| 14 | Die Maske birst | 500 |
+| 15 | Sand im Wind | 600 |
+| 16 | Sand, erstes Licht | 800 |
+| 17 | Sonnenaufgang, „BEZWUNGEN!“ | 1600 |
+
+- Summe 9300 ms, mit Cut-in und Schriftzug ≈ 10,5 s.
+- Die Impact-Bilder 8 und 9 und das Bild 13 liegen mehr als 1 s auseinander, die Blitzregel ist also erfüllt.
+- Bei „Effekte reduzieren“ fallen 8, 9 und 13 weg. Die Bilder 7 und 12 halten dann je 200 ms länger.
+
+**Dateien und Build (Teil 2):**
+- `assets/sprites-m10b.js` enthält Level 20, 25, 30 und die Zeichenfunktion für Level 40.
+- `assets/sprites-m10c.js` baut Level 40.
+- Grund für die Teilung: `build-sprites.mjs` gibt jeder Datei 1000 ms. Im Browser brauchen die Dateien ≈ 220 ms (m10), ≈ 260 ms (m10b) und ≈ 210 ms (m10c).
+- Ladefolge: `sprites-m10.js`, `sprites-m10b.js`, `sprites-m10c.js`, am Ende der Quellenliste.
+- Bogenbreiten: 11 Bilder = 3520 px, 9 Bilder = 2880 px. Alle Bögen liegen unter 4096 px.
+
+**Übergabe Teil 2 (ergänzt AP-159):**
+- Die drei Quellen in `scripts/build-sprites.mjs` eintragen.
+- Die Schlüssel `finisher-finale-20`, `-25`, `-30`, `-40a`, `-40b` in `src/config/assets.ts` eintragen und die Sprite-Zahl im Test anpassen.
+- In `config/finishers.ts` bekommt der `frames`-Block von Level 40 zwei Bögen nacheinander (9 + 9 Bilder). Wenn der Vertrag nur einen Bogen je Block kennt, gibt es zwei `frames`-Blöcke direkt hintereinander.
+- Haltezeiten aus den Tabellen oben, siehe auch den offenen Punkt `holdsMs`.
+- Platzhalter-Töne wie in Teil 1. Für Level 40 kommt zusätzlich ein ruhiger Schlusston zum Sonnenaufgang dazu.
+
+**Mockup-Ansichten Teil 2:**
+- 15b bis 15l, siehe `mockups/m10-boss-finisher.html`.
+- Nahansichten:
+  - `screenshots/m10-zoom-part2-desktop.png`: L20, L25, L30, vor der Hieroglyphen-Korrektur.
+  - `m10-zoom-part2b-desktop.png`: L30 und alle 18 Bilder von L40, letzter Stand.
+  - `m10-zoom-40-desktop.png`: L30 Bild 4 und L40 Bild 17 in 2×.
+- Der Gesamt-Screenshot `m10-boss-finisher-desktop.png` endet bei 12000 px. Ansichten 16 bis 19 stehen in `m10-zoom-parts-desktop.png`.
+
+**Design-Review zusätzlich:** AP-159 gegen 15b, 15d, 15f und 15h. AP-160 gegen 15c, 15e, 15g und 15i bis 15l.
+
+**Handtest H-40 zusätzlich:**
+- Rückblick-Panels in Level 40 am iPhone lesbar?
+- Wirkt der Sonnenaufgang als Abschluss des Spiels?
 
 - keine weiteren (erste Fassung vom 2026-10-25)

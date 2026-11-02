@@ -51,8 +51,8 @@
 </head>
 <body>
 <header class="doc">
-  <h1>M10 · Boss-Finisher · Ergänzung H-39 (Teil 1)</h1>
-  <p>Ernstes Anime nach jedem Boss-Sieg. Stufe 1 bis 6 je Batch, überwiegend Effekte. Die Batch-Finale (Level 4, 9, 20, 25, 30, 40) bekommen eine Bildfolge 320×180, im Spiel doppelt groß. Teil 1 enthält alle Bausteine, Porträt, Treffer-Bilder und die Bildfolgen von Level 4 und 9. Pixelquelle: <code>assets/sprites-m10.js</code>. Alle Maße in Arena-px (640×360, randlos bis 900 breit).</p>
+  <h1>M10 · Boss-Finisher · Ergänzung H-39 (Teil 1 und 2)</h1>
+  <p>Ernstes Anime nach jedem Boss-Sieg. Stufe 1 bis 6 je Batch, überwiegend Effekte. Die Batch-Finale (Level 4, 9, 20, 25, 30, 40) bekommen eine Bildfolge 320×180, im Spiel doppelt groß. Teil 1: alle Bausteine, Porträt, Treffer-Bilder, Bildfolgen Level 4 und 9 (<code>assets/sprites-m10.js</code>). Teil 2: Bildfolgen Level 20, 25, 30 (<code>sprites-m10b.js</code>) und Level 40 (<code>sprites-m10c.js</code>). Alle Maße in Arena-px (640×360, randlos bis 900 breit).</p>
   <dl>
     <dt>Farben</dt><dd>Impact Frames nur Tinte und Papier (<code>finisher.ink</code>, <code>finisher.paper</code>). Ein satter Ton je Boss (<code>finisher.bg-*</code>). Koralle gehört der Astronautin (Strahl, Name). Rot nur als kleiner Akzent.</dd>
     <dt>Schrift</dt><dd>Kapsel für „BEZWUNGEN!“ (×4) und den Namen des Schlusstreffers (×3), harter Tintenschatten. Funk nur für „TIPPEN: WEITER“.</dd>
@@ -78,6 +78,18 @@
 <section><h2>13 · FINALE LEVEL 9 · Schlusstreffer (2×): Bild 5, Name „MONDSCHNITT“</h2><div class="stage-wrap"><div class="stage" id="f9a" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
 <section><h2>14 · FINALE LEVEL 9 · Zerfaserung (2×): Bild 9</h2><div class="stage-wrap"><div class="stage" id="f9b" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
 <section><h2>15 · FINALE LEVEL 9 · Ende (2×): Bild 10</h2><div class="stage-wrap"><div class="stage" id="f9c" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+
+<section><h2>15b · FINALE LEVEL 20 · RIESEN-STEIN · <code>finisher-finale-20</code> (11 Bilder, 1×), Name „STERNENHAMMER“</h2><div class="film" id="film20"></div></section>
+<section><h2>15c · FINALE LEVEL 20 · Schlusstreffer (2×): Bild 5</h2><div class="stage-wrap"><div class="stage" id="f20a" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>15d · FINALE LEVEL 25 · SAND-WURM · <code>finisher-finale-25</code> (11 Bilder, 1×), Name „SONNENSPEER“</h2><div class="film" id="film25"></div></section>
+<section><h2>15e · FINALE LEVEL 25 · Zerfall zu Sand (2×): Bild 9</h2><div class="stage-wrap"><div class="stage" id="f25a" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>15f · FINALE LEVEL 30 · WÄCHTER-HUND · <code>finisher-finale-30</code> (11 Bilder, 1×), Name „GRABESLICHT“</h2><div class="film" id="film30"></div></section>
+<section><h2>15g · FINALE LEVEL 30 · Hund brüllt, Schutzzauber flammt auf (2×): Bild 4</h2><div class="stage-wrap"><div class="stage" id="f30a" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>15h · FINALE LEVEL 40 · PHARAO · Finale des Spiels · <code>finisher-finale-40a</code> (Bild 0–8) + <code>finisher-finale-40b</code> (Bild 9–17), 1×</h2><div class="film" id="film40"></div></section>
+<section><h2>15i · FINALE LEVEL 40 · Rückblick (2×): Bild 1</h2><div class="stage-wrap"><div class="stage" id="f40a" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>15j · FINALE LEVEL 40 · Der Pharao bäumt sich auf (2×): Bild 10</h2><div class="stage-wrap"><div class="stage" id="f40b" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>15k · FINALE LEVEL 40 · Zweiter Schuss (2×): Bild 12, Name „LETZTER STERN“</h2><div class="stage-wrap"><div class="stage" id="f40c" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
+<section><h2>15l · FINALE LEVEL 40 · Sonnenaufgang (2×): Bild 17, „BEZWUNGEN!“</h2><div class="stage-wrap"><div class="stage" id="f40d" data-component="FinisherScene.frames" data-font="funk"></div></div></section>
 
 <section><h2>16 · TREFFER-BILDER <code>finisher-hit</code> (96×96, 2×) auf dem Farbhintergrund des Bosses</h2><div class="grid2" id="hits"></div></section>
 <section><h2>17 · PORTRÄT-STREIFEN <code>finisher-portrait</code> (160×20, 2×) mit Spiegelung je Boss · Splitter <code>finisher-shards</code> (4×4, 4×)</h2><div class="grid2" id="strips"></div></section>
@@ -175,6 +187,23 @@
   set('f9b', `<div class="fill bars">${frame('finisher-finale-9', 9)}</div>`);
   set('f9c', `<div class="fill bars">${frame('finisher-finale-9', 10)}</div>${title(52)}${skip()}`);
 
+  const HOLD20 = HOLD9;
+  const HOLD25 = [700, 400, 400, 250, 400, 600, 100, 100, 500, 700, 1300];
+  const HOLD30 = [800, 500, 400, 250, 500, 700, 100, 100, 600, 900, 1500];
+  film('film20', 'finisher-finale-20', HOLD20);
+  film('film25', 'finisher-finale-25', HOLD25);
+  film('film30', 'finisher-finale-30', HOLD30);
+  set('f20a', `<div class="fill bars">${frame('finisher-finale-20', 5)}</div>${nameT('STERNENHAMMER', 52)}`);
+  set('f25a', `<div class="fill bars">${frame('finisher-finale-25', 9)}</div>`);
+  set('f30a', `<div class="fill bars">${frame('finisher-finale-30', 4)}</div>`);
+  const ACT40 = ['Rückblick 1', 'Rückblick 2 · Pharao', 'Totale Oase', 'Strahler lädt', 'Zielen', 'Sprung', 'Pharao ruft Goldkugeln', 'Strahl 1', 'Impact hell', 'Impact dunkel', 'Pharao bäumt sich auf', 'Zweites Aufladen', 'Strahl 2 + Name', 'Impact hell 2', 'Maske birst', 'Sand im Wind', 'Sand, erstes Licht', 'Sonnenaufgang · BEZWUNGEN!'];
+  const HOLD40 = [900, 900, 500, 300, 300, 200, 400, 400, 100, 100, 700, 400, 500, 100, 500, 600, 800, 1600];
+  set('film40', HOLD40.map((h, f) => `<figure>${W(f < 9 ? 'finisher-finale-40a' : 'finisher-finale-40b', 0, 0, { f: f % 9, s: 1, in: 1 })}<figcaption><b>Bild ${f}</b> (${f < 9 ? 'a' : 'b'}${f % 9}) · ${ACT40[f]} · ${h} ms${[8, 9, 13].includes(f) ? ' · <b>Impact, entfällt bei „Effekte reduzieren“</b>' : ''}</figcaption></figure>`).join(''));
+  set('f40a', `<div class="fill bars">${frame('finisher-finale-40a', 1)}</div>`);
+  set('f40b', `<div class="fill bars">${frame('finisher-finale-40b', 1)}</div>`);
+  set('f40c', `<div class="fill bars">${frame('finisher-finale-40b', 3)}</div>${nameT('LETZTER STERN', 52)}`);
+  set('f40d', `<div class="fill bars">${frame('finisher-finale-40b', 8)}</div>${title(52)}${skip()}`);
+
   set('hits', BOSS.map((b, i) => `<figure><div style="position:relative;width:224px;height:224px;background:var(${b.bg})">${W('finisher-hit', 16, 16, { f: i, s: 2 })}</div><figcaption>${i} · ${b.k.replace('boss-', '')} · ${b.bg.replace('--color-', '')}</figcaption></figure>`).join(''));
   set('strips', BOSS.map((b, i) => `<figure><div style="background:var(--color-finisher-cutin-band);box-shadow:0 -2px 0 var(--color-finisher-cutin-edge),0 2px 0 var(--color-finisher-cutin-edge);line-height:0">${W('finisher-portrait', 0, 0, { f: i, s: 2, in: 1 })}</div><figcaption>${i} · Spiegelung ${b.k.replace('boss-', '')}</figcaption></figure>`).join('')
     + `<figure><div style="display:flex;gap:6px;padding:8px;background:var(--color-finisher-bg-pyramid)">${Array.from({ length: 18 }, (_, f) => W('finisher-shards', 0, 0, { f, s: 4, in: 1 })).join('')}</div><figcaption>finisher-shards · 6 Bosse × 3</figcaption></figure>`);
@@ -209,9 +238,13 @@
 <script src="../assets/sprites-m9.js"></script>
 <script>window.__t0 = performance.now(); window.onerror = (m, s, l) => { window.__err = 1; document.getElementById('perf').textContent = 'FEHLER: ' + m + ' (Zeile ' + l + ')'; };</script>
 <script src="../assets/sprites-m10.js"></script>
+<script>window.__t1 = performance.now();</script>
+<script src="../assets/sprites-m10b.js"></script>
+<script>window.__t2 = performance.now();</script>
+<script src="../assets/sprites-m10c.js"></script>
 <script>
   (function () {
-    if (!window.__err) document.getElementById('perf').textContent = 'sprites-m10.js gebaut in ' + Math.round(performance.now() - window.__t0) + ' ms (Grenze im Build-Skript: 1000 ms).';
+    if (!window.__err) document.getElementById('perf').textContent = 'sprites-m10.js gebaut in ' + Math.round(window.__t1 - window.__t0) + ' ms, sprites-m10b.js in ' + Math.round(window.__t2 - window.__t1) + ' ms, sprites-m10c.js in ' + Math.round(performance.now() - window.__t2) + ' ms (Grenze im Build-Skript: 1000 ms je Datei).';
     const S = window.PX_SPRITES, css = getComputedStyle(document.documentElement);
     const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
     const v = (n) => css.getPropertyValue(n).trim();

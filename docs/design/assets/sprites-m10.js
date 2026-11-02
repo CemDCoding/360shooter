@@ -268,8 +268,7 @@
     return c;
   }
   // beam from x0 to the right edge at height y, flare where it hits (hx)
-  function beam(c, x0, y, hitX) {
-    const t = 6;
+  function beam(c, x0, y, hitX, t = 6) {
     c.dith(x0, y - t / 2 - 6, c.w - x0, t + 12, C.coralD, 0.5);
     c.rect(x0, y - t / 2 - 3, c.w - x0, t + 6, C.coral).rect(x0, y - t / 2, c.w - x0, t, C.white);
     c.ell(x0, y, 7, 10, C.coral).ell(x0, y, 4, 6, C.white);
@@ -473,7 +472,7 @@
   // ---------- finale builder ----------
   function finale(B) {
     const r = rng(B.seed), W = 320, H = 180, s2 = B.size * 2;
-    const boss = (f, tone, x = B.bx, y = B.by) => { const c = cv(W, H); spr(c, B.key, f, x, y, { s: 2, fn: tone ? (col) => mix(col, C.ink, tone) : null }); return c; };
+    const boss = (f, tone, x = B.bx, y = B.by) => { const c = cv(W, H); spr(c, B.key, f, x, y, { s: 2, flip: B.flip, fn: tone ? (col) => mix(col, C.ink, tone) : null }); return c; };
     const cx = B.bx + B.size, cy = B.by + B.size; // boss centre in the frame
     const F = [];
     let c;
@@ -629,4 +628,7 @@
 
   S['finisher-finale-4'] = sheet(finale(ROOT));
   S['finisher-finale-9'] = sheet(finale(GHOST));
+
+  // shared with sprites-m10b.js (delivery part 2); each file runs in its own build time slot
+  root.PX_FINISHER = { C, rng, on, mix, cv, spr, sheet, crack, crackIn, astro, radial, hlines, glow, sparks, beam, shatter, fray, finale };
 })(typeof window !== 'undefined' ? window : globalThis);
