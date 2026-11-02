@@ -424,3 +424,60 @@ describe('Pharaoh (AP-104)', () => {
     expect(boss.alpha).toBe(1);
   });
 });
+
+describe('Pharaoh quicktime anchors (AP-155)', async () => {
+  const { planCircles } = await import('../../src/logic/parry');
+  const { PARRY_RULES } = await import('../../src/config/parry');
+  const { RIDDLE_DEG, DECOY_OFFSET_DEG, riddleAngle, sandDecoyAngle } =
+    await import('../../src/entities/bosses/pharaohStyle');
+
+  const diff = (a: number, b: number): number => {
+    const d = Math.abs(a - b) % 360;
+    return Math.min(d, 360 - d);
+  };
+  const reach = PARRY_RULES.circleRadiusPx + PARRY_RULES.touchSlackPx;
+  const minSep = (2 * Math.asin(reach / PARRY_RULES.distanceFromPlayerPx) * 180) / Math.PI;
+
+  interface Anchoring {
+    parryAnchor(a: BossAttackDef, c: unknown): { angleDeg: number };
+  }
+
+  it('riddle: each leg symbol has its own place, none overlap', () => {
+    const syms = ['legs4', 'legs2', 'legs3'];
+    for (const s of syms) expect(riddleAngle(s)).toBe(RIDDLE_DEG[s]);
+    for (let i = 0; i < 3; i++)
+      for (let j = i + 1; j < 3; j++)
+        expect(diff(RIDDLE_DEG[syms[i]], RIDDLE_DEG[syms[j]])).toBeGreaterThanOrEqual(minSep);
+    expect(riddleAngle('heart')).toBeNull();
+    expect(riddleAngle(undefined)).toBeNull();
+    expect(riddleAngle('toString')).toBeNull();
+  });
+
+  it('goldCurse: planned circles land on the places of their symbols, one is right', () => {
+    const { boss } = makePharaoh();
+    const a = attack('goldCurse');
+    for (const r of [0.05, 0.5, 0.95]) {
+      const circles = planCircles(a, a.telegraphMs, { next: () => r });
+      expect(circles).toHaveLength(3);
+      expect(circles.filter((c) => c.correct).length).toBe(1);
+      for (const c of circles) {
+        expect((boss as unknown as Anchoring).parryAnchor(a, c).angleDeg).toBe(
+          RIDDLE_DEG[c.symbol as string],
+        );
+      }
+    }
+  });
+
+  it('sandstorm: the sand decoy sits beside the tap circle', () => {
+    expect(DECOY_OFFSET_DEG).toBeGreaterThanOrEqual(minSep);
+    expect(sandDecoyAngle(300)).toBe(15);
+    const { boss } = makePharaoh();
+    const a = attack('sandstorm');
+    const circles = planCircles(a, a.telegraphMs, { next: () => 0.6 });
+    const [tap, decoy] = circles.map(
+      (c) => (boss as unknown as Anchoring).parryAnchor(a, c).angleDeg,
+    );
+    expect(tap).toBe(circles[0].angleDeg);
+    expect(decoy).toBe(sandDecoyAngle(tap));
+  });
+});

@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import { BOSS_TUNING, MIN_REACTION_MS } from '../../config/bosses';
 import type { BossAttackDef } from '../../contracts';
+import type { ParryCircleState } from '../../logic/parry';
 import { prefersReducedMotion } from '../../platform/motion';
 import { BossBase, type BossContext } from './BossBase';
 import {
@@ -15,9 +16,9 @@ import {
   volleySpeed,
   type Point,
 } from './bossGeometry';
-import type { BossHazard } from './hazards';
+import type { BossHazard, ParryAnchor } from './hazards';
 import { PharaohOrb } from './PharaohOrb';
-import { HIDDEN_ALPHA, stormStyle } from './pharaohStyle';
+import { HIDDEN_ALPHA, riddleAngle, sandDecoyAngle, stormStyle } from './pharaohStyle';
 import { rimRadii } from './rim';
 import { Telegraph } from './Telegraph';
 
@@ -81,6 +82,8 @@ export class Pharaoh extends BossBase {
   private radii: { rx: number; ry: number } = { rx: 0, ry: 0 };
   private orbitAngle = 0;
   private holding = false;
+  /** Angle of the tap circle of the running sandstorm announcement (the decoy sits beside it). */
+  private sandTapDeg = 0;
   /** Spiral chosen during the announcement (warning lines), fired by onAttack. */
   private pendingCurse: { base: number; spin: number } | null = null;
   private curse: Curse | null = null;
@@ -125,6 +128,22 @@ export class Pharaoh extends BossBase {
     const out: BossHazard[] = [];
     for (const o of this.orbs ?? []) if (o.active) out.push(o.hazard());
     return out;
+  }
+
+  /**
+   * Circles sit where the brief wants them (the overlay draws symbols and the riddle picture above the
+   * astronaut): goldCurse one fixed place per leg symbol, sandstorm the sand decoy beside the tap circle.
+   */
+  protected override parryAnchor(attack: BossAttackDef, circle: ParryCircleState): ParryAnchor {
+    if (attack.id === 'goldCurse') {
+      const deg = riddleAngle(circle.symbol);
+      if (deg !== null) return { angleDeg: deg };
+    } else if (attack.id === 'sandstorm') {
+      // The tap circle comes first in the pattern; it keeps its planned angle.
+      if (circle.kind === 'decoy') return { angleDeg: sandDecoyAngle(this.sandTapDeg) };
+      this.sandTapDeg = circle.angleDeg;
+    }
+    return super.parryAnchor(attack, circle);
   }
 
   protected override onSpawn(): void {

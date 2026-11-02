@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { spawnRadiusFor } from '../../config/arena';
 import { BOSS_TUNING, MIN_REACTION_MS } from '../../config/bosses';
 import type { BossAttackDef, EnemyId } from '../../contracts';
+import type { ParryCircleState } from '../../logic/parry';
 import { BossBase, type BossContext } from './BossBase';
 import {
   edgePoint,
@@ -19,8 +20,10 @@ import {
   SPARK_COLOR,
   WARD_ALPHA,
   WARD_COLOR,
+  headAngle,
+  scaleAngle,
 } from './dogStyle';
-import type { BossHazard, LaserProbe } from './hazards';
+import type { BossHazard, LaserProbe, ParryAnchor } from './hazards';
 import { rimRadii } from './rim';
 import { Telegraph } from './Telegraph';
 
@@ -76,6 +79,8 @@ interface Wave {
  *   `maxMs` at the latest and comes back only after the attack cooldown.
  * - guardBark: a solid shock wave ring in `hud.danger` with a visible gap spreads from the dog. It is slow
  *   enough to keep MIN_REACTION_MS; a laser hit breaks an arc, so the player can open her own gap.
+ * - heartScale (optIn extra attack, M9): same shock wave as guardBark, but the quicktime is the scale riddle
+ *   (two rounds: tap the feather pan). Circle anchors: parryAnchor().
  * - summonMummies (extra attack): warning circles at the screen edge, then 3 mummies come in from the spawn ring
  *   outside the screen (BossContext.onSummon).
  * Runes, shield and wave reach the scene through getHazards() (PE-134).
@@ -143,6 +148,27 @@ export class GuardianDog extends BossBase {
     return out;
   }
 
+  /** The scale (heartScale) is unlocked in the extra levels (M9, PE-193). */
+  protected override optInAttacks(): readonly string[] {
+    return ['heartScale'];
+  }
+
+  /**
+   * Circles sit where the brief wants them (the overlay draws symbols, hint board and "z"): guardBark one circle
+   * per head, in beat order; heartScale heart pan left and feather pan right, per round.
+   */
+  protected override parryAnchor(attack: BossAttackDef, circle: ParryCircleState): ParryAnchor {
+    if (attack.id === 'guardBark') {
+      const dogDeg = (Math.atan2(this.y - this.center.y, this.x - this.center.x) * 180) / Math.PI;
+      return { angleDeg: headAngle(dogDeg, circle.index) };
+    }
+    if (attack.id === 'heartScale') {
+      const deg = scaleAngle(circle.symbol, circle.group, circle.index);
+      if (deg !== null) return { angleDeg: deg };
+    }
+    return super.parryAnchor(attack, circle);
+  }
+
   protected override onSpawn(): void {
     this.resetState();
     this.setVelocity(0, 0);
@@ -174,7 +200,7 @@ export class GuardianDog extends BossBase {
         runes: new Array<number>(SHIELD.runeCount).fill(SHIELD.runeHits),
       };
       this.invulnerable = false;
-    } else if (attack.id === 'guardBark') {
+    } else if (attack.id === 'guardBark' || attack.id === 'heartScale') {
       this.holding = true;
       this.barkGapStart = this.random() * FULL_TURN;
       this.track(
@@ -214,7 +240,7 @@ export class GuardianDog extends BossBase {
       shield.phase = 'up';
       shield.leftMs = SHIELD.maxMs;
       this.invulnerable = true;
-    } else if (attackId === 'guardBark') {
+    } else if (attackId === 'guardBark' || attackId === 'heartScale') {
       this.holding = false;
       const dist = Math.hypot(this.center.x - this.x, this.center.y - this.y);
       const reach = BOSS_TUNING.playerHitRadius;
