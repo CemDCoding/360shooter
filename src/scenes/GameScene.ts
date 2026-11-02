@@ -201,6 +201,8 @@ function armourKey(a: ActiveArmour): string {
 const NO_GEAR: EquippedGear = { head: null, body: null, legs: null };
 /** Status sink for a contact hit the gear blocked: the collected effects are dropped. */
 const NO_STATUS_TARGET = { applyStatus: (): void => undefined };
+/** Shared empty list for pet targets in rounds without a boss (no garbage per frame). */
+const NO_BOSS_PARTS: readonly BossBase[] = [];
 
 /** What the pet can target: pool enemies and boss parts (AP-164). */
 type PetTarget = Enemy | BossBase;
@@ -477,7 +479,11 @@ export class GameScene extends Phaser.Scene {
     if (!pet || !round || this.player.isDead) return;
     const targets = this.petTargets;
     targets.length = 0;
-    collectPetTargets(targets, this.enemyPool.enemies, this.bossParts());
+    collectPetTargets(
+      targets,
+      this.enemyPool.enemies,
+      this.boss ? this.bossParts() : NO_BOSS_PARTS,
+    );
     const world: PetWorld<PetTarget> = {
       player: this.player,
       enemies: targets,
