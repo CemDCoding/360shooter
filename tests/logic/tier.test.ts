@@ -42,11 +42,21 @@ describe('tierFor', () => {
     }
   });
 
-  it('adds +8 % hp and +5 % damage per stage, additive', () => {
-    const t = tierFor(4);
+  it('adds +8 % hp and +5 % damage per stage, additive (forest: +5 % hp, AP-168, PE-209)', () => {
+    const t = tierFor(9);
     expect(t.hpFactor).toBeCloseTo(1.32);
     expect(t.damageFactor).toBeCloseTo(1.2);
     expect(tierFor(20).hpFactor).toBeCloseTo(1.8);
+    expect(tierFor(40).hpFactor).toBeCloseTo(1.72);
+  });
+
+  it('uses +5 % hp per stage in the forest (level 0 to 4) and +8 % from level 5, damage unchanged', () => {
+    expect(tierFor(1).hpFactor).toBeCloseTo(1.05);
+    expect(tierFor(2).hpFactor).toBeCloseTo(1.1);
+    expect(tierFor(4).hpFactor).toBeCloseTo(1.2);
+    expect(tierFor(4).damageFactor).toBeCloseTo(1.2);
+    expect(tierFor(5).hpFactor).toBe(1);
+    expect(tierFor(6).hpFactor).toBeCloseTo(1.08);
   });
 
   it('grows the size by 3 % per stage and caps it at 1.15', () => {

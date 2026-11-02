@@ -94,6 +94,8 @@ Schwierigkeit nicht mehr stetig steigt.
 | 39 | oasis | 5 | 435 | 149 | 178 | 12095 | 5,04 | 15963 |
 | 40 | oasis | 5 | 430 | 150 | 180 | 12989 | 5,41 | 16093 |
 
+**AP-168 (PE-209):** Die Spalten Spawn-Abstand, Max. Gegner, Spawns/Min, Gegner-HP/Min, Druck und Schaden gelten fuer Level 0 bis 4 mit dem alten Gegnerzahl-Faktor (1,5 / 1,75 / 2 / 2,25 / 2,5) und fuer Level 31 bis 40 mit dem alten `hp` (`M5_HP`); die aktuellen Werte dieser Level stehen in „M7: mehr Gegner und Gegnerstufen (AP-127)“ und „Kurve geglaettet (AP-168)“.
+
 Seit AP-105 mit Wildschwein, Baer und Fee in Level 0 bis 20, Stand nach AP-113. Ab Level 21 ist der Druck gegen die Grundwaffe ohne Upgrades
 gerechnet und deshalb deutlich ueber 1: Die Wueste setzt Upgrades voraus (siehe „Level 21 bis 40“).
 
@@ -335,7 +337,7 @@ Zahlen in diesem Abschnitt: **Stand bis AP-127** (seit AP-127 2,5-mal so viele G
 - **Pools:** Die Gewichte halten die wirksamen mittleren HP der drei Batches nahe beieinander, Tanks sind selten:
   Wueste Sandwurm 10, Armadillo 2, Kamel 4, Schlange 10; Pyramiden Mumie 3, Sandwurm 14, Archaeologe 8, Sphinx 1;
   Oase Mumie 4, Schlange 14, Archaeologe 6, Sphinx 2.
-- **`hp`:** 0,806 (Level 21) bis 2,422 (Level 40), so gewaehlt, dass der Druck je Level um etwa +7,5 % steigt und an den
+- **`hp`:** 0,806 (Level 21) bis 1,344 (Level 30); **Level 31 bis 40 seit AP-168 (PE-209) fallend von 1,250 auf 1,093** (vorher bis 2,422, siehe „Kurve geglaettet (AP-168)“). Bis Level 30 so gewaehlt, dass der Druck je Level um etwa +7,5 % steigt und an den
   Batch-Grenzen 20 zu 21, 25 zu 26 und 30 zu 31 um etwa +9,5 % springt (wie 4 zu 5 und 9 zu 10, hoechstens +10 %).
 - **`contact`:** 0,77 bis 0,963, waechst wie die angenommenen Lebenspunkte der Spielerin (200 bei Stufe 10, 250 bei Stufe 15).
   Geschosse, Gift und Aura werden nicht skaliert.
@@ -361,16 +363,18 @@ mit Stufe 8 bei Level 21 und Stufe 14 bei Level 40 (Level 40: Druck mit Upgrades
 | 28 | 1,191 | 1,550 | 0,841 | 175 | 2192 | 11,8 / 0,47 | +7,6 % |
 | 29 | 1,279 | 1,600 | 0,851 | 302 | 2494 | 12,1 / 0,49 | +7,1 % |
 | 30 | 1,344 | 1,650 | 0,861 | 315 | 2809 | 12,4 / 0,52 | +7,8 % |
-| 31 | 1,385 | 1,700 | 0,871 | 200 | 3009 | 12,6 / 0,55 | +9,4 % |
-| 32 | 1,472 | 1,750 | 0,881 | 208 | 3217 | 12,9 / 0,58 | +7,4 % |
-| 33 | 1,563 | 1,800 | 0,892 | 217 | 3434 | 13,2 / 0,61 | +7,7 % |
-| 34 | 1,663 | 1,850 | 0,902 | 225 | 3659 | 13,4 / 0,64 | +7,4 % |
-| 35 | 1,772 | 1,900 | 0,912 | 233 | 3893 | 13,7 / 0,67 | +7,3 % |
-| 36 | 1,891 | 1,950 | 0,922 | 402 | 4295 | 13,9 / 0,71 | +7,6 % |
-| 37 | 2,022 | 2,000 | 0,932 | 417 | 4711 | 14,2 / 0,74 | +7,4 % |
-| 38 | 2,147 | 2,050 | 0,942 | 432 | 5143 | 14,5 / 0,78 | +7,4 % |
-| 39 | 2,272 | 2,100 | 0,952 | 448 | 5591 | 14,7 / 0,82 | +7,5 % |
-| 40 | 2,422 | 2,150 | 0,963 | 463 | 6054 | 15,0 / 0,87 | +7,4 % |
+| 31 | 1,250 | 1,700 | 0,871 | 200 | 3009 | 12,6 / 0,55 | +9,4 % |
+| 32 | 1,209 | 1,750 | 0,881 | 208 | 3217 | 12,9 / 0,58 | +7,4 % |
+| 33 | 1,186 | 1,800 | 0,892 | 217 | 3434 | 13,2 / 0,61 | +7,7 % |
+| 34 | 1,156 | 1,850 | 0,902 | 225 | 3659 | 13,4 / 0,64 | +7,4 % |
+| 35 | 1,138 | 1,900 | 0,912 | 233 | 3893 | 13,7 / 0,67 | +7,3 % |
+| 36 | 1,122 | 1,950 | 0,922 | 402 | 4295 | 13,9 / 0,71 | +7,6 % |
+| 37 | 1,112 | 2,000 | 0,932 | 417 | 4711 | 14,2 / 0,74 | +7,4 % |
+| 38 | 1,106 | 2,050 | 0,942 | 432 | 5143 | 14,5 / 0,78 | +7,4 % |
+| 39 | 1,098 | 2,100 | 0,952 | 448 | 5591 | 14,7 / 0,82 | +7,5 % |
+| 40 | 1,093 | 2,150 | 0,963 | 463 | 6054 | 15,0 / 0,87 | +7,4 % |
+
+Seit AP-168 gilt fuer Level 31 bis 40 die Spalte `hp` neu; die Spalten „Stufe (Annahme) / Druck mit Upgrades“ und „Schritt Druck“ dieser zehn Zeilen zeigen den Stand **vor AP-168** (aktuelle Werte: Abschnitt M7, Spalte „Druck mit Upgrades“, und „Kurve geglaettet (AP-168)“).
 
 Lesart: Mit den angenommenen Upgrades beginnt die Wueste leicht (0,33) und wird stetig fordernder, Level 40 liegt bei 0,87
 (Level 20 ohne Upgrades: 1,22). Der Schaden ohne Abschuss steigt ab Level 21 langsamer als vorher, weil der Kontaktschaden nur
@@ -401,7 +405,7 @@ Level 20 hat Stufe 10 (+80 % HP), Level 40 Stufe 9 (+72 % HP).
 
 **Stellschrauben:**
 
-- **Gegnerzahl-Faktor** `ENEMY_COUNT_FACTOR` (`levels.ts`): Level 0 1,5, Level 1 1,75, Level 2 2,0, Level 3 2,25, ab Level 4 2,5.
+- **Gegnerzahl-Faktor** `ENEMY_COUNT_FACTOR` (`levels.ts`): Level 0 1,5, Level 1 1,64, Level 2 1,72, Level 3 1,94, Level 4 2,15, ab Level 5 2,5 (seit AP-168; bei AP-127 waren es 1,5 / 1,75 / 2,0 / 2,25 / 2,5 ab Level 4).
 - **Spawn-Abstand:** bisheriger Wert durch den Faktor, auf ganze ms gerundet (Level 0: 1500 auf 1000 ms, Level 40: 430 auf 172 ms).
   Untergrenze `MIN_SPAWN_INTERVAL_MS = 150`: Am Rundenende sinkt der Abstand auf 60 % (90 ms, gut 5 Frames bei 60 fps),
   mehr als ein Gegner je 5 Frames bringt am iPhone nichts ausser Last. Sie greift heute nirgends (kleinster Wert 172 ms).
@@ -424,11 +428,11 @@ weiter nur HP und Kontakt.
 
 | Level | Faktor | Spawn-Abstand (ms) | Max. Gegner (gewuenscht) | HP-Aufschlag | Stufe | Druck alt / neu | neu / alt | Gold je Runde alt / neu | Druck mit Upgrades (Annahme AP-105) |
 |---|---|---|---|---|---|---|---|---|---|
-| 0 | 1,5 | 1000 | 38 (38) | 1,00 | 0 | 0,51 / 0,77 | x1,51 | 5,8 / 5,8 | - |
-| 1 | 1,75 | 829 | 49 (49) | 1,00 | 1 | 0,56 / 1,06 | x1,90 | 6,3 / 6,3 | - |
-| 2 | 2,0 | 700 | 62 (62) | 1,00 | 2 | 0,63 / 1,46 | x2,32 | 6,9 / 6,9 | - |
-| 3 | 2,25 | 604 | 77 (77) | 1,00 | 3 | 0,69 / 1,90 | x2,74 | 13,0 / 13,0 | - |
-| 4 | 2,5 | 532 | 93 (93) | 1,00 | 4 | 0,79 / 2,60 | x3,30 | 14,6 / 14,4 | - |
+| 0 | 1,5 | 1000 | 38 (38) | 1,00 | 0 | 0,51 / 0,76 | x1,49 | 5,8 / 5,8 | - |
+| 1 | 1,64 | 884 | 46 (46) | 1,00 | 1 | 0,56 / 0,96 | x1,71 | 6,3 / 6,3 | - |
+| 2 | 1,72 | 814 | 53 (53) | 1,00 | 2 | 0,63 / 1,21 | x1,92 | 6,9 / 6,9 | - |
+| 3 | 1,94 | 701 | 66 (66) | 1,00 | 3 | 0,69 / 1,54 | x2,23 | 13,0 / 13,0 | - |
+| 4 | 2,15 | 619 | 80 (80) | 1,00 | 4 | 0,79 / 2,02 | x2,56 | 14,6 / 14,5 | - |
 | 5 | 2,5 | 348 | 130 (130) | 1,00 | 0 | 0,86 / 2,12 | x2,46 | 27,5 / 27,1 | - |
 | 6 | 2,5 | 336 | 138 (138) | 1,00 | 1 | 0,89 / 2,32 | x2,61 | 28,4 / 28,0 | - |
 | 7 | 2,5 | 324 | 143 (143) | 1,00 | 2 | 0,91 / 2,56 | x2,83 | 29,6 / 29,2 | - |
@@ -455,31 +459,31 @@ weiter nur HP und Kontakt.
 | 28 | 2,5 | 196 | 250 (345) | 1,38 | 2 | 2,25 / 6,47 | x2,88 | 174,8 / 173,3 | 1,36 |
 | 29 | 2,5 | 194 | 250 (348) | 1,39 | 3 | 2,40 / 7,41 | x3,08 | 302,1 / 300,5 | 1,52 |
 | 30 | 2,5 | 192 | 250 (350) | 1,40 | 4 | 2,59 / 8,45 | x3,26 | 314,7 / 313,2 | 1,69 |
-| 31 | 2,5 | 190 | 250 (353) | 1,41 | 0 | 2,83 / 7,03 | x2,48 | 200,3 / 198,6 | 1,37 |
-| 32 | 2,5 | 188 | 250 (355) | 1,42 | 1 | 3,04 / 8,14 | x2,68 | 208,3 / 206,6 | 1,55 |
-| 33 | 2,5 | 186 | 250 (358) | 1,43 | 2 | 3,28 / 9,37 | x2,86 | 216,9 / 214,8 | 1,75 |
-| 34 | 2,5 | 184 | 250 (360) | 1,44 | 3 | 3,52 / 10,79 | x3,06 | 225,1 / 223,2 | 1,97 |
-| 35 | 2,5 | 182 | 250 (363) | 1,45 | 4 | 3,78 / 12,35 | x3,27 | 233,5 / 231,6 | 2,20 |
-| 36 | 2,5 | 180 | 250 (365) | 1,46 | 5 | 4,06 / 14,12 | x3,47 | 402,0 / 399,9 | 2,46 |
-| 37 | 2,5 | 178 | 250 (368) | 1,47 | 6 | 4,37 / 16,11 | x3,69 | 416,6 / 414,7 | 2,75 |
-| 38 | 2,5 | 176 | 250 (370) | 1,48 | 7 | 4,69 / 18,26 | x3,89 | 432,0 / 429,8 | 3,05 |
-| 39 | 2,5 | 174 | 250 (373) | 1,49 | 8 | 5,04 / 20,54 | x4,08 | 447,6 / 445,3 | 3,36 |
-| 40 | 2,5 | 172 | 250 (375) | 1,50 | 9 | 5,41 / 23,19 | x4,29 | 463,4 / 461,3 | 3,71 |
+| 31 | 2,5 | 190 | 250 (353) | 1,41 | 0 | 2,83 / 6,34 | x2,24 | 200,3 / 198,6 | 1,24 |
+| 32 | 2,5 | 188 | 250 (355) | 1,42 | 1 | 3,04 / 6,70 | x2,20 | 208,3 / 206,6 | 1,28 |
+| 33 | 2,5 | 186 | 250 (358) | 1,43 | 2 | 3,28 / 7,12 | x2,17 | 216,9 / 214,8 | 1,33 |
+| 34 | 2,5 | 184 | 250 (360) | 1,44 | 3 | 3,52 / 7,51 | x2,13 | 225,1 / 223,2 | 1,37 |
+| 35 | 2,5 | 182 | 250 (363) | 1,45 | 4 | 3,78 / 7,95 | x2,10 | 233,5 / 231,6 | 1,42 |
+| 36 | 2,5 | 180 | 250 (365) | 1,46 | 5 | 4,06 / 8,38 | x2,06 | 402,0 / 399,9 | 1,46 |
+| 37 | 2,5 | 178 | 250 (368) | 1,47 | 6 | 4,37 / 8,84 | x2,02 | 416,6 / 414,7 | 1,51 |
+| 38 | 2,5 | 176 | 250 (370) | 1,48 | 7 | 4,69 / 9,43 | x2,01 | 432,0 / 429,8 | 1,57 |
+| 39 | 2,5 | 174 | 250 (373) | 1,49 | 8 | 5,04 / 9,93 | x1,97 | 447,6 / 445,3 | 1,62 |
+| 40 | 2,5 | 172 | 250 (375) | 1,50 | 9 | 5,41 / 10,46 | x1,93 | 463,4 / 461,3 | 1,67 |
 
-„Druck alt“ ist der Stand vor AP-127 (ohne Stufe, Tabelle „Tabelle aller Level“). „neu / alt“ ist Faktor mal Stufe
+Seit AP-168 (PE-209, RS-05.2) gilt fuer Level 1 bis 4 der flachere Faktor und im Wald +5 % statt +8 % HP je Stufe, fuer Level 31 bis 40 das fallende `hp` (die Stufe traegt den Anstieg); „Druck neu“ und „Druck mit Upgrades“ sind fuer diese Level neu gerechnet. „Druck alt“ ist der Stand vor AP-127 (ohne Stufe, Tabelle „Tabelle aller Level“). „neu / alt“ ist Faktor mal Stufe
 (kleine Abweichungen durch gerundete HP und die groessere Eroeffnungswelle). Gold-Mittel Level 0 bis 20: 45,9 (Band 43 bis 47).
 
 **Lesart und Folgen (RI-30, Feinjustierung nach H-34):**
 
-- Level 0 ist mit Druck 0,77 weiter mit der Grundwaffe zu schaffen. Ab Level 1 liegt der Druck ueber 1, ab Level 4 bei 2,1 bis 23,2:
+- Level 0 ist mit Druck 0,77 weiter mit der Grundwaffe zu schaffen. Ab Level 1 liegt der Druck ueber 1, ab Level 4 bei 2,0 bis 10,5 (vor AP-168 bis 23,2):
   Doppelschuss und Upgrades werden frueh noetig. Level 20 braucht 220 HP pro Sekunde (vorher 49), das ist mehr als Doppelschuss
   Stufe 2 ohne Upgrades (120) und knapp unter Doppelschuss Stufe 2 mit Upgrade-Stufe 10 auf beiden Schadens-Spuren (480, bei halber Trefferquote 240).
-- Level 21 bis 40 mit den angenommenen Upgrades (Stufe 10 bei Level 21 bis 15 bei Level 40): Druck 0,83 bis 3,71 (vorher 0,33 bis 0,87).
-  Level 40 braucht damit auch mit Doppelschuss Stufe 2 (x3) noch mehr Schaden, als die Upgrades bis Stufe 15 bringen.
-  Die frueheren Fairness-Baender (Level 40 mit Upgrades 0,8 bis 1,25) sind deshalb nicht mehr im Test.
+- Level 21 bis 40 mit den angenommenen Upgrades (Stufe 10 bei Level 21 bis 15 bei Level 40): Druck 0,83 bis 1,69 (vorher 0,33 bis 0,87; vor AP-168 bis 3,71).
+  Seit AP-168 steigt der Druck in Level 31 bis 40 nur noch von 1,24 auf 1,67.
+  Die frueheren Fairness-Baender (Level 40 mit Upgrades 0,8 bis 1,25) sind nicht mehr im Test.
 - Innerhalb eines Batches steigt der Druck je Level um 5 bis 18 %. An jeder Batch-Grenze faellt er (die Stufe beginnt wieder bei 0),
-  jeder Batch beginnt aber hoeher als der vorige. In Level 1 bis 4 steigt zusaetzlich der Faktor (+11 bis +17 % je Level),
-  die Schritte sind dort 1,30 bis 1,38.
+  jeder Batch beginnt aber hoeher als der vorige. In Level 1 bis 4 steigt zusaetzlich der Faktor (seit AP-168 +5 bis +13 % je Level, vorher +11 bis +17 %);
+  der Referenz-Druck steigt dort um 1,21 je Schritt (Abschnitt „Kurve geglaettet (AP-168)“).
 - Item-Drops haengen an der Zahl besiegter Gegner (`ITEM_RULES.dropChance` in `items.ts`, nicht Teil von AP-127). Mit mehr Gegnern
   kommen auch mehr Items: Dauerfeuer in Level 20 etwa 45 % der Rundenzeit (vorher 23 %), Schaden im Mittel etwa 2,8-fach (vorher 1,9-fach).
 - Ein Einzeltreffer des staerksten Kontakt-Gegners liegt mit dem Level-Faktor weiter unter 15 % der Spielerin-HP; die Stufe kommt
@@ -489,10 +493,10 @@ weiter nur HP und Kontakt.
 
 **Was die Tests ab AP-127 sichern** (die alten Baender „Druck je Level gleich“, ±4 % und `MAX_ENEMIES` hoechstens 150 sind ersetzt):
 
-- Faktor 1,5 / 1,75 / 2,0 / 2,25, ab Level 4 2,5; Spawns pro Minute = Faktor mal vorher (±3 %).
-- Druck mindestens 1,4-mal der alte Wert in Level 0 bis 3 und 2,3-mal in Level 4 bis 40 (Stufe eingerechnet).
+- Faktor 1,5 / 1,64 / 1,72 / 1,94 / 2,15, ab Level 5 2,5 (AP-168); Spawns pro Minute = Faktor mal vorher (±3 %).
+- Druck mindestens 1,4-mal der alte Wert in Level 0 bis 3, 2,3-mal in Level 4 bis 30 und 1,5-mal in Level 31 bis 40 (Stufe eingerechnet; Level 31 bis 40 seit AP-168 geglaettet).
 - Druck innerhalb jedes Batches streng steigend, jeder Batch beginnt hoeher als der vorige.
-- Schritt zwischen Nachbarleveln hoechstens 1,25; in Level 1 bis 4 gilt die Grenze fuer den Schritt ohne den Anstieg des Faktors.
+- Schritt zwischen Nachbarleveln hoechstens 1,25; in Level 1 bis 5 gilt die Grenze fuer den Schritt ohne den Anstieg des Faktors.
 - `MAX_ENEMIES` hoechstens 250, Abstand mindestens 150 ms, HP-Aufschlag = gewuenscht durch moeglich.
 - Gold und Erfahrung je gewonnener Runde im Band ±10 % um den Stand vor AP-127.
 
@@ -569,6 +573,45 @@ Set-Effekt bei allen drei Teilen: Diamant = alle 30 s ein Block, Hoelle = alle 2
 **Pets greifen auch den Boss an (AP-164, PE-205):** Boss und lebende Boss-Teile (auch beide Teile des Riesen-Steins) sind Ziele; Unverwundbare (Geist-Phase) und Tote nicht. Der Schaden geht ueber `BossBase.takeDamage` (Ruestung `damageFactor`, Stein 0,5, wirkt wie beim Laser), der Pinguin verlangsamt Bosse nicht. Ursache des Fehlers: in der Boss-Runde ist der Gegner-Pool leer und Bosse waren nie in der Zielliste. Anteil am Laser-DPS (Laser 10 x 4/s = 40 DPS in der Basis): Der Pet-Schaden ist ein Anteil des Laserschadens, der Anteil ist deshalb in Level 4 und 40 gleich (nur Feuerrate-Upgrades senken ihn, `damageFactor` trifft Laser und Pet gleich). Stufe 0 (geschluepft): Biene 25 %, Pinguin 33 %, Capybara 12,5 % (nur im Radius). Stufe 3 (Schaden und Tempo je 1,3^3 = 2,2): Biene 121 % je Biene, 242 % mit zwei Bienen (Obergrenze bei Dauerstichen), Pinguin 161 %, Capybara 27,5 %. Das liegt ueber 25 % des Laser-DPS; der Nutzer hat es entschieden (RI-40) und akzeptiert, kein Deckel. Handtest: H-38.
 
 **Pet-Leiste (PE-179):** Das Pet startet jede Runde als Ei. Besiegte Gegner fuellen die Leiste (ein Boss zaehlt wie 10 Gegner, `bossWeight`). Die erste volle Leiste (12 % der erwarteten Gegner der Runde, `hatchFraction` 0,12; PE-194, vorher 0,15) laesst das Pet schluepfen, jede weitere Leiste (25 %, `powerUpFraction` 0,25) gibt ein Power-up bis Rundenende, hoechstens 3 (`maxPowerUps`). Jedes Power-up macht Schaden und Tempo 1,3-fach; Zusatzboni: zweite Biene, Schneeball-Radius 1,5-fach, Aura-Radius 1,3-fach. Richtwert Schluepfzeit 30 bis 60 s Spielzeit (Startwert fuer den Handtest); die Schluepfzeit haengt an der Leveldauer (ideal etwa `hatchFraction` x Dauer x 1,277 s: 180-s-Level ca. 22 bis 28 s, 300-s-Level ca. 41 bis 44 s ohne Laufwege). Die Leiste sitzt mittig unter dem Timer (Abstand 4).
+
+## Kurve geglaettet (AP-168)
+
+AP-168 (PE-209, RS-05.2, PE-225): Die Spitze in Level 4 und die Steilwand in Level 31 bis 40 sind weg. Gemessen wird mit dem Referenz-Druck aus „Referenzspielerin und Ziel-Baender (M11)“.
+
+**Was sich geaendert hat:**
+
+- **Level 0 bis 4:** `ENEMY_COUNT_FACTOR` 1,5 / 1,64 / 1,72 / 1,94 / 2,15 (vorher 1,5 / 1,75 / 2 / 2,25 / 2,5), im Wald +5 % statt +8 % HP je Stufe (`TIER_RULES.hpPerStageByBatch`, `logic/tier.ts`; ab Level 5 weiter +8 %). `xp` und `coin` folgen dem Faktor, Gold je Runde bleibt gleich (Tabelle in M7); der Ausgleich aus AP-166 bleibt (Mix-Budget ±4 % gegen den Stand nach AP-166, umgerechnet um genau diese beiden Aenderungen).
+- **Level 31 bis 40:** `M5_HP` (`scaling.ts`) faellt von 1,250 auf 1,093 (vorher 1,385 bis 2,422), weil die Gegnerstufe (+8 % je Level) den Anstieg schon traegt. Vorher wurde er doppelt gezaehlt. Level 5 bis 30 sind unveraendert (Q-78 (a), der Test `scaling.test.ts` prueft den Rest der Tabelle).
+
+**Abweichung von den Zielzahlen RS-05.2 (Level 0 bis 4):** Der Plan nennt Druck 0,77 / 0,91 / 1,11 / 1,31 / 1,54 und die Faktoren 1,6 / 1,75 / 1,9 / 2,0. Damit laege Level 4 (1,54) **unter** dem Anfang von Level 5 (1,62), das Saegezahn-Band (jeder Batch beginnt unter dem Ende des vorigen) waere verletzt, und Level 5 darf nicht geaendert werden. Die Faktoren sind deshalb so gewaehlt, dass Level 4 knapp ueber Level 5 liegt und jeder Schritt unter +22 % bleibt.
+
+| Level | Faktor alt / neu | Referenz-Druck alt | Referenz-Druck neu | Schritt neu |
+|---|---|---|---|---|
+| 0 | 1,5 / 1,5 | 0,76 | 0,76 | - |
+| 1 | 1,75 / 1,64 | 1,02 | 0,92 | +20,8 % |
+| 2 | 2,0 / 1,72 | 1,36 | 1,12 | +21,1 % |
+| 3 | 2,25 / 1,94 | 1,67 | 1,35 | +21,4 % |
+| 4 | 2,5 / 2,15 | 2,11 | 1,64 | +21,2 % |
+| 5 | 2,5 / 2,5 | 1,62 | 1,62 | Batch-Wechsel |
+
+| Level | `hp` alt / neu | Referenz-Druck alt | Referenz-Druck neu | Schritt neu |
+|---|---|---|---|---|
+| 31 | 1,385 / 1,250 | 1,44 | 1,30 | Batch-Wechsel |
+| 32 | 1,472 / 1,209 | 1,65 | 1,36 | +3,9 % |
+| 33 | 1,563 / 1,186 | 1,86 | 1,41 | +4,4 % |
+| 34 | 1,663 / 1,156 | 2,11 | 1,47 | +3,7 % |
+| 35 | 1,772 / 1,138 | 2,37 | 1,52 | +3,8 % |
+| 36 | 1,891 / 1,122 | 2,66 | 1,58 | +3,7 % |
+| 37 | 2,022 / 1,112 | 2,97 | 1,63 | +3,2 % |
+| 38 | 2,147 / 1,106 | 3,28 | 1,70 | +4,1 % |
+| 39 | 2,272 / 1,098 | 3,61 | 1,74 | +2,8 % |
+| 40 | 2,422 / 1,093 | 3,99 | 1,80 | +3,2 % |
+
+**Schritt-Band je Abschnitt (PE-225, Q-81 (a)):** `BALANCE_BANDS.maxStepBySection` in `balanceTargets.ts` ersetzt das einheitliche +12 %: Level 0 bis 4 hoechstens +22 %, Level 21 bis 30 hoechstens +15 %, sonst +12 %. Als Ausnahme bleibt **Level 23** (+15,13 % gegen 1,15): kein Rundungsfall, sondern ein echter, knapper Ueberschritt, Level 21 bis 30 bleiben nach Q-78 (a) unveraendert; das Band wurde nicht angehoben, der Eintrag steht in `KNOWN_OUT_OF_BAND.step` (Entscheidung beim Nutzer).
+
+**Gold je Minute gegen alle Nachbarn im Batch (PE-224):** Level 0 zu 1 +9,4 %, 1 zu 2 +8,8 %, 2 zu 3 +13,1 % (180 s zu 300 s), 3 zu 4 +11,1 %; alle uebrigen Nachbarn im Batch unter ±6 %. Level 3 und 4 stehen in `KNOWN_OUT_OF_BAND.gold`; sie entstehen nicht durch die Glaettung (Gold je Runde ist unveraendert), das Band wurde nicht gelockert. Ueber Batch-Grenzen springt Gold je Minute (Level 4 zu 5 dreifach, 20 zu 21 +87 %, 25 zu 26 +30 %, 30 zu 31 +6 %), das ist gewollt.
+
+Hinweis: Die Tabelle der 41 Level im Abschnitt „Referenzspielerin und Ziel-Baender (M11)“ zeigt in der Spalte Referenz-Druck noch den Stand vor AP-168 fuer Level 1 bis 4 und 31 bis 40, ebenso die Liste „Bekannte Ausreisser“; massgeblich sind die Tabellen hier.
 
 ## Referenzspielerin und Ziel-Baender (M11)
 

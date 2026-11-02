@@ -292,6 +292,11 @@ const CONTACT_COMPENSATION = 2;
  * Stand vor AP-127 (Stand AP-113, ohne Gegnerstufe, gerechnet mit diesem Test), Index = Level-ID. Referenz fuer
  * Druck (PE-152), Spawns pro Minute und Gold und Erfahrung je gewonnener Runde (PE-163, Q-64).
  */
+/** M5_HP (hp ohne Aufschlag) der Level 31 bis 40 vor AP-168; Grundlage der Erwartung im Test zur Obergrenze unten. */
+const M5_HP_BEFORE_AP168 = [1.385, 1.472, 1.563, 1.663, 1.772, 1.891, 2.022, 2.147, 2.272, 2.422];
+const HP_BEFORE_AP127_NOW: Record<number, number> = Object.fromEntries(
+  [1.25, 1.209, 1.186, 1.156, 1.138, 1.122, 1.112, 1.106, 1.098, 1.093].map((h, k) => [31 + k, h]),
+);
 const PRESSURE_BEFORE_AP127 = [
   0.5121, 0.5573, 0.6281, 0.6928, 0.7869, 0.861, 0.8884, 0.906, 0.9434, 0.9807, 1.0667, 1.0751,
   1.0919, 1.1115, 1.1199, 1.1395, 1.1608, 1.1725, 1.1927, 1.2044, 1.2263, 1.3306, 1.4424, 1.5492,
@@ -471,7 +476,17 @@ describe('balance: boar, bear and fairy in level 0 to 20 (PE-125, AP-105)', () =
       { hp: 26.796, contact: 9.9078, xp: 1.39322, coin: 0.2789 },
       { hp: 31.216, contact: 10.3122, xp: 1.2789, coin: 0.256 },
     ];
-    BEFORE.forEach((b, i) => {
+    // AP-168 (PE-209): Gegnerzahl-Faktor (1,75 / 2 fuer Level 1 und 2 vorher) und Stufen-HP im Wald (+5 % statt +8 %) sind
+    // Absicht dieses Pakets; die Referenz wird um genau diese beiden Faktoren umgerechnet, die Mischung bleibt im Budget.
+    const COUNT_BEFORE = [1.5, 1.75, 2];
+    BEFORE.forEach((b0, i) => {
+      const f = COUNT_BEFORE[i] / ENEMY_COUNT_FACTOR[i];
+      const b = {
+        hp: (b0.hp * tierFor(i).hpFactor) / (1 + i * 0.08),
+        contact: b0.contact,
+        xp: b0.xp * f,
+        coin: b0.coin * f,
+      };
       const l = LEVELS[i];
       const hp = poolMean(l.enemyPool, (id) => tieredHp(id, i) * pressureFactor(id));
       const contact = poolMean(
@@ -535,8 +550,10 @@ describe('balance: boar, bear and fairy in level 0 to 20 (PE-125, AP-105)', () =
 });
 
 describe('balance: more enemies and enemy tiers (AP-127, PE-152, PE-153, PE-161, PE-163)', () => {
-  it('uses the enemy count factor of PE-153: 1.5 at level 0 rising to 2.5 from level 4', () => {
-    expect(ENEMY_COUNT_FACTOR.slice(0, 5)).toEqual([1.5, 1.75, 2, 2.25, 2.5]);
+  it('uses the enemy count factor: 1.5 at level 0 rising to 2.5 from level 5 (PE-153, smoothed in AP-168, PE-209, RS-05.2)', () => {
+    // PE-209, RS-05.2: vorher 1,5 / 1,75 / 2 / 2,25 / 2,5. Der Anstieg ist flacher, damit der Referenz-Druck von Level 0
+    // bis 4 um hoechstens +22 % je Schritt steigt und Level 4 (1,64) ueber dem Beginn von Level 5 (1,62) bleibt (Saegezahn).
+    expect(ENEMY_COUNT_FACTOR.slice(0, 5)).toEqual([1.5, 1.64, 1.72, 1.94, 2.15]);
     for (let i = 5; i < LEVELS.length; i++) expect(ENEMY_COUNT_FACTOR[i], `level ${i}`).toBe(2.5);
   });
 
@@ -548,11 +565,12 @@ describe('balance: more enemies and enemy tiers (AP-127, PE-152, PE-153, PE-161,
     }
   });
 
-  it('pressure (enemies per minute x mean hp x tier factor) is at least 1.4 times the old value in level 0 to 3 and 2.3 times in level 4 to 40', () => {
+  it('pressure (enemies per minute x mean hp x tier factor) is at least 1.4 times the old value in level 0 to 3, 2.3 times in level 4 to 30 and 1.5 times in level 31 to 40', () => {
     expect(M).toHaveLength(41);
     for (let i = 0; i < LEVELS.length; i++) {
       const ratio = M[i].pressure / PRESSURE_BEFORE_AP127[i];
-      expect(ratio, `level ${i}`).toBeGreaterThanOrEqual(i < 4 ? 1.4 : 2.3);
+      // PE-209, RS-05.2: Level 31 bis 40 tragen den Anstieg ueber die Gegnerstufe, M5_HP faellt (AP-168), daher kleinere Grenze.
+      expect(ratio, `level ${i}`).toBeGreaterThanOrEqual(i < 4 ? 1.4 : i < 31 ? 2.3 : 1.5);
     }
   });
 
@@ -578,7 +596,8 @@ describe('balance: more enemies and enemy tiers (AP-127, PE-152, PE-153, PE-161,
     for (let i = 1; i < M.length; i++) {
       const ramp = ENEMY_COUNT_FACTOR[i] / ENEMY_COUNT_FACTOR[i - 1];
       expect(ramp, `level ${i}`).toBeGreaterThanOrEqual(1);
-      if (i >= 5) expect(ramp, `level ${i}`).toBe(1);
+      // AP-168: der Faktor steigt bis Level 5 (2,15 auf 2,5), dort beginnt der Batch neu (Saegezahn).
+      if (i >= 6) expect(ramp, `level ${i}`).toBe(1);
       const step = M[i].pressure / M[i - 1].pressure;
       expect(step / ramp, `level ${i}`).toBeLessThanOrEqual(1.25);
     }
@@ -601,9 +620,11 @@ describe('balance: more enemies and enemy tiers (AP-127, PE-152, PE-153, PE-161,
       const capped = MAX_ENEMIES_WANTED[i] > LEVELS[i].maxEnemies;
       expect(capShare(LEVELS[i]) < 1, `level ${i}`).toBe(capped);
       // Ohne Stufe: Druck = Faktor mal alter Wert (Abweichung durch gerundete HP und Eroeffnungswelle).
+      // Level 31 bis 40 (AP-168, PE-209): M5_HP ist gesenkt, der Erwartungswert wird mit dem Verhaeltnis neu zu alt skaliert.
+      const hpRatio = i >= 31 ? HP_BEFORE_AP127_NOW[i] / M5_HP_BEFORE_AP168[i - 31] : 1;
       const ratio = M[i].pressure / tierFor(i).hpFactor / PRESSURE_BEFORE_AP127[i];
-      expect(ratio / ENEMY_COUNT_FACTOR[i], `level ${i}`).toBeGreaterThanOrEqual(0.94);
-      expect(ratio / ENEMY_COUNT_FACTOR[i], `level ${i}`).toBeLessThanOrEqual(1.06);
+      expect(ratio / ENEMY_COUNT_FACTOR[i] / hpRatio, `level ${i}`).toBeGreaterThanOrEqual(0.94);
+      expect(ratio / ENEMY_COUNT_FACTOR[i] / hpRatio, `level ${i}`).toBeLessThanOrEqual(1.06);
     }
   });
 });
@@ -647,13 +668,15 @@ describe('balance: level 21 to 40 (AP-105, PE-129)', () => {
   it('makes the enemies stronger rather than more: hp factor above 0.77 and rising, spawns grow slowly', () => {
     for (let i = M5_FIRST; i < LEVELS.length; i++) {
       expect(LEVEL_SCALING[i].hp, `level ${i}`).toBeGreaterThan(0.77);
-      if (i > M5_FIRST) {
+      // Level 31 bis 40 (AP-168, PE-209, RS-05.2): hp faellt, die Gegnerstufe traegt den Anstieg (Druck steigt trotzdem).
+      if (i > M5_FIRST && i < 31) {
         expect(LEVEL_SCALING[i].hp, `level ${i}`).toBeGreaterThan(LEVEL_SCALING[i - 1].hp);
       }
     }
     // Die Gegnerzahl je Minute waechst von Level 20 bis 40 um hoechstens 30 %, der Druck um mehr als das Dreifache.
     expect(M[40].spawnsPerMin / M[20].spawnsPerMin).toBeLessThanOrEqual(1.3);
-    expect(M[40].pressure / M[20].pressure).toBeGreaterThan(3);
+    // AP-168 (PE-209, RS-05.2): Druck Level 40 gegen 20 nur noch gut 1,1-fach in der Referenz; absolut (ohne Upgrades) mehr als 1,5-fach.
+    expect(M[40].pressure / M[20].pressure).toBeGreaterThan(1.5);
   });
 
   it('with the assumed upgrades (stage 10 at level 21 to 15 at level 40) pressure rises inside each batch, level 21 stays below 1', () => {
