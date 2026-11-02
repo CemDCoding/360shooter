@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { ASSIST_PER_STAGE } from '../../src/config/assist';
 import { BATCH_STARTS, LEVEL_COUNT, batchOf } from '../../src/config/levels';
 import {
   NO_ASSIST,
