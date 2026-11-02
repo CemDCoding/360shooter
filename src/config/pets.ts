@@ -5,7 +5,9 @@ import type { PetDef, PetId, PetRules } from '../contracts';
 export const PET_IDS: readonly PetId[] = ['bee', 'penguin', 'capybara'];
 
 export const PET_RULES: PetRules = {
-  hatchFraction: 0.15,
+  // PE-194: 0.12 (was 0.15). Starting value for the hand test; target 30 to 60 s of play until the hatch.
+  // The hatch time depends on the level duration (about f * duration * 1.277 s, ideal), not on the interval.
+  hatchFraction: 0.12,
   powerUpFraction: 0.25,
   maxPowerUps: 3,
   /** A boss counts 10 enemies for the bar (assumed, PE-179). */

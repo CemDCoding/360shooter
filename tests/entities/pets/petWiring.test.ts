@@ -59,6 +59,6 @@ describe('pet bar wiring in the HudScene', () => {
   it('creates the bar only with the first pet state', () => {
     const onPet = body(hud, 'onPet');
     expect(onPet).toContain('if (!this.petBar)');
-    expect(onPet).toContain('petBarRect(this.scale.height, this.e.bottom, this.e.left)');
+    expect(onPet).toContain('petBarRect(');
   });
 });

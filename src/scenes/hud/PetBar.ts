@@ -6,10 +6,12 @@ import type { PetId, PetRoundState } from '../../contracts';
 import { petBarFraction } from '../../logic/pets';
 import { prefersReducedMotion } from '../../platform/motion';
 import { FunkPanel, funkText, type PanelStyle } from './FunkPanel';
-import { powerSlotRects, type Rect } from './hudMath';
+import { clampSpan } from '../safeInsets';
+import type { Rect } from './hudMath';
 
-// Pet bar in the HUD (AP-144, brief H-35 "Pet-Leiste", mockup view 6): radio glass 88 x 20 bottom left, its
-// lower edge size.hud-petbar-gap above the power slots. Fixed size like the slots (PE-94), not tappable.
+// Pet bar in the HUD (AP-144, brief H-35 "Pet-Leiste"; position moved by AP-156/PE-194): radio glass 88 x 20,
+// centred below the timer, its upper edge size.hud-petbar-gap under the timer. Fixed size like the slots
+// (PE-94), not tappable.
 
 /** Inner padding left/right and gap between icon, track and the right part (mockup .petbar). */
 const PAD_X = 3;
@@ -21,11 +23,10 @@ const PIP_W = 4;
 const PIP_H = 6;
 const PIP_GAP = 2;
 
-/** Slot metrics of the power slots (same values as PowerSlots, desktop size at every k). */
+/** Slot metrics the bar width is derived from (same values as PowerSlots, desktop size at every k). */
 const SLOT_BASE = {
   size: THEME.sizePx['size.hud-slot'],
   gap: THEME.sizePx['size.hud-slot-gap'],
-  margin: THEME.spacePx['space.2'],
 };
 
 /** Width of the bar: as wide as the slots together (2 x 40 + 8 = 88). */
@@ -35,14 +36,24 @@ export function petBarWidth(): number {
 }
 
 /**
- * Bar rectangle: left at the HUD edge, bottom size.hud-petbar-gap above the slots. `bottomEdge` and
- * `leftEdge` are the same values the HudScene passes to PowerSlots.
+ * Bar rectangle: centred under the timer, upper edge size.hud-petbar-gap below the timer's lower edge.
+ * It only moves sideways if it would leave `[leftEdge, arenaW - rightEdge]` (safe area) or reach into
+ * the chip row: `chipsRight` is the right end of the chips in the row under the timer (optional); the
+ * bar then moves right of it, `size.hud-petbar-gap` away, as far as the free strip allows.
  */
-export function petBarRect(arenaH: number, bottomEdge: number, leftEdge: number): Rect {
-  const slot = powerSlotRects(1, 1, arenaH, SLOT_BASE, bottomEdge, leftEdge)[0];
+export function petBarRect(
+  timer: Rect,
+  arenaW: number,
+  leftEdge: number,
+  rightEdge: number,
+  chipsRight?: number,
+): Rect {
+  const w = petBarWidth();
   const h = THEME.sizePx['size.hud-petbar-h'];
   const gap = THEME.sizePx['size.hud-petbar-gap'];
-  return { x: slot.x, y: slot.y - gap - h, w: petBarWidth(), h };
+  const centred = Math.round(timer.x + timer.w / 2 - w / 2);
+  const wantX = chipsRight !== undefined ? Math.max(centred, chipsRight + gap) : centred;
+  return { x: clampSpan(wantX, w, leftEdge, arenaW - rightEdge), y: timer.y + timer.h + gap, w, h };
 }
 
 export interface PetBarParts {

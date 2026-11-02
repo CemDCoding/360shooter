@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PET_RULES, getPet } from '../../src/config/pets';
 import { LEVELS } from '../../src/config/levels';
+import { openingCount } from '../../src/logic/spawn';
 import type { LevelDef } from '../../src/contracts';
 import {
   HealTimer,
@@ -40,18 +41,27 @@ describe('expectedEnemies', () => {
 
 describe('pet round', () => {
   it.each([0, 40])(
-    'hatches at about 15 percent and reaches stage 3 at about 90 percent (level %i)',
+    'hatches at about 12 percent and reaches stage 3 at about 87 to 90 percent (level %i)',
     (id) => {
       const l = LEVELS[id];
       const exp = expectedEnemies(l);
       const hatch = killsUntil(l, (s) => s.phase === 'hatched');
-      expect(hatch / exp).toBeGreaterThan(0.13);
-      expect(hatch / exp).toBeLessThan(0.18);
+      expect(hatch / exp).toBeGreaterThan(0.11);
+      expect(hatch / exp).toBeLessThan(0.13);
       const three = killsUntil(l, (s) => s.powerUps >= 3);
-      expect(three / exp).toBeGreaterThan(0.87);
-      expect(three / exp).toBeLessThan(0.93);
+      expect(three / exp).toBeGreaterThan(0.86);
+      expect(three / exp).toBeLessThan(0.91);
     },
   );
+  it('ideal hatch time (spawn formula) is 20 to 55 s for all levels', () => {
+    for (const l of LEVELS) {
+      const n = createPetRound(l).xpToNext - openingCount(l);
+      const d = l.durationSec;
+      const t = (d / 0.4) * (1 - Math.exp((-0.4 * (l.spawnIntervalMs / 1000) * n) / d));
+      expect(t).toBeGreaterThan(20);
+      expect(t).toBeLessThan(55);
+    }
+  });
   it('starts in egg phase with target ceil(expected * hatchFraction)', () => {
     const l = LEVELS[0];
     const s = createPetRound(l);

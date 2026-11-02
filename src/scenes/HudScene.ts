@@ -36,6 +36,7 @@ import {
   patternCells,
   patternWidth,
   PIXEL_LOCK,
+  type Rect,
 } from './hud/hudMath';
 import { pauseLayout } from './hud/pauseLayout';
 import { PetBar, petBarRect } from './hud/PetBar';
@@ -93,6 +94,8 @@ export class HudScene extends Phaser.Scene {
   private energyLow = false;
 
   private timerPanel!: FunkPanel;
+  /** Rectangle of the timer panel (the pet bar sits below it). */
+  private timerRect: Rect = { x: 0, y: 0, w: 0, h: 0 };
   private timerText!: Phaser.GameObjects.BitmapText;
   private timerSec = 0;
   private overtime = false;
@@ -268,6 +271,7 @@ export class HudScene extends Phaser.Scene {
     const wantX = Math.round(width / 2 - w / 2);
     const x = clampSpan(wantX, w, this.e.left, width - this.e.right);
     const cx = x === wantX ? width / 2 : x + w / 2;
+    this.timerRect = { x, y: my, w, h };
     this.timerPanel = new FunkPanel(this, x, my, w, h);
     this.timerText = funkText(this, cx, my + h / 2, '0:00', scale, 'hud.text').setOrigin(0.5);
   }
@@ -711,11 +715,23 @@ export class HudScene extends Phaser.Scene {
     this.slots?.setStore(p);
   }
 
-  /** Pet bar: appears with the first state of the round's pet, sits above the slots (fixed size). */
+  /** Pet bar: appears with the first state of the round's pet, sits below the timer (fixed size). */
   private onPet(p: GameEventPayloads['pet-changed']): void {
     if (!p) return;
     if (!this.petBar) {
-      const rect = petBarRect(this.scale.height, this.e.bottom, this.e.left);
+      // Chips visible right now push the bar sideways (it does not follow chips that appear later).
+      const shown = this.chipRow.filter((c) => c.visible);
+      const chipGap = Math.round(CHIP_GAP * this.k);
+      const chipsRight = shown.length
+        ? this.e.left + shown.reduce((sum, c) => sum + c.width, 0) + chipGap * (shown.length - 1)
+        : undefined;
+      const rect = petBarRect(
+        this.timerRect,
+        this.scale.width,
+        this.e.left,
+        this.e.right,
+        chipsRight,
+      );
       this.petBar = new PetBar(this, rect, p.petId);
     }
     this.petBar.set(p);
