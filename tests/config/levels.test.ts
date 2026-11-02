@@ -8,6 +8,7 @@ import {
   LEVEL_COUNT,
   MAX_ENEMIES_CAP,
   MAX_ENEMIES_WANTED,
+  MIX_LAST_LEVEL,
   MIN_SPAWN_INTERVAL_MS,
   batchOf,
   getLevel,
@@ -140,11 +141,42 @@ describe('levels', () => {
           : l.batch === 'forestNight'
             ? { boar: 0.007, bear: 0.007, fairy: 0.041 }
             : { fairy: 0.009 };
+      // AP-166 (PE-207): level 0 to 2 are mixed on purpose (boar and bear 15 to 25 %), all other levels stay at most 12 %.
+      const maxShare = l.id <= MIX_LAST_LEVEL ? 0.25 : 0.12;
       for (const [id, before] of Object.entries(oldShare) as [EnemyId, number][]) {
         expect(w(id) / total, `${id} level ${l.id}`).toBeGreaterThanOrEqual(before * 2);
-        expect(w(id) / total, `${id} level ${l.id}`).toBeLessThanOrEqual(0.12);
+        expect(w(id) / total, `${id} level ${l.id}`).toBeLessThanOrEqual(maxShare);
       }
     }
+  });
+
+  it('mixes the pool of level 0 to 2 (AP-166, PE-207): boar and bear 15 to 25 %, the tree stays the most frequent', () => {
+    for (const l of LEVELS.filter((x) => x.id <= MIX_LAST_LEVEL)) {
+      const total = l.enemyPool.reduce((s, e) => s + e.weight, 0);
+      const share = (id: EnemyId) =>
+        (l.enemyPool.find((e) => e.enemyId === id)?.weight ?? 0) / total;
+      expect(l.enemyPool.map((e) => e.enemyId).sort(), `level ${l.id}`).toEqual([
+        'bear',
+        'boar',
+        'cursedTree',
+      ]);
+      for (const id of ['boar', 'bear'] as const) {
+        expect(share(id), `${id} level ${l.id}`).toBeGreaterThanOrEqual(0.15);
+        expect(share(id), `${id} level ${l.id}`).toBeLessThanOrEqual(0.25);
+        expect(share('cursedTree'), `level ${l.id}`).toBeGreaterThan(share(id));
+      }
+    }
+  });
+
+  it('keeps the pool of level 3 and up on the batch pool (forest 178 / 11 / 11, AP-166 touches level 0 to 2 only)', () => {
+    for (const l of LEVELS.filter((x) => x.id > MIX_LAST_LEVEL && x.batch === 'forest')) {
+      expect(l.enemyPool, `level ${l.id}`).toEqual([
+        { enemyId: 'cursedTree', weight: 178 },
+        { enemyId: 'boar', weight: 11 },
+        { enemyId: 'bear', weight: 11 },
+      ]);
+    }
+    expect(LEVELS[5].enemyPool.map((e) => e.weight)).toEqual([120, 60, 96, 17, 17, 35]);
   });
 
   it('has a pool entry with a config for every enemy id and uses every enemy somewhere', () => {

@@ -27,7 +27,7 @@ Hinweise: Tileset-Frame 0 = Boden, weitere Frames = Dekoration. Die Partikelzahl
 
 ### Welche Gegner spawnen auf welcher Map
 
-Der Spawn-Pool hängt am **Batch** (`POOL_OF_BATCH` in `levels.ts`), alle Level eines Batches haben denselben Pool.
+Der Spawn-Pool hängt am **Batch** (`POOL_OF_BATCH` in `levels.ts`), alle Level eines Batches haben denselben Pool. **Ausnahme Level 0 bis 2** (AP-166, PE-207): Sie haben einen eigenen, gemischteren Pool (`POOL_OVERRIDE_LEVELS_0_2`, `MIX_LAST_LEVEL` in `levels.ts`) und eine Abwechslungsregel beim Ziehen (höchstens 3 gleiche Typen in Folge, jeder Typ in der Eröffnungswelle, spätestens beim 8. Spawn; siehe `docs/balancing.md`). Level 3 und 4 behalten den Pool des Waldes.
 
 | Map | Normale Gegner im Spawn-Pool | Boss (am Rundenende) |
 |---|---|---|
@@ -42,7 +42,8 @@ Spawn-Gewichte (je höher, desto häufiger; Anteil am Pool). Die Gewichte sind j
 
 | Batch (Level) | Gewichte (Summe) und Anteil |
 |---|---|
-| Wald (0 bis 4) | Verfluchter Baum 178 (89,0 %), Wildschwein 11 (5,5 %), Bär 11 (5,5 %) – Summe 200 |
+| Wald, Level 0 bis 2 (AP-166) | Verfluchter Baum 112 (56 %), Wildschwein 44 (22 %), Bär 44 (22 %) – Summe 200 |
+| Wald, Level 3 und 4 | Verfluchter Baum 178 (89,0 %), Wildschwein 11 (5,5 %), Bär 11 (5,5 %) – Summe 200 |
 | Wald bei Nacht (5 bis 9) | Verfluchter Baum 120 (34,8 %), Waldhexe 60 (17,4 %), Zombie-Eichhörnchen 96 (27,8 %), Wildschwein 17 (4,9 %), Bär 17 (4,9 %), Fee 35 (10,1 %) – Summe 345 |
 | Elfenwald (10 bis 20) | Verfluchter Baum 80 (35,1 %), Waldhexe 40 (17,5 %), Zombie-Eichhörnchen 64 (28,1 %), Waldgeist-Wesen 32 (14,0 %), Fee 12 (5,3 %) – Summe 228 |
 | Wüste (21 bis 25) | Sandwurm 10 (38,5 %), Armadillo 2 (7,7 %), Kamel 4 (15,4 %), Schlange 10 (38,5 %) – Summe 26 |

@@ -12,6 +12,7 @@ import {
   LEVELS,
   LEVEL_SCALING,
   MAX_ENEMIES_WANTED,
+  MIX_LAST_LEVEL,
   PLAYER,
   RAPID_FIRE_MAX_PER_SEC,
   WEAPON_BASE,
@@ -430,16 +431,19 @@ describe('balance: boar, bear and fairy in level 0 to 20 (PE-125, AP-105)', () =
     const share = (l: LevelDef, id: EnemyId): number =>
       (l.enemyPool.find((e) => e.enemyId === id)?.weight ?? 0) /
       l.enemyPool.reduce((s, e) => s + e.weight, 0);
+    // Level 0 bis 2 haben seit AP-166 (PE-207) einen eigenen Pool, der Wald-Pool gilt nur noch fuer Level 3 und 4.
     const cases: [number, EnemyId, number, number][] = [
-      [0, 'boar', 0.024, 0.07],
-      [0, 'bear', 0.024, 0.07],
+      [3, 'boar', 0.024, 0.07],
+      [3, 'bear', 0.024, 0.07],
       [5, 'boar', 0.007, 0.05],
       [5, 'bear', 0.007, 0.05],
       [5, 'fairy', 0.041, 0.1],
       [10, 'fairy', 0.009, 0.05],
     ];
     for (const [level, id, before, target] of cases) {
-      for (const l of LEVELS.filter((x) => x.batch === LEVELS[level].batch)) {
+      for (const l of LEVELS.filter(
+        (x) => x.batch === LEVELS[level].batch && x.id > MIX_LAST_LEVEL,
+      )) {
         expect(share(l, id), `${id} level ${l.id}`).toBeGreaterThanOrEqual(before * 2);
         expect(Math.abs(share(l, id) - target), `${id} level ${l.id}`).toBeLessThanOrEqual(
           0.015 + 1e-9,
@@ -451,10 +455,51 @@ describe('balance: boar, bear and fairy in level 0 to 20 (PE-125, AP-105)', () =
   it('keeps the tanks tanks: boar and bear have at least 1.5 times the base hp of the cursed tree', () => {
     expect(ENEMIES.boar.hp).toBeGreaterThanOrEqual(ENEMIES.cursedTree.hp * 1.5);
     expect(ENEMIES.bear.hp).toBeGreaterThanOrEqual(ENEMIES.cursedTree.hp * 1.5);
-    // Baum in Level 0 bis 4 nicht weicher als vor AP-113 (22 bis 30 Lebenspunkte, AP-91).
-    [22, 23, 25, 27, 30].forEach((hp, i) =>
+    // Baum in Level 3 und 4 nicht weicher als vor AP-113 (27 und 30 Lebenspunkte, AP-91). Level 0 bis 2: AP-166 (PE-207)
+    // senkt den Baum (18 / 19 / 21) zum Ausgleich des Mehranteils von Wildschwein und Baer, Untergrenze 15.
+    [15, 15, 15, 27, 30].forEach((hp, i) =>
       expect(scaledHp('cursedTree', i)).toBeGreaterThanOrEqual(hp),
     );
+  });
+
+  it('mixes level 0 to 2 (AP-166, PE-207) without changing hp, contact damage, gold and xp per spawn by more than 4 percent', () => {
+    // Referenz: Stand vor AP-166, gerechnet mit denselben Formeln auf dem Stand von dev (935da6d): mittlere wirksame HP je
+    // Spawn (tieredHp x pressureFactor), mittlerer Kontaktschaden (contactDamage x contact), mittlere Erfahrung und Muenze je
+    // Spawn (Wert x Level-Faktor). Spawn-Abstand, maxEnemies und Gegnerzahl-Faktor sind unveraendert.
+    const BEFORE = [
+      { hp: 23.634, contact: 9.3012, xp: 1.54147, coin: 0.308 },
+      { hp: 26.796, contact: 9.9078, xp: 1.39322, coin: 0.2789 },
+      { hp: 31.216, contact: 10.3122, xp: 1.2789, coin: 0.256 },
+    ];
+    BEFORE.forEach((b, i) => {
+      const l = LEVELS[i];
+      const hp = poolMean(l.enemyPool, (id) => tieredHp(id, i) * pressureFactor(id));
+      const contact = poolMean(
+        l.enemyPool,
+        (id) => ENEMIES[id].contactDamage * LEVEL_SCALING[i].contact,
+      );
+      const xp = poolMean(l.enemyPool, (id) => ENEMIES[id].xp * LEVEL_SCALING[i].xp);
+      const coin = poolMean(
+        l.enemyPool,
+        (id) => (ENEMIES[id].coinValue ?? 0) * LEVEL_SCALING[i].coin,
+      );
+      for (const [name, now, before] of [
+        ['hp', hp, b.hp],
+        ['contact', contact, b.contact],
+        ['xp', xp, b.xp],
+        ['coin', coin, b.coin],
+      ] as const) {
+        expect(now / before, `${name} level ${i}`).toBeGreaterThanOrEqual(0.96);
+        expect(now / before, `${name} level ${i}`).toBeLessThanOrEqual(1.04);
+      }
+      // Gold und Erfahrung je Runde: Gegnerzahl unveraendert, also gilt dieselbe Grenze.
+      const n = spawnCount(l);
+      const goldBefore = n * COIN_RULES.dropChance * b.coin;
+      expect(GOLD[i] / goldBefore, `gold level ${i}`).toBeGreaterThanOrEqual(0.96);
+      expect(GOLD[i] / goldBefore, `gold level ${i}`).toBeLessThanOrEqual(1.04);
+      expect(xpOf(l) / (n * b.xp), `xp level ${i}`).toBeGreaterThanOrEqual(0.96);
+      expect(xpOf(l) / (n * b.xp), `xp level ${i}`).toBeLessThanOrEqual(1.04);
+    });
   });
 
   it('compensates the single hit with factor 2 on contact and keeps one hit below 15 percent of the player hp (level factor, the tier adds up to 50 percent, PE-161)', () => {

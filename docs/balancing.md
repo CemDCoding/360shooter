@@ -496,6 +496,41 @@ weiter nur HP und Kontakt.
 - `MAX_ENEMIES` hoechstens 250, Abstand mindestens 150 ms, HP-Aufschlag = gewuenscht durch moeglich.
 - Gold und Erfahrung je gewonnener Runde im Band ±10 % um den Stand vor AP-127.
 
+## Mischung der Gegner in Level 0 bis 2 (AP-166, PE-207)
+
+Handtest 2026-11-02, Nutzer: „es fehlt die variätat von gegner in den level 0-2 mehr durchmischen von den was verefügbar ist es ist zu langweilig“.
+
+**Befund.** In Level 0 bis 2 sind genau 3 Typen freigeschaltet (Verfluchter Baum, Wildschwein, Bär; Hexe, Eichhörnchen, Fee, Waldgeist erscheinen erst ab Level 5 bzw. 10). Der Pool `forest` (178 / 11 / 11) bestand zu 89 % aus Bäumen, und `SpawnDirector` zog jeden Gegner unabhängig. Gemessen mit 20 Seeds und den ersten 30 s: längste Folge gleicher Typen im Mittel 17 bis 19 (Maximum 36 bis 39), im Mittel nur 2,85 bis 2,9 von 3 Typen sichtbar.
+
+**Hebel 1: Pool nur für Level 0 bis 2** (`POOL_OVERRIDE_LEVELS_0_2` in `levels.ts`, Ausnahme von „der Pool hängt am Batch“, `MIX_LAST_LEVEL` = 2). Level 3 und 4 behalten den Pool `forest`.
+
+| Typ | Anteil vorher | Anteil nachher (Gewicht) |
+|---|---|---|
+| Verfluchter Baum | 89,0 % | 56 % (112) |
+| Wildschwein | 5,5 % | 22 % (44) |
+| Bär | 5,5 % | 22 % (44) |
+
+**Hebel 2: Abwechslungsregel in `SpawnDirector.pickEnemy`** (nur Level 0 bis 2, `MAX_RUN`, `FIRST_APPEARANCE_BY` in `spawn.ts`):
+
+- Höchstens **3 gleiche Typen in Folge** (`MAX_RUN` = 3). Gezogen wird aus einem „Beutel“ (100 Marken im Verhältnis der Pool-Gewichte, nachgefüllt wenn leer, nichts wird verworfen): so entsprechen die Anteile auf lange Sicht genau den Pool-Gewichten (Test: 5000 Züge, ±2 Prozentpunkte), und nach 3 gleichen Typen wird der Typ übersprungen. Eine einfache Sperre mit Neuziehen hätte den Baum um etwa 4 Prozentpunkte gedrückt.
+- **Eröffnungswelle** (6 bis 8 Gegner) enthält jeden verfügbaren Typ mindestens einmal (zufällig auf die Plätze verteilt).
+- Ein Typ, der noch nie kam, wird **spätestens beim 8. Spawn** der Runde gezogen.
+- Level ab 3 ziehen wie bisher unabhängig und gewichtet (gleiche Zufallszahlen, kein Zusatzaufruf). Grund: Im Pool `forest` (89 % Baum) würde die Regel die Anteile um mehr als 1 Prozentpunkt verschieben (Vorgabe des Pakets: höchstens 1); so bleibt Level 3 ff. unberührt.
+
+**Ausgleich (Schwierigkeit, Gold, Erfahrung unverändert, ±4 %).** Wildschwein und Bär haben 75 statt 50 Basis-HP, der Mehranteil wird über `LEVEL_SCALING` Level 0 bis 2 bezahlt (Baum etwas schwächer, Münze unverändert, weil alle drei Typen 1 Münze geben). Pro Spawn, vorher → nachher:
+
+| Level | `hp` (Baum-HP ohne / mit Stufe) | wirksame HP je Spawn | `xp` (Basis) | Erfahrung je Spawn | `contact` | Kontaktschaden je Spawn | Münze je Spawn |
+|---|---|---|---|---|---|---|---|
+| 0 | 0,44 → 0,36 (22 → 18) | 23,63 → 23,35 (−1,2 %) | 0,443 → 0,393 | 1,541 → 1,541 (±0 %) | 0,92 → 0,89 | 9,30 → 9,29 (−0,1 %) | 0,308 (±0 %) |
+| 1 | 0,46 → 0,38 (25 → 21) | 26,80 → 26,99 (+0,7 %) | 0,467 → 0,415 | 1,393 → 1,394 (+0,1 %) | 0,98 → 0,95 | 9,91 → 9,92 (+0,1 %) | 0,279 (±0 %) |
+| 2 | 0,50 → 0,42 (29 → 24) | 31,22 → 31,62 (+1,3 %) | 0,490 → 0,435 | 1,279 → 1,279 (±0 %) | 1,02 → 0,99 | 10,31 → 10,34 (+0,2 %) | 0,256 (±0 %) |
+
+(„Wirksame HP“ wie im Test: gerundete HP mit Gegnerstufe mal Ansturm-Faktor des Wildschweins.) Spawn-Abstand, `maxEnemies` und Gegnerzahl-Faktor bleiben, also bleiben auch Gold und Erfahrung je Runde (Test `balance.test.ts`, Grenze ±4 %). Die Baum-HP bleibt über 15 (18 / 19 / 21 ohne Stufe). Die Doppelschuss-Salve tötet den Baum in Level 0 bis 2 weiterhin in einem Zug.
+
+**Anschluss Level 2 auf 3.** Der Druck steigt weiter streng (Tests der Kurve unverändert grün). Die Mischung springt zwischen Level 2 und 3 von 56 / 22 / 22 auf 89 / 5,5 / 5,5; das ist Absicht des Pakets (Level 3 ff. unberührt) und wird im Handtest H-38 geprüft.
+
+**Offene Grenze (Q-75).** Mehr als 3 Typen in Level 0 bis 2 gehen nur mit früherer Freischaltung (z. B. Fee oder Hexe schon in Level 1). Das ist nicht umgesetzt; es braucht die Entscheidung des Nutzers.
+
 ## Diamanten, Shop, Ruestung, Pets (M8, AP-136, AP-145, PE-166 bis PE-179)
 
 Alle Zahlen stehen nur im Code (`config/shop.ts`, `config/gear.ts`, `config/pets.ts`); dieser Abschnitt liest sie ab. Alle Werte sind Startwerte fuer den Handtest M8-DEP (H-36).
