@@ -16,7 +16,12 @@ export function isValidLevelId(value: unknown): value is number {
  * (text, decimals like 1.5, exponents, hex) gives 0; integers are clamped to 0..MAX_LEVEL_ID.
  */
 export function parseDebugLevel(search: string): number | null {
-  const raw = new URLSearchParams(search).get('level');
+  return parseLevelParam(search, 'level');
+}
+
+/** Same rules for any level parameter (`level`, `finisher`). */
+function parseLevelParam(search: string, name: string): number | null {
+  const raw = new URLSearchParams(search).get(name);
   if (raw === null) return null;
   const trimmed = raw.trim();
   if (!/^-?\d+$/.test(trimmed)) return 0;
@@ -25,10 +30,23 @@ export function parseDebugLevel(search: string): number | null {
   return Math.min(MAX_LEVEL_ID, Math.max(0, n));
 }
 
-export type StartTarget = { scene: 'GameScene'; levelId: number } | { scene: 'MenuScene' };
+/** Debug parameter `?finisher=n` (M10, AP-160): plays the boss finisher of level n, same rules as `?level`. */
+export function parseDebugFinisher(search: string): number | null {
+  return parseLevelParam(search, 'finisher');
+}
 
-/** Scene to start after preload: direct GameScene with `?level=n`, otherwise the menu. */
+export type StartTarget =
+  | { scene: 'GameScene'; levelId: number }
+  | { scene: 'FinisherScene'; levelId: number }
+  | { scene: 'MenuScene' };
+
+/**
+ * Scene to start after preload: the finisher with `?finisher=n` (wins over `?level`), GameScene with
+ * `?level=n`, otherwise the menu.
+ */
 export function resolveStartTarget(search: string): StartTarget {
+  const finisher = parseDebugFinisher(search);
+  if (finisher !== null) return { scene: 'FinisherScene', levelId: finisher };
   const levelId = parseDebugLevel(search);
   return levelId === null ? { scene: 'MenuScene' } : { scene: 'GameScene', levelId };
 }
