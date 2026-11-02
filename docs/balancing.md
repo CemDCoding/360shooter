@@ -568,11 +568,11 @@ Verdienbar sind bis Level 40 nur 53 Diamanten, 7 fehlen zum Komplettkauf: man mu
 
 Set-Effekt bei allen drei Teilen: Diamant = alle 30 s ein Block, Hoelle = alle 20 s ein Feuerring fuer 3 s, Himmel = 1 Leben alle 2 s.
 
-**Pets (PE-170):** Pets sind unverwundbar. Biene: 220 px/s, Stich 40 % des Laserschadens, 2,5 Stiche/s. Pinguin: Schneeball alle 0,9 s, 120 % des Laserschadens, 40 % langsamer fuer 1,5 s. Capybara: Aura Radius 70 px, 50 % des Laserschadens je Sekunde, 30 % langsamer, heilt 2 Leben alle 10 s.
+**Pets (PE-170):** Pets sind unverwundbar. Biene: 220 px/s, Stich 40 % des Laserschadens, 2,5 Stiche/s. Pinguin: Schneeball alle 0,9 s, 120 % des Laserschadens, 40 % langsamer fuer 1,5 s. Capybara: Aura Radius 70 px, seit AP-169 160 % des Laserschadens je Sekunde (vorher 50 %), 30 % langsamer, heilt 2 Leben alle 10 s.
 
-**Pets greifen auch den Boss an (AP-164, PE-205):** Boss und lebende Boss-Teile (auch beide Teile des Riesen-Steins) sind Ziele; Unverwundbare (Geist-Phase) und Tote nicht. Der Schaden geht ueber `BossBase.takeDamage` (Ruestung `damageFactor`, Stein 0,5, wirkt wie beim Laser), der Pinguin verlangsamt Bosse nicht. Ursache des Fehlers: in der Boss-Runde ist der Gegner-Pool leer und Bosse waren nie in der Zielliste. Anteil am Laser-DPS (Laser 10 x 4/s = 40 DPS in der Basis): Der Pet-Schaden ist ein Anteil des Laserschadens, der Anteil ist deshalb in Level 4 und 40 gleich (nur Feuerrate-Upgrades senken ihn, `damageFactor` trifft Laser und Pet gleich). Stufe 0 (geschluepft): Biene 25 %, Pinguin 33 %, Capybara 12,5 % (nur im Radius). Stufe 3 (Schaden und Tempo je 1,3^3 = 2,2): Biene 121 % je Biene, 242 % mit zwei Bienen (Obergrenze bei Dauerstichen), Pinguin 161 %, Capybara 27,5 %. Das liegt ueber 25 % des Laser-DPS; der Nutzer hat es entschieden (RI-40) und akzeptiert, kein Deckel. Handtest: H-38.
+**Pets greifen auch den Boss an (AP-164, PE-205):** Boss und lebende Boss-Teile (auch beide Teile des Riesen-Steins) sind Ziele; Unverwundbare (Geist-Phase) und Tote nicht. Der Schaden geht ueber `BossBase.takeDamage` (Ruestung `damageFactor`, Stein 0,5, wirkt wie beim Laser), der Pinguin verlangsamt Bosse nicht. Ursache des Fehlers: in der Boss-Runde ist der Gegner-Pool leer und Bosse waren nie in der Zielliste. Anteil am Laser-DPS (Laser 10 x 4/s = 40 DPS in der Basis): Der Pet-Schaden ist ein Anteil des Laserschadens, der Anteil ist deshalb in Level 4 und 40 gleich (nur Feuerrate-Upgrades senken ihn, `damageFactor` trifft Laser und Pet gleich). Stufe 0 (geschluepft): Biene 25 %, Pinguin 33 %, Capybara 40 % (seit AP-169, vorher 12,5 %; nur im Radius). Stufe 3 (seit AP-169 nur Schaden 1,3^3 = 2,2-fach, das Tempo bleibt, `powerUpSpeedMul` 1,0): Biene 88 % des Laserschadens je Stich, mit zwei Bienen etwa 110 % des Laser-DPS, Pinguin 264 % je Schneeball (etwa 73 % des Laser-DPS), Capybara etwa 88 % des Laser-DPS gegen ein Ziel (jeder Gegner im Radius bekommt es, gegen Gruppen etwa 3,2-fach, Q-85). Der Pet-Anteil am Gesamtschaden gegen den Boss steht im Abschnitt „Referenzspielerin und Ziel-Baender (M11)“ (Biene 25 bis 45 %, Pinguin 18 bis 35 %, Capybara 21 bis 39 %, Ausreisser Q-84). Der Nutzer hat die Staerke entschieden (RI-40), kein Deckel. Handtest: H-38.
 
-**Pet-Leiste (PE-179):** Das Pet startet jede Runde als Ei. Besiegte Gegner fuellen die Leiste (ein Boss zaehlt wie 10 Gegner, `bossWeight`). Die erste volle Leiste (12 % der erwarteten Gegner der Runde, `hatchFraction` 0,12; PE-194, vorher 0,15) laesst das Pet schluepfen, jede weitere Leiste (25 %, `powerUpFraction` 0,25) gibt ein Power-up bis Rundenende, hoechstens 3 (`maxPowerUps`). Jedes Power-up macht Schaden und Tempo 1,3-fach; Zusatzboni: zweite Biene, Schneeball-Radius 1,5-fach, Aura-Radius 1,3-fach. Richtwert Schluepfzeit 30 bis 60 s Spielzeit (Startwert fuer den Handtest); die Schluepfzeit haengt an der Leveldauer (ideal etwa `hatchFraction` x Dauer x 1,277 s: 180-s-Level ca. 22 bis 28 s, 300-s-Level ca. 41 bis 44 s ohne Laufwege). Die Leiste sitzt mittig unter dem Timer (Abstand 4).
+**Pet-Leiste (PE-179):** Das Pet startet jede Runde als Ei. Besiegte Gegner fuellen die Leiste (ein Boss zaehlt wie 10 Gegner, `bossWeight`). Die erste volle Leiste (12 % der erwarteten Gegner der Runde, `hatchFraction` 0,12; PE-194, vorher 0,15) laesst das Pet schluepfen, jede weitere Leiste (25 %, `powerUpFraction` 0,25) gibt ein Power-up bis Rundenende, hoechstens 3 (`maxPowerUps`). Jedes Power-up macht seit AP-169 nur den Schaden 1,3-fach (das Tempo bleibt, `powerUpSpeedMul` 1,0); Zusatzboni: zweite Biene, Schneeball-Radius 1,5-fach, Aura-Radius 1,3-fach. Richtwert Schluepfzeit 30 bis 60 s Spielzeit (Startwert fuer den Handtest); die Schluepfzeit haengt an der Leveldauer (ideal etwa `hatchFraction` x Dauer x 1,277 s: 180-s-Level ca. 22 bis 28 s, 300-s-Level ca. 41 bis 44 s ohne Laufwege). Die Leiste sitzt mittig unter dem Timer (Abstand 4).
 
 ## Kurve geglaettet (AP-168)
 
@@ -589,7 +589,7 @@ AP-168 (PE-209, RS-05.2, PE-225): Die Spitze in Level 4 und die Steilwand in Lev
 |---|---|---|---|---|
 | 0 | 1,5 / 1,5 | 0,76 | 0,76 | - |
 | 1 | 1,75 / 1,64 | 1,02 | 0,92 | +20,8 % |
-| 2 | 2,0 / 1,72 | 1,36 | 1,12 | +21,1 % |
+| 2 | 2,0 / 1,72 | 1,36 | 1,12 (1,115) | +21,1 % |
 | 3 | 2,25 / 1,94 | 1,67 | 1,35 | +21,4 % |
 | 4 | 2,5 / 2,15 | 2,11 | 1,64 | +21,2 % |
 | 5 | 2,5 / 2,5 | 1,62 | 1,62 | Batch-Wechsel |
@@ -611,7 +611,7 @@ AP-168 (PE-209, RS-05.2, PE-225): Die Spitze in Level 4 und die Steilwand in Lev
 
 **Gold je Minute gegen alle Nachbarn im Batch (PE-224):** Level 0 zu 1 +9,4 %, 1 zu 2 +8,8 %, 2 zu 3 +13,1 % (180 s zu 300 s), 3 zu 4 +11,1 %; alle uebrigen Nachbarn im Batch unter ±6 %. Level 3 und 4 stehen in `KNOWN_OUT_OF_BAND.gold`; sie entstehen nicht durch die Glaettung (Gold je Runde ist unveraendert), das Band wurde nicht gelockert. Ueber Batch-Grenzen springt Gold je Minute (Level 4 zu 5 dreifach, 20 zu 21 +87 %, 25 zu 26 +30 %, 30 zu 31 +6 %), das ist gewollt.
 
-Hinweis: Die Tabelle der 41 Level im Abschnitt „Referenzspielerin und Ziel-Baender (M11)“ und die Liste „Bekannte Ausreisser“ stehen seit AP-170 auf dem Stand nach AP-168 und AP-169 (Level 2 steht dort mit 1,11, gerechnet 1,115; die Tabelle hier rundet auf 1,12).
+Hinweis: Die Tabelle der 41 Level im Abschnitt „Referenzspielerin und Ziel-Baender (M11)“ und die Liste „Bekannte Ausreisser“ stehen seit AP-170 auf dem Stand nach AP-168 und AP-169 (Level 2 steht in beiden Tabellen als 1,12; gerechnet 1,115).
 
 ## Referenzspielerin und Ziel-Baender (M11)
 
@@ -653,7 +653,7 @@ AP-167 (PE-208, RS-05.1). Das Spiel ist dadurch **unveraendert**: neu sind nur `
 |---|---|---|---|---|---|---|---|
 | 0 | 0,0 | 0,0 | 0,76 | 1,9 | 24,1 | 0,25 | 0,45 / 0,35 / 0,39 |
 | 1 | 0,2 | 0,1 | 0,92 | 2,1 | 26,5 | 0,23 | 0,44 / 0,35 / 0,39 |
-| 2 | 0,4 | 0,2 | 1,11 | 2,3 | 29,0 | 0,35 | 0,44 / 0,34 / 0,38 |
+| 2 | 0,4 | 0,2 | 1,12 | 2,3 | 29,0 | 0,35 | 0,44 / 0,34 / 0,38 |
 | 3 | 0,7 | 0,3 | 1,35 | 2,6 | 31,6 | 0,37 | 0,43 / 0,34 / 0,38 |
 | 4 | 1,1 | 0,5 | 1,64 | 2,9 | 34,0 | 0,38 | 0,42 / 0,33 / 0,37 |
 | 5 | 1,4 | 0,7 | 1,62 | 9,0 | 24,0 | 0,23 | 0,42 / 0,32 / 0,36 |

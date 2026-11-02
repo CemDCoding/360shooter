@@ -281,20 +281,20 @@ Wird der Boss besiegt, endet die Runde sofort mit Sieg, auch vor 0:00. Lebt er a
 
 | Boss | Angriff | Wirkung | Abklingzeit | Ankündigung | Schaden | Zusatz |
 |---|---|---|---|---|---|---|
-| Baummonster | `rootThrust` | Wurzeln brechen unter der Spielerin aus der Erde. | 6000 ms | 1000 ms | 15 | nein |
+| Baummonster | `rootThrust` | Wurzeln brechen unter der Spielerin aus der Erde. | 6000 ms | 1200 ms | 15 | nein |
 | Baummonster | `forestCall` | Ruft 3 bis 5 verfluchte Bäume. | 10 000 ms | 1200 ms | 0 | nein |
 | Baummonster | `rootRing` | Ring aus Wurzeln mit einer sichtbaren Lücke. | 9000 ms | 1500 ms | 15 | ja |
-| Waldgeist | `orbFan` | Fächer aus Geisterkugeln. | 6500 ms | 900 ms | 10 | nein |
+| Waldgeist | `orbFan` | Fächer aus Geisterkugeln. | 6500 ms | 1800 ms | 10 | nein |
 | Waldgeist | `fade` | Wird halb durchsichtig und kurz unverwundbar. | 9000 ms | 1000 ms | 0 | nein |
-| Waldgeist | `decoys` | Teilt sich kurz in 2 Attrappen. | 12 000 ms | 1000 ms | 0 | ja |
+| Waldgeist | `decoys` | Teilt sich kurz in 2 Attrappen. | 12 000 ms | 1200 ms | 8 | ja |
 | Riesen-Stein | `roll` | Rollt entlang einer Warnlinie zur Mitte und springt zurück. | 6000 ms | 1200 ms | 20 | nein |
 | Sand-Wurm | `burrow` | Taucht ab (unverwundbar); beim Eingraben bleibt nur der abgedimmte Kopf sichtbar, die Körperglieder sind ausgeblendet und ohne Hitbox (PE-138). Eine Sandspur wandert zur Spielerin, der Wurm bricht neben ihr im angekündigten Kreis aus. Der Sandhügel am Ende der Spur schwächt den Ausbruch, wenn man ihn beschießt. | 7000 ms | 1200 ms | 18 | nein |
-| Sand-Wurm | `spikeVolley` | Fächer aus Hautstacheln (abschießbar wie die Geisterkugeln). | 7000 ms | 900 ms | 10 | nein |
+| Sand-Wurm | `spikeVolley` | Fächer aus Hautstacheln (abschießbar wie die Geisterkugeln). | 7000 ms | 1200 ms | 10 | nein |
 | Sand-Wurm | `coil` | Der Körper umkreist die Spielerin als Ring mit Lücke und drückt zu. Nur der Kopf ist verwundbar. | 12 000 ms | 1500 ms | 15 | ja |
 | Wächter-Hund | `runeShield` | Unverwundbar, bis 3 schwebende Runen abgeschossen sind. | 14 000 ms | 1000 ms | 0 | nein |
 | Wächter-Hund | `guardBark` | Schallwellen-Ring mit Lücke. | 5000 ms | 1200 ms | 15 | nein |
 | Wächter-Hund | `summonMummies` | Ruft 3 Mumien. | 12 000 ms | 1200 ms | 0 | ja |
-| Pharao | `goldCurse` | Spirale aus Goldkugeln. | 8000 ms | 1000 ms | 10 | nein |
+| Pharao | `goldCurse` | Spirale aus Goldkugeln. | 8000 ms | 1800 ms | 10 | nein |
 | Pharao | `sarcophagus` | Verschwindet und taucht an einem angekündigten Ort wieder auf. | 9000 ms | 1200 ms | 0 | nein |
 | Pharao | `sandstorm` | Der Rand verdunkelt sich, Geschosse kommen von außen. | 14 000 ms | 1500 ms | 8 | ja |
 
