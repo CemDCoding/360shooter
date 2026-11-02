@@ -13,6 +13,7 @@ import {
   petBarLook,
   petBarParts,
   petBarRect,
+  chipRowRight,
   petBarWidth,
   trackFillWidth,
 } from '../../src/scenes/hud/PetBar';
@@ -453,11 +454,12 @@ describe('phone HUD layout (H-23, AP-86)', () => {
     }
     const slots = powerSlotRects(2, 1, H, base, m);
     const bar = bossBarRect(W, H, k, 200, 8, 8);
-    // Rest time strip below the double shot chip (AP-134) and the pet bar above the slots (AP-144).
+    // Rest time strip below the double shot chip (AP-134) and the pet bar below the timer (AP-156).
     const tb = timebarMetrics(k);
     const ds = chips[1];
     const timebar = { x: ds.x, y: ds.y + ds.h + tb.gap, w: ds.w, h: tb.stripH };
-    const petBar = petBarRect(H, m, m);
+    // Worst case: all five chips of the first row visible; the bar clears their right end.
+    const petBar = petBarRect(timer, W, m, m, chips[4].x + chips[4].w);
     return { m, energy, timer, pause, mute, chips, slots, bar, timebar, petBar };
   }
 
@@ -466,7 +468,17 @@ describe('phone HUD layout (H-23, AP-86)', () => {
 
   it.each(combos)('has no overlaps and stays in the arena at width %s, k = %s', (W, k) => {
     const l = layout(W, k);
-    const rects = [l.energy, l.timer, l.pause, l.mute, ...l.chips, ...l.slots, l.bar];
+    const rects = [
+      l.energy,
+      l.timer,
+      l.pause,
+      l.mute,
+      ...l.chips,
+      ...l.slots,
+      l.bar,
+      l.petBar,
+      l.timebar,
+    ];
     for (const r of rects) expect(rectInArena(r, W, H)).toBe(true);
     for (let i = 0; i < rects.length; i++)
       for (let j = i + 1; j < rects.length; j++)
@@ -491,13 +503,18 @@ describe('phone HUD layout (H-23, AP-86)', () => {
     const l = layout(W, k);
     const r = l.petBar;
     expect(rectInArena(r, W, H)).toBe(true);
-    // Safe area: margin m on the left, inside the arena on all sides.
-    expect(r.x).toBe(l.m);
-    expect(r.y).toBeGreaterThanOrEqual(l.m);
-    // Lower edge size.hud-petbar-gap above the slots, as wide as both slots, fixed height.
-    expect(l.slots[0].y - (r.y + r.h)).toBe(THEME.sizePx['size.hud-petbar-gap']);
+    // Safe area: inside the margin m on the left and right.
+    expect(r.x).toBeGreaterThanOrEqual(l.m);
+    expect(r.x + r.w).toBeLessThanOrEqual(W - l.m);
+    // Centred under the timer, upper edge size.hud-petbar-gap below it, as wide as both slots, fixed height.
+    expect(r.y - (l.timer.y + l.timer.h)).toBe(THEME.sizePx['size.hud-petbar-gap']);
+    // Centred, or (with all chips visible) right of the chip row: never left of the centred place.
+    expect(r.x).toBeGreaterThanOrEqual(Math.round(l.timer.x + l.timer.w / 2 - r.w / 2));
+    expect(r.x).toBeGreaterThanOrEqual(l.chips[4].x + l.chips[4].w + 4);
     expect(r.w).toBe(l.slots[1].x + l.slots[1].w - l.slots[0].x);
     expect(r.h).toBe(THEME.sizePx['size.hud-petbar-h']);
+    // Boss banner starts at BANNER_TOP (92 / 360) of the height 360.
+    expect(r.y + r.h).toBeLessThan(Math.round(H * (92 / 360)));
     const stick = {
       x: W - 24 - STICK_CATCH_DIAMETER,
       y: H - 24 - STICK_CATCH_DIAMETER,
@@ -519,6 +536,27 @@ describe('phone HUD layout (H-23, AP-86)', () => {
     ];
     for (const o of others) expect(rectsOverlap(r, o)).toBe(false);
   });
+
+  it.each(combos)(
+    'stays clear of the chip row while chips appear one by one at %s, k = %s',
+    (W, k) => {
+      const l = layout(W, k);
+      const row = l.chips.slice(0, 5);
+      for (let n = 1; n <= 5; n++) {
+        const shown = row.slice(0, n);
+        const right = chipRowRight(
+          shown.map((c) => c.w),
+          l.m,
+          row[1].x - (row[0].x + row[0].w),
+        );
+        const r = petBarRect(l.timer, W, l.m, l.m, right);
+        for (const c of shown) expect(rectsOverlap(r, c)).toBe(false);
+        expect(rectsOverlap(r, l.timer)).toBe(false);
+        expect(rectsOverlap(r, l.mute)).toBe(false);
+        expect(rectsOverlap(r, l.pause)).toBe(false);
+      }
+    },
+  );
 
   it('takes the slot margin separately from size and gap', () => {
     expect(powerSlotRects(2, 1, H, base, 11)).toEqual([
@@ -606,11 +644,22 @@ describe('pet bar (AP-144, brief H-35 view 6)', () => {
     powerUps,
   });
 
-  it('is 88 x 20 above the slots at the mockup place (8, 288) at k = 1', () => {
+  it('is 88 x 20, centred 4 below the timer', () => {
     expect(petBarWidth()).toBe(88);
-    expect(petBarRect(360, 8, 8)).toEqual({ x: 8, y: 288, w: 88, h: 20 });
-    // Safe-area inset on the left: the bar moves in with the slots.
-    expect(petBarRect(360, 8, 30).x).toBe(30);
+    const timer = { x: 290, y: 8, w: 60, h: 40 };
+    expect(petBarRect(timer, 640, 8, 8)).toEqual({ x: 276, y: 52, w: 88, h: 20 });
+    // Safe-area inset: the bar moves sideways only as far as needed.
+    expect(petBarRect({ x: 10, y: 8, w: 60, h: 40 }, 640, 30, 8).x).toBe(30);
+    // Chips under the timer push the bar right of them; it stays in the safe area.
+    expect(petBarRect(timer, 640, 8, 8, 300).x).toBe(304);
+    expect(petBarRect(timer, 640, 8, 8, 200).x).toBe(276);
+    expect(petBarRect(timer, 640, 8, 8, 600).x).toBe(640 - 8 - 88);
+    expect(petBarRect({ x: 580, y: 8, w: 60, h: 40 }, 640, 8, 30).x).toBe(640 - 30 - 88);
+  });
+
+  it('sums the visible chips for the chip row end', () => {
+    expect(chipRowRight([null, null], 8, 4)).toBeUndefined();
+    expect(chipRowRight([60, null, 50], 8, 4)).toBe(8 + 60 + 50 + 4);
   });
 
   it('lays out icon, 40 x 6 track and three 4 x 6 pips like the mockup', () => {

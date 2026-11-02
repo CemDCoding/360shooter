@@ -10,7 +10,7 @@ describe('pets config (PE-168, PE-170, PE-179)', () => {
 
   it('rules', () => {
     expect(PET_RULES).toMatchObject({
-      hatchFraction: 0.15,
+      hatchFraction: 0.12,
       powerUpFraction: 0.25,
       maxPowerUps: 3,
       bossWeight: 10,

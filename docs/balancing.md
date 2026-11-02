@@ -531,7 +531,7 @@ Set-Effekt bei allen drei Teilen: Diamant = alle 30 s ein Block, Hoelle = alle 2
 
 **Pets (PE-170):** Pets sind unverwundbar. Biene: 220 px/s, Stich 40 % des Laserschadens, 2,5 Stiche/s. Pinguin: Schneeball alle 0,9 s, 120 % des Laserschadens, 40 % langsamer fuer 1,5 s. Capybara: Aura Radius 70 px, 50 % des Laserschadens je Sekunde, 30 % langsamer, heilt 2 Leben alle 10 s.
 
-**Pet-Leiste (PE-179):** Das Pet startet jede Runde als Ei. Besiegte Gegner fuellen die Leiste (ein Boss zaehlt wie 10 Gegner, `bossWeight`). Die erste volle Leiste (15 % der erwarteten Gegner der Runde, `hatchFraction` 0,15) laesst das Pet schluepfen, jede weitere Leiste (25 %, `powerUpFraction` 0,25) gibt ein Power-up bis Rundenende, hoechstens 3 (`maxPowerUps`). Jedes Power-up macht Schaden und Tempo 1,3-fach; Zusatzboni: zweite Biene, Schneeball-Radius 1,5-fach, Aura-Radius 1,3-fach.
+**Pet-Leiste (PE-179):** Das Pet startet jede Runde als Ei. Besiegte Gegner fuellen die Leiste (ein Boss zaehlt wie 10 Gegner, `bossWeight`). Die erste volle Leiste (12 % der erwarteten Gegner der Runde, `hatchFraction` 0,12; PE-194, vorher 0,15) laesst das Pet schluepfen, jede weitere Leiste (25 %, `powerUpFraction` 0,25) gibt ein Power-up bis Rundenende, hoechstens 3 (`maxPowerUps`). Jedes Power-up macht Schaden und Tempo 1,3-fach; Zusatzboni: zweite Biene, Schneeball-Radius 1,5-fach, Aura-Radius 1,3-fach. Richtwert Schluepfzeit 30 bis 60 s Spielzeit (Startwert fuer den Handtest); die Schluepfzeit haengt an der Leveldauer (ideal etwa `hatchFraction` x Dauer x 1,277 s: 180-s-Level ca. 22 bis 28 s, 300-s-Level ca. 41 bis 44 s ohne Laufwege). Die Leiste sitzt mittig unter dem Timer (Abstand 4).
 
 ## Nachjustieren: Beispiele
 

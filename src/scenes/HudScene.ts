@@ -36,9 +36,10 @@ import {
   patternCells,
   patternWidth,
   PIXEL_LOCK,
+  type Rect,
 } from './hud/hudMath';
 import { pauseLayout } from './hud/pauseLayout';
-import { PetBar, petBarRect } from './hud/PetBar';
+import { chipRowRight, PetBar, petBarRect } from './hud/PetBar';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
 import { StatusIndicator } from './hud/StatusIndicator';
@@ -93,6 +94,8 @@ export class HudScene extends Phaser.Scene {
   private energyLow = false;
 
   private timerPanel!: FunkPanel;
+  /** Rectangle of the timer panel (the pet bar sits below it). */
+  private timerRect: Rect = { x: 0, y: 0, w: 0, h: 0 };
   private timerText!: Phaser.GameObjects.BitmapText;
   private timerSec = 0;
   private overtime = false;
@@ -268,6 +271,7 @@ export class HudScene extends Phaser.Scene {
     const wantX = Math.round(width / 2 - w / 2);
     const x = clampSpan(wantX, w, this.e.left, width - this.e.right);
     const cx = x === wantX ? width / 2 : x + w / 2;
+    this.timerRect = { x, y: my, w, h };
     this.timerPanel = new FunkPanel(this, x, my, w, h);
     this.timerText = funkText(this, cx, my + h / 2, '0:00', scale, 'hud.text').setOrigin(0.5);
   }
@@ -551,6 +555,7 @@ export class HudScene extends Phaser.Scene {
         if (x !== null) c.setPosition(x, y);
       });
     }
+    this.petBar?.moveTo(this.petBarPlace());
   }
 
   private createPauseOverlay(
@@ -711,14 +716,24 @@ export class HudScene extends Phaser.Scene {
     this.slots?.setStore(p);
   }
 
-  /** Pet bar: appears with the first state of the round's pet, sits above the slots (fixed size). */
+  /** Pet bar: appears with the first state of the round's pet, sits below the timer (fixed size). */
   private onPet(p: GameEventPayloads['pet-changed']): void {
     if (!p) return;
     if (!this.petBar) {
-      const rect = petBarRect(this.scale.height, this.e.bottom, this.e.left);
+      const rect = this.petBarPlace();
       this.petBar = new PetBar(this, rect, p.petId);
     }
     this.petBar.set(p);
+  }
+
+  /** Pet bar place: centred under the timer, right of the visible chip row if that reaches it. */
+  private petBarPlace(): Rect {
+    const chipsRight = chipRowRight(
+      this.chipRow.map((c) => (c.visible ? c.width : null)),
+      this.e.left,
+      Math.round(CHIP_GAP * this.k),
+    );
+    return petBarRect(this.timerRect, this.scale.width, this.e.left, this.e.right, chipsRight);
   }
 
   /** A ready slot was tapped: report it to the GameScene, but never while paused or after the end. */
