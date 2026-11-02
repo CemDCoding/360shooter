@@ -410,3 +410,45 @@ describe('seenFinishers and reduceEffects (AP-161)', () => {
     expect(l.reduceEffects).toBe(false);
   });
 });
+
+describe('assistLosses (AP-172)', () => {
+  it('is empty in the default save and in an old save without the field', () => {
+    expect(defaultSave().assistLosses ?? {}).toEqual({});
+    expect(loadSave(memory(JSON.stringify(v1))).assistLosses ?? {}).toEqual({});
+    const old: Partial<SaveGame> = { ...valid };
+    delete old.assistLosses;
+    expect(loadSave(memory(JSON.stringify(old))).assistLosses ?? {}).toEqual({});
+  });
+  it('round-trips valid entries', () => {
+    const s = memory();
+    expect(writeSave({ ...valid, assistLosses: { '0': 2, '7': 5 } }, s)).toBe(true);
+    expect(loadSave(s).assistLosses).toEqual({ '0': 2, '7': 5 });
+  });
+  it.each([1, 'x', null, [], [3], true])('treats %j as empty', (bad) => {
+    const l = loadSave(memory(JSON.stringify({ ...valid, assistLosses: bad })));
+    expect(l.assistLosses ?? {}).toEqual({});
+  });
+  it('drops unknown level ids and broken counts, keeps the rest', () => {
+    const raw = {
+      '1': 3,
+      '41': 2,
+      '-1': 2,
+      abc: 2,
+      '2': 0,
+      '3': 1.5,
+      '4': '2',
+      '5': -1,
+      '6': 1000,
+      '07': 2,
+    };
+    const l = loadSave(memory(JSON.stringify({ ...valid, assistLosses: raw })));
+    expect(l.assistLosses).toEqual({ '1': 3, '7': 2 });
+    expect(l.gold).toBe(120);
+  });
+  it('reset deletes the field', () => {
+    const s = memory();
+    writeSave({ ...valid, assistLosses: { '1': 4 } }, s);
+    resetSave(s);
+    expect(loadSave(s).assistLosses ?? {}).toEqual({});
+  });
+});

@@ -414,3 +414,12 @@ describe('M10 contracts (AP-157)', () => {
     expect(enemy.role).toBeUndefined();
   });
 });
+
+describe('SaveGame.assistLosses (AP-172)', () => {
+  it('is an optional record of losses per level id', () => {
+    const none: Pick<SaveGame, 'assistLosses'> = {};
+    expect(none.assistLosses).toBeUndefined();
+    const some: Pick<SaveGame, 'assistLosses'> = { assistLosses: { '3': 2 } };
+    expect(some.assistLosses?.['3']).toBe(2);
+  });
+});

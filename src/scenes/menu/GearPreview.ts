@@ -66,11 +66,7 @@ export class GearPreview extends Phaser.GameObjects.Container {
       if (s) this.baseSprites.push(s);
     }
     if (layers.pet) {
-      const { x: dx, y: dy } = previewPetPlacement(
-        this.opts.scale,
-        this.opts.flipX,
-        this.opts.fit,
-      );
+      const { x: dx, y: dy } = previewPetPlacement(this.opts.scale, this.opts.flipX, this.opts.fit);
       this.layer(layers.pet, dx, dy);
       if (layers.petGear) this.layer(layers.petGear, dx, dy);
     }
