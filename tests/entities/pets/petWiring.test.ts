@@ -59,6 +59,11 @@ describe('pet bar wiring in the HudScene', () => {
   it('creates the bar only with the first pet state', () => {
     const onPet = body(hud, 'onPet');
     expect(onPet).toContain('if (!this.petBar)');
-    expect(onPet).toContain('petBarRect(');
+    expect(onPet).toContain('this.petBarPlace()');
+    expect(body(hud, 'petBarPlace')).toContain('petBarRect(');
+  });
+
+  it('moves the bar with every chip relayout', () => {
+    expect(body(hud, 'relayoutChips')).toContain('this.petBar?.moveTo(this.petBarPlace())');
   });
 });

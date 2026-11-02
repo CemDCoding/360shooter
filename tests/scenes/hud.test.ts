@@ -13,6 +13,7 @@ import {
   petBarLook,
   petBarParts,
   petBarRect,
+  chipRowRight,
   petBarWidth,
   trackFillWidth,
 } from '../../src/scenes/hud/PetBar';
@@ -536,6 +537,27 @@ describe('phone HUD layout (H-23, AP-86)', () => {
     for (const o of others) expect(rectsOverlap(r, o)).toBe(false);
   });
 
+  it.each(combos)(
+    'stays clear of the chip row while chips appear one by one at %s, k = %s',
+    (W, k) => {
+      const l = layout(W, k);
+      const row = l.chips.slice(0, 5);
+      for (let n = 1; n <= 5; n++) {
+        const shown = row.slice(0, n);
+        const right = chipRowRight(
+          shown.map((c) => c.w),
+          l.m,
+          row[1].x - (row[0].x + row[0].w),
+        );
+        const r = petBarRect(l.timer, W, l.m, l.m, right);
+        for (const c of shown) expect(rectsOverlap(r, c)).toBe(false);
+        expect(rectsOverlap(r, l.timer)).toBe(false);
+        expect(rectsOverlap(r, l.mute)).toBe(false);
+        expect(rectsOverlap(r, l.pause)).toBe(false);
+      }
+    },
+  );
+
   it('takes the slot margin separately from size and gap', () => {
     expect(powerSlotRects(2, 1, H, base, 11)).toEqual([
       { x: 11, y: 309, w: 40, h: 40 },
@@ -633,6 +655,11 @@ describe('pet bar (AP-144, brief H-35 view 6)', () => {
     expect(petBarRect(timer, 640, 8, 8, 200).x).toBe(276);
     expect(petBarRect(timer, 640, 8, 8, 600).x).toBe(640 - 8 - 88);
     expect(petBarRect({ x: 580, y: 8, w: 60, h: 40 }, 640, 8, 30).x).toBe(640 - 30 - 88);
+  });
+
+  it('sums the visible chips for the chip row end', () => {
+    expect(chipRowRight([null, null], 8, 4)).toBeUndefined();
+    expect(chipRowRight([60, null, 50], 8, 4)).toBe(8 + 60 + 50 + 4);
   });
 
   it('lays out icon, 40 x 6 track and three 4 x 6 pips like the mockup', () => {

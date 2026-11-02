@@ -56,6 +56,17 @@ export function petBarRect(
   return { x: clampSpan(wantX, w, leftEdge, arenaW - rightEdge), y: timer.y + timer.h + gap, w, h };
 }
 
+/** Right end of the chip row: `left` plus the widths of the visible chips and the gaps between them. */
+export function chipRowRight(
+  widths: readonly (number | null)[],
+  left: number,
+  gap: number,
+): number | undefined {
+  const shown = widths.filter((w): w is number => w !== null);
+  if (shown.length === 0) return undefined;
+  return left + shown.reduce((s, w) => s + w, 0) + gap * (shown.length - 1);
+}
+
 export interface PetBarParts {
   /** Centre of the egg or pet icon (1x). */
   icon: { x: number; y: number };
@@ -135,14 +146,14 @@ export class PetBar {
   private readonly gfx: Phaser.GameObjects.Graphics;
   private readonly eggText: Phaser.GameObjects.BitmapText;
   private readonly maxText: Phaser.GameObjects.BitmapText;
-  private readonly parts: PetBarParts;
+  private parts: PetBarParts;
   private state: PetRoundState | null = null;
   private flashing = false;
   private flashTimer?: Phaser.Time.TimerEvent;
 
   constructor(
     private readonly scene: Phaser.Scene,
-    readonly rect: Rect,
+    public rect: Rect,
     private readonly petId: PetId,
   ) {
     this.parts = petBarParts(rect);
@@ -167,6 +178,18 @@ export class PetBar {
     )
       .setOrigin(0, 0.5)
       .setVisible(false);
+  }
+
+  /** Moves the whole bar (the chip row changed); same size. */
+  moveTo(rect: Rect): void {
+    if (rect.x === this.rect.x && rect.y === this.rect.y) return;
+    this.rect = rect;
+    this.parts = petBarParts(rect);
+    this.panel.setPosition(rect.x, rect.y);
+    this.icon.setPosition(this.parts.icon.x, this.parts.icon.y);
+    this.eggText.setPosition(this.parts.eggLabel.x, this.parts.eggLabel.y);
+    this.maxText.setPosition(this.parts.maxLabel.x, this.parts.maxLabel.y);
+    this.redraw();
   }
 
   set(next: PetRoundState): void {

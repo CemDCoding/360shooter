@@ -39,7 +39,7 @@ import {
   type Rect,
 } from './hud/hudMath';
 import { pauseLayout } from './hud/pauseLayout';
-import { PetBar, petBarRect } from './hud/PetBar';
+import { chipRowRight, PetBar, petBarRect } from './hud/PetBar';
 import { PowerIndicators } from './hud/PowerIndicators';
 import { POWER_SLOT_PRESSED, PowerSlots } from './hud/PowerSlots';
 import { StatusIndicator } from './hud/StatusIndicator';
@@ -555,6 +555,7 @@ export class HudScene extends Phaser.Scene {
         if (x !== null) c.setPosition(x, y);
       });
     }
+    this.petBar?.moveTo(this.petBarPlace());
   }
 
   private createPauseOverlay(
@@ -719,22 +720,20 @@ export class HudScene extends Phaser.Scene {
   private onPet(p: GameEventPayloads['pet-changed']): void {
     if (!p) return;
     if (!this.petBar) {
-      // Chips visible right now push the bar sideways (it does not follow chips that appear later).
-      const shown = this.chipRow.filter((c) => c.visible);
-      const chipGap = Math.round(CHIP_GAP * this.k);
-      const chipsRight = shown.length
-        ? this.e.left + shown.reduce((sum, c) => sum + c.width, 0) + chipGap * (shown.length - 1)
-        : undefined;
-      const rect = petBarRect(
-        this.timerRect,
-        this.scale.width,
-        this.e.left,
-        this.e.right,
-        chipsRight,
-      );
+      const rect = this.petBarPlace();
       this.petBar = new PetBar(this, rect, p.petId);
     }
     this.petBar.set(p);
+  }
+
+  /** Pet bar place: centred under the timer, right of the visible chip row if that reaches it. */
+  private petBarPlace(): Rect {
+    const chipsRight = chipRowRight(
+      this.chipRow.map((c) => (c.visible ? c.width : null)),
+      this.e.left,
+      Math.round(CHIP_GAP * this.k),
+    );
+    return petBarRect(this.timerRect, this.scale.width, this.e.left, this.e.right, chipsRight);
   }
 
   /** A ready slot was tapped: report it to the GameScene, but never while paused or after the end. */
