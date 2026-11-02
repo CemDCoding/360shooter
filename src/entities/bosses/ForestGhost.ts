@@ -2,8 +2,9 @@ import Phaser from 'phaser';
 import { BOSS_TUNING } from '../../config/bosses';
 import { THEME } from '../../config/theme';
 import type { BossAttackDef } from '../../contracts';
+import type { ParryCircleState } from '../../logic/parry';
 import { canLaserDestroyBolt } from '../../logic/projectiles';
-import { BossBase, type BossContext } from './BossBase';
+import { BossBase, type BossContext, type ParryAnchor } from './BossBase';
 import { GhostOrb } from './GhostOrb';
 import { bodyCircle, bodyShape, type BossHazard } from './hazards';
 import { Telegraph } from './Telegraph';
@@ -11,12 +12,34 @@ import { Telegraph } from './Telegraph';
 const T = BOSS_TUNING.forestGhost;
 const FAN_SPREAD = Phaser.Math.DegToRad(T.fanSpreadDeg); // total opening angle
 const SHIELD_COLOR = THEME.colors['mint.200'].num;
+/** Angle between the two pebble circles of orbFan (AP-153): 64 degrees = 59 px apart, no overlap. */
+const PEBBLE_STEP_DEG = 64;
+const RAD_TO_DEG = 180 / Math.PI;
+
+/**
+ * Angle (degrees, around the player) of circle `index` (AP-153). `ghostDeg` is the direction of the real ghost.
+ * - orbFan: the pebble trail points towards the fan, i.e. towards the ghost (two circles, +-32 degrees).
+ * - decoys: index 0 (the real ghost) sits on the ghost, every further circle on the decoy at the same angle as
+ *   the decoy sprite (placeDecoys: evenly spread around the orbit). Other attacks: null (default places).
+ */
+export function ghostCircleAngle(
+  attackId: string,
+  index: number,
+  ghostDeg: number,
+  decoyCount: number,
+): number | null {
+  if (attackId === 'orbFan') return ghostDeg + (index - 0.5) * PEBBLE_STEP_DEG;
+  if (attackId === 'decoys') return ghostDeg + (index * 360) / (decoyCount + 1);
+  return null;
+}
 
 /**
  * Boss "Waldgeist" (AP-18, PE-34). Floats on a circle around the middle.
  * - fade: half transparent and invulnerable for a short time (announced by blinking, shield ring while it lasts).
  * - orbFan: warning lines, then 5 GhostOrbs in a fan towards the middle.
  * - decoys (extra attack): 2 decoys for a few seconds. They do not shoot and have no body; only the real one takes damage.
+ *   The quicktime (AP-153) has one circle on the real ghost and a mist decoy circle on each decoy; a missed real circle
+ *   (or a tapped decoy) lets one orb fly at the player (8 damage after the share).
  * The scene reads the orbs via getHazards() (generic hit path, PE-134) for the overlap with the player
  * (orb.damage, orb.kill()) and destroys orbs with lasers like the witch projectile (PE-37, one laser hits one orb). Orbs need at least MIN_REACTION_MS
  * (PE-75) from the orbit to the player.
@@ -105,9 +128,10 @@ export class ForestGhost extends BossBase {
     for (const o of this.orbs) o.tick(delta);
   }
 
-  protected override canParry(attack: BossAttackDef): boolean {
-    // AP-153 unlocks the decoys circles.
-    return attack.id !== 'decoys';
+  protected override parryAnchor(attack: BossAttackDef, circle: ParryCircleState): ParryAnchor {
+    const ghostDeg = Math.atan2(this.y - this.center.y, this.x - this.center.x) * RAD_TO_DEG;
+    const angleDeg = ghostCircleAngle(attack.id, circle.index, ghostDeg, T.decoyCount);
+    return angleDeg === null ? super.parryAnchor(attack, circle) : { angleDeg };
   }
 
   protected onTelegraph(attack: BossAttackDef): void {
@@ -140,6 +164,10 @@ export class ForestGhost extends BossBase {
         repeat: 1,
       });
     } else if (attack.id === 'decoys') {
+      // Stand still so the decoy circles sit exactly where the decoys appear.
+      this.holdMovement = true;
+      // The decoys are visible during the announcement already (look only; duration starts at the impact).
+      this.showDecoys();
       this.track(Telegraph.circle(this.scene, this.x, this.y, 40, attack.telegraphMs));
     }
   }
@@ -164,15 +192,21 @@ export class ForestGhost extends BossBase {
       this.invulnerable = true;
       this.setAlpha(T.fadeAlpha);
     } else if (attackId === 'decoys') {
-      this.decoyLeftMs = T.decoyDurationMs;
-      for (let i = 0; i < T.decoyCount; i++) {
-        const d = this.scene.add
-          .sprite(this.x, this.y, this.def.spriteKey)
-          .setAlpha(T.decoyAlpha)
-          .setDepth(this.depth - 0.1);
-        this.decoys.push(d);
+      this.holdMovement = false;
+      // The real circle missed (or a decoy was tapped): the ghost's wail comes as one orb, `damage` already
+      // carries the quicktime share. Fully parried: nothing.
+      if (damage > 0) {
+        this.takeOrb().fire(
+          this.x,
+          this.y,
+          this.angleToCenter(),
+          T.orbSpeedPxPerSec,
+          damage,
+          T.orbLifeMs,
+        );
       }
-      this.placeDecoys();
+      this.decoyLeftMs = T.decoyDurationMs;
+      if (this.decoys.length === 0) this.showDecoys();
     }
   }
 
@@ -189,6 +223,18 @@ export class ForestGhost extends BossBase {
       this.center.x + Math.cos(this.orbitAngle) * T.orbitRadius,
       this.center.y + Math.sin(this.orbitAngle) * T.orbitRadius,
     );
+  }
+
+  private showDecoys(): void {
+    this.clearDecoys();
+    for (let i = 0; i < T.decoyCount; i++) {
+      const d = this.scene.add
+        .sprite(this.x, this.y, this.def.spriteKey)
+        .setAlpha(T.decoyAlpha)
+        .setDepth(this.depth - 0.1);
+      this.decoys.push(d);
+    }
+    this.placeDecoys();
   }
 
   private placeDecoys(): void {
