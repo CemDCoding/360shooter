@@ -13,7 +13,7 @@ import {
   type Point,
   type Rect,
 } from './layout';
-import { beamProgress, impactPhase, letterboxVisible } from './timing';
+import { beamProgress, hitImageAt, impactPhase, letterboxVisible } from './timing';
 
 const SPEEDLINES = THEME.sizeCount['size.finisher-speedlines'];
 /** Extra size of shaken full-screen fills, so no edge shows while shaking. */
@@ -114,10 +114,16 @@ export function bgColor(ctx: FinisherContext, step: FinisherStep): BlockEffect {
   };
 }
 
+/**
+ * Speedlines of the plan, centred on the hit point. While the hit image is shown they step aside:
+ * the hit image draws its own speedlines onto the picture centre (see `frames`).
+ */
 export function speedlines(ctx: FinisherContext, step: FinisherStep): BlockEffect {
   const g = addBackSpeedlines(ctx, ctx.hit, step.color, step.atMs + 1);
   return {
-    update() {},
+    update(seqMs) {
+      g.setVisible(!hitImageAt(ctx.plan, step.atMs + seqMs));
+    },
     destroy() {
       g.destroy();
     },
@@ -130,7 +136,8 @@ export function speedlines(ctx: FinisherContext, step: FinisherStep): BlockEffec
  */
 export function beam(ctx: FinisherContext): BlockEffect {
   const scene = ctx.scene;
-  const y = ctx.hit.y;
+  // The beam leaves the astronaut, so it runs at her height (her copy on screen, zoom included).
+  const y = ctx.actors.playerScreen().y;
   const fromLeft = ctx.data.player.x <= ctx.data.boss.x;
   const glowKey = ctx.textures.dither(themeColor('finisher.beam-glow').css);
   const rim = themeColor('finisher.beam-rim').num;
@@ -154,8 +161,9 @@ export function beam(ctx: FinisherContext): BlockEffect {
   };
   let lastW = -1;
   return {
-    update(_seqMs, fxMs) {
-      const span = beamSpan(fromLeft, ctx.layout.width, beamProgress(fxMs));
+    update(seqMs) {
+      // Growth in sequence time: a slow motion (stage 4 to 6 from 800 ms) must not hold it short.
+      const span = beamSpan(fromLeft, ctx.layout.width, beamProgress(seqMs));
       // Sizes change only on the 3 growth steps (a TileSprite redraws its canvas on every resize).
       if (span.w === lastW) return;
       lastW = span.w;

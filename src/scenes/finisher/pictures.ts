@@ -252,6 +252,10 @@ export function frames(ctx: FinisherContext, step: FinisherStep): BlockEffect {
   const extras: Phaser.GameObjects.GameObject[] = [];
   if (isHitImage(step)) {
     ctx.actors.setBossMode('hidden');
+    // Stages with speedlines (3 to 6): they run onto the picture centre for the whole hit image
+    // (mockup m10-zoom-stages); the plan's speedlines around the hit point hide meanwhile.
+    const lines = ctx.plan.steps.find((s) => s.block === 'speedlines');
+    if (lines) extras.push(addBackSpeedlines(ctx, center, lines.color, step.atMs + 13));
     if (!bgAt(ctx, step.atMs)) {
       extras.push(
         scene.add

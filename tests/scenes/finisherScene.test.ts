@@ -8,7 +8,9 @@ import overlays from '../../src/scenes/finisher/overlays.ts?raw';
 import pictures from '../../src/scenes/finisher/pictures.ts?raw';
 import particles from '../../src/scenes/finisher/particles.ts?raw';
 import camera from '../../src/scenes/finisher/camera.ts?raw';
+import { createRequire } from 'node:module';
 import type { FinisherBlock } from '../../src/contracts';
+import { releaseTimeline } from '../../src/scenes/finisher/shutdown';
 
 /** All 15 blocks of the contract; `satisfies` keeps the list in step with the type. */
 const ALL_BLOCKS = {
@@ -77,7 +79,7 @@ describe('FinisherScene wiring', () => {
 
   it('after end or skip stops GameScene and the HUD and starts ResultScene with data.result', () => {
     const finish = method(scene, 'finish');
-    expect(finish).toMatch(/if \(this\.result !== undefined\)/);
+    expect(finish).toMatch(/if \(this\.result !== undefined && this\.result !== null\)/);
     expect(finish).toMatch(/for \(const key of \[GAME_KEY, HUD_KEY\]\)/);
     expect(finish).toMatch(/this\.scene\.stop\(key\)/);
     expect(finish).toMatch(/this\.scene\.start\(RESULT_KEY, this\.result/);
@@ -105,16 +107,64 @@ describe('FinisherScene wiring', () => {
       'this.unbindInput()',
       'r.effect.destroy()',
       'this.particleSystem?.destroy()',
-      'this.timeline?.destroy()',
+      'this.timeline = releaseTimeline(this.timeline)',
       'this.ctx.textures.destroy()',
       'this.tweens.timeScale = 1',
     ]) {
       expect(cleanup).toContain(part);
     }
+    // Phaser destroys the timeline itself; a second destroy() throws (review round 2).
+    expect(scene).not.toMatch(/timeline\??\.destroy\(/);
+  });
+
+  it('runs the hit image speedlines onto the picture centre and grows the beam at the astronaut', () => {
+    expect(pictures).toMatch(/addBackSpeedlines\(ctx, center, lines\.color/);
+    expect(overlays).toMatch(/g\.setVisible\(!hitImageAt\(ctx\.plan, step\.atMs \+ seqMs\)\)/);
+    expect(overlays).toMatch(/const y = ctx\.actors\.playerScreen\(\)\.y/);
+    expect(overlays).toMatch(/beamProgress\(seqMs\)/);
   });
 
   it('plays the four finisher sounds only through the sound service', () => {
     expect(scene).toMatch(/for \(const cue of soundCues\(plan\)\)/);
     expect(scene).toMatch(/sound\.play\(cue\.key\)/);
+  });
+});
+
+describe('FinisherScene shutdown with the real Phaser Timeline', () => {
+  // Phaser's Timeline and its emitter run in Node; the scene itself needs a browser.
+  const req = createRequire(import.meta.url);
+  const EventEmitter = req('eventemitter3') as new () => {
+    once(e: string, fn: () => void): void;
+    emit(e: string): boolean;
+  };
+  const Timeline = req('phaser/src/time/Timeline.js') as new (scene: unknown) => {
+    stop(): unknown;
+    destroy(): void;
+    systems: unknown;
+  };
+  const SHUTDOWN = (req('phaser/src/scene/events/index.js') as { SHUTDOWN: string }).SHUTDOWN;
+
+  /** Same order as the scene: cleanup is registered in create() before the timeline exists. */
+  function shutdownWith(cleanupTimeline: (tl: InstanceType<typeof Timeline>) => void) {
+    const events = new EventEmitter();
+    const fakeScene = { sys: { events } };
+    let tl: InstanceType<typeof Timeline> | null = null;
+    events.once(SHUTDOWN, () => {
+      if (tl) cleanupTimeline(tl);
+    });
+    tl = new Timeline(fakeScene);
+    const created = tl;
+    return { run: () => events.emit(SHUTDOWN), created };
+  }
+
+  it('ends without throwing; Phaser destroys the timeline exactly once', () => {
+    const { run, created } = shutdownWith((tl) => releaseTimeline(tl));
+    expect(run).not.toThrow();
+    expect(created.systems).toBeNull();
+  });
+
+  it('would throw with a second destroy() in cleanup (the bug of round 1)', () => {
+    const { run } = shutdownWith((tl) => tl.destroy());
+    expect(run).toThrow(TypeError);
   });
 });

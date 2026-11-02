@@ -152,7 +152,14 @@ export function centredX(cx: number, w: number): number {
   return Math.round(cx - w / 2);
 }
 
-/** Screen position of an actor copy with the camera zoomed on the hit point, kept inside the arena. */
+function clampHalf(v: number, half: number, size: number): number {
+  return half * 2 >= size ? size / 2 : Math.min(size - half, Math.max(half, v));
+}
+
+/**
+ * Screen position of an actor copy with the camera zoomed on the hit point, kept inside the arena.
+ * Writes into `out` when given (the scene reuses one object per frame).
+ */
 export function actorScreen(
   actor: Point,
   hit: Point,
@@ -161,13 +168,12 @@ export function actorScreen(
   height: number,
   halfW: number,
   halfH: number,
+  out?: Point,
 ): Point {
-  const clamp = (v: number, half: number, size: number): number =>
-    half * 2 >= size ? size / 2 : Math.min(size - half, Math.max(half, v));
-  return {
-    x: Math.round(clamp(hit.x + (actor.x - hit.x) * zoom, halfW, width)),
-    y: Math.round(clamp(hit.y + (actor.y - hit.y) * zoom, halfH, height)),
-  };
+  const p = out ?? { x: 0, y: 0 };
+  p.x = Math.round(clampHalf(hit.x + (actor.x - hit.x) * zoom, halfW, width));
+  p.y = Math.round(clampHalf(hit.y + (actor.y - hit.y) * zoom, halfH, height));
+  return p;
 }
 
 /** Hit point (boss position) inside the arena. */

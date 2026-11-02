@@ -26,6 +26,7 @@ import { actorScreen, finisherLayout, hitPoint } from './finisher/layout';
 import { beam, bgColor, flash, impactFrame, letterbox, speedlines } from './finisher/overlays';
 import { ParticleSystem, particles, shatter } from './finisher/particles';
 import { createSkipHint, cutIn, frames, panels, title } from './finisher/pictures';
+import { releaseTimeline } from './finisher/shutdown';
 import { isFinisherStartData } from './finisher/startData';
 import { TextureBank } from './finisher/textures';
 import { beamWindow, effectRate, soundCues } from './finisher/timing';
@@ -224,19 +225,27 @@ export class FinisherScene extends Phaser.Scene {
     };
     const boss = make(data.boss);
     const player = make(data.player);
-    const screen = (img: Phaser.GameObjects.Image, a: FinisherStartData['boss']) => {
-      const scale = a.scale * ctx.zoom;
-      const p = actorScreen(
+    // One result object per actor, reused every frame (read it right away, it changes on the next call).
+    const screen = (
+      img: Phaser.GameObjects.Image,
+      a: FinisherStartData['boss'],
+      out: { x: number; y: number; scale: number },
+    ) => {
+      out.scale = a.scale * ctx.zoom;
+      actorScreen(
         a,
         hit,
         ctx.zoom,
         layout.width,
         layout.height,
-        (img.width * scale) / 2,
-        (img.height * scale) / 2,
+        (img.width * out.scale) / 2,
+        (img.height * out.scale) / 2,
+        out,
       );
-      return { x: p.x, y: p.y, scale };
+      return out;
     };
+    const bossAt = { x: 0, y: 0, scale: 1 };
+    const playerAt = { x: 0, y: 0, scale: 1 };
     const actors: ActorCopies = {
       boss,
       player,
@@ -248,8 +257,8 @@ export class FinisherScene extends Phaser.Scene {
       setPlayerShown(shown: boolean) {
         player.setVisible(shown && !ctx.plan.isFinale);
       },
-      bossScreen: () => screen(boss, data.boss),
-      playerScreen: () => screen(player, data.player),
+      bossScreen: () => screen(boss, data.boss, bossAt),
+      playerScreen: () => screen(player, data.player, playerAt),
     };
     // Finales show their own pictures; the stages start on the boss copy.
     actors.setBossMode(ctx.plan.isFinale ? 'hidden' : 'shown');
@@ -267,12 +276,10 @@ export class FinisherScene extends Phaser.Scene {
     this.particleSystem?.update(dtFx);
     ctx.back.setPosition(ctx.shake.x, ctx.shake.y);
     ctx.world.setPosition(ctx.shake.x, ctx.shake.y);
-    for (const [img, at] of [
-      [ctx.actors.boss, ctx.actors.bossScreen()],
-      [ctx.actors.player, ctx.actors.playerScreen()],
-    ] as const) {
-      img.setPosition(at.x, at.y).setScale(at.scale);
-    }
+    const b = ctx.actors.bossScreen();
+    ctx.actors.boss.setPosition(b.x, b.y).setScale(b.scale);
+    const p = ctx.actors.playerScreen();
+    ctx.actors.player.setPosition(p.x, p.y).setScale(p.scale);
     this.hint?.setVisible(ctx.plan.skippable && seq >= FINISHER_RULES.skipLockMs);
   }
 
@@ -304,7 +311,7 @@ export class FinisherScene extends Phaser.Scene {
     this.done = true;
     this.timeline?.stop();
     this.unbindInput();
-    if (this.result !== undefined) {
+    if (this.result !== undefined && this.result !== null) {
       for (const key of [GAME_KEY, HUD_KEY]) {
         if (this.scene.isActive(key) || this.scene.isPaused(key) || this.scene.isSleeping(key)) {
           this.scene.stop(key);
@@ -326,8 +333,8 @@ export class FinisherScene extends Phaser.Scene {
     this.particleSystem = null;
     this.hint?.destroy();
     this.hint = null;
-    this.timeline?.destroy();
-    this.timeline = null;
+    // Phaser destroys the timeline itself on SHUTDOWN; a second destroy() would throw.
+    this.timeline = releaseTimeline(this.timeline);
     if (this.ctx) {
       this.ctx.back.destroy();
       this.ctx.world.destroy();

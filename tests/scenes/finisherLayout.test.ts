@@ -29,6 +29,7 @@ import {
   cutInOffset,
   effectRate,
   frameAt,
+  hitImageAt,
   impactPhase,
   letterboxVisible,
   panelsVisible,
@@ -105,6 +106,12 @@ describe('actors, hit point, speedlines, beam', () => {
     expect(actorScreen(hit, hit, 2, 640, H, 64, 64)).toEqual(hit);
     expect(actorScreen({ x: 320, y: 180 }, hit, 2, 640, H, 32, 32)).toEqual({ x: 160, y: 180 });
     expect(actorScreen({ x: 100, y: 180 }, hit, 2, 640, H, 32, 32).x).toBe(32);
+  });
+
+  it('writes into a reused point when given', () => {
+    const out = { x: 0, y: 0 };
+    expect(actorScreen({ x: 320, y: 180 }, { x: 480, y: 180 }, 2, 640, H, 32, 32, out)).toBe(out);
+    expect(out).toEqual({ x: 160, y: 180 });
   });
 
   it('clamps the hit point into the arena', () => {
@@ -231,6 +238,14 @@ describe('beam window and sounds (AP-160 decisions)', () => {
       atMs: 800,
       durationMs: 300,
     });
+  });
+
+  it('knows when the hit image is shown (plan speedlines step aside then)', () => {
+    const p4 = buildFinisher(21, { reduceEffects: false, seen: [] });
+    expect(hitImageAt(p4, 900)).toBe(false);
+    expect(hitImageAt(p4, 1100)).toBe(true);
+    expect(hitImageAt(buildFinisher(10, { reduceEffects: false, seen: [] }), 520)).toBe(true);
+    expect(hitImageAt(buildFinisher(4, { reduceEffects: false, seen: [] }), 1200)).toBe(false);
   });
 
   it('keeps every plan flash safe with and without reduce effects (the beam adds no step)', () => {

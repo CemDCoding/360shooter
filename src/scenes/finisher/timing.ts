@@ -110,7 +110,12 @@ export function isHitImage(step: FinisherStep): boolean {
   return step.block === 'frames' && step.texture === HIT_TEXTURE;
 }
 
-/** Growth of the beam from the astronaut across the picture, in 3 whole steps. */
+/** True while a stage hit image is shown at sequence time `t`. */
+export function hitImageAt(plan: FinisherPlan, t: number): boolean {
+  return plan.steps.some((s) => isHitImage(s) && covers(s, t));
+}
+
+/** Growth of the beam from the astronaut across the picture, in 3 whole steps of 20 ms (sequence time). */
 export const BEAM_GROW_MS = 60;
 
 export function beamProgress(t: number): number {
