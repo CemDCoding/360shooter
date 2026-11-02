@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { BOSS_TUNING } from '../../config/bosses';
 import { PARRY_RULES } from '../../config/parry';
-import type { BossAttackDef, ParryRules } from '../../contracts';
+import { EASY_PARRY_KEY, type BossAttackDef, type ParryRules } from '../../contracts';
 import { circlePosition, type ParryCircleState } from '../../logic/parry';
 import { ringSpikeAngles, treePositions } from './bossGeometry';
 import { BossBase, type BossContext, type ParryAnchor } from './BossBase';
@@ -149,7 +149,15 @@ export class RootMonster extends BossBase {
     if (attack.id !== 'rootThrust' && attack.id !== 'rootRing') {
       return super.parryAnchor(attack, circle);
     }
-    const count = attack.parryPattern?.steps.length ?? attack.parryCircles;
+    // Einfache Abwehr drops the decoy circles: fan only as many circles as are really shown.
+    const steps = attack.parryPattern?.steps;
+    const registry = (this.scene as Partial<Phaser.Scene> | undefined)?.registry;
+    const easy = registry?.get?.(EASY_PARRY_KEY) === true;
+    const count = steps
+      ? easy
+        ? steps.filter((s) => s.kind !== 'decoy').length
+        : steps.length
+      : attack.parryCircles;
     const body = {
       x: this.x,
       y: this.y,

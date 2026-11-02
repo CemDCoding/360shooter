@@ -124,8 +124,13 @@ class Sprite {
   setPosition() {
     return this;
   }
-  destroy() {}
+  alive = true;
+  destroy() {
+    this.alive = false;
+  }
 }
+
+const sprites: Sprite[] = [];
 
 function fakeScene(easy = false) {
   const Graphics = class {
@@ -143,7 +148,11 @@ function fakeScene(easy = false) {
     add: {
       existing: () => undefined,
       graphics: () => new Graphics(),
-      sprite: () => new Sprite(),
+      sprite: () => {
+        const sp = new Sprite();
+        sprites.push(sp);
+        return sp;
+      },
     },
     physics: { add: { existing: () => undefined }, velocityFromRotation: () => undefined },
     anims: { exists: () => false },
@@ -263,11 +272,12 @@ describe('RootMonster circles (AP-153)', () => {
     expect(Math.cos(((mid - gapCentre) * Math.PI) / 180)).toBeCloseTo(-1, 5);
   });
 
-  it('rootRing with Einfache Abwehr: two circles only, still apart', () => {
+  it('rootRing with Einfache Abwehr: two circles only, fanned symmetrically', () => {
     const boss = make(0.25, true);
     announce(boss, 'rootMonster', 'rootRing');
     const circles = boss.parryGroups[0].circles;
     expect(circles).toHaveLength(2);
+    expect(circles[1].angleDeg - circles[0].angleDeg).toBeCloseTo(70);
     expect(minGap(circles.map((c) => c.angleDeg))).toBeGreaterThan(2 * R);
   });
 
@@ -327,6 +337,26 @@ describe('ForestGhost circles (AP-153)', () => {
       const p = pos(c.angleDeg);
       expect(Math.hypot(p.x - boss.x, p.y - boss.y)).toBeGreaterThan(R + BODY_R);
     }
+  });
+
+  it('decoy ghosts are visible during the announcement and gone after despawn', () => {
+    sprites.length = 0;
+    const boss = make();
+    announce(boss, 'forestGhost', 'decoys');
+    expect(sprites.filter((x) => x.alive)).toHaveLength(BOSS_TUNING.forestGhost.decoyCount);
+    // The impact keeps the same two (no doubles).
+    (boss as unknown as Internals).onAttack('decoys', 0, 0);
+    expect(sprites.filter((x) => x.alive)).toHaveLength(BOSS_TUNING.forestGhost.decoyCount);
+    boss.despawn();
+    expect(sprites.filter((x) => x.alive)).toHaveLength(0);
+  });
+
+  it('an aborted announcement removes the decoy ghosts', () => {
+    sprites.length = 0;
+    const boss = make();
+    announce(boss, 'forestGhost', 'decoys');
+    boss.despawn();
+    expect(sprites.filter((x) => x.alive)).toHaveLength(0);
   });
 
   it('other attacks keep the default places', () => {

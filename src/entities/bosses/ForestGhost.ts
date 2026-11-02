@@ -166,6 +166,8 @@ export class ForestGhost extends BossBase {
     } else if (attack.id === 'decoys') {
       // Stand still so the decoy circles sit exactly where the decoys appear.
       this.holdMovement = true;
+      // The decoys are visible during the announcement already (look only; duration starts at the impact).
+      this.showDecoys();
       this.track(Telegraph.circle(this.scene, this.x, this.y, 40, attack.telegraphMs));
     }
   }
@@ -204,14 +206,7 @@ export class ForestGhost extends BossBase {
         );
       }
       this.decoyLeftMs = T.decoyDurationMs;
-      for (let i = 0; i < T.decoyCount; i++) {
-        const d = this.scene.add
-          .sprite(this.x, this.y, this.def.spriteKey)
-          .setAlpha(T.decoyAlpha)
-          .setDepth(this.depth - 0.1);
-        this.decoys.push(d);
-      }
-      this.placeDecoys();
+      if (this.decoys.length === 0) this.showDecoys();
     }
   }
 
@@ -228,6 +223,18 @@ export class ForestGhost extends BossBase {
       this.center.x + Math.cos(this.orbitAngle) * T.orbitRadius,
       this.center.y + Math.sin(this.orbitAngle) * T.orbitRadius,
     );
+  }
+
+  private showDecoys(): void {
+    this.clearDecoys();
+    for (let i = 0; i < T.decoyCount; i++) {
+      const d = this.scene.add
+        .sprite(this.x, this.y, this.def.spriteKey)
+        .setAlpha(T.decoyAlpha)
+        .setDepth(this.depth - 0.1);
+      this.decoys.push(d);
+    }
+    this.placeDecoys();
   }
 
   private placeDecoys(): void {
