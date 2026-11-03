@@ -3,9 +3,17 @@ import type { ActivePowers, ItemDef, ItemRules } from '../contracts';
 import { MAX_DOUBLE_SHOT_STAGE } from './powers';
 import type { Rng } from './rng';
 
-/** Weighted drop: first checks dropChance, then picks a def by dropWeight. */
-export function rollDrop(rng: Rng, rules: ItemRules, defs: readonly ItemDef[]): ItemDef | null {
-  if (rng.next() >= rules.dropChance) return null;
+/**
+ * Weighted drop: first checks dropChance, then picks a def by dropWeight. `guaranteed` (elite, AP-178) skips
+ * the chance check, so the drop is safe whenever there is a def to pick.
+ */
+export function rollDrop(
+  rng: Rng,
+  rules: ItemRules,
+  defs: readonly ItemDef[],
+  guaranteed = false,
+): ItemDef | null {
+  if (!guaranteed && rng.next() >= rules.dropChance) return null;
   const total = defs.reduce((sum, d) => sum + Math.max(0, d.dropWeight), 0);
   if (total <= 0) return null;
   let roll = rng.next() * total;

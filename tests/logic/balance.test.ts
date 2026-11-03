@@ -719,11 +719,11 @@ describe('balance: wave rhythm keeps the pressure rules (M12, AP-175, RS-01.6)',
     }
   });
 
-  it('puts the pressure into count, rhythm and elites, not into hp: the pacing mean is 1 and elites stay off', () => {
+  it('puts the pressure into count, rhythm and elites, not into hp: the pacing mean is 1', () => {
     for (const level of LEVELS) {
       expect(Math.abs(pacingSpawnFactor(level) - 1), `level ${level.id}`).toBeLessThan(1e-9);
     }
-    expect(ELITE_RULES.enabled).toBe(false);
+    expect(ELITE_RULES.enabled).toBe(true);
   });
 });
 

@@ -9,7 +9,7 @@ import { BATCH_STARTS, LEVELS, LEVEL_COUNT, MAX_ENEMIES_WANTED } from '../config
 import { getPet } from '../config/pets';
 import { LEVEL_SCALING } from '../config/scaling';
 import { COST_BASE, COST_GROWTH, UPGRADES } from '../config/upgrades';
-import { ELITE_RULES } from '../config/waves';
+import { ELITE_MODEL_SHARE, ELITE_RULES, eliteChanceScale } from '../config/waves';
 import { WEAPON_BASE } from '../config/weapon';
 import type { BossId, EnemyId, EnemyPoolEntry, LevelDef, PetId, UpgradeLevels } from '../contracts';
 import { MAX_UPGRADE_LEVEL } from '../contracts';
@@ -78,16 +78,20 @@ export function pacingMean(levelId: number): number {
 }
 
 /**
- * Elite-Anteil im Referenz-Druck (M12, RS-01.5, RS-01.6): bei eingeschalteten Eliten ab `fromLevel` die Obergrenze
- * `maxShare` (obere Naeherung), sonst 0. Bis AP-178 ausgeschaltet.
+ * Elite-Anteil im Referenz-Druck (M12, AP-178): bei eingeschalteten Eliten ab `fromLevel` der gemessene obere Anteil
+ * `ELITE_MODEL_SHARE` (2,4 bis 3,6 %) mal dem Chance-Faktor des Levels (`eliteChanceScale`), hoechstens `maxShare`.
  */
 export function eliteShare(levelId: number): number {
   const id = clampLevel(levelId);
-  return ELITE_RULES.enabled && id >= ELITE_RULES.fromLevel ? ELITE_RULES.maxShare : 0;
+  if (!ELITE_RULES.enabled || id < ELITE_RULES.fromLevel) return 0;
+  return Math.min(ELITE_RULES.maxShare, ELITE_MODEL_SHARE * eliteChanceScale(id));
 }
 
-/** Faktor auf die mittleren Lebenspunkte durch Eliten (`hpMul`-fach). */
-const eliteHpFactor = (levelId: number): number =>
+/**
+ * Faktor auf die mittleren Lebenspunkte durch Eliten (AP-178): ein Elite ersetzt einen regulaeren Spawn (Spawns je
+ * Runde unveraendert, `tests/logic/eliteBalance.test.ts`), bringt aber `hpMul`-fach Lebenspunkte.
+ */
+export const eliteHpFactor = (levelId: number): number =>
   1 + eliteShare(levelId) * (ELITE_RULES.hpMul - 1);
 
 /**

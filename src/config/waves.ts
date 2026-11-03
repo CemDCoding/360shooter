@@ -95,9 +95,37 @@ export const MAX_BACKLOG = 10;
 export const ELITE_CHANCE_PEAK = 0.15;
 export const ELITE_CHANCE_OTHER = 0.03;
 
-/** Elite rules (RS-01.5). Switched off until AP-178 (PE-220). */
+/**
+ * Elite chance per level as a factor on `ELITE_CHANCE_PEAK` / `ELITE_CHANCE_OTHER` (AP-178, user decision C). The
+ * reference pressure of the M11 bands has almost no reserve at the edges, so elites fade out there: levels 3 and 4
+ * (step to the next level 1.2144 / 1.2122 of at most 1.22), 5 (sawtooth), 38 and 39 (1.0614 / 1.0324 of room) and
+ * 30 and 40 (1.0013 / 1.0007 of room) get less or none; everything else keeps the factor 1. First match wins.
+ */
+const ELITE_CHANCE_SCALE_BY_LEVEL: readonly { first: number; last: number; scale: number }[] = [
+  { first: 3, last: 3, scale: 0.06 },
+  { first: 4, last: 4, scale: 0.08 },
+  { first: 5, last: 5, scale: 0.15 },
+  { first: 30, last: 30, scale: 0 },
+  { first: 38, last: 38, scale: 0.7 },
+  { first: 39, last: 39, scale: 0.35 },
+  { first: 40, last: 40, scale: 0 },
+];
+
+/** Factor on the elite chance for a level (0 = no elites, 1 = full). */
+export function eliteChanceScale(levelId: number): number {
+  const e = ELITE_CHANCE_SCALE_BY_LEVEL.find((x) => levelId >= x.first && levelId <= x.last);
+  return e ? e.scale : 1;
+}
+
+/**
+ * Elite share of the spawns at scale 1 as the balance model counts it (measured with the SpawnDirector, 2.4 to 3.6 %,
+ * `tests/logic/eliteBalance.test.ts`): the upper end, so the model stays on the safe side.
+ */
+export const ELITE_MODEL_SHARE = 0.036;
+
+/** Elite rules (RS-01.5). On from AP-178: hp x3, damage x1.5, same speed. */
 export const ELITE_RULES: EliteRules = {
-  enabled: false,
+  enabled: true,
   fromLevel: 3,
   hpMul: 3,
   damageMul: 1.5,

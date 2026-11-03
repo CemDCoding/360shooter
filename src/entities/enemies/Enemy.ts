@@ -3,7 +3,7 @@ import { animKey } from '../../config/assets';
 import { OPACITY, THEME } from '../../config/theme';
 import { ENEMIES, ENEMY_BODY_SIZE } from '../../config/enemies';
 import { contactHitDamage, dealsContactHit } from '../../logic/contactHit';
-import type { EnemyDef, EnemyId, EnemyStatusState, StatusOnHit } from '../../contracts';
+import type { EliteRules, EnemyDef, EnemyId, EnemyStatusState, StatusOnHit } from '../../contracts';
 import { ARENA, BASE_SPAWN_RADIUS } from '../../config/arena';
 import { approachSpeedFactor } from '../../logic/approach';
 import { distance } from '../../logic/geometry';
@@ -30,6 +30,34 @@ const BURN_ANIM = 'gear-burn-8fps';
 const BURN_FPS = 8;
 /** Thorns and knockback hit the same enemy at most this often (per-second contact enemies, AP-143). */
 const RECOIL_GAP_MS = 500;
+/** Elite marking (AP-178, brief H-43): 1 px ice-white outline from 4 silhouette copies, crown above the head. */
+const ELITE_EDGE_COLOR = THEME.colors['game.elite-edge'].num;
+const ELITE_EDGE_PX = THEME.sizePx['size.elite-edge'];
+const ELITE_CROWN_KEY = 'elite-crown';
+const ELITE_CROWN_GAP = THEME.sizePx['size.elite-crown-gap'];
+/** Offsets of the 4 outline copies (px, in x and y). */
+const ELITE_EDGE_OFFSETS: readonly (readonly [number, number])[] = [
+  [-ELITE_EDGE_PX, -ELITE_EDGE_PX],
+  [ELITE_EDGE_PX, -ELITE_EDGE_PX],
+  [-ELITE_EDGE_PX, ELITE_EDGE_PX],
+  [ELITE_EDGE_PX, ELITE_EDGE_PX],
+];
+
+/**
+ * Scale of an elite (AP-178): hp and contact/shot damage times the elite factors; speed, xp and coin chance
+ * stay as they are. The size factor is applied by `Enemy.markElite`, not here.
+ */
+export function eliteScale<T extends { hp: number; contact?: number; shot?: number }>(
+  scale: T,
+  rules: Pick<EliteRules, 'hpMul' | 'damageMul'>,
+): T {
+  return {
+    ...scale,
+    hp: scale.hp * rules.hpMul,
+    ...(scale.contact !== undefined ? { contact: scale.contact * rules.damageMul } : {}),
+    ...(scale.shot !== undefined ? { shot: scale.shot * rules.damageMul } : {}),
+  };
+}
 
 /** Flash of a hit: white, golden (critical laser hit) or none (burn ticks). */
 export type EnemyHitFlash = 'hit' | 'crit' | 'none';
@@ -60,6 +88,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   /** Burn mark, created on the first burn only (no extra sprite for rounds without gear). */
   private burnFx?: Phaser.GameObjects.Sprite;
   private recoilLeftMs = 0;
+  /** Elite flag (AP-178). Stays readable after the death (kill rewards), reset on every spawn. */
+  private eliteFlag = false;
+  /** Outline copies and crown, created on the first elite only. */
+  private eliteEdge: Phaser.GameObjects.Image[] = [];
+  private eliteCrown?: Phaser.GameObjects.Image;
 
   constructor(scene: Phaser.Scene, id: EnemyId, ctx: EnemyContext = {}) {
     const def = ENEMIES[id];
@@ -94,6 +127,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.status = createEnemyStatus();
     this.burnDamage = 0;
     this.recoilLeftMs = 0;
+    this.eliteFlag = false;
+    this.showElite(false);
     this.tintStep = tintStep;
     this.shotFactor = Number.isFinite(shot) && shot > 0 ? shot : 1;
     this.applyTierTint();
@@ -115,6 +150,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     // Also runs inside the base constructor (before the field initialisers); spawn() resets the status.
     this.burnDamage = 0;
     this.burnFx?.setVisible(false);
+    this.showElite(false);
     this.onDespawn();
   }
 
@@ -126,6 +162,75 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   protected onSpawn(): void {}
+
+  /** True for an elite (AP-178), also right after its death. */
+  get isElite(): boolean {
+    return this.eliteFlag;
+  }
+
+  /**
+   * Marks the spawned enemy as an elite (AP-178): size times `scaleMul`, outline and crown. hp and damage come
+   * through the scale (`eliteScale`). Call right after `spawn`; the next `spawn` resets everything.
+   */
+  markElite(scaleMul: number): void {
+    if (!this.active) return;
+    const mul = Number.isFinite(scaleMul) && scaleMul > 0 ? scaleMul : 1;
+    this.eliteFlag = true;
+    this.setScale(this.scaleX * mul);
+    this.showElite(true);
+  }
+
+  /** Outline copies (tint fill, behind the body) and crown; hidden again by despawn and spawn. */
+  private showElite(on: boolean): void {
+    if (!on) {
+      for (const c of this.eliteEdge) c.setVisible(false);
+      this.eliteCrown?.setVisible(false);
+      return;
+    }
+    if (this.eliteEdge.length === 0) {
+      const add = this.scene.add;
+      this.eliteEdge = ELITE_EDGE_OFFSETS.map(() =>
+        add.image(this.x, this.y, this.texture.key).setTintFill(ELITE_EDGE_COLOR),
+      );
+      if (this.scene.textures.exists(ELITE_CROWN_KEY)) {
+        this.eliteCrown = add.image(this.x, this.y, ELITE_CROWN_KEY);
+      }
+    }
+    for (const c of this.eliteEdge) c.setVisible(true);
+    this.eliteCrown?.setVisible(true);
+    this.syncElite();
+  }
+
+  /** Copies follow position, picture, direction, size and visibility of the body (crown is not scaled). */
+  private syncElite(): void {
+    if (!this.eliteFlag || this.eliteEdge.length === 0) return;
+    const frame = this.frame?.name;
+    const visible = this.visible && this.active;
+    for (let i = 0; i < this.eliteEdge.length; i++) {
+      const [dx, dy] = ELITE_EDGE_OFFSETS[i] ?? [0, 0];
+      this.eliteEdge[i]!.setTexture(this.texture.key, frame)
+        .setPosition(this.x + dx, this.y + dy)
+        .setFlipX(this.flipX)
+        .setScale(this.scaleX, this.scaleY)
+        .setAlpha(this.alpha)
+        .setDepth(this.depth - 0.5)
+        .setVisible(visible);
+    }
+    // Whole pixels, so the 9x7 crown stays sharp (brief H-43).
+    this.eliteCrown
+      ?.setPosition(
+        Math.round(this.x),
+        Math.round(
+          this.y -
+            (this.height * Math.abs(this.scaleY)) / 2 -
+            ELITE_CROWN_GAP -
+            this.eliteCrown.height / 2,
+        ),
+      )
+      .setAlpha(this.alpha)
+      .setDepth(this.depth + 1)
+      .setVisible(visible);
+  }
 
   /** Hook to hide the visuals of a subclass. Also runs inside the base constructor, before subclass fields exist. */
   protected onDespawn(): void {}
@@ -286,6 +391,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       // burrowing worm cannot switch its body on again (AP-112).
       this.flashLeftMs -= delta;
       if (this.flashLeftMs <= 0) this.despawn();
+      else this.syncElite();
       return;
     }
     if (this.flashLeftMs > 0) {
@@ -295,6 +401,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.updateStatus(delta);
     this.behave(delta);
     this.auraGfx?.setPosition(this.x, this.y);
+    this.syncElite();
   }
 
   /** Behavior hook, overridden by subclasses. */
@@ -349,6 +456,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.auraGfx?.destroy();
     this.burnFx?.destroy();
     this.burnFx = undefined;
+    for (const c of this.eliteEdge) c.destroy();
+    this.eliteEdge = [];
+    this.eliteCrown?.destroy();
+    this.eliteCrown = undefined;
     super.destroy(fromScene);
   }
 }
