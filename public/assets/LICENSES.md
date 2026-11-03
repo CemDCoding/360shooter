@@ -104,6 +104,8 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sprites/finisher-finale-30.png       | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10b.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
 | sprites/finisher-finale-40a.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10c.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
 | sprites/finisher-finale-40b.png      | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m10c.js`, erzeugt mit `npm run sprites:build`)                   | eigene Arbeit des Projekts |
+| sprites/elite-crown.png              | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m11.js`, erzeugt mit `npm run sprites:build`)                    | eigene Arbeit des Projekts |
+| sprites/event-markers.png            | eigene Arbeit des Projekts (Pixel in `docs/design/assets/sprites-m11.js`, erzeugt mit `npm run sprites:build`)                    | eigene Arbeit des Projekts |
 | fonts/astro-kapsel.png, .xml         | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | fonts/astro-funk.png, .xml           | eigene Arbeit des Projekts (Glyphen `docs/design/assets/fonts.js`, `npm run fonts:build`)                                         | eigene Arbeit des Projekts |
 | sounds/laser.wav                     | selbst erzeugt                                                                                                                    | selbst erzeugt             |
@@ -124,6 +126,9 @@ Die Sprites entstehen aus den Pixeldaten des Designers mit `npm run sprites:buil
 | sounds/finisher-hit.wav              | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 | sounds/finisher-signal.wav           | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 | sounds/finisher-dawn.wav             | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/event-swarm.wav               | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/event-ring.wav                | selbst erzeugt                                                                                                                    | selbst erzeugt             |
+| sounds/event-pincer.wav              | selbst erzeugt                                                                                                                    | selbst erzeugt             |
 
 ## App-Icons (`public/icons/`)
 

@@ -38,8 +38,8 @@ describe('asset manifest', () => {
     expect(new Set(ASSETS.map((a) => a.path)).size).toBe(ASSETS.length);
   });
 
-  it('has 98 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
-    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(98);
+  it('has 100 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
+    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(100);
     const expected: Record<string, [number, number, number]> = {
       'enemy-mummy': [32, 32, 4],
       'mummy-wrap': [16, 8, 2],
@@ -68,6 +68,21 @@ describe('asset manifest', () => {
       expect(a?.path, key).toBe(`assets/sprites/${key}.png`);
       expect(a?.description, key).not.toContain('Platzhalter');
       expect([a?.frameWidth, a?.frameHeight, a?.frames], key).toEqual([w, h, n]);
+    }
+  });
+
+  it('has the M11/M12 sprites of brief H-43 and the three event sounds (AP-177)', () => {
+    const expected: Record<string, [number, number, number]> = {
+      'elite-crown': [9, 7, 1],
+      'event-markers': [24, 24, 2],
+    };
+    for (const [key, [w, h, n]] of Object.entries(expected)) {
+      const a = ASSETS.find((x) => x.key === key);
+      expect(a?.kind, key).toBe('spritesheet');
+      expect([a?.frameWidth, a?.frameHeight, a?.frames], key).toEqual([w, h, n]);
+    }
+    for (const key of ['sfx-event-swarm', 'sfx-event-ring', 'sfx-event-pincer']) {
+      expect(ASSETS.find((x) => x.key === key)?.kind, key).toBe('audio');
     }
   });
 

@@ -1,5 +1,5 @@
 import type Phaser from 'phaser';
-import { GameEvents, type GameEventPayloads } from '../contracts';
+import { GameEvents, type GameEventPayloads, type SpawnEventKind } from '../contracts';
 import { THEME } from '../config/theme';
 import { defaultSave, loadSave, writeSave, type StorageLike } from './storage';
 
@@ -15,6 +15,15 @@ export const PARRY_KEY = 'sfx-parry';
 export const PEBBLE_KEY = 'sfx-pebble';
 /** Manifest key of the beat: one beat of the beat circles (M9, AP-151). Never the only information. */
 export const BEAT_KEY = 'sfx-beat';
+/**
+ * Manifest keys of the spawn event announcements (M12, AP-177, brief H-43 5a), one per kind. Only on top of the edge
+ * marker: if the sound stays silent, shape and word carry the whole information.
+ */
+export const EVENT_SOUND_KEYS = {
+  swarm: 'sfx-event-swarm',
+  ring: 'sfx-event-ring',
+  pincer: 'sfx-event-pincer',
+} as const satisfies Record<SpawnEventKind, string>;
 
 /** Minimal sound backend (Phaser sound manager in the game, a fake in tests). */
 export interface SoundBackend {
