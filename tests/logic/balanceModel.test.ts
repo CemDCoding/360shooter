@@ -120,11 +120,11 @@ describe('balance model: reference player (AP-167)', () => {
     for (const i of ids) {
       // Build-up and peak are normalised per level: the wave rhythm moves spawns in time, not their number.
       expect(Math.abs(pacingMean(i) - 1), `level ${i}`).toBeLessThan(1e-9);
-      // Upper bound maxShare from fromLevel; switched off until AP-178.
+      // Upper bound maxShare from fromLevel.
       const on = ELITE_RULES.enabled && i >= ELITE_RULES.fromLevel;
       expect(eliteShare(i), `level ${i}`).toBe(on ? ELITE_RULES.maxShare : 0);
     }
-    expect(ELITE_RULES.enabled).toBe(false);
+    expect(ELITE_RULES.enabled).toBe(true);
   });
 });
 

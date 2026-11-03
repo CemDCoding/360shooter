@@ -79,16 +79,20 @@ export function pacingMean(levelId: number): number {
 
 /**
  * Elite-Anteil im Referenz-Druck (M12, RS-01.5, RS-01.6): bei eingeschalteten Eliten ab `fromLevel` die Obergrenze
- * `maxShare` (obere Naeherung), sonst 0. Bis AP-178 ausgeschaltet.
+ * `maxShare` (obere Naeherung), sonst 0.
  */
 export function eliteShare(levelId: number): number {
   const id = clampLevel(levelId);
   return ELITE_RULES.enabled && id >= ELITE_RULES.fromLevel ? ELITE_RULES.maxShare : 0;
 }
 
-/** Faktor auf die mittleren Lebenspunkte durch Eliten (`hpMul`-fach). */
+/**
+ * Faktor auf die mittleren Lebenspunkte durch Eliten (AP-178). Ein Elite kostet `costMul` Bedrohungsbudget, haelt
+ * aber nur `hpMul`-fach aus und verdraengt so regulaere Spawns: je Budget bringt er nicht mehr HP (hpMul <= costMul),
+ * der Druck waechst durch Eliten nicht. Nur der Teil von `hpMul` ueber `costMul` ginge in den Druck ein.
+ */
 const eliteHpFactor = (levelId: number): number =>
-  1 + eliteShare(levelId) * (ELITE_RULES.hpMul - 1);
+  1 + eliteShare(levelId) * Math.max(0, ELITE_RULES.hpMul - ELITE_RULES.costMul);
 
 /**
  * Spawns je Runde ohne Obergrenze (Eroeffnungswelle plus Spawns, Abstand sinkt auf `MIN_INTERVAL_FACTOR`), mal dem
