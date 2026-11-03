@@ -108,7 +108,7 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 - **Plan-Bezug:** §4 (Q-89), AP-181, AP-182
 - **Größe:** M
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** Architektur: neuer Vertrag in §4 (in PE-233 schon angekündigt)
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-03)
 
 ### RS-06.2 – Timing-Raster als Abnahmekriterium
 - **Vorschlag:** Jede Choreografie hält das Raster aus Ergebnis 1 ein: Antizipation ≥ 150 ms, Aktion ≤ 120 ms, Hit-Stop 100–200 ms (Schlusstreffer ≤ 300 ms), Zittern abklingend, Nachschwingen ≥ 200 ms, ≥ 350 ms Abstand zwischen ⚡-Ereignissen, höchstens 1 ⚡ im Kampfmoment außer dem Haupttreffer. Ein Vitest prüft die Werte aus `config`, das Gefühl prüft der Nutzer in H-47.
@@ -116,7 +116,7 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 - **Plan-Bezug:** Abnahmekriterium für AP-181, AP-184, AP-186 bis AP-190
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-03)
 
 ### RS-06.3 – Canvas-sichere Effekte
 - **Vorschlag:** Bewegungsspuren als Nachbilder (Pool, 2 bis 4 Kopien, fallende Deckkraft) oder `Graphics`-Band, Treffer-Weiß als vorgezeichnete Silhouette je Teil, Partikel aus vorgefärbten Bildern. `Rope`, Tint, `particleTint` und FX nur als Zugabe unter WebGL, nie tragend.
@@ -124,7 +124,7 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 - **Plan-Bezug:** AP-182 (Abspieler), AP-183/AP-185 (Silhouetten in der Pipeline), H-46 (Designer liefert Silhouetten)
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-03)
 
 ### RS-06.4 – Regel für Pixel-Art-Drehung
 - **Vorschlag:** Große Winkeländerungen zeichnet der Designer als eigene Teilbilder (Schlüsselposen in H-46). Im Code werden Teile nur fein gedreht (≤ ± 20°), kleine oder schnelle Teile (Klinge, Splitter) frei. Kamera hält auf ganzzahligen Zoomstufen. Wirkt der Prototyp H-47 gezackt, folgt als Nachtrag eine Vorab-Drehung in Stufen mit eigener RotSprite-Umsetzung in der Sprite-Pipeline (ohne Paket).
@@ -132,7 +132,7 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 - **Plan-Bezug:** H-46 (Designer-Auftrag), AP-183, Abnahme H-47
 - **Größe:** S (Nachtrag RotSprite: M)
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein (Nachtrag: Sprite-Pipeline)
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-03)
 
 ### RS-06.5 – Zeitbasiert, ein Atlas, Messung am Gerät
 - **Vorschlag:** Alle Zeiten in ms, Zeitlupe nur über `timeScale` von Timeline und Tweens. Je Finisher-Ablauf ein Atlas. Budget als Startwert: ≤ 10 Teile je Figur, ≤ 4 Nachbilder je Teil, ≤ 150 Partikel, wenige große halbtransparente Flächen. Abnahme H-47 und H-49: 60 fps mit `?fps=1` am iPhone 15, im Stromsparmodus gleiche Dauer.
@@ -140,7 +140,7 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 - **Plan-Bezug:** AP-182, H-47, H-49, §5 (60 fps)
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-03)
 
 ### RS-06.6 – Dramaturgie der Cinematics
 - **Vorschlag:** Rhythmus der 5 Einstellungen: ruhig → schnell (nur kleine Funken) → Spannung → einziger Vollbild-Impact mit Zeitlupe → Ausklang. Die Achse bleibt (Astronautin links, Boss rechts), gewechselt wird höchstens einmal mit Absicht. Level 40: die zusätzliche Einstellung ist ein Rückblick auf die fünf besiegten Bosse. Die Gerüste je Finale aus Ergebnis 3 dienen als Vorlage für die Storyboards H-46/H-48.
@@ -148,7 +148,7 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 - **Plan-Bezug:** H-46, H-48, AP-184, AP-186 bis AP-190
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-03)
 
 ### RS-06.7 – Kampfmoment-Ideen je Boss
 - **Vorschlag:** Je Boss wird die mit **Empf.** markierte Idee aus Ergebnis 3 zum Kampfmoment: Rosenschnitt, Erlkönigs Töchter, Morgenlicht, Segmentkette, Drei Takte, Rätsel. Die übrigen Ideen dürfen Designer und Coder als Teile der Cinematics nutzen. Die Laserklinge ist ein neues Gestaltungselement (eigene Form, kein Lichtschwert-Griff) und kommt in den Designer-Auftrag H-46.
@@ -156,7 +156,7 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 - **Plan-Bezug:** H-46, H-48, AP-184, AP-186 bis AP-190
 - **Größe:** S
 - **Berührt Architektur / Sicherheit / Datenschutz / Abhängigkeiten:** nein (R1 eigene Gestaltung: Klinge vom Nutzer im Design-Review prüfen)
-- **Status:** entwurf
+- **Status:** freigegeben (2026-11-03)
 
 ## Vertrauen und Lücken
 
@@ -193,3 +193,4 @@ Die Takte sind Richtwerte in ms. ⚡ markiert einen großflächigen Helligkeitsw
 ## Entscheidungen
 
 - Nutzer am 2026-11-03: Rückfragen beantwortet (1a, 2a, 3a), siehe Kopf.
+- Nutzer am 2026-11-03: RS-06.1 bis RS-06.7 freigegeben

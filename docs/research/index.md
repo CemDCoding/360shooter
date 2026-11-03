@@ -9,4 +9,4 @@ Berichte des Researchers (ma-researcher). Freigegebene Vorschläge übernimmt de
 | [RS-03](RS-03-maerchen-boss-quicktime.md) | Boss-Angriffe und Quicktime-Abwehr nach Märchen- und Fabelmotiven | 2026-11-01 | .1 bis .9 übernommen |
 | [RS-04](RS-04-boss-finisher-cutscenes.md) | Boss-Finisher: Zwischensequenzen im Anime-Stil | 2026-11-02 | .1 bis .5 übernommen |
 | [RS-05](RS-05-balancing-fortschrittsbogen.md) | Balancing-Update: Fortschrittsbogen über Level 0 bis 40 | 2026-11-02 | .1 bis .7 übernommen |
-| [RS-06](RS-06-anime-kampfchoreografie.md) | Finisher 2.0: Anime-Kampfchoreografie, Ideen je Boss, Technik Phaser/iPhone | 2026-11-03 | .1 bis .7 entwurf |
+| [RS-06](RS-06-anime-kampfchoreografie.md) | Finisher 2.0: Anime-Kampfchoreografie, Ideen je Boss, Technik Phaser/iPhone | 2026-11-03 | .1 bis .7 freigegeben |
