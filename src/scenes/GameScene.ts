@@ -60,7 +60,7 @@ import { PetCompanion } from '../entities/pets/PetCompanion';
 import { petChangedPayload, petGearKeyFor } from '../entities/pets/petLogic';
 import type { PetWorld } from '../entities/pets/Pet';
 import { EnemyPool } from '../entities/enemies/createEnemy';
-import { Enemy, type EnemyHitFlash } from '../entities/enemies/Enemy';
+import { Enemy, eliteScale, type EnemyHitFlash } from '../entities/enemies/Enemy';
 import { WitchBolt } from '../entities/enemies/WitchBolt';
 import { WitchBoltPool } from '../entities/enemies/WitchBoltPool';
 import {
@@ -234,6 +234,8 @@ interface PendingDrop {
   y: number;
   coinValue: number;
   coinChance: number;
+  /** Elite kill: the item drop is safe (AP-178). */
+  elite: boolean;
 }
 
 /** Where a defeated enemy explodes (lava boots, AP-143); handled in the next update. */
@@ -697,6 +699,7 @@ export class GameScene extends Phaser.Scene {
     this.pendingDrops.push({
       x,
       y,
+      elite: enemy.isElite && ELITE_RULES.guaranteedDrop,
       coinValue: enemy.def.coinValue ?? 0,
       coinChance: scaledDropChance(COIN_RULES.dropChance, scale),
     });
@@ -776,15 +779,23 @@ export class GameScene extends Phaser.Scene {
   }
 
   /** Single spawn path: always records the scale (default for summons), pooled enemies never keep an old one. */
-  private spawnScaled(id: EnemyId, x: number, y: number, scale?: EnemyScale): Enemy {
-    const e = this.enemyPool.spawn(id, x, y, scale);
+  private spawnScaled(
+    id: EnemyId,
+    x: number,
+    y: number,
+    scale?: EnemyScale,
+    asElite = false,
+  ): Enemy {
+    const used = asElite && scale ? eliteScale(scale, ELITE_RULES) : scale;
+    const e = this.enemyPool.spawn(id, x, y, used);
+    if (asElite) e.markElite(ELITE_RULES.scaleMul);
     // A pooled director enemy that left the field this frame is reported before the pool reuses it.
     const elite = this.directorEnemies.get(e);
     if (elite !== undefined) {
       this.directorEnemies.delete(e);
       this.spawner.noteRemoved(e.def.id, elite);
     }
-    this.enemyScales.assign(e, scale);
+    this.enemyScales.assign(e, used);
     return e;
   }
 
@@ -800,7 +811,7 @@ export class GameScene extends Phaser.Scene {
     this.syncMarkers(dt);
     for (const req of reqs) {
       const p = pointOnRing(req.angle, req.radius, this.center.x, this.center.y);
-      const e = this.spawnScaled(req.enemyId, p.x, p.y, this.levelScale);
+      const e = this.spawnScaled(req.enemyId, p.x, p.y, this.levelScale, req.elite === true);
       this.directorEnemies.set(e, req.elite === true);
     }
   }
@@ -1225,8 +1236,9 @@ export class GameScene extends Phaser.Scene {
       ...ARMOUR_RULES,
       dropChance: scaledDropRate(ARMOUR_RULES.dropChance, this.level.id),
     };
-    for (const { x, y, coinValue, coinChance } of this.pendingDrops) {
-      const def = rollDrop(this.rng, itemRules, ITEMS);
+    for (const { x, y, coinValue, coinChance, elite } of this.pendingDrops) {
+      // An elite always drops an item (AP-178); coins keep their normal chance (Q-51 gold pace).
+      const def = rollDrop(this.rng, itemRules, ITEMS, elite);
       if (def) this.spawnItem(x, y, def);
       if (coinValue > 0 && rollCoinDrop(this.rng, { ...COIN_RULES, dropChance: coinChance }))
         this.coinPool?.spawn(x, y, coinValue);

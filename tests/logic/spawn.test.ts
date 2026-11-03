@@ -628,11 +628,15 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
   });
 
   /** Spawn shares of a level over `seeds` simulated rounds with exact reports. */
+  // The pool weights of AP-166 are about regular spawns: elites (cost x6) shift them, so they are off here (AP-178).
+  const NO_ELITES: EliteRules = { ...ELITE_RULES, enabled: false };
+
   function shares(level: LevelDef, killEveryMs: number, seeds = 6): Map<EnemyId, number> {
     const counts = new Map<EnemyId, number>();
     let n = 0;
     for (let seed = 1; seed <= seeds; seed++) {
-      for (const s of simulate(level, { killEveryMs, report: true, seed }).spawns) {
+      for (const s of simulate(level, { killEveryMs, report: true, seed, rules: NO_ELITES })
+        .spawns) {
         counts.set(s.enemyId, (counts.get(s.enemyId) ?? 0) + 1);
         n += 1;
       }
@@ -707,9 +711,13 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
     expect(start(40)).toBeGreaterThan(start(0));
   });
 
-  it('marks no elite while ELITE_RULES is switched off', () => {
-    expect(ELITE_RULES.enabled).toBe(false);
+  it('marks no elite while the rules are switched off, and in the default rules before fromLevel', () => {
+    expect(ELITE_RULES.enabled).toBe(true);
     for (const id of [0, 3, 12, 40]) {
+      const res = simulate(lvl(id), { killEveryMs: 500, seed: id, rules: NO_ELITES });
+      expect(res.spawns.some((s) => s.elite)).toBe(false);
+    }
+    for (const id of [0, 1, 2]) {
       const res = simulate(lvl(id), { killEveryMs: 500, seed: id });
       expect(res.spawns.some((s) => s.elite)).toBe(false);
     }

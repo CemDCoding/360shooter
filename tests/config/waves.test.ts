@@ -71,7 +71,7 @@ describe('waves config (AP-174)', () => {
   it('role caps and elites', () => {
     expect(ROLE_CAPS.shooter).toBe(3);
     expect(ROLE_CAPS.aura).toBe(4);
-    expect(ELITE_RULES.enabled).toBe(false);
+    expect(ELITE_RULES.enabled).toBe(true);
     expect(ELITE_RULES.fromLevel).toBe(3);
     expect(ELITE_RULES.costMul).toBe(6);
   });

@@ -13,6 +13,19 @@ const def = (id: string): ItemDef => {
 const always = { ...ITEM_RULES, dropChance: 1 };
 
 describe('rollDrop', () => {
+  it('always drops with guaranteed (elite, AP-178), even at chance 0, and stays weighted', () => {
+    const rng = createRng(7);
+    const none = { ...ITEM_RULES, dropChance: 0 };
+    const seen = new Set<string>();
+    for (let i = 0; i < 2000; i++) {
+      const d = rollDrop(rng, none, ITEMS, true);
+      expect(d).not.toBeNull();
+      seen.add(d!.id);
+    }
+    expect(seen.size).toBeGreaterThan(1);
+    expect(rollDrop(createRng(1), none, [], true)).toBeNull();
+  });
+
   it('drops at about dropChance, weighted by dropWeight (fixed seed)', () => {
     const rng = createRng(12345);
     const counts: Record<string, number> = {};

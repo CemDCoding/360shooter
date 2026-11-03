@@ -95,9 +95,9 @@ export const MAX_BACKLOG = 10;
 export const ELITE_CHANCE_PEAK = 0.15;
 export const ELITE_CHANCE_OTHER = 0.03;
 
-/** Elite rules (RS-01.5). Switched off until AP-178 (PE-220). */
+/** Elite rules (RS-01.5). On from AP-178: hp x3, damage x1.5, same speed. */
 export const ELITE_RULES: EliteRules = {
-  enabled: false,
+  enabled: true,
   fromLevel: 3,
   hpMul: 3,
   damageMul: 1.5,

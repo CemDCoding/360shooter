@@ -414,6 +414,10 @@ Märchensymbole:
 - **Ruhig:** Kein Blinken, kein Pulsieren, kein Blitz. Der Marker gleitet beim Erscheinen 4 px nach innen (150 ms in 3 Stufen, mit „Bewegung reduzieren“ sofort) und steht dann still. Er verschwindet mit dem Spawn der Gruppe, beim Rundenende und mit der Boss-Warnung; in der Pause steht er still.
 - **Zählung:** Ereignis-Gegner zählen gegen die normalen Spawns (die Runde wird dadurch nicht voller) und nie über `maxEnemies`; was keinen Platz hat, entfällt. Die Gegnerart kommt aus dem Pool des Levels (mit Rollen-Grenzen und Bedrohungs-Budget). In der Boss-Phase gibt es keine Ereignisse.
 
+### Eliten
+
+Ab Level 3 (`ELITE_RULES.fromLevel`) wird vereinzelt ein regulärer Spawn zur Elite (15 % in der Spitze, 3 % sonst, höchstens 10 % der Lebenden). Eine Elite ist ein bestehender Gegner mit **3-facher Lebenskraft**, **1,5-fachem Schaden** (Kontakt, Geist-Aura, Hexen-Blitz), **gleichem Tempo** und **1,25-facher Größe** (auf die Stufengröße). Kennzeichnung (Brief H-43, nur Tokens, keine neuen Gegner-Sprites): 1 px eisblau-weißer Umriss (`color.game.elite-edge`, 4 Silhouetten-Kopien hinter dem Körper) und eine Krone (`elite-crown`, 9×7, nicht skaliert, nicht getönt) 2 px über der Oberkante. Die warme Glut-Tönung der Stufe bleibt auf dem Körper, die Elite bleibt dadurch von Glut-Stufe 3 unterscheidbar (kalter Rand und Krone). Eine Elite lässt **immer einen Gegenstand** fallen; die Münz-Chance bleibt wie bei regulären Gegnern. Beim Recyceln im Pool werden Umriss, Krone und Größe zurückgesetzt.
+
 ---
 
 ## Quellen

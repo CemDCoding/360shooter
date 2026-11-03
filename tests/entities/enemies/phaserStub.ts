@@ -158,6 +158,11 @@ class Sprite {
   tintMode: 'multiply' | 'fill' | undefined;
   body: StubBody;
 
+  /** Like Phaser: the texture of the sprite, only its key is kept. */
+  get texture(): { key: string } {
+    return { key: this.texKey };
+  }
+
   constructor(scene: StubScene, x: number, y: number, texture: string) {
     this.scene = scene;
     this.x = x;
