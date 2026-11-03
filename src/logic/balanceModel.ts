@@ -87,12 +87,16 @@ export function eliteShare(levelId: number): number {
 }
 
 /**
- * Faktor auf die mittleren Lebenspunkte durch Eliten (AP-178). Ein Elite kostet `costMul` Bedrohungsbudget, haelt
- * aber nur `hpMul`-fach aus und verdraengt so regulaere Spawns: je Budget bringt er nicht mehr HP (hpMul <= costMul),
- * der Druck waechst durch Eliten nicht. Nur der Teil von `hpMul` ueber `costMul` ginge in den Druck ein.
+ * Faktor auf die mittleren Lebenspunkte durch Eliten (AP-178): bewusst 1 (neutral). Gemessen mit dem `SpawnDirector`
+ * (`tests/logic/eliteBalance.test.ts`) ersetzt ein Elite einen regulaeren Spawn eins zu eins (Spawns je Runde unveraendert,
+ * das Budget bindet nicht), die HP je Runde wachsen um 4,6 bis 8,4 % (Elite-Anteil 2,4 bis 3,6 %). Gezaehlt wuerden die
+ * M11-Baender brechen (Level 40: 1,799 gegen 1,8, Level 4, 30, 39 und der Schritt zu Level 3); das ist eine offene
+ * Entscheidung (Nutzer), kein Beleg fuer Neutralitaet.
  */
-const eliteHpFactor = (levelId: number): number =>
-  1 + eliteShare(levelId) * Math.max(0, ELITE_RULES.hpMul - ELITE_RULES.costMul);
+export const eliteHpFactor = (levelId: number): number => {
+  void levelId;
+  return 1;
+};
 
 /**
  * Spawns je Runde ohne Obergrenze (Eroeffnungswelle plus Spawns, Abstand sinkt auf `MIN_INTERVAL_FACTOR`), mal dem

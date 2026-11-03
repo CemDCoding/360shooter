@@ -206,23 +206,26 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (!this.eliteFlag || this.eliteEdge.length === 0) return;
     const frame = this.frame?.name;
     const visible = this.visible && this.active;
-    this.eliteEdge.forEach((c, i) => {
+    for (let i = 0; i < this.eliteEdge.length; i++) {
       const [dx, dy] = ELITE_EDGE_OFFSETS[i] ?? [0, 0];
-      c.setTexture(this.texture.key, frame)
+      this.eliteEdge[i]!.setTexture(this.texture.key, frame)
         .setPosition(this.x + dx, this.y + dy)
         .setFlipX(this.flipX)
         .setScale(this.scaleX, this.scaleY)
         .setAlpha(this.alpha)
         .setDepth(this.depth - 0.5)
         .setVisible(visible);
-    });
+    }
+    // Whole pixels, so the 9x7 crown stays sharp (brief H-43).
     this.eliteCrown
       ?.setPosition(
-        this.x,
-        this.y -
-          (this.height * Math.abs(this.scaleY)) / 2 -
-          ELITE_CROWN_GAP -
-          this.eliteCrown.height / 2,
+        Math.round(this.x),
+        Math.round(
+          this.y -
+            (this.height * Math.abs(this.scaleY)) / 2 -
+            ELITE_CROWN_GAP -
+            this.eliteCrown.height / 2,
+        ),
       )
       .setAlpha(this.alpha)
       .setDepth(this.depth + 1)

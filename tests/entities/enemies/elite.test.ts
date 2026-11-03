@@ -141,7 +141,9 @@ describe('elite marking (AP-178, brief H-43)', () => {
     expect(crown.tintMode).toBeUndefined();
     expect(crown.scaleX).toBe(1);
     const top = enemy.y - (enemy.height * enemy.scaleY) / 2;
-    expect(crown.y + crown.height / 2).toBeCloseTo(top - THEME.sizePx['size.elite-crown-gap']);
+    expect(Number.isInteger(crown.x) && Number.isInteger(crown.y)).toBe(true);
+    const want = top - THEME.sizePx['size.elite-crown-gap'];
+    expect(Math.abs(crown.y + crown.height / 2 - want)).toBeLessThanOrEqual(0.5);
   });
 
   it('follows the body while it moves', () => {
