@@ -20,7 +20,23 @@ import {
   minAliveOf,
   pacingOf,
 } from '../config/waves';
-import type { EliteRules, EnemyId, EnemyRole, LevelDef, PacingDef } from '../contracts';
+import type {
+  ArenaSize,
+  EliteRules,
+  EnemyId,
+  EnemyRole,
+  LevelDef,
+  PacingDef,
+  SpawnEventKind,
+} from '../contracts';
+import {
+  dueEvents,
+  eventCount,
+  eventPositions,
+  eventSchedule,
+  type EventPosition,
+  type ScheduledEvent,
+} from './spawnEvents';
 
 /** Minimale RNG-Schnittstelle: Zahl in [0, 1). */
 export interface SpawnRng {
@@ -37,6 +53,23 @@ export interface SpawnRequest {
   /** Index of the spawn event in the schedule (`spawnEvents.ts`) for event spawns (AP-177). */
   eventId?: number;
 }
+
+/** Announcement of a spawn event (AP-177, RS-01.3): what the scene shows as an edge marker and plays as a sound. */
+export interface EventAnnouncement {
+  /** Index in the schedule; the event's spawns carry the same `eventId`. */
+  eventId: number;
+  kind: SpawnEventKind;
+  /** Direction of the group (rad, 0..2*PI): swarm one, pincer two opposite ones, ring none (all around). */
+  angles: readonly number[];
+  /** Time from the announcement to the spawn (ms). */
+  announceMs: number;
+}
+
+const EV_IDLE = 0;
+/** Announced in this tick: fires at the earliest in the next one (PE-228 (a)). */
+const EV_NEW = 1;
+const EV_WAITING = 2;
+const EV_DONE = 3;
 
 /** Faktor auf das Spawn-Intervall am Rundenende (Start: 1,0). */
 export const MIN_INTERVAL_FACTOR = 0.6;
@@ -81,6 +114,18 @@ const TAU = Math.PI * 2;
 /** Anzahl der Gegner der Eroeffnungswelle: 15 % von maxEnemies, mindestens 3, hoechstens 8. */
 export function openingCount(level: LevelDef): number {
   return Math.min(8, Math.max(3, Math.round(level.maxEnemies * 0.15)));
+}
+
+/** Circular mean of the angles `from` to `to` (exclusive) of the positions, 0..2*PI. */
+function meanAngle(spots: readonly { angle: number }[], from: number, to: number): number {
+  let x = 0;
+  let y = 0;
+  for (let j = from; j < to; j++) {
+    x += Math.cos(spots[j].angle);
+    y += Math.sin(spots[j].angle);
+  }
+  const a = Math.atan2(y, x);
+  return a < 0 ? a + TAU : a;
 }
 
 /** Rate curve of one level (pure data, built once per round). */
@@ -220,16 +265,26 @@ export class SpawnDirector {
   private fillCooldownMs = FILL_INTERVAL_MS;
   private budget: number;
   private eliteFlag = false;
+  // Spawn events (AP-177); empty without an arena. Arrays allocated once.
+  private readonly schedule: ScheduledEvent[];
+  private readonly eventState: number[];
+  private readonly eventSpots: (EventPosition[] | null)[];
+  private readonly announced: EventAnnouncement[] = [];
+  private readonly ended: number[] = [];
+  private eventFromMs = -1;
+  private nextEventMs = Number.POSITIVE_INFINITY;
 
   /**
    * @param spawnRadius Ring knapp ausserhalb des Sichtfelds (Pixel vom Zentrum)
    * @param eliteRules elite rules (default `ELITE_RULES` from config/waves.ts; tests pass their own)
+   * @param arena arena of the round: switches on the spawn events of `WAVE_PLANS` (AP-177); without it none run
    */
   constructor(
     private readonly level: LevelDef,
     private readonly rng: SpawnRng,
     private readonly spawnRadius: number,
     private readonly eliteRules: EliteRules = ELITE_RULES,
+    private readonly arena?: ArenaSize,
   ) {
     this.durationMs = level.durationSec * 1000;
     this.totalWeight = level.enemyPool.reduce((s, e) => s + Math.max(0, e.weight), 0);
@@ -264,6 +319,26 @@ export class SpawnDirector {
     this.eliteOn =
       eliteRules.enabled && level.id >= eliteRules.fromLevel && eliteRules.maxShare > 0;
     this.budget = this.reserve();
+    this.schedule = arena && this.totalWeight > 0 ? eventSchedule(level.id) : [];
+    this.eventState = this.schedule.map(() => EV_IDLE);
+    this.eventSpots = this.schedule.map(() => null);
+    this.nextEventMs = this.nextAnnounceMs();
+  }
+
+  /**
+   * Spawn events announced in the last `tick` (AP-177). Reused like the `tick` result: read it right away. An event
+   * fires `announceMs` later, never in the same tick as its announcement (PE-228 (a)).
+   */
+  get eventAnnouncements(): readonly EventAnnouncement[] {
+    return this.announced;
+  }
+
+  /**
+   * Ids of the events that ended in the last `tick`: fired (their spawns carry the id) or dropped because the boss
+   * phase began. The scene removes their markers. Reused array.
+   */
+  get endedEvents(): readonly number[] {
+    return this.ended;
   }
 
   /** Aktuelles Intervall der Grundrampe: sinkt linear von x1,0 auf x0,6 ueber die Rundendauer. */
@@ -327,6 +402,8 @@ export class SpawnDirector {
   tick(dtMs: number, aliveCount: number, bossActive = false): SpawnRequest[] {
     const out = this.out;
     out.length = 0;
+    this.announced.length = 0;
+    this.ended.length = 0;
     if (!Number.isFinite(dtMs) || dtMs <= 0 || this.totalWeight <= 0) return out;
     this.syncAlive(aliveCount);
     let alive = aliveCount;
@@ -346,6 +423,8 @@ export class SpawnDirector {
     }
     this.advance(dtMs, bossActive);
     const phase = phaseCode(this.curve, this.elapsedMs / 1000);
+    // Spawn events (AP-177) before the regular spawns: an announced group gets its room under the cap first.
+    if (this.schedule.length > 0) alive = this.runEvents(alive, phase, bossActive);
     while (this.credit >= 1) {
       if (alive >= this.level.maxEnemies) {
         // Kein Aufstauen: verpasste Spawns werden nicht nachgeholt.
@@ -425,14 +504,121 @@ export class SpawnDirector {
     this.tracked = alive;
   }
 
-  private emit(k: number, angle: number, radius: number): void {
+  /** Earliest announcement time of an event not announced yet (infinite if none is left). */
+  private nextAnnounceMs(): number {
+    let next = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < this.schedule.length; i++) {
+      const at = this.schedule[i].announceMs;
+      if (this.eventState[i] === EV_IDLE && at < next) next = at;
+    }
+    return next;
+  }
+
+  /**
+   * Spawn events (AP-177, RS-01.3): announcements from `dueEvents` of `spawnEvents.ts`, the spawns `announceMs` later.
+   * The times are fixed by the schedule (all in peaks); the boss phase drops waiting events (their markers end).
+   * Announcement and spawn never come in the same tick, also after a long frame (PE-228 (a)): an event announced in
+   * this tick fires in the next one at the earliest.
+   * @returns living count after the event spawns
+   */
+  private runEvents(alive: number, phase: number, bossActive: boolean): number {
+    const now = this.elapsedMs;
+    const blocked = bossActive || phase === BOSS;
+    const state = this.eventState;
+    for (let i = 0; i < state.length; i++) if (state[i] === EV_NEW) state[i] = EV_WAITING;
+    if (now >= this.nextEventMs) {
+      // dueEvents builds new arrays: only called in the few ticks that pass an announcement time.
+      for (const s of dueEvents(this.schedule, now, this.eventFromMs).announce) {
+        const i = this.schedule.indexOf(s);
+        if (i < 0 || state[i] !== EV_IDLE) continue;
+        if (blocked) state[i] = EV_DONE;
+        else this.announce(i);
+      }
+      this.nextEventMs = this.nextAnnounceMs();
+    }
+    this.eventFromMs = now;
+    for (let i = 0; i < state.length; i++) {
+      if (state[i] !== EV_NEW && state[i] !== EV_WAITING) continue;
+      if (blocked) {
+        state[i] = EV_DONE;
+        this.eventSpots[i] = null;
+        this.ended.push(i);
+      } else if (state[i] === EV_WAITING && this.schedule[i].fireMs <= now) {
+        alive = this.fireEvent(i, alive);
+        state[i] = EV_DONE;
+        this.ended.push(i);
+      }
+    }
+    return alive;
+  }
+
+  /** Fixes the spawn positions now, so the marker shows where the group will come from. */
+  private announce(i: number): void {
+    const { event } = this.schedule[i];
+    const spots = eventPositions(event, this.arena as ArenaSize, this.rng);
+    const angles: number[] = [];
+    if (event.kind === 'swarm') angles.push(meanAngle(spots, 0, spots.length));
+    if (event.kind === 'pincer') {
+      // eventPositions lists side A, then side B. Interleave them, so a cut at the cap keeps both groups.
+      const a = Math.ceil(spots.length / 2);
+      const first = meanAngle(spots, 0, a);
+      angles.push(first, (first + Math.PI) % TAU);
+      const sideA = spots.slice(0, a);
+      const sideB = spots.slice(a);
+      spots.length = 0;
+      for (let j = 0; j < a; j++) {
+        spots.push(sideA[j]);
+        if (j < sideB.length) spots.push(sideB[j]);
+      }
+    }
+    this.eventSpots[i] = spots;
+    this.eventState[i] = EV_NEW;
+    this.announced.push({ eventId: i, kind: event.kind, angles, announceMs: event.announceMs });
+  }
+
+  /**
+   * Spawns of an event on top of the schedule (PE-228 (b)): only the free room under `maxEnemies` (`eventCount`, no
+   * catch-up), role caps hold, the threat budget pays like a fill spawn. The spawns are taken from the regular
+   * credit, so the spawns per minute stay those of the base ramp.
+   */
+  private fireEvent(i: number, alive: number): number {
+    const { event } = this.schedule[i];
+    const spots = this.eventSpots[i] ?? [];
+    this.eventSpots[i] = null;
+    const n = Math.min(spots.length, eventCount(event, alive, this.level.maxEnemies));
+    const fixed = event.enemy === undefined ? -1 : this.activeIndexOf(event.enemy);
+    let emitted = 0;
+    for (let j = 0; j < n; j++) {
+      let k: number;
+      if (fixed >= 0) {
+        this.eliteFlag = false;
+        k = this.allowed(fixed, Number.POSITIVE_INFINITY) ? fixed : -1;
+      } else k = this.pickEnemy(FILL, PEAK, 0);
+      if (k < 0) continue;
+      this.emit(k, spots[j].angle, spots[j].radius, i);
+      emitted += 1;
+    }
+    this.credit -= emitted;
+    return alive + emitted;
+  }
+
+  private activeIndexOf(id: EnemyId): number {
+    for (let k = 0; k < this.active.length; k++) {
+      if (this.level.enemyPool[this.active[k]].enemyId === id) return k;
+    }
+    return -1;
+  }
+
+  private emit(k: number, angle: number, radius: number, eventId = -1): void {
     const elite = this.eliteFlag;
-    this.out.push({
+    const req: SpawnRequest = {
       enemyId: this.level.enemyPool[this.active[k]].enemyId,
       angle,
       radius,
       elite,
-    });
+    };
+    if (eventId >= 0) req.eventId = eventId;
+    this.out.push(req);
     this.roleCount[this.roleOf[k]] += 1;
     this.tracked += 1;
     if (elite) this.eliteAlive += 1;

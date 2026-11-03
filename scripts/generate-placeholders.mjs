@@ -35,9 +35,72 @@ const SOUNDS = {
   'sfx-finisher-hit': { f0: 1200, f1: 120, dur: 0.4, wave: 'square' },
   'sfx-finisher-signal': { f0: 700, f1: 760, dur: 0.5, wave: 'sine' },
   'sfx-finisher-dawn': { f0: 330, f1: 440, dur: 1.2, wave: 'sine' },
+  // Spawn event announcements (AP-177, brief H-43 5a): about 250 ms, quieter than PARRY! (amp below 0.3).
+  'sfx-event-swarm': {
+    wave: 'square',
+    amp: 0.18,
+    parts: [
+      { f: 1600, dur: 0.05 },
+      { gap: 0.03 },
+      { f: 1600, dur: 0.05 },
+      { gap: 0.03 },
+      { f: 1600, dur: 0.05 },
+    ],
+  },
+  'sfx-event-ring': {
+    wave: 'sine',
+    amp: 0.22,
+    swell: true,
+    tremolo: { rate: 20, depth: 0.3 },
+    parts: [{ f: 180, dur: 0.25 }],
+  },
+  'sfx-event-pincer': {
+    wave: 'square',
+    amp: 0.18,
+    parts: [{ f: 900, dur: 0.07 }, { gap: 0.08 }, { f: 600, dur: 0.07 }],
+  },
 };
+const RATE = 44100;
+/** Short fade in and out of every tone (s), so the beeps do not click. */
+const EDGE = 0.004;
+
+function wave(kind, p) {
+  if (kind === 'square') return p < 0.5 ? 1 : -1;
+  if (kind === 'saw') return 2 * p - 1;
+  return Math.sin(2 * Math.PI * p);
+}
+
+/** Samples of a tone pattern: beeps and gaps, optional tremolo and a swell (rise and fall over the whole sound). */
+function patternSamples(spec) {
+  const total = spec.parts.reduce((s, p) => s + (p.dur ?? p.gap), 0);
+  const n = Math.floor(RATE * total);
+  const out = new Float64Array(n);
+  let i = 0;
+  for (const part of spec.parts) {
+    const len = Math.floor(RATE * (part.dur ?? part.gap));
+    let phase = 0;
+    for (let k = 0; k < len && i < n; k++, i++) {
+      if (part.gap !== undefined) continue;
+      phase += part.f / RATE;
+      const t = k / RATE;
+      const edge = Math.min(1, t / EDGE, (part.dur - t) / EDGE);
+      out[i] = wave(spec.wave, phase % 1) * Math.max(0, edge);
+    }
+  }
+  for (let k = 0; k < n; k++) {
+    const t = k / RATE;
+    let a = spec.amp;
+    if (spec.tremolo)
+      a *= 1 - spec.tremolo.depth * (0.5 + 0.5 * Math.sin(2 * Math.PI * spec.tremolo.rate * t));
+    if (spec.swell) a *= Math.sin((Math.PI * k) / n);
+    out[k] *= a;
+  }
+  return out;
+}
+
 function makeWav(spec) {
-  const rate = 44100;
+  if (spec.parts) return wavFile(patternSamples(spec));
+  const rate = RATE;
   const n = Math.floor(rate * spec.dur);
   const data = Buffer.alloc(n * 2);
   let phase = 0;
@@ -51,6 +114,20 @@ function makeWav(spec) {
     else s = Math.sin(2 * Math.PI * p);
     data.writeInt16LE(Math.round(s * 0.3 * (1 - t) * 32767), i * 2);
   }
+  return wavHeader(data, rate);
+}
+
+/** 16-bit mono WAV from samples in -1..1. */
+function wavFile(samples) {
+  const data = Buffer.alloc(samples.length * 2);
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    data.writeInt16LE(Math.round(s * 32767), i * 2);
+  }
+  return wavHeader(data, RATE);
+}
+
+function wavHeader(data, rate) {
   const head = Buffer.alloc(44);
   head.write('RIFF', 0, 'ascii');
   head.writeUInt32LE(36 + data.length, 4);

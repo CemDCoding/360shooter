@@ -172,6 +172,15 @@ const OWN_ASSETS: readonly AssetDef[] = [
   sprite('finisher-finale-30', 320, 180, 11, 'Finisher: Bildfolge Level 30 (Waechter-Hund).'),
   sprite('finisher-finale-40a', 320, 180, 9, 'Finisher: Bildfolge Level 40, Bogen a (Bild 0-8).'),
   sprite('finisher-finale-40b', 320, 180, 9, 'Finisher: Bildfolge Level 40, Bogen b (Bild 9-17).'),
+  // M11/M12 (H-43): Pixel in docs/design/assets/sprites-m11.js.
+  sprite('elite-crown', 9, 7, 1, 'Elite-Krone ueber dem Gegner (farbig, nicht getoent).'),
+  sprite(
+    'event-markers',
+    24,
+    24,
+    2,
+    'Rand-Marker der Spawn-Ereignisse, fuer den oberen Rand: Frame 0 Schwarm, 1 Zange (weiss, wird getoent).',
+  ),
   font(
     'astro-kapsel',
     'Bitmap-Schrift "Astro Kapsel": dicke Schrift fuer Titel, Menue und grosse Zahlen.',
@@ -195,6 +204,18 @@ const OWN_ASSETS: readonly AssetDef[] = [
   sound('finisher-hit', 'Finisher: Schlusstreffer.'),
   sound('finisher-signal', 'Finisher: Signal.'),
   sound('finisher-dawn', 'Finisher: ruhiger Schlusston, Sonnenaufgang Level 40.'),
+  sound(
+    'event-swarm',
+    'Ankuendigung Schwarm: drei hohe Piepser (nur zusaetzlich zum Rand-Marker).',
+  ),
+  sound(
+    'event-ring',
+    'Ankuendigung Ring: tiefes an- und abschwellendes Brummen (nur zusaetzlich zum Rand-Marker).',
+  ),
+  sound(
+    'event-pincer',
+    'Ankuendigung Zange: zwei Piepser, der zweite tiefer (nur zusaetzlich zum Rand-Marker).',
+  ),
 ];
 
 /** Festes Asset-Manifest. Designer ersetzen nur die Dateien unter public/assets. */

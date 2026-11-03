@@ -398,6 +398,22 @@ Märchensymbole:
 - **Blitz-Grenze:** In jedem Zeitfenster von 1000 ms beginnen höchstens 3 Blitze oder Zwischenbilder (WCAG 2.3.1); ein Test prüft das für alle Sequenzen, normal und reduziert.
 - **Debug:** `?finisher=n` (n = 0 bis 40, ungültig ergibt Level 0) spielt die Sequenz des Levels n direkt ab; es hat Vorrang vor `?level`.
 
+### Ereignisse und Wellen-Rhythmus
+
+**Rhythmus (M12):** Eine Runde läuft in Zyklen aus Aufbau, Spitze (6 s) und Entspannung (10 s, ein Viertel der Spawn-Rate); 3-Minuten-Runden haben 3 Zyklen, 5-Minuten-Runden 5. Jeder Zyklus ist etwas dichter als der vorige, der letzte endet mit der Boss-Warnung. Über die ganze Runde bleiben die Spawns pro Minute die der bisherigen Rampe (± 5 %). Eine Mindestbesetzung (30 % von `maxEnemies`, höchstens 60) hält das Feld auch in der Entspannung belebt.
+
+**Ereignisse:** Ab dem zweiten Zyklus kommt je Zyklus ein Ereignis, eine Sekunde nach Beginn der Spitze. Die Arten wechseln sich ab (die neueste zuerst):
+
+| Ereignis | ab Level | Gegner | Form | Rand-Marker |
+|---|---|---|---|---|
+| Ring | 0 | 8 | rundum, gleichmäßig verteilt | Punktreihe entlang des ganzen Marker-Rahmens, Wort **RING** oben mittig |
+| Schwarm | 5 | 12 | dichte Gruppe in einem 60°-Sektor | Keil am Rand in Richtung der Gruppe, Wort **SCHWARM** |
+| Zange | 10 | 10 | zwei Gruppen von gegenüberliegenden Seiten (je 50°) | Doppelpfeil an beiden gegenüberliegenden Rändern, Wort **ZANGE** |
+
+- **Ankündigung:** Jedes Ereignis wird 1 s vorher angekündigt: Marker am Bildrand (immer innerhalb des sicheren Bereichs, nie unter Notch oder Home-Leiste) und ein eigener Warnton je Art (`sfx-event-ring`, `sfx-event-swarm`, `sfx-event-pincer`). Unter dem Wort zählen 3 Punkte die Sekunde herunter. Ankündigung und Spawn fallen nie in denselben Frame.
+- **Ruhig:** Kein Blinken, kein Pulsieren, kein Blitz. Der Marker gleitet beim Erscheinen 4 px nach innen (150 ms in 3 Stufen, mit „Bewegung reduzieren“ sofort) und steht dann still. Er verschwindet mit dem Spawn der Gruppe, beim Rundenende und mit der Boss-Warnung; in der Pause steht er still.
+- **Zählung:** Ereignis-Gegner zählen gegen die normalen Spawns (die Runde wird dadurch nicht voller) und nie über `maxEnemies`; was keinen Platz hat, entfällt. Die Gegnerart kommt aus dem Pool des Levels (mit Rollen-Grenzen und Bedrohungs-Budget). In der Boss-Phase gibt es keine Ereignisse.
+
 ---
 
 ## Quellen

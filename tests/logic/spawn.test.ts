@@ -29,6 +29,7 @@ import {
   type SpawnRequest,
   type WavePhase,
 } from '../../src/logic/spawn';
+import { eventSchedule as eventScheduleOf } from '../../src/logic/spawnEvents';
 
 /** Kleine deterministische Test-RNG (mulberry32). */
 function testRng(seed: number): { next(): number } {
@@ -754,5 +755,154 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
     const a = simulate(lvl(21), { killEveryMs: 500, seed: 4 }).spawns;
     const b = simulate(lvl(21), { killEveryMs: 500, seed: 4 }).spawns;
     expect(a).toEqual(b);
+  });
+
+  describe('spawn events (AP-177, RS-01.3, PE-228)', () => {
+    const ARENA = { width: 640, height: 360 };
+    interface EventRun {
+      announced: { t: number; eventId: number; kind: string; angles: readonly number[] }[];
+      fired: Map<number, { t: number; angles: number[] }>;
+      ended: { t: number; eventId: number }[];
+      total: number;
+      maxAlive: number;
+    }
+    /** Runs a round with the arena; the field holds `alive` enemies (or the real count if `world`). */
+    function runEvents(
+      level: LevelDef,
+      dt: number,
+      opts: { seed?: number; killEveryMs?: number } = {},
+    ): EventRun {
+      const d = new SpawnDirector(level, testRng(opts.seed ?? 3), 600, ELITE_RULES, ARENA);
+      const run: EventRun = { announced: [], fired: new Map(), ended: [], total: 0, maxAlive: 0 };
+      let alive = 0;
+      let nextKill = opts.killEveryMs ?? 400;
+      for (let t = 0; t < level.durationSec * 1000; t += dt) {
+        if (t >= nextKill) {
+          nextKill += opts.killEveryMs ?? 400;
+          alive = Math.max(0, alive - 1);
+        }
+        const reqs = d.tick(dt, alive, t >= (level.durationSec - BOSS_WARNING_SEC) * 1000);
+        for (const a of d.eventAnnouncements) run.announced.push({ t, ...a });
+        for (const id of d.endedEvents) run.ended.push({ t, eventId: id });
+        for (const r of reqs) {
+          if (r.eventId !== undefined) {
+            const f = run.fired.get(r.eventId) ?? { t, angles: [] };
+            f.angles.push(r.angle);
+            run.fired.set(r.eventId, f);
+          }
+        }
+        alive += reqs.length;
+        run.total += reqs.length;
+        run.maxAlive = Math.max(run.maxAlive, alive);
+      }
+      return run;
+    }
+    const angleDiff = (a: number, b: number): number => {
+      const d = Math.abs(a - b) % (Math.PI * 2);
+      return Math.min(d, Math.PI * 2 - d);
+    };
+    const withEvents = LEVELS.filter((l) => WAVE_PLANS[l.id].events.length > 0);
+
+    it('has levels with events to test', () => {
+      expect(withEvents.length).toBeGreaterThan(0);
+    });
+
+    it('announces every event before its spawns, never in the same tick, also with a long frame', () => {
+      for (const dt of [16, 50, 2500]) {
+        for (const level of withEvents.slice(0, 6)) {
+          const run = runEvents(level, dt);
+          expect(run.announced.length, `level ${level.id}`).toBeGreaterThan(0);
+          for (const a of run.announced) {
+            const f = run.fired.get(a.eventId);
+            if (f) expect(f.t, `level ${level.id} dt ${dt}`).toBeGreaterThan(a.t);
+          }
+          for (const [id] of run.fired) {
+            expect(run.announced.some((a) => a.eventId === id)).toBe(true);
+          }
+        }
+      }
+    });
+
+    it('fires an event no earlier than announceMs after the announcement and ends each event once', () => {
+      const level = withEvents[0];
+      const run = runEvents(level, 16);
+      for (const a of run.announced) {
+        const f = run.fired.get(a.eventId);
+        const sched = eventScheduleOf(level.id)[a.eventId];
+        if (f) expect(f.t + 16).toBeGreaterThanOrEqual(sched.fireMs);
+        expect(run.ended.filter((e) => e.eventId === a.eventId)).toHaveLength(1);
+      }
+    });
+
+    it('marks the direction the group comes from: swarm and pincer angles match their spawns', () => {
+      let checked = 0;
+      for (const level of withEvents) {
+        const run = runEvents(level, 50);
+        for (const a of run.announced) {
+          const f = run.fired.get(a.eventId);
+          if (!f) continue;
+          if (a.kind === 'ring') {
+            expect(a.angles).toHaveLength(0);
+            continue;
+          }
+          expect(a.angles).toHaveLength(a.kind === 'pincer' ? 2 : 1);
+          if (a.kind === 'pincer')
+            expect(angleDiff(a.angles[0], a.angles[1])).toBeCloseTo(Math.PI, 5);
+          for (const s of f.angles) {
+            const near = Math.min(...a.angles.map((m) => angleDiff(m, s)));
+            expect(near, `level ${level.id} ${a.kind}`).toBeLessThan(Math.PI / 2);
+          }
+          checked += 1;
+        }
+      }
+      expect(checked).toBeGreaterThan(0);
+    });
+
+    it('counts event spawns against the regular ones: spawns per minute stay within 5 percent', () => {
+      for (const level of LEVELS) {
+        const d = new SpawnDirector(level, testRng(level.id + 1), 600, ELITE_RULES, ARENA);
+        let n = 0;
+        for (let t = 0; t < level.durationSec * 1000; t += 50)
+          n += d.tick(50, d.minimumAlive).length;
+        const ratio = n / baseRampCount(level);
+        expect(ratio, `level ${level.id}`).toBeGreaterThan(0.95);
+        expect(ratio, `level ${level.id}`).toBeLessThan(1.05);
+      }
+    });
+
+    it('never exceeds maxEnemies with events', () => {
+      for (const level of withEvents) {
+        const run = runEvents(level, 50, { killEveryMs: 200 });
+        expect(run.maxAlive, `level ${level.id}`).toBeLessThanOrEqual(level.maxEnemies);
+      }
+    });
+
+    it('drops events in the boss phase: no announcement and no spawn after the boss warning', () => {
+      for (const level of withEvents) {
+        const run = runEvents(level, 50);
+        const bossMs = (level.durationSec - BOSS_WARNING_SEC) * 1000;
+        for (const a of run.announced) expect(a.t).toBeLessThan(bossMs);
+        for (const [, f] of run.fired) expect(f.t).toBeLessThan(bossMs);
+      }
+    });
+
+    it('runs no events without an arena (existing callers unchanged)', () => {
+      const level = withEvents[0];
+      const d = new SpawnDirector(level, testRng(3), 600);
+      for (let t = 0; t < level.durationSec * 1000; t += 50) {
+        for (const r of d.tick(50, 0)) expect(r.eventId).toBeUndefined();
+        expect(d.eventAnnouncements).toHaveLength(0);
+      }
+    });
+
+    it('reuses the announcement and ended arrays (no allocation per frame)', () => {
+      const d = new SpawnDirector(withEvents[0], testRng(3), 600, ELITE_RULES, ARENA);
+      d.tick(16, 0);
+      const a = d.eventAnnouncements;
+      const e = d.endedEvents;
+      d.tick(16, 0);
+      expect(d.eventAnnouncements).toBe(a);
+      expect(d.endedEvents).toBe(e);
+    });
   });
 });

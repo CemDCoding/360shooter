@@ -120,8 +120,11 @@ import type { RoundResult } from '../logic/progression';
 import { createRng, type Rng } from '../logic/rng';
 import { RoundState } from '../logic/round';
 import { SpawnDirector } from '../logic/spawn';
+import { ELITE_RULES } from '../config/waves';
+import { SpawnMarker, markerFrame, type MarkerFrame } from '../entities/SpawnMarker';
 import {
   BEAT_KEY,
+  EVENT_SOUND_KEYS,
   getSoundService,
   PARRY_KEY,
   PEBBLE_KEY,
@@ -147,6 +150,7 @@ import { FINISHER_SCENE_KEY, type FinisherActor, type FinisherStartData } from '
 import type { SaveGame } from '../contracts/save';
 import { VirtualStick } from './controls/VirtualStick';
 import { parseDebugLevel, resolveLevelId } from './debug';
+import { readSafeInsets } from './safeInsets';
 import { energyRatio, hudSeconds, powerBlock, powersKey } from './hud/hudMath';
 import { POWER_SLOT_PRESSED } from './hud/PowerSlots';
 
@@ -321,6 +325,11 @@ export class GameScene extends Phaser.Scene {
   /** The rank 4 effects already show their own opacity (nothing to fade until the focus or the switch). */
   private focusNeutral = true;
   private reducedMotion = false;
+  /** Edge markers of the announced spawn events (AP-177); each goes with the spawn of its group. */
+  private markers: SpawnMarker[] = [];
+  private markerFrame: MarkerFrame = { left: 0, right: 0, top: 0, bottom: 0 };
+  /** Living enemies of the spawn director (value: elite), so each removal reaches noteRemoved (PE-228 (c)). */
+  private readonly directorEnemies = new Map<Enemy, boolean>();
 
   constructor() {
     super('GameScene');
@@ -367,6 +376,8 @@ export class GameScene extends Phaser.Scene {
     this.focusDim = undefined;
     this.focusFade.reset();
     this.focusNeutral = true;
+    this.markers = [];
+    this.directorEnemies.clear();
   }
 
   create(): void {
@@ -443,11 +454,15 @@ export class GameScene extends Phaser.Scene {
       : assistStage(save.assistLosses?.[String(this.level.id)] ?? 0);
     this.assist = assistFactors(this.level.id, this.assistStage);
     this.levelScale = { ...this.levelScale, hp: this.levelScale.hp * this.assist.enemyHp };
+    // With the arena the director plays the spawn events of WAVE_PLANS (AP-177); markers inside the safe area.
     this.spawner = new SpawnDirector(
       { ...this.level, spawnIntervalMs: this.level.spawnIntervalMs * this.assist.spawnInterval },
       this.rng,
       spawnRadius,
+      ELITE_RULES,
+      { width, height },
     );
+    this.markerFrame = markerFrame(width, height, readSafeInsets(this.registry));
 
     this.bindPlayerCallbacks();
     this.addColliders();
@@ -763,21 +778,75 @@ export class GameScene extends Phaser.Scene {
   /** Single spawn path: always records the scale (default for summons), pooled enemies never keep an old one. */
   private spawnScaled(id: EnemyId, x: number, y: number, scale?: EnemyScale): Enemy {
     const e = this.enemyPool.spawn(id, x, y, scale);
+    // A pooled director enemy that left the field this frame is reported before the pool reuses it.
+    const elite = this.directorEnemies.get(e);
+    if (elite !== undefined) {
+      this.directorEnemies.delete(e);
+      this.spawner.noteRemoved(e.def.id, elite);
+    }
     this.enemyScales.assign(e, scale);
     return e;
   }
 
   private spawnEnemies(dt: number): void {
+    this.reportRemovedEnemies();
     const bossAlive = this.boss !== undefined && !this.bossDefeatedFlag;
     // Q-58: no normal spawns while the boss lives.
     if (!shouldSpawnNormalEnemies(bossAlive)) return;
     let alive = 0;
     for (const e of this.enemyPool.enemies) if (e.active) alive += 1;
-    for (const req of this.spawner.tick(dt, alive, bossAlive)) {
+    const reqs = this.spawner.tick(dt, alive, bossAlive);
+    // Markers before the spawns: a marker whose group comes now goes in the same frame, new ones appear (AP-177).
+    this.syncMarkers(dt);
+    for (const req of reqs) {
       const p = pointOnRing(req.angle, req.radius, this.center.x, this.center.y);
-      this.spawnScaled(req.enemyId, p.x, p.y, this.levelScale);
+      const e = this.spawnScaled(req.enemyId, p.x, p.y, this.levelScale);
+      this.directorEnemies.set(e, req.elite === true);
     }
   }
+
+  /**
+   * Edge markers of the spawn events (AP-177, brief H-43) on play time: ended events (spawned or dropped at the boss
+   * phase) lose their marker, the others advance, new announcements get a marker and their sound (only on top).
+   */
+  private syncMarkers(dt: number): void {
+    const ended = this.spawner.endedEvents;
+    if (ended.length > 0) {
+      let w = 0;
+      for (const m of this.markers) {
+        if (ended.includes(m.eventId)) m.destroy();
+        else this.markers[w++] = m;
+      }
+      this.markers.length = w;
+    }
+    for (const m of this.markers) m.update(dt);
+    for (const a of this.spawner.eventAnnouncements) {
+      this.markers.push(
+        new SpawnMarker(this, a, this.markerFrame, this.center, this.reducedMotion),
+      );
+      this.sfx.play(EVENT_SOUND_KEYS[a.kind]);
+    }
+  }
+
+  /** Removes every marker at once (boss warning, round end, abort): no effect, no sound. */
+  private clearMarkers(): void {
+    for (const m of this.markers) m.destroy();
+    this.markers = [];
+  }
+
+  /**
+   * Tells the director about every enemy of its own that left the field since the last frame (killed, contact hit,
+   * cleared for the boss), so role caps and the elite share stay exact (PE-228 (c)).
+   */
+  private reportRemovedEnemies(): void {
+    if (this.directorEnemies.size > 0) this.directorEnemies.forEach(this.reportIfGone);
+  }
+
+  private readonly reportIfGone = (elite: boolean, e: Enemy): void => {
+    if (e.active) return;
+    this.directorEnemies.delete(e);
+    this.spawner.noteRemoved(e.def.id, elite);
+  };
 
   /** Contact damage and spirit aura, both scaled by frame time (values per second in config). */
   private applyAreaDamage(dt: number): void {
@@ -875,6 +944,8 @@ export class GameScene extends Phaser.Scene {
     if (!bossId) return;
     if (!this.bossWarned) {
       this.bossWarned = true;
+      // The boss phase drops waiting events (the director ends them too): no marker stays (AP-177).
+      this.clearMarkers();
       if (phase === 'warning') {
         this.sfx.play('sfx-boss-warning');
         emitGameEvent(this.events, GameEvents.BossWarning, { bossId });
@@ -1329,6 +1400,7 @@ export class GameScene extends Phaser.Scene {
     this.despawnBoss();
     this.parryOverlay?.clear();
     this.endFocus();
+    this.clearMarkers();
 
     const before = loadSave();
     const settled = settleRound(
@@ -1448,6 +1520,9 @@ export class GameScene extends Phaser.Scene {
     this.despawnBoss();
     this.parryOverlay?.destroy();
     this.parryOverlay = undefined;
+    // Also after abortRound from the pause menu: open edge markers go with the round (AP-177).
+    this.clearMarkers();
+    this.directorEnemies.clear();
     this.player.callbacks.onHpChange = undefined;
     this.player.callbacks.onStatsChange = undefined;
     this.player.callbacks.onShieldChange = undefined;
