@@ -25,6 +25,7 @@ Grundlage der Regeln: MultiAgent/entscheidungen.md
 - **Fertig:** AP-01 bis AP-176, AP-179, AP-180. Merges zuletzt: AP-173 831bb11, AP-175 0150e1a, AP-172 18cae0f, AP-180 6c607d2, AP-176 e8f9cd9 (Reviews bestanden). Am Gerät unbestätigt: AP-63, AP-76 (nur gerechnet), AP-89, AP-96, AP-109, AP-117, AP-118 (H-30).
 - **Laufende Arbeit:** keine vermerkt (der Lead führt die Liste der Worktrees). **Bereit [Code]:** **AP-177** (M12 W3, Ereignisse/Marker/Töne/Sprite-Sync, jetzt Aufwand L, Q-86 (b), PE-230; `GameScene.ts`). Wartend: AP-178 auf AP-177.
 - **Offen [Mensch]:** Handtests A (Pet/Gegner-Mix, H-38), B (Finisher, H-40) und C (Balance, Teil von H-42) vom Nutzer als bestanden gemeldet (§13); offen bleiben die Release-Schritte H-36/H-38/H-40, H-28/H-30 in einem Release, H-34, H-32 sowie Rest von H-42 (jetzt mit Fokus-Detailprüfung, PE-229) und H-44. `IMG_6372.PNG` (iPhone-Seitenränder) liegt unversioniert im Hauptcheckout, nicht anfassen.
+- **M13 Finisher 2.0 (Interview 2026-11-03, PE-231 bis PE-241):** grob geschnitten (AP-181 bis AP-191). **H-45 (Recherche RS-06) ist sofort startbar**, danach H-46 (Designer Teil 1) und Q-89 (§4-Vertrag); kein M13-Paket fasst `GameScene.ts` an, läuft parallel zu M12.
 - **Offene Fragen an den Nutzer:** Q-87 und Q-88 (Design-Lücken Fokus: helle Bodenvarianten, „EFFEKTE REDUZIEREN“; im Handtest prüfen, nicht blockierend), Q-82 bis Q-85 (Ausreißer Level 23, Gold Level 3/4, Pet-Anteil Biene/Pinguin, Kapybara-Aura; nicht blockierend), Q-75; optional: Q-60/H-29, Q-66, Q-70, Q-71, Q-72; unbestätigt PE-182 bis PE-184, PE-228; Q-52 (Foto Layout-Anzeige in H-30).
 - **Erkenntnisse (Details §18, PE-228):** M12 liest aus `WAVE_PLANS[level.id]` (`src/config/waves.ts`), nicht aus `LevelDef`. **AP-175: Rollen-Cap = max(`ROLE_CAPS`, ceil(2 · Pool-Anteil · (alive + 1)))** (feste Caps verletzten ±2 pp AP-166), 12 neue Konstanten in `waves.ts`; `SpawnRequest.elite` immer gesetzt, `tick`-Array wird wiederverwendet. **AP-177/178 müssen `noteRemoved(enemyId, elite)` in `GameScene` verdrahten**, Frame-Sprung ≥ `announceMs` begrenzen, Ereignis-Spawns gegen reguläre Spawns verrechnen. AP-172: erstes Level eines Batches (0, 5, 10, 21, 26, 31) ohne Gegner-Entlastung. AP-168-Faktoren und Level 4/5 nie ohne Nachrechnen ändern (Sägezahn 1,641 gegen 1,619). **Technische Schuld:** `STICK_EDGE`/`STICK_CATCH_R`/`targetZone` doppelt in `GiantStone`/`GiantSandWorm`; Konstanten in `hintBoard.ts` spiegeln den HUD-Timer.
 - **Nächster Schritt:** AP-177 starten (alleine, `GameScene.ts`), danach AP-178 seriell (Hinweis PE-229: Wiring-Tests und `GameScene.ts`), dann H-42/H-44. H-42 (M11-Release) kann der Nutzer schon jetzt angehen. Worktrees brauchen eine frische Installation der Abhängigkeiten.
@@ -64,7 +65,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | § | Abschnitt | Status | Offene Fragen | Nötig für Gate |
 |---|---|---|---|---|
 | 1 | Projektkontext und Ziel | fertig | – | G1 |
-| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) durch Handtest M3-DEP bestätigt (2026-10-26); F-07, F-15 bis F-17 und Backlog freigegeben (H-07); F-01 mit Stick übernommen (V-05, 2026-10-25); F-17 bleibt Pflicht (V-06 abgelehnt, PE-56); M5: F-18 bis F-22 (PE-123), Boss-Verhalten PE-128 angenommen (Bestätigung in H-28); **M7 (Interview 2026-11-01): F-25 bis F-30 neu (PE-152 bis PE-163)**; **M8 Shop (Interview 2026-11-01): F-31 bis F-35 neu (PE-165 bis PE-180)**; **M9 (RS-03 übernommen 2026-11-01): F-36, F-37 neu, F-29 ergänzt (PE-187 bis PE-190)**; **M10 (RS-04 übernommen 2026-11-02): F-38 neu, F-05 ergänzt (PE-195 bis PE-200)**; **M13 Finisher 2.0 (Interview 2026-11-03): F-43 neu (PE-231 bis PE-238), Paketschnitt in Klärung** | G1 |
+| 2 | Umfang | angenommen | PE-34 (Boss-Verhalten) durch Handtest M3-DEP bestätigt (2026-10-26); F-07, F-15 bis F-17 und Backlog freigegeben (H-07); F-01 mit Stick übernommen (V-05, 2026-10-25); F-17 bleibt Pflicht (V-06 abgelehnt, PE-56); M5: F-18 bis F-22 (PE-123), Boss-Verhalten PE-128 angenommen (Bestätigung in H-28); **M7 (Interview 2026-11-01): F-25 bis F-30 neu (PE-152 bis PE-163)**; **M8 Shop (Interview 2026-11-01): F-31 bis F-35 neu (PE-165 bis PE-180)**; **M9 (RS-03 übernommen 2026-11-01): F-36, F-37 neu, F-29 ergänzt (PE-187 bis PE-190)**; **M10 (RS-04 übernommen 2026-11-02): F-38 neu, F-05 ergänzt (PE-195 bis PE-200)**; **M13 Finisher 2.0 (Interview 2026-11-03): F-43 neu (PE-231 bis PE-241), M13 grob geschnitten, G2(M13) wartet auf RS-06, H-46, Q-89** | G1 |
 | 3 | Tech-Stack | angenommen | Werkzeuge (Vitest, ESLint, Prettier) angenommen | G1 |
 | 4 | Architektur, Datenmodell, Verträge | fertig | – | G1 |
 | 5 | Sicherheit, Datenschutz, Recht, Limits | fertig | – | G1 |
@@ -74,7 +75,7 @@ Status: `leer` · `in Klärung` · `fertig` · `angenommen` (fertig, aber mit un
 | 9 | Meilensteine und Wellen | fertig | – (M2b freigegeben, H-07; am 2026-10-25 um AP-38, AP-39 und Rüstungen AP-37a/AP-37c erweitert, AP-32 nach W5; M2c Design-Umsetzung neu, Reihenfolge PE-60 bestätigt 2026-10-25; M2b-Nachtrag AP-56 neu; M2c-Nachtrag AP-58–AP-62 (PE-65), AP-16 hängt nach PE-69 am Nachtrag) | G2 |
 | 10 | Statusübersicht | fertig | – | G2 |
 | 11 | Abhängigkeitsgraph | fertig | – | G2 |
-| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de); Nachtrag 3 N8 AP-76 (HUD-Größe Handy), AP-77 (Seitenverhältnis, Beleg) und AP-78 (Theme-Sync, PE-95) fertig (gemergt da5ead9, 665b843, 95418ac, 2026-10-26); **Nachtrag 4 N9 AP-79 (Sprite-Pipeline, 24 PNGs) und AP-80 (Doku, Lizenzen) neu (PE-107, 2026-10-26), fertig (gemergt 2c0dd76, ab1e4ba; 2026-10-27)**; M4 W1/W2 AP-81 bis AP-84 fertig (gemergt 9267542, 675afef, 0bd0ed0, 9383e4a; 2026-10-27); **Nachtrag 5 N10 AP-87 (Prettier-Aufräumen, PE-110) fertig (gemergt b0182b9, 2026-10-27)**; Folgepakete Seitenverhältnis Teil 2 (Variante B, M4, PE-96 bis PE-106, Planner-Interview) sind M4 (AP-81 bis AP-86); **Nachtrag 6 N11 AP-88 bis AP-94 neu (Fix-Pakete Handtest H-22 und Design H-23, PE-111 bis PE-118, 2026-10-28), AP-86 verfeinert; Folgepaket AP-95 (B5 Teil 3, Level 5 bis 20, PE-120); Design H-25 übernommen (PE-121), AP-92 bereit**; **M5 AP-97 bis AP-108 neu (2026-10-31, PE-123 bis PE-130), AP-106 und AP-107 warten auf H-27**; **Nachtrag 9 AP-117 und AP-118 neu (RS-02, PE-140 bis PE-143, 2026-11-01), G2 erfüllt**; **M6 AP-121 bis AP-124 neu (RQ-01, RQ-02, PE-144 bis PE-150, 2026-11-01), G2 erfüllt; AP-125 (Fix versendbare Windows-Datei, PE-151) neu, G2 erfüllt**; **M7 AP-126 bis AP-134 neu (PE-152 bis PE-163, 2026-11-01), AP-135 neu aus „Design übernehmen“ (PE-164), G2 erfüllt für W1 bis W4 (H-33 übernommen), W1 bis W3 `fertig`; AP-146 (Fix Item-Drops, PE-182) neu in W4b**; **M8 AP-136 bis AP-145 neu (PE-165 bis PE-180, 2026-11-01), G2 für W1 und W2 erfüllt; H-35 übernommen (PE-183), AP-147 (Theme-Sync H-35 und Asset-Nachtrag) neu, AP-140 nur noch Sprite-Sync, G2 für W3 bis W5 erfüllt; M7 W4 `fertig`, AP-146 um den HUD-Hash-Fix erweitert (PE-184)**; **M9 AP-148 bis AP-155 neu (RS-03, PE-187 bis PE-193, 2026-11-01), G2 für W1 und W2 erfüllt, W3 bis W5 nach H-37 und „Design übernehmen“ (PE-202, 2026-11-02): G2 für AP-150 erfüllt**; **M10 AP-157 bis AP-162 neu (RS-04, PE-195 bis PE-201, 2026-11-02), G2 für W1 und W2 erfüllt, W3 bis W5 warten auf H-39 und „Design übernehmen“ sowie auf M9 W3/W4**; **M11 AP-167 bis AP-173 neu (RS-05, PE-208 bis PE-214, 2026-11-02), G2 für W1 bis W4 erfüllt (W1 nach dem Merge von AP-166; Q-76 bis Q-78 beantwortet, PE-215), W5 wartet auf H-41 und „Design übernehmen“**; **M12 AP-174 bis AP-178 neu (RS-01, PE-216 bis PE-221, 2026-11-02), Q-80 freigegeben (PE-222), G2 für W1 und W2 erfüllt, W3/W4 warten auf H-43 und „Design übernehmen“** | G2 (je Meilenstein) |
+| 12 | Arbeitspakete | angenommen | M0–M2 abgenommen (2026-10-25); M2b AP-25–AP-36 freigegeben (H-07), AP-38 und AP-39 (nach AP-38), AP-37a und AP-37c (Feuerring, PE-52, PE-58); M2c AP-50–AP-55 aus dem freigegebenen Design (PE-59), Reihenfolge PE-60 bestätigt (H-11); M2b-Nachtrag AP-56 (Handtest-Befunde Balancing und Rundenstart, PE-61) und AP-57 (Lint-Fix, PE-62); M2c-Nachtrag AP-58–AP-62 (PE-65); M3 detailliert, Boss-Verhalten angenommen (PE-34), Abhängigkeit auf M2c-Nachtrag (PE-69) statt M2c-DEP; M3 W2b: AP-67 (Boss-Fairness, Konfig, Robustheit, PE-75) vor AP-20; M3-Nachtrag AP-68 bis AP-70 aus dem Handtest M3-DEP (PE-76 bis PE-80, Planung 2026-10-26), AP-71 (Theme-Sync, PE-86) in W2; Nachtrag 2: AP-66 hängt nach PE-85 zusätzlich an AP-71, AP-72 (Boss-Lücken) neu in N6, N6 (AP-72, AP-73, AP-74) fertig (2026-10-26); N7 AP-75 (Aufräum-Folgepaket, PE-91) fertig (gemergt 59f53de); Nachtrag 3 N8 AP-76 (HUD-Größe Handy), AP-77 (Seitenverhältnis, Beleg) und AP-78 (Theme-Sync, PE-95) fertig (gemergt da5ead9, 665b843, 95418ac, 2026-10-26); **Nachtrag 4 N9 AP-79 (Sprite-Pipeline, 24 PNGs) und AP-80 (Doku, Lizenzen) neu (PE-107, 2026-10-26), fertig (gemergt 2c0dd76, ab1e4ba; 2026-10-27)**; M4 W1/W2 AP-81 bis AP-84 fertig (gemergt 9267542, 675afef, 0bd0ed0, 9383e4a; 2026-10-27); **Nachtrag 5 N10 AP-87 (Prettier-Aufräumen, PE-110) fertig (gemergt b0182b9, 2026-10-27)**; Folgepakete Seitenverhältnis Teil 2 (Variante B, M4, PE-96 bis PE-106, Planner-Interview) sind M4 (AP-81 bis AP-86); **Nachtrag 6 N11 AP-88 bis AP-94 neu (Fix-Pakete Handtest H-22 und Design H-23, PE-111 bis PE-118, 2026-10-28), AP-86 verfeinert; Folgepaket AP-95 (B5 Teil 3, Level 5 bis 20, PE-120); Design H-25 übernommen (PE-121), AP-92 bereit**; **M5 AP-97 bis AP-108 neu (2026-10-31, PE-123 bis PE-130), AP-106 und AP-107 warten auf H-27**; **Nachtrag 9 AP-117 und AP-118 neu (RS-02, PE-140 bis PE-143, 2026-11-01), G2 erfüllt**; **M6 AP-121 bis AP-124 neu (RQ-01, RQ-02, PE-144 bis PE-150, 2026-11-01), G2 erfüllt; AP-125 (Fix versendbare Windows-Datei, PE-151) neu, G2 erfüllt**; **M7 AP-126 bis AP-134 neu (PE-152 bis PE-163, 2026-11-01), AP-135 neu aus „Design übernehmen“ (PE-164), G2 erfüllt für W1 bis W4 (H-33 übernommen), W1 bis W3 `fertig`; AP-146 (Fix Item-Drops, PE-182) neu in W4b**; **M8 AP-136 bis AP-145 neu (PE-165 bis PE-180, 2026-11-01), G2 für W1 und W2 erfüllt; H-35 übernommen (PE-183), AP-147 (Theme-Sync H-35 und Asset-Nachtrag) neu, AP-140 nur noch Sprite-Sync, G2 für W3 bis W5 erfüllt; M7 W4 `fertig`, AP-146 um den HUD-Hash-Fix erweitert (PE-184)**; **M9 AP-148 bis AP-155 neu (RS-03, PE-187 bis PE-193, 2026-11-01), G2 für W1 und W2 erfüllt, W3 bis W5 nach H-37 und „Design übernehmen“ (PE-202, 2026-11-02): G2 für AP-150 erfüllt**; **M10 AP-157 bis AP-162 neu (RS-04, PE-195 bis PE-201, 2026-11-02), G2 für W1 und W2 erfüllt, W3 bis W5 warten auf H-39 und „Design übernehmen“ sowie auf M9 W3/W4**; **M11 AP-167 bis AP-173 neu (RS-05, PE-208 bis PE-214, 2026-11-02), G2 für W1 bis W4 erfüllt (W1 nach dem Merge von AP-166; Q-76 bis Q-78 beantwortet, PE-215), W5 wartet auf H-41 und „Design übernehmen“**; **M12 AP-174 bis AP-178 neu (RS-01, PE-216 bis PE-221, 2026-11-02), Q-80 freigegeben (PE-222), G2 für W1 und W2 erfüllt, W3/W4 warten auf H-43 und „Design übernehmen“**; **M13 Finisher 2.0 AP-181 bis AP-191 und H-45 bis H-49 grob neu (PE-231 bis PE-241, 2026-11-03), G2(M13) offen bis RS-06, H-46 und Q-89** | G2 (je Meilenstein) |
 | 13 | Menschliche Schritte | fertig | – | G2 |
 | 14 | Budget und Kürzungen | angenommen | Fensterleistung nach M0 nachschärfen | G2 |
 | 15 | Risiken | fertig | – | G2 |
@@ -656,6 +657,14 @@ flowchart TD
 | M12 W2 | AP-176 (Logik der Spawn-Ereignisse) | `src/logic/spawnEvents.ts` (neu: Fahrplan aus `WAVE_PLANS[levelId].events`, Sektor, Ring, Zange, Ankündigungszeit; rein; liest `src/config/waves.ts` nur, PE-227), `tests/logic/spawnEvents.test.ts` (neu) |
 | M12 W3 | AP-177 (Ereignisse in der Runde, Rand-Marker, Ton) | `src/logic/spawn.ts` (nur Aufruf von `spawnEvents` in der Spitze), `src/entities/SpawnMarker.ts` (neu), `src/scenes/GameScene.ts` (nur Marker anlegen und Ereignis-Spawns platzieren), `src/platform/audio.ts` (nur drei neue Ton-Schlüssel, PE-226), `src/config/theme.ts`, `src/styles/tokens.css` (nur falls nach AP-179 ein Token fehlt), `src/config/assets.ts`, `public/assets/**`, `scripts/{build-sprites,generate-placeholders}.mjs`, `public/assets/{LICENSES.md,.placeholders.json}` (nur Ergebnis von `theme:build`/`sprites:build`/Ton nach H-43), `tests/scenes/spawnMarkerWiring.test.ts` (neu), `tests/logic/spawn.test.ts` (nur Ereignis-Aufruf), Tests zu Theme und Assets (nur Anzahlen), `docs/gegner-und-maps.md` (nur neuer Abschnitt „Ereignisse und Wellen-Rhythmus“) |
 | M12 W4 | AP-178 (Elite-Varianten) | `src/entities/enemies/Enemy.ts` (nur Elite-Werte und Darstellung), `src/scenes/GameScene.ts` (nur Elite-Drop beim Tod), `src/logic/items.ts` bzw. `src/logic/coins.ts` (nur „sicherer Drop“), `src/config/waves.ts` (nur `ELITE_RULES.enabled` und Faktoren), `tests/entities/enemies/*elite*.test.ts` (neu), `tests/logic/{items,coins}.test.ts` (nur sicherer Drop), `tests/logic/balanceModel.test.ts` (nur Elite-Anteil), `docs/gegner-und-maps.md` (nur Abschnitt Eliten), `docs/balancing.md` (nur Absatz Eliten) |
+| M13 (Regel) | Hinweis M13 (F-43, PE-231 bis PE-241) | Kein M13-Paket fasst `src/scenes/GameScene.ts`, `HudScene.ts`, `desktop/**`, `package.json`, `package-lock.json`, `docs/design/**`, `docs/research/**` an (PE-238). Gerüst-Regel: AP-181 legt die Register `src/config/rigs/index.ts` und `src/config/choreo/index.ts` mit Platzhaltern für alle 7 Figuren und 6 Bosse an, AP-182 das Register `src/scenes/finisher/fx/index.ts` mit 6 leeren Boss-Effekt-Modulen; spätere Pakete ändern nur ihre eigene Datei darin |
+| M13 W1 | AP-181 (Verträge und Logik Rig/Choreografie) | `src/contracts/finisher.ts` (Rig-, Choreografie- und Einstellungs-Typen, neue Varianten-IDs), `src/contracts/index.ts` (nur Exporte), `src/config/finishers.ts` (Variantenliste, `skipFirstViewMs`), `src/config/rigs/index.ts` (neu, Register mit Platzhaltern), `src/config/choreo/index.ts` (neu, Register mit Platzhaltern), `src/logic/finisher.ts`, `src/logic/choreo.ts` (neu: Abtasten der Schlüsselbilder, Easing, Einstellungs-Zeiten, Blitz-Zählung), `src/platform/storage.ts` (nur Gültigkeit der neuen IDs in `seenFinishers`), `tests/logic/{finisher,choreo}.test.ts`, `tests/platform/storage.test.ts` (nur `seenFinishers`) |
+| M13 W2 | AP-182 (Abspieler in der Finisher-Szene) | `src/scenes/FinisherScene.ts`, `src/scenes/finisher/**` (neu u. a. `rig.ts`, `choreoPlayer.ts`, `trails.ts`, `shots.ts`, `fx/index.ts` mit 6 leeren Modulen `fx/<bossId>.ts`), `tests/scenes/finisher*.test.ts` |
+| M13 W2 | AP-183 (Figurenteile Teil 1) | `scripts/build-sprites.mjs`, `public/assets/sprites/**`, `src/config/assets.ts`, `src/config/rigs/astronaut.ts`, `src/config/rigs/rootMonster.ts` (neu, Teile und Drehpunkte nach H-46), `LICENSES.md`, `tests/scripts/build-sprites.test.ts`; bei neuen Tokens `src/config/theme.ts` und `src/styles/tokens.css` nur über das Theme-Build-Skript |
+| M13 W3 | AP-184 (Choreografie Baummonster) | `src/config/choreo/rootMonster.ts`, `src/scenes/finisher/fx/rootMonster.ts`, `tests/config/choreo/rootMonster.test.ts` (neu) |
+| M13 W6 | AP-185 (Figurenteile Teil 2) | wie AP-183, aber `src/config/rigs/{forestGhost,giantStone,sandWorm,guardianDog,pharaoh}.ts` (Namen nach `BossId`) |
+| M13 W7 | AP-186 bis AP-190 (Choreografie je Boss) | je Paket nur `src/config/choreo/<bossId>.ts`, `src/scenes/finisher/fx/<bossId>.ts`, `tests/config/choreo/<bossId>.test.ts` |
+| M13 W8 | AP-191 (Aufräumen) | `src/config/finishers.ts` (alte Stufen und Bildfolgen entfernen), `src/logic/finisher.ts`, `src/scenes/finisher/{pictures,overlays,timing}.ts` (nur Altes), `src/config/assets.ts` und `public/assets/sprites/**` (nur nicht mehr genutzte Bildfolgen), `tests/**` (nur betroffene), Finisher-Abschnitt der Doku |
 
 ---
 
@@ -684,6 +693,7 @@ flowchart TD
 | M10 | Boss-Finisher (RS-04, PE-195 bis PE-201) | Finisher-Sequenz nach jedem Boss-Sieg in 6 Eskalationsstufen (F-38), handgezeichnete Bildfolgen in den Batch-Finale (Level 4, 9, 20, 25, 30, 40), Überspringen nach dem ersten Ansehen, Schalter „Effekte reduzieren“, Blitz-Grenze als Test, Designer-Nachtrag H-39. W1/W2 laufen parallel zu M9 W3 bis W5, W4 nach AP-151/AP-152 | Jeder Boss-Sieg zeigt vor dem Ergebnis eine kurze Sequenz, die von Batch zu Batch epischer wird; in den Batch-Finale wird der Boss in einer animierten Bildfolge endgültig besiegt, Level 40 als Höhepunkt; ab dem zweiten Mal per Tipp überspringbar; flüssig auf dem iPhone |
 | M11 | Balancing-Update (RS-05, PE-208 bis PE-214) | Referenzmodell mit Ziel-Bändern als Test (F-39), Kurve geglättet (Level 0 bis 4, Oase), Boss-HP nach Zielzeit, Pet-Power-ups nur auf den Schaden, Rüstungs-Effekte relativ zum Laser, verdeckter Rückenwind (F-40), Quicktime-Fokus (F-41), Designer-Nachtrag H-41. W1 nach AP-166; W3 bis W5 nach M10 W4/W5 (`GameScene.ts`) | Sägezahn-Kurve über alle 41 Level im Test grün, Level 40 am schwersten, Bosskämpfe mit realistischen Upgrades 20 bis 45 s, nach zwei Niederlagen unbemerkt leichter, Quicktime-Kreise im Gewimmel klar lesbar, 60 fps am iPhone |
 | M12 | Wellen-Rhythmus (RS-01, PE-216 bis PE-221) | Phasenkurve mit Atempausen und Mindestbelegung, angekündigte Ereignisse Schwarm/Ring/Zange mit Rand-Marker, Bedrohungsbudget mit Rollen-Caps, Elite-Varianten (F-42), Designer-Nachtrag H-43. Nach M11 (gleiche Dateien) | Runden haben spürbare Spitzen und Atempausen, Ereignisse kündigen sich an und sind lernbar, Eliten tauchen vereinzelt auf, Druck- und Gold-Bänder aus M11 bleiben grün, 60 fps am iPhone |
+| M13 | Finisher 2.0 (F-43, PE-231 bis PE-241) | Je Boss ein eigener flüssiger Kampfmoment (≈ 3 bis 4 s) für die normalen Level und ein 15-s-Cinematic für jedes Batch-Finale (Level 40: 20 s), gebaut aus Figurenteilen mit Code-Animation (60 fps); Recherche RS-06, Designer-Nachträge H-46/H-48, Prototyp Baummonster mit Freigabe H-47 vor den übrigen Bossen; alter M10-Ablauf wird ersetzt. Parallel zu M12 W3/W4 (PE-238) | Jeder Boss-Sieg zeigt eine flüssige, bosseigene Kampfszene; jedes Batch-Finale ein 15-s-Cinematic in 5 Einstellungen, Level 40 als 20-s-Höhepunkt; ab 3 s überspringbar; 60 fps auf dem iPhone |
 
 ### 9.1 Ablauf einer Welle
 
@@ -1324,6 +1334,36 @@ Ziel: Spannung durch Rhythmus statt nur Menge (F-42): Aufbau, Spitze, Atempause,
   - [ ] Wiederholung Fokus-Prüfung (PE-229): iPhone mit Pet, Höllen-Set, Feuerring, dicht folgende Kreise bei 60 fps (`?fps=1`); Bosskampf mit „EFFEKTE REDUZIEREN“ (Q-88)
   - [ ] Release: Pull Request `dev` → `stage`, Smoke-Test, Pull Request `stage` → `master`
 
+#### M13 – Finisher 2.0 (F-43, PE-231 bis PE-241)
+
+Ziel: Die Animationen am Ende eines Bosskampfes werden flüssig und eindrucksvoll (Nutzerwunsch 2026-11-03). Normale Level: je Boss ein eigener kurzer Anime-Kampfmoment (≈ 3 bis 4 s). Batch-Finale (Level 4, 9, 20, 25, 30, 40): ein Cinematic von 15 s in 5 Einstellungen, Level 40 20 s. Technik: Figuren aus Teilen, Code-Animation mit Easing bei 60 fps, Kamerafahrten, Bewegungsspuren, Partikel; Treffer- und Impact-Bilder aus H-39 als Akzente. Kein neuer Ton. Ablauf, Speicherung, „EFFEKTE REDUZIEREN“ und Blitz-Grenze aus M10 bleiben. **G2(M13) offen:** wartet auf RS-06 („Recherche übernehmen“), H-46 („Design übernehmen“) und Q-89 (Vertrag §4).
+
+| Welle | Pakete |
+|---|---|
+| M13 W0a (sofort) | **H-45** [Mensch startet Researcher] Recherche RS-06: Anime-Kampfchoreografie, Animationsprinzipien, 2 bis 3 Ideen je Boss, Technik in Phaser 3 und iPhone-Leistung (PE-240) |
+| M13 W0b (nach „Recherche übernehmen RS-06“) | **H-46** [Mensch startet Designer] Designer-Nachtrag Teil 1: Astronautin und Baummonster in Teilen mit Drehpunkten, Schlüsselposen des Kampfmoments, Storyboard Level 4 (5 Einstellungen). **Q-89** [Mensch] Freigabe Vertrag Rig/Choreografie (§4) |
+| M13 W1 (nach Q-89) | **AP-181** Verträge und Logik Rig/Choreografie, Variantenliste, Überspringen ab 3 s |
+| M13 W2 (nach AP-181, H-46) | **AP-182** Abspieler in der Finisher-Szene (opus, Kern). **AP-183** Figurenteile Teil 1 in die Sprite-Pipeline |
+| M13 W3 (nach AP-182, AP-183) | **AP-184** Choreografie Baummonster: Kampfmoment und Cinematic Level 4 |
+| M13 W4 | **H-47** [Mensch] Prototyp am Gerät freigeben (`?finisher=0`, `?finisher=4`, PC und iPhone) |
+| M13 W5 (nach H-47) | **H-48** [Mensch startet Designer] Designer-Nachtrag Teil 2: übrige 5 Bosse (Teile, Posen, Storyboards; Level 40 mit 6 Einstellungen) |
+| M13 W6 (nach H-48 und „Design übernehmen“) | **AP-185** Figurenteile Teil 2 |
+| M13 W7 (nach AP-185) | **AP-186** Waldgeist, **AP-187** Riesen-Stein, **AP-188** Sand-Wurm, **AP-189** Wächter-Hund, **AP-190** Pharao (Level 40, 20 s) – parallel, je eigene Dateien (höchstens 5 Coder, PE-192) |
+| M13 W8 (nach AP-186 bis AP-190) | **AP-191** Aufräumen: alter M10-Ablauf raus, Blitz-Test über alle neuen Abläufe, Doku |
+| M13 W9 | **H-49** [Mensch] M13-DEP: Handtest PC und iPhone, Release `dev` → `stage` → `master` (nach H-44) |
+
+**Integration:** nach jeder Welle frische Installation der Abhängigkeiten im Worktree und alle Checks. Bis AP-191 läuft für Bosse ohne Choreografie der alte M10-Ablauf weiter (Rückfall im Register), das Spiel bleibt jederzeit auslieferbar. Nach W3 und W7 spielt der Lead per `?finisher=n` jeden fertigen Kampfmoment und jedes Cinematic an und meldet Dauer, Überspringen und `?fps=1`.
+
+##### M13-DEP – Abnahme [Mensch] (H-49)
+
+- **Prüfpunkte H-49 (nach W8):**
+  - [ ] Jeder der 6 Bosse hat einen eigenen, erkennbar anderen Kampfmoment (≈ 3 bis 4 s), flüssig ohne Ruckeln
+  - [ ] Batch-Finale `?finisher=4/9/20/25/30` je ≈ 15 s in 5 Einstellungen, `?finisher=40` ≈ 20 s; der Boss ist am Ende endgültig besiegt
+  - [ ] Beim ersten Ansehen ab 3 s überspringbar, danach nach `skipLockMs`; Ergebnis, Gold und Erfahrung unverändert
+  - [ ] „EFFEKTE REDUZIEREN“: keine Impact Frames, kein Blitz, kein Wackeln, Bewegung bleibt; nie mehr als 3 Blitze je Sekunde
+  - [ ] iPhone (Homescreen-App, quer): 60 fps im Cinematic Level 40 (`?fps=1`)
+  - [ ] Release: Pull Request `dev` → `stage`, Smoke-Test, Pull Request `stage` → `master`
+
 ---
 
 ## 10. Statusübersicht
@@ -1534,6 +1574,22 @@ Status: `offen` · `bereit` · `in Arbeit` · `Review` · `fertig` (gemergt in d
 | AP-161 | Einbau in die Runde: Pause, Start der Sequenz, Überspringen nach dem ersten Ansehen, `seenFinishers`/`reduceEffects` im Spielstand (RS-04.1, RS-04.4; Design-Review nein) | M10 | GAME | M10 W4 | AP-158, AP-151, AP-152, AP-164 | M | sonnet (high) | – (gemergt e00d7f4) | fertig |
 | AP-162 | Schalter „EFFEKTE REDUZIEREN“ im Pausemenü, Doku Finisher (RS-04.5; Design-Review ja) | M10 | GAME | M10 W5 | AP-161, AP-159 (beide fertig) | S | sonnet (medium) | – (gemergt 6102eda) | fertig |
 | H-40 | M10-DEP: Handtest PC und iPhone (§9.2 „M10-DEP“), Release `dev` → `stage` → `master` | M10 | HUM | M10 W6 | AP-160 bis AP-162, H-38 | H | – | – | offen |
+| H-45 | Recherche RS-06 starten: Anime-Kampfchoreografie, Prinzipien, Ideen je Boss, Technik Phaser/iPhone (PE-240) | M13 | HUM | M13 W0a | – | H | researcher | – | bereit |
+| H-46 | Designer-Nachtrag M13 Teil 1: Astronautin und Baummonster in Teilen, Schlüsselposen, Storyboard Level 4 (PE-233, PE-236) | M13 | HUM | M13 W0b | H-45, „Recherche übernehmen RS-06“ | H | designer | – | offen |
+| AP-181 | M13 Verträge und Logik: Rig, Choreografie, Einstellungen, Varianten, Überspringen ab 3 s (PE-231 bis PE-234; Design-Review nein) | M13 | SH/LOG | M13 W1 | Q-89 | M | sonnet (high) | – | offen |
+| AP-182 | Abspieler: Figuren aus Teilen, Easing 60 fps, Kamera, Bewegungsspuren, Schnitte (PE-233; Design-Review ja) | M13 | GAME | M13 W2 | AP-181, H-46 | L | opus (high), Opus-Grund: Kern | – | offen |
+| AP-183 | Figurenteile Teil 1 (Astronautin, Baummonster) in die Sprite-Pipeline (Design-Review ja) | M13 | ASSET | M13 W2 | AP-181, H-46, AP-177 (`build-sprites.mjs`, `assets.ts`) | S | sonnet (medium) | – | offen |
+| AP-184 | Choreografie Baummonster: Kampfmoment und Cinematic Level 4 (PE-231, PE-232; Design-Review ja) | M13 | CFG/GAME | M13 W3 | AP-182, AP-183 | M | sonnet (high) | – | offen |
+| H-47 | Prototyp Baummonster am Gerät freigeben (PE-235) | M13 | HUM | M13 W4 | AP-184 | H | – | – | offen |
+| H-48 | Designer-Nachtrag M13 Teil 2: übrige 5 Bosse (PE-235) | M13 | HUM | M13 W5 | H-47 | H | designer | – | offen |
+| AP-185 | Figurenteile Teil 2 (5 Bosse) in die Sprite-Pipeline (Design-Review ja) | M13 | ASSET | M13 W6 | H-48, „Design übernehmen“ | S | sonnet (medium) | – | offen |
+| AP-186 | Choreografie Waldgeist: Kampfmoment und Cinematic Level 9 (Design-Review ja) | M13 | CFG/GAME | M13 W7 | AP-185 | M | sonnet (high) | – | offen |
+| AP-187 | Choreografie Riesen-Stein: Kampfmoment und Cinematic Level 20 (Design-Review ja) | M13 | CFG/GAME | M13 W7 | AP-185 | M | sonnet (high) | – | offen |
+| AP-188 | Choreografie Sand-Wurm: Kampfmoment und Cinematic Level 25 (Design-Review ja) | M13 | CFG/GAME | M13 W7 | AP-185 | M | sonnet (high) | – | offen |
+| AP-189 | Choreografie Wächter-Hund: Kampfmoment und Cinematic Level 30 (Design-Review ja) | M13 | CFG/GAME | M13 W7 | AP-185 | M | sonnet (high) | – | offen |
+| AP-190 | Choreografie Pharao: Kampfmoment und Cinematic Level 40, 20 s (Design-Review ja) | M13 | CFG/GAME | M13 W7 | AP-185 | L | sonnet (high) | – | offen |
+| AP-191 | Aufräumen: alter M10-Ablauf entfernen, Blitz-Test über alle Abläufe, Doku (PE-241; Design-Review nein) | M13 | CFG/GAME | M13 W8 | AP-186 bis AP-190 | S | sonnet (medium) | – | offen |
+| H-49 | M13-DEP: Handtest PC und iPhone (§9.2 „M13-DEP“), Release `dev` → `stage` → `master` | M13 | HUM | M13 W9 | AP-181 bis AP-191, H-44 | H | – | – | offen |
 
 ---
 
@@ -1748,7 +1804,23 @@ flowchart LR
     AP177 --> AP178["AP-178 Elite-Varianten (W4)"]
     AP178 & H42 --> H44["H-44 M12-DEP (W5)"]
   end
+  subgraph M13["M13 – Finisher 2.0 (F-43)"]
+    H45["H-45 Recherche RS-06 (W0a)"] --> H46["H-46 Designer Teil 1 (W0b)"]
+    H45 --> Q89["Q-89 Freigabe §4"]
+    Q89 --> AP181["AP-181 Verträge und Logik (W1)"]
+    AP181 & H46 --> AP182["AP-182 Abspieler (W2)"]
+    AP181 & H46 & AP177 --> AP183["AP-183 Figurenteile 1 (W2)"]
+    AP182 & AP183 --> AP184["AP-184 Baummonster (W3)"]
+    AP184 --> H47["H-47 Prototyp freigeben (W4)"]
+    H47 --> H48["H-48 Designer Teil 2 (W5)"]
+    H48 --> AP185["AP-185 Figurenteile 2 (W6)"]
+    AP185 --> AP186["AP-186 Waldgeist (W7)"] & AP187["AP-187 Riesen-Stein (W7)"] & AP188["AP-188 Sand-Wurm (W7)"] & AP189["AP-189 Wächter-Hund (W7)"] & AP190["AP-190 Pharao (W7)"]
+    AP186 & AP187 & AP188 & AP189 & AP190 --> AP191["AP-191 Aufräumen (W8)"]
+    AP191 & H44 --> H49["H-49 M13-DEP (W9)"]
+  end
 ```
+
+**M13 (F-43, PE-231 bis PE-241):** AP-181 legt alle Verträge, die reine Logik (`logic/choreo.ts`) und die Register für Figuren und Choreografien mit Platzhaltern an; AP-182 (Szene, `finisher/**`, Register `fx/index.ts`) und AP-183 (Sprites, `rigs/astronaut.ts`, `rigs/rootMonster.ts`) nutzen sie eine Welle später und teilen keine Datei. AP-184 nutzt Abspieler und Figuren eine Welle später und besitzt nur die Dateien des Baummonsters. In W7 besitzt jedes Boss-Paket nur seine drei Dateien (`choreo/<bossId>.ts`, `fx/<bossId>.ts`, Test); die Register ändert dort niemand. Kein M13-Paket fasst `GameScene.ts` oder `HudScene.ts` an, deshalb keine Kante zu AP-177/AP-178 (PE-238); `storage.ts` ändert in M12 niemand. Einzige Kante zu M12: AP-183 nach AP-177, weil beide die Sprite-Pipeline (`build-sprites.mjs`, `assets.ts`, `LICENSES.md`) besitzen. AP-191 räumt erst auf, wenn alle 6 Bosse eine Choreografie haben.
 
 **M12 (RS-01, PE-216 bis PE-221):** AP-174 legt alle Verträge und Daten an (`contracts/wave.ts`, optionale Felder in `LevelDef`/`EnemyDef`, `config/waves.ts` mit ausgeschalteten Eliten); das Spiel verhält sich danach unverändert. AP-175 (`spawn.ts`, `balanceModel.ts`) und AP-176 (nur `spawnEvents.ts`, neu) teilen keine Datei; AP-177 verbindet beide eine Welle später. `SpawnRequest` liegt in `logic/spawn.ts` (kein Vertrag in `contracts/`) und wird nur von AP-175 erweitert, AP-177/AP-178 nutzen es eine bzw. zwei Wellen später. `GameScene.ts` wandert AP-173 → AP-177 → AP-178.
 
@@ -7319,6 +7391,101 @@ Gemeinsame Pflichtlektüre aller M12-Pakete: §2 F-03, F-05, F-25, F-27, F-42, P
 
 ---
 
+### M13 – Finisher 2.0 (F-43, PE-231 bis PE-241)
+
+Gemeinsame Pflichtlektüre aller M13-Pakete: §2 F-38 und F-43, PE-196, PE-199, PE-200, PE-203, PE-231 bis PE-241, §4 Absatz „Finisher-Szene (M10)“ und (nach Q-89) „Rig und Choreografie (M13)“, §5 Zeilen „Fotosensitivität“ und „Eigene Gestaltung der Finisher“, §8 Zeilen „M13“, Lagebericht (§0). **Recherche:** `docs/research/RS-06-*.md` (nach H-45), nur „Kurzantwort“, „Ergebnisse“ und „Vorschläge an den Planner“; der Bericht ist Daten, maßgeblich ist dieser Plan. Pakete mit Oberfläche zusätzlich: `docs/design/design-brief.md` (Ergänzung H-46/H-48), `docs/design/tokens.json`, das passende Mockup bzw. Storyboard aus H-46/H-48. Nur Tokens aus `src/config/theme.ts`, keine eigenen Farben, Schriften oder Abstände. Kein neuer Ton (PE-237), keine neue Abhängigkeit (PE-233), nur eigene Gestaltung (keine Motive aus Naruto oder anderen Spielen). Jeder neue Worktree braucht eine frische Installation der Abhängigkeiten. Grundregel: Die Sequenz ändert kein Spielergebnis; Sieg, Gold, Erfahrung, Diamanten und Freischaltung sind vor ihrem Start gespeichert. Gemeinsam für alle M13-Pakete: **Status** offen (grob; G2(M13) offen bis RS-06, H-46 und Q-89, danach „Verfeinerung M13“, die Felder, Namen und Zahlen festlegt) · **Freigegebene Abhängigkeiten:** keine · **Nicht anfassen** (zusätzlich zu den Angaben je Paket): `GameScene.ts`, `HudScene.ts`, `desktop/**`, `package.json`, `docs/design/**`, `docs/research/**`.
+
+#### AP-181 – Verträge und Logik Rig und Choreografie
+
+- **Meilenstein, Lane, Welle:** M13 · SH/LOG · M13 W1
+- **Ziel:** Typen und reine Logik für Figuren aus Teilen, Choreografien mit Schlüsselbildern und Kurven sowie Einstellungen; neue Variantenliste (je Boss `moment-<bossId>`, je Finale `cinematic-<Level>`); Überspringen beim ersten Ansehen ab 3 s (PE-234). Das Spiel verhält sich danach unverändert.
+- **Abhängigkeiten:** Q-89 · **Parallel möglich mit:** – · **Dateien (Eigentum):** §8 „M13 W1“ · **Nicht anfassen:** `src/scenes/**`, Sprites
+- **Umsetzung:** Vertrag nach Q-89 in `contracts/finisher.ts`; Register `config/rigs/index.ts` und `config/choreo/index.ts` mit Platzhaltern (fehlt eine Choreografie, liefert `buildFinisher` den alten M10-Ablauf als Rückfall); `logic/choreo.ts` tastet Teile-Transformationen zu einer Zeit ab (deterministisch, ohne Phaser), zählt Blitze je 1-s-Fenster und wendet „Effekte reduzieren“ an; `skipFirstViewMs` = 3000 in `FINISHER_RULES`; alte IDs in `seenFinishers` werden beim Laden verworfen.
+- **Akzeptanzkriterien:** Abtasten und Easing deterministisch (Test); Blitz-Regel und „Effekte reduzieren“ greifen auf Choreografien (Test); Überspringen beim ersten Ansehen erst ab 3 s (Test); alte und neue IDs in `seenFinishers` korrekt behandelt (Test); alle Checks grün, Spiel unverändert.
+- **Tests:** `tests/logic/{finisher,choreo}.test.ts`, `tests/platform/storage.test.ts`
+- **Review-Schwerpunkte:** reine Funktionen ohne Phaser, Rückfall auf M10, Spielstand v3 bleibt kompatibel
+- **Design-Review:** nein · **Doku-Pflichten:** JSDoc der Verträge
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high · **Opus-Grund:** – · **Kürzbar:** nein
+- **Commit-Typ:** `feat(AP-181): add rig and choreography contracts and logic`
+
+#### AP-182 – Abspieler in der Finisher-Szene
+
+- **Meilenstein, Lane, Welle:** M13 · GAME · M13 W2
+- **Ziel:** Die Finisher-Szene spielt Choreografien flüssig mit 60 fps ab: Figuren aus Teilen aufbauen, Teile per Easing bewegen, Kamerafahrten und -schnitte, Bewegungsspuren (Smear/Trails), Partikel, Treffer- und Impact-Bilder als Akzente; Register `fx/index.ts` mit 6 leeren Boss-Effekt-Modulen.
+- **Abhängigkeiten:** AP-181, H-46 · **Parallel möglich mit:** AP-183 · **Dateien (Eigentum):** §8 „M13 W2“ (AP-182) · **Nicht anfassen:** Sprites, `config/rigs/**`, `config/choreo/**`
+- **Umsetzung:** Details nach Verfeinerung. Grundsätze: Objekte vorab erzeugen und wiederverwenden (keine Erzeugung pro Bild), Canvas-tauglich, WebGL nur optional; Abspielen über die Zeitachse aus `logic/choreo.ts`, nicht über verstreute Tweens; Debug-Start `?finisher=n` bleibt; Rückfall auf den M10-Ablauf, wenn keine Choreografie da ist.
+- **Akzeptanzkriterien:** Ein Test-Ablauf mit Platzhalter-Figur läuft per `?finisher=0` flüssig; 60 fps im Lead-Lauf auf dem PC mit `?fps=1`; M10-Rückfall unverändert; alle Checks grün.
+- **Tests:** `tests/scenes/finisher*.test.ts`
+- **Review-Schwerpunkte:** Leistung auf dem iPhone, Speicher und Aufräumen beim Szenenende, Blitz-Regel, nur Tokens
+- **Design-Review:** ja · **Doku-Pflichten:** Abschnitt „Finisher“ in der Doku (Aufbau Abspieler)
+- **Aufwand:** L · **Modell:** opus · **Effort:** high · **Opus-Grund:** Kern (neuer Abspieler für jede Boss-Runde, Leistung) · **Kürzbar:** nein
+- **Commit-Typ:** `feat(AP-182): add rig choreography player to finisher scene`
+
+#### AP-183 – Figurenteile Teil 1
+
+- **Meilenstein, Lane, Welle:** M13 · ASSET · M13 W2
+- **Ziel:** Teile und Drehpunkte von Astronautin und Baummonster aus H-46 stehen als Sprites und als Rig-Daten bereit.
+- **Abhängigkeiten:** AP-181, H-46, AP-177 (gemeinsame Dateien `build-sprites.mjs`, `assets.ts`, `LICENSES.md`) · **Parallel möglich mit:** AP-182 · **Dateien (Eigentum):** §8 „M13 W2“ (AP-183) · **Nicht anfassen:** `src/scenes/**`, `config/choreo/**`
+- **Umsetzung:** Sprite-Quellen aus `docs/design/assets/` (nur lesen) per `build-sprites.mjs` übernehmen, Lizenzzeilen ergänzen, Rig-Daten (Teile, Drehpunkte, Ebenen) in `config/rigs/astronaut.ts` und `config/rigs/rootMonster.ts`.
+- **Akzeptanzkriterien:** Alle Teile geladen und im Register; Texturgrenze eingehalten; `build-sprites` deterministisch; alle Checks grün.
+- **Tests:** `tests/scripts/build-sprites.test.ts`, Rig-Daten gegen Register
+- **Review-Schwerpunkte:** Lizenzzeilen, Texturgröße, pixelgenaue Drehpunkte
+- **Design-Review:** ja · **Doku-Pflichten:** `LICENSES.md`
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium · **Opus-Grund:** – · **Kürzbar:** nein
+- **Commit-Typ:** `feat(AP-183): add rig parts for astronaut and root monster`
+
+#### AP-184 – Choreografie Baummonster (Prototyp)
+
+- **Meilenstein, Lane, Welle:** M13 · CFG/GAME · M13 W3
+- **Ziel:** Kampfmoment Baummonster (Level 0 bis 3, ≈ 3 bis 4 s) und Cinematic Level 4 (15 s, 5 Einstellungen) nach Storyboard H-46 und RS-06.
+- **Abhängigkeiten:** AP-182, AP-183 · **Parallel möglich mit:** – · **Dateien (Eigentum):** §8 „M13 W3“ · **Nicht anfassen:** Register, `finisher/**` außer `fx/rootMonster.ts`
+- **Umsetzung:** Schlüsselbilder, Kurven, Kamera und Effekte als Daten in `config/choreo/rootMonster.ts`, bosseigene Effekte in `fx/rootMonster.ts`; Antizipation, Treffer-Stopp und Nachschwingen nach RS-06.
+- **Akzeptanzkriterien:** `?finisher=0` und `?finisher=4` laufen flüssig; Längen ≈ 3–4 s bzw. 15 s; Blitz-Regel und „Effekte reduzieren“ grün (Test); Design-Review gegen Storyboard bestanden.
+- **Tests:** `tests/config/choreo/rootMonster.test.ts`
+- **Review-Schwerpunkte:** Bewegungsgefühl, Lesbarkeit am iPhone, eigene Gestaltung
+- **Design-Review:** ja · **Doku-Pflichten:** Abschnitt „Finisher“ (Muster für die weiteren Bosse)
+- **Aufwand:** M · **Modell:** sonnet · **Effort:** high · **Opus-Grund:** – · **Kürzbar:** nein
+- **Commit-Typ:** `feat(AP-184): add root monster finisher choreography`
+
+#### AP-185 – Figurenteile Teil 2
+
+- **Meilenstein, Lane, Welle:** M13 · ASSET · M13 W6
+- **Ziel:** Teile und Drehpunkte von Waldgeist, Riesen-Stein, Sand-Wurm, Wächter-Hund und Pharao aus H-48 als Sprites und Rig-Daten.
+- **Abhängigkeiten:** H-48, „Design übernehmen“ · **Dateien (Eigentum):** §8 „M13 W6“ · sonst wie AP-183
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium · **Opus-Grund:** – · **Design-Review:** ja · **Kürzbar:** nein
+- **Commit-Typ:** `feat(AP-185): add rig parts for remaining bosses`
+
+#### AP-186 bis AP-190 – Choreografie je Boss
+
+- **Meilenstein, Lane, Welle:** M13 · CFG/GAME · M13 W7 (alle fünf parallel, keine gemeinsame Datei)
+
+| Paket | Boss (`BossId`) | Kampfmoment in Level | Cinematic | Aufwand · Modell · Effort | Commit-Typ |
+|---|---|---|---|---|---|
+| AP-186 | Waldgeist (`forestGhost`) | 5 bis 8 | Level 9, 15 s | M · sonnet · high | `feat(AP-186): add forest ghost finisher choreography` |
+| AP-187 | Riesen-Stein (`giantStone`) | 10 bis 19 | Level 20, 15 s | M · sonnet · high | `feat(AP-187): add giant stone finisher choreography` |
+| AP-188 | Sand-Wurm (`sandWorm`) | 21 bis 24 | Level 25, 15 s | M · sonnet · high | `feat(AP-188): add sand worm finisher choreography` |
+| AP-189 | Wächter-Hund (`guardianDog`) | 26 bis 29 | Level 30, 15 s | M · sonnet · high | `feat(AP-189): add guardian dog finisher choreography` |
+| AP-190 | Pharao (`pharaoh`) | 31 bis 39 | Level 40, 20 s, 6 Einstellungen, Höhepunkt des Spiels | L · sonnet · high | `feat(AP-190): add pharaoh finisher choreography` |
+
+- **Ziel je Paket:** eigener Kampfmoment (≈ 3 bis 4 s, erkennbar anders als alle anderen Bosse, PE-235) und Cinematic nach Storyboard H-48 und RS-06. Die `BossId`-Namen prüft die Verfeinerung gegen `src/contracts/boss.ts`.
+- **Abhängigkeiten:** AP-185 · **Dateien (Eigentum):** je Paket nur `src/config/choreo/<bossId>.ts`, `src/scenes/finisher/fx/<bossId>.ts`, `tests/config/choreo/<bossId>.test.ts` · **Nicht anfassen:** Register, Dateien anderer Bosse
+- **Umsetzung:** Muster aus AP-184; fehlt dem Abspieler ein Baustein, nur bosseigen in `fx/<bossId>.ts`, sonst Rückfrage an den Lead.
+- **Akzeptanzkriterien:** Kampfmoment und Cinematic per `?finisher=n` flüssig; Längen stimmen; Blitz-Regel und „Effekte reduzieren“ grün (Test); Design-Review gegen Storyboard bestanden.
+- **Review-Schwerpunkte:** Unterscheidbarkeit zu den anderen Bossen, Leistung, eigene Gestaltung · **Design-Review:** ja · **Opus-Grund:** – · **Kürzbar:** nein
+
+#### AP-191 – Aufräumen alter Finisher-Ablauf
+
+- **Meilenstein, Lane, Welle:** M13 · CFG/GAME · M13 W8
+- **Ziel:** Die 6 Stufen und Bildfolgen aus M10 werden entfernt (PE-241), Treffer- und Impact-Bilder bleiben, der Rückfall im Register entfällt; Blitz-Test läuft über alle 12 neuen Abläufe; Doku aktuell.
+- **Abhängigkeiten:** AP-186 bis AP-190 · **Dateien (Eigentum):** §8 „M13 W8“ · **Nicht anfassen:** `config/choreo/**`, `config/rigs/**`
+- **Umsetzung:** nur Löschen und Umstellen, keine neue Gestaltung.
+- **Akzeptanzkriterien:** keine toten Abläufe, Sprites oder Tests; alle 12 Varianten im Blitz-Test; alle Checks grün; Build nicht größer als vor M13.
+- **Review-Schwerpunkte:** nichts Genutztes entfernt, Spielstand-Kompatibilität · **Design-Review:** nein · **Doku-Pflichten:** Abschnitt „Finisher“, `docs/grafik-austauschen.md` falls betroffen
+- **Aufwand:** S · **Modell:** sonnet · **Effort:** medium · **Opus-Grund:** – · **Kürzbar:** ja (dann bleibt der Rückfall im Code)
+- **Commit-Typ:** `refactor(AP-191): remove legacy finisher stages`
+
+---
+
 ## 13. Menschliche Schritte
 
 | ID | Schritt | Ab wann nötig | Blockiert | Erledigt |
@@ -7369,6 +7536,11 @@ Gemeinsame Pflichtlektüre aller M12-Pakete: §2 F-03, F-05, F-25, F-27, F-42, P
 | Q-80 | **Freigabe M12 (§4):** neue Verträge für den Wellen-Rhythmus und Designer-Nachtrag H-43. Antwort im Chat an den Lead oder Planner | sofort | AP-174, H-43 | ☑ ((a), 2026-11-02, PE-222) |
 | H-43 | **Designer-Nachtrag M12 (RS-01.3, RS-01.5, PE-218, PE-220), nach Q-80.** Start: `start-agent.ps1 -Project "<Projektpfad>" -Role designer`. Auftrag: Rand-Marker je Ereignisart (Schwarm, Ring, Zange; Richtung erkennbar, etwa 1 s sichtbar, ohne Blitz, Ersatz bei „Bewegung reduzieren“, innerhalb des sicheren Bereichs), kurzer Ankündigungston (Platzhalter-Beschreibung), Elite-Kennzeichnung für alle Gegner (Größe ×≈1,25 plus Umriss oder Aura, klar unterscheidbar von der Stufen-Tönung F-27, ohne neue Gegner-Sprites wenn möglich), Querformat-Mockup einer Ring-Spitze mit Elite. Danach Freigabe durch den Nutzer und Planner-Auftrag „Design übernehmen“ | nach Q-80 | AP-177, AP-178 | ☐ |
 | H-44 | **M12-DEP:** Handtest PC und iPhone nach §9.2 „M12-DEP“, Release `dev` → `stage` → `master` (nach H-42) | nach M12 W4 | – | ☐ |
+| H-45 | **Recherche RS-06 (M13, PE-240).** Start: `start-agent.ps1 -Project "<Projektpfad>" -Role researcher`. Auftrag: Anime-Kampfchoreografie und Animationsprinzipien (Antizipation, Smear Frames, Hit-Stop, Kamera, Schnitt, Timing); je Boss 2 bis 3 Ideen für Kampfmoment und Cinematic passend zu Charakter und Märchen-Quicktimes (M9); Technik in Phaser 3 (Figuren aus Teilen, Kurven, Bewegungsspuren) und was ein iPhone flüssig schafft; Vorschläge `RS-06.x`. Danach Freigabe der Vorschläge und Lead-Auftrag „Recherche übernehmen RS-06“ | sofort | H-46, Q-89, M13 | ☐ |
+| H-46 | **Designer-Nachtrag M13 Teil 1 (PE-233, PE-236).** Start: `start-agent.ps1 -Project "<Projektpfad>" -Role designer`. Auftrag: Astronautin und Baummonster in Teile mit Drehpunkten zerlegen (Pixel-Art im bestehenden Stil), Schlüsselposen des Kampfmoments, Storyboard Level 4 (5 Einstellungen); danach „Design übernehmen“ | nach H-45 | AP-182, AP-183 | ☐ |
+| H-47 | **Prototyp freigeben (PE-235):** `?finisher=0` und `?finisher=4` am PC und iPhone ansehen; Look und Bewegungsgefühl freigeben oder Änderungen nennen | nach AP-184 | H-48 | ☐ |
+| H-48 | **Designer-Nachtrag M13 Teil 2:** übrige 5 Bosse (Teile, Posen, Storyboards; Level 40 mit 6 Einstellungen); danach „Design übernehmen“ | nach H-47 | AP-185 | ☐ |
+| H-49 | **M13-DEP:** Handtest PC und iPhone nach §9.2 „M13-DEP“, Release `dev` → `stage` → `master` (nach H-44) | nach M13 W8 | – | ☐ |
 
 ---
 
@@ -7406,7 +7578,8 @@ Gemeinsame Pflichtlektüre aller M12-Pakete: §2 F-03, F-05, F-25, F-27, F-42, P
 | Nachtrag 6 Fix Test-Timeout `build-sprites.test.ts` (PE-227) | 1 (AP-180 S) | ≈ 0,5 h (+ Review ≈ 0,75 h) | ≈ 0,3 bei 2,5 h je Fenster; läuft im Fenster von AP-170 mit |
 | M11 Balancing-Update (RS-05, PE-208 bis PE-214) | 7 (AP-167 M, AP-168 M, AP-169 S, AP-170 M, AP-171 S, AP-172 M, AP-173 L) | ≈ 10 h (angenommen: L ≈ 2,5 h, M ≈ 1,5 h, S ≈ 0,75 h; + Review inkl. Design-Review AP-173 ≈ 13 h; H-41 ist Designer-Zeit im Nutzer-Kontingent) | ≈ 5–6 bei 2,5 h je Fenster; W3 bis W5 laufen seriell (`GameScene.ts`), W1/W2 in den Fenstern von M10 W3 bis W5 |
 | M12 Wellen-Rhythmus (RS-01, PE-216 bis PE-221) | 5 (AP-174 M, AP-175 L, AP-176 M, AP-177 L (Q-86 (b), PE-230), AP-178 M) | ≈ 9,5 h (angenommen; + Review inkl. Design-Review AP-177/AP-178 ≈ 12 h; H-43 ist Designer-Zeit im Nutzer-Kontingent) | ≈ 4–5 bei 2,5 h je Fenster; W1 läuft in den Fenstern von M11 mit, W3/W4 seriell nach M11 W5 |
-| **Gesamt** | **87** | **≈ 134 h (+ Review ≈ 172 h)** | **≈ 62–72** |
+| M13 Finisher 2.0 (F-43, PE-231 bis PE-241) | 11 (AP-181 M, AP-182 L opus, AP-183 S, AP-184 M, AP-185 S, AP-186 bis AP-189 je M, AP-190 L, AP-191 S) | ≈ 16,25 h (angenommen; + Review inkl. Design-Review ≈ 21 h; H-45 Researcher- sowie H-46/H-48 Designer-Zeit im Nutzer-Kontingent) | ≈ 7–9 bei 2,5 h je Fenster; bis zur Prototyp-Freigabe H-47 ≈ 3 Fenster; W1 bis W3 parallel zu M12 W3/W4 möglich |
+| **Gesamt** | **98** | **≈ 150 h (+ Review ≈ 193 h)** | **≈ 69–81** |
 
 Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster etwa 2,5 h Paketarbeit inklusive Review. Der Wert wird nach M0 mit echten Zahlen nachgeschärft (§18). Die Summe aus den Einzelzeilen ergibt 24–29 Fenster. Die M2b-Zeile enthält AP-38 und AP-39 (je M, ca. 1,5 h Agent-Zeit, angenommen) sowie die Rüstungspakete AP-37a und AP-37c (je M, ca. 1,5 h, angenommen). Die Einbindung der Rüstung in AP-33 und die Anzeige in AP-34 sind im bisherigen Aufwand dieser Pakete enthalten, das Risiko steht in RI-16. Der Katalog weiterer Rüstungen ist nicht enthalten, er wird nach Klärung geschätzt. Optionale Kürzung K8 (Ring ohne Pulsieren, AP-37c) spart ca. 0,3 h. Die Fensterzahlen oben gelten noch für 30 % Zielwert. Bei 45 % sinkt die Zahl rechnerisch auf etwa zwei Drittel, Neuberechnung nach M2b-DEP (§18). Die M2c-Zeile (PE-59) enthält AP-50 und AP-54 (je M, ca. 1,5 h), AP-51, AP-52 und AP-53 (je L, ca. 2,5 h) und AP-55 (S, ca. 0,75 h), alle angenommen. Dazu kommen drei Design-Reviews durch `ma-designer`, deren Kosten als Review-Zuschlag gerechnet sind. Optional sind die Pakete AP-55 (Regel kann später folgen) und H-13 (Sprites, Mensch). Das Risiko steht in RI-17. Die Gesamtzeile enthält die Zeilen M2c-Nachtrag und Nachtrag 2 nicht: Nachtrag 2 (PE-70 bis PE-72) bringt 4 Pakete, ≈ 6,25 h (+ Review ≈ 8 h) und ≈ 3–4 Fenster zusätzlich, Risiko RI-19.
 
@@ -7727,6 +7900,9 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | PE-236 | **Recherche vor Design (M13, Antwort 6c):** Zuerst ein Researcher-Auftrag RS-06 zu Anime-Kampfchoreografie und Animationsprinzipien (Antizipation, Smear Frames, Timing, Kamera, Schnitt) samt Ideen für je Boss eigene Choreografien; danach ein Designer-Nachtrag H-45 (Figurenteile mit Drehpunkten, Storyboards der Cinematics, Schlüsselposen der Kampfmomente), zuerst nur Astronautin und Baummonster (PE-235). Der Vertrag für Rig und Choreografie (§4) wird nach RS-06 vorgeschlagen | Nutzer am 2026-11-03 („6c“) | Nutzer |
 | PE-237 | **Kein neuer Ton in M13 (Antwort 7c):** Die Cinematics nutzen nur vorhandene Platzhalter-Töne (M10); keine neuen Töne, keine Musik, keine neue Lizenz | Nutzer am 2026-11-03 („7c“) | Nutzer |
 | PE-238 | **Reihenfolge M13 zu M12 (Antwort 8a):** RS-06 und danach H-45 starten sofort; M13-Coder-Pakete laufen parallel zu M12 W3/W4 und fassen `GameScene.ts` nicht an (braucht ein Paket es doch, wartet es auf AP-178). Releases H-40, H-42, H-44 dürfen mit dem alten Finisher (M10) erscheinen | Nutzer am 2026-11-03 („8a“) | Nutzer |
+| PE-239 | **Schnitt M13 (Antwort 9a):** M13 mit W0a bis W9 wie in §9.2: Recherche H-45, Designer Teil 1 H-46, Vertrag Q-89, AP-181 (Verträge/Logik), AP-182 (Abspieler, opus) und AP-183 (Figurenteile 1), AP-184 (Baummonster), Freigabe H-47, Designer Teil 2 H-48, AP-185 (Figurenteile 2), AP-186 bis AP-190 (je Boss), AP-191 (Aufräumen), H-49 (M13-DEP). Pakete grob; „Verfeinerung M13“ nach RS-06, H-46 und Q-89 | Nutzer am 2026-11-03 („9a“) | Nutzer |
+| PE-240 | **Umfang RS-06 (Antwort 10a):** Prinzipien (Antizipation, Smear Frames, Hit-Stop, Kamera, Schnitt), je Boss 2 bis 3 Ideen für Kampfmoment und Cinematic passend zu Charakter und Märchen-Quicktimes (M9), Technik in Phaser 3 (Figuren aus Teilen, Kurven, Bewegungsspuren) und iPhone-Leistung, Vorschläge `RS-06.x` | Nutzer am 2026-11-03 („10a“) | Nutzer |
+| PE-241 | **Alter M10-Ablauf wird ersetzt (Antwort 11a):** Nach M13 entfallen die 6 Eskalationsstufen (PE-197) und die Bildfolgen der Finale (PE-198); Treffer- und Impact-Bilder aus H-39 bleiben als Akzente. „EFFEKTE REDUZIEREN“ gilt für die neuen Abläufe (ohne Impact Frame, Blitz, Wackeln; Bewegung bleibt). Bis AP-191 ist der M10-Ablauf Rückfall für Bosse ohne Choreografie | Nutzer am 2026-11-03 („11a“) | Nutzer |
 
 ### Offene Fragen
 
@@ -7812,6 +7988,7 @@ Annahme (angenommen): Bei 30 % des 5-Stunden-Limits schafft das Team pro Fenster
 | Q-87 | **Bodenvarianten `biome.*-ground-hi` ohne Kontrastregel (Design-System-Lücke, Review AP-173):** Die Kontrastregel des Briefs und der Test in AP-173 prüfen nur die normalen Bodenfarben; die helleren Varianten `biome.*-ground-hi` fehlen (Wüste hell ohne Fokus 3,42:1 gegen den Kreis, unter 4,15:1). Kein Coder-Fehler. (a) Designer ergänzt Regel/Werte im Brief (Nachtrag), danach kleines Fix-Paket für den Test, (b) Handtest H-42 abwarten, ob die helle Wüste im Spiel lesbar ist (empfohlen, die Tintenlinie gleicht es teilweise aus), (c) so lassen | Reviews AP-173 und Design-Review am 2026-11-02 | offen, nicht blockierend |
 | Q-88 | **„EFFEKTE REDUZIEREN“ setzt Rang 4 dauerhaft auf 25 % auch ohne Kreis (Brief mehrdeutig, Review AP-173):** Umgesetzt nach Wortlaut des Briefs und AP-173 Umsetzung 3 (dauerhaft, überall). (a) so lassen und im Handtest H-42/H-44 prüfen (empfohlen, Pet, Münzen und Laser sind dann immer blass), (b) Designer präzisiert den Brief auf „nur im Fokus“ und ein Fix-Paket ändert `effectRank.ts` | Reviews AP-173 und Design-Review am 2026-11-02 | offen, nicht blockierend |
 | Q-86 | **AP-177 zu eng für Aufwand M (Einschätzung Planner, Reviews AP-175/AP-176):** AP-177 enthält Director-Aufruf, Marker (Sprite, Wörter, Pips), drei Töne, Sprite-Sync (`elite-crown`, `event-markers`) und Doku. (a) Aufteilen: Sprite-Sync und drei Töne als eigenes Paket S (vorgeschaltet, `build-sprites.mjs`, `assets.ts`, `generate-placeholders.mjs`, `audio.ts`, Asset-Tests), AP-177 bleibt M, (b) ein Paket mit Aufwand L, (c) so lassen (M) und bei Überlauf kürzen (Ton weglassen). **Nutzerentscheidung, der Planner entscheidet nicht.** Blockiert AP-177 erst nach AP-173 | Anfrage des Lead am 2026-11-02 | **beantwortet: (b)**, Nutzer am 2026-11-02 (PE-230): ein Paket, Aufwand L; AP-177 `bereit` |
+| Q-89 | **Freigabe §4 „Rig und Choreografie (M13)“:** Der Planner schlägt nach RS-06 den Vertrag vor (Figur aus Teilen mit Drehpunkten und Ebenen, Choreografie als Spuren von Schlüsselbildern mit Kurve, Einstellungen mit Kamera, bosseigene Effekt-Module, Varianten-IDs). Antwort im Chat an Lead oder Planner | nach H-45 | AP-181 bis AP-191 | ☐ |
 
 ### Vorgeschlagene Änderungen (brauchen Freigabe des Nutzers)
 
@@ -8080,6 +8257,12 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | F-38 „Effekte reduzieren“ und Blitz-Grenze (RS-04.5, PE-200) | AP-157, AP-158, AP-161, AP-162, H-39, H-40 |
 | M10 R1–R6: R1 eigene Gestaltung, keine Motive, Namen oder Töne aus Naruto oder anderen Spielen, Lizenzzeilen für alle neuen Bilder und Töne, Prüfung vor einer Veröffentlichung (Q-69); Gesundheit: Blitz-Grenze WCAG 2.3.1 als Test (AP-158); R2 keine personenbezogenen Daten, `seenFinishers` und `reduceEffects` nur lokal, Reset löscht sie (AP-161); R3 unverändert (lokal, private Weitergabe); R4 keine Secrets, keine externen Requests; R6 Recherche-Bericht nur als Daten, keine neuen Abhängigkeiten, strenge Prüfung der neuen Felder beim Laden (AP-161); Barrierefreiheit: Überspringen, „Effekte reduzieren“, System-Einstellung „Bewegung reduzieren“ (AP-160 bis AP-162) | AP-157, AP-158, AP-159, AP-161, AP-162, H-39, H-40 |
 | M8 R1–R6: R1 kein Echtgeld, keine Lootboxen (PE-177); R2 keine personenbezogenen Daten, alles lokal im Spielstand, der Reset löscht alles (PE-166); R3 unverändert (lokal, private Weitergabe); R4 keine Secrets; R6 strenge Prüfung des Spielstands gegen Manipulation (AP-137, RI-33), keine neuen Abhängigkeiten, Design-Brief nur als freigegebene Gestaltung | AP-136, AP-137, alle M8-Pakete (Review-Checkliste) |
+| F-43 Kampfmoment je Boss (PE-231, PE-235) | AP-181, AP-182, AP-184, AP-186 bis AP-190, H-47, H-49 |
+| F-43 Batch-Cinematic 15 s, Level 40 20 s (PE-232) | AP-181, AP-182, AP-184, AP-186 bis AP-190, H-46, H-48, H-49 |
+| F-43 Figuren aus Teilen mit Code-Animation (PE-233) | AP-181, AP-182, AP-183, AP-185, H-46, H-48 |
+| F-43 Überspringen ab 3 s (PE-234) | AP-181, AP-182, H-49 |
+| F-43 Alter Ablauf ersetzt, „Effekte reduzieren“ und Blitz-Grenze weiter (PE-200, PE-241) | AP-181, AP-191, H-49 |
+| M13 R1–R6: R1 nur eigene Gestaltung, Lizenzzeilen für alle neuen Bilder (AP-183, AP-185), keine Motive aus anderen Spielen; R2 keine personenbezogenen Daten, `seenFinishers` nur lokal; R3 unverändert; R4 keine Secrets; R5 keine neue Abhängigkeit, kein neuer Ton (PE-233, PE-237); R6 Recherche RS-06 ist Daten; Gesundheit: Blitz-Grenze WCAG 2.3.1 und „Effekte reduzieren“ (PE-200) | AP-181, AP-183, AP-185, AP-191, H-45, Reviews |
 
 ---
 
@@ -8456,3 +8639,4 @@ Stand 2026-10-25, Sonderauftrag des Nutzers. Keine Pakete in §10/§12, keine St
 | 2026-11-02 | **Wellenabschluss AP-173 (M11 W5, PE-229):** gemergt und `fertig`: AP-173 (831bb11, Review und Design-Review Runde 1 bestanden); `dev` 831bb11, 142 Testdateien, 1986/1986 Tests. M11 ist damit komplett in `dev` (Rest: Handtests H-42, Release). **Erkenntnisse:** Kontrast Wüste ohne Fokus real 4,157:1, Kriterium „≥ 4,15:1 (Rundung ≈ 4,2)“; JSDoc `bracketRects` über `KEYLINE` in `src/entities/parry/look.ts` (Kosmetik, nächstes Paket an der Datei); Design-System-Lücken Q-87 (helle Bodenvarianten `-ground-hi`, Wüste hell 3,42:1) und Q-88 („EFFEKTE REDUZIEREN“ Rang 4 dauerhaft 25 %); Handtest-Hinweise in H-42/H-44 (iPhone mit Pet, Höllen-Set, Feuerring, dicht folgende Kreise, `?fps=1`, Boss mit „EFFEKTE REDUZIEREN“); Fokus kann bis zu 1 s verzögert angehen (RI-43); Wiring-Tests mit herausgeschnittenen Methoden aus `GameScene.ts` brechen bei davor eingefügten Methoden (Hinweis in AP-177/AP-178). Q-86 vom Nutzer entschieden: AP-177 bleibt ein Paket mit Aufwand L (PE-230), `bereit` | Wellenabschluss (Auftrag des Lead), Reviews AP-173 | AP-173, AP-177, AP-178, H-42, H-44, Q-86, Q-87, Q-88, PE-229, PE-230 | Planner (Pflege) |
 | 2026-11-03 | **Interview M13 „Finisher 2.0“ Runde 1:** F-43 neu, PE-231 bis PE-234 (Kampfmoment je Boss, Batch-Cinematic 15 s/Level 40 20 s, Rig mit Code-Animation, Überspringen ab 3 s); Pakete folgen | Nutzerwunsch: Animationen am Bossende zu simpel und nicht flüssig | M13 (neu) | Nutzer |
 | 2026-11-03 | **Interview M13 Runde 2:** PE-235 bis PE-238 (Prototyp Baummonster zuerst, jeder Boss eigene Choreografie, Recherche RS-06 vor Designer H-45, kein neuer Ton, parallel zu M12) | Interview | M13 (neu) | Nutzer |
+| 2026-11-03 | **Interview M13 Runde 3:** PE-239 bis PE-241, Q-89; M13 grob geschnitten (§8, §9, §10, §11, §12, §13, §14, §17): H-45 bis H-49, AP-181 bis AP-191; G2(M13) offen bis RS-06, H-46 und Q-89 | Interview | AP-181 bis AP-191 | Nutzer |
