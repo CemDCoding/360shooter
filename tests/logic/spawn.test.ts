@@ -15,6 +15,7 @@ import {
   ROLE_CAP_HEADROOM,
   WAVE_PLANS,
   cyclesOf,
+  eliteChanceScale,
 } from '../../src/config/waves';
 import {
   FIRST_APPEARANCE_BY,
@@ -733,11 +734,13 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
     let peakElites = 0;
     let otherSpawns = 0;
     let otherElites = 0;
-    for (const id of [rules.fromLevel, 12, 30, 40]) {
+    for (const id of [12, 20, 30, 36, 38]) {
       const res = simulate(lvl(id), { killEveryMs: 700, report: true, rules, seed: id });
       expect(res.eliteShareViolations, `level ${id}`).toBe(0);
       const elites = res.spawns.filter((s) => s.elite).length;
-      expect(elites, `level ${id}`).toBeGreaterThan(0);
+      // Level 30 and 40 have no elites (AP-178, no room in the pressure bands); the others have.
+      if (eliteChanceScale(id) > 0) expect(elites, `level ${id}`).toBeGreaterThan(0);
+      else expect(elites, `level ${id}`).toBe(0);
       expect(elites / res.spawns.length, `level ${id}`).toBeLessThanOrEqual(rules.maxShare);
       for (const s of res.spawns) {
         if (s.phase === 'peak') {
@@ -751,6 +754,22 @@ describe('SpawnDirector: wave rhythm (M12, AP-175, RS-01.1, RS-01.2, RS-01.4)', 
     }
     expect(peakElites / peakSpawns).toBeGreaterThan(otherElites / otherSpawns);
   });
+
+  it('elites appear from fromLevel on in small numbers (level 3 and 4) and never at level 30 and 40', () => {
+    const count = (id: number): number => {
+      let n = 0;
+      for (let seed = 1; seed <= 40; seed++) {
+        n += simulate(lvl(id), { killEveryMs: 400, report: true, seed }).spawns.filter(
+          (x) => x.elite,
+        ).length;
+      }
+      return n;
+    };
+    expect(count(3)).toBeGreaterThan(0);
+    expect(count(4)).toBeGreaterThan(0);
+    expect(count(30)).toBe(0);
+    expect(count(40)).toBe(0);
+  }, 120_000);
 
   it('allocates nothing per frame: the output array is reused and stays empty without spawns', () => {
     const level = lvl(12);

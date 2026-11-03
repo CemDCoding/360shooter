@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BALANCE_BANDS, LEVELS, LEVEL_COUNT, maxStepForLevel } from '../../src/config';
-import { ELITE_RULES } from '../../src/config/waves';
+import { ELITE_MODEL_SHARE, ELITE_RULES, eliteChanceScale } from '../../src/config/waves';
 import {
   basePressure,
   eliteShare,
@@ -120,9 +120,12 @@ describe('balance model: reference player (AP-167)', () => {
     for (const i of ids) {
       // Build-up and peak are normalised per level: the wave rhythm moves spawns in time, not their number.
       expect(Math.abs(pacingMean(i) - 1), `level ${i}`).toBeLessThan(1e-9);
-      // Upper bound maxShare from fromLevel.
+      // Measured upper share times the level factor from fromLevel (none at level 30 and 40).
       const on = ELITE_RULES.enabled && i >= ELITE_RULES.fromLevel;
-      expect(eliteShare(i), `level ${i}`).toBe(on ? ELITE_RULES.maxShare : 0);
+      expect(eliteShare(i), `level ${i}`).toBeCloseTo(
+        on ? Math.min(ELITE_RULES.maxShare, ELITE_MODEL_SHARE * eliteChanceScale(i)) : 0,
+        12,
+      );
     }
     expect(ELITE_RULES.enabled).toBe(true);
   });

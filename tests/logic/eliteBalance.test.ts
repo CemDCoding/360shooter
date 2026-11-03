@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENEMIES } from '../../src/config';
 import { LEVELS } from '../../src/config/levels';
-import { ELITE_RULES } from '../../src/config/waves';
+import { ELITE_MODEL_SHARE, ELITE_RULES, eliteChanceScale } from '../../src/config/waves';
 import type { EliteRules, EnemyId } from '../../src/contracts';
 import { SpawnDirector } from '../../src/logic/spawn';
 import { eliteHpFactor, referencePressure } from '../../src/logic/balanceModel';
@@ -71,26 +71,36 @@ function sum(levelId: number, rules: EliteRules): Totals {
   return acc;
 }
 
+const LEVELS_UNDER_TEST = [3, 4, 5, 12, 20, 29, 30, 36, 38, 39, 40];
+
 describe('elites and the balance model (AP-178, measured with the SpawnDirector)', () => {
-  it('replaces regular spawns one for one: the spawn count is the same, the hp per round grows by 3 to 9 %, the share stays below maxShare', () => {
+  it('replaces regular spawns one for one; the measured hp per round stays within the factor the model counts', () => {
     const off: EliteRules = { ...ELITE_RULES, enabled: false };
-    for (const id of [3, 4, 12, 30, 39, 40]) {
+    for (const id of LEVELS_UNDER_TEST) {
       const a = sum(id, off);
       const b = sum(id, ELITE_RULES);
       const share = b.elites / b.spawns;
-      expect(b.elites, `level ${id}`).toBeGreaterThan(0);
-      expect(share, `level ${id}`).toBeLessThanOrEqual(ELITE_RULES.maxShare);
-      // Measured (levels 3, 4, 12, 30, 39, 40): spawns x1.000, hp x1.046 to x1.084, share 2.4 to 3.6 %.
       expect(b.spawns / a.spawns, `level ${id} spawns`).toBeCloseTo(1, 2);
-      expect(b.hp / a.hp, `level ${id} hp`).toBeGreaterThan(1.03);
-      expect(b.hp / a.hp, `level ${id} hp`).toBeLessThan(1.1);
+      expect(share, `level ${id}`).toBeLessThanOrEqual(ELITE_RULES.maxShare);
+      // The model counts the upper share: it is never below the measured growth (random noise 1.5 %: elites move the random sequence).
+      expect(b.hp / a.hp, `level ${id} hp`).toBeLessThanOrEqual(eliteHpFactor(id) + 0.015);
+      if (eliteChanceScale(id) === 0) expect(b.elites, `level ${id}`).toBe(0);
     }
-  }, 120_000);
+  }, 300_000);
 
-  it('keeps the model neutral on purpose: eliteHpFactor is 1 although the measured hp grows (no room in the bands)', () => {
-    for (const id of [0, 3, 4, 12, 30, 39, 40]) expect(eliteHpFactor(id)).toBe(1);
-    // Level 40 sits at 1.799 of at most 1.8: a measured +5.7 % would break the band (AP-168, Q-81).
+  it('counts elites into the pressure and keeps every M11 band green with them', () => {
+    expect(eliteHpFactor(2)).toBe(1);
+    expect(eliteHpFactor(30)).toBe(1);
+    expect(eliteHpFactor(40)).toBe(1);
+    expect(eliteHpFactor(12)).toBeCloseTo(1 + ELITE_MODEL_SHARE * 2, 10);
+    for (const id of [3, 4, 5, 38, 39]) {
+      expect(eliteHpFactor(id), `level ${id}`).toBeGreaterThan(1);
+      expect(eliteHpFactor(id), `level ${id}`).toBeLessThan(1 + ELITE_MODEL_SHARE * 2);
+    }
+    // Level 40 has no room (1.799 of at most 1.8): no elites there.
     expect(referencePressure(40)).toBeGreaterThan(1.79);
     expect(referencePressure(40)).toBeLessThanOrEqual(1.8);
+    for (let id = 0; id <= 40; id++)
+      expect(referencePressure(id), `level ${id}`).toBeLessThanOrEqual(1.8);
   });
 });

@@ -9,6 +9,7 @@ import {
   BUILD_TO,
   ELITE_CHANCE_OTHER,
   ELITE_CHANCE_PEAK,
+  eliteChanceScale,
   ELITE_RULES,
   FILL_INTERVAL_MS,
   MAX_BACKLOG,
@@ -664,7 +665,8 @@ export class SpawnDirector {
     const rules = this.eliteRules;
     if (this.costOf[k] * rules.costMul > spend) return;
     if (this.eliteAlive + 1 > rules.maxShare * (this.tracked + 1)) return;
-    const chance = phase === PEAK ? ELITE_CHANCE_PEAK : ELITE_CHANCE_OTHER;
+    const chance =
+      (phase === PEAK ? ELITE_CHANCE_PEAK : ELITE_CHANCE_OTHER) * eliteChanceScale(this.level.id);
     this.eliteFlag = this.rng.next() < chance;
   }
 
