@@ -5,12 +5,22 @@ import {
   FINISHER_STAGES,
   type FinisherTemplate,
 } from '../../src/config/finishers';
-import { LEVEL_COUNT } from '../../src/config/levels';
-import { FINISHER_VARIANT_IDS, type FinisherPlan, type FinisherStep } from '../../src/contracts';
+import { BOSS_OF_BATCH, LEVEL_COUNT, batchOf } from '../../src/config/levels';
 import {
+  CHOREO_VARIANT_IDS,
+  FINISHER_VARIANT_IDS,
+  type ChoreoDef,
+  type ChoreoVariantId,
+  type FinisherPlan,
+  type FinisherStep,
+} from '../../src/contracts';
+import {
+  DEFAULT_FINISHER_SOURCE,
   buildFinisher,
   buildPlanFromTemplate,
   canSkip,
+  choreoVariantId,
+  isSeenFinisherId,
   finisherStage,
   finisherVariantId,
   frameHolds,
@@ -334,5 +344,86 @@ describe('flash safety', () => {
   it('builds from a template directly', () => {
     const plan = buildPlanFromTemplate(template4(), REDUCED);
     expect(plan.reduced).toBe(true);
+  });
+});
+
+describe('choreography plan (M13, AP-181)', () => {
+  const choreo = (variantId: ChoreoVariantId): ChoreoDef => ({
+    variantId,
+    actors: [],
+    durationMs: 3000,
+    tracks: [],
+    events: [
+      { kind: 'hitStop', atMs: 1000, ms: 200, axis: 'x', targets: [], flash: false },
+      { kind: 'flash', atMs: 1000, flash: true },
+      { kind: 'particles', atMs: 1500, texture: 's', count: 5, flash: false },
+    ],
+    beats: [],
+  });
+  const all = Object.fromEntries(CHOREO_VARIANT_IDS.map((id) => [id, choreo(id)]));
+  const withChoreos = { ...DEFAULT_FINISHER_SOURCE, choreos: all };
+
+  it('chooses cinematic-<level> for finales and moment-<boss> otherwise, for levels 0 to 40', () => {
+    const ids = new Set<string>();
+    for (let id = 0; id < LEVEL_COUNT; id++) {
+      const expected = isBatchFinale(id)
+        ? `cinematic-${id}`
+        : `moment-${BOSS_OF_BATCH[batchOf(id)]}`;
+      expect(choreoVariantId(id)).toBe(expected);
+      const plan = buildFinisher(id, NONE, withChoreos);
+      expect(plan.variantId).toBe(expected);
+      expect(plan.choreo?.variantId).toBe(expected);
+      expect(plan.realMs).toBe(3200);
+      expect(plan.totalMs).toBe(3200);
+      ids.add(expected);
+    }
+    expect(choreoVariantId(0)).toBe('moment-rootMonster');
+    expect(choreoVariantId(4)).toBe('cinematic-4');
+    expect(choreoVariantId(40)).toBe('cinematic-40');
+    expect(ids.size).toBe(12);
+  });
+
+  it('falls back to the unchanged M10 plan without a choreography', () => {
+    for (let id = 0; id < LEVEL_COUNT; id++) {
+      const plan = buildFinisher(id, NONE);
+      expect(plan).toEqual(
+        buildFinisher(id, NONE, { ...DEFAULT_FINISHER_SOURCE, choreos: undefined }),
+      );
+      expect(plan.choreo).toBeUndefined();
+      expect(plan.realMs).toBeUndefined();
+      expect(plan.variantId).toBe(finisherVariantId(id));
+    }
+  });
+
+  it('reduces the choreography with "reduce effects"', () => {
+    const plan = buildFinisher(1, REDUCED, withChoreos);
+    expect(plan.reduced).toBe(true);
+    expect(plan.choreo?.events.map((e) => e.kind)).toEqual(['hitStop', 'particles']);
+  });
+
+  it('allows skipping at the first view only from 3 s, later after the lock', () => {
+    const first = buildFinisher(1, NONE, withChoreos);
+    expect(FINISHER_RULES.skipFirstViewMs).toBe(3000);
+    expect(canSkip(first, 2999)).toBe(false);
+    expect(canSkip(first, 3000)).toBe(true);
+    const seen = { reduceEffects: false, seen: ['moment-rootMonster'] };
+    const again = buildFinisher(1, seen, withChoreos);
+    expect(canSkip(again, FINISHER_RULES.skipLockMs - 1)).toBe(false);
+    expect(canSkip(again, FINISHER_RULES.skipLockMs)).toBe(true);
+    // an M10 id does not count as seen for the choreography
+    const oldSeen = buildFinisher(1, { reduceEffects: false, seen: ['stage-1'] }, withChoreos);
+    expect(canSkip(oldSeen, 1000)).toBe(false);
+  });
+
+  it('accepts old and new ids as seen', () => {
+    expect(isSeenFinisherId('stage-1')).toBe(true);
+    expect(isSeenFinisherId('moment-pharaoh')).toBe(true);
+    expect(isSeenFinisherId('cinematic-9')).toBe(true);
+    expect(isSeenFinisherId('cinematic-10')).toBe(false);
+    expect(markSeen(['stage-1', 'moment-pharaoh', 'bad'], 'cinematic-40')).toEqual([
+      'stage-1',
+      'moment-pharaoh',
+      'cinematic-40',
+    ]);
   });
 });

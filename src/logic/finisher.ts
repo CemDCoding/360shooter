@@ -6,25 +6,32 @@ import {
   FINISHER_STAGES,
   type FinisherTemplate,
 } from '../config/finishers';
-import { BATCH_STARTS, LEVEL_COUNT } from '../config/levels';
+import { CHOREOS } from '../config/choreo';
+import { BATCH_STARTS, BOSS_OF_BATCH, LEVEL_COUNT, batchOf } from '../config/levels';
 import { MAP_FINAL_LEVELS } from '../config/shop';
 import {
   FINISHER_VARIANT_IDS,
+  type ChoreoDef,
+  type ChoreoVariantId,
   type FinisherPlan,
   type FinisherStage,
   type FinisherStep,
   type FinisherVariantId,
 } from '../contracts';
+import { isChoreoVariantId, realDurationMs, reduceChoreo } from './choreo';
 
 /** Templates a plan is built from; tests pass their own data. */
 export interface FinisherSource {
   stages: Readonly<Record<FinisherStage, FinisherTemplate>>;
   finales: Readonly<Record<number, FinisherTemplate>>;
+  /** Choreographies per variant (M13); missing or `undefined` = M10 fallback. */
+  choreos?: Readonly<Partial<Record<ChoreoVariantId, ChoreoDef | undefined>>>;
 }
 
 export const DEFAULT_FINISHER_SOURCE: FinisherSource = {
   stages: FINISHER_STAGES,
   finales: FINISHER_FINALES,
+  choreos: CHOREOS,
 };
 
 export interface BuildFinisherOptions {
@@ -62,6 +69,19 @@ export function finisherVariantId(levelId: number): FinisherVariantId {
 
 export function isFinisherVariantId(value: unknown): value is FinisherVariantId {
   return typeof value === 'string' && (FINISHER_VARIANT_IDS as readonly string[]).includes(value);
+}
+
+/** Choreography variant of a level: `cinematic-<Level>` for a batch finale, else `moment-<BossId>` (M13). */
+export function choreoVariantId(levelId: number): ChoreoVariantId {
+  assertLevel(levelId);
+  return isBatchFinale(levelId)
+    ? (`cinematic-${levelId}` as ChoreoVariantId)
+    : (`moment-${BOSS_OF_BATCH[batchOf(levelId)]}` as ChoreoVariantId);
+}
+
+/** An id that may be stored in `seenFinishers`: an M10 id or a choreography id (the M10 ids stay until AP-191). */
+export function isSeenFinisherId(value: unknown): value is FinisherVariantId | ChoreoVariantId {
+  return isFinisherVariantId(value) || isChoreoVariantId(value);
 }
 
 /**
@@ -156,19 +176,39 @@ export function buildFinisher(
     ? source.finales[levelId]
     : source.stages[finisherStage(levelId)];
   if (!template) throw new RangeError(`finisher: no template for level ${levelId}`);
-  return buildPlanFromTemplate(template, options);
+  const base = buildPlanFromTemplate(template, options);
+  const variantId = choreoVariantId(levelId);
+  const def = source.choreos?.[variantId];
+  if (!def) return base;
+  const choreo = options.reduceEffects ? reduceChoreo(def) : def;
+  const realMs = realDurationMs(choreo);
+  const wasSeen = options.seen.includes(variantId);
+  return {
+    ...base,
+    variantId,
+    totalMs: realMs,
+    skippable: true,
+    skipFromMs: wasSeen ? FINISHER_RULES.skipLockMs : FINISHER_RULES.skipFirstViewMs,
+    choreo,
+    realMs,
+  };
 }
 
-/** New list of seen variants: valid ids only, no duplicates, `variantId` added when valid. */
-export function markSeen(seen: readonly string[], variantId: string): FinisherVariantId[] {
-  const out: FinisherVariantId[] = [];
+/** New list of seen variants: valid ids only (M10 and choreography ids), no duplicates, `variantId` added when valid. */
+export function markSeen(
+  seen: readonly string[],
+  variantId: string,
+): (FinisherVariantId | ChoreoVariantId)[] {
+  const out: (FinisherVariantId | ChoreoVariantId)[] = [];
   for (const v of [...seen, variantId]) {
-    if (isFinisherVariantId(v) && !out.includes(v)) out.push(v);
+    if (isSeenFinisherId(v) && !out.includes(v)) out.push(v);
   }
   return out;
 }
 
+/** Skipping: with a choreography from `skipFromMs` (3 s on first view, PE-234), else after the M10 lock once seen. */
 export function canSkip(plan: FinisherPlan, elapsedMs: number): boolean {
+  if (plan.skipFromMs !== undefined) return elapsedMs >= plan.skipFromMs;
   return plan.skippable && elapsedMs >= FINISHER_RULES.skipLockMs;
 }
 
