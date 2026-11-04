@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Teil 2b: Wächter-Hund – „Drei Takte“ und Cinematic Level 30 (H-48) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="m13b-boards.css">
+</head>
+<body>
+<header class="doc">
+  <h1>Wächter-Hund · Kampfmoment „Drei Takte“ und Cinematic Level 30 „GRABESLICHT“ (H-48 Teil 2b)</h1>
+  <p>Kampfmoment in Level 26 bis 29 (<code>moment-guardianDog</code>, ≈ 3,5 s), Cinematic nach Level 30 (<code>cinematic-30</code>, 15 s). Astronautin 2×, Hund 3× bzw. 4×. Eigene Handschrift: der Takt. Die drei Schattenköpfe (<code>shade-1..3</code>) schnappen im festen Abstand von 400 ms, nach jedem Konter verblasst einer (<code>fade</code>, dann ausgeblendet). Der Hund behält seinen einen Kopf (6a).</p>
+  <dl>
+    <dt>Grab</dt><dd>Welt <code>pyramid</code>, dunkler als die Spielwelt (Tinte 0,6 bis 0,85). Fackeln sind <code>rig-prop-torch</code> (Bild 0 aus, 1 und 2 brennend).</dd>
+    <dt>Blitz</dt><dd>Moment: genau ein ⚡ (Boss-Weiß 100 ms, Ring) beim Stoß durch das Halsband. Die drei Konter sind nur Funken. Cinematic: genau ein ⚡ (Impact-Paar in Einstellung 4).</dd>
+    <dt>Reduziert</dt><dd>Boss-Weiß, Impact-Paar, Ring und Wackeln entfallen. Takt, Verblassen, Runen und Bröckeln bleiben.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+<section>
+  <h2>1 · KAMPFMOMENT „DREI TAKTE“ (Level 26 bis 29) · ≈ 3,5 s</h2>
+  <div class="legend"><span><i class="boss"></i>Boss</span><span><i class="astro"></i>Astronautin</span><span><i class="hit"></i>Treffer ⚡</span><span><i class="react"></i>Reaktion</span><span><i class="calm"></i>Ausklang</span></div>
+  <div class="tl" id="tlM"></div>
+  <div class="boards" id="moment"></div>
+</section>
+<section>
+  <h2>2 · CINEMATIC LEVEL 30 „GRABESLICHT“ (cinematic-30) · 15 s in 5 Einstellungen</h2>
+  <div class="tl" id="tlC"></div>
+  <div class="boards" id="cine"></div>
+</section>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script src="../assets/sprites-m13b.js"></script>
+<script src="m13b-boards.js"></script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  const B = window.M13B(), { A, P, T, GROUND, X } = B;
+  const ID = 'guardianDog', W = 'pyramid', FX = 'rig-fx-dog', SH = ['shade-1', 'shade-2', 'shade-3'];
+  // dog poses: `gone` = shadow heads already faded out (hidden)
+  const D = {
+    rest: {},
+    snap: (k) => ({ ['shade-' + k]: 'snap', jaw: 'snap' }),
+    low: { head: 'low', collar: 'rest' },
+    sleep: { 'legs-front': 'lie', 'legs-back': 'lie', head: 'sleep', tail: 'down', body: 'dark', collar: 'broken' },
+  };
+  // at 4x the shadow heads would rise into the letterbox: the cinematic lowers them (choreography offset, `low` below)
+  let SHOFF = {};
+  const dog = (c, x, pose, s, o = {}) => {
+    const hide = (o.hide || []).slice(); if (pose.head === 'low' || pose.head === 'sleep') hide.push('jaw');
+    const off = Object.assign({}, SHOFF); Object.entries(o.off || {}).forEach(([k, v]) => { const b = off[k] || [0, 0]; off[k] = [b[0] + v[0], b[1] + v[1]]; });
+    B.rig(c, ID, x, pose, s, Object.assign({}, o, { hide, off }));
+  };
+  const torch = (c, x, y, f, s = 3) => B.spr(c, 'rig-prop-torch', f, x - 4 * s, y - 16 * s, s);
+  const glow = (c, x, y, r, a) => { c.save(); c.globalAlpha = a; c.fillStyle = T.gold; c.beginPath(); c.ellipse(x, y, r, r * 0.8, 0, 0, Math.PI * 2); c.fill(); c.restore(); };
+  // grave light: a narrow vertical band from the opened ceiling (Graphics band; finisher.title and paper)
+  const light = (c, x, w, a = 1) => { c.save(); c.globalAlpha = 0.5 * a; c.fillStyle = T.title; c.fillRect(Math.round(x - w), -400, w * 2, GROUND + 400); c.globalAlpha = a; c.fillStyle = T.paper; c.fillRect(Math.round(x - w / 3), -400, Math.round((w * 2) / 3), GROUND + 400); c.restore(); };
+  const THRUST = { 'arm-front': 'aim', 'leg-front': 'crouch', 'leg-back': 'crouch', torso: 'lean', 'arm-back': 'back', helmet: 'dark', blade: 'full' };
+
+  // =========================== moment ===========================
+  B.timeline('tlM', 3500, [
+    [0, 400, 'boss', 'Takt 1'], [400, 800, 'boss', 'Takt 2'], [800, 1200, 'boss', 'Takt 3'], [1200, 1500, 'astro', 'Halt · Köpfe hängen'],
+    [1500, 1650, 'hit', '⚡ Stoß · Stopp 150', 1], [1650, 2800, 'react', 'legt sich schlafen · Runen erlöschen'], [2800, 3500, 'calm', 'BEZWUNGEN!'],
+  ], [[0, 'H1'], [280, 'H2'], [680, 'H3'], [1080, 'H4'], [1350, 'H5'], [1575, 'H6'], [2100, 'H7'], [2600, 'H8'], [3100, 'H9']]);
+  const AX = X.am, BX = X.bm, s3 = B.SBM;
+  const sc = (c) => { B.world(c, W, { dark: 0.6 }); torch(c, 60, GROUND - 120, 1); torch(c, 590, GROUND - 120, 2); };
+  B.board('moment', '<b>H1 · 0 ms</b> · Grabkammer, zwei Fackeln. Der Hund 3×, drei Schattenköpfe steigen aus dem Runenhalsband.', (c) => { sc(c); dog(c, BX, D.rest, s3); B.astro(c, AX, A.stand); B.bars(c); });
+  B.board('moment', '<b>H2 · 280 ms</b> · Takt 1 (Antizipation 150, Aktion 120): Schattenkopf 1 schnappt, sie gleitet zurück (Nachbilder) und kontert klein: nur Funken, kein Blitz.', (c) => {
+    sc(c); dog(c, BX, D.snap(1), s3, { off: { 'shade-1': [-18, 10] } });
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[AX + 30, GROUND - 10]]); B.astro(c, AX - 10, A.guard); B.burst(c, 'rig-fx-root', 11, AX + 100, GROUND - 120, 6, [6, 7], 14, 2); B.bars(c);
+  });
+  B.board('moment', '<b>H3 · 680 ms</b> · Takt 2: Kopf 1 verblasst (<code>fade</code>), Kopf 2 schnappt von oben. Wieder ausweichen, wieder Funken.', (c) => {
+    sc(c); dog(c, BX, P(D.snap(2), { 'shade-1': 'fade' }), s3, { off: { 'shade-2': [-16, 16] } });
+    B.astro(c, AX + 20, A.guard); B.burst(c, 'rig-fx-root', 12, AX + 120, GROUND - 140, 6, [6, 7], 14, 2); B.bars(c);
+  });
+  B.board('moment', '<b>H4 · 1080 ms</b> · Takt 3: Kopf 2 verblasst, Kopf 3 schnappt flach. Konter mit der Klinge, Funken. Der Takt ist fest: 400 ms je Kopf.', (c) => {
+    sc(c); dog(c, BX, P(D.snap(3), { 'shade-1': 'fade', 'shade-2': 'fade' }), s3, { hide: ['shade-1'], off: { 'shade-3': [-20, 8] } });
+    B.astro(c, AX + 30, P(A.smear, { 'blade-arc': 'arc2' })); B.burst(c, 'rig-fx-root', 13, AX + 130, GROUND - 120, 6, [6, 7], 14, 2); B.bars(c);
+  });
+  B.board('moment', '<b>H5 · 1350 ms</b> · Halt (300): Alle Schattenköpfe sind verblasst, der Kopf hängt (<code>low</code>). Sie setzt die Klinge an, Visier dunkel.', (c) => {
+    sc(c); dog(c, BX, D.low, s3, { hide: SH }); B.astro(c, AX + 40, THRUST); B.bars(c);
+  });
+  B.board('moment', '<b>H6 · 1575 ms</b> · <span class="flash">⚡</span> Stoß durch das Runenhalsband (Aktion 120, Smear 33 ms), Treffer-Stopp 150: Hund weiß (<code>-sil</code>), Speedline-Ring, Runen springen ab.', (c) => {
+    sc(c); dog(c, BX, P(D.low, { collar: 'broken' }), s3, { hide: SH, sil: 'all' }); B.ring(c, 5, BX - 40, GROUND - 110, 90, 24);
+    B.burst(c, FX, 6, BX - 50, GROUND - 110, 6, [0], 40, 3); B.astro(c, BX - 150, THRUST); B.bars(c);
+  });
+  B.board('moment', '<b>H7 · 2100 ms</b> · Reaktion (Zeitlupe 0,3 bis 1800): Der Hund legt sich schlafen (Anker <code>lie</code>, Kopf <code>sleep</code>, Schwanz <code>down</code>). Die Runen erlöschen nacheinander und steigen auf.', (c) => {
+    sc(c); dog(c, BX, D.sleep, s3, { hide: SH }); B.rise(c, FX, 7, BX - 80, BX + 20, GROUND - 170, GROUND - 90, 5, [0], 3); B.astro(c, BX - 160, A.cut); B.bars(c);
+  });
+  B.board('moment', '<b>H8 · 2600 ms</b> · Die letzte Rune erlischt, das Halsband ist dunkel. Sie steht auf.', (c) => {
+    sc(c); dog(c, BX, D.sleep, s3, { hide: SH }); B.rise(c, FX, 8, BX - 60, BX, GROUND - 210, GROUND - 170, 2, [0], 3); B.astro(c, BX - 170, P(A.aim, { blade: 'full' })); B.bars(c);
+  });
+  B.board('moment', '<b>H9 · 3100 ms</b> · Der Hund schläft. „BEZWUNGEN!“.', (c) => { sc(c); dog(c, BX, D.sleep, s3, { hide: SH }); B.astro(c, BX - 170, A.stand); B.bars(c); B.title(c); });
+
+  // =========================== cinematic 30 ===========================
+  B.timeline('tlC', 15000, [
+    [0, 3000, 'calm', 'E1 Grabgang · drei Augenpaare'], [3000, 6000, 'boss', 'E2 Köpfe im Takt · Paraden'], [6000, 9000, 'astro', 'E3 Fackeln · Licht · Name'],
+    [9000, 9600, 'astro', 'E4 Lichtstoß'], [9600, 9800, 'hit', '⚡ Impact-Paar', 1], [9800, 12000, 'react', 'Zeitlupe · Halsband bricht'], [12000, 15000, 'calm', 'E5 Statue · bröckelt · Titel'],
+  ], [[0, '1a'], [1200, '1b'], [2400, '1c'], [3400, '2a'], [4300, '2b'], [5400, '2c'], [6300, '3a'], [7300, '3b'], [8300, '3c'], [9200, '4a'], [9600, '4b'], [10800, '4c'], [12400, '5a'], [13400, '5b'], [14300, '5c']]);
+  const AC = X.ac, BC = X.bc, s4 = B.SBC;
+  SHOFF = { 'shade-1': [0, 12], 'shade-2': [0, 16], 'shade-3': [0, 12] };
+  const TX = [60, 180, 460, 580];
+  // lit = number of burning torches (left to right in pairs from the outside)
+  const scene = (c, cx, cy, z, dark, lit = 0) => {
+    B.cam(c, cx, cy, z); B.world(c, W, { dark });
+    TX.forEach((x, i) => { const on = [0, 3, 1, 2].indexOf(i) < lit; if (on) glow(c, x, GROUND - 160, 34, 0.18); torch(c, x, GROUND - 120, on ? 1 + (i % 2) : 0); });
+  };
+  const ONLY = (ids) => ['legs-back', 'legs-front', 'tail', 'body', 'head', 'jaw', 'collar', ...SH].filter((p) => !ids.includes(p));
+  B.board('cine', '<b>1a · 0 ms</b> · Dunkler Grabgang (Tinte 0,85). Ein Augenpaar leuchtet auf: Schattenkopf 1. Langsame Fahrt nach vorn.', (c) => { scene(c, 360, 180, 1, 0.85); dog(c, BC, D.rest, s4, { hide: ONLY(['shade-1']) }); B.bars(c); });
+  B.board('cine', '<b>1b · 1200 ms</b> · Das zweite Augenpaar (Kopf 2).', (c) => { scene(c, 380, 180, 1, 0.85); dog(c, BC, D.rest, s4, { hide: ONLY(['shade-1', 'shade-2']) }); B.bars(c); });
+  B.board('cine', '<b>1c · 2400 ms</b> · Das dritte, dann der Hund selbst im Halbdunkel. Sie steht links, klein.', (c) => { scene(c, 320, 180, 1, 0.75); dog(c, BC, D.rest, s4, { alpha: 0.85 }); B.astro(c, AC, A.stand); B.bars(c); });
+  B.board('cine', '<b>2a · 3400 ms</b> · Takt 1: Kopf 1 stößt herab, sie pariert mit der Klinge (Funken).', (c) => {
+    scene(c, 320, 180, 1, 0.7); dog(c, BC, D.snap(1), s4, { off: { 'shade-1': [-30, 18] } }); B.astro(c, 250, A.guard); B.burst(c, 'rig-fx-root', 21, 330, 190, 6, [6, 7], 16, 2); B.bars(c);
+  });
+  B.board('cine', '<b>2b · 4300 ms</b> · Takt 2: Kopf 2 von oben, Parade nach oben. Kopf 1 verblasst.', (c) => {
+    scene(c, 320, 180, 1, 0.7); dog(c, BC, P(D.snap(2), { 'shade-1': 'fade' }), s4, { off: { 'shade-2': [-24, 22] } }); B.astro(c, 270, P(A.guard, { 'arm-front': 'raise' })); B.burst(c, 'rig-fx-root', 22, 340, 150, 6, [6, 7], 16, 2); B.bars(c);
+  });
+  B.board('cine', '<b>2c · 5400 ms</b> · Takt 3: Kopf 3 flach, Bogen-Konter (<code>blade-arc</code>, Smear 66 ms). Kopf 2 verblasst.', (c) => {
+    scene(c, 320, 180, 1, 0.7); dog(c, BC, P(D.snap(3), { 'shade-2': 'fade' }), s4, { hide: ['shade-1'], off: { 'shade-3': [-28, 10] } }); B.astro(c, 280, P(A.smear, { 'blade-arc': 'arc2' })); B.burst(c, 'rig-fx-root', 23, 360, 200, 6, [6, 7], 16, 2); B.bars(c);
+  });
+  B.board('cine', '<b>3a · 6300 ms</b> · Porträt-Streifen (<code>finisher-portrait</code> Bild 4, Hund im Visier). Die äußeren Fackeln entflammen.', (c) => { scene(c, 320, 180, 1, 0.65, 2); dog(c, BC, D.rest, s4, { hide: SH }); B.astro(c, AC, A.crouch); B.bars(c); B.cutIn(c, ID); });
+  B.board('cine', '<b>3b · 7300 ms</b> · Zoom 2: Die inneren Fackeln entflammen. Ihr Licht zieht als Funken in die Klinge (<code>rig-fx-dog</code> 3).', (c) => {
+    scene(c, 190, 220, 2, 0.6, 4); B.astro(c, AC, P(A.aim, { blade: 'full', helmet: 'dark' })); B.rise(c, FX, 31, 120, 300, 150, 230, 10, [3], 2); B.bars(c);
+  });
+  B.board('cine', '<b>3c · 8300 ms</b> · Name „GRABESLICHT“ (Kapsel ×3), Zoom 1. Alle Fackeln brennen, die Klinge leuchtet.', (c) => {
+    scene(c, 320, 180, 1, 0.5, 4); dog(c, BC, D.rest, s4, { hide: SH }); B.astro(c, AC, A.raise); B.burst(c, FX, 32, AC + 10, GROUND - 130, 6, [3], 24, 2); B.bars(c); B.nameText(c, 'GRABESLICHT');
+  });
+  B.board('cine', '<b>4a · 9200 ms</b> · Antizipation: Sie zieht die Klinge zurück und stürmt los (Nachbilder), Ziel ist das Halsband.', (c) => {
+    scene(c, 320, 180, 1, 0.5, 4); dog(c, BC, D.low, s4, { hide: SH });
+    B.trail(c, 'astronaut', { s: B.SA, pose: THRUST }, [[200, GROUND], [160, GROUND], [120, GROUND]]); B.astro(c, 240, THRUST); B.bars(c);
+  });
+  B.board('cine', '<b>4b · 9600 ms</b> · <span class="flash">⚡</span> einziges Vollbild-Impact (hell 100, dunkel 100): Lichtstoß durch das Halsband, Figuren in Tinte. Entfällt bei „Reduzieren“.', (c) => {
+    B.impact(c, false, BC - 60, GROUND - 140, () => { dog(c, BC, D.low, s4, { hide: SH, ink: true }); B.drawRig(c, 'astronaut', { x: BC - 190, y: GROUND, s: B.SA, pose: THRUST, ink: true }); }); B.bars(c);
+  });
+  B.board('cine', '<b>4c · 10800 ms</b> · Zeitlupe 0,3: Das Halsband bricht (<code>broken</code>), die Runen springen einzeln ab, das Fackellicht flackert.', (c) => {
+    scene(c, 320, 180, 1, 0.55, 4); dog(c, BC, P(D.low, { collar: 'broken' }), s4, { hide: SH }); B.burst(c, FX, 41, BC - 60, GROUND - 140, 7, [0, 3], 50, 3); B.astro(c, BC - 190, THRUST); B.bars(c);
+  });
+  B.board('cine', '<b>5a · 12400 ms</b> · Der Hund erstarrt zur Statue (alle Teile <code>stone</code>).', (c) => {
+    scene(c, 320, 180, 1, 0.55, 4); dog(c, BC, {}, s4,{ hide: SH, all: 'stone' }); B.astro(c, 250, A.cut); B.bars(c);
+  });
+  B.board('cine', '<b>5b · 13400 ms</b> · Die Decke öffnet sich, Licht fällt ins Grab. Die Statue bröckelt (Kiesel <code>rig-fx-dog</code> 4), das Halsband bleibt liegen.', (c) => {
+    scene(c, 320, 180, 1, 0.5, 4); light(c, BC - 20, 60, 0.8); dog(c, BC, {}, s4, { hide: SH, all: 'stone', alpha: 0.55 }); B.burst(c, FX, 51, BC - 20, GROUND - 60, 22, [4], 120, 3); B.astro(c, 250, A.stand); B.bars(c);
+  });
+  B.board('cine', '<b>5c · 14300 ms</b> · Im Lichtband liegt nur noch das goldene Halsband. „BEZWUNGEN!“.', (c) => {
+    scene(c, 320, 180, 1, 0.5, 4); light(c, BC - 20, 60, 0.8); B.rig(c, ID, BC, { collar: 'broken' }, s4, { hide: ONLY(['collar']), off: { collar: [6, 26] }, ang: { collar: 12 } });
+    B.burst(c, FX, 52, BC - 20, GROUND - 6, 10, [4], 90, 3); B.astro(c, 250, A.stand); B.bars(c); B.title(c);
+  });
+})();
+</script>
+</body>
+</html>
