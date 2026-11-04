@@ -1,6 +1,7 @@
 // Baut die Ingame-Sprites aus den Pixeldaten des Designs
-// (docs/design/assets/sprites.js, sprites-world.js, sprites-desert.js, sprites-m8.js, sprites-m9.js, sprites-m10.js, sprites-m10b.js, sprites-m10c.js und sprites-m11.js, window.PX_SPRITES)
-// nach public/assets/sprites/<key>.png (RGBA, Frames waagerecht nebeneinander).
+// (docs/design/assets/sprites.js, sprites-world.js, sprites-desert.js, sprites-m8.js, sprites-m9.js, sprites-m10.js, sprites-m10b.js, sprites-m10c.js, sprites-m11.js und sprites-m13.js, window.PX_SPRITES)
+// nach public/assets/sprites/<key>.png (RGBA, Frames waagerecht nebeneinander). Die Figurenteile (M13) kommen zusaetzlich
+// in einen Atlas je Boss-Variante (finisher-rig-<BossId>.png plus .json, Phaser-JSON-Hash, Bildname <Bogen>-<Index>).
 // Die Framegroesse und -zahl werden gegen ASSETS (src/config/assets.ts) geprueft.
 // Nur Node-Bordmittel, kein Netz. Die Ausgabe ist deterministisch (gleicher Lauf, gleiche Bytes).
 // Aufruf: npm run sprites:build
@@ -11,10 +12,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 import { deflateSync } from 'node:zlib';
-import { ASSETS } from '../src/config/assets.ts';
+import { ASSETS, FINISHER_ATLASES } from '../src/config/assets.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-// Reihenfolge ist wichtig: sprites-world.js, sprites-desert.js, sprites-m8.js bis sprites-m11.js ergaenzen window.PX_SPRITES aus sprites.js.
+// Reihenfolge ist wichtig: sprites-world.js, sprites-desert.js, sprites-m8.js bis sprites-m13.js ergaenzen window.PX_SPRITES aus sprites.js.
 // PX_TOOLKIT aus sprites-desert.js ist kein Sprite-Schluessel und wird ignoriert (gebaut werden nur Manifest-Schluessel).
 const SOURCES = [
   join(root, 'docs', 'design', 'assets', 'sprites.js'),
@@ -26,6 +27,7 @@ const SOURCES = [
   join(root, 'docs', 'design', 'assets', 'sprites-m10b.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-m10c.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-m11.js'),
+  join(root, 'docs', 'design', 'assets', 'sprites-m13.js'),
 ];
 const OUT_DIR = join(root, 'public', 'assets', 'sprites');
 
@@ -76,12 +78,21 @@ function encodePng(width, height, rgba) {
 
 // ---------- Sprites ----------
 /** Liest window.PX_SPRITES aus den Designer-Dateien in einem leeren vm-Kontext (kein Node, kein Netz). */
-export function loadSprites(sourcePaths = SOURCES) {
+function runSources(sourcePaths) {
   const sandbox = { window: {} };
   for (const p of sourcePaths) {
     runInNewContext(readFileSync(p, 'utf8'), sandbox, { timeout: 5000 });
   }
-  return sandbox.window.PX_SPRITES;
+  return sandbox.window;
+}
+
+export function loadSprites(sourcePaths = SOURCES) {
+  return runSources(sourcePaths).PX_SPRITES;
+}
+
+/** Liest window.PX_RIGS (Rig-Daten der Figuren aus sprites-m13.js) auf demselben Weg. */
+export function loadRigs(sourcePaths = SOURCES) {
+  return runSources(sourcePaths).PX_RIGS;
 }
 
 /** Prueft ein Sprite gegen die Manifest-Definition und erzeugt das PNG (Buffer) samt Massen. */
@@ -132,6 +143,118 @@ export function buildSprite(sprite, def) {
   return { png: encodePng(width, fh, px), width, height: fh };
 }
 
+// ---------- Atlas ----------
+const ATLAS_MAX = 4096;
+const ATLAS_WIDTH = 512;
+const ATLAS_PAD = 1;
+
+/** Farbe eines Palettenzeichens als [r, g, b] (Fehlertext wie in buildSprite). */
+function rgbOf(sprite, key, ch) {
+  const color = Object.hasOwn(sprite.palette, ch) ? sprite.palette[ch] : undefined;
+  if (typeof color !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(color)) {
+    throw new Error(`Sprite "${key}": Palettenzeichen "${ch}" fehlt oder ist keine #rrggbb-Farbe.`);
+  }
+  return [
+    parseInt(color.slice(1, 3), 16),
+    parseInt(color.slice(3, 5), 16),
+    parseInt(color.slice(5, 7), 16),
+  ];
+}
+
+/**
+ * Packt alle Frames der Boegen `sheets` in einen Atlas (PNG plus Phaser-JSON-Hash). Bildname = <Bogen>-<Index>.
+ * Deterministisch: Reihenfolge nach Hoehe (absteigend), dann Name; Regalpackung mit 1 px Rand, feste Breite.
+ */
+export function buildAtlas(sprites, sheets, imageName) {
+  const items = [];
+  for (const key of sheets) {
+    const sprite = sprites[key];
+    if (!sprite || !Array.isArray(sprite.frames) || !sprite.palette) {
+      throw new Error(`Sprite "${key}" fehlt oder ist unvollstaendig in den Designer-Dateien.`);
+    }
+    sprite.frames.forEach((rows, f) => {
+      items.push({
+        name: `${key}-${f}`,
+        key,
+        sprite,
+        rows,
+        w: sprite.frameWidth,
+        h: sprite.frameHeight,
+      });
+    });
+  }
+  items.sort((a, b) => b.h - a.h || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  let x = 0;
+  let y = 0;
+  let shelfH = 0;
+  for (const it of items) {
+    if (it.w + ATLAS_PAD > ATLAS_WIDTH) throw new Error(`Atlas: Bild ${it.name} ist zu breit.`);
+    if (x + it.w + ATLAS_PAD > ATLAS_WIDTH) {
+      x = 0;
+      y += shelfH + ATLAS_PAD;
+      shelfH = 0;
+    }
+    it.x = x;
+    it.y = y;
+    x += it.w + ATLAS_PAD;
+    shelfH = Math.max(shelfH, it.h);
+  }
+  const width = ATLAS_WIDTH;
+  const height = y + shelfH;
+  if (height > ATLAS_MAX) {
+    throw new Error(`Atlas ${imageName}: ${width}x${height} ueberschreitet ${ATLAS_MAX}.`);
+  }
+  const px = Buffer.alloc(width * height * 4);
+  const frames = {};
+  for (const it of items) {
+    it.rows.forEach((row, ry) => {
+      if (row.length !== it.w) {
+        throw new Error(`Sprite "${it.key}": Zeile ${ry} hat ${row.length} statt ${it.w} Zeichen.`);
+      }
+      for (let rx = 0; rx < it.w; rx++) {
+        if (row[rx] === '.') continue;
+        const [r, g, b] = rgbOf(it.sprite, it.key, row[rx]);
+        const i = ((it.y + ry) * width + it.x + rx) * 4;
+        px[i] = r;
+        px[i + 1] = g;
+        px[i + 2] = b;
+        px[i + 3] = 255;
+      }
+    });
+    frames[it.name] = {
+      frame: { x: it.x, y: it.y, w: it.w, h: it.h },
+      rotated: false,
+      trimmed: false,
+      spriteSourceSize: { x: 0, y: 0, w: it.w, h: it.h },
+      sourceSize: { w: it.w, h: it.h },
+    };
+  }
+  const sortedFrames = Object.fromEntries(
+    Object.entries(frames).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
+  );
+  const json = JSON.stringify(
+    {
+      frames: sortedFrames,
+      meta: {
+        app: 'build-sprites.mjs',
+        image: imageName,
+        format: 'RGBA8888',
+        size: { w: width, h: height },
+        scale: '1',
+      },
+    },
+    null,
+    2, // wie Prettier die Datei formatiert (npm run format:check)
+  );
+  return {
+    png: encodePng(width, height, px),
+    json: json + '\n',
+    width,
+    height,
+    count: items.length,
+  };
+}
+
 function main() {
   const sprites = loadSprites();
   mkdirSync(OUT_DIR, { recursive: true });
@@ -139,6 +262,16 @@ function main() {
     const { png, width, height } = buildSprite(sprites[def.key], def);
     writeFileSync(join(root, 'public', def.path), png);
     console.log(`wrote public/${def.path} (${width}x${height})`);
+  }
+  for (const atlas of FINISHER_ATLASES) {
+    const { png, json, width, height, count } = buildAtlas(
+      sprites,
+      atlas.sheets,
+      `${atlas.key}.png`,
+    );
+    writeFileSync(join(root, 'public', atlas.path), png);
+    writeFileSync(join(root, 'public', atlas.jsonPath), json);
+    console.log(`wrote public/${atlas.path} + .json (${width}x${height}, ${count} Bilder)`);
   }
 }
 

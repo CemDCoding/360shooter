@@ -1,0 +1,2334 @@
+{
+  "frames": {
+    "rig-astro-arm-back-0": {
+      "frame": {
+        "x": 243,
+        "y": 176,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-1": {
+      "frame": {
+        "x": 259,
+        "y": 176,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-2": {
+      "frame": {
+        "x": 275,
+        "y": 176,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-sil-0": {
+      "frame": {
+        "x": 291,
+        "y": 176,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-sil-1": {
+      "frame": {
+        "x": 307,
+        "y": 176,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-sil-2": {
+      "frame": {
+        "x": 323,
+        "y": 176,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-front-0": {
+      "frame": {
+        "x": 189,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-1": {
+      "frame": {
+        "x": 216,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-2": {
+      "frame": {
+        "x": 243,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-3": {
+      "frame": {
+        "x": 270,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-4": {
+      "frame": {
+        "x": 297,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-sil-0": {
+      "frame": {
+        "x": 324,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-sil-1": {
+      "frame": {
+        "x": 351,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-sil-2": {
+      "frame": {
+        "x": 378,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-sil-3": {
+      "frame": {
+        "x": 405,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-sil-4": {
+      "frame": {
+        "x": 432,
+        "y": 144,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-blade-0": {
+      "frame": {
+        "x": 149,
+        "y": 229,
+        "w": 36,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 36,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 36,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-1": {
+      "frame": {
+        "x": 186,
+        "y": 229,
+        "w": 36,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 36,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 36,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-2": {
+      "frame": {
+        "x": 223,
+        "y": 229,
+        "w": 36,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 36,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 36,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-arc-0": {
+      "frame": {
+        "x": 366,
+        "y": 0,
+        "w": 52,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 52,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 52,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-arc-1": {
+      "frame": {
+        "x": 419,
+        "y": 0,
+        "w": 52,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 52,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 52,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-arc-sil-0": {
+      "frame": {
+        "x": 0,
+        "y": 57,
+        "w": 52,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 52,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 52,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-arc-sil-1": {
+      "frame": {
+        "x": 53,
+        "y": 57,
+        "w": 52,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 52,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 52,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-sil-0": {
+      "frame": {
+        "x": 260,
+        "y": 229,
+        "w": 36,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 36,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 36,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-sil-1": {
+      "frame": {
+        "x": 297,
+        "y": 229,
+        "w": 36,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 36,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 36,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-sil-2": {
+      "frame": {
+        "x": 334,
+        "y": 229,
+        "w": 36,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 36,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 36,
+        "h": 9
+      }
+    },
+    "rig-astro-helmet-0": {
+      "frame": {
+        "x": 44,
+        "y": 108,
+        "w": 35,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 35,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 35,
+        "h": 34
+      }
+    },
+    "rig-astro-helmet-1": {
+      "frame": {
+        "x": 80,
+        "y": 108,
+        "w": 35,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 35,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 35,
+        "h": 34
+      }
+    },
+    "rig-astro-helmet-sil-0": {
+      "frame": {
+        "x": 116,
+        "y": 108,
+        "w": 35,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 35,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 35,
+        "h": 34
+      }
+    },
+    "rig-astro-helmet-sil-1": {
+      "frame": {
+        "x": 152,
+        "y": 108,
+        "w": 35,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 35,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 35,
+        "h": 34
+      }
+    },
+    "rig-astro-leg-back-0": {
+      "frame": {
+        "x": 339,
+        "y": 176,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-1": {
+      "frame": {
+        "x": 361,
+        "y": 176,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-2": {
+      "frame": {
+        "x": 383,
+        "y": 176,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-3": {
+      "frame": {
+        "x": 405,
+        "y": 176,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-4": {
+      "frame": {
+        "x": 427,
+        "y": 176,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-sil-0": {
+      "frame": {
+        "x": 449,
+        "y": 176,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-sil-1": {
+      "frame": {
+        "x": 471,
+        "y": 176,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-sil-2": {
+      "frame": {
+        "x": 0,
+        "y": 205,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-sil-3": {
+      "frame": {
+        "x": 22,
+        "y": 205,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-sil-4": {
+      "frame": {
+        "x": 44,
+        "y": 205,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-0": {
+      "frame": {
+        "x": 66,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-1": {
+      "frame": {
+        "x": 87,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-2": {
+      "frame": {
+        "x": 108,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-3": {
+      "frame": {
+        "x": 129,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-4": {
+      "frame": {
+        "x": 150,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-sil-0": {
+      "frame": {
+        "x": 171,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-sil-1": {
+      "frame": {
+        "x": 192,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-sil-2": {
+      "frame": {
+        "x": 213,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-sil-3": {
+      "frame": {
+        "x": 234,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-sil-4": {
+      "frame": {
+        "x": 255,
+        "y": 205,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-pack-0": {
+      "frame": {
+        "x": 106,
+        "y": 57,
+        "w": 8,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 37
+      }
+    },
+    "rig-astro-pack-1": {
+      "frame": {
+        "x": 115,
+        "y": 57,
+        "w": 8,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 37
+      }
+    },
+    "rig-astro-pack-sil-0": {
+      "frame": {
+        "x": 124,
+        "y": 57,
+        "w": 8,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 37
+      }
+    },
+    "rig-astro-pack-sil-1": {
+      "frame": {
+        "x": 133,
+        "y": 57,
+        "w": 8,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 37
+      }
+    },
+    "rig-astro-raygun-0": {
+      "frame": {
+        "x": 188,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-1": {
+      "frame": {
+        "x": 221,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-2": {
+      "frame": {
+        "x": 254,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-3": {
+      "frame": {
+        "x": 287,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-4": {
+      "frame": {
+        "x": 320,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-sil-0": {
+      "frame": {
+        "x": 353,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-sil-1": {
+      "frame": {
+        "x": 386,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-sil-2": {
+      "frame": {
+        "x": 419,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-sil-3": {
+      "frame": {
+        "x": 452,
+        "y": 108,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-sil-4": {
+      "frame": {
+        "x": 0,
+        "y": 144,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-torso-0": {
+      "frame": {
+        "x": 33,
+        "y": 144,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-1": {
+      "frame": {
+        "x": 59,
+        "y": 144,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-2": {
+      "frame": {
+        "x": 85,
+        "y": 144,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-sil-0": {
+      "frame": {
+        "x": 111,
+        "y": 144,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-sil-1": {
+      "frame": {
+        "x": 137,
+        "y": 144,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-sil-2": {
+      "frame": {
+        "x": 163,
+        "y": 144,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-fx-ground-bulge-0": {
+      "frame": {
+        "x": 368,
+        "y": 205,
+        "w": 48,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 16
+      }
+    },
+    "rig-fx-ground-bulge-1": {
+      "frame": {
+        "x": 417,
+        "y": 205,
+        "w": 48,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 16
+      }
+    },
+    "rig-fx-ground-bulge-2": {
+      "frame": {
+        "x": 0,
+        "y": 229,
+        "w": 48,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 16
+      }
+    },
+    "rig-fx-root-0": {
+      "frame": {
+        "x": 371,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-fx-root-1": {
+      "frame": {
+        "x": 380,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-fx-root-2": {
+      "frame": {
+        "x": 389,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-fx-root-3": {
+      "frame": {
+        "x": 398,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-fx-root-4": {
+      "frame": {
+        "x": 407,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-fx-root-5": {
+      "frame": {
+        "x": 416,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-fx-root-6": {
+      "frame": {
+        "x": 425,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-fx-root-7": {
+      "frame": {
+        "x": 434,
+        "y": 229,
+        "w": 8,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 8
+      }
+    },
+    "rig-prop-rosehedge-0": {
+      "frame": {
+        "x": 0,
+        "y": 176,
+        "w": 80,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 28
+      }
+    },
+    "rig-prop-rosehedge-1": {
+      "frame": {
+        "x": 81,
+        "y": 176,
+        "w": 80,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 28
+      }
+    },
+    "rig-prop-rosehedge-2": {
+      "frame": {
+        "x": 162,
+        "y": 176,
+        "w": 80,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 28
+      }
+    },
+    "rig-root-arm-left-0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-left-1": {
+      "frame": {
+        "x": 31,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-left-2": {
+      "frame": {
+        "x": 62,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-left-sil-0": {
+      "frame": {
+        "x": 93,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-left-sil-1": {
+      "frame": {
+        "x": 124,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-left-sil-2": {
+      "frame": {
+        "x": 155,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-0": {
+      "frame": {
+        "x": 186,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-1": {
+      "frame": {
+        "x": 216,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-2": {
+      "frame": {
+        "x": 246,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-sil-0": {
+      "frame": {
+        "x": 276,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-sil-1": {
+      "frame": {
+        "x": 306,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-sil-2": {
+      "frame": {
+        "x": 336,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-crown-0": {
+      "frame": {
+        "x": 142,
+        "y": 57,
+        "w": 54,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 36
+      }
+    },
+    "rig-root-crown-1": {
+      "frame": {
+        "x": 197,
+        "y": 57,
+        "w": 54,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 36
+      }
+    },
+    "rig-root-crown-sil-0": {
+      "frame": {
+        "x": 252,
+        "y": 57,
+        "w": 54,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 36
+      }
+    },
+    "rig-root-crown-sil-1": {
+      "frame": {
+        "x": 307,
+        "y": 57,
+        "w": 54,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 36
+      }
+    },
+    "rig-root-jaw-0": {
+      "frame": {
+        "x": 49,
+        "y": 229,
+        "w": 24,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 16
+      }
+    },
+    "rig-root-jaw-1": {
+      "frame": {
+        "x": 74,
+        "y": 229,
+        "w": 24,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 16
+      }
+    },
+    "rig-root-jaw-sil-0": {
+      "frame": {
+        "x": 99,
+        "y": 229,
+        "w": 24,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 16
+      }
+    },
+    "rig-root-jaw-sil-1": {
+      "frame": {
+        "x": 124,
+        "y": 229,
+        "w": 24,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 16
+      }
+    },
+    "rig-root-roots-left-0": {
+      "frame": {
+        "x": 276,
+        "y": 205,
+        "w": 22,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 17
+      }
+    },
+    "rig-root-roots-left-sil-0": {
+      "frame": {
+        "x": 299,
+        "y": 205,
+        "w": 22,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 17
+      }
+    },
+    "rig-root-roots-right-0": {
+      "frame": {
+        "x": 322,
+        "y": 205,
+        "w": 22,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 17
+      }
+    },
+    "rig-root-roots-right-sil-0": {
+      "frame": {
+        "x": 345,
+        "y": 205,
+        "w": 22,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 17
+      }
+    },
+    "rig-root-trunk-left-0": {
+      "frame": {
+        "x": 362,
+        "y": 57,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-left-1": {
+      "frame": {
+        "x": 384,
+        "y": 57,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-left-sil-0": {
+      "frame": {
+        "x": 406,
+        "y": 57,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-left-sil-1": {
+      "frame": {
+        "x": 428,
+        "y": 57,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-right-0": {
+      "frame": {
+        "x": 450,
+        "y": 57,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-right-1": {
+      "frame": {
+        "x": 472,
+        "y": 57,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-right-sil-0": {
+      "frame": {
+        "x": 0,
+        "y": 108,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-right-sil-1": {
+      "frame": {
+        "x": 22,
+        "y": 108,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    }
+  },
+  "meta": {
+    "app": "build-sprites.mjs",
+    "image": "finisher-rig-rootMonster.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 512,
+      "h": 245
+    },
+    "scale": "1"
+  }
+}

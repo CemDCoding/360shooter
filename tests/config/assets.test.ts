@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ASSETS } from '../../src/config/assets';
+import { ASSETS, FINISHER_ATLASES } from '../../src/config/assets';
 import { GEAR_PIECES } from '../../src/config/gear';
 import { PETS } from '../../src/config/pets';
 import { SHOP_ITEMS } from '../../src/config/shop';
@@ -7,6 +7,7 @@ import { SHOP_ITEMS } from '../../src/config/shop';
 // Kein @types/node im Projekt: minimale Typen fuer node:fs (Variable verhindert Typaufloesung).
 interface Bytes {
   subarray(a: number, b: number): { toString(enc: string): string };
+  toString(enc: string): string;
   readUInt32BE(o: number): number;
   readUInt32LE(o: number): number;
   readUInt16LE(o: number): number;
@@ -38,8 +39,8 @@ describe('asset manifest', () => {
     expect(new Set(ASSETS.map((a) => a.path)).size).toBe(ASSETS.length);
   });
 
-  it('has 100 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
-    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(100);
+  it('has 139 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
+    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(139);
     const expected: Record<string, [number, number, number]> = {
       'enemy-mummy': [32, 32, 4],
       'mummy-wrap': [16, 8, 2],
@@ -142,6 +143,77 @@ describe('asset manifest', () => {
       expect(a?.xmlPath, key).toBe(`assets/fonts/${key}.xml`);
       expect(existsSync(a?.xmlPath ?? ''), key).toBe(true);
     }
+  });
+
+  it('has the 39 rig sheets of part 1 (AP-183): 18 parts, 18 silhouettes of equal size, 3 effects', () => {
+    const rig = ASSETS.filter((a) => a.key.startsWith('rig-'));
+    expect(rig).toHaveLength(39);
+    const sil = rig.filter((a) => a.key.endsWith('-sil'));
+    expect(sil).toHaveLength(18);
+    for (const s of sil) {
+      const base = ASSETS.find((a) => a.key === s.key.slice(0, -4));
+      expect(base, s.key).toBeDefined();
+      expect([s.frameWidth, s.frameHeight, s.frames], s.key).toEqual([
+        base?.frameWidth,
+        base?.frameHeight,
+        base?.frames,
+      ]);
+    }
+    expect(
+      rig.filter((a) => a.key.startsWith('rig-astro-') && !a.key.endsWith('-sil')),
+    ).toHaveLength(10);
+    expect(
+      rig.filter((a) => a.key.startsWith('rig-root-') && !a.key.endsWith('-sil')),
+    ).toHaveLength(8);
+    const fx: Record<string, [number, number, number]> = {
+      'rig-fx-root': [8, 8, 8],
+      'rig-prop-rosehedge': [80, 28, 3],
+      'rig-fx-ground-bulge': [48, 16, 3],
+    };
+    for (const [key, size] of Object.entries(fx)) {
+      const a = ASSETS.find((x) => x.key === key);
+      expect([a?.frameWidth, a?.frameHeight, a?.frames], key).toEqual(size);
+    }
+    // 51 part images (10 + 8 parts, their poses) plus the same number of silhouettes
+    const partFrames = rig
+      .filter((a) => !a.key.endsWith('-sil') && /^rig-(astro|root)-/.test(a.key))
+      .reduce((n, a) => n + (a.frames ?? 0), 0);
+    expect(partFrames).toBe(51);
+  });
+
+  it('has one atlas per boss variant within the texture limit (AP-183, PE-248, PE-252)', () => {
+    expect(FINISHER_ATLASES.map((x) => x.key)).toEqual(['finisher-rig-rootMonster']);
+    const atlas = FINISHER_ATLASES[0];
+    expect(atlas?.sheets).toHaveLength(39);
+    for (const s of atlas?.sheets ?? [])
+      expect(
+        ASSETS.some((a) => a.key === s),
+        s,
+      ).toBe(true);
+    const png = readFileSync(atlas?.path ?? '');
+    const w = png.readUInt32BE(16);
+    const h = png.readUInt32BE(20);
+    expect(w).toBeLessThanOrEqual(4096);
+    expect(h).toBeLessThanOrEqual(4096);
+    const json = JSON.parse(readFileSync(atlas?.jsonPath ?? '').toString('utf8')) as {
+      frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+    };
+    const names = Object.keys(json.frames);
+    // 51 part images + 51 silhouettes + 14 effect images
+    expect(names).toHaveLength(116);
+    for (const sheet of atlas?.sheets ?? []) {
+      const def = ASSETS.find((a) => a.key === sheet);
+      for (let i = 0; i < (def?.frames ?? 0); i++) {
+        const name = `${sheet}-${i}`;
+        const f = json.frames[name]?.frame;
+        expect(f, name).toBeDefined();
+        expect([f?.w, f?.h]).toEqual([def?.frameWidth, def?.frameHeight]);
+        expect((f?.x ?? 0) + (f?.w ?? 0)).toBeLessThanOrEqual(w);
+        expect((f?.y ?? 0) + (f?.h ?? 0)).toBeLessThanOrEqual(h);
+      }
+    }
+    expect(names).toContain('rig-astro-torso-sil-0');
+    expect(names).toContain('rig-fx-root-7');
   });
 
   it('has valid mono 16-bit 44.1 kHz WAV files', () => {
