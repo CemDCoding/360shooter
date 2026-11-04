@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-02 (Ergänzung H-41 „M11: Quicktime-Fokus“ und H-43 „M12: Rand-Marker, Ankündigungston, Eliten“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-46 (2026-11-04):** Interview „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ läuft, Runden 1 und 2 beantwortet (1a 2a 3a 4a, 5c 6a 7a 8b), Runde 3 beantwortet (9a 10a 11a). Interview abgeschlossen. Als Nächstes: Sprites `assets/sprites-m13.js`, Mockup `mockups/m13-rig-und-storyboard.html`, Tokens, Übergabe. Ergänzung noch **nicht freigegeben**; bis dahin gilt der freigegebene Stand unten.
+**Stand H-46 (2026-11-04):** Interview „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ läuft, Runden 1 und 2 beantwortet (1a 2a 3a 4a, 5c 6a 7a 8b), Runde 3 beantwortet (9a 10a 11a). Interview abgeschlossen. Sprites `assets/sprites-m13.js`, Mockup `mockups/m13-rig-und-storyboard.html`, Tokens (Kontrast grün) und Übergabe sind fertig. Wartet auf die Freigabe des Nutzers. Ergänzung noch **nicht freigegeben**; bis dahin gilt der freigegebene Stand unten.
 **Stand H-41/H-43 (2026-11-02):** Interview läuft. Interview abgeschlossen (1a–7a). Tokens, Sprites `assets/sprites-m11.js`, Mockup `mockups/m11-m12-fokus-und-wellen.html` und Übergabe fertig, Kontrast grün. H-41 und H-43 vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-173, AP-177, AP-178; Hinweise zu Dateilisten und Ton-Schlüsseln beachten).
 **Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. Teil 2 fertig (Bildfolgen Level 20, 25, 30, 40 in `assets/sprites-m10b.js` und `sprites-m10c.js`, Level 40 als zwei Bögen) und vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-159 bis AP-162, offener Punkt `holdsMs`).
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
@@ -1026,5 +1026,97 @@ Das Wort steht in Funk 1× auf `hud.glass`, mit 1-px-Rand `event-marker` und Au�
     - Sprung: Beine und Rumpf je 1 gestrecktes Bild
 
     Die Bilder stehen jeweils 1 bis 2 Frames (≈ 16 bis 33 ms) und zählen nicht als Blitz.
+
+**Annahmen des Designers** (angenommen, Teil der Freigabe):
+- Die Astronautin hat **10 Teile** statt 9: Der Bogen-Smear aus 11a ist ein eigenes Teil `blade-arc` (Kind von `arm-front`, `freeRotate`), weil sein Bild viel größer ist als die Klinge. Damit ist das Budget von 10 Teilen voll ausgeschöpft.
+- **Kind-Teile von `arm-front` hängen von der Arm-Pose ab:** Die Hand liegt in jeder Arm-Pose woanders. Der Vertrag kennt aber nur einen festen Versatz je Teil. Lösung ohne Vertragsänderung: Im selben Schlüsselbild wie die Arm-Pose setzt die Choreografie mit `hold` die Werte `x`/`y`/`pose` von `raygun` und `x`/`y`/`angle` von `blade` und `blade-arc` aus der Tabelle `anchors` (in `PX_RIGS.astronaut.anchors`, Mockup Ansicht 5). Alternative für den Planner: ein optionales Feld `anchors` je Pose im Vertrag.
+- **Der Strahler hat 5 gezeichnete Winkel** (`a0`, `up45`, `up90`, `back135`, `down45`). Das ist nötig, weil er ohne `freeRotate` nur ± 20° drehen darf. `back135` ist vorher gespiegelt, damit die Oberseite oben bleibt.
+- Hocke und Knien senken `torso`, `arm-front`, `arm-back` und `pack` um 4 px (`anchors.bodyDrop`). `torso: lean` schiebt `arm-front` 3 px sowie `arm-back` und `pack` 2 px nach vorn (`anchors.torsoLean`).
+- Die Klinge leuchtet und hat deshalb einen Rand in Dunkelkoralle statt in Tinte. Alle übrigen Teile haben den Tintenumriss des Spiels.
+- Die Stammhälften haben an der Schnittkante keinen Umriss, solange sie geschlossen sind. Mit der Pose `cracked` ist die Kante ein Rosenlicht-Riss.
+- Der Boss schaut nach links zur Astronautin (Augen nach links verschoben). Kein `flipX` nötig.
+- Die Rosenhecke (`rig-prop-rosehedge`) und der gewölbte Boden (`rig-fx-ground-bulge`) sind keine Rig-Teile, sondern Sprites für die bosseigenen Effekte (`fx` in `scenes/finisher/fx/rootMonster.ts`).
+- Der Wurzelstoß im Kampfmoment nutzt das vorhandene Sprite `boss-root-spike` (3×), die Zeitlupe läuft in **Echtzeit** 1000 ms bei `timeScale` 0,3.
+- Die Hintergründe der Bretter (Waldsäulen) sind nur Skizze. Im Spiel liegt dahinter die echte Map bzw. die Arena-Deko.
+
+**Ergebnis:**
+- Pixelquelle `assets/sprites-m13.js`: 18 Rig-Teile mit 51 Teilbildern, je Teil ein Silhouetten-Bogen `…-sil` und 3 Effekt-Bögen. Zusätzlich gibt die Datei `window.PX_RIGS` aus (Drehpunkte, Versätze, Eltern, Reihenfolge, Posen-Index, `anchors`), also die Daten für `src/config/rigs/*.ts`.
+- Mockup `mockups/m13-rig-und-storyboard.html` mit 7 Ansichten:
+  - 1 bis 3: Teile mit Drehpunkt und Silhouette, Effekte
+  - 4: zusammengesetzte Posen
+  - 5: Rig-Tabelle
+  - 6: Rosenschnitt, 9 Bretter mit Zeitleiste
+  - 7: Cinematic Level 4, 15 Bretter mit Zeitleiste
+
+  Alle Bilder sind aus den echten Teilen zusammengesetzt.
+- Tokens: `color.finisher.slash`, `slash-rim`, `size.rig-*` (Maßstäbe 2/3/4, Bodenlinie 300, Nachbilder 3, Schnittlinie, Feindrehung 20), `motion.duration.rig-smear` 33, `rig-afterimage-gap` 33, `rig-afterimage-fade` 150, `rig-blade-step` 80, `opacity.rig-afterimage-1..3` (0,55/0,35/0,18). 3 neue Paare, `contrast.js --tokens` grün (knappstes Paar: `slash-rim` auf `bg-forest` mit 3,78:1).
+- Screenshots: `screenshots/m13-rig-und-storyboard-desktop.png` und `-mobile.png`. Nahansichten: `m13-zoom-parts-desktop.png` (Teile und Posen), `m13-zoom-moment-desktop.png` (Rosenschnitt), `m13-zoom-cinematic-desktop.png` (Level 4).
+
+**Teile Astronautin** (`rig-astro-<teil>`, Reihenfolge von hinten nach vorn):
+
+| order | Teil | Eltern | Posen |
+|---|---|---|---|
+| 0 | `pack` | – | rest, thrust (Rückstoß-Düse) |
+| 1 | `arm-back` | – | rest, back, up |
+| 2 | `leg-back` | `torso` | stand, crouch, tuck, kneel, smear |
+| 3 | `leg-front` | `torso` | stand, crouch, tuck, kneel, smear |
+| 4 | `torso` | – | upright, lean, smear |
+| 5 | `helmet` | `torso` | serious, dark |
+| 6 | `arm-front` | – | rest, aim, raise, slash-end, smear |
+| 7 | `blade` | `arm-front` | full, grow2, grow1 (`freeRotate`) |
+| 8 | `raygun` | `arm-front` | a0, up45, up90, back135, down45 |
+| 9 | `blade-arc` | `arm-front` | arc1, arc2 (`freeRotate`) |
+
+**Teile Baummonster** (`rig-root-<teil>`): `crown` (upright, bent) 0 · `arm-right` (Eltern `trunk-right`; rest, raised, stab) 1 · `roots-right` 2 · `roots-left` 3 · `trunk-right` (rest, cracked) 4 · `trunk-left` (rest, cracked) 5 · `jaw` (closed, roar) 6 · `arm-left` (Eltern `trunk-left`; rest, raised, stab) 7. Die Stammhälften drehen sich um den Fuß des Schnitts (klaffen nach außen, ± 20°).
+
+Drehpunkte, Versätze und Größen stehen in `PX_RIGS` und in Ansicht 5 des Mockups. Die Werte entstehen beim Bauen und sind deshalb nicht noch einmal von Hand im Brief notiert.
+
+**Kampfmoment „Rosenschnitt“ (`moment-rootMonster`, Echtzeit ms, Raster RS-06.2):**
+
+| Zeit | Takt | Inhalt | Brett |
+|---|---|---|---|
+| 0–500 | Boss Antizipation | Arme hoch, Maul auf, Boden wölbt sich unter ihr (`ground-bulge` 0 → 2). Sie geht ab 150 in die Hocke | M1, M2 |
+| 500–700 | Boss Aktion | Wurzelstoß (`boss-root-spike`) dort, wo sie stand. Rückstoß-Sprung mit Düse, 3 Nachbilder | M3 |
+| 700–900 | Antizipation 200 | Halt in der Luft: `raise`, Visier `dark`, Klinge `grow1 → grow2 → full` (je 80) | M4 |
+| 900–1000 | Aktion 100 | Smear-Posen 33 ms, `blade-arc` arc1 → arc2, senkrechter Schnitt durch den Stamm | M5 |
+| 1000–1200 | Treffer-Stopp 200 ⚡ | Treffer-Weiß (Silhouetten), Zittern waagerecht klingt ab, Schnittlinie, Funken. Landung `kneel` + `slash-end` | M6 |
+| 1200–2200 | Reaktion, Zeitlupe 0,3 | `cracked`, Hälften ± 12° auseinander, Kiefer fällt, Krone `bent` zuletzt, Blätter | M7 |
+| 2200–3000 | Nachschwingen | Hälften ± 20°, zerfallen zu Blättern, Rosenhecke Stufe 1, Blütenblätter steigen | M8 |
+| 3000–3500 | Titel | Hecke Stufe 2, sie steht auf, Klinge geht zurück, „BEZWUNGEN!“ | M9 |
+
+Genau ein ⚡ (der Haupttreffer). Bei „Reduzieren“ fallen Treffer-Weiß und Zittern weg. Die Schnittlinie bleibt als Treffer-Merkmal.
+
+**Cinematic Level 4 „WURZELBRECHER“ (`cinematic-4`, 15 s, Echtzeit):**
+
+| Einstellung | Zeit | Inhalt | Kamera |
+|---|---|---|---|
+| 1 Gegenüberstellung | 0–3000 | Wurzelboden, Fahrt am Stamm hoch bis zu den Augen, dann Totale (sie klein links, er 4× rechts) | Zoom 2, `scrollY` sine.inOut ≈ 2500, Schnitt auf Zoom 1 (≤ 200) |
+| 2 Schlagabtausch | 3000–6000 | Wurzelstoß und Zickzack-Ausweichen, zwei Klingenkonter (arc2, `guard`), nur kleine Funken | Zoom 1, steht |
+| 3 Aufladen | 6000–9000 | Porträt-Streifen (`finisher-portrait` Bild 0), Zoom auf sie mit dunklem Visier, Klinge wächst, Name „WURZELBRECHER“ | Zoom 1 → 2 → 1 (Schnitte) |
+| 4 Schlusstreffer | 9000–12000 | Sprung über den Boss, Abwärtsschnitt von oben links, **einziges Impact-Paar ⚡** (hell 100 / dunkel 100, Silhouetten in Tinte, Speedlines), Zeitlupe 0,3, der Stamm klafft bis in den Boden | Zoom 1 |
+| 5 Ausklang | 12000–15000 | Hälften kippen und zerfallen zu Blättern, Krone zuletzt, Rosenhecke blüht (Stufe 1 → 2), Klinge geht zurück, „BEZWUNGEN!“ | Zoom 1 |
+
+Kein Achswechsel (7a). Bei „Reduzieren“ fallen Impact-Paar, Treffer-Weiß und Wackeln weg. Bild 4c folgt dann direkt auf den Schnitt.
+
+**Übergabe an den Planner (H-46):**
+
+| Paket | Aufgabe |
+|---|---|
+| „Design übernehmen“ | Bild-, Posen- und Token-Namen aus dieser Ergänzung. Entscheidung zu den Kind-Versätzen von `arm-front`: `hold`-Spuren nach `anchors` (meine Empfehlung, keine Vertragsänderung) oder ein optionales Feld `anchors` im Vertrag. Hinweis: Die Astronautin hat 10 Teile, das Budget ist ausgeschöpft. |
+| AP-183 | `npm run theme:build` (neue Tokens). `assets/sprites-m13.js` ans Ende der Quellenliste in `scripts/build-sprites.mjs` setzen. Alle Schlüssel `rig-astro-*`, `rig-root-*` (je mit `-sil`), `rig-fx-root`, `rig-prop-rosehedge` und `rig-fx-ground-bulge` in `src/config/assets.ts` eintragen und die Sprite-Zahl im Test anpassen. Die Teile in **einen** Atlas packen (§4; Summe der Bögen weit unter 4096 px). `src/config/rigs/astronaut.ts` und `rootMonster.ts` aus `PX_RIGS` übernehmen (`originX/Y`, `x/y`, `parent`, `order`, `freeRotate`, `poses`, `silhouette`). Die Laufzeit des Build-Skripts für die neue Datei messen (Grenze 1000 ms, die Datei dreht Bilder mit Überabtastung). |
+| AP-182 | Abspieler nach §4. Nachbilder mit `opacity.rig-afterimage-1..3`, Abstand `rig-afterimage-gap`, Ausblenden `rig-afterimage-fade` in `Stepped(3)`. Treffer-Weiß über die `-sil`-Bilder, nicht über Tint. Schnittlinie als `Graphics`-Band (`finisher.slash` mit `slash-rim`, Breite × Boss-Maßstab). Maßstäbe aus `size.rig-scale-*`. |
+| AP-184 | `config/choreo/rootMonster.ts` nach den beiden Tabellen oben und den Brettern M1 bis M9 sowie 1a bis 5c. Bosseigene Effekte in `fx/rootMonster.ts`: Bodenwölbung, Rosenhecke, Blätter- und Rosenpartikel aus `rig-fx-root` (Bild 6/7 nur für Funken der Astronautin). |
+
+Hinweise:
+- Keine neuen Schriften, Töne oder Abhängigkeiten, keine externen Requests.
+- Die Abgrenzung der Laserklinge zu bekannten Lichtschwertern prüft der Nutzer (PE-250, R1, keine Rechtsberatung): Blatt-Keil mit Meißelspitze, kein Griff, kein gerader Stab, keine runde Spitze.
+- Bekannte Schwäche im Mockup: Auf 390 px ist die Seite etwas zu breit, Text wird rechts abgeschnitten. Das betrifft nur das Arbeitsdokument, nicht das Spiel.
+
+**Design-Review:** AP-183 gegen die Ansichten 1 bis 5. AP-182 und AP-184 gegen die Ansichten 6 und 7.
+
+**Handtest H-47 zusätzlich:**
+- Wirkt die gedrehte Klinge am iPhone gezackt? Wenn ja, gilt der Nachtrag RotSprite aus PE-247.
+- Liest sich die Astronautin im Smear (33 ms) als schneller Schnitt oder als Flackern?
+- Ist der Achswechsel-Verzicht in Level 4 richtig, oder fehlt Wucht im Schlusstreffer?
 
 - keine weiteren (erste Fassung vom 2026-10-25)
