@@ -857,6 +857,15 @@ describe('effects of the boss', () => {
   });
 });
 
+describe('end of the cut line', () => {
+  it('ends before the rose hedge blooms (trunk gone at real 13000) in both choreographies', () => {
+    const cut = fxNamed(CINE, 'cut-line')[0];
+    expect(realAt(CINE, cut.atMs) + (cut.durationMs ?? 0)).toBeLessThanOrEqual(13000);
+    const slash = fxNamed(MOMENT, 'slash')[0];
+    expect(realAt(MOMENT, slash.atMs) + (slash.durationMs ?? 0)).toBeLessThanOrEqual(2600);
+  });
+});
+
 describe('register and plan', () => {
   it('holds both choreographies and they pass validateChoreo with the rules', () => {
     expect(CHOREOS['moment-rootMonster']).toBe(MOMENT);

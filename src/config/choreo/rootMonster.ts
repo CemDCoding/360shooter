@@ -387,7 +387,7 @@ function buildMoment(): ChoreoDef {
   arc(t, 900 + 2 * SMEAR, 'off');
   stance(t, 1000, CUT);
   // Stand up (board M9): blade back in 3 steps, then the title.
-  bladeSteps(t, c(3000), { ...STAND, armFront: 'aim' }, -1);
+  bladeSteps(t, c(3100), { ...STAND, armFront: 'aim' }, -1);
 
   // Root monster: arms up and jaw open (anticipation), root thrust, hit, break-up.
   bossArms(t, 0, 'rest', 'rest', 'closed');
@@ -579,7 +579,7 @@ function buildCinematic(): ChoreoDef {
   t.key('astronaut', 'x', c(14000), 300, 'linear');
   t.key('astronaut', 'x', c(14300), 290);
   // E5: she stands up, lowers the blade (3 steps), the title follows.
-  bladeSteps(t, c(14000), { ...STAND, armFront: 'aim' }, -1);
+  bladeSteps(t, c(14150), { ...STAND, armFront: 'aim' }, -1);
   t.key('astronaut.arm-front', 'angle', c(14200), 14);
 
   // Root monster, 4x. E2: two thrusts and the arm that meets the blade.
@@ -674,9 +674,15 @@ function buildCinematic(): ChoreoDef {
     },
     { kind: 'timeScale', atMs: 9600, durationMs: slowChoreo, factor: SLOW, flash: false },
     { kind: 'fx', atMs: 9600, durationMs: 200, name: 'impact-pair', flash: true },
-    { kind: 'hitWhite', atMs: 9600, durationMs: 300, targets: ['rootMonster'], flash: false },
+    {
+      kind: 'hitWhite',
+      atMs: 9600,
+      durationMs: 200,
+      targets: ['rootMonster', 'astronaut'],
+      flash: false,
+    },
     { kind: 'shake', atMs: c(9800), durationMs: 300, strength: 0.6, flash: false },
-    { kind: 'fx', atMs: 9600, durationMs: 4300, name: 'cut-line', flash: false },
+    { kind: 'fx', atMs: 9600, durationMs: 2800, name: 'cut-line', flash: false },
     {
       kind: 'particles',
       atMs: c(9800),

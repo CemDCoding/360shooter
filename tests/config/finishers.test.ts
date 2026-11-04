@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildFinisher, isFlashSafe } from '../../src/logic/finisher';
-import { DEFAULT_FINISHER_SOURCE } from '../../src/logic/finisher';
-const M10 = { ...DEFAULT_FINISHER_SOURCE, choreos: undefined };
+import { DEFAULT_FINISHER_SOURCE, buildFinisher, isFlashSafe } from '../../src/logic/finisher';
 import { FINISHER_VARIANT_IDS, type FinisherBlock, type FinisherStep } from '../../src/contracts';
 import {
   FINISHER_FINALES,
@@ -10,6 +8,9 @@ import {
   FINISHER_STAGES,
   type FinisherTemplate,
 } from '../../src/config';
+
+/** M10 plans without the choreography register. */
+const M10 = { ...DEFAULT_FINISHER_SOURCE, choreos: undefined };
 
 const STAGES = [1, 2, 3, 4, 5, 6] as const;
 const FINALE_LEVELS = [4, 9, 20, 25, 30, 40];

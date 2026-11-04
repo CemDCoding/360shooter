@@ -388,9 +388,8 @@ describe('choreography plan (M13, AP-181)', () => {
   it('falls back to the unchanged M10 plan without a choreography', () => {
     for (let id = 0; id < LEVEL_COUNT; id++) {
       const plan = buildFinisher(id, NONE, M10);
-      expect(plan).toEqual(
-        buildFinisher(id, NONE, { ...DEFAULT_FINISHER_SOURCE, choreos: undefined }),
-      );
+      if (id >= 5) expect(buildFinisher(id, NONE)).toEqual(plan);
+      else expect(buildFinisher(id, NONE).choreo).toBeDefined();
       expect(plan.choreo).toBeUndefined();
       expect(plan.realMs).toBeUndefined();
       expect(plan.variantId).toBe(finisherVariantId(id));
