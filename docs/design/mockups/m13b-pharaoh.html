@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Teil 2b: Pharao – „Rätsel“ und Cinematic Level 40 (H-48) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="m13b-boards.css">
+</head>
+<body>
+<header class="doc">
+  <h1>Pharao · Kampfmoment „Rätsel“ und Cinematic Level 40 „LETZTER STERN“ (H-48 Teil 2b)</h1>
+  <p>Kampfmoment in Level 31 bis 39 (<code>moment-pharaoh</code>, ≈ 3,5 s), Cinematic nach Level 40 (<code>cinematic-40</code>, 20 s in 6 Einstellungen, Spielende). Astronautin 2×, Pharao 3× bzw. 4×. Eigene Handschrift: das Gold. Der Pharao vergoldet von den Füßen aufwärts in der Reihenfolge <code>gildOrder</code> (Gewand, Geißel, Krummstab, Kragen, Kopf) und zerspringt in Goldstaub (9a).</p>
+  <dl>
+    <dt>Rätsel</dt><dd>Die Symbole sind <code>rig-prop-riddle</code>: Kind (0), Mensch (1), Greis (2), leuchtend +3. Die Antwort ist der Mensch; sein Bild 4 leuchtet nach dem Treffer.</dd>
+    <dt>Blitz</dt><dd>Moment: genau ein ⚡ (Boss-Weiß 100 ms, Ring). Cinematic: genau ein ⚡ (Impact-Paar in Einstellung 5). Einstellung 3 (Rückblick) ohne jeden Helligkeitssprung.</dd>
+    <dt>Achse</dt><dd>Einziger Achswechsel aller Finale in Einstellung 5 (8a): Astronautin rechts bei 480, Pharao links bei 160, beide gespiegelt. Einstellung 6 behält die gewechselte Achse <code>(angenommen)</code>.</dd>
+    <dt>Reduziert</dt><dd>Boss-Weiß, Impact-Paar, Ring und Wackeln entfallen. Vergolden, Goldstaub, Rückblick und Sonnenaufgang bleiben.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+<section>
+  <h2>1 · KAMPFMOMENT „RÄTSEL“ (Level 31 bis 39) · ≈ 3,5 s</h2>
+  <div class="legend"><span><i class="boss"></i>Boss</span><span><i class="astro"></i>Astronautin</span><span><i class="hit"></i>Treffer ⚡</span><span><i class="react"></i>Reaktion</span><span><i class="calm"></i>Ausklang</span></div>
+  <div class="tl" id="tlM"></div>
+  <div class="boards" id="moment"></div>
+</section>
+<section>
+  <h2>2 · CINEMATIC LEVEL 40 „LETZTER STERN“ (cinematic-40) · 20 s in 6 Einstellungen</h2>
+  <div class="tl" id="tlC"></div>
+  <div class="boards" id="cine"></div>
+</section>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script src="../assets/sprites-m13b.js"></script>
+<script src="m13b-boards.js"></script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  const B = window.M13B(), { A, P, T, GROUND, X } = B;
+  const ID = 'pharaoh', W = 'oasis', FX = 'rig-fx-pharaoh';
+  const css = getComputedStyle(document.documentElement), tk = (n) => css.getPropertyValue(n).trim();
+  // gilding in gildOrder: 0 none, 1 robe half, 2 robe, 3 + flail, 4 + crook, 5 + collar, 6 + head
+  const gild = (n, base = {}) => {
+    const g = {}; if (n === 1) g.robe = 'gilded-half'; if (n >= 2) g.robe = 'gilded';
+    ['flail', 'crook', 'collar', 'head'].forEach((p, i) => { if (n >= 3 + i) g[p] = 'gilded'; });
+    return P(base, g);
+  };
+  const ph = (c, x, pose, s, o = {}) => B.rig(c, ID, x, pose, s, o);
+  const riddle = (c, x, y, i, s, a = 1) => B.spr(c, 'rig-prop-riddle', i, x - 8 * s, y - 8 * s, s, { alpha: a });
+  const RAISED = { crook: 'raised', flail: 'raised', head: 'glare' };
+
+  // =========================== moment ===========================
+  B.timeline('tlM', 3500, [
+    [0, 700, 'boss', 'drei Rätselsymbole erscheinen'], [700, 1000, 'astro', 'Zielen · Halt'], [1000, 1100, 'astro', 'Schuss', 1],
+    [1100, 1300, 'hit', '⚡ Stopp 200 · Spirale kehrt um', 2], [1300, 2700, 'react', 'vergoldet von den Füßen aufwärts · Goldstaub'], [2700, 3500, 'calm', 'BEZWUNGEN!'],
+  ], [[0, 'R1'], [400, 'R2'], [850, 'R3'], [1050, 'R4'], [1200, 'R5'], [1700, 'R6'], [2200, 'R7'], [2550, 'R8'], [3100, 'R9']]);
+  const AX = X.am, BX = X.bm, s3 = B.SBM;
+  const SY = GROUND - 220, SX = [BX - 84, BX, BX + 84]; // riddle symbols above him
+  const sc = (c) => B.world(c, W, { dark: 0.5, moon: [110, 90, 20] });
+  const syms = (c, lit, a = 1) => SX.forEach((x, k) => riddle(c, x, SY, k === lit ? k + 3 : k, 3,k === lit || lit == null ? a : a * 0.45));
+  B.board('moment', '<b>R1 · 0 ms</b> · Oase bei Nacht. Der Pharao 3×, die Gold-Spirale (<code>orb-ring</code>) kreist um ihn.', (c) => { sc(c); ph(c, BX, { 'orb-ring': 'spin1' }, s3); B.astro(c, AX, A.stand); B.bars(c); });
+  B.board('moment', '<b>R2 · 400 ms</b> · Boss-Antizipation (700): Er hebt Krummstab und Geißel (<code>raised</code>), drei Rätselsymbole erscheinen über ihm: Kind, Mensch, Greis.', (c) => {
+    sc(c); ph(c, BX, P(RAISED, { 'orb-ring': 'spin2' }), s3); syms(c, null, 0.7); B.astro(c, AX, A.aim); B.bars(c);
+  });
+  B.board('moment', '<b>R3 · 850 ms</b> · Halt (300): Sie zielt steil auf den Menschen (<code>up45</code>, Feindrehung −10°), Visier dunkel.', (c) => {
+    sc(c); ph(c, BX, P(RAISED, { 'orb-ring': 'spin3' }), s3); syms(c, null); B.astro(c, AX, A.shootUp, { ang: { 'arm-front': -10 } }); B.bars(c);
+  });
+  B.board('moment', '<b>R4 · 1050 ms</b> · Schuss (Aktion 100) auf das richtige Symbol. Der Mensch leuchtet auf (Bild 4), Kind und Greis verblassen.', (c) => {
+    sc(c); ph(c, BX, P(RAISED, { 'orb-ring': 'spin1' }), s3); syms(c, 1); B.astro(c, AX, A.shootUp, { ang: { 'arm-front': -10 } });
+    B.beam(c, AX + 36, GROUND - 96, SX[1] - 6, SY + 4, 4); B.bars(c);
+  });
+  B.board('moment', '<b>R5 · 1200 ms</b> · <span class="flash">⚡</span> Treffer-Stopp 200: Pharao weiß (<code>-sil</code>), Speedline-Ring. Die Gold-Spirale kehrt um und zieht sich auf ihn zusammen.', (c) => {
+    sc(c); ph(c, BX, P(RAISED, { 'orb-ring': 'spin3' }), s3, { sil: 'all' }); B.ring(c, 5, BX, GROUND - 100, 100, 26); syms(c, 1, 0.6); B.astro(c, AX, A.aim); B.bars(c);
+  });
+  B.board('moment', '<b>R6 · 1700 ms</b> · Reaktion (Zeitlupe 0,3 bis 2000): Das Gold steigt von den Füßen auf (<code>robe: gilded-half</code>), die Spirale ist in ihm verschwunden.', (c) => {
+    sc(c); ph(c, BX, gild(1, RAISED), s3, { hide: ['orb-ring'] }); B.rise(c, FX, 6, BX - 50, BX + 50, GROUND - 40, GROUND - 4, 6, [1], 3); B.astro(c, AX, A.aim); B.bars(c);
+  });
+  B.board('moment', '<b>R7 · 2200 ms</b> · Gewand, Geißel und Krummstab sind Gold, dann Kragen und Kopf. Ein Glanzstreifen wandert aufwärts.', (c) => {
+    sc(c); ph(c, BX, gild(5, RAISED), s3, { hide: ['orb-ring'] }); B.burst(c, FX, 7, BX, GROUND - 150, 4, [0], 30, 3); B.astro(c, AX, A.stand); B.bars(c);
+  });
+  B.board('moment', '<b>R8 · 2550 ms</b> · Ganz Gold (<code>head: gilded</code>), dann zerspringt er in Goldstaub (<code>rig-fx-pharaoh</code> 0 bis 2).', (c) => {
+    sc(c); ph(c, BX, gild(6, RAISED), s3, { hide: ['orb-ring'], alpha: 0.45 }); B.burst(c, FX, 8, BX, GROUND - 100, 40, [0, 1, 2], 110, 3); B.astro(c, AX, A.stand); B.bars(c);
+  });
+  B.board('moment', '<b>R9 · 3100 ms</b> · Goldstaub sinkt in den Sand. „BEZWUNGEN!“.', (c) => { sc(c); B.rise(c, FX, 9, BX - 90, BX + 90, GROUND - 30, GROUND - 2, 16, [1, 2], 3); B.astro(c, AX, A.stand); B.bars(c); B.title(c); });
+
+  // =========================== cinematic 40 ===========================
+  B.timeline('tlC', 20000, [
+    [0, 3300, 'calm', 'E1 Fahrt Oase → Thron'], [3300, 6600, 'boss', 'E2 Gold-Spirale gegen Laser'], [6600, 10000, 'calm', 'E3 Rückblick (ohne Blitz)'],
+    [10000, 13300, 'astro', 'E4 Sterne · Porträt · Name'], [13300, 13800, 'astro', 'E5 Achswechsel', 1], [13800, 14000, 'hit', '⚡', 2], [14000, 16700, 'react', 'längste Zeitlupe · Maske birst'],
+    [16700, 20000, 'calm', 'E6 Gold · Staub · Sonnenaufgang · Ende'],
+  ], [[0, '1a'], [1300, '1b'], [2600, '1c'], [3700, '2a'], [4800, '2b'], [5900, '2c'], [7000, '3a'], [8100, '3b'], [9200, '3c'], [10400, '4a'], [11500, '4b'], [12600, '4c'], [13500, '5a'], [13800, '5b'], [15500, '5c'], [17200, '6a'], [18300, '6b'], [19400, '6c']]);
+  const AC = X.ac, BC = X.bc, s4 = B.SBC;
+  // dawn: warm band over the horizon (finisher gold, low alpha), drawn after the world, before the figures
+  const dawn = (c, a) => { c.save(); for (let i = 0; i < 6; i++) { c.globalAlpha = a * (1 - i / 6); c.fillStyle = T.gold; c.fillRect(-400, GROUND - 12 - i * 14, 1440, 14); } c.restore(); };
+  const scene = (c, cx, cy, z, o = {}) => { B.cam(c, cx, cy, z); B.world(c, W, Object.assign({ dark: 0.55, moon: [120, 80, 20] }, o)); if (o.dawn) dawn(c, o.dawn); };
+  // throne dais: a flat stone plate in finisher ink at ground level (no new sprite; at 4x he fills the frame height)
+  const dais = (c, x) => { c.save(); c.globalAlpha = 0.7; c.fillStyle = T.ink; c.fillRect(x - 110, GROUND - 4, 220, 8); c.restore(); };
+  const throne = (c, x, pose, o = {}) => { dais(c, x); ph(c, x, pose, s4, o); };
+  const LS = P(A.raise, {});
+  B.board('cine', '<b>1a · 0 ms</b> · Oase bei Nacht: Palmen, Wasser im Mondlicht. Langsame Fahrt (sine.inOut) nach rechts.', (c) => { scene(c, 160, 180, 1); B.bars(c); });
+  B.board('cine', '<b>1b · 1300 ms</b> · Die Fahrt erreicht den Thron. Die Spirale kreist, er sitzt still.', (c) => { scene(c, 420, 190, 1); throne(c, BC, { 'orb-ring': 'spin1' }); B.bars(c); });
+  B.board('cine', '<b>1c · 2600 ms</b> · Totale: sie links, klein; er rechts auf dem Thron.', (c) => { scene(c, 320, 180, 1); throne(c, BC, { 'orb-ring': 'spin2' }); B.astro(c, AC, A.stand); B.bars(c); });
+  B.board('cine', '<b>2a · 3700 ms</b> · Er hebt die Stäbe, die Gold-Spirale löst sich und fliegt auf sie zu (Goldkugeln, <code>rig-fx-pharaoh</code> 0).', (c) => {
+    scene(c, 320, 180, 1); throne(c, BC, P(RAISED, { 'orb-ring': 'spin3' })); B.burst(c, FX, 21, 300, 200, 8, [0], 60, 3); B.astro(c, AC, A.guard); B.bars(c);
+  });
+  B.board('cine', '<b>2b · 4800 ms</b> · Schlagabtausch: Laser gegen Goldkugeln, wo sie sich treffen, nur Funken.', (c) => {
+    scene(c, 320, 180, 1); throne(c, BC, P(RAISED, { 'orb-ring': 'spin1' })); B.astro(c, AC, A.aim); B.beam(c, AC + 70, GROUND - 74, 330, GROUND - 74, 4); B.burst(c, FX, 22, 340, GROUND - 74, 8, [0, 1], 20, 3); B.bars(c);
+  });
+  B.board('cine', '<b>2c · 5900 ms</b> · Bogen-Konter durch die letzten Kugeln (<code>blade-arc</code>, Smear 66 ms). Sie steht.', (c) => {
+    scene(c, 320, 180, 1); throne(c, BC, { 'orb-ring': 'spin2', head: 'glare' }); B.astro(c, 260, P(A.smear, { 'blade-arc': 'arc2' })); B.burst(c, FX, 23, 330, 180, 8, [1, 2], 40, 3); B.bars(c);
+  });
+
+  // E3 flashback: ink silhouettes in their defeat pose before strips in their world's backdrop colour (12a), right to left, no flash
+  const STRIP = (key) => tk('--color-finisher-bg-' + key);
+  const past = [
+    { id: 'rootMonster', key: 'forest', pose: { 'trunk-left': 'cracked', 'trunk-right': 'cracked', jaw: 'roar' } },
+    { id: 'forestGhost', key: 'night', pose: { body: 'dissolve1' } },
+    { id: 'giantStone', key: 'elf', pose: { body: 'cracked3', face: 'frozen', crystals: 'lit', 'fist-left': 'frozen', 'fist-right': 'frozen' }, hide: ['chunk-1', 'chunk-2', 'chunk-3', 'chunk-4'] },
+    { id: 'giantSandWorm', key: 'desert', pose: { jaw: 'roar' } },
+    { id: 'guardianDog', key: 'pyramid', pose: { 'legs-front': 'lie', 'legs-back': 'lie', head: 'sleep', tail: 'down' }, hide: ['jaw', 'shade-1', 'shade-2', 'shade-3'] },
+  ];
+  const flash = (c, list, shift) => {
+    B.cam(c, 320, 180, 1); B.world(c, W, { dark: 0.75 });
+    list.forEach((k, i) => {
+      const b = past[k], x = 330 + i * 190 - shift;
+      c.fillStyle = STRIP(b.key); c.fillRect(x - 84, 46, 168, GROUND - 46);
+      B.rig(c, b.id, x + (b.id === 'giantSandWorm' ? -20 : 0), b.pose, 2, { ink: true, hide: b.hide });
+    });
+    B.astro(c, 90, A.stand);
+    B.bars(c);
+  };
+  B.board('cine', '<b>3a · 7000 ms</b> · Rückblick: Baummonster und Waldgeist ziehen als Tinten-Silhouetten (Niederlage-Pose) vor Streifen in ihrer Weltfarbe von rechts nach links. Sie schaut vorn links nach. Kein Blitz.', (c) => flash(c, [0, 1, 2], 60));
+  B.board('cine', '<b>3b · 8100 ms</b> · Riesen-Stein und Sand-Wurm. Langsames Tempo (≈ 60 px/s), kein Helligkeitssprung zwischen den Streifen.', (c) => flash(c, [2, 3, 4], 110));
+  B.board('cine', '<b>3c · 9200 ms</b> · Wächter-Hund, schlafend. Der letzte Streifen zieht hinaus, die Oase bleibt dunkel.', (c) => flash(c, [4], -60));
+  B.board('cine', '<b>4a · 10400 ms</b> · Die Sterne aller Welten sammeln sich über ihr (Sterne aus <code>rig-fx-stone</code> 5 und <code>rig-fx-pharaoh</code> 4).', (c) => {
+    scene(c, 320, 180, 1); throne(c, BC, { 'orb-ring': 'spin3', head: 'glare' }); B.rise(c, 'rig-fx-stone', 41, 40, 600, 50, 120, 16, [5], 2); B.rise(c, FX, 42, 100, 260, 90, 150, 8, [4], 2); B.astro(c, AC, A.aim); B.bars(c);
+  });
+  B.board('cine', '<b>4b · 11500 ms</b> · Porträt-Streifen (<code>finisher-portrait</code> Bild 5, Pharao im Visier).', (c) => { scene(c, 320, 180, 1); throne(c, BC, { 'orb-ring': 'spin1' }); B.astro(c, AC, A.crouch); B.bars(c); B.cutIn(c, ID); });
+  B.board('cine', '<b>4c · 12600 ms</b> · Name „LETZTER STERN“ (Kapsel ×3): Die Klinge hoch, alle Sterne sitzen in ihr.', (c) => {
+    scene(c, 320, 180, 1); throne(c, BC, { 'orb-ring': 'spin2', head: 'glare' }); B.astro(c, AC, LS); B.burst(c, FX, 43, AC + 4, GROUND - 160, 10, [4], 30, 2); B.bars(c); B.nameText(c, 'LETZTER STERN');
+  });
+  // E5: axis change (8a). She stands right at 480, he left at 160; both flipped.
+  B.board('cine', '<b>5a · 13500 ms</b> · Schnitt mit Achswechsel (einziger in allen Finalen): Sie steht jetzt rechts, er links. Sprung, Klinge weit hinten.', (c) => {
+    scene(c, 320, 180, 1, { moon: [560, 80, 20] }); throne(c, AC, P(RAISED, { 'orb-ring': 'spin3' }), { flip: true });
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap, flip: true }, [[BC - 20, GROUND - 20], [BC + 10, GROUND]]); B.drawRig(c, 'astronaut', { x: BC - 60, y: GROUND - 70, s: B.SA, pose: P(LS, { pack: 'thrust' }), flip: true }); B.bars(c);
+  });
+  B.board('cine', '<b>5b · 13800 ms</b> · <span class="flash">⚡</span> einziges Vollbild-Impact (hell 100, dunkel 100): der Schlusstreffer von rechts oben, Figuren in Tinte. Entfällt bei „Reduzieren“.', (c) => {
+    B.impact(c, false, AC + 20, 150, () => { dais(c, AC); ph(c, AC, RAISED, s4, { ink: true, flip: true, hide: ['orb-ring'] }); B.drawRig(c, 'astronaut', { x: AC + 150, y: GROUND - 30, s: B.SA, pose: A.cut, ink: true, flip: true }); }); B.bars(c);
+  });
+  B.board('cine', '<b>5c · 15500 ms</b> · Längste Zeitlupe des Spiels (0,2 für ≈ 2,5 s): Die Maske birst (<code>head: cracked</code>), Leinen und Goldflocken fliegen. Sie kniet hinter ihm.', (c) => {
+    scene(c, 320, 180, 1, { moon: [560, 80, 20] }); throne(c, AC, { head: 'cracked' }, { flip: true, hide: ['orb-ring'] }); B.burst(c, FX, 51, AC + 10, GROUND - 190, 10, [2, 3], 70, 3); B.astro(c, AC + 170, A.cut, { flip: true }); B.bars(c);
+  });
+  B.board('cine', '<b>6a · 17200 ms</b> · Der Gold-Fluch kehrt zu ihm zurück: Er vergoldet von den Füßen aufwärts. Die gewechselte Achse bleibt.', (c) => {
+    scene(c, 320, 180, 1, { dark: 0.45, moon: [560, 80, 20] }); throne(c, AC, gild(3, { head: 'cracked' }), { flip: true, hide: ['orb-ring'] }); B.rise(c, FX, 61, AC - 60, AC + 60, GROUND - 60, GROUND - 20, 6, [1], 3); B.astro(c, BC, A.stand, { flip: true }); B.bars(c);
+  });
+  B.board('cine', '<b>6b · 18300 ms</b> · Ganz Gold, dann Goldstaub im Wind. Am Horizont färbt sich der Himmel, die Sonne geht auf.', (c) => {
+    scene(c, 320, 180, 1, { dark: 0.3, moon: null, sun: [330, GROUND - 6, 30], dawn: 0.25 }); throne(c, AC, gild(6), { flip: true, hide: ['orb-ring'], alpha: 0.4 }); B.burst(c, FX, 62, AC + 60, GROUND - 120, 36, [0, 1, 2], 140, 3); B.astro(c, BC, A.stand, { flip: true }); B.bars(c);
+  });
+  B.board('cine', '<b>6c · 19400 ms</b> · Sonnenaufgang über der Oase. Sie steht im Gegenlicht (Tinte), Goldstaub sinkt. „BEZWUNGEN!“, Spielende.', (c) => {
+    scene(c, 320, 180, 1, { dark: 0.15, moon: null, sun: [330, GROUND - 40, 44], dawn: 0.4 }); dais(c, AC); B.rise(c, FX, 63, AC - 100, AC + 100, GROUND - 30, GROUND - 4, 14, [1, 2], 3);
+    B.astro(c, 330, A.stand, { ink: true }); B.bars(c); B.title(c);
+  });
+})();
+</script>
+</body>
+</html>
