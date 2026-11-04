@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-02 (Ergänzung H-41 „M11: Quicktime-Fokus“ und H-43 „M12: Rand-Marker, Ankündigungston, Eliten“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-46 (2026-11-04):** Interview „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ läuft, Runden 1 und 2 beantwortet (1a 2a 3a 4a, 5c 6a 7a 8b), Runde 3 (Boss-Posen, Ausklang, Smears) gefragt. Ergänzung noch **nicht freigegeben**; bis dahin gilt der freigegebene Stand unten.
+**Stand H-46 (2026-11-04):** Interview „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ läuft, Runden 1 und 2 beantwortet (1a 2a 3a 4a, 5c 6a 7a 8b), Runde 3 beantwortet (9a 10a 11a). Interview abgeschlossen. Als Nächstes: Sprites `assets/sprites-m13.js`, Mockup `mockups/m13-rig-und-storyboard.html`, Tokens, Übergabe. Ergänzung noch **nicht freigegeben**; bis dahin gilt der freigegebene Stand unten.
 **Stand H-41/H-43 (2026-11-02):** Interview läuft. Interview abgeschlossen (1a–7a). Tokens, Sprites `assets/sprites-m11.js`, Mockup `mockups/m11-m12-fokus-und-wellen.html` und Übergabe fertig, Kontrast grün. H-41 und H-43 vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-173, AP-177, AP-178; Hinweise zu Dateilisten und Ton-Schlüsseln beachten).
 **Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. Teil 2 fertig (Bildfolgen Level 20, 25, 30, 40 in `assets/sprites-m10b.js` und `sprites-m10c.js`, Level 40 als zwei Bögen) und vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-159 bis AP-162, offener Punkt `holdsMs`).
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
@@ -1014,5 +1014,17 @@ Das Wort steht in Funk 1× auf `hud.glass`, mit 1-px-Rand `event-marker` und Au�
    - Level 4 in 5 Einstellungen
 
    Es gibt keine abspielbare Vorschau. Das Bewegungsgefühl prüft der Nutzer erst im Prototyp (AP-184, H-47).
+9. **9a Posen des Baummonsters (≈ 12 Teilbilder):**
+   - Wurzelarme je Seite: Ruhe, ausgeholt, Stoß in den Boden
+   - `jaw`: zu, brüllend offen
+   - Stammhälften: normal und mit leuchtendem Riss an der Schnittkante
+   - `crown`: aufrecht, geknickt
+10. **10a Ausklang Level 4:** Der Stamm zerfällt zu Blättern, an seiner Stelle blüht eine niedrige Rosenhecke. Die Astronautin senkt die Klinge, die in 3 Stufen in den Lauf zurückgeht. Danach „BEZWUNGEN!“.
+11. **11a Smear-Bilder:**
+    - Klinge: Bogen-Smear als Sichelfläche (Kern weiß, Rand Koralle) in 2 Stufen
+    - Arm: 1 gestrecktes Bild beim Schnitt
+    - Sprung: Beine und Rumpf je 1 gestrecktes Bild
+
+    Die Bilder stehen jeweils 1 bis 2 Frames (≈ 16 bis 33 ms) und zählen nicht als Blitz.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
