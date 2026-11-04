@@ -1,16 +1,50 @@
 // Boss finisher sequences (M10, RS-04.1 to RS-04.5, PE-196 to PE-200, PE-203).
 // Values follow the design brief H-39; all numbers of the sequences live here.
 // Colour values are theme token keys `finisher.*`.
-import type { FinisherRules, FinisherStage, FinisherStep, FinisherVariantId } from '../contracts';
+import type {
+  ChoreoRules,
+  FinisherRules,
+  FinisherStage,
+  FinisherStep,
+  FinisherVariantId,
+} from '../contracts';
 
 /** Start values, hand test H-40. */
 export const FINISHER_RULES: FinisherRules = {
   flashMaxPerWindow: 3,
   flashWindowMs: 1000,
   skipLockMs: 400,
+  skipFirstViewMs: 3000,
   reducedRemoves: ['impactFrame', 'flash', 'shake'],
   flashBlocks: ['impactFrame', 'flash'],
   maxParticles: 120,
+};
+
+/** Rules of the choreographies (M13, AP-181, RS-06.2, RS-06.4, RS-06.5, PE-245, PE-247, PE-248). */
+export const CHOREO_RULES: ChoreoRules = {
+  anticipationMinMs: 150,
+  bossAnticipationMaxMs: 600,
+  actionMaxMs: 120,
+  hitStopMinMs: 100,
+  hitStopMaxMs: 200,
+  finalHitStopMaxMs: 300,
+  followThroughMinMs: 200,
+  flashMinGapMs: 350,
+  momentMaxExtraFlashes: 1,
+  flashMaxPerWindow: 3,
+  flashWindowMs: 1000,
+  maxPartsPerRig: 10,
+  maxAfterimagesPerPart: 4,
+  maxParticles: 150,
+  maxRigDepth: 2,
+  maxFineRotationDeg: 20,
+  zoomTransitionMaxMs: 200,
+  momentRealMs: { minMs: 3000, maxMs: 4000 },
+  cinematicRealMs: { minMs: 14500, maxMs: 15500 },
+  finalCinematicRealMs: { minMs: 19500, maxMs: 20500 },
+  cinematicShots: 5,
+  finalCinematicShots: 6,
+  reduceDropKinds: ['flash', 'impact', 'shake', 'hitWhite'],
 };
 
 /** Title shown after the defeat (design brief H-39, decision 11a). */

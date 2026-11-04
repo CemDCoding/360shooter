@@ -8,7 +8,7 @@ import { GEAR_SLOTS, getGearPiece } from '../config/gear';
 import { PET_IDS } from '../config/pets';
 import { eggItemId, getShopItem } from '../config/shop';
 import { MAX_DIAMONDS, migrateDiamonds } from '../logic/diamonds';
-import { isFinisherVariantId, markSeen } from '../logic/finisher';
+import { isSeenFinisherId, markSeen } from '../logic/finisher';
 
 export const SAVE_KEY = '360shooter.save.v1';
 
@@ -69,7 +69,7 @@ function isIntInRange(v: unknown, min: number, max: number): v is number {
 function parseSeenFinishers(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   const out: string[] = [];
-  for (const v of raw) if (isFinisherVariantId(v) && !out.includes(v)) out.push(v);
+  for (const v of raw) if (isSeenFinisherId(v) && !out.includes(v)) out.push(v);
   return out;
 }
 

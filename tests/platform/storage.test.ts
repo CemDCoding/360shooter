@@ -379,6 +379,27 @@ describe('seenFinishers and reduceEffects (AP-161)', () => {
     const raw = { ...valid, seenFinishers: ['stage-2', 'evil', 7, null, '__proto__'] };
     expect(loadSave(memory(JSON.stringify(raw))).seenFinishers).toEqual(['stage-2']);
   });
+  it('accepts the 12 choreography ids next to the old ids (M13, AP-181) and drops unknown ones', () => {
+    const ids = [
+      'moment-rootMonster',
+      'moment-forestGhost',
+      'moment-giantStone',
+      'moment-giantSandWorm',
+      'moment-guardianDog',
+      'moment-pharaoh',
+      'cinematic-4',
+      'cinematic-9',
+      'cinematic-20',
+      'cinematic-25',
+      'cinematic-30',
+      'cinematic-40',
+    ];
+    const raw = { ...valid, seenFinishers: ['stage-1', ...ids, 'moment-nobody', 'cinematic-5'] };
+    expect(loadSave(memory(JSON.stringify(raw))).seenFinishers).toEqual(['stage-1', ...ids]);
+    const s = memory(JSON.stringify(valid));
+    expect(markFinisherSeen('cinematic-40', s)).toBe(true);
+    expect(loadSave(s).seenFinishers).toEqual(['cinematic-40']);
+  });
   it.each([1, 'true', null, [], {}, 0])('treats reduceEffects %j as false', (bad) => {
     const l = loadSave(memory(JSON.stringify({ ...valid, reduceEffects: bad })));
     expect(l.reduceEffects).toBe(false);
