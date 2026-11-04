@@ -34,6 +34,8 @@ import {
 
 const NONE = { reduceEffects: false, seen: [] as string[] };
 const REDUCED = { reduceEffects: true, seen: [] as string[] };
+/** The M10 plans: no choreography register (levels 0 to 4 have a choreography since AP-184). */
+const M10 = { ...DEFAULT_FINISHER_SOURCE, choreos: undefined };
 
 const HOLD4 = [500, 300, 300, 200, 300, 400, 100, 100, 300, 400, 900];
 const RED4 = [500, 300, 300, 200, 300, 600, 0, 0, 300, 400, 900];
@@ -170,8 +172,8 @@ describe('stage and finale selection', () => {
   });
 
   it('builds the stage or finale for the level', () => {
-    expect(buildFinisher(0, NONE).variantId).toBe('stage-1');
-    const f = buildFinisher(9, NONE);
+    expect(buildFinisher(0, NONE, M10).variantId).toBe('stage-1');
+    const f = buildFinisher(9, NONE, M10);
     expect(f.variantId).toBe('finale-9');
     expect(f.isFinale).toBe(true);
     expect(f.stage).toBe(2);
@@ -186,10 +188,10 @@ describe('seen, skip', () => {
   });
 
   it('is skippable only after the variant was seen, and not during the lock', () => {
-    const first = buildFinisher(0, NONE);
+    const first = buildFinisher(0, NONE, M10);
     expect(first.skippable).toBe(false);
     expect(canSkip(first, 5000)).toBe(false);
-    const again = buildFinisher(0, { reduceEffects: false, seen: ['stage-1'] });
+    const again = buildFinisher(0, { reduceEffects: false, seen: ['stage-1'] }, M10);
     expect(again.skippable).toBe(true);
     expect(canSkip(again, FINISHER_RULES.skipLockMs - 1)).toBe(false);
     expect(canSkip(again, FINISHER_RULES.skipLockMs)).toBe(true);
@@ -206,7 +208,7 @@ describe('plan building', () => {
   });
 
   it('keeps the frames block of the finale and its duration (frameCount 0 blocks are dropped by the builder)', () => {
-    const plan = buildFinisher(4, NONE);
+    const plan = buildFinisher(4, NONE, M10);
     expect(plan.steps.some((s) => s.block === 'frames')).toBe(true);
     expect(plan.totalMs).toBe(FINISHER_FINALES[4].totalMs);
     expect(plan.totalMs).toBeGreaterThan(FINISHER_STAGES[1].totalMs);
@@ -385,10 +387,9 @@ describe('choreography plan (M13, AP-181)', () => {
 
   it('falls back to the unchanged M10 plan without a choreography', () => {
     for (let id = 0; id < LEVEL_COUNT; id++) {
-      const plan = buildFinisher(id, NONE);
-      expect(plan).toEqual(
-        buildFinisher(id, NONE, { ...DEFAULT_FINISHER_SOURCE, choreos: undefined }),
-      );
+      const plan = buildFinisher(id, NONE, M10);
+      if (id >= 5) expect(buildFinisher(id, NONE)).toEqual(plan);
+      else expect(buildFinisher(id, NONE).choreo).toBeDefined();
       expect(plan.choreo).toBeUndefined();
       expect(plan.realMs).toBeUndefined();
       expect(plan.variantId).toBe(finisherVariantId(id));

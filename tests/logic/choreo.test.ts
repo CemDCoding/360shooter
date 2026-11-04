@@ -538,10 +538,12 @@ describe('registers', () => {
       expect(rig.parts.length).toBeLessThanOrEqual(CHOREO_RULES.maxPartsPerRig);
     }
   });
-  it('has the 12 choreography ids, all still empty (fallback)', () => {
+  it('has the 12 choreography ids, only the two root monster entries are set', () => {
     expect(CHOREO_VARIANT_IDS).toHaveLength(12);
     expect(Object.keys(CHOREOS).sort()).toEqual([...CHOREO_VARIANT_IDS].sort());
-    for (const id of CHOREO_VARIANT_IDS) expect(CHOREOS[id]).toBeUndefined();
+    for (const id of CHOREO_VARIANT_IDS) {
+      expect(CHOREOS[id] === undefined).toBe(id !== 'moment-rootMonster' && id !== 'cinematic-4');
+    }
   });
   it('recognises choreography ids', () => {
     expect(isChoreoVariantId('moment-pharaoh')).toBe(true);

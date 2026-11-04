@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildFinisher, isFlashSafe } from '../../src/logic/finisher';
+import { DEFAULT_FINISHER_SOURCE, buildFinisher, isFlashSafe } from '../../src/logic/finisher';
 import { FINISHER_VARIANT_IDS, type FinisherBlock, type FinisherStep } from '../../src/contracts';
 import {
   FINISHER_FINALES,
@@ -8,6 +8,9 @@ import {
   FINISHER_STAGES,
   type FinisherTemplate,
 } from '../../src/config';
+
+/** M10 plans without the choreography register. */
+const M10 = { ...DEFAULT_FINISHER_SOURCE, choreos: undefined };
 
 const STAGES = [1, 2, 3, 4, 5, 6] as const;
 const FINALE_LEVELS = [4, 9, 20, 25, 30, 40];
@@ -203,9 +206,9 @@ describe('finisher plans from the brief H-39 (AP-159)', () => {
       40: 10500,
     };
     for (const l of FINALE_LEVELS) {
-      const plan = buildFinisher(l, { reduceEffects: false, seen: [] });
+      const plan = buildFinisher(l, { reduceEffects: false, seen: [] }, M10);
       expect(Math.abs(plan.totalMs - want[l])).toBeLessThanOrEqual(500);
-      const red = buildFinisher(l, { reduceEffects: true, seen: [] });
+      const red = buildFinisher(l, { reduceEffects: true, seen: [] }, M10);
       const names = red.steps.filter((s) => s.block === 'title').map((s) => s.titleKind);
       expect(names).toEqual(['name', 'title']);
       expect(red.steps.some((s) => ['impactFrame', 'flash', 'shake'].includes(s.block))).toBe(
