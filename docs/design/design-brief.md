@@ -1,6 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-02 (Ergänzung H-41 „M11: Quicktime-Fokus“ und H-43 „M12: Rand-Marker, Ankündigungston, Eliten“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand H-46 (2026-11-04):** Interview „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ läuft, Runde 1 (Figurenteile) gefragt. Ergänzung noch **nicht freigegeben**; bis dahin gilt der freigegebene Stand unten.
 **Stand H-41/H-43 (2026-11-02):** Interview läuft. Interview abgeschlossen (1a–7a). Tokens, Sprites `assets/sprites-m11.js`, Mockup `mockups/m11-m12-fokus-und-wellen.html` und Übergabe fertig, Kontrast grün. H-41 und H-43 vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-173, AP-177, AP-178; Hinweise zu Dateilisten und Ton-Schlüsseln beachten).
 **Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. Teil 2 fertig (Bildfolgen Level 20, 25, 30, 40 in `assets/sprites-m10b.js` und `sprites-m10c.js`, Level 40 als zwei Bögen) und vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-159 bis AP-162, offener Punkt `holdsMs`).
 **Stand H-37 (2026-11-02):** Interview „M9: Märchen-Quicktimes“ abgeschlossen (Entscheidungen 1a–12a), vom Nutzer freigegeben am 2026-11-02. Mockup `mockups/m9-maerchen-quicktimes.html`, Sprites `assets/sprites-m9.js`, Tokens und Exporte sind fertig, `contrast.js --tokens` grün. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-150 bis AP-155).
@@ -970,5 +971,21 @@ Das Wort steht in Funk 1× auf `hud.glass`, mit 1-px-Rand `event-marker` und Au�
 - Fokus am iPhone: wirkt der Wechsel ruhig, kein Flackern bei dicht folgenden Kreisen?
 - Sind SCHWARM, RING und ZANGE in Funk 1× am iPhone lesbar?
 - Ist die Krone bei kleinen Gegnern (Eichhörnchen, Schlange) erkennbar?
+
+### 2026-11-04 · Ergänzung H-46 „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ (in Arbeit, nicht freigegeben)
+
+**Auftrag:** H-46 aus dem Plan (§13; PE-233, PE-236, PE-246, PE-247, PE-249, PE-250; Vertrag §4 „Rig und Choreografie (M13)“, PE-251). Astronautin und Baummonster werden in Teile mit Drehpunkten zerlegt. Dazu kommen die Laserklinge als neues Element, Teilbilder für große Winkel (Posen), weiße Silhouetten je Teil, vorgefärbte Partikel- und Splitterbilder, die Schlüsselposen des Kampfmoments „Rosenschnitt“ und das Storyboard für Level 4 „WURZELBRECHER“ in 5 Einstellungen.
+
+**Rahmen (fest, aus dem Plan):**
+- Je Figur höchstens 10 Teile. Ein Teil mit Eltern-Teil ist selbst kein Eltern-Teil (höchstens eine Ebene). Drehpunkt `originX`/`originY` 0..1, Versatz in px, Reihenfolge `order`.
+- Im Code nur Feindrehung bis ± 20°. Größere Winkel zeichne ich als eigene Teilbilder (`poses`). Frei drehen dürfen nur kleine oder schnelle Teile (`freeRotate`: Klinge, Splitter).
+- Treffer-Weiß kommt aus einer vorgezeichneten weißen Silhouette je Teil. Partikel und Splitter sind vorgefärbt. Tint, Rope und FX dürfen nichts tragen (Canvas-Rückfall).
+- Alle Teile eines Ablaufs liegen in einem Atlas (≤ 4096 px). Kamera-Zoom nur ganzzahlig.
+- Laserklinge: kurze Klinge aus dem Lauf, kein Schwertgriff, eigene Form. Ob sie sich genug von bekannten Lichtschwertern abhebt, prüft der Nutzer (R1, keine Rechtsberatung).
+- Cinematic Level 4: 5 Einstellungen zu je ≈ 3 s (ruhig → schnell mit kleinen Funken → Spannung mit Porträt und „WURZELBRECHER“ → einziger Vollbild-Impact ⚡ mit Zeitlupe → Ausklang). Astronautin links, Boss rechts, höchstens ein bewusster Achswechsel.
+- Kein neuer Ton (PE-237), keine neue Abhängigkeit. Nur eigene Gestaltung.
+- Treffer- und Impact-Bilder aus H-39 bleiben als Akzente.
+
+**Entscheidungen (Nutzer):** folgen.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
