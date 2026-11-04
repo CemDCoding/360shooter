@@ -1,6 +1,6 @@
 // Choreography player of the finisher scene (M13, AP-182, §4 "Rig und Choreografie (M13)", PE-246 to
 // PE-252, brief H-46). Plays one ChoreoDef in real time:
-// - Clock: real ms since the start (the frame delta, never frames); `sampleChoreo` maps it to choreography
+// - Clock: real ms since the start (the frame delta, never frames); `sampleClock` maps it to choreography
 //   time (slow motion via `timeScale`, the clock stands during a `hitStop`), `sampleTrack` gives every value.
 // - Figures: one flat Container per actor (rig.ts); parts move by easing, poses switch frames.
 // - Events start when the choreography clock passes `atMs`; their `durationMs` counts in real time.
@@ -18,7 +18,13 @@ import type {
 } from '../../contracts';
 import { CHOREO_RULES } from '../../config/finishers';
 import { THEME } from '../../config/theme';
-import { realDurationMs, sampleChoreo, sampleTrack } from '../../logic/choreo';
+import {
+  prepareChoreo,
+  sampleClock,
+  sampleTrack,
+  type ChoreoClock,
+  type ChoreoClockSample,
+} from '../../logic/choreo';
 import { CHOREO_DEPTH, type ChoreoContext } from './context';
 import { BOSS_FX, findFx, type BossFxModule, type FxApi, type FxInstance } from './fx';
 import { centredX, tokenColor } from './layout';
@@ -95,7 +101,9 @@ export class ChoreoPlayer {
   readonly atlas: string;
   readonly bossId: BossId | null;
   private readonly byRig = new Map<string, RigFigure>();
-  private readonly clockDef: ChoreoDef;
+  /** Real-time segments, built once; sampled every frame without allocation. */
+  private readonly clock: ChoreoClock;
+  private readonly tick: ChoreoClockSample = { choreoMs: 0, frozen: false, done: false };
   private readonly bindings: Binding[] = [];
   private readonly poseTracks = new Map<RigFigure, (ChoreoTrack | null)[]>();
   private readonly runners: Runner[] = [];
@@ -117,8 +125,8 @@ export class ChoreoPlayer {
     private readonly camera: CameraLike,
     source: ChoreoPlayerSource,
   ) {
-    this.realMs = realDurationMs(def);
-    this.clockDef = { ...def, tracks: [] };
+    this.clock = prepareChoreo(def);
+    this.realMs = this.clock.realMs;
     this.atlas = atlasKey(def);
     this.bossId = bossRigOf(def);
     const bossScale = this.bossId ? rigScale(this.bossId, def) : C['size.rig-scale-boss-moment'];
@@ -247,7 +255,8 @@ export class ChoreoPlayer {
           pre: (since) => {
             if (reduced) return;
             const o = axisShake(since, amp);
-            for (const t of targets) {
+            for (let i = 0; i < targets.length; i++) {
+              const t = targets[i];
               if (t.part < 0) {
                 if (ev.axis === 'x') t.fig.rootShakeX += o;
                 else t.fig.rootShakeY += o;
@@ -270,9 +279,9 @@ export class ChoreoPlayer {
             for (const p of pools) p.follow(this.elapsedMs, copies, gap);
           },
           post: (since) => {
-            for (const p of pools) {
-              if (since < trail) p.follow(this.elapsedMs, copies, gap);
-              else p.fade(since - trail, fade);
+            for (let i = 0; i < pools.length; i++) {
+              if (since < trail) pools[i].follow(this.elapsedMs, copies, gap);
+              else pools[i].fade(since - trail, fade);
             }
           },
           stop: () => {
@@ -324,7 +333,7 @@ export class ChoreoPlayer {
           ...base,
           durationMs: ev.durationMs ?? rules.hitStopMinMs,
           pre: () => {
-            for (const p of parts) p.fig.white[p.part] = 1;
+            for (let i = 0; i < parts.length; i++) parts[i].fig.white[parts[i].part] = 1;
           },
         };
       }
@@ -472,7 +481,7 @@ export class ChoreoPlayer {
     const dt = Number.isFinite(dtMs) && dtMs > 0 ? dtMs : 0;
     this.elapsedMs += dt;
     const before = this.choreoMs;
-    const clock = sampleChoreo(this.clockDef, this.elapsedMs);
+    const clock = sampleClock(this.clock, this.elapsedMs, this.tick);
     this.choreoMs = clock.choreoMs;
     this.frozen = clock.frozen;
     // Sparks run in a hit stop (§4) and slow down with the clock in slow motion.
@@ -485,20 +494,26 @@ export class ChoreoPlayer {
       r.start();
     }
 
-    for (const fig of this.figures) fig.beginFrame();
-    for (const b of this.bindings) {
+    // Index loops only: nothing (iterators, closures, arrays) is allocated per frame.
+    const figs = this.figures;
+    const active = this.active;
+    for (let i = 0; i < figs.length; i++) figs[i].beginFrame();
+    for (let i = 0; i < this.bindings.length; i++) {
+      const b = this.bindings[i];
       const v = sampleTrack(b.track, this.choreoMs);
       if (v !== undefined) b.fig.set(b.part, b.track.property, v);
     }
-    for (const r of this.active) r.pre?.(this.elapsedMs - r.startedAt);
-    for (const fig of this.figures) {
-      fig.apply(this.elapsedMs, this.poseTracks.get(fig), this.choreoMs);
+    for (let i = 0; i < active.length; i++) active[i].pre?.(this.elapsedMs - active[i].startedAt);
+    for (let i = 0; i < figs.length; i++) {
+      figs[i].apply(this.elapsedMs, this.poseTracks.get(figs[i]), this.choreoMs);
     }
-    for (const h of this.histories) h.record(this.elapsedMs);
+    for (let i = 0; i < this.histories.length; i++) this.histories[i].record(this.elapsedMs);
 
     this.screenShake.x = 0;
     this.screenShake.y = 0;
-    for (const r of this.active) r.post?.(this.elapsedMs - r.startedAt, dt);
+    for (let i = 0; i < active.length; i++) {
+      active[i].post?.(this.elapsedMs - active[i].startedAt, dt);
+    }
     this.sparks?.update(dt * Math.max(0, rate));
 
     cameraAt(this.def, this.choreoMs, this.cam);

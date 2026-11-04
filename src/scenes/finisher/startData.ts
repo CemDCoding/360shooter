@@ -1,9 +1,11 @@
 // Start data of the finisher scene: input check and the debug start `?finisher=n` (AP-160). No Phaser import.
 import type { ChoreoDef, FinisherActor, FinisherPlan, FinisherStartData } from '../../contracts';
+import { FINISHER_ATLASES, type FinisherAtlasDef } from '../../config/assets';
 import { BOSSES } from '../../config/bosses';
 import { LEVELS } from '../../config/levels';
 import { DEFAULT_FINISHER_SOURCE, buildFinisher } from '../../logic/finisher';
 import { DEBUG_CHOREO, DEBUG_CHOREO_LEVEL } from './debugChoreo';
+import { atlasKey } from './rig';
 
 function finite(v: unknown): v is number {
   return typeof v === 'number' && Number.isFinite(v);
@@ -53,6 +55,20 @@ export function choreoOf(plan: FinisherPlan): ChoreoDef | null {
     Array.isArray(c.beats) &&
     (c.shots === undefined || Array.isArray(c.shots));
   return ok ? (c as ChoreoDef) : null;
+}
+
+/**
+ * Atlas the scene still has to load for a choreography (`finisher-rig-<BossId>` from `FINISHER_ATLASES`);
+ * null when it is loaded already (`exists`) or not registered (the figures then show the game sprites).
+ */
+export function atlasToLoad(
+  def: ChoreoDef,
+  exists: (key: string) => boolean,
+  atlases: readonly FinisherAtlasDef[] = FINISHER_ATLASES,
+): FinisherAtlasDef | null {
+  const key = atlasKey(def);
+  if (exists(key)) return null;
+  return atlases.find((a) => a.key === key) ?? null;
 }
 
 /** True when `v` can be played: a plan with timed steps and two actors with finite positions. */

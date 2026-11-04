@@ -1,13 +1,17 @@
-// Test sequence of the choreography player (M13, AP-182): plays with the placeholder figures of
-// `config/rigs` for the debug start `?finisher=0` as long as the register has no `moment-rootMonster`
-// (AP-184 replaces it with the real one). Uses every event kind once, keeps the grid (PE-245), one flash,
-// a smear pose and a camera zoom on whole steps. Not part of the game: nothing outside the debug start uses it.
+// Test sequence of the choreography player (M13, AP-182): plays with the rigs of astronaut and root monster
+// (AP-183, atlas `finisher-rig-rootMonster`) for the debug start `?finisher=0` as long as the register has no
+// `moment-rootMonster` (AP-184 replaces it with the real one). Uses every event kind once, keeps the grid
+// (PE-245), one flash, smear poses, angle tracks, the growing blade and a camera zoom on whole steps.
+// Not part of the game: nothing outside the debug start uses it.
 import type { ChoreoDef } from '../../contracts';
 import { THEME } from '../../config/theme';
 import { SOUND_CHARGE } from './timing';
 import { AFTERIMAGE_COPIES, AFTERIMAGE_FADE_MS, AFTERIMAGE_GAP_MS, SLASH_FX } from './trails';
 
 const GROUND = THEME.sizePx['size.rig-ground'];
+const BLADE_STEP = THEME.motionMs['motion.rig-blade-step'];
+/** Pre-coloured spark of the root monster atlas (`rig-fx-root-6`, coral). */
+const SPARK_FRAME = 'rig-fx-root-6';
 /** Level whose debug start plays the test sequence. */
 export const DEBUG_CHOREO_LEVEL = 0;
 
@@ -41,7 +45,7 @@ export const DEBUG_CHOREO: ChoreoDef = {
       ],
     },
     {
-      target: 'astronaut.body',
+      target: 'astronaut.torso',
       property: 'angle',
       keys: [
         { atMs: 0, value: 0, ease: 'sine.inOut' },
@@ -53,16 +57,57 @@ export const DEBUG_CHOREO: ChoreoDef = {
       ],
     },
     {
-      target: 'astronaut.body',
+      target: 'astronaut.torso',
       property: 'pose',
       keys: [
-        { atMs: 0, value: 'stand', ease: 'hold' },
+        { atMs: 0, value: 'upright', ease: 'hold' },
+        { atMs: 700, value: 'lean', ease: 'hold' },
         { atMs: 900, value: 'smear', ease: 'hold' },
-        { atMs: 933, value: 'stand', ease: 'hold' },
+        { atMs: 933, value: 'upright', ease: 'hold' },
+      ],
+    },
+    ...(['astronaut.leg-front', 'astronaut.leg-back'] as const).map((target) => ({
+      target,
+      property: 'pose' as const,
+      keys: [
+        { atMs: 0, value: 'stand', ease: 'hold' as const },
+        { atMs: 300, value: 'crouch', ease: 'hold' as const },
+        { atMs: 600, value: 'tuck', ease: 'hold' as const },
+        { atMs: 900, value: 'smear', ease: 'hold' as const },
+        { atMs: 933, value: 'kneel', ease: 'hold' as const },
+        { atMs: 1300, value: 'stand', ease: 'hold' as const },
+      ],
+    })),
+    {
+      // The blade grows in steps of motion.rig-blade-step before the cut.
+      target: 'astronaut.blade',
+      property: 'pose',
+      keys: [
+        { atMs: 0, value: 'grow1', ease: 'hold' },
+        { atMs: 600 + BLADE_STEP, value: 'grow2', ease: 'hold' },
+        { atMs: 600 + 2 * BLADE_STEP, value: 'full', ease: 'hold' },
       ],
     },
     {
-      target: 'rootMonster.body',
+      target: 'astronaut.blade',
+      property: 'alpha',
+      keys: [
+        { atMs: 0, value: 0, ease: 'hold' },
+        { atMs: 600, value: 1, ease: 'hold' },
+      ],
+    },
+    {
+      // Drawn blade arc (base frame arc1): shown only for one smear time while the cut runs.
+      target: 'astronaut.blade-arc',
+      property: 'alpha',
+      keys: [
+        { atMs: 0, value: 0, ease: 'hold' },
+        { atMs: 900, value: 1, ease: 'hold' },
+        { atMs: 933, value: 0, ease: 'hold' },
+      ],
+    },
+    {
+      target: 'rootMonster',
       property: 'scaleY',
       keys: [
         { atMs: 0, value: 1, ease: 'sine.inOut' },
@@ -71,7 +116,40 @@ export const DEBUG_CHOREO: ChoreoDef = {
       ],
     },
     {
-      target: 'rootMonster.body',
+      target: 'rootMonster.jaw',
+      property: 'pose',
+      keys: [
+        { atMs: 0, value: 'closed', ease: 'hold' },
+        { atMs: 500, value: 'roar', ease: 'hold' },
+        { atMs: 1000, value: 'closed', ease: 'hold' },
+      ],
+    },
+    ...(['rootMonster.trunk-left', 'rootMonster.trunk-right'] as const).map((target) => ({
+      target,
+      property: 'pose' as const,
+      keys: [
+        { atMs: 0, value: 'rest', ease: 'hold' as const },
+        { atMs: 1000, value: 'cracked', ease: 'hold' as const },
+      ],
+    })),
+    {
+      target: 'rootMonster.crown',
+      property: 'pose',
+      keys: [
+        { atMs: 0, value: 'upright', ease: 'hold' },
+        { atMs: 1000, value: 'bent', ease: 'hold' },
+      ],
+    },
+    {
+      target: 'rootMonster.crown',
+      property: 'angle',
+      keys: [
+        { atMs: 1000, value: 0, ease: 'sine.out' },
+        { atMs: 1300, value: 15, ease: 'hold' },
+      ],
+    },
+    {
+      target: 'rootMonster',
       property: 'alpha',
       keys: [
         { atMs: 1300, value: 1, ease: 'stepped', steps: 3 },
@@ -113,9 +191,9 @@ export const DEBUG_CHOREO: ChoreoDef = {
     { kind: 'sound', atMs: 500, key: SOUND_CHARGE, flash: false },
     {
       kind: 'afterimage',
-      atMs: 500,
-      durationMs: 200,
-      parts: ['astronaut.body'],
+      atMs: 850,
+      durationMs: 250,
+      parts: ['astronaut.torso', 'astronaut.arm-front'],
       copies: AFTERIMAGE_COPIES,
       spacingMs: AFTERIMAGE_GAP_MS,
       fadeMs: AFTERIMAGE_FADE_MS,
@@ -139,7 +217,7 @@ export const DEBUG_CHOREO: ChoreoDef = {
     {
       kind: 'particles',
       atMs: 1000,
-      texture: 'finisher-shards',
+      texture: SPARK_FRAME,
       count: 24,
       follow: 'rootMonster',
       flash: false,

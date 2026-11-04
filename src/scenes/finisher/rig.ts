@@ -118,7 +118,8 @@ export function nextPose(
   choreoMs: number,
   current: string | undefined,
 ): string | undefined {
-  for (const k of track.keys) {
+  for (let i = 0; i < track.keys.length; i++) {
+    const k = track.keys[i];
     if (k.atMs > choreoMs && typeof k.value === 'string' && k.value !== current) return k.value;
   }
   return undefined;
@@ -297,7 +298,8 @@ export class RigFigure {
 
   /** Resets the state to the rest pose of the rig and the start position of the actor. */
   beginFrame(): void {
-    this.parts.forEach((p, i) => {
+    for (let i = 0; i < this.parts.length; i++) {
+      const p = this.parts[i];
       this.ox[i] = p.x;
       this.oy[i] = p.y;
       this.ang[i] = 0;
@@ -309,7 +311,7 @@ export class RigFigure {
       this.shakeY[i] = 0;
       this.white[i] = 0;
       this.pose[i] = undefined;
-    });
+    }
     this.x = this.actor.x;
     this.y = this.actor.y;
     this.angle = 0;
@@ -350,7 +352,8 @@ export class RigFigure {
   /** Solves the parents (one level) in figure space and writes containers and images. */
   apply(nowMs: number, poseTracks?: readonly (ChoreoTrack | null)[], choreoMs = 0): void {
     const smearMs = THEME.motionMs['motion.rig-smear'];
-    for (const i of this.solveOrder) {
+    for (let s = 0; s < this.solveOrder.length; s++) {
+      const i = this.solveOrder[s];
       const part = this.parts[i];
       const a = fineAngle(part, this.ang[i]);
       const p = this.parent[i];

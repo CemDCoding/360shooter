@@ -15,7 +15,10 @@ export function shotAt(
 ): ChoreoShot | null {
   let found: ChoreoShot | null = null;
   if (!shots) return null;
-  for (const s of shots) if (s.atMs <= choreoMs && (!found || s.atMs >= found.atMs)) found = s;
+  for (let i = 0; i < shots.length; i++) {
+    const s = shots[i];
+    if (s.atMs <= choreoMs && (!found || s.atMs >= found.atMs)) found = s;
+  }
   return found;
 }
 
@@ -40,7 +43,8 @@ export function cameraAt(def: ChoreoDef, choreoMs: number, out: ChoreoCamera): C
   out.scrollY = base.scrollY;
   out.zoom = base.zoom;
   const shotStart = shot ? shot.atMs : -Infinity;
-  for (const track of def.tracks) {
+  for (let i = 0; i < def.tracks.length; i++) {
+    const track = def.tracks[i];
     if (track.target !== 'camera' || !trackApplies(track, choreoMs, shotStart)) continue;
     const v = sampleTrack(track, choreoMs);
     if (typeof v !== 'number' || !Number.isFinite(v)) continue;

@@ -34,7 +34,7 @@ import { beam, bgColor, flash, impactFrame, letterbox, speedlines } from './fini
 import { ParticleSystem, particles, shatter } from './finisher/particles';
 import { createSkipHint, cutIn, frames, panels, title } from './finisher/pictures';
 import { releaseTimeline } from './finisher/shutdown';
-import { choreoOf, isFinisherStartData } from './finisher/startData';
+import { atlasToLoad, choreoOf, isFinisherStartData } from './finisher/startData';
 import { TextureBank } from './finisher/textures';
 import { beamWindow, effectRate, soundCues } from './finisher/timing';
 
@@ -89,6 +89,15 @@ export class FinisherScene extends Phaser.Scene {
     this.player = null;
     this.choreoCtx = null;
     this.uiCam = null;
+  }
+
+  /** M13: loads the rig atlas of the choreography once; a missing file leaves the game-sprite fallback. */
+  preload(): void {
+    const plan = this.startData?.plan;
+    const def = plan ? choreoOf(plan) : null;
+    if (!def) return;
+    const atlas = atlasToLoad(def, (key) => this.textures.exists(key));
+    if (atlas) this.load.atlas(atlas.key, atlas.path, atlas.jsonPath);
   }
 
   create(): void {

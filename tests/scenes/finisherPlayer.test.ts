@@ -29,7 +29,8 @@ import {
   rigScale,
   silhouetteFrame,
 } from '../../src/scenes/finisher/rig';
-import { choreoOf, debugFinisherData } from '../../src/scenes/finisher/startData';
+import { FINISHER_ATLASES } from '../../src/config/assets';
+import { atlasToLoad, choreoOf, debugFinisherData } from '../../src/scenes/finisher/startData';
 import { TextureBank } from '../../src/scenes/finisher/textures';
 import { SOUND_CHARGE } from '../../src/scenes/finisher/timing';
 import {
@@ -225,6 +226,25 @@ const PLACEHOLDER_TEXTURES: TextureList = {
   'finisher-shards': [],
 };
 
+/** Every frame of a rig: pose frames and their `<Bogen>-sil-<Index>` silhouettes. */
+function rigFrames(rig: RigDef): string[] {
+  return rig.parts.flatMap((p) => {
+    const frames = [p.frame, ...Object.values(p.poses ?? {})];
+    return [...frames, ...frames.map((f) => silhouetteFrame(p, f))];
+  });
+}
+
+/** The loaded atlas `finisher-rig-rootMonster` (AP-183 rigs) plus the game sprites and the hit image. */
+const RIG_ATLAS = 'finisher-rig-rootMonster';
+const RIG_TEXTURES: TextureList = {
+  ...PLACEHOLDER_TEXTURES,
+  [RIG_ATLAS]: [
+    ...rigFrames(RIGS.astronaut),
+    ...rigFrames(RIGS.rootMonster),
+    ...Array.from({ length: 8 }, (_, i) => `rig-fx-root-${i}`),
+  ],
+};
+
 function part(id: string, frame: string, extra: Partial<RigPartDef> = {}): RigPartDef {
   return {
     id,
@@ -293,9 +313,33 @@ function playOut(p: ChoreoPlayer, dt: number, each?: () => void): number {
 
 // ---------------------------------------------------------------- tests
 
-describe('debug choreography (placeholder figures)', () => {
-  it('is valid against the placeholder rigs and uses every event kind exactly once', () => {
+describe('debug choreography (AP-183 rigs)', () => {
+  it('is valid against the real rigs and uses every event kind exactly once', () => {
     expect(validateChoreo(DEBUG_CHOREO, RIGS, CHOREO_RULES)).toEqual([]);
+    // Every part named by tracks and afterimages exists (the player would skip unknown ones silently).
+    const known = (target: string): boolean => {
+      const [rigId, partId] = target.split('.');
+      const rig = RIGS[rigId as keyof typeof RIGS];
+      return !!rig && (partId === undefined || rig.parts.some((p) => p.id === partId));
+    };
+    for (const t of DEBUG_CHOREO.tracks) {
+      if (t.target !== 'camera') expect(known(t.target), t.target).toBe(true);
+    }
+    for (const e of DEBUG_CHOREO.events) {
+      if (e.kind === 'afterimage') for (const p of e.parts) expect(known(p), p).toBe(true);
+      if (e.kind === 'hitWhite' || e.kind === 'hitStop') {
+        for (const p of e.targets) expect(known(p), p).toBe(true);
+      }
+    }
+    // Pose tracks name poses of their part; sparks use a pre-coloured frame of the atlas.
+    for (const t of DEBUG_CHOREO.tracks) {
+      if (t.property !== 'pose') continue;
+      const [rigId, partId] = t.target.split('.');
+      const p = RIGS[rigId as keyof typeof RIGS].parts.find((q) => q.id === partId);
+      for (const k of t.keys) expect(Object.keys(p?.poses ?? {})).toContain(k.value);
+    }
+    const sparks = DEBUG_CHOREO.events.find((e) => e.kind === 'particles');
+    expect(RIG_TEXTURES[RIG_ATLAS]).toContain(sparks?.kind === 'particles' && sparks.texture);
     const kinds: ChoreoEvent['kind'][] = [
       'hitStop',
       'afterimage',
@@ -341,36 +385,51 @@ describe('M10 fallback', () => {
   });
 });
 
-describe('player under Canvas (placeholder figures)', () => {
+describe('player under Canvas (debug choreography, rig atlas loaded)', () => {
   it('builds every effect without tint, FX or Rope and creates nothing in the update', () => {
-    const run = makePlayer(DATA, DEBUG_CHOREO, PLACEHOLDER_TEXTURES);
+    const run = makePlayer(DATA, DEBUG_CHOREO, RIG_TEXTURES);
     const { player, rec } = run;
+    expect(player.figures.every((f) => f.atlasLoaded)).toBe(true);
     expect(player.runnerCount).toBe(DEBUG_CHOREO.events.length);
-    expect(player.afterimagePools.size).toBe(1);
-    const pool = [...player.afterimagePools.values()][0];
-    expect(pool.images).toHaveLength(3);
+    expect(player.afterimagePools.size).toBe(2);
+    for (const pool of player.afterimagePools.values()) expect(pool.images).toHaveLength(3);
     expect(player.sparkPool?.capacity).toBe(CHOREO_RULES.maxParticles);
-    // Hit-white of the placeholder: a silhouette drawn once on a canvas (no setTintFill).
-    expect(rec.canvases.some((k) => k.startsWith('finisher-rt-sil-'))).toBe(true);
+    expect(rec.canvases).toEqual([]);
     const created = rec.adds;
+    const partImages = images(rec)
+      .filter((o) => o.st.texture === RIG_ATLAS)
+      .slice(0, 18);
+    const bossImages = partImages.slice(RIGS.astronaut.parts.length);
 
     let maxSparks = 0;
-    let silShown = false;
+    let allWhite = false;
     let flashShown = false;
     let maxZoom = 0;
+    const framesSeen = new Set<unknown>();
     playOut(player, 1000 / 60, () => {
       maxSparks = Math.max(maxSparks, player.sparkPool?.alive ?? 0);
-      silShown ||= images(rec).some(
-        (o) => String(o.st.texture).startsWith('finisher-rt-sil-') && o.st.visible !== false,
-      );
+      allWhite ||= bossImages.every((o) => /-sil-\d+$/.test(String(o.st.frame)));
       flashShown ||= rec.objects.some((o) => o.kind === 'rectangle' && o.st.visible === true);
       maxZoom = Math.max(maxZoom, run.camera.zoom);
+      for (const o of partImages) framesSeen.add(o.st.frame);
     });
 
     expect(rec.adds).toBe(created);
     expect(rec.webglOnly).toEqual([]);
     expect(maxSparks).toBe(24);
-    expect(silShown).toBe(true);
+    // Hit-white: every boss part on its `-sil-` frame at once.
+    expect(allWhite).toBe(true);
+    // Pose and smear frames of the atlas were shown (torso smear, legs, blade growth, cracked trunk).
+    for (const f of [
+      'rig-astro-torso-2',
+      'rig-astro-leg-front-4',
+      'rig-astro-blade-2',
+      'rig-astro-blade-0',
+      'rig-root-trunk-left-1',
+      'rig-root-jaw-1',
+    ]) {
+      expect(framesSeen.has(f), f).toBe(true);
+    }
     expect(flashShown).toBe(true);
     expect(maxZoom).toBe(2);
     expect(rec.sounds).toEqual([SOUND_CHARGE]);
@@ -384,14 +443,23 @@ describe('player under Canvas (placeholder figures)', () => {
     expect(player.done).toBe(true);
   });
 
+  it('falls back to the game sprites without the atlas (silhouette drawn once, no sparks)', () => {
+    const { player, rec } = makePlayer(DATA, DEBUG_CHOREO, PLACEHOLDER_TEXTURES);
+    expect(player.figures.some((f) => f.atlasLoaded)).toBe(false);
+    expect(player.sparkPool).toBeNull();
+    expect(rec.canvases.some((k) => k.startsWith('finisher-rt-sil-'))).toBe(true);
+    const created = rec.adds;
+    let silShown = false;
+    playOut(player, 1000 / 60, () => {
+      silShown ||= images(rec).some((o) => String(o.st.texture).startsWith('finisher-rt-sil-'));
+    });
+    expect(silShown).toBe(true);
+    expect(rec.adds).toBe(created);
+    expect(rec.webglOnly).toEqual([]);
+  });
+
   it('tints the title only under WebGL', () => {
-    const { player, rec } = makePlayer(
-      DATA,
-      DEBUG_CHOREO,
-      PLACEHOLDER_TEXTURES,
-      { rigs: RIGS },
-      true,
-    );
+    const { player, rec } = makePlayer(DATA, DEBUG_CHOREO, RIG_TEXTURES, { rigs: RIGS }, true);
     playOut(player, 1000 / 60);
     expect(rec.webglOnly).toEqual(['bitmapText.setTint']);
   });
@@ -399,7 +467,7 @@ describe('player under Canvas (placeholder figures)', () => {
   it('takes the same real time at 30 and 60 fps', () => {
     for (const fps of [30, 60]) {
       const dt = 1000 / fps;
-      const { player } = makePlayer(DATA, DEBUG_CHOREO, PLACEHOLDER_TEXTURES);
+      const { player } = makePlayer(DATA, DEBUG_CHOREO, RIG_TEXTURES);
       expect(player.realMs).toBe(DATA.plan.realMs);
       playOut(player, dt);
       expect(player.elapsedMs).toBeGreaterThanOrEqual(player.realMs);
@@ -414,7 +482,7 @@ describe('player under Canvas (placeholder figures)', () => {
     expect(def).not.toBeNull();
     const kinds = new Set(def?.events.map((e) => e.kind));
     for (const k of CHOREO_RULES.reduceDropKinds) expect(kinds.has(k)).toBe(false);
-    const { player, rec } = makePlayer(reduced, def as ChoreoDef, PLACEHOLDER_TEXTURES);
+    const { player, rec } = makePlayer(reduced, def as ChoreoDef, RIG_TEXTURES);
     playOut(player, 1000 / 60);
     expect(rec.objects.some((o) => o.kind === 'rectangle')).toBe(false);
   });
@@ -460,7 +528,8 @@ describe('afterimages (H-46)', () => {
         },
       ],
     });
-    const { player } = makePlayer(DATA, def, PLACEHOLDER_TEXTURES);
+    // Local one-part test figures: the part sits on the figure root, so its x is the track value.
+    const { player } = makePlayer(DATA, def, PLACEHOLDER_TEXTURES, { rigs: ATLAS_RIGS });
     // 3 ms frames (333 fps): every copy time (267, 234, 201 ms) is a recorded sample.
     for (let i = 0; i < 100; i++) player.update(3);
     const pool = [...player.afterimagePools.values()][0];
@@ -598,6 +667,32 @@ describe('figures and tokens', () => {
   });
 });
 
+describe('rig atlas loading', () => {
+  it('loads the atlas of the boss rig from FINISHER_ATLASES once', () => {
+    const atlas = atlasToLoad(DEBUG_CHOREO, () => false);
+    expect(atlas).toEqual(FINISHER_ATLASES.find((a) => a.key === RIG_ATLAS));
+    expect(atlas?.path).toMatch(/finisher-rig-rootMonster\.png$/);
+    expect(atlas?.jsonPath).toMatch(/finisher-rig-rootMonster\.json$/);
+    // Loaded already: nothing to do.
+    expect(atlasToLoad(DEBUG_CHOREO, (k) => k === RIG_ATLAS)).toBeNull();
+    // Not registered (later bosses): nothing to load, the figures show the game sprites.
+    const ghost = choreo({
+      variantId: 'moment-forestGhost',
+      actors: [
+        { rigId: 'astronaut', x: 170, y: 300 },
+        { rigId: 'forestGhost', x: 470, y: 300 },
+      ],
+    });
+    expect(atlasToLoad(ghost, () => false)).toBeNull();
+  });
+
+  it('FinisherScene loads it in preload, only for a choreography', () => {
+    expect(sceneSrc).toMatch(
+      /preload\(\): void \{[\s\S]*?choreoOf\(plan\)[\s\S]*?atlasToLoad\(def, \(key\) => this\.textures\.exists\(key\)\)[\s\S]*?this\.load\.atlas\(atlas\.key, atlas\.path, atlas\.jsonPath\)/,
+    );
+  });
+});
+
 describe('wiring', () => {
   it('FinisherScene plays a choreography with the player and keeps the M10 path', () => {
     expect(sceneSrc).toMatch(/const choreo = choreoOf\(plan\);\s*if \(choreo\) \{/);
@@ -617,6 +712,13 @@ describe('wiring', () => {
       expect(src).not.toMatch(/setTintFill|preFX|postFX|add\.rope|add\.particles|setPipeline/);
       expect(src).not.toMatch(/^import Phaser/m);
     }
+    // No allocation per frame: the clock is prepared once, the per-frame loops are index loops.
+    expect(playerSrc).toContain('prepareChoreo(def)');
+    expect(playerSrc).not.toMatch(/sampleChoreo\(/);
+    const update = playerSrc.slice(playerSrc.indexOf('  update(dtMs: number)'));
+    expect(update.slice(0, update.indexOf('\n  }\n'))).not.toMatch(/for \(const|forEach|\.map\(/);
+    const frame = rigSrc.slice(rigSrc.indexOf('  beginFrame(): void'));
+    expect(frame.slice(0, frame.indexOf('\n  }\n'))).not.toMatch(/forEach|for \(const/);
     expect(playerSrc).toMatch(/if \(this\.ctx\.webgl\) label\.setTint\(/);
     expect(playerSrc.match(/setTint\(/g)).toHaveLength(1);
   });

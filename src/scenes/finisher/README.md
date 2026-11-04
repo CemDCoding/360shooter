@@ -28,4 +28,6 @@
 - Jedes Objekt entsteht beim Start; `update` erzeugt nichts.
 - Bühne 640 px breit, in breiteren Arenen mittig (`stageX`); Kamera-Scroll 0 = Bühne mittig.
 - Ereignisdauern zählen in Echtzeit; Zeitlupe und Hit-Stop stecken in der Uhr.
-- Atlas `finisher-rig-<BossId>`; fehlt er, zeigen die Figuren das Spiel-Sprite.
+- Atlas `finisher-rig-<BossId>`: `FinisherScene.preload` lädt ihn aus `FINISHER_ATLASES`
+  (`atlasToLoad`); fehlt er, zeigen die Figuren das Spiel-Sprite.
+- Die Uhr wird einmal vorberechnet (`prepareChoreo`) und pro Bild ohne Allokation abgetastet (`sampleClock`).
