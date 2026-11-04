@@ -309,7 +309,7 @@
     if (p === 'smear') {
       // gestretched in-between: a dithered fan from the raised arm over the top to the cut
       for (let i = 0; i <= 6; i++) {
-        const a0 = Math.atan2(HAND.raise[1], HAND.raise[0]), a1 = Math.atan2(hy, hx) + 2 * Math.PI;
+        const a0 = Math.atan2(HAND.raise[1], HAND.raise[0]), a1 = Math.atan2(hy, hx); // over the top, clockwise
         const a = a0 + ((a1 - a0) * i) / 6, l = 13;
         c.L(SH[0], SH[1], SH[0] + Math.cos(a) * l, SH[1] + Math.sin(a) * l, i < 3 ? C.suitN : C.suitS, 4, 0.5);
       }
@@ -342,18 +342,20 @@
 
   // ---- laser blade (child of arm-front, freeRotate): a curved leaf wedge with a chisel tip, base at the muzzle ----
   // Not a sword: no hilt, no straight rod, no round tip (decision 3a). Points right, rotate freely.
+  // Back (top) edge rises in a gentle curve; the cutting edge (bottom) bellies out like a leaf and is cut
+  // straight up to the back at the end: a slanted chisel tip like the cut corner of the Funk font.
   function blade(len) {
-    const c = cv(AW, AH), bx = O[0], by = O[1];
+    const c = cv(AW, AH), bx = O[0], by = O[1], chisel = Math.max(3, Math.round(len * 0.22));
+    const topAt = (t) => -1.5 - 2.2 * t * t;
     for (let x = 0; x < len; x++) {
-      const t = x / (len - 1), hw = 1.2 + 2.6 * Math.sin(Math.PI * Math.min(1, t * 0.95 + 0.05)) * (t < 0.6 ? 1 : 1 - (t - 0.6) * 0.6);
-      const cy = -2.6 * t * t;
-      let top = cy - hw, bot = cy + hw;
-      const cut = len - 6;
-      if (x > cut) top += ((x - cut) / 6) * (bot - top - 0.6); // chisel: the top edge runs down to the lower tip
+      const t = x / (len - 1), top = topAt(t);
+      let bot = 1.5 + 2.6 * Math.sin(Math.PI * Math.min(1, t / 0.78) * 0.5) - 1.6 * t * t;
+      const k = x - (len - chisel);
+      if (k > 0) bot = bot + (top + 0.8 - bot) * (k / chisel); // straight slanted cut up to the back
       for (let y = Math.floor(top); y <= Math.ceil(bot); y++) {
         const yc = y + 0.5;
         if (yc < top || yc > bot) continue;
-        const inner = yc > top + 1 && yc < bot - 1.2 && x > 1;
+        const inner = yc > top + 1 && yc < bot - 1 && x > 1;
         c.px(bx + x, by + y, inner ? C.white : C.coral);
       }
     }

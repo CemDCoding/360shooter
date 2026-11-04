@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4 (H-46) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  .boards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px 12px; }
+  @media (min-width: 720px) { .boards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) { .boards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .boards figure { margin: 0; min-width: 0; }
+  .boards canvas { width: 100%; height: auto; display: block; image-rendering: pixelated; background: var(--color-finisher-ink); }
+  figcaption { font-size: 0.8125rem; color: var(--page-muted); margin-top: 4px; line-height: 1.35; }
+  figcaption b { color: var(--page-fg); font-weight: 600; }
+  .flash { color: var(--color-gold-400); font-weight: 700; }
+  .parts { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+  .parts figure { margin: 0; background: var(--color-hud-screen); padding: 6px; }
+  .parts canvas { display: block; image-rendering: pixelated; max-width: 100%; height: auto; }
+  .parts figure { max-width: 100%; min-width: 0; flex: 0 1 auto; }
+  #rigtab { overflow-x: auto; }
+  section, .doc { padding-inline: 0; min-width: 0; }
+  table.rig { min-width: 720px; }
+  html, body { overflow-x: clip; }
+  .parts figcaption { max-width: 260px; }
+  .tl { position: relative; height: 34px; margin: 10px 0 14px; padding-top: 12px; max-width: 1280px; overflow: hidden; }
+  .tl .seg { margin-top: 12px; }
+  .tl .tick { margin-top: 12px; }
+  .tl .lab { margin-top: 12px; }
+  .tl .seg { position: absolute; top: 0; height: 12px; box-shadow: inset 0 0 0 1px var(--color-ink-950); }
+  .tl .seg.boss { background: var(--color-finisher-bg-forest); }
+  .tl .seg.astro { background: var(--color-coral-400); }
+  .tl .seg.hit { background: var(--color-cream-50); }
+  .tl .seg.react { background: var(--color-coral-600); }
+  .tl .seg.calm { background: var(--color-hud-line-dim); }
+  .tl .lab { position: absolute; top: 14px; font-size: 11px; line-height: 1.2; color: var(--page-muted); white-space: nowrap; }
+  .tl .tick { position: absolute; top: -4px; width: 1px; height: 20px; background: var(--page-fg); }
+  .tl .tick span { position: absolute; top: -12px; left: -4px; font-size: 10px; color: var(--page-fg); }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--page-muted); margin-bottom: 8px; }
+  .legend i { display: inline-block; width: 12px; height: 8px; margin-right: 4px; vertical-align: middle; box-shadow: inset 0 0 0 1px var(--color-ink-950); }
+  table.rig { border-collapse: collapse; font-size: 0.75rem; width: 100%; max-width: 1280px; margin-top: 8px; }
+  table.rig th, table.rig td { border-bottom: 1px solid color-mix(in srgb, var(--page-muted) 35%, transparent); padding: 3px 6px; text-align: left; vertical-align: top; }
+  table.rig th { color: var(--page-fg); }
+  table.rig td { color: var(--page-muted); font-family: ui-monospace, Consolas, monospace; }
+  #err { color: var(--color-red-300); white-space: pre-wrap; font-size: 12px; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>M13 Teil 1 · Figuren aus Teilen, Laserklinge, „Rosenschnitt“, Storyboard Level 4 (H-46)</h1>
+  <p>Astronautin (ernste Fassung aus H-39, ≈ 60 px, im Spiel 2×) und Baummonster (64 px, Kampfmoment 3×, Cinematic 4×) als Figuren aus Teilen nach §4 „Rig und Choreografie“. Alle Bilder unten sind aus den Teilen in <code>assets/sprites-m13.js</code> zusammengesetzt: wie im Spiel, mit Feindrehung ≤ ± 20°, Nachbildern und Silhouetten. Alle Maße sind Arena-px (640 × 360, Kinobalken je 40 px). Die Zeiten sind <b>Echtzeit</b> in ms.</p>
+  <dl>
+    <dt>Teile</dt><dd>Astronautin 10 Teile (9 aus Entscheidung 2a plus <code>blade-arc</code> für den Bogen-Smear aus 11a), Baummonster 8 Teile. Höchstens eine Eltern-Ebene. Jedes Teil hat einen eigenen Bogen <code>rig-&lt;figur&gt;-&lt;teil&gt;</code> (Bild = Pose) und einen weißen Silhouetten-Bogen <code>…-sil</code>.</dd>
+    <dt>Drehung</dt><dd>Große Winkel sind gezeichnete Posen. Im Code nur Feindrehung bis ± 20° (<code>rig-fine-rotate</code>). Frei drehen dürfen nur <code>blade</code> und <code>blade-arc</code>.</dd>
+    <dt>Blitz</dt><dd>⚡ markiert einen großflächigen Helligkeitswechsel. Der Kampfmoment hat genau einen (Treffer-Weiß des Bosses beim Schnitt), das Cinematic genau einen (Impact-Paar in Einstellung 4). Funken, Klinge und Rosenlicht sind klein und zählen nicht.</dd>
+    <dt>Reduziert</dt><dd>„EFFEKTE REDUZIEREN“ und „Bewegung reduzieren“: ⚡, Treffer-Weiß, Impact und Wackeln entfallen. Die Bewegung, die Schnittlinie und die Rosen bleiben.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+
+<section><h2>1 · TEILE DER ASTRONAUTIN (3×) · Posen links nach rechts, darunter die Silhouetten · Kreuz = Drehpunkt</h2><div class="parts" id="partsA" data-component="rigs/astronaut"></div></section>
+<section><h2>2 · TEILE DES BAUMMONSTERS (3×)</h2><div class="parts" id="partsB" data-component="rigs/rootMonster"></div></section>
+<section><h2>3 · EFFEKTE (4×) · rig-fx-root, rig-prop-rosehedge, rig-fx-ground-bulge</h2><div class="parts" id="partsFx" data-component="finisher/fx/rootMonster"></div></section>
+<section><h2>4 · ZUSAMMENGESETZT · Posen der Astronautin (2×) und des Baummonsters (2×)</h2><div class="parts" id="poses"></div></section>
+<section><h2>5 · RIG-DATEN (für src/config/rigs/*.ts)</h2><div id="rigtab"></div></section>
+
+<section>
+  <h2>6 · KAMPFMOMENT „ROSENSCHNITT“ (moment-rootMonster, Level 0 bis 3) · ≈ 3,5 s · Astronautin 2×, Boss 3×</h2>
+  <div class="legend"><span><i style="background:var(--color-finisher-bg-forest)"></i>Boss: Antizipation, Aktion</span><span><i style="background:var(--color-coral-400)"></i>Astronautin: Antizipation, Aktion</span><span><i style="background:var(--color-cream-50)"></i>Treffer-Stopp</span><span><i style="background:var(--color-coral-600)"></i>Reaktion, Zeitlupe</span><span><i style="background:var(--color-hud-line-dim)"></i>Nachschwingen, Titel</span><span class="flash">⚡ Blitz</span></div>
+  <div class="tl" id="tlM"></div>
+  <div class="boards" id="moment" data-component="FinisherScene · moment-rootMonster"></div>
+</section>
+
+<section>
+  <h2>7 · CINEMATIC LEVEL 4 „WURZELBRECHER“ (cinematic-4) · 15 s in 5 Einstellungen · Astronautin 2×, Boss 4×</h2>
+  <div class="tl" id="tlC"></div>
+  <div class="boards" id="cine" data-component="FinisherScene · cinematic-4"></div>
+</section>
+
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  // ?theme=only-<id>,<id> keeps only these sections (screenshot.js passes ?theme=)
+  const QS = new URLSearchParams(location.search), TH = QS.get('theme') || '';
+  const ONLY = TH.startsWith('only-') ? TH.slice(5).split(',') : null;
+  if (ONLY) {
+    document.querySelector('header.doc').hidden = true;
+    document.querySelectorAll('section').forEach((s) => { if (!ONLY.some((id) => s.querySelector('#' + id))) s.remove(); });
+  }
+  const S = window.PX_SPRITES, RG = window.PX_RIGS, F = window.PX_FONTS;
+  const css = getComputedStyle(document.documentElement), tok = (n) => css.getPropertyValue(n).trim(), num = (n) => parseFloat(tok(n));
+  const T = {
+    ink: tok('--color-finisher-ink'), paper: tok('--color-finisher-paper'), bg: tok('--color-finisher-bg-forest'),
+    title: tok('--color-finisher-title'), name: tok('--color-finisher-name'), shadow: tok('--color-finisher-title-shadow'),
+    band: tok('--color-finisher-cutin-band'), edge: tok('--color-finisher-cutin-edge'), speed: tok('--color-finisher-speedline'),
+    g: tok('--color-biome-forest-ground'), gh: tok('--color-biome-forest-ground-hi'), gl: tok('--color-biome-forest-ground-lo'),
+    slash: tok('--color-finisher-slash'), rim: tok('--color-finisher-slash-rim'), coral: tok('--color-coral-400'), focus: tok('--color-hud-accent'),
+  };
+  const SA = num('--size-rig-scale-astronaut'), SBM = num('--size-rig-scale-boss-moment'), SBC = num('--size-rig-scale-boss-cinematic');
+  const GROUND = num('--size-rig-ground'), BAR = num('--size-finisher-letterbox');
+  const AI = [num('--opacity-rig-afterimage-1'), num('--opacity-rig-afterimage-2'), num('--opacity-rig-afterimage-3')];
+
+  // ---------- frame cache ----------
+  const cache = new Map();
+  function fr(key, f, tint) {
+    const id = key + '|' + f + '|' + (tint || '');
+    if (cache.has(id)) return cache.get(id);
+    const d = S[key]; if (!d) throw new Error('Sprite fehlt: ' + key);
+    const c = document.createElement('canvas'); c.width = d.frameWidth; c.height = d.frameHeight;
+    const x = c.getContext('2d'), rows = d.frames[f];
+    for (let y = 0; y < rows.length; y++) for (let i = 0; i < rows[y].length; i++) { const ch = rows[y][i]; if (ch === '.') continue; x.fillStyle = tint || d.palette[ch]; x.fillRect(i, y, 1, 1); }
+    cache.set(id, c); return c;
+  }
+  function spr(ctx, key, f, x, y, s, o = {}) { // x,y = top-left
+    ctx.save(); ctx.globalAlpha = o.alpha == null ? 1 : o.alpha;
+    const d = S[key]; ctx.drawImage(fr(key, f, o.tint), Math.round(x), Math.round(y), d.frameWidth * s, d.frameHeight * s); ctx.restore();
+  }
+
+  // ---------- rig drawing (same rules as the contract) ----------
+  function drawRig(ctx, id, o) {
+    const rig = RG[id], s = o.s, pose = o.pose || {}, ang = o.ang || {}, off = o.off || {};
+    const ov = {};
+    const add = (p, k, v) => { ov[p] = ov[p] || {}; ov[p][k] = (ov[p][k] || 0) + v; };
+    if (id === 'astronaut') {
+      const ap = pose['arm-front'] || 'rest', an = rig.anchors['arm-front'][ap];
+      ov.raygun = { pose: an.raygun.pose, x: an.raygun.x, y: an.raygun.y };
+      ov.blade = { x: an.blade.x, y: an.blade.y, angle: an.blade.angle };
+      ov['blade-arc'] = { x: an.blade.x, y: an.blade.y, angle: an.blade.angle };
+      const drop = rig.anchors.bodyDrop[pose['leg-front']] || 0;
+      if (drop) ['torso', 'arm-front', 'arm-back', 'pack'].forEach((p) => add(p, 'dy', drop));
+      if (pose.torso === 'lean') Object.entries(rig.anchors.torsoLean).forEach(([p, v]) => add(p, 'dx', v[0]));
+    }
+    const byId = Object.fromEntries(rig.parts.map((p) => [p.id, p])), world = {};
+    const calc = (p) => {
+      if (world[p.id]) return world[p.id];
+      const v = ov[p.id] || {}, d = off[p.id] || [0, 0];
+      const lx = (v.x != null ? v.x : p.x) + (v.dx || 0) + d[0], ly = (v.y != null ? v.y : p.y) + (v.dy || 0) + d[1];
+      const a = (v.angle || 0) + (ang[p.id] || 0);
+      let r;
+      if (p.parent) {
+        const P = calc(byId[p.parent]), rad = (P.a * Math.PI) / 180;
+        r = { x: P.x + (lx * Math.cos(rad) - ly * Math.sin(rad)) * s, y: P.y + (lx * Math.sin(rad) + ly * Math.cos(rad)) * s, a: P.a + a };
+      } else r = { x: o.x + lx * s, y: o.y + ly * s, a };
+      return (world[p.id] = r);
+    };
+    const hidden = new Set(o.hide || []);
+    if (id === 'astronaut') { if (!pose.blade) hidden.add('blade'); if (!pose['blade-arc']) hidden.add('blade-arc'); }
+    ctx.save();
+    if (o.flip) { ctx.translate(o.x, 0); ctx.scale(-1, 1); ctx.translate(-o.x, 0); }
+    rig.parts.forEach((p) => {
+      if (hidden.has(p.id)) return;
+      const w = calc(p), pn = pose[p.id] || (ov[p.id] && ov[p.id].pose) || Object.keys(p.poses)[0];
+      const f = p.poses[pn] != null ? p.poses[pn] : 0;
+      const sil = o.sil === 'all' || (Array.isArray(o.sil) && o.sil.includes(p.id));
+      const img = sil ? fr(p.silhouette, f, o.silCol) : fr(p.frame, f);
+      ctx.save();
+      ctx.globalAlpha = (o.alpha == null ? 1 : o.alpha) * (o.partAlpha && o.partAlpha[p.id] != null ? o.partAlpha[p.id] : 1);
+      ctx.translate(Math.round(w.x), Math.round(w.y)); ctx.rotate((w.a * Math.PI) / 180);
+      ctx.drawImage(img, -p.pivotPx[0] * s, -p.pivotPx[1] * s, p.size[0] * s, p.size[1] * s);
+      ctx.restore();
+    });
+    ctx.restore();
+  }
+  // afterimages: the same rig at earlier places, newest first (opacity.rig-afterimage-1..3)
+  function trail(ctx, id, o, pts) { pts.slice(0, 3).forEach((p, i) => drawRig(ctx, id, Object.assign({}, o, { x: p[0], y: p[1], alpha: AI[i] }))); }
+
+  // ---------- text in Kapsel ----------
+  function ktext(ctx, str, s, cx, y, col, sh) {
+    const font = F.kapsel, gs = [...str].map((ch) => (ch === ' ' ? null : (font.g[ch] || font.g['?']).split('/')));
+    const w = gs.reduce((a, g) => a + (g ? g[0].length : font.space) + 1, -1);
+    const x0 = Math.round(cx - (w * s) / 2);
+    const pass = (c, ox) => { ctx.fillStyle = c; let x = 0; gs.forEach((g) => { if (g) g.forEach((r, ry) => { for (let i = 0; i < r.length; i++) if (r[i] === '#') ctx.fillRect(x0 + (x + i + ox) * s, y + (ry + ox) * s, s, s); }); x += (g ? g[0].length : font.space) + 1; }); };
+    if (sh) pass(sh, 1);
+    pass(col, 0);
+  }
+
+  // ---------- scene helpers ----------
+  const rnd = (seed) => { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+  function pxCircle(ctx, cx, cy, r) { for (let y = -r; y <= r; y++) { const hw = Math.round(Math.sqrt(r * r - y * y)); ctx.fillRect(Math.round(cx - hw), Math.round(cy + y), hw * 2, 1); } }
+  function forest(ctx) {
+    ctx.fillStyle = T.bg; ctx.fillRect(-400, -400, 1440, 1160);
+    ctx.save(); ctx.globalAlpha = 0.45; ctx.fillStyle = T.ink; ctx.fillRect(-400, -400, 1440, 1160); ctx.restore();
+    const r = rnd(4);
+    ctx.save(); ctx.globalAlpha = 0.5; ctx.fillStyle = T.ink;
+    for (let i = -4; i < 14; i++) { const x = i * 68 + r() * 30, w = 12 + r() * 12; ctx.fillRect(Math.round(x), -200, Math.round(w), 520); pxCircle(ctx, x + w / 2, 40 + r() * 60, 30 + r() * 16); }
+    ctx.restore();
+    ctx.fillStyle = T.g; ctx.fillRect(-400, GROUND, 1440, 400);
+    ctx.fillStyle = T.gh; ctx.fillRect(-400, GROUND, 1440, 2);
+    ctx.fillStyle = T.gl; for (let i = 0; i < 60; i++) ctx.fillRect(Math.round(-300 + r() * 1240), GROUND + 6 + Math.round(r() * 50), 6 + Math.round(r() * 14), 2);
+  }
+  function bars(ctx) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = T.ink; ctx.fillRect(0, 0, 640, BAR); ctx.fillRect(0, 360 - BAR, 640, BAR); }
+  function cam(ctx, cx, cy, z) { ctx.setTransform(z, 0, 0, z, Math.round(320 - cx * z), Math.round(180 - cy * z)); }
+  function fx(ctx, i, x, y, s, a) { spr(ctx, 'rig-fx-root', i, x - 4 * s, y - 4 * s, s, { alpha: a }); }
+  function burst(ctx, seed, cx, cy, n, list, rad, s) { const r = rnd(seed); for (let i = 0; i < n; i++) { const a = r() * Math.PI * 2, d = r() * rad; fx(ctx, list[(r() * list.length) | 0], cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.8, s); } }
+  function slashLine(ctx, x, y0, y1, s) { const w = num('--size-rig-slash') * s / 2, rim = num('--size-rig-slash-rim') * s / 2; ctx.fillStyle = T.rim; ctx.fillRect(Math.round(x - w - rim), y0, Math.round((w + rim) * 2), y1 - y0); ctx.fillStyle = T.slash; ctx.fillRect(Math.round(x - w), y0, Math.round(w * 2), y1 - y0); }
+  function speedH(ctx, seed, n, col, y0, y1) { const r = rnd(seed); ctx.fillStyle = col; for (let i = 0; i < n; i++) ctx.fillRect(Math.round(r() * 640) - 60, Math.round(y0 + r() * (y1 - y0)), 40 + Math.round(r() * 140), r() < 0.2 ? 2 : 1); }
+  function radial(ctx, seed, fx0, fy0, n, col) {
+    const r = rnd(seed); ctx.fillStyle = col;
+    for (let i = 0; i < n; i++) { const a = ((i + r() * 0.7) / n) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a), R = 700, w = 2 + r() * 5, r1 = 56 + r() * 30;
+      ctx.beginPath(); ctx.moveTo(fx0 + ca * r1, fy0 + sa * r1); ctx.lineTo(fx0 + ca * R - sa * w, fy0 + sa * R + ca * w); ctx.lineTo(fx0 + ca * R + sa * w, fy0 + sa * R - ca * w); ctx.fill(); }
+  }
+  function cutIn(ctx) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = T.band; ctx.fillRect(0, 160, 640, 40);
+    ctx.fillStyle = T.edge; ctx.fillRect(0, 158, 640, 2); ctx.fillRect(0, 200, 640, 2);
+    spr(ctx, 'finisher-portrait', 0, 160, 160, 2);
+  }
+
+  // ---------- poses ----------
+  const A = {
+    stand: { 'arm-front': 'rest' },
+    crouch: { 'leg-front': 'crouch', 'leg-back': 'crouch', torso: 'lean', 'arm-back': 'back', 'arm-front': 'aim' },
+    leap: { 'leg-front': 'tuck', 'leg-back': 'tuck', pack: 'thrust', 'arm-back': 'back', 'arm-front': 'aim' },
+    raise: { 'leg-front': 'tuck', 'leg-back': 'tuck', 'arm-back': 'up', 'arm-front': 'raise', helmet: 'dark', blade: 'full' },
+    smear: { 'leg-front': 'smear', 'leg-back': 'smear', torso: 'smear', 'arm-back': 'back', 'arm-front': 'smear', 'blade-arc': 'arc1', helmet: 'dark' },
+    cut: { 'leg-front': 'kneel', 'leg-back': 'kneel', torso: 'lean', 'arm-back': 'back', 'arm-front': 'slash-end', blade: 'full' },
+    guard: { 'leg-front': 'crouch', 'leg-back': 'crouch', 'arm-back': 'back', 'arm-front': 'aim', blade: 'full' },
+  };
+  const B = {
+    rest: {},
+    roar: { 'arm-left': 'raised', 'arm-right': 'raised', jaw: 'roar' },
+    stab: { 'arm-left': 'stab', 'arm-right': 'raised', jaw: 'roar' },
+    open: { 'trunk-left': 'cracked', 'trunk-right': 'cracked', jaw: 'roar', crown: 'bent', 'arm-right': 'raised' },
+  };
+  const astro = (ctx, x, pose, o = {}) => drawRig(ctx, 'astronaut', Object.assign({ x, y: GROUND, s: SA, pose }, o));
+  const boss = (ctx, x, pose, s, o = {}) => drawRig(ctx, 'rootMonster', Object.assign({ x, y: GROUND, s, pose }, o));
+
+  // ---------- board factory ----------
+  function board(host, caption, fn) {
+    const fig = document.createElement('figure'), c = document.createElement('canvas');
+    c.width = 640; c.height = 360; c.setAttribute('role', 'img'); c.setAttribute('aria-label', caption.replace(/<[^>]+>/g, ''));
+    const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+    try { fn(ctx); } catch (e) { document.getElementById('err').textContent += caption.replace(/<[^>]+>/g, '') + ': ' + e.message + '\n'; }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const cap = document.createElement('figcaption'); cap.innerHTML = caption;
+    fig.append(c, cap); host.appendChild(fig);
+  }
+  function timeline(host, total, segs, ticks) {
+    const el = document.getElementById(host); if (!el) return;
+    segs.forEach(([a, b, cls, lab, row]) => {
+      const s = document.createElement('div'); s.className = 'seg ' + cls; s.style.left = (a / total) * 100 + '%'; s.style.width = ((b - a) / total) * 100 + '%'; el.appendChild(s);
+      if (lab) { const l = document.createElement('div'); l.className = 'lab'; l.style.left = (a / total) * 100 + '%'; l.style.top = 14 + (row || 0) * 10 + 'px'; l.innerHTML = lab; el.appendChild(l); }
+    });
+    ticks.forEach(([t, n]) => { const k = document.createElement('div'); k.className = 'tick'; k.style.left = (t / total) * 100 + '%'; k.innerHTML = '<span>' + n + '</span>'; el.appendChild(k); });
+    el.style.height = '60px';
+  }
+
+  // =========================== 1-3 parts ===========================
+  function partSheet(host, rigId, s) {
+    const el = document.getElementById(host); if (!el) return;
+    RG[rigId].parts.forEach((p) => {
+      const names = Object.keys(p.poses), w = p.size[0] * s, h = p.size[1] * s, gap = 4 * s;
+      const c = document.createElement('canvas'); c.width = names.length * (w + gap) - gap; c.height = h * 2 + gap;
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+      names.forEach((n, i) => {
+        const x = i * (w + gap);
+        ctx.drawImage(fr(p.frame, p.poses[n]), x, 0, w, h);
+        ctx.drawImage(fr(p.silhouette, p.poses[n]), x, h + gap, w, h);
+        ctx.fillStyle = T.focus; const px = x + Math.round(p.pivotPx[0] * s), py = Math.round(p.pivotPx[1] * s);
+        ctx.fillRect(px - 4, py, 9, 1); ctx.fillRect(px, py - 4, 1, 9);
+      });
+      const fig = document.createElement('figure'), cap = document.createElement('figcaption');
+      cap.innerHTML = `<b>${p.id}</b> ${p.size[0]}×${p.size[1]} · ${names.join(', ')}${p.parent ? ' · Eltern: ' + p.parent : ''}${p.freeRotate ? ' · freeRotate' : ''}`;
+      fig.append(c, cap); el.appendChild(fig);
+    });
+  }
+  partSheet('partsA', 'astronaut', 3);
+  partSheet('partsB', 'rootMonster', 3);
+  (function () {
+    const el = document.getElementById('partsFx'); if (!el) return;
+    [['rig-fx-root', 4, '0 Rose · 1 Knospe · 2 Blütenblatt · 3/4 Blatt · 5 Holzsplitter · 6/7 Funke (nur Astronautin)'], ['rig-prop-rosehedge', 3, 'Rosenhecke 0 Triebe · 1 Knospen · 2 Blüte'], ['rig-fx-ground-bulge', 4, 'Boden wölbt sich 0 Riss · 1 Hügel · 2 Wurzelspitzen']].forEach(([k, s, t]) => {
+      const d = S[k], n = d.frames.length, c = document.createElement('canvas'); c.width = n * (d.frameWidth * s + 8) - 8; c.height = d.frameHeight * s;
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+      for (let i = 0; i < n; i++) ctx.drawImage(fr(k, i), i * (d.frameWidth * s + 8), 0, d.frameWidth * s, d.frameHeight * s);
+      const fig = document.createElement('figure'), cap = document.createElement('figcaption'); cap.innerHTML = `<b>${k}</b> ${d.frameWidth}×${d.frameHeight} ×${n} · ${t}`;
+      fig.append(c, cap); el.appendChild(fig);
+    });
+  })();
+
+  // =========================== 4 assembled poses ===========================
+  (function () {
+    const el = document.getElementById('poses'); if (!el) return;
+    const list = [
+      ['astronaut', 'stand', A.stand, 'Ruhe'], ['astronaut', 'crouch', A.crouch, 'Hocke (Antizipation)'], ['astronaut', 'leap', A.leap, 'Rückstoß-Sprung'],
+      ['astronaut', 'raise', A.raise, 'Ausholen, Klinge voll, Visier dunkel'], ['astronaut', 'smear', A.smear, 'Schnitt-Smear (33 ms)'], ['astronaut', 'cut', A.cut, 'Schnitt-Ende, Knie'],
+      ['rootMonster', 'rest', B.rest, 'Ruhe'], ['rootMonster', 'roar', B.roar, 'Brüllen, Arme oben'], ['rootMonster', 'stab', B.stab, 'Wurzelstoß'], ['rootMonster', 'open', B.open, 'Stamm klafft (±12°)'],
+    ];
+    list.forEach(([rig, , pose, lab]) => {
+      const s = 2, c = document.createElement('canvas'); c.width = rig === 'astronaut' ? 200 : 260; c.height = rig === 'astronaut' ? 170 : 200;
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+      const o = { x: Math.round(c.width / 2), y: c.height - 14, s, pose };
+      if (lab.startsWith('Stamm')) o.ang = { 'trunk-left': -12, 'trunk-right': 12, crown: 8 }, o.off = { 'trunk-left': [-3, 0], 'trunk-right': [3, 0], crown: [6, -4] };
+      if (lab.startsWith('Schnitt-Smear')) o.ang = { torso: 0 };
+      drawRig(ctx, rig, o);
+      ctx.fillStyle = T.gh; ctx.fillRect(0, c.height - 14, c.width, 1);
+      const fig = document.createElement('figure'), cap = document.createElement('figcaption'); cap.innerHTML = `<b>${rig === 'astronaut' ? 'Astronautin' : 'Baummonster'}</b> · ${lab}`;
+      fig.append(c, cap); el.appendChild(fig);
+    });
+  })();
+
+  // =========================== 5 rig table ===========================
+  (function () {
+    const el = document.getElementById('rigtab'); if (!el) return;
+    let h = '<table class="rig"><thead><tr><th>Figur</th><th>Teil</th><th>Bogen</th><th>Größe</th><th>Posen (Bild)</th><th>originX/Y</th><th>x/y</th><th>Eltern</th><th>order</th><th>freeRotate</th></tr></thead><tbody>';
+    ['astronaut', 'rootMonster'].forEach((r) => RG[r].parts.forEach((p) => {
+      h += `<tr><td>${r}</td><td>${p.id}</td><td>${p.frame}</td><td>${p.size.join('×')}</td><td>${Object.entries(p.poses).map(([k, v]) => k + ' ' + v).join(', ')}</td><td>${p.originX} / ${p.originY}</td><td>${p.x} / ${p.y}</td><td>${p.parent || '–'}</td><td>${p.order}</td><td>${p.freeRotate ? 'ja' : '–'}</td></tr>`;
+    }));
+    h += '</tbody></table>';
+    const an = RG.astronaut.anchors['arm-front'];
+    h += '<table class="rig"><thead><tr><th>Arm-Pose (arm-front)</th><th>raygun: Pose, x/y</th><th>blade und blade-arc: x/y, Winkel</th></tr></thead><tbody>';
+    Object.entries(an).forEach(([k, v]) => { h += `<tr><td>${k}</td><td>${v.raygun.pose}, ${v.raygun.x} / ${v.raygun.y}</td><td>${v.blade.x} / ${v.blade.y}, ${v.blade.angle}°</td></tr>`; });
+    h += '</tbody></table><p class="doc" style="font-size:12px;margin-top:6px">Hocke und Knien senken <code>torso</code>, <code>arm-front</code>, <code>arm-back</code> und <code>pack</code> um 4 px (unskaliert). <code>torso: lean</code> schiebt <code>arm-front</code> 3 px, <code>arm-back</code> und <code>pack</code> 2 px nach vorn.</p>';
+    el.innerHTML = h;
+  })();
+
+  // =========================== 6 moment ===========================
+  timeline('tlM', 3500, [
+    [0, 500, 'boss', 'Boss holt aus · Boden wölbt sich'], [500, 700, 'boss', 'Wurzelstoß · Sprung', 1], [700, 900, 'astro', 'Halt · Klinge'], [900, 1000, 'astro', 'Schnitt', 1],
+    [1000, 1200, 'hit', '⚡ Stopp 200'], [1200, 2200, 'react', 'Zeitlupe 0,3 · Stamm klafft'], [2200, 3000, 'calm', 'Rosen blühen'], [3000, 3500, 'calm', 'BEZWUNGEN!', 1],
+  ], [[0, 'M1'], [300, 'M2'], [600, 'M3'], [800, 'M4'], [950, 'M5'], [1100, 'M6'], [1700, 'M7'], [2600, 'M8'], [3200, 'M9']]);
+  const MH = document.getElementById('moment');
+  const AX = 170, BXm = 470, sBm = SBM;
+  if (MH) {
+    board(MH, '<b>M1 · 0 ms</b> · Gegenüber. Halt, Kamera steht. Boss 3×, Astronautin 2×.', (c) => { forest(c); boss(c, BXm, B.rest, sBm); astro(c, AX, A.stand); bars(c); });
+    board(MH, '<b>M2 · 300 ms</b> · Boss-Antizipation: Arme hoch, Maul auf, unter ihr wölbt sich der Boden (<code>ground-bulge</code> 1 → 2). Sie geht in die Hocke (Antizipation 150 ms).', (c) => {
+      forest(c); boss(c, BXm, B.roar, sBm, { off: { 'trunk-left': [0, -1], 'trunk-right': [0, -1] } });
+      astro(c, AX, A.crouch); spr(c, 'rig-fx-ground-bulge', 2, AX - 72, GROUND - 40, 3); bars(c);
+    });
+    board(MH, '<b>M3 · 600 ms</b> · Wurzelstoß (Boss-Aktion) aus dem Boden, wo sie stand. Rückstoß-Sprung mit Düse, 3 Nachbilder (55/35/18 %).', (c) => {
+      forest(c); boss(c, BXm, B.stab, sBm);
+      spr(c, 'boss-root-spike', 2, AX - 24, GROUND - 96 + 6, 3);
+      trail(c, 'astronaut', { s: SA, pose: A.leap }, [[232, 214], [214, 246], [196, 276]]);
+      drawRig(c, 'astronaut', { x: 252, y: 186, s: SA, pose: A.leap, ang: { torso: -6 } }); bars(c);
+    });
+    board(MH, '<b>M4 · 800 ms</b> · Halt in der Luft (200 ms, Antizipation): Arm hinter dem Kopf, Klinge wächst in 3 Stufen à 80 ms, Visier dunkel.', (c) => {
+      forest(c); boss(c, BXm, B.stab, sBm); spr(c, 'boss-root-spike', 2, AX - 24, GROUND - 90, 3, { alpha: 0.6 });
+      drawRig(c, 'astronaut', { x: 340, y: 196, s: SA, pose: A.raise, ang: { 'arm-front': -8, torso: -4 } }); bars(c);
+    });
+    board(MH, '<b>M5 · 950 ms</b> · Schnitt (Aktion 100 ms): Smear-Posen 33 ms, Bogen <code>blade-arc</code> arc1 → arc2, senkrecht durch den Stamm. Nachbilder auf der Bahn.', (c) => {
+      forest(c); boss(c, BXm, B.stab, sBm);
+      trail(c, 'astronaut', { s: SA, pose: A.raise }, [[350, 168], [338, 156]]);
+      drawRig(c, 'astronaut', { x: 386, y: 214, s: SA, pose: A.smear, ang: { 'blade-arc': 20 } }); bars(c);
+    });
+    board(MH, '<b>M6 · 1100 ms</b> · <span class="flash">⚡</span> Treffer-Stopp 200 ms: beide frieren ein, Boss als weiße Silhouette (<code>hitWhite</code>, entfällt bei „Reduzieren“), Zittern waagerecht klingt ab. Schnittlinie <code>finisher.slash</code>, Funken.', (c) => {
+      forest(c); boss(c, BXm + 4, B.stab, sBm, { sil: 'all' });
+      slashLine(c, BXm, 96, GROUND - 4, sBm);
+      burst(c, 3, BXm, 200, 10, [6, 7], 50, 2);
+      astro(c, 372, A.cut); bars(c);
+    });
+    board(MH, '<b>M7 · 1700 ms</b> · Zeitlupe 0,3 (Reaktion): Stamm klafft auf (±12°, Posen <code>cracked</code>), Rosenlicht im Spalt, Kiefer fällt, Krone knickt zuletzt. Blätter lösen sich.', (c) => {
+      forest(c);
+      boss(c, BXm, B.open, sBm, { ang: { 'trunk-left': -12, 'trunk-right': 12, crown: 10, 'arm-left': 8 }, off: { 'trunk-left': [-2, 0], 'trunk-right': [2, 0], crown: [4, -3], jaw: [0, 3] } });
+      slashLine(c, BXm, 150, GROUND - 4, sBm);
+      burst(c, 9, BXm, 130, 14, [3, 4, 5], 90, 2); astro(c, 372, A.cut); bars(c);
+    });
+    board(MH, '<b>M8 · 2600 ms</b> · Nachschwingen: Die Hälften kippen (20°) und zerfallen zu Blättern, aus dem Spalt wächst die Rosenhecke (Stufe 1), Blütenblätter steigen.', (c) => {
+      forest(c);
+      boss(c, BXm, B.open, sBm, { ang: { 'trunk-left': -20, 'trunk-right': 20, crown: 20 }, off: { 'trunk-left': [-10, 2], 'trunk-right': [10, 2], crown: [10, 8], jaw: [0, 6] }, alpha: 0.55, hide: ['arm-left', 'arm-right'] });
+      spr(c, 'rig-prop-rosehedge', 1, BXm - 120, GROUND - 84 + 6, 3);
+      burst(c, 21, BXm, 150, 22, [3, 4, 3, 2], 120, 2); burst(c, 22, BXm, 200, 6, [0, 2], 60, 2);
+      astro(c, 372, A.cut); bars(c);
+    });
+    board(MH, '<b>M9 · 3200 ms</b> · Ausklang: Rosenhecke in Blüte, sie steht auf, die Klinge geht in 3 Stufen in den Lauf zurück. „BEZWUNGEN!“ (Kapsel ×4) 12 px unter dem oberen Balken.', (c) => {
+      forest(c); spr(c, 'rig-prop-rosehedge', 2, BXm - 120, GROUND - 84 + 6, 3);
+      burst(c, 31, BXm, 180, 5, [2, 3], 120, 2);
+      astro(c, 330, Object.assign({}, A.stand, { 'arm-front': 'aim', blade: 'grow1' })); bars(c);
+      ktext(c, 'BEZWUNGEN!', 4, 320, BAR + 12, T.title, T.shadow);
+    });
+  }
+
+  // =========================== 7 cinematic ===========================
+  timeline('tlC', 15000, [
+    [0, 3000, 'calm', 'E1 Gegenüberstellung · Fahrt hoch'], [3000, 6000, 'boss', 'E2 Schlagabtausch · kleine Funken'], [6000, 9000, 'astro', 'E3 Aufladen · Porträt · Name'],
+    [9000, 9300, 'astro', 'E4 Sprung'], [9600, 9800, 'hit', '⚡ Impact-Paar', 1], [9800, 12000, 'react', 'Zeitlupe 0,3 · Stamm klafft'], [12000, 15000, 'calm', 'E5 Ausklang · Rosenhecke · Titel'],
+  ], [[0, '1a'], [1500, '1b'], [2600, '1c'], [3400, '2a'], [4300, '2b'], [5400, '2c'], [6300, '3a'], [7300, '3b'], [8300, '3c'], [9200, '4a'], [9600, '4b'], [10800, '4c'], [12400, '5a'], [13400, '5b'], [14300, '5c']]);
+  const CH = document.getElementById('cine');
+  const AXc = 160, BXc = 480, sBc = SBC;
+  if (CH) {
+    const scene = (c, cx, cy, z) => { cam(c, cx, cy, z); forest(c); };
+    board(CH, '<b>1a · 0 ms</b> · Zoom 2 auf den Wurzelboden. Die Kamera fährt in ≈ 2,5 s (sine.inOut) senkrecht nach oben. Ruhig, kein Effekt.', (c) => {
+      scene(c, 470, 260, 2); boss(c, BXc, B.rest, sBc); spr(c, 'rig-fx-ground-bulge', 1, 380, GROUND - 16, 2); bars(c);
+    });
+    board(CH, '<b>1b · 1500 ms</b> · Fahrt am Stamm hoch bis zu den Augen. Größenkontrast: der Boss füllt das Bild.', (c) => { scene(c, 470, 170, 2); boss(c, BXc, B.rest, sBc); bars(c); });
+    board(CH, '<b>1c · 2600 ms</b> · Schnitt auf Zoom 1 (≤ 200 ms): Totale. Sie links und klein, er rechts und riesig (4×). Achse bleibt (7a).', (c) => { scene(c, 320, 180, 1); boss(c, BXc, B.rest, sBc); astro(c, AXc, A.stand); bars(c); });
+    board(CH, '<b>2a · 3400 ms</b> · Wurzelstoß 1 schießt aus dem Boden, sie weicht im Zickzack aus (Rückstoß, Nachbilder).', (c) => {
+      scene(c, 320, 180, 1); boss(c, BXc, B.stab, sBc); spr(c, 'boss-root-spike', 2, AXc - 24, GROUND - 90, 3);
+      trail(c, 'astronaut', { s: SA, pose: A.leap }, [[206, 244], [190, 272]]); drawRig(c, 'astronaut', { x: 226, y: 214, s: SA, pose: A.leap }); bars(c);
+    });
+    board(CH, '<b>2b · 4300 ms</b> · Klingenkonter 1 gegen den hinteren Arm: dünner Bogen (arc2), nur kleine Funken, <b>kein</b> Blitz.', (c) => {
+      scene(c, 320, 180, 1); boss(c, BXc, B.roar, sBc);
+      drawRig(c, 'astronaut', { x: 300, y: 240, s: SA, pose: Object.assign({}, A.smear, { 'blade-arc': 'arc2' }), ang: { 'blade-arc': -30 } });
+      burst(c, 41, 352, 170, 6, [6, 7], 18, 2); bars(c);
+    });
+    board(CH, '<b>2c · 5400 ms</b> · Konter 2: Sie fängt den Wurzelarm mit der Klinge ab (Pose <code>guard</code>), Funken, dann Rücksprung nach links.', (c) => {
+      scene(c, 320, 180, 1); boss(c, BXc, B.stab, sBc, { pose: { 'arm-left': 'raised', 'arm-right': 'raised', jaw: 'roar' } });
+      astro(c, 280, A.guard, { ang: { blade: -16 } }); burst(c, 42, 330, 232, 7, [6, 7], 16, 2); bars(c);
+    });
+    board(CH, '<b>3a · 6300 ms</b> · Porträt-Streifen aus H-39 (<code>finisher-portrait</code> Bild 0, Baummonster im Visier). Ruhige Spannung, Kamera steht.', (c) => {
+      scene(c, 320, 180, 1); boss(c, BXc, B.rest, sBc); astro(c, AXc, A.crouch); bars(c); cutIn(c);
+    });
+    board(CH, '<b>3b · 7300 ms</b> · Zoom 2 auf sie: Visier dunkel, die Klinge wächst aus dem Lauf (grow1 → grow2 → full, je 80 ms), Rosenlicht auf dem Visier.', (c) => {
+      scene(c, 190, 250, 2); boss(c, BXc, B.rest, sBc); astro(c, AXc, Object.assign({}, A.crouch, { helmet: 'dark', blade: 'grow2' })); bars(c);
+    });
+    board(CH, '<b>3c · 8300 ms</b> · Name „WURZELBRECHER“ (Kapsel ×3, <code>finisher.name</code>), Zoom 1. Der Boss brüllt zurück.', (c) => {
+      scene(c, 320, 180, 1); boss(c, BXc, B.roar, sBc); astro(c, AXc, Object.assign({}, A.crouch, { helmet: 'dark', blade: 'full' })); bars(c);
+      ktext(c, 'WURZELBRECHER', 3, 320, BAR + 12, T.name, T.shadow);
+    });
+    board(CH, '<b>4a · 9200 ms</b> · Sprung hoch über den Boss, Ausholen, Klinge voll. Nachbilder.', (c) => {
+      scene(c, 320, 180, 1); boss(c, BXc, B.roar, sBc);
+      trail(c, 'astronaut', { s: SA, pose: A.leap }, [[250, 190], [220, 240], [190, 280]]);
+      drawRig(c, 'astronaut', { x: 300, y: 190, s: SA, pose: Object.assign({}, A.raise, { pack: 'thrust' }), ang: { 'arm-front': -10 } }); bars(c);
+    });
+    board(CH, '<b>4b · 9600 ms</b> · <span class="flash">⚡</span> einziger Vollbild-Impact: hell 100 ms, danach dunkel 100 ms (invertiert). Silhouetten in Tinte, Speedlines, die Schnittlinie trennt den Stamm. Entfällt bei „Reduzieren“.', (c) => {
+      c.fillStyle = T.paper; c.fillRect(0, 0, 640, 360); radial(c, 7, BXc, 190, 30, T.ink);
+      boss(c, BXc, B.stab, sBc, { sil: 'all', silCol: T.ink }); astro(c, 330, A.cut, { sil: 'all', silCol: T.ink });
+      c.fillStyle = T.paper; c.fillRect(BXc - 3, 40, 6, GROUND - 40); bars(c);
+    });
+    board(CH, '<b>4c · 10800 ms</b> · Zeitlupe 0,3: Der Schnitt reicht bis in den Boden, der Stamm klafft, Rosenlicht, Blätter schweben.', (c) => {
+      scene(c, 320, 180, 1);
+      boss(c, BXc, B.open, sBc, { ang: { 'trunk-left': -10, 'trunk-right': 10, crown: 8 }, off: { 'trunk-left': [-2, 0], 'trunk-right': [2, 0], crown: [3, -2], jaw: [0, 3] } });
+      slashLine(c, BXc, 70, GROUND + 20, sBc); burst(c, 51, BXc, 110, 16, [3, 4, 5], 120, 2); astro(c, 356, A.cut); bars(c);
+    });
+    board(CH, '<b>5a · 12400 ms</b> · Die Hälften kippen auseinander (20°) und zerfallen zu Blättern, die Krone fällt zuletzt.', (c) => {
+      scene(c, 320, 180, 1);
+      boss(c, BXc, B.open, sBc, { ang: { 'trunk-left': -20, 'trunk-right': 20, crown: 20 }, off: { 'trunk-left': [-12, 3], 'trunk-right': [12, 3], crown: [12, 14], jaw: [0, 6] }, alpha: 0.5, hide: ['arm-left', 'arm-right'] });
+      burst(c, 61, BXc, 160, 34, [3, 4, 3, 5], 160, 2); astro(c, 356, A.cut); bars(c);
+    });
+    board(CH, '<b>5b · 13400 ms</b> · Wo der Stamm stand, blüht die Rosenhecke auf (Stufe 1 → 2), Blütenblätter steigen.', (c) => {
+      scene(c, 320, 180, 1); spr(c, 'rig-prop-rosehedge', 2, BXc - 160, GROUND - 112 + 8, 4); burst(c, 62, BXc, 170, 10, [2, 0, 3], 140, 2); astro(c, 300, A.cut); bars(c);
+    });
+    board(CH, '<b>5c · 14300 ms</b> · Sie steht auf, senkt die Klinge, die in den Lauf zurückgeht. „BEZWUNGEN!“, dann Szenenende.', (c) => {
+      scene(c, 320, 180, 1); spr(c, 'rig-prop-rosehedge', 2, BXc - 160, GROUND - 112 + 8, 4);
+      astro(c, 290, Object.assign({}, A.stand, { 'arm-front': 'aim', blade: 'grow1' }), { ang: { 'arm-front': 14 } }); bars(c);
+      ktext(c, 'BEZWUNGEN!', 4, 320, BAR + 12, T.title, T.shadow);
+    });
+  }
+})();
+</script>
+</body>
+</html>
