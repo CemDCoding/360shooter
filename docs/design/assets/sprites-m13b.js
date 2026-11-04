@@ -727,12 +727,17 @@
     if (byId['blade-arc']) extendPart(byId['blade-arc'], {
       // star hammer: a shaft of light with a block head of gathered stars
       hammer: (c, P) => {
-        const len = 30, hx = P[0] + len, hy = P[1] - 12, r = rng(20);
+        // the head is not a solid block: a loose cloud of stars inside a faint dithered hammer shape
+        const len = 30, hx = P[0] + len, hy = P[1] - 13, r = rng(20);
         for (let x = 0; x < len; x++) c.px(P[0] + x, P[1] - 1, AC.coralL).px(P[0] + x, P[1], AC.white).px(P[0] + x, P[1] + 1, AC.coral);
-        c.rect(hx, hy, 14, 24, AC.coralD).rect(hx + 1, hy + 1, 12, 22, AC.coral);
-        for (let j = 2; j < 22; j += 4) for (let i = 2; i < 12; i += 4) plus(c, hx + i + Math.round(r()), hy + j + Math.round(r()), AC.coralL, AC.white);
-        c.rect(hx + 5, hy + 10, 4, 4, AC.white);
-        return c.outline(AC.ink);
+        c.rect(hx, hy, 15, 26, AC.coralD, 0.25);
+        for (let k = 0; k < 11; k++) {
+          const sx = hx + 2 + Math.round(r() * 11), sy = hy + 2 + Math.round(r() * 22);
+          plus(c, sx, sy, k % 3 ? AC.coralL : AC.coral, AC.white);
+          if (k % 4 === 0) c.px(sx - 2, sy, AC.coralL).px(sx + 2, sy, AC.coralL).px(sx, sy - 2, AC.coralL).px(sx, sy + 2, AC.coralL);
+        }
+        plus(c, hx + 7, hy + 13, AC.white, AC.white).px(hx + 7, hy + 11, AC.white).px(hx + 7, hy + 15, AC.white).px(hx + 5, hy + 13, AC.white).px(hx + 9, hy + 13, AC.white);
+        return c;
       },
     });
   }
