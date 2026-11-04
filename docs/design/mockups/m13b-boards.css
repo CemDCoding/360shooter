@@ -1,0 +1,25 @@
+/* Shared styles for the H-48 storyboards (same look as m13-rig-und-storyboard.html). */
+html, body { overflow-x: clip; }
+section, .doc { padding-inline: 0; min-width: 0; }
+.boards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px 12px; }
+@media (min-width: 720px) { .boards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .boards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.boards figure { margin: 0; min-width: 0; }
+.boards canvas { width: 100%; height: auto; display: block; image-rendering: pixelated; background: var(--color-finisher-ink); }
+figcaption { font-size: 0.8125rem; color: var(--page-muted); margin-top: 4px; line-height: 1.35; }
+figcaption b { color: var(--page-fg); font-weight: 600; }
+.flash { color: var(--color-gold-400); font-weight: 700; }
+.tl { position: relative; height: 34px; margin: 10px 0 14px; padding-top: 12px; max-width: 1280px; overflow: hidden; }
+.tl .seg { position: absolute; top: 0; height: 12px; margin-top: 12px; box-shadow: inset 0 0 0 1px var(--color-ink-950); }
+.tl .seg.boss, .legend i.boss { background: var(--color-finisher-bg-night); }
+.tl .seg.astro, .legend i.astro { background: var(--color-coral-400); }
+.tl .seg.hit, .legend i.hit { background: var(--color-cream-50); }
+.tl .seg.react, .legend i.react { background: var(--color-coral-600); }
+.tl .seg.calm, .legend i.calm { background: var(--color-hud-line-dim); }
+.tl .seg.flash2 { background: var(--color-gold-400); }
+.tl .lab { position: absolute; top: 14px; margin-top: 12px; font-size: 11px; line-height: 1.2; color: var(--page-muted); white-space: nowrap; }
+.tl .tick { position: absolute; top: -4px; margin-top: 12px; width: 1px; height: 20px; background: var(--page-fg); }
+.tl .tick span { position: absolute; top: -12px; left: -4px; font-size: 10px; color: var(--page-fg); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--page-muted); margin-bottom: 8px; }
+.legend i { display: inline-block; width: 12px; height: 8px; margin-right: 4px; vertical-align: middle; box-shadow: inset 0 0 0 1px var(--color-ink-950); }
+#err { color: var(--color-red-300); white-space: pre-wrap; font-size: 12px; }

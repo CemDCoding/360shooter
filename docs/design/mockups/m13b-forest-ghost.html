@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Teil 2b: Waldgeist – „Erlkönigs Töchter“ und Cinematic Level 9 (H-48) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="m13b-boards.css">
+</head>
+<body>
+<header class="doc">
+  <h1>Waldgeist · Kampfmoment „Erlkönigs Töchter“ und Cinematic Level 9 „MONDSCHNITT“ (H-48 Teil 2b)</h1>
+  <p>Kampfmoment in Level 5 bis 8 (<code>moment-forestGhost</code>, ≈ 3,5 s), Cinematic nach Level 9 (<code>cinematic-9</code>, 15 s in 5 Einstellungen). Astronautin 2×, Geist 3× (Moment) bzw. 4× (Cinematic). Alle Bilder aus den Teilen in <code>assets/sprites-m13b.js</code>. Zeiten in <b>Echtzeit</b> ms. Kern aus M9: der Trug. Die Trugbilder (Pose <code>trug</code>) haben keine Augenhöhlen, der echte Geist schon.</p>
+  <dl>
+    <dt>Blitz</dt><dd>⚡ = großflächiger Helligkeitswechsel. Moment: genau einer (Haupttreffer = Boss-Weiß 100 ms, Zittern, Speedline-Ring, <b>kein</b> Vollbild-Blitz, 13a). Cinematic: genau einer (Impact-Paar in Einstellung 4).</dd>
+    <dt>Reduziert</dt><dd>„EFFEKTE REDUZIEREN“: Boss-Weiß, Impact-Paar, Ring und Wackeln entfallen. Bewegung, Mondlicht und der Versatz entlang des Schnitts bleiben.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+<section>
+  <h2>1 · KAMPFMOMENT „ERLKÖNIGS TÖCHTER“ (Level 5 bis 8) · ≈ 3,5 s</h2>
+  <div class="legend"><span><i class="boss"></i>Boss</span><span><i class="astro"></i>Astronautin</span><span><i class="hit"></i>Treffer ⚡</span><span><i class="react"></i>Reaktion</span><span><i class="calm"></i>Ausklang</span></div>
+  <div class="tl" id="tlM"></div>
+  <div class="boards" id="moment"></div>
+</section>
+<section>
+  <h2>2 · CINEMATIC LEVEL 9 „MONDSCHNITT“ (cinematic-9) · 15 s in 5 Einstellungen</h2>
+  <div class="tl" id="tlC"></div>
+  <div class="boards" id="cine"></div>
+</section>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script src="../assets/sprites-m13b.js"></script>
+<script src="m13b-boards.js"></script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  const B = window.M13B(), { A, P, T, GROUND, X } = B;
+  const ID = 'forestGhost', W = 'night', FX = 'rig-fx-ghost';
+  const G = {
+    rest: {},
+    wail: { face: 'wail', 'arm-left': 'reach', 'arm-right': 'reach', 'antenna-left': 'swept', 'antenna-right': 'swept', 'tail-wisp': 'flow' },
+    stretch: { body: 'stretch', face: 'wail', 'tail-wisp': 'stretch', 'antenna-left': 'swept', 'antenna-right': 'swept' },
+  };
+  const ghost = (c, x, pose, s, o = {}) => B.rig(c, ID, x, pose, s, o);
+  const decoy = (c, x, s, o = {}) => B.rig(c, ID, x, G.wail, s, Object.assign({ all: 'trug', pose: { face: 'trug', 'arm-left': 'trug', 'arm-right': 'trug', 'antenna-left': 'trug', 'antenna-right': 'trug', 'tail-wisp': 'trug', body: 'trug' } }, o));
+  // the ghost cut along a horizontal line: the upper half slides sideways (decision: Bild wird entlang des Schnitts versetzt)
+  const split = (c, y, dx, draw) => { c.save(); c.beginPath(); c.rect(-400, -400, 1440, y + 400); c.clip(); c.translate(dx, 0); draw(); c.restore(); c.save(); c.beginPath(); c.rect(-400, y, 1440, 800); c.clip(); draw(); c.restore(); };
+
+  // =========================== moment ===========================
+  B.timeline('tlM', 3500, [
+    [0, 600, 'boss', 'Geist teilt sich · umkreist sie'], [600, 900, 'astro', 'Halt · Visier dunkel'], [900, 1000, 'astro', 'Drehung · Schuss', 1],
+    [1000, 1150, 'hit', '⚡ Stopp 150', 2], [1150, 2400, 'react', 'Zeitlupe 0,3 · zerfließt zu Mondlicht'], [2400, 3500, 'calm', 'Nebel klärt · BEZWUNGEN!'],
+  ], [[0, 'G1'], [300, 'G2'], [600, 'G3'], [800, 'G4'], [950, 'G5'], [1075, 'G6'], [1700, 'G7'], [2400, 'G8'], [3200, 'G9']]);
+  const AX = X.am, BX = X.bm, s3 = B.SBM, AX2 = X.am + 70; // G3-G8: she steps forward, the real ghost slips behind her
+  const sc = (c, mist) => B.world(c, W, { moon: [560, 90, 20], mist: mist == null ? 0.12 : mist });
+  B.board('moment', '<b>G1 · 0 ms</b> · Gegenüber. Nacht, Nebel am Boden, Mond. Kamera steht. Geist 3×, Astronautin 2×.', (c) => { sc(c); ghost(c, BX, G.rest, s3); B.astro(c, AX, A.stand); B.bars(c); });
+  B.board('moment', '<b>G2 · 300 ms</b> · Boss-Antizipation (0–600): Der Geist teilt sich. Zwei Trugbilder (<code>trug</code>) gleiten seitlich aus ihm heraus.', (c) => {
+    sc(c); decoy(c, BX - 46, s3, { alpha: 0.85 }); decoy(c, BX + 46, s3, { alpha: 0.85 }); ghost(c, BX, G.wail, s3); B.astro(c, AX, A.aim); B.bars(c);
+  });
+  B.board('moment', '<b>G3 · 600 ms</b> · Drei Gestalten umkreisen sie. Die Trugbilder stehen vor ihr, der echte Geist gleitet <b>hinter</b> sie (links, mit Augenhöhlen). Kamera und Achse bleiben.', (c) => {
+    sc(c); decoy(c, 390, s3); decoy(c, 310, s3, { y: GROUND - 56 }); ghost(c, 64, G.rest, s3, { alpha: 0.9 }); B.astro(c, AX2, A.aim); B.bars(c);
+  });
+  B.board('moment', '<b>G4 · 800 ms</b> · Halt (Antizipation 300): Sie steht still, das Visier dunkelt ab. Die Trugbilder greifen nach ihr.', (c) => {
+    sc(c); decoy(c, 370, s3); decoy(c, 300, s3, { y: GROUND - 50 }); ghost(c, 64, G.wail, s3); B.astro(c, AX2, P(A.stand, { helmet: 'dark' })); B.bars(c);
+  });
+  B.board('moment', '<b>G5 · 950 ms</b> · Aktion (100): Sie dreht sich um (gespiegelt) und schießt <b>hinter sich</b> auf den echten Geist. Ein Nachbild ihrer alten Haltung.', (c) => {
+    sc(c); decoy(c, 370, s3); decoy(c, 300, s3, { y: GROUND - 50 }); ghost(c, 64, G.wail, s3);
+    B.drawRig(c, 'astronaut', { x: AX2, y: GROUND, s: B.SA, pose: A.stand, alpha: B.AI[1] });
+    B.astro(c, AX2, P(A.aim, { helmet: 'dark' }), { flip: true }); B.beam(c, AX2 - 76, GROUND - 52, 100, GROUND - 64, 4); B.bars(c);
+  });
+  B.board('moment', '<b>G6 · 1075 ms</b> · <span class="flash">⚡</span> Treffer-Stopp 150: echter Geist weiß (<code>-sil</code>), Speedline-Ring, Zittern waagerecht. Die Trugbilder zerstieben zu Splittern und Nebel.', (c) => {
+    sc(c); ghost(c, 66, G.wail, s3, { sil: 'all' }); B.ring(c, 3, 66, GROUND - 70, 80, 22);
+    B.burst(c, FX, 5, 370, GROUND - 70, 12, [3, 2], 60, 3); B.burst(c, FX, 6, 300, GROUND - 120, 10, [3, 2], 56, 3);
+    B.astro(c, AX2, P(A.aim, { helmet: 'dark' }), { flip: true }); B.bars(c);
+  });
+  B.board('moment', '<b>G7 · 1700 ms</b> · Zeitlupe 0,3 (Reaktion): Der Geist zieht sich in die Länge (<code>stretch</code>) und zerfließt von unten in Mondlicht (<code>dissolve1</code>, Mondlicht-Partikel steigen, überlappend).', (c) => {
+    sc(c); ghost(c, 66, P(G.stretch, { body: 'dissolve1' }), s3); B.rise(c, FX, 7, 20, 120, GROUND - 120, GROUND - 10, 14, [0, 1, 1], 3);
+    B.astro(c, AX2, A.aim, { flip: true }); B.bars(c);
+  });
+  B.board('moment', '<b>G8 · 2400 ms</b> · Nachschwingen: nur noch Mondlicht (<code>dissolve2</code>), die Teilchen steigen und verblassen.', (c) => {
+    sc(c, 0.06); ghost(c, 66, P(G.stretch, { body: 'dissolve2' }), s3, { alpha: 0.55, hide: ['arm-left', 'arm-right', 'face'] }); B.rise(c, FX, 8, 10, 140, 60, GROUND - 40, 22, [0, 1, 1], 3);
+    B.astro(c, AX2, A.stand, { flip: true }); B.bars(c);
+  });
+  B.board('moment', '<b>G9 · 3200 ms</b> · Ausklang: Der Nebel klärt, sie dreht sich zurück. „BEZWUNGEN!“ (Kapsel ×4).', (c) => {
+    sc(c, 0); B.rise(c, FX, 9, 0, 640, 60, 200, 6, [1], 3); B.astro(c, AX + 20, A.stand); B.bars(c); B.title(c);
+  });
+
+  // =========================== cinematic 9 ===========================
+  B.timeline('tlC', 15000, [
+    [0, 3000, 'calm', 'E1 Nebel · Augen · Totale'], [3000, 6000, 'boss', 'E2 Hiebe durch Trugbilder'], [6000, 9000, 'astro', 'E3 Mond · Porträt · Name'],
+    [9000, 9600, 'astro', 'E4 Sprung · Sichel'], [9600, 9800, 'hit', '⚡ Impact-Paar', 1], [9800, 12000, 'react', 'Zeitlupe 0,3 · Versatz'], [12000, 15000, 'calm', 'E5 Lichtpunkte · Titel'],
+  ], [[0, '1a'], [1500, '1b'], [2600, '1c'], [3400, '2a'], [4300, '2b'], [5400, '2c'], [6300, '3a'], [7300, '3b'], [8300, '3c'], [9200, '4a'], [9600, '4b'], [10800, '4c'], [12400, '5a'], [13400, '5b'], [14300, '5c']]);
+  const AC = X.ac, BC = X.bc, s4 = B.SBC;
+  const scene = (c, cx, cy, z, o = {}) => { B.cam(c, cx, cy, z); B.world(c, W, Object.assign({ moon: [140, 80, 24], mist: 0.12 }, o)); };
+  const eyesOnly = { 'tail-wisp': 0.1, 'antenna-left': 0.1, 'antenna-right': 0.1, 'arm-left': 0.1, 'arm-right': 0.1, body: 0.12, face: 1 };
+  B.board('cine', '<b>1a · 0 ms</b> · Dichter Nebel, nur zwei leuchtende Augen. Langsame Fahrt nach links (≈ 2,5 s, sine.inOut). Ruhig.', (c) => { scene(c, 440, 180, 1, { mist: 0.35 }); ghost(c, BC, G.rest, s4, { partAlpha: eyesOnly }); B.bars(c); });
+  B.board('cine', '<b>1b · 1500 ms</b> · Der Geist tritt halb aus dem Nebel.', (c) => { scene(c, 380, 180, 1, { mist: 0.3 }); ghost(c, BC, G.rest, s4, { alpha: 0.6 }); B.bars(c); });
+  B.board('cine', '<b>1c · 2600 ms</b> · Schnitt auf die Totale: sie links und klein, er rechts (4×). Achse bleibt.', (c) => { scene(c, 320, 180, 1); ghost(c, BC, G.rest, s4); B.astro(c, AC, A.stand); B.bars(c); });
+  B.board('cine', '<b>2a · 3400 ms</b> · Hieb 1 geht durch ein Trugbild: Es zerstiebt zu Nebel und Splittern, <b>kein</b> Blitz. Der echte Geist lacht hinten.', (c) => {
+    scene(c, 320, 180, 1); ghost(c, BC + 20, G.wail, s4); B.drawRig(c, 'astronaut', { x: 270, y: 250, s: B.SA, pose: P(A.smear, { 'blade-arc': 'arc2' }), ang: { 'blade-arc': -20 } });
+    B.burst(c, FX, 21, 330, 210, 14, [2, 3, 2], 50, 3); B.bars(c);
+  });
+  B.board('cine', '<b>2b · 4300 ms</b> · Hieb 2 durch das zweite Trugbild, nur kleine Funken.', (c) => {
+    scene(c, 320, 180, 1); ghost(c, BC + 20, G.wail, s4); decoy(c, 390, s4, { alpha: 0.6 }); B.astro(c, 320, A.guard, { ang: { blade: -14 } });
+    B.burst(c, 'rig-fx-root', 22, 372, 236, 6, [6, 7], 14, 2); B.bars(c);
+  });
+  B.board('cine', '<b>2c · 5400 ms</b> · Sie springt zurück (Nachbilder), der Geist weicht hinter den Mond-Nebel zurück.', (c) => {
+    scene(c, 320, 180, 1); ghost(c, BC + 30, G.rest, s4, { alpha: 0.8 });
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[260, 260], [280, 280]]); B.drawRig(c, 'astronaut', { x: 230, y: 250, s: B.SA, pose: A.leap }); B.bars(c);
+  });
+  B.board('cine', '<b>3a · 6300 ms</b> · Porträt-Streifen (<code>finisher-portrait</code> Bild 1, Geist im Visier). Kamera steht.', (c) => { scene(c, 320, 180, 1); ghost(c, BC, G.rest, s4); B.astro(c, AC, A.crouch); B.bars(c); B.cutIn(c, ID); });
+  B.board('cine', '<b>3b · 7300 ms</b> · Zoom 2 auf sie: Der Mond steht hinter ihr, die Klinge wächst und fängt sein Licht (Mondlicht-Teilchen an der Klinge).', (c) => {
+    scene(c, 190, 230, 2, { moon: [176, 196, 30], mist: 0 }); B.astro(c, AC, P(A.crouch, { helmet: 'dark', blade: 'grow2' }));
+    B.burst(c, FX, 31, AC + 70, GROUND - 52, 6, [0, 1], 16, 2); B.bars(c);
+  });
+  B.board('cine', '<b>3c · 8300 ms</b> · Name „MONDSCHNITT“ (Kapsel ×3, <code>finisher.name</code>), Zoom 1. Der Geist klagt.', (c) => {
+    scene(c, 320, 180, 1); ghost(c, BC, G.wail, s4); B.astro(c, AC, P(A.crouch, { helmet: 'dark', blade: 'full' })); B.bars(c); B.nameText(c, 'MONDSCHNITT');
+  });
+  B.board('cine', '<b>4a · 9200 ms</b> · Sprung auf Brusthöhe, waagerechter Sichelschnitt (<code>blade-arc</code> arc1, 90° gedreht). Nachbilder.', (c) => {
+    scene(c, 320, 180, 1); ghost(c, BC, G.wail, s4);
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[300, 240], [270, 270]]);
+    B.drawRig(c, 'astronaut', { x: 350, y: 216, s: B.SA, pose: A.smear, ang: { 'blade-arc': 75 } }); B.bars(c);
+  });
+  B.board('cine', '<b>4b · 9600 ms</b> · <span class="flash">⚡</span> einziges Vollbild-Impact: hell 100, dann dunkel 100. Figuren in Tinte (<code>-ink</code>), das Bild ist entlang des Schnitts versetzt. Entfällt bei „Reduzieren“.', (c) => {
+    B.impact(c, false, BC, 200, () => {
+      const y = 212; split(c, y, 14, () => ghost(c, BC, G.wail, s4, { ink: true }));
+      B.astro(c, 380, A.cut, { ink: true }); c.fillStyle = T.paper; c.fillRect(0, y - 2, 640, 4);
+    }); B.bars(c);
+  });
+  B.board('cine', '<b>4c · 10800 ms</b> · Zeitlupe 0,3: Die obere Hälfte gleitet weiter zur Seite, Schnittlinie waagerecht, Mondlicht quillt aus dem Schnitt.', (c) => {
+    scene(c, 320, 180, 1); const y = 212; split(c, y, 18, () => ghost(c, BC, G.wail, s4)); B.slashH(c, y, BC - 110, BC + 110, s4);
+    B.burst(c, FX, 41, BC, y, 14, [0, 1, 2], 100, 3); B.astro(c, 380, A.cut); B.bars(c);
+  });
+  B.board('cine', '<b>5a · 12400 ms</b> · Der Geist löst sich in Lichtpunkte auf (<code>dissolve2</code>), sie steigen zum Mond.', (c) => {
+    scene(c, 320, 180, 1); ghost(c, BC, P(G.stretch, { body: 'dissolve2' }), s4, { alpha: 0.5, hide: ['arm-left', 'arm-right', 'face'] });
+    B.rise(c, FX, 51, 380, 600, 40, GROUND - 20, 34, [0, 1, 1], 3); B.astro(c, 380, A.cut); B.bars(c);
+  });
+  B.board('cine', '<b>5b · 13400 ms</b> · Klarer Nachthimmel, Sterne, nur noch wenige Lichtpunkte. Kein Nebel.', (c) => { scene(c, 320, 180, 1, { mist: 0 }); B.rise(c, FX, 52, 100, 600, 40, 180, 8, [1], 3); B.astro(c, 360, A.stand); B.bars(c); });
+  B.board('cine', '<b>5c · 14300 ms</b> · Sie senkt die Klinge, die in den Lauf zurückgeht. „BEZWUNGEN!“, dann Szenenende.', (c) => {
+    scene(c, 320, 180, 1, { mist: 0 }); B.astro(c, 340, P(A.aim, { blade: 'grow1' }), { ang: { 'arm-front': 14 } }); B.bars(c); B.title(c);
+  });
+})();
+</script>
+</body>
+</html>
