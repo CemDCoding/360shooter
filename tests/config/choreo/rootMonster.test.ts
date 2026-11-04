@@ -26,6 +26,9 @@ import {
   sampleTrack,
   validateChoreo,
 } from '../../../src/logic/choreo';
+import { CHOREOS } from '../../../src/config/choreo';
+import { CHOREO_RULES } from '../../../src/config/finishers';
+import { buildFinisher } from '../../../src/logic/finisher';
 import { ChoreoPlayer } from '../../../src/scenes/finisher/choreoPlayer';
 import { CHOREO_DEPTH, type ChoreoContext } from '../../../src/scenes/finisher/context';
 import {
@@ -851,5 +854,26 @@ describe('effects of the boss', () => {
     expect(box?.st.x).toBe(0);
     inst.update(1000, 16);
     expect(Number(box?.st.x)).toBeGreaterThan(0);
+  });
+});
+
+describe('register and plan', () => {
+  it('holds both choreographies and they pass validateChoreo with the rules', () => {
+    expect(CHOREOS['moment-rootMonster']).toBe(MOMENT);
+    expect(CHOREOS['cinematic-4']).toBe(CINE);
+    for (const def of [MOMENT, CINE]) expect(validateChoreo(def, RIGS, CHOREO_RULES)).toEqual([]);
+  });
+
+  it.each([
+    [0, 'moment-rootMonster'],
+    [1, 'moment-rootMonster'],
+    [2, 'moment-rootMonster'],
+    [3, 'moment-rootMonster'],
+    [4, 'cinematic-4'],
+  ])('buildFinisher for level %i gives %s with choreo and realMs', (level, id) => {
+    const plan = buildFinisher(level, { reduceEffects: false, seen: [] });
+    expect(plan.variantId).toBe(id);
+    expect(plan.choreo?.variantId).toBe(id);
+    expect(plan.realMs).toBe(id === 'cinematic-4' ? 15000 : 3500);
   });
 });

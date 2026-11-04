@@ -363,13 +363,13 @@ describe('debug choreography (AP-183 rigs)', () => {
   it('is played for ?finisher=0 only; other levels keep the M10 plan', () => {
     expect(choreoOf(DATA.plan)).toBe(DATA.plan.choreo);
     expect(DATA.plan.realMs).toBeGreaterThan(DEBUG_CHOREO.durationMs);
-    expect(choreoOf(debugFinisherData(3, 640, 360, false).plan)).toBeNull();
+    expect(choreoOf(debugFinisherData(5, 640, 360, false).plan)).toBeNull();
   });
 });
 
 describe('M10 fallback', () => {
   it('a plan without choreography plays the M10 steps', () => {
-    for (const level of [0, 3, 40]) {
+    for (const level of [5, 14, 40]) {
       const plan = buildFinisher(level, { reduceEffects: false, seen: [] });
       expect(plan.choreo).toBeUndefined();
       expect(choreoOf(plan)).toBeNull();
@@ -467,12 +467,12 @@ describe('player under Canvas (debug choreography, rig atlas loaded)', () => {
   it('takes the same real time at 30 and 60 fps', () => {
     for (const fps of [30, 60]) {
       const dt = 1000 / fps;
-      const { player } = makePlayer(DATA, DEBUG_CHOREO, RIG_TEXTURES);
+      const { player } = makePlayer(DATA, choreoOf(DATA.plan) as ChoreoDef, RIG_TEXTURES);
       expect(player.realMs).toBe(DATA.plan.realMs);
       playOut(player, dt);
       expect(player.elapsedMs).toBeGreaterThanOrEqual(player.realMs);
       expect(player.elapsedMs - player.realMs).toBeLessThan(dt);
-      expect(player.choreoMs).toBe(DEBUG_CHOREO.durationMs);
+      expect(player.choreoMs).toBe((choreoOf(DATA.plan) as ChoreoDef).durationMs);
     }
   });
 

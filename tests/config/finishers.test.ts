@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildFinisher, isFlashSafe } from '../../src/logic/finisher';
+import { DEFAULT_FINISHER_SOURCE } from '../../src/logic/finisher';
+const M10 = { ...DEFAULT_FINISHER_SOURCE, choreos: undefined };
 import { FINISHER_VARIANT_IDS, type FinisherBlock, type FinisherStep } from '../../src/contracts';
 import {
   FINISHER_FINALES,
@@ -203,9 +205,9 @@ describe('finisher plans from the brief H-39 (AP-159)', () => {
       40: 10500,
     };
     for (const l of FINALE_LEVELS) {
-      const plan = buildFinisher(l, { reduceEffects: false, seen: [] });
+      const plan = buildFinisher(l, { reduceEffects: false, seen: [] }, M10);
       expect(Math.abs(plan.totalMs - want[l])).toBeLessThanOrEqual(500);
-      const red = buildFinisher(l, { reduceEffects: true, seen: [] });
+      const red = buildFinisher(l, { reduceEffects: true, seen: [] }, M10);
       const names = red.steps.filter((s) => s.block === 'title').map((s) => s.titleKind);
       expect(names).toEqual(['name', 'title']);
       expect(red.steps.some((s) => ['impactFrame', 'flash', 'shake'].includes(s.block))).toBe(
