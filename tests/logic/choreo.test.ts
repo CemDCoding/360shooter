@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CHOREO_RULES } from '../../src/config/finishers';
-import { RIGS } from '../../src/config/rigs';
+import { RIGS as REAL_RIGS } from '../../src/config/rigs';
 import { CHOREOS } from '../../src/config/choreo';
 import {
   CHOREO_VARIANT_IDS,
@@ -21,6 +21,34 @@ import {
   sampleTrack,
   validateChoreo,
 } from '../../src/logic/choreo';
+
+/** Local one-part placeholder figures: the tests below target `<rig>.body` and do not depend on the real parts (AP-183). */
+function placeholder(id: RigId): RigDef {
+  return {
+    id,
+    parts: [
+      {
+        id: 'body',
+        frame: `${id}-body`,
+        silhouette: `${id}-body-white`,
+        originX: 0.5,
+        originY: 0.5,
+        x: 0,
+        y: 0,
+        order: 0,
+      },
+    ],
+  };
+}
+const RIGS: Readonly<Record<RigId, RigDef>> = {
+  astronaut: placeholder('astronaut'),
+  rootMonster: placeholder('rootMonster'),
+  forestGhost: placeholder('forestGhost'),
+  giantStone: placeholder('giantStone'),
+  giantSandWorm: placeholder('giantSandWorm'),
+  guardianDog: placeholder('guardianDog'),
+  pharaoh: placeholder('pharaoh'),
+};
 
 const flashEvent = (atMs: number): ChoreoEvent => ({ kind: 'flash', atMs, flash: true });
 
@@ -476,11 +504,12 @@ describe('validateChoreo', () => {
 });
 
 describe('registers', () => {
-  it('has 7 rigs with one placeholder part within the budget', () => {
-    const ids = Object.keys(RIGS);
+  it('has 7 rigs: astronaut and root monster with real parts, 5 placeholders, within the budget', () => {
+    const ids = Object.keys(REAL_RIGS);
     expect(ids).toHaveLength(7);
-    for (const rig of Object.values(RIGS)) {
-      expect(rig.parts).toHaveLength(1);
+    for (const rig of Object.values(REAL_RIGS)) {
+      const real = rig.id === 'astronaut' || rig.id === 'rootMonster';
+      expect(rig.parts).toHaveLength(real ? (rig.id === 'astronaut' ? 10 : 8) : 1);
       expect(rig.parts.length).toBeLessThanOrEqual(CHOREO_RULES.maxPartsPerRig);
     }
   });
