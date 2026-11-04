@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Teil 2b: Riesen-Stein – „Morgenlicht“ und Cinematic Level 20 (H-48) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="m13b-boards.css">
+</head>
+<body>
+<header class="doc">
+  <h1>Riesen-Stein · Kampfmoment „Morgenlicht“ und Cinematic Level 20 „STERNENHAMMER“ (H-48 Teil 2b)</h1>
+  <p>Kampfmoment in Level 10 bis 19 (<code>moment-giantStone</code>, ≈ 3,5 s), Cinematic nach Level 20 (<code>cinematic-20</code>, 15 s in 5 Einstellungen). Astronautin 2×, Riese 3× bzw. 4×, mit den schwebenden Felsfäusten (5a). Sehr schwer, sehr lange Antizipation. Der Sieg kommt aus der Sage: Das Morgenlicht lässt den Riesen erstarren.</p>
+  <dl>
+    <dt>Blitz</dt><dd>Moment: genau ein ⚡ (Lichtstrahl trifft, Boss-Weiß 100 ms, Ring, kein Vollbild-Blitz). Der Lichtstrahl ist ein schmales Band (≤ 1/6 der Bildbreite), kein Vollbild. Cinematic: genau ein ⚡ (Impact-Paar in Einstellung 4).</dd>
+    <dt>Reduziert</dt><dd>Boss-Weiß, Impact-Paar, Ring und Wackeln (auch das senkrechte Bodenzittern) entfallen. Lichtstrahl, Risse und Brocken bleiben.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+<section>
+  <h2>1 · KAMPFMOMENT „MORGENLICHT“ (Level 10 bis 19) · ≈ 3,5 s</h2>
+  <div class="legend"><span><i class="boss"></i>Boss</span><span><i class="astro"></i>Astronautin</span><span><i class="hit"></i>Treffer ⚡</span><span><i class="react"></i>Reaktion</span><span><i class="calm"></i>Ausklang</span></div>
+  <div class="tl" id="tlM"></div>
+  <div class="boards" id="moment"></div>
+</section>
+<section>
+  <h2>2 · CINEMATIC LEVEL 20 „STERNENHAMMER“ (cinematic-20) · 15 s in 5 Einstellungen</h2>
+  <div class="tl" id="tlC"></div>
+  <div class="boards" id="cine"></div>
+</section>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script src="../assets/sprites-m13b.js"></script>
+<script src="m13b-boards.js"></script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  const B = window.M13B(), { A, P, T, GROUND, X } = B;
+  const ID = 'giantStone', W = 'elf', FX = 'rig-fx-stone';
+  const CH = ['chunk-1', 'chunk-2', 'chunk-3', 'chunk-4'];
+  const R = {
+    rest: {},
+    windup: { face: 'strain', 'fist-left': 'raised' },
+    punch: { face: 'strain', 'fist-left': 'punch' },
+    frozen: (lv) => ({ body: 'cracked' + lv, face: 'frozen', crystals: 'lit', 'fist-left': 'frozen', 'fist-right': 'frozen' }),
+  };
+  const stone = (c, x, pose, s, o = {}) => B.rig(c, ID, x, pose, s, Object.assign({ hide: CH }, o));
+  const rubble = (c, x, s, spread, drop, a) => B.rig(c, ID, x, R.frozen(3), s, { hide: ['body', 'face', 'crystals'], alpha: a, off: { 'chunk-1': [-spread, -4 + drop], 'chunk-2': [spread, -2 + drop], 'chunk-3': [spread, 6], 'chunk-4': [-spread, 5], 'fist-left': [-6, 12], 'fist-right': [6, 12] }, ang: { 'chunk-1': -16, 'chunk-2': 12, 'chunk-3': 18, 'chunk-4': -10 } });
+  // morning light: a narrow vertical band from the sky (Graphics band in the game; colours finisher.title and paper)
+  const light = (c, x, w, a = 1) => { c.save(); c.globalAlpha = 0.55 * a; c.fillStyle = T.title; c.fillRect(Math.round(x - w), -400, w * 2, GROUND + 400); c.globalAlpha = a; c.fillStyle = T.paper; c.fillRect(Math.round(x - w / 3), -400, Math.round((w * 2) / 3), GROUND + 400); c.restore(); };
+
+  // =========================== moment ===========================
+  B.timeline('tlM', 3500, [
+    [0, 800, 'boss', 'Faust holt weit aus (800)'], [800, 920, 'boss', 'Schlag', 1], [920, 1000, 'calm', ''], [1000, 1300, 'astro', 'Halt · Schuss in den Himmel'],
+    [1300, 1500, 'hit', '⚡ Licht · Stopp 200', 1], [1500, 2800, 'react', 'Erstarrt · Risse leuchten · Brocken fallen'], [2800, 3500, 'calm', 'Staub · BEZWUNGEN!'],
+  ], [[0, 'S1'], [400, 'S2'], [860, 'S3'], [1150, 'S4'], [1400, 'S5'], [1900, 'S6'], [2500, 'S7'], [3200, 'S8']]);
+  const AX = X.am, BX = X.bm, s3 = B.SBM;
+  const sc = (c) => B.world(c, W);
+  B.board('moment', '<b>S1 · 0 ms</b> · Gegenüber im Elfenwald. Der Riese 3×, die Fäuste schweben an seiner Seite.', (c) => { sc(c); stone(c, BX, R.rest, s3); B.astro(c, AX, A.stand); B.bars(c); });
+  B.board('moment', '<b>S2 · 400 ms</b> · Boss-Antizipation (lange 800 ms = Gewicht): Die vordere Faust steigt weit hinter und über ihn, das Gesicht spannt sich. Sie geht in die Hocke.', (c) => {
+    sc(c); stone(c, BX, R.windup, s3, { off: { 'fist-left': [30, -58] }, ang: { 'fist-left': 10 } }); B.astro(c, AX, A.crouch); B.bars(c);
+  });
+  B.board('moment', '<b>S3 · 860 ms</b> · Boss-Aktion (120): Faustschlag (<code>punch</code>, Speedlines). Sie gleitet nach hinten oben weg (Nachbilder). Der Boden zittert <b>senkrecht</b>, Staub.', (c) => {
+    sc(c); stone(c, BX, R.punch, s3, { off: { 'fist-left': [-40, 2] } });
+    B.burst(c, FX, 3, AX + 40, GROUND - 6, 10, [2, 1, 0], 40, 3);
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[AX - 10, GROUND - 20], [AX + 10, GROUND - 6]]);
+    B.drawRig(c, 'astronaut', { x: AX - 40, y: GROUND - 36, s: B.SA, pose: A.leap }); B.bars(c);
+  });
+  B.board('moment', '<b>S4 · 1150 ms</b> · Halt (300): Sie landet und schießt steil in den Himmel (Strahler <code>up45</code>, Feindrehung −20°). Der Riese zieht die Faust zurück.', (c) => {
+    sc(c); stone(c, BX, R.windup, s3, { off: { 'fist-left': [-30, -6] } });
+    B.astro(c, AX - 30, A.shootUp, { ang: { 'arm-front': -20 } }); B.beam(c, AX - 4, GROUND - 92, AX + 120, -40, 4); B.bars(c);
+  });
+  B.board('moment', '<b>S5 · 1400 ms</b> · <span class="flash">⚡</span> Das Morgenlicht fällt als schmales Band auf den Riesen. Treffer-Stopp 200: Riese weiß (<code>-sil</code>), Speedline-Ring.', (c) => {
+    sc(c); light(c, BX, 36); stone(c, BX, R.windup, s3, { sil: 'all', off: { 'fist-left': [-30, -6] } }); B.ring(c, 5, BX, GROUND - 100, 110, 26);
+    B.astro(c, AX - 30, A.shootUp, { ang: { 'arm-front': -20 } }); B.bars(c);
+  });
+  B.board('moment', '<b>S6 · 1900 ms</b> · Reaktion (Zeitlupe 0,3): Er erstarrt mitten in der Bewegung (<code>frozen</code>), die Risse leuchten nacheinander auf (<code>cracked1 → 3</code>, hier Stufe 2), die Kristalle fangen das Licht.', (c) => {
+    sc(c); light(c, BX, 30, 0.6); stone(c, BX, R.frozen(2), s3, { off: { 'fist-left': [-30, -6] } }); B.burst(c, FX, 6, BX, GROUND - 120, 8, [3], 90, 3);
+    B.astro(c, AX - 30, A.aim); B.bars(c);
+  });
+  B.board('moment', '<b>S7 · 2500 ms</b> · Nachschwingen: Er zerbricht in 4 Brocken (<code>chunk-1..4</code>), die oberen fallen zuerst. Die Fäuste sinken.', (c) => {
+    sc(c); light(c, BX, 24, 0.3); rubble(c, BX, s3, 8, 4, 1); B.burst(c, FX, 7, BX, GROUND - 40, 14, [0, 1, 2], 120, 3); B.astro(c, AX - 30, A.aim); B.bars(c);
+  });
+  B.board('moment', '<b>S8 · 3200 ms</b> · Staub legt sich, Kiesel und Kristallsplitter am Boden. „BEZWUNGEN!“.', (c) => {
+    sc(c); rubble(c, BX, s3, 14, 16, 0.85); B.burst(c, FX, 8, BX, GROUND - 6, 14, [0, 1, 4], 130, 3); B.astro(c, AX, A.stand); B.bars(c); B.title(c);
+  });
+
+  // =========================== cinematic 20 ===========================
+  B.timeline('tlC', 15000, [
+    [0, 3000, 'calm', 'E1 Fahrt am Riesen hoch · Schatten'], [3000, 6000, 'boss', 'E2 Faustschläge · Sprung über die Faust'], [6000, 9000, 'astro', 'E3 Sterne · Porträt · Name'],
+    [9000, 9600, 'astro', 'E4 Sprung · Hammer'], [9600, 9800, 'hit', '⚡ Impact-Paar', 1], [9800, 12000, 'react', 'Zeitlupe · Risse'], [12000, 15000, 'calm', 'E5 Felsen · Sterne · Titel'],
+  ], [[0, '1a'], [1500, '1b'], [2600, '1c'], [3400, '2a'], [4300, '2b'], [5400, '2c'], [6300, '3a'], [7300, '3b'], [8300, '3c'], [9200, '4a'], [9600, '4b'], [10800, '4c'], [12400, '5a'], [13400, '5b'], [14300, '5c']]);
+  const AC = X.ac, BC = X.bc, s4 = B.SBC;
+  const scene = (c, cx, cy, z) => { B.cam(c, cx, cy, z); B.world(c, W); };
+  const HAM = P(A.raise, { 'blade-arc': 'hammer', blade: undefined });
+  delete HAM.blade;
+  const stars = (c, seed, cx, cy, rad, n) => B.burst(c, FX, seed, cx, cy, n, [5], rad, 2);
+  B.board('cine', '<b>1a · 0 ms</b> · Zoom 2 auf die Felsfäuste am Boden. Die Kamera fährt in ≈ 2,5 s (sine.inOut) am Riesen hoch.', (c) => { scene(c, 470, 250, 2); stone(c, BC, R.rest, s4); B.bars(c); });
+  B.board('cine', '<b>1b · 1500 ms</b> · Fahrt bis zu den Augen, Kristalle gegen den Sternenhimmel.', (c) => { scene(c, 480, 130, 2); stone(c, BC, R.rest, s4); B.bars(c); });
+  B.board('cine', '<b>1c · 2600 ms</b> · Totale (Zoom 1): Sein Schatten fällt über sie. Sie links und klein.', (c) => {
+    scene(c, 320, 180, 1); stone(c, BC, R.rest, s4); B.astro(c, AC, A.stand);
+    c.save(); c.globalAlpha = 0.4; c.fillStyle = T.ink; c.beginPath(); c.ellipse(AC + 60, GROUND - 40, 130, 90, 0, 0, Math.PI * 2); c.fill(); c.restore(); B.bars(c);
+  });
+  B.board('cine', '<b>2a · 3400 ms</b> · Faustschlag 1, sie springt darüber (Nachbilder).', (c) => {
+    scene(c, 320, 180, 1); stone(c, BC, R.punch, s4, { off: { 'fist-left': [-52, 4] } });
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[200, 250], [180, 280]]); B.drawRig(c, 'astronaut', { x: 220, y: 214, s: B.SA, pose: A.leap }); B.bars(c);
+  });
+  B.board('cine', '<b>2b · 4300 ms</b> · Sie landet auf der schwebenden Faust (5a: keine Arme) und duckt sich zum nächsten Sprung.', (c) => {
+    scene(c, 320, 180, 1); stone(c, BC, R.windup, s4, { off: { 'fist-left': [-30, -6] } });
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[190, 214], [170, 250]]); B.astro(c, 216, A.crouch, { y: 174 }); B.bars(c);
+  });
+  B.board('cine', '<b>2c · 5400 ms</b> · Sprung von der Faust über seinen Kopf, ein Klingenkonter an den Kristallen, nur kleine Funken.', (c) => {
+    scene(c, 320, 180, 1); stone(c, BC, R.windup, s4, { off: { 'fist-left': [-30, -6] } });
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[300, 150], [250, 170]]);
+    B.drawRig(c, 'astronaut', { x: 380, y: 140, s: B.SA, pose: P(A.smear, { 'blade-arc': 'arc2' }) }); B.burst(c, FX, 25, 440, 120, 6, [4, 3], 20, 2); B.bars(c);
+  });
+  B.board('cine', '<b>3a · 6300 ms</b> · Porträt-Streifen (<code>finisher-portrait</code> Bild 2, Riese im Visier). Sie ist zurück am Boden.', (c) => { scene(c, 320, 180, 1); stone(c, BC, R.rest, s4); B.astro(c, AC, A.crouch); B.bars(c); B.cutIn(c, ID); });
+  B.board('cine', '<b>3b · 7300 ms</b> · Zoom 2: Über ihr sammeln sich Sterne zur Hammerform. Der Hammer (<code>blade-arc</code> Pose <code>hammer</code>) erscheint halb.', (c) => {
+    scene(c, 190, 230, 2); B.astro(c, AC, HAM, { partAlpha: { 'blade-arc': 0.5 } }); stars(c, 31, AC - 20, GROUND - 120, 50, 14); B.bars(c);
+  });
+  B.board('cine', '<b>3c · 8300 ms</b> · Name „STERNENHAMMER“ (Kapsel ×3), Zoom 1. Hammer voll, Visier dunkel.', (c) => {
+    scene(c, 320, 180, 1); stone(c, BC, R.windup, s4); B.astro(c, AC, HAM); stars(c, 32, AC, GROUND - 130, 40, 6); B.bars(c); B.nameText(c, 'STERNENHAMMER');
+  });
+  B.board('cine', '<b>4a · 9200 ms</b> · Sprung hoch über ihn, Hammer weit hinter dem Kopf (Antizipation in der Luft). Nachbilder.', (c) => {
+    scene(c, 320, 180, 1); stone(c, BC, R.windup, s4);
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[300, 160], [260, 220], [220, 270]]); B.drawRig(c, 'astronaut', { x: 380, y: 140, s: B.SA, pose: P(HAM, { pack: 'thrust' }) }); B.bars(c);
+  });
+  B.board('cine', '<b>4b · 9600 ms</b> · <span class="flash">⚡</span> einziges Vollbild-Impact (hell 100, dunkel 100), Figuren in Tinte, Hammerschlag von oben. Entfällt bei „Reduzieren“.', (c) => {
+    B.impact(c, false, BC, 120, () => { stone(c, BC, R.windup, s4, { ink: true }); B.drawRig(c, 'astronaut', { x: 300, y: 170, s: B.SA, pose: HAM, ink: true, ang: { 'arm-front': 20 } }); }); B.bars(c);
+  });
+  B.board('cine', '<b>4c · 10800 ms</b> · Zeitlupe 0,3: Der Hammer sitzt, von der Einschlagstelle laufen leuchtende Risse durch ihn (<code>cracked3</code>), er erstarrt.', (c) => {
+    scene(c, 320, 180, 1); stone(c, BC, R.frozen(3), s4); B.burst(c, FX, 41, BC, 90, 10, [5, 3], 60, 2);
+    B.drawRig(c, 'astronaut', { x: 400, y: 124, s: B.SA, pose: P(HAM, { 'arm-front': 'slash-end' }) }); B.bars(c);
+  });
+  B.board('cine', '<b>5a · 12400 ms</b> · Er bricht in Felsen (4 Brocken), die Fäuste fallen, Staub.', (c) => {
+    scene(c, 320, 180, 1); rubble(c, BC, s4, 10, 8, 1); B.burst(c, FX, 51, BC, GROUND - 60, 18, [0, 1, 2], 160, 3); B.astro(c, 300, A.cut); B.bars(c);
+  });
+  B.board('cine', '<b>5b · 13400 ms</b> · Die Sterne des Hammers bleiben als neue Sterne am Himmel.', (c) => {
+    scene(c, 320, 180, 1); rubble(c, BC, s4, 14, 18, 0.8); B.rise(c, FX, 52, 120, 600, 60, 150, 14, [5], 2); B.astro(c, 300, A.stand); B.bars(c);
+  });
+  B.board('cine', '<b>5c · 14300 ms</b> · „BEZWUNGEN!“, Szenenende.', (c) => {
+    scene(c, 320, 180, 1); rubble(c, BC, s4, 14, 18, 0.8); B.rise(c, FX, 53, 120, 600, 60, 150, 14, [5], 2); B.astro(c, 300, A.stand); B.bars(c); B.title(c);
+  });
+})();
+</script>
+</body>
+</html>
