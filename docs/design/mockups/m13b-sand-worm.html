@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Teil 2b: Sand-Wurm – „Segmentkette“ und Cinematic Level 25 (H-48) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="m13b-boards.css">
+</head>
+<body>
+<header class="doc">
+  <h1>Sand-Wurm · Kampfmoment „Segmentkette“ und Cinematic Level 25 „SONNENSPEER“ (H-48 Teil 2b)</h1>
+  <p>Kampfmoment in Level 21 bis 24 (<code>moment-giantSandWorm</code>, ≈ 3,5 s), Cinematic nach Level 25 (<code>cinematic-25</code>, 15 s). Astronautin 2×, Wurm 3× bzw. 4×. Eigene Handschrift: die Gliederung. Die Glieder zerfallen nacheinander vom Kopf zum Schwanz, je <code>rig-crumble-step</code> = 120 ms versetzt (Kopf, Kiefer, seg-1 … seg-7, Schwanz).</p>
+  <dl>
+    <dt>Sand</dt><dd>Unter dem Boden liegende Glieder deckt die Choreografie mit einem Bodenstreifen ab (wie hier gezeichnet). Die Sandwelle ist <code>rig-prop-sandwave</code> (Stufe 0 bis 2).</dd>
+    <dt>Blitz</dt><dd>Moment: genau ein ⚡ (Boss-Weiß 100 ms, Ring). Cinematic: genau ein ⚡ (Impact-Paar in Einstellung 4).</dd>
+    <dt>Reduziert</dt><dd>Boss-Weiß, Impact-Paar, Ring und Wackeln entfallen. Zerfall, Sand und Speer bleiben.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+<section>
+  <h2>1 · KAMPFMOMENT „SEGMENTKETTE“ (Level 21 bis 24) · ≈ 3,5 s</h2>
+  <div class="legend"><span><i class="boss"></i>Boss</span><span><i class="astro"></i>Astronautin</span><span><i class="hit"></i>Treffer ⚡</span><span><i class="react"></i>Reaktion</span><span><i class="calm"></i>Ausklang</span></div>
+  <div class="tl" id="tlM"></div>
+  <div class="boards" id="moment"></div>
+</section>
+<section>
+  <h2>2 · CINEMATIC LEVEL 25 „SONNENSPEER“ (cinematic-25) · 15 s in 5 Einstellungen</h2>
+  <div class="tl" id="tlC"></div>
+  <div class="boards" id="cine"></div>
+</section>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script src="../assets/sprites-m13b.js"></script>
+<script src="m13b-boards.js"></script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  const B = window.M13B(), { A, P, T, GROUND, X } = B;
+  const ID = 'giantSandWorm', W = 'desert', FX = 'rig-fx-worm';
+  const css = getComputedStyle(document.documentElement), tk = (n) => css.getPropertyValue(n).trim();
+  const GR = { g: tk('--color-biome-desert-ground'), gh: tk('--color-biome-desert-ground-hi') };
+  const SEG = ['seg-1', 'seg-2', 'seg-3', 'seg-4', 'seg-5', 'seg-6', 'seg-7', 'tail'];
+  // crumble chain: index 0 = head+jaw, then seg-1..seg-7, tail; `front` parts are fully gone, the next two crumble
+  const chain = (front) => {
+    const ids = [['head', 'jaw'], ...SEG.map((s) => [s])], pose = {}, hide = [];
+    ids.forEach((g, i) => g.forEach((p) => { if (i < front) hide.push(p); else if (i === front) pose[p] = 'crumble2'; else if (i === front + 1) pose[p] = 'crumble1'; }));
+    return { pose, hide };
+  };
+  // the chain arcs out of the sand behind the head (choreography offsets from the default chain in PX_RIGS)
+  const ARCH = {}; SEG.forEach((id, i) => { const k = i + 1; ARCH[id] = [k, -6 * k]; });
+  const worm = (c, x, pose, s, o = {}) => B.rig(c, ID, x, pose, s, Object.assign({ off: ARCH }, o));
+  const cover = (c) => { c.fillStyle = GR.g; c.fillRect(-400, GROUND + 2, 1440, 400); c.fillStyle = GR.gh; c.fillRect(-400, GROUND, 1440, 2); };
+  const wave = (c, st, x, s) => B.spr(c, 'rig-prop-sandwave', st, x - 32 * s, GROUND - 20 * s + 4, s);
+
+  // =========================== moment ===========================
+  B.timeline('tlM', 3500, [
+    [0, 600, 'boss', 'Sandwelle läuft auf sie zu'], [600, 720, 'boss', 'Durchbruch', 1], [720, 900, 'astro', 'auf dem Kopf · Halt'], [900, 1000, 'astro', 'Schuss senkrecht', 1],
+    [1000, 1150, 'hit', '⚡ Stopp 150', 2], [1150, 2700, 'react', 'Glieder zerfallen Kopf → Schwanz (je 120)'], [2700, 3500, 'calm', 'Wüste glättet sich · BEZWUNGEN!'],
+  ], [[0, 'W1'], [300, 'W2'], [660, 'W3'], [820, 'W4'], [1075, 'W5'], [1500, 'W6'], [2200, 'W7'], [3100, 'W8']]);
+  const AX = X.am, BX = X.bm, s3 = B.SBM;
+  const WY = GROUND - 20, HX = AX + 80, HY = 158; // worm raised out of the sand; HX/HY = where she stands on the head
+  const sc = (c) => B.world(c, W, { sun: [120, 100, 22] });
+  B.board('moment', '<b>W1 · 0 ms</b> · Dünen, Sonne. Der Wurm ist nur als Sandkräuseln zu sehen (Sandwelle Stufe 0).', (c) => { sc(c); wave(c, 0, BX, 3); B.astro(c, AX, A.stand); B.bars(c); });
+  B.board('moment', '<b>W2 · 300 ms</b> · Boss-Antizipation (600): Die Sandwelle wächst und läuft auf sie zu (Stufe 1 → 2). Sie geht in die Hocke.', (c) => { sc(c); wave(c, 2, AX + 110, 3); B.astro(c, AX, A.crouch); B.bars(c); });
+  B.board('moment', '<b>W3 · 660 ms</b> · Boss-Aktion (120): Der Wurm bricht unter ihr hervor, Maul offen. Sie springt mit der Düse ab und landet auf seinem Kopf (Nachbilder).', (c) => {
+    sc(c); worm(c, AX + 120, { jaw: 'roar' }, s3, { y: WY }); cover(c); B.burst(c, FX, 3, AX + 110, GROUND - 4, 14, [0, 1, 2], 80, 3);
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[AX + 40, 170], [AX + 10, 220]]); B.drawRig(c, 'astronaut', { x: HX, y: HY - 6, s: B.SA, pose: A.leap }); B.bars(c);
+  });
+  B.board('moment', '<b>W4 · 820 ms</b> · Halt (180) auf dem Kopf: Sie duckt sich, Visier dunkel, der Strahler zeigt steil nach unten (<code>down45</code>, Feindrehung +20°).', (c) => {
+    sc(c); worm(c, AX + 120, { jaw: 'open' }, s3, { y: WY }); cover(c); B.astro(c, HX, A.shootDown, { y: HY, ang: { 'arm-front': 20 } }); B.bars(c);
+  });
+  B.board('moment', '<b>W5 · 1075 ms</b> · <span class="flash">⚡</span> Schuss senkrecht in den Kopf (Aktion 100), Treffer-Stopp 150: Wurm weiß (<code>-sil</code>), Speedline-Ring.', (c) => {
+    sc(c); worm(c, AX + 120, { jaw: 'open' }, s3, { y: WY, sil: 'all' }); cover(c); B.ring(c, 5, HX - 10, HY + 70, 80, 22);
+    B.astro(c, HX, A.shootDown, { y: HY, ang: { 'arm-front': 20 } }); B.beam(c, HX + 30, HY - 4, HX + 20, HY + 70, 4); B.bars(c);
+  });
+  B.board('moment', '<b>W6 · 1500 ms</b> · Reaktion (Zeitlupe 0,3 bis 1600, dann Echtzeit): Kopf und Kiefer zerfallen zu Sand (<code>crumble2</code>), das erste Glied beginnt (<code>crumble1</code>). Sie gleitet mit dem Zerfall abwärts.', (c) => {
+    sc(c); const k = chain(0); worm(c, AX + 120, P(k.pose, { jaw: 'crumble2' }), s3, { y: WY, hide: k.hide }); cover(c);
+    B.burst(c, FX, 6, HX, HY + 60, 16, [0, 1, 2], 60, 3); B.drawRig(c, 'astronaut', { x: HX + 90, y: HY + 50, s: B.SA, pose: A.leap }); B.bars(c);
+  });
+  B.board('moment', '<b>W7 · 2200 ms</b> · Der Zerfall läuft die Kette entlang (je 120 ms versetzt), Sand rieselt. Sie landet hinter dem Wurm.', (c) => {
+    sc(c); const k = chain(4); worm(c, AX + 120, k.pose, s3, { y: WY, hide: k.hide }); cover(c);
+    B.burst(c, FX, 7, AX + 260, GROUND - 20, 18, [0, 1, 2], 90, 3); B.astro(c, AX + 200, A.cut); B.bars(c);
+  });
+  B.board('moment', '<b>W8 · 3100 ms</b> · Die Wüste glättet sich (Sandwelle Stufe 0). „BEZWUNGEN!“.', (c) => { sc(c); wave(c, 0, AX + 200, 3); B.astro(c, AX + 200, A.stand); B.bars(c); B.title(c); });
+
+  // =========================== cinematic 25 ===========================
+  B.timeline('tlC', 15000, [
+    [0, 3000, 'calm', 'E1 Dünen · Sandwelle'], [3000, 6000, 'boss', 'E2 drei Durchbrüche'], [6000, 9000, 'astro', 'E3 Sonne · Speer · Name'],
+    [9000, 9600, 'astro', 'E4 Sprung'], [9600, 9800, 'hit', '⚡ Impact-Paar', 1], [9800, 12000, 'react', 'Zeitlupe · Speer im Rachen'], [12000, 15000, 'calm', 'E5 Glieder zerfallen · Titel'],
+  ], [[0, '1a'], [1500, '1b'], [2600, '1c'], [3400, '2a'], [4300, '2b'], [5400, '2c'], [6300, '3a'], [7300, '3b'], [8300, '3c'], [9200, '4a'], [9600, '4b'], [10800, '4c'], [12400, '5a'], [13400, '5b'], [14300, '5c']]);
+  const AC = X.ac, BC = X.bc, s4 = B.SBC;
+  const scene = (c, cx, cy, z, o = {}) => { B.cam(c, cx, cy, z); B.world(c, W, Object.assign({ sun: [200, 90, 24] }, o)); };
+  const SPEAR = P(A.raise, { blade: 'spear' });
+  const NOT_BLADE = ['pack', 'arm-back', 'leg-back', 'leg-front', 'torso', 'helmet', 'arm-front', 'raygun', 'blade-arc'];
+  B.board('cine', '<b>1a · 0 ms</b> · Nur Dünen. Weit hinten ein Sandkräuseln. Langsame Fahrt nach rechts.', (c) => { scene(c, 260, 180, 1); wave(c, 0, 560, 3); B.bars(c); });
+  B.board('cine', '<b>1b · 1500 ms</b> · Die Sandwelle kommt näher (Stufe 1).', (c) => { scene(c, 300, 180, 1); wave(c, 1, 470, 4); B.bars(c); });
+  B.board('cine', '<b>1c · 2600 ms</b> · Totale: sie links, die Welle türmt sich rechts (Stufe 2).', (c) => { scene(c, 320, 180, 1); wave(c, 2, BC, 4); B.astro(c, AC, A.stand); B.bars(c); });
+  B.board('cine', '<b>2a · 3400 ms</b> · Durchbruch 1 direkt vor ihr. Sie springt zurück (Nachbilder). Kamera seitlich, steht.', (c) => {
+    scene(c, 320, 180, 1); worm(c, 330, { jaw: 'roar' }, s4, { y: GROUND + 110 }); cover(c); B.burst(c, FX, 21, 300, GROUND, 12, [0, 1, 2], 70, 3);
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[180, 250], [196, 280]]); B.drawRig(c, 'astronaut', { x: 150, y: 220, s: B.SA, pose: A.leap }); B.bars(c);
+  });
+  B.board('cine', '<b>2b · 4300 ms</b> · Durchbruch 2 hinter ihr (rechts), sie rollt sich zur Seite, kleiner Klingenkonter an einem Glied, nur Funken.', (c) => {
+    scene(c, 320, 180, 1); worm(c, BC, { jaw: 'open' }, s4, { y: GROUND + 90 }); cover(c); B.astro(c, 280, A.guard); B.burst(c, 'rig-fx-root', 22, 330, 236, 6, [6, 7], 16, 2); B.bars(c);
+  });
+  B.board('cine', '<b>2c · 5400 ms</b> · Durchbruch 3: Der Wurm taucht im Bogen wieder ab, Sandfontäne.', (c) => {
+    scene(c, 320, 180, 1); worm(c, BC + 40, { jaw: 'closed' }, s4, { y: GROUND + 150, ang: { head: 18 } }); cover(c); B.burst(c, FX, 23, BC - 20, GROUND - 10, 20, [0, 1, 2], 100, 3); B.astro(c, AC + 40, A.crouch); B.bars(c);
+  });
+  B.board('cine', '<b>3a · 6300 ms</b> · Porträt-Streifen (<code>finisher-portrait</code> Bild 3, Wurm im Visier).', (c) => { scene(c, 320, 180, 1); wave(c, 1, BC, 4); B.astro(c, AC, A.crouch); B.bars(c); B.cutIn(c, ID); });
+  B.board('cine', '<b>3b · 7300 ms</b> · Zoom 2: Die Sonne steht im Zenit über ihr, aus der Klinge wird ein Speer aus Licht (<code>blade</code> Pose <code>spear</code>), Sonnenfunken.', (c) => {
+    scene(c, 190, 220, 2, { sun: [190, 120, 28] }); B.astro(c, AC, P(A.aim, { blade: 'spear', helmet: 'dark' }), { partAlpha: { blade: 0.6 } }); B.burst(c, FX, 31, AC + 90, GROUND - 50, 8, [4], 40, 2); B.bars(c);
+  });
+  B.board('cine', '<b>3c · 8300 ms</b> · Name „SONNENSPEER“ (Kapsel ×3). Sie holt aus wie zum Speerwurf. Der Wurm bricht ganz hervor.', (c) => {
+    scene(c, 320, 180, 1); worm(c, BC, { jaw: 'roar' }, s4, { y: GROUND }); cover(c); B.astro(c, AC, SPEAR); B.bars(c); B.nameText(c, 'SONNENSPEER');
+  });
+  B.board('cine', '<b>4a · 9200 ms</b> · Sprung hoch über den offenen Rachen, Speer hinter dem Kopf (Antizipation in der Luft).', (c) => {
+    scene(c, 320, 180, 1); worm(c, BC, { jaw: 'roar' }, s4, { y: GROUND }); cover(c);
+    B.trail(c, 'astronaut', { s: B.SA, pose: A.leap }, [[260, 200], [220, 250]]); B.drawRig(c, 'astronaut', { x: 300, y: 150, s: B.SA, pose: P(SPEAR, { pack: 'thrust' }) }); B.bars(c);
+  });
+  B.board('cine', '<b>4b · 9600 ms</b> · <span class="flash">⚡</span> einziges Vollbild-Impact (hell 100, dunkel 100): Wurf von oben in den Rachen, Figuren in Tinte. Entfällt bei „Reduzieren“.', (c) => {
+    B.impact(c, false, BC - 70, 200, () => { worm(c, BC, { jaw: 'roar' }, s4, { y: GROUND, ink: true }); B.drawRig(c, 'astronaut', { x: 250, y: 140, s: B.SA, pose: P(A.cut, { blade: undefined }), ink: true }); }); B.bars(c);
+  });
+  B.board('cine', '<b>4c · 10800 ms</b> · Zeitlupe 0,3: Der Speer steckt im Rachen, Licht dringt durch die Glieder. Sie landet auf dem Knie.', (c) => {
+    scene(c, 320, 180, 1); worm(c, BC, { jaw: 'roar' }, s4, { y: GROUND }); cover(c);
+    B.drawRig(c, 'astronaut', { x: 330, y: 150, s: B.SA, pose: P(A.aim, { blade: 'spear' }), hide: NOT_BLADE, ang: { blade: 40 } });
+    B.burst(c, FX, 41, BC - 60, 200, 10, [4], 60, 2); B.astro(c, 240, P(A.cut, { blade: undefined })); B.bars(c);
+  });
+  B.board('cine', '<b>5a · 12400 ms</b> · Die Glieder zerfallen nacheinander vom Kopf her (je 120 ms).', (c) => {
+    scene(c, 320, 180, 1); const k = chain(1); worm(c, BC, k.pose, s4, { y: GROUND, hide: k.hide }); cover(c); B.burst(c, FX, 51, BC - 40, 190, 16, [0, 1, 2], 80, 3); B.astro(c, 240, A.cut); B.bars(c);
+  });
+  B.board('cine', '<b>5b · 13400 ms</b> · Der Zerfall erreicht den Schwanz, Sand rieselt in die Düne.', (c) => {
+    scene(c, 320, 180, 1); const k = chain(6); worm(c, BC, k.pose, s4, { y: GROUND, hide: k.hide }); cover(c); B.burst(c, FX, 52, BC + 200, GROUND - 30, 16, [0, 1, 2], 80, 3); B.astro(c, 260, A.stand); B.bars(c);
+  });
+  B.board('cine', '<b>5c · 14300 ms</b> · Glatte Düne, Sonne. „BEZWUNGEN!“.', (c) => { scene(c, 320, 180, 1); wave(c, 0, BC, 4); B.astro(c, 280, P(A.aim, { blade: 'grow1' }), { ang: { 'arm-front': 14 } }); B.bars(c); B.title(c); });
+})();
+</script>
+</body>
+</html>
