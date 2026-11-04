@@ -213,6 +213,8 @@ const COLORS = {
   'finisher.bg-desert': { num: 0x6a3a0e, css: '#6a3a0e' },
   'finisher.bg-pyramid': { num: 0x0c4a4c, css: '#0c4a4c' },
   'finisher.bg-oasis': { num: 0x5c4206, css: '#5c4206' },
+  'finisher.slash': { num: 0xffffff, css: '#ffffff' },
+  'finisher.slash-rim': { num: 0xff6b8a, css: '#ff6b8a' },
 } as const satisfies Record<string, ThemeColor>;
 
 /** Abstände in px. */
@@ -284,6 +286,9 @@ const SIZE_PX = {
   'size.event-slide': 4,
   'size.elite-edge': 1,
   'size.elite-crown-gap': 2,
+  'size.rig-ground': 300,
+  'size.rig-slash': 2,
+  'size.rig-slash-rim': 1,
 } as const;
 
 /** Größen als Anzahl. */
@@ -300,6 +305,11 @@ const SIZE_COUNT = {
   'size.finisher-title-scale': 4,
   'size.finisher-name-scale': 3,
   'size.elite-scale': 1.25,
+  'size.rig-scale-astronaut': 2,
+  'size.rig-scale-boss-moment': 3,
+  'size.rig-scale-boss-cinematic': 4,
+  'size.rig-afterimages': 3,
+  'size.rig-fine-rotate': 20,
 } as const;
 
 /** Zeiten in ms. */
@@ -334,6 +344,10 @@ const MOTION_MS = {
   'motion.focus-hold': 600,
   'motion.event-slide': 150,
   'motion.event-tone': 250,
+  'motion.rig-smear': 33,
+  'motion.rig-afterimage-gap': 33,
+  'motion.rig-afterimage-fade': 150,
+  'motion.rig-blade-step': 80,
 } as const;
 
 /** Bewegung als Anzahl. */
@@ -358,6 +372,9 @@ const OPACITY = {
   'focus-low-near': 0.4,
   'focus-low-far': 0.7,
   'focus-low-reduced': 0.25,
+  'rig-afterimage-1': 0.55,
+  'rig-afterimage-2': 0.35,
+  'rig-afterimage-3': 0.18,
 } as const;
 
 /** Schrift: Familien (Fallback-Reihenfolge), Skalierungsstufen, Zeichenabstand und Zeilenabstand in px. */

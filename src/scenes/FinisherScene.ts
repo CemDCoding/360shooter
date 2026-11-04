@@ -2,24 +2,31 @@
 // Plays one FinisherPlan with its own camera and its own copies of boss and astronaut over the paused
 // game scene, full arena width, also with the Canvas renderer. Ends after `plan.totalMs` or on skip:
 // with `result` it stops GameScene (and the HUD) and starts ResultScene, without it (debug) the menu.
+// M13 (AP-182): a plan with a choreography is played by the ChoreoPlayer instead (figures from parts,
+// world camera with zoom and scroll, screen camera for flash, text and hint); without one the M10 blocks run.
 import Phaser from 'phaser';
 import {
   FINISHER_SCENE_KEY,
+  type ChoreoDef,
   type FinisherPlan,
   type FinisherStartData,
   type FinisherStep,
 } from '../contracts';
 import { FINISHER_RULES } from '../config/finishers';
+import { RIGS } from '../config/rigs';
 import { OPACITY } from '../config/theme';
 import { canSkip } from '../logic/finisher';
 import { getSoundService } from '../platform/audio';
+import { FONT_KEY } from './menu/kassette';
 import { readSafeInsets } from './safeInsets';
 import { hitstop, shake, slowmo, zoom } from './finisher/camera';
+import { ChoreoPlayer } from './finisher/choreoPlayer';
 import {
   DEPTH,
   type ActorCopies,
   type BlockEffect,
   type BossMode,
+  type ChoreoContext,
   type FinisherContext,
 } from './finisher/context';
 import { actorScreen, finisherLayout, hitPoint } from './finisher/layout';
@@ -27,7 +34,7 @@ import { beam, bgColor, flash, impactFrame, letterbox, speedlines } from './fini
 import { ParticleSystem, particles, shatter } from './finisher/particles';
 import { createSkipHint, cutIn, frames, panels, title } from './finisher/pictures';
 import { releaseTimeline } from './finisher/shutdown';
-import { isFinisherStartData } from './finisher/startData';
+import { atlasToLoad, choreoOf, isFinisherStartData } from './finisher/startData';
 import { TextureBank } from './finisher/textures';
 import { beamWindow, effectRate, soundCues } from './finisher/timing';
 
@@ -37,6 +44,8 @@ const RESULT_KEY = 'ResultScene';
 const MENU_KEY = 'MenuScene';
 /** Fallback texture of a missing actor (transparent, built into Phaser). */
 const EMPTY_TEXTURE = '__DEFAULT';
+/** Width of the choreography stage (arena px of the H-46 boards); wider arenas centre it. */
+const CHOREO_STAGE_W = 640;
 
 interface Running {
   effect: BlockEffect;
@@ -56,6 +65,10 @@ export class FinisherScene extends Phaser.Scene {
   private fxNow = 0;
   private done = false;
   private inputBound = false;
+  /** M13: player of `plan.choreo`, its context and the screen camera (null on the M10 path). */
+  private player: ChoreoPlayer | null = null;
+  private choreoCtx: ChoreoContext | null = null;
+  private uiCam: Phaser.Cameras.Scene2D.Camera | null = null;
 
   constructor() {
     super(FINISHER_SCENE_KEY);
@@ -73,6 +86,18 @@ export class FinisherScene extends Phaser.Scene {
     this.fxNow = 0;
     this.done = false;
     this.inputBound = false;
+    this.player = null;
+    this.choreoCtx = null;
+    this.uiCam = null;
+  }
+
+  /** M13: loads the rig atlas of the choreography once; a missing file leaves the game-sprite fallback. */
+  preload(): void {
+    const plan = this.startData?.plan;
+    const def = plan ? choreoOf(plan) : null;
+    if (!def) return;
+    const atlas = atlasToLoad(def, (key) => this.textures.exists(key));
+    if (atlas) this.load.atlas(atlas.key, atlas.path, atlas.jsonPath);
   }
 
   create(): void {
@@ -84,6 +109,11 @@ export class FinisherScene extends Phaser.Scene {
     }
     this.cameras.main.setBackgroundColor('rgba(0,0,0,0)');
     const plan = data.plan;
+    const choreo = choreoOf(plan);
+    if (choreo) {
+      this.createChoreo(data, choreo);
+      return;
+    }
     const width = this.scale.width;
     const height = this.scale.height;
     const insets = readSafeInsets(this.registry);
@@ -119,6 +149,47 @@ export class FinisherScene extends Phaser.Scene {
     this.timeline = this.add.timeline(this.timelineEvents(plan));
     this.bindInput();
     this.timeline.play();
+  }
+
+  /**
+   * M13 path: the choreography is played by the ChoreoPlayer on the main camera (world: zoom, scroll,
+   * shake), a second camera shows the screen layer (flash, text, skip hint) unzoomed. Both cameras are
+   * removed by Phaser on SHUTDOWN (the camera manager rebuilds the main camera on the next start).
+   */
+  private createChoreo(data: FinisherStartData, def: ChoreoDef): void {
+    const width = this.scale.width;
+    const height = this.scale.height;
+    const layout = finisherLayout(width, height, readSafeInsets(this.registry), false);
+    const main = this.cameras.main.setRoundPixels(true);
+    const uiCam = this.cameras.add(0, 0, width, height).setRoundPixels(true);
+    uiCam.setBackgroundColor('rgba(0,0,0,0)');
+    this.uiCam = uiCam;
+    const sound = getSoundService(this.game);
+    const ctx: ChoreoContext = {
+      scene: this,
+      data,
+      plan: data.plan,
+      layout,
+      webgl: this.sys.renderer.type === Phaser.WEBGL,
+      stageX: Math.round((width - CHOREO_STAGE_W) / 2),
+      textures: new TextureBank(this),
+      fontKey: FONT_KEY,
+      playSound: (key) => {
+        if (!this.done) sound.play(key);
+      },
+      addWorld: (obj) => {
+        uiCam.ignore(obj);
+      },
+      addUi: (obj) => {
+        main.ignore(obj);
+      },
+    };
+    this.choreoCtx = ctx;
+    this.player = new ChoreoPlayer(ctx, def, main, { rigs: RIGS });
+    const hint = createSkipHint({ scene: this, layout });
+    if (hint) ctx.addUi(hint);
+    this.hint = hint;
+    this.bindInput();
   }
 
   /** Timeline from `plan.steps`: start and end of every block, the beam, the sounds and the end. */
@@ -266,6 +337,15 @@ export class FinisherScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
+    const player = this.player;
+    if (player) {
+      if (this.done) return;
+      player.update(Math.max(0, delta));
+      const plan = this.choreoCtx?.plan;
+      this.hint?.setVisible(!!plan && canSkip(plan, player.elapsedMs));
+      if (player.done) this.finish();
+      return;
+    }
     const ctx = this.ctx;
     const tl = this.timeline;
     if (this.done || !ctx || !tl) return;
@@ -285,7 +365,12 @@ export class FinisherScene extends Phaser.Scene {
 
   private readonly onSkip = (): void => {
     const plan = this.startData?.plan;
-    if (this.done || !plan || !this.timeline) return;
+    if (this.done || !plan) return;
+    if (this.player) {
+      if (canSkip(plan, this.player.elapsedMs)) this.finish();
+      return;
+    }
+    if (!this.timeline) return;
     if (canSkip(plan, this.timeline.elapsed)) this.finish();
   };
 
@@ -341,6 +426,12 @@ export class FinisherScene extends Phaser.Scene {
       this.ctx.textures.destroy();
       this.ctx = null;
     }
+    // M13: player objects and generated textures; the cameras go with the camera manager (SHUTDOWN).
+    this.player?.destroy();
+    this.player = null;
+    this.choreoCtx?.textures.destroy();
+    this.choreoCtx = null;
+    this.uiCam = null;
     this.tweens.timeScale = 1;
   }
 }

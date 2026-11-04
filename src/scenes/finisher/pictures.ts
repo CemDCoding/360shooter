@@ -331,7 +331,9 @@ export function title(ctx: FinisherContext, step: FinisherStep): BlockEffect {
 }
 
 /** "TIPPEN: WEITER" (Funk x1) with arrow on glass, bottom right inside the insets; does not blink. */
-export function createSkipHint(ctx: FinisherContext): Phaser.GameObjects.Container | null {
+export function createSkipHint(
+  ctx: Pick<FinisherContext, 'scene' | 'layout'>,
+): Phaser.GameObjects.Container | null {
   const scene = ctx.scene;
   if (!scene.cache.bitmapFont.exists(FUNK_FONT)) return null;
   const text = funkText(scene, 0, 0, 'TIPPEN: WEITER', 1, 'finisher.skip-text');

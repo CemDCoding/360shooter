@@ -201,6 +201,8 @@
   --color-finisher-bg-desert: #6a3a0e;
   --color-finisher-bg-pyramid: #0c4a4c;
   --color-finisher-bg-oasis: #5c4206;
+  --color-finisher-slash: #ffffff;
+  --color-finisher-slash-rim: var(--color-coral-400);
   --font-family-menu: "Astro Kapsel";
   --font-family-hud: "Astro Funk";
   --font-scale-1: 1;
@@ -283,6 +285,14 @@
   --size-elite-scale: 1.25;
   --size-elite-edge: 1px;
   --size-elite-crown-gap: 2px;
+  --size-rig-scale-astronaut: 2;
+  --size-rig-scale-boss-moment: 3;
+  --size-rig-scale-boss-cinematic: 4;
+  --size-rig-ground: 300px;
+  --size-rig-afterimages: 3;
+  --size-rig-slash: 2px;
+  --size-rig-slash-rim: 1px;
+  --size-rig-fine-rotate: 20;
   --motion-duration-fast: 80ms;
   --motion-duration-base: 150ms;
   --motion-duration-slow: 300ms;
@@ -313,6 +323,10 @@
   --motion-duration-focus-hold: 600ms;
   --motion-duration-event-slide: 150ms;
   --motion-duration-event-tone: 250ms;
+  --motion-duration-rig-smear: 33ms;
+  --motion-duration-rig-afterimage-gap: 33ms;
+  --motion-duration-rig-afterimage-fade: 150ms;
+  --motion-duration-rig-blade-step: 80ms;
   --motion-banner-blinks: 3;
   --motion-easing-pixel: steps(3);
   --motion-easing-out: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -325,4 +339,7 @@
   --opacity-focus-low-near: 0.4;
   --opacity-focus-low-far: 0.7;
   --opacity-focus-low-reduced: 0.25;
+  --opacity-rig-afterimage-1: 0.55;
+  --opacity-rig-afterimage-2: 0.35;
+  --opacity-rig-afterimage-3: 0.18;
 }

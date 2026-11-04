@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { FINISHER_RULES } from '../../src/config/finishers';
 import { LEVEL_COUNT } from '../../src/config/levels';
 import { THEME } from '../../src/config/theme';
-import { FINISHER_VARIANT_IDS, type FinisherPlan, type SafeInsets } from '../../src/contracts';
+import {
+  CHOREO_VARIANT_IDS,
+  FINISHER_VARIANT_IDS,
+  type FinisherPlan,
+  type SafeInsets,
+} from '../../src/contracts';
 import { buildFinisher, isFlashSafe } from '../../src/logic/finisher';
 import {
   ARROW_H,
@@ -302,7 +307,8 @@ describe('start data', () => {
       expect(d.result).toBeUndefined();
       expect(d.boss.texture.startsWith('boss-')).toBe(true);
       expect(d.player.texture).toBe('astronaut');
-      expect(FINISHER_VARIANT_IDS).toContain(d.plan.variantId);
+      // Level 0 plays the player test sequence of AP-182 (a choreography variant), the rest M10.
+      expect([...FINISHER_VARIANT_IDS, ...CHOREO_VARIANT_IDS]).toContain(d.plan.variantId);
     }
     expect(debugFinisherData(40, 640, H, true).plan.reduced).toBe(true);
   });

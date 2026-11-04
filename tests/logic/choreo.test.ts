@@ -15,9 +15,11 @@ import {
   applyEase,
   countFlashes,
   isChoreoVariantId,
+  prepareChoreo,
   realDurationMs,
   reduceChoreo,
   sampleChoreo,
+  sampleClock,
   sampleTrack,
   validateChoreo,
 } from '../../src/logic/choreo';
@@ -274,6 +276,29 @@ describe('real time mapping', () => {
       { kind: 'hitStop', atMs: 500, ms: 100, axis: 'y', targets: [], flash: false },
     ]);
     expect(realDurationMs(def)).toBeCloseTo(1000 + 500 + 100);
+  });
+  it('prepareChoreo + sampleClock give the clock of sampleChoreo without new objects (AP-182)', () => {
+    const defs = [
+      base([]),
+      base([
+        { kind: 'timeScale', atMs: 0, durationMs: 500, factor: 0.5, flash: false },
+        { kind: 'hitStop', atMs: 500, ms: 100, axis: 'y', targets: [], flash: false },
+        { kind: 'timeScale', atMs: 700, durationMs: 200, factor: 0.3, flash: false },
+        { kind: 'hitStop', atMs: 1000, ms: 200, axis: 'x', targets: [], flash: false },
+      ]),
+      { ...base([]), durationMs: 0 },
+    ];
+    for (const def of defs) {
+      const clock = prepareChoreo(def);
+      expect(clock.realMs).toBe(realDurationMs(def));
+      const out = { choreoMs: -1, frozen: true, done: true };
+      for (let t = -10; t <= clock.realMs + 20; t += 7.3) {
+        const want = sampleChoreo(def, t);
+        const got = sampleClock(clock, t, out);
+        expect(got).toBe(out);
+        expect(got).toEqual({ choreoMs: want.choreoMs, frozen: want.frozen, done: want.done });
+      }
+    }
   });
 });
 

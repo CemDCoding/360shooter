@@ -99,7 +99,8 @@ export function sampleTrack(track: ChoreoTrack, tMs: number): number | string | 
   return a.value + (b.value - a.value) * applyEase(a.ease, p, a.steps);
 }
 
-interface Segment {
+/** One piece of the real-time clock: a hit stop or a stretch with constant speed. */
+export interface Segment {
   realStart: number;
   realEnd: number;
   choreoStart: number;
@@ -218,6 +219,63 @@ export interface ChoreoSample {
   done: boolean;
   /** One entry per non-empty track, in track order. */
   values: ChoreoSampleValue[];
+}
+
+/** Real-time clock of a choreography, built once (`prepareChoreo`) and sampled without allocation. */
+export interface ChoreoClock {
+  readonly segments: readonly Segment[];
+  /** Real length (ms), same as `realDurationMs`. */
+  readonly realMs: number;
+}
+
+/** Clock state at a real time; `sampleClock` writes into it. */
+export interface ChoreoClockSample {
+  choreoMs: number;
+  frozen: boolean;
+  done: boolean;
+}
+
+/** Builds the real-time segments of a choreography once (for a player that samples every frame). */
+export function prepareChoreo(def: ChoreoDef): ChoreoClock {
+  const segments = timeline(def);
+  return { segments, realMs: segments.length === 0 ? 0 : segments[segments.length - 1].realEnd };
+}
+
+/**
+ * Clock of `sampleChoreo` without allocation: choreography time, hit stop and end at `realMs`,
+ * written into `out` (same values as `sampleChoreo(def, realMs)`).
+ */
+export function sampleClock(
+  clock: ChoreoClock,
+  realMs: number,
+  out: ChoreoClockSample,
+): ChoreoClockSample {
+  const segs = clock.segments;
+  out.done = realMs >= clock.realMs;
+  if (segs.length === 0) {
+    out.choreoMs = 0;
+    out.frozen = false;
+    return out;
+  }
+  if (realMs <= 0) {
+    out.choreoMs = 0;
+    out.frozen = segs[0].stop;
+    return out;
+  }
+  for (let i = 0; i < segs.length; i++) {
+    const s = segs[i];
+    if (realMs >= s.realStart && realMs < s.realEnd) {
+      out.frozen = s.stop;
+      out.choreoMs = s.stop
+        ? s.choreoStart
+        : s.choreoStart +
+          ((realMs - s.realStart) / (s.realEnd - s.realStart)) * (s.choreoEnd - s.choreoStart);
+      return out;
+    }
+  }
+  out.choreoMs = segs[segs.length - 1].choreoEnd;
+  out.frozen = false;
+  return out;
 }
 
 /** All track values at a real time since the start (maps real to choreography time first). */
