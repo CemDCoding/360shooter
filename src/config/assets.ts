@@ -41,6 +41,91 @@ function sound(name: string, description: string): AssetDef {
   };
 }
 
+/** Bogen eines Figurenteils: [Schluessel, Breite, Hoehe, Frames, Beschreibung]. */
+type RigSheet = readonly [string, number, number, number, string];
+
+/** Teil mit Posen (Frames) und sein Silhouetten-Bogen `<key>-sil` (alle Pixel weiss, gleicher Rahmen). */
+function partSheets(
+  rig: 'astro' | 'root',
+  part: string,
+  w: number,
+  h: number,
+  poses: string,
+): RigSheet[] {
+  const n = poses.split(' ').length;
+  const who = rig === 'astro' ? 'Astronautin' : 'Baummonster';
+  return [
+    [`rig-${rig}-${part}`, w, h, n, `Figurenteil ${who} "${part}", Posen: ${poses}.`],
+    [`rig-${rig}-${part}-sil`, w, h, n, `Silhouette (weiss) zu "${part}" (${who}), gleiche Posen.`],
+  ];
+}
+
+/**
+ * Die 39 Boegen der Figurenteile Teil 1 (Astronautin, Baummonster, Effekte). Sie landen zusaetzlich in einem
+ * Atlas (`FINISHER_ATLASES`), Bildname im Atlas = `<Bogen>-<Index>`.
+ */
+const RIG_SHEETS: readonly RigSheet[] = [
+  ...partSheets('astro', 'pack', 8, 37, 'rest thrust'),
+  ...partSheets('astro', 'arm-back', 15, 23, 'rest back up'),
+  ...partSheets('astro', 'leg-back', 21, 23, 'stand crouch tuck kneel smear'),
+  ...partSheets('astro', 'leg-front', 20, 23, 'stand crouch tuck kneel smear'),
+  ...partSheets('astro', 'torso', 25, 30, 'upright lean smear'),
+  ...partSheets('astro', 'helmet', 35, 34, 'serious dark'),
+  ...partSheets('astro', 'arm-front', 26, 29, 'rest aim raise slash-end smear'),
+  ...partSheets('astro', 'blade', 36, 9, 'full grow2 grow1'),
+  ...partSheets('astro', 'raygun', 32, 31, 'a0 up45 up90 back135 down45'),
+  ...partSheets('astro', 'blade-arc', 52, 50, 'arc1 arc2'),
+  ...partSheets('root', 'crown', 54, 36, 'upright bent'),
+  ...partSheets('root', 'arm-right', 29, 56, 'rest raised stab'),
+  ...partSheets('root', 'roots-right', 22, 17, 'rest'),
+  ...partSheets('root', 'roots-left', 22, 17, 'rest'),
+  ...partSheets('root', 'trunk-right', 21, 35, 'rest cracked'),
+  ...partSheets('root', 'trunk-left', 21, 35, 'rest cracked'),
+  ...partSheets('root', 'jaw', 24, 16, 'closed roar'),
+  ...partSheets('root', 'arm-left', 30, 56, 'rest raised stab'),
+  [
+    'rig-fx-root',
+    8,
+    8,
+    8,
+    'Partikel Baummonster (vorgefaerbt): 0 Rose, 1 Knospe, 2 Bluetenblatt, 3 Blatt hell, 4 Blatt dunkel, 5 Holzsplitter, 6 Funke Koralle, 7 Funke weiss.',
+  ],
+  [
+    'rig-prop-rosehedge',
+    80,
+    28,
+    3,
+    'Rosenhecke: 0 Triebe, 1 Blaetter und Knospen, 2 volle Bluete.',
+  ],
+  [
+    'rig-fx-ground-bulge',
+    48,
+    16,
+    3,
+    'Bodenwoelbung unter der Astronautin: 0 Riss, 1 Huegel, 2 Huegel mit Wurzelspitzen.',
+  ],
+];
+
+/**
+ * Atlas je Boss-Variante (PE-248, PE-252): ein PNG plus Phaser-JSON-Hash, gebaut von `npm run sprites:build`
+ * aus den Boegen `sheets` (jedes Einzelbild heisst `<Bogen>-<Index>`). Die Szene leitet den Atlas aus dem Boss-Rig ab.
+ */
+export interface FinisherAtlasDef {
+  key: string;
+  path: string;
+  jsonPath: string;
+  sheets: readonly string[];
+}
+
+export const FINISHER_ATLASES: readonly FinisherAtlasDef[] = [
+  {
+    key: 'finisher-rig-rootMonster',
+    path: 'assets/sprites/finisher-rig-rootMonster.png',
+    jsonPath: 'assets/sprites/finisher-rig-rootMonster.json',
+    sheets: RIG_SHEETS.map((s) => s[0]),
+  },
+];
+
 /** Assets mit eigener Datei. */
 const OWN_ASSETS: readonly AssetDef[] = [
   sprite('astronaut', 32, 32, 4, 'Astronautin: Frame 0 bis 1 Ruhe, Frame 2 bis 3 Rückstoß.'),
@@ -181,6 +266,8 @@ const OWN_ASSETS: readonly AssetDef[] = [
     2,
     'Rand-Marker der Spawn-Ereignisse, fuer den oberen Rand: Frame 0 Schwarm, 1 Zange (weiss, wird getoent).',
   ),
+  // M13 (H-46, AP-183): Figurenteile und Effekte der Finisher-Choreografien, Pixel in docs/design/assets/sprites-m13.js.
+  ...RIG_SHEETS.map(([key, w, h, frames, description]) => sprite(key, w, h, frames, description)),
   font(
     'astro-kapsel',
     'Bitmap-Schrift "Astro Kapsel": dicke Schrift fuer Titel, Menue und grosse Zahlen.',
