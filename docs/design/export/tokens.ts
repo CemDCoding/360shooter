@@ -231,7 +231,9 @@ export const tokens = {
       "bg-elf": "var(--color-finisher-bg-elf)",
       "bg-desert": "var(--color-finisher-bg-desert)",
       "bg-pyramid": "var(--color-finisher-bg-pyramid)",
-      "bg-oasis": "var(--color-finisher-bg-oasis)"
+      "bg-oasis": "var(--color-finisher-bg-oasis)",
+      "slash": "var(--color-finisher-slash)",
+      "slash-rim": "var(--color-finisher-slash-rim)"
     }
   },
   "font": {
@@ -328,7 +330,15 @@ export const tokens = {
     "event-slide": "var(--size-event-slide)",
     "elite-scale": "var(--size-elite-scale)",
     "elite-edge": "var(--size-elite-edge)",
-    "elite-crown-gap": "var(--size-elite-crown-gap)"
+    "elite-crown-gap": "var(--size-elite-crown-gap)",
+    "rig-scale-astronaut": "var(--size-rig-scale-astronaut)",
+    "rig-scale-boss-moment": "var(--size-rig-scale-boss-moment)",
+    "rig-scale-boss-cinematic": "var(--size-rig-scale-boss-cinematic)",
+    "rig-ground": "var(--size-rig-ground)",
+    "rig-afterimages": "var(--size-rig-afterimages)",
+    "rig-slash": "var(--size-rig-slash)",
+    "rig-slash-rim": "var(--size-rig-slash-rim)",
+    "rig-fine-rotate": "var(--size-rig-fine-rotate)"
   },
   "motion": {
     "duration": {
@@ -361,7 +371,11 @@ export const tokens = {
       "focus-out": "var(--motion-duration-focus-out)",
       "focus-hold": "var(--motion-duration-focus-hold)",
       "event-slide": "var(--motion-duration-event-slide)",
-      "event-tone": "var(--motion-duration-event-tone)"
+      "event-tone": "var(--motion-duration-event-tone)",
+      "rig-smear": "var(--motion-duration-rig-smear)",
+      "rig-afterimage-gap": "var(--motion-duration-rig-afterimage-gap)",
+      "rig-afterimage-fade": "var(--motion-duration-rig-afterimage-fade)",
+      "rig-blade-step": "var(--motion-duration-rig-blade-step)"
     },
     "banner-blinks": "var(--motion-banner-blinks)",
     "easing": {
@@ -378,7 +392,10 @@ export const tokens = {
     "focus-dim": "var(--opacity-focus-dim)",
     "focus-low-near": "var(--opacity-focus-low-near)",
     "focus-low-far": "var(--opacity-focus-low-far)",
-    "focus-low-reduced": "var(--opacity-focus-low-reduced)"
+    "focus-low-reduced": "var(--opacity-focus-low-reduced)",
+    "rig-afterimage-1": "var(--opacity-rig-afterimage-1)",
+    "rig-afterimage-2": "var(--opacity-rig-afterimage-2)",
+    "rig-afterimage-3": "var(--opacity-rig-afterimage-3)"
   }
 } as const;
 

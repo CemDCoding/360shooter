@@ -230,7 +230,9 @@
         "bg-elf": "#1c3470",
         "bg-desert": "#6a3a0e",
         "bg-pyramid": "#0c4a4c",
-        "bg-oasis": "#5c4206"
+        "bg-oasis": "#5c4206",
+        "slash": "#ffffff",
+        "slash-rim": "#ff6b8a"
       }
     },
     "font": {
@@ -331,7 +333,15 @@
       "event-slide": "4px",
       "elite-scale": 1.25,
       "elite-edge": "1px",
-      "elite-crown-gap": "2px"
+      "elite-crown-gap": "2px",
+      "rig-scale-astronaut": 2,
+      "rig-scale-boss-moment": 3,
+      "rig-scale-boss-cinematic": 4,
+      "rig-ground": "300px",
+      "rig-afterimages": 3,
+      "rig-slash": "2px",
+      "rig-slash-rim": "1px",
+      "rig-fine-rotate": 20
     },
     "motion": {
       "duration": {
@@ -364,7 +374,11 @@
         "focus-out": "120ms",
         "focus-hold": "600ms",
         "event-slide": "150ms",
-        "event-tone": "250ms"
+        "event-tone": "250ms",
+        "rig-smear": "33ms",
+        "rig-afterimage-gap": "33ms",
+        "rig-afterimage-fade": "150ms",
+        "rig-blade-step": "80ms"
       },
       "banner-blinks": 3,
       "easing": {
@@ -381,7 +395,10 @@
       "focus-dim": 0.35,
       "focus-low-near": 0.4,
       "focus-low-far": 0.7,
-      "focus-low-reduced": 0.25
+      "focus-low-reduced": 0.25,
+      "rig-afterimage-1": 0.55,
+      "rig-afterimage-2": 0.35,
+      "rig-afterimage-3": 0.18
     }
   }
 }
