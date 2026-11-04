@@ -986,6 +986,14 @@ Das Wort steht in Funk 1× auf `hud.glass`, mit 1-px-Rand `event-marker` und Au�
 - Kein neuer Ton (PE-237), keine neue Abhängigkeit. Nur eigene Gestaltung.
 - Treffer- und Impact-Bilder aus H-39 bleiben als Akzente.
 
-**Entscheidungen (Nutzer):** folgen.
+**Entscheidungen (Nutzer, 2026-11-04):**
+1. **1a Ernste Astronautin, ≈ 60 px.** Gezeichnet wird die ernste Fassung aus H-39 (schmaler Blick, Visier mit Spiegelung, harte Schatten), im Spiel doppelt groß (≈ 120 px). So schließt sie an den Porträt-Streifen und die M10-Bildfolgen an.
+2. **2a Astronautin in 9 Teilen:**
+   - Wurzel `torso` mit den Kindern `helmet`, `leg-front` und `leg-back`.
+   - Wurzel `arm-front` mit den Kindern `raygun` und `blade` (`freeRotate`).
+   - Wurzeln `arm-back` und `pack` (Rucksack mit Antenne).
+   - Hand und Waffe bleiben immer zusammen. Hiebe entstehen aus dem Drehen von `arm-front` und den Arm-Posen.
+3. **3a Laserklinge als Blatt-Keil:** flach, ≈ 1,5-mal so lang wie der Strahler, leicht gebogen wie ein Blatt, weißer Kern, Rand in Koralle. Die Spitze ist schräg angeschliffen wie die Ecke der Funk-Schrift. Kein Griff, kein gerader Stab, keine runde Spitze.
+4. **4a Baummonster in 8 Teilen:** `trunk-left`, `trunk-right` (die Stammhälften, der Spalt beim Rosenschnitt ist echt), `crown`, `arm-left`, `arm-right`, `jaw`, `roots-left`, `roots-right`. Gezeichnet in 64 px wie im Spiel, im Cinematic vierfach groß.
 
 - keine weiteren (erste Fassung vom 2026-10-25)
