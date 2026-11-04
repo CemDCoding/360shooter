@@ -119,6 +119,9 @@ describe('OPACITY', () => {
       'focus-low-reduced',
       'ghost',
       'hover',
+      'rig-afterimage-1',
+      'rig-afterimage-2',
+      'rig-afterimage-3',
     ]);
   });
 
