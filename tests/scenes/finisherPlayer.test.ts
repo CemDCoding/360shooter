@@ -693,6 +693,13 @@ describe('rig atlas loading', () => {
   });
 });
 
+/** Source of one method, cut at its closing brace; line-ending safe (checkout may be CRLF). */
+const bodyOf = (src: string, head: string): string => {
+  const s = src.replace(/\r\n/g, '\n');
+  const from = s.slice(s.indexOf(head));
+  return from.slice(0, from.indexOf('\n  }\n'));
+};
+
 describe('wiring', () => {
   it('FinisherScene plays a choreography with the player and keeps the M10 path', () => {
     expect(sceneSrc).toMatch(/const choreo = choreoOf\(plan\);\s*if \(choreo\) \{/);
@@ -715,10 +722,8 @@ describe('wiring', () => {
     // No allocation per frame: the clock is prepared once, the per-frame loops are index loops.
     expect(playerSrc).toContain('prepareChoreo(def)');
     expect(playerSrc).not.toMatch(/sampleChoreo\(/);
-    const update = playerSrc.slice(playerSrc.indexOf('  update(dtMs: number)'));
-    expect(update.slice(0, update.indexOf('\n  }\n'))).not.toMatch(/for \(const|forEach|\.map\(/);
-    const frame = rigSrc.slice(rigSrc.indexOf('  beginFrame(): void'));
-    expect(frame.slice(0, frame.indexOf('\n  }\n'))).not.toMatch(/forEach|for \(const/);
+    expect(bodyOf(playerSrc, '  update(dtMs: number)')).not.toMatch(/for \(const|forEach|\.map\(/);
+    expect(bodyOf(rigSrc, '  beginFrame(): void')).not.toMatch(/forEach|for \(const/);
     expect(playerSrc).toMatch(/if \(this\.ctx\.webgl\) label\.setTint\(/);
     expect(playerSrc.match(/setTint\(/g)).toHaveLength(1);
   });
