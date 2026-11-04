@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Teil 2a: Teile der übrigen fünf Bosse (H-48) · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+  html, body { overflow-x: clip; }
+  section, .doc { padding-inline: 0; min-width: 0; }
+  figcaption { font-size: 0.8125rem; color: var(--page-muted); margin-top: 4px; line-height: 1.35; }
+  figcaption b { color: var(--page-fg); font-weight: 600; }
+  .parts { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+  .parts figure { margin: 0; background: var(--color-hud-screen); padding: 6px; max-width: 100%; min-width: 0; flex: 0 1 auto; }
+  .parts canvas { display: block; image-rendering: pixelated; max-width: 100%; height: auto; }
+  .parts figcaption { max-width: 300px; }
+  table.rig { border-collapse: collapse; font-size: 0.75rem; width: 100%; max-width: 1280px; margin-top: 8px; min-width: 720px; }
+  table.rig th, table.rig td { border-bottom: 1px solid color-mix(in srgb, var(--page-muted) 35%, transparent); padding: 3px 6px; text-align: left; vertical-align: top; }
+  table.rig th { color: var(--page-fg); }
+  table.rig td { color: var(--page-muted); font-family: ui-monospace, Consolas, monospace; }
+  .scroll { overflow-x: auto; }
+  .ok { color: var(--color-hud-accent); } .bad { color: var(--color-red-300); font-weight: 700; }
+  #err { color: var(--color-red-300); white-space: pre-wrap; font-size: 12px; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>M13 Teil 2a · Teile der übrigen fünf Bosse (H-48)</h1>
+  <p>Waldgeist, Riesen-Stein, Sand-Wurm, Wächter-Hund und Pharao als Figuren aus Teilen nach §4 „Rig und Choreografie“. Gezeichnet nach dem Spiel-Code (Bild 0), gespiegelt: Im Finisher steht der Boss rechts und schaut nach links zur Astronautin. Größe wie im Spiel (Entscheidung 3a): Kampfmoment 3×, Cinematic 4×. Quelle: <code>assets/sprites-m13b.js</code>.</p>
+  <dl>
+    <dt>Bögen</dt><dd>Je Teil <code>rig-&lt;figur&gt;-&lt;teil&gt;</code> (Bild = Pose), <code>…-sil</code> (weiß, Treffer-Weiß) und neu <code>…-ink</code> (Tinte, helles Impact-Bild, Q-92). Die Tinten-Bögen gibt es auch für Astronautin und Baummonster.</dd>
+    <dt>Posen aus Regeln</dt><dd><code>trug</code> (Waldgeist, 10a: Umriss hell, innen Punktraster), <code>gilded</code> (Pharao, 9a: zwei harte Goldtöne, Glanzband, Blau und Gesicht weg), <code>stone</code> (Wächter-Hund als Statue), <code>crumble1/2</code> (Sand-Wurm, Glied für Glied).</dd>
+    <dt>Drehung</dt><dd>Große Winkel sind gezeichnete Posen. Im Code nur Feindrehung bis ± 20°. Frei drehen dürfen weiterhin nur <code>blade</code> und <code>blade-arc</code>.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+
+<section><h2>0 · PRÜFUNG (aus den Daten berechnet)</h2><div class="scroll" id="diag"></div></section>
+<section><h2>1 · WALDGEIST (forestGhost, 48 px, 3×) · Posen links nach rechts · darunter Silhouette weiß und Tinte · Kreuz = Drehpunkt</h2><div class="parts" id="p-forestGhost" data-component="rigs/forestGhost"></div></section>
+<section><h2>2 · RIESEN-STEIN (giantStone, 64 px, 3×) · mit schwebenden Felsfäusten (5a)</h2><div class="parts" id="p-giantStone" data-component="rigs/giantStone"></div></section>
+<section><h2>3 · SAND-WURM (giantSandWorm, 64 px, 3×) · seg-1 bis seg-7 teilen einen Bogen</h2><div class="parts" id="p-giantSandWorm" data-component="rigs/giantSandWorm"></div></section>
+<section><h2>4 · WÄCHTER-HUND (guardianDog, 64 px, 3×) · shade-1 bis shade-3 teilen einen Bogen (6a)</h2><div class="parts" id="p-guardianDog" data-component="rigs/guardianDog"></div></section>
+<section><h2>5 · PHARAO (pharaoh, 64 px, 3×) · Krummstab und Geißel statt Armen</h2><div class="parts" id="p-pharaoh" data-component="rigs/pharaoh"></div></section>
+<section><h2>6 · ASTRONAUTIN · neue Posen blade „spear“ und blade-arc „hammer“ (7a)</h2><div class="parts" id="p-astro"></div></section>
+<section><h2>7 · EFFEKTE UND REQUISITEN (4×)</h2><div class="parts" id="p-fx" data-component="finisher/fx"></div></section>
+<section><h2>8 · ZUSAMMENGESETZT (2×) · so stehen die Teile im Spiel</h2><div class="parts" id="p-poses"></div></section>
+<section><h2>9 · RIG-DATEN (für src/config/rigs/*.ts)</h2><div class="scroll" id="rigtab"></div></section>
+
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script>window.__before = Object.keys(window.PX_SPRITES).length; window.__t0 = performance.now();</script>
+<script src="../assets/sprites-m13b.js"></script>
+<script>window.__ms = performance.now() - window.__t0;</script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  const QS = new URLSearchParams(location.search), TH = QS.get('theme') || '';
+  const ONLY = TH.startsWith('only-') ? TH.slice(5).split(',') : null;
+  if (ONLY) {
+    document.querySelector('header.doc').hidden = true;
+    document.querySelectorAll('section').forEach((s) => { if (!ONLY.some((id) => s.querySelector('#' + id))) s.remove(); });
+  }
+  const S = window.PX_SPRITES, RG = window.PX_RIGS;
+  const css = getComputedStyle(document.documentElement), tok = (n) => css.getPropertyValue(n).trim();
+  const T = { paper: tok('--color-finisher-paper'), focus: tok('--color-hud-accent'), ground: tok('--color-hud-line-dim') };
+  const BOSSES = ['forestGhost', 'giantStone', 'giantSandWorm', 'guardianDog', 'pharaoh'];
+
+  const cache = new Map();
+  function fr(key, f) {
+    const id = key + '|' + f;
+    if (cache.has(id)) return cache.get(id);
+    const d = S[key]; if (!d) throw new Error('Sprite fehlt: ' + key);
+    const c = document.createElement('canvas'); c.width = d.frameWidth; c.height = d.frameHeight;
+    const x = c.getContext('2d'), rows = d.frames[f];
+    for (let y = 0; y < rows.length; y++) for (let i = 0; i < rows[y].length; i++) { const ch = rows[y][i]; if (ch === '.') continue; x.fillStyle = d.palette[ch]; x.fillRect(i, y, 1, 1); }
+    cache.set(id, c); return c;
+  }
+  const add = (host, c, cap) => { const el = document.getElementById(host); if (!el) return; const fig = document.createElement('figure'), fc = document.createElement('figcaption'); fc.innerHTML = cap; fig.append(c, fc); el.appendChild(fig); };
+  const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.imageSmoothingEnabled = false; return [c, x]; };
+
+  // ---------- 0 diagnostics ----------
+  (function () {
+    const el = document.getElementById('diag'); if (!el) return;
+    const keys = Object.keys(S).slice(window.__before);
+    let area = 0, maxW = 0, maxH = 0; keys.forEach((k) => { const s = S[k]; area += s.frameWidth * s.frameHeight * s.frames.length; maxW = Math.max(maxW, s.frameWidth); maxH = Math.max(maxH, s.frameHeight); });
+    let rows = '';
+    BOSSES.concat(['astronaut', 'rootMonster']).forEach((id) => {
+      const r = RG[id]; if (!r) { rows += `<tr><td>${id}</td><td class="bad" colspan="6">fehlt</td></tr>`; return; }
+      const parents = new Set(r.parts.filter((p) => p.parent).map((p) => p.parent));
+      const nested = r.parts.filter((p) => p.parent && parents.has(p.id)).map((p) => p.id);
+      const missing = r.parts.filter((p) => !S[p.frame] || !S[p.silhouette] || !S[p.ink]).map((p) => p.id);
+      const orders = r.parts.map((p) => p.order), dup = orders.length !== new Set(orders).size;
+      const poses = r.parts.reduce((n, p) => n + Object.keys(p.poses).length, 0);
+      const sheets = new Set(r.parts.map((p) => p.frame)).size;
+      const ok = (b, t) => `<span class="${b ? 'ok' : 'bad'}">${t}</span>`;
+      rows += `<tr><td>${id}</td><td>${ok(r.parts.length <= 10, r.parts.length)}</td><td>${poses}</td><td>${sheets}</td><td>${ok(!nested.length, nested.join(', ') || 'keine')}</td><td>${ok(!missing.length, missing.join(', ') || 'keine')}</td><td>${ok(!dup, dup ? 'doppelt' : 'eindeutig')}</td></tr>`;
+    });
+    el.innerHTML = `<table class="rig"><tr><th>Figur</th><th>Teile (≤ 10)</th><th>Teilbilder</th><th>Bögen</th><th>Kind ist Eltern</th><th>fehlende Bögen</th><th>order</th></tr>${rows}</table>
+      <p>Neue Sprite-Schlüssel aus sprites-m13b.js: <b>${keys.length}</b> · Pixelfläche ${area} (≈ ${Math.ceil(Math.sqrt(area))}² px) · größter Rahmen ${maxW}×${maxH} · Laufzeit im Browser ${window.__ms.toFixed(0)} ms</p>`;
+  })();
+
+  // ---------- 1-5 part sheets: pose row, white silhouette row, ink silhouette row on paper ----------
+  function partSheet(host, rigId, s) {
+    RG[rigId].parts.forEach((p) => {
+      const names = Object.keys(p.poses), w = p.size[0] * s, h = p.size[1] * s, gap = 4 * s;
+      const [c, ctx] = canvas(names.length * (w + gap) - gap, h * 3 + gap * 2);
+      names.forEach((n, i) => {
+        const x = i * (w + gap);
+        ctx.drawImage(fr(p.frame, p.poses[n]), x, 0, w, h);
+        ctx.drawImage(fr(p.silhouette, p.poses[n]), x, h + gap, w, h);
+        ctx.fillStyle = T.paper; ctx.fillRect(x, 2 * (h + gap), w, h);
+        ctx.drawImage(fr(p.ink, p.poses[n]), x, 2 * (h + gap), w, h);
+        ctx.fillStyle = T.focus; const px = x + Math.round(p.pivotPx[0] * s), py = Math.round(p.pivotPx[1] * s);
+        ctx.fillRect(px - 4, py, 9, 1); ctx.fillRect(px, py - 4, 1, 9);
+      });
+      add(host, c, `<b>${p.id}</b> ${p.size[0]}×${p.size[1]} · ${names.join(', ')}${p.parent ? ' · Eltern: ' + p.parent : ''}${p.freeRotate ? ' · freeRotate' : ''}`);
+    });
+  }
+  BOSSES.forEach((id) => partSheet('p-' + id, id, 3));
+  (function () {
+    const a = RG.astronaut; if (!a) return;
+    a.parts.filter((p) => p.id === 'blade' || p.id === 'blade-arc').forEach((p) => {
+      const s = 3, names = Object.keys(p.poses), w = p.size[0] * s, h = p.size[1] * s, gap = 8;
+      const [c, ctx] = canvas(names.length * (w + gap) - gap, h);
+      names.forEach((n, i) => { ctx.drawImage(fr(p.frame, p.poses[n]), i * (w + gap), 0, w, h); ctx.fillStyle = T.focus; const px = i * (w + gap) + p.pivotPx[0] * s, py = p.pivotPx[1] * s; ctx.fillRect(px - 4, py, 9, 1); ctx.fillRect(px, py - 4, 1, 9); });
+      add('p-astro', c, `<b>${p.id}</b> ${p.size[0]}×${p.size[1]} (neu) · ${names.join(', ')} · Ursprung ${p.originX}/${p.originY}`);
+    });
+  })();
+
+  // ---------- 7 effects ----------
+  [['rig-fx-ghost', '0/1 Mondlicht · 2 Nebel · 3 Trug-Splitter'], ['rig-fx-stone', '0/1 Kiesel · 2 Staub · 3 Morgenlicht · 4 Kristallsplitter · 5 Stern'], ['rig-fx-worm', '0/1 Sand · 2 Sandwolke · 3 Stachel · 4 Sonnenfunke'], ['rig-prop-sandwave', 'Sandwelle 0 Kräuseln · 1 Welle · 2 Kamm'], ['rig-fx-dog', '0 Runensplitter · 1 Goldflocke · 2 Schatten · 3 Glut · 4 Steinbrösel'], ['rig-prop-torch', 'Fackel 0 aus · 1/2 brennt'], ['rig-fx-pharaoh', '0/1 Goldstaub · 2 Goldflocke · 3 Leinenfetzen · 4 Stern'], ['rig-prop-riddle', 'Rätsel 0 Kind · 1 Mensch · 2 Greis · 3–5 leuchtend']].forEach(([k, t]) => {
+    const d = S[k]; if (!d) return;
+    const s = 4, n = d.frames.length, [c, ctx] = canvas(n * (d.frameWidth * s + 8) - 8, d.frameHeight * s);
+    for (let i = 0; i < n; i++) ctx.drawImage(fr(k, i), i * (d.frameWidth * s + 8), 0, d.frameWidth * s, d.frameHeight * s);
+    add('p-fx', c, `<b>${k}</b> ${d.frameWidth}×${d.frameHeight} ×${n} · ${t}`);
+  });
+
+  // ---------- 8 assembled ----------
+  function drawRig(ctx, id, o) {
+    const rig = RG[id], s = o.s, pose = o.pose || {}, ang = o.ang || {}, off = o.off || {}, ov = {};
+    const addv = (p, k, v) => { ov[p] = ov[p] || {}; ov[p][k] = (ov[p][k] || 0) + v; };
+    if (id === 'astronaut') {
+      const ap = pose['arm-front'] || 'rest', an = rig.anchors['arm-front'][ap];
+      ov.raygun = { pose: an.raygun.pose, x: an.raygun.x, y: an.raygun.y };
+      ov.blade = { x: an.blade.x, y: an.blade.y, angle: an.blade.angle };
+      ov['blade-arc'] = { x: an.blade.x, y: an.blade.y, angle: an.blade.angle };
+      const drop = rig.anchors.bodyDrop[pose['leg-front']] || 0;
+      if (drop) ['torso', 'arm-front', 'arm-back', 'pack'].forEach((p) => addv(p, 'dy', drop));
+    }
+    if (id === 'forestGhost' && pose.body === 'stretch') Object.entries(rig.anchors.stretch).forEach(([p, v]) => { addv(p, 'dx', v[0]); addv(p, 'dy', v[1]); });
+    if (id === 'guardianDog' && pose['legs-front'] === 'lie') Object.entries(rig.anchors.lie).forEach(([p, v]) => { addv(p, 'dx', v[0]); addv(p, 'dy', v[1]); });
+    const byId = Object.fromEntries(rig.parts.map((p) => [p.id, p])), world = {};
+    const calc = (p) => {
+      if (world[p.id]) return world[p.id];
+      const v = ov[p.id] || {}, d = off[p.id] || [0, 0];
+      const lx = (v.x != null ? v.x : p.x) + (v.dx || 0) + d[0], ly = (v.y != null ? v.y : p.y) + (v.dy || 0) + d[1], a = (v.angle || 0) + (ang[p.id] || 0);
+      let r;
+      if (p.parent) { const P = calc(byId[p.parent]), rad = (P.a * Math.PI) / 180; r = { x: P.x + (lx * Math.cos(rad) - ly * Math.sin(rad)) * s, y: P.y + (lx * Math.sin(rad) + ly * Math.cos(rad)) * s, a: P.a + a }; }
+      else r = { x: o.x + lx * s, y: o.y + ly * s, a };
+      return (world[p.id] = r);
+    };
+    const hidden = new Set(o.hide || []);
+    if (id === 'astronaut') { if (!pose.blade) hidden.add('blade'); if (!pose['blade-arc']) hidden.add('blade-arc'); }
+    rig.parts.forEach((p) => {
+      if (hidden.has(p.id)) return;
+      const w = calc(p), pn = pose[p.id] || o.all || (ov[p.id] && ov[p.id].pose) || Object.keys(p.poses)[0];
+      const f = p.poses[pn] != null ? p.poses[pn] : 0;
+      const img = o.ink ? fr(p.ink, f) : fr(p.frame, f);
+      ctx.save(); ctx.globalAlpha = o.alpha == null ? 1 : o.alpha;
+      ctx.translate(Math.round(w.x), Math.round(w.y)); ctx.rotate((w.a * Math.PI) / 180);
+      ctx.drawImage(img, -p.pivotPx[0] * s, -p.pivotPx[1] * s, p.size[0] * s, p.size[1] * s);
+      ctx.restore();
+    });
+  }
+  const sh3 = ['shade-1', 'shade-2', 'shade-3'], chunks = ['chunk-1', 'chunk-2', 'chunk-3', 'chunk-4'];
+  const LIST = [
+    ['forestGhost', 'Ruhe', { hide: [] }],
+    ['forestGhost', 'Klagen, Arme greifen', { pose: { face: 'wail', 'arm-left': 'reach', 'arm-right': 'reach', 'antenna-left': 'swept', 'antenna-right': 'swept', 'tail-wisp': 'flow' } }],
+    ['forestGhost', 'Trugbild (alle Teile trug)', { all: 'trug' }],
+    ['forestGhost', 'Zieht sich in die Länge', { pose: { body: 'stretch', 'tail-wisp': 'stretch', face: 'wail' } }],
+    ['forestGhost', 'Zerfließt zu Mondlicht', { pose: { body: 'dissolve1', 'tail-wisp': 'stretch' }, hide: ['arm-left', 'arm-right'] }],
+    ['giantStone', 'Ruhe, Fäuste an der Seite', { hide: chunks }],
+    ['giantStone', 'Faust holt weit aus', { hide: chunks, pose: { face: 'strain', 'fist-left': 'raised' }, off: { 'fist-left': [24, -46] } }],
+    ['giantStone', 'Faustschlag', { hide: chunks, pose: { face: 'strain', 'fist-left': 'punch' }, off: { 'fist-left': [-14, 4] } }],
+    ['giantStone', 'Erstarrt, Risse leuchten', { hide: chunks, pose: { body: 'cracked3', face: 'frozen', crystals: 'lit', 'fist-left': 'frozen', 'fist-right': 'frozen' } }],
+    ['giantStone', 'Zerbricht in Brocken', { hide: ['body', 'face', 'crystals'], pose: { 'fist-left': 'frozen', 'fist-right': 'frozen' }, off: { 'chunk-1': [-4, -6], 'chunk-2': [6, -4], 'chunk-3': [5, 6], 'chunk-4': [-6, 5], 'fist-left': [-4, 10], 'fist-right': [4, 10] }, ang: { 'chunk-1': -12, 'chunk-2': 10, 'chunk-3': 14, 'chunk-4': -8 } }],
+    ['giantSandWorm', 'Bricht hervor', { hide: ['seg-5', 'seg-6', 'seg-7', 'tail'] }],
+    ['giantSandWorm', 'Brüllt', { pose: { jaw: 'roar' }, hide: ['seg-5', 'seg-6', 'seg-7', 'tail'] }],
+    ['giantSandWorm', 'Segmentkette zerfällt (Kopf zuerst)', { pose: { head: 'crumble2', jaw: 'crumble2', 'seg-1': 'crumble2', 'seg-2': 'crumble1' }, hide: ['seg-5', 'seg-6', 'seg-7', 'tail'] }],
+    ['guardianDog', 'Ruhe', { hide: sh3 }],
+    ['guardianDog', 'Drei Schattenköpfe schnappen', { pose: { jaw: 'snap', 'shade-1': 'snap', 'shade-2': 'snap', 'shade-3': 'snap' } }],
+    ['guardianDog', 'Halsband bricht, Kopf sinkt', { pose: { head: 'low', collar: 'broken', body: 'dark', tail: 'down' }, hide: ['jaw', 'shade-1', 'shade-2'], all: null, pose2: { 'shade-3': 'fade' } }],
+    ['guardianDog', 'Schläft, Runen erloschen', { pose: { head: 'sleep', collar: 'dark', body: 'dark', tail: 'down', 'legs-front': 'lie', 'legs-back': 'lie' }, hide: ['jaw'].concat(sh3) }],
+    ['guardianDog', 'Statue (Cinematic 30)', { all: 'stone', hide: sh3 }],
+    ['pharaoh', 'Ruhe mit Gold-Spirale', {}],
+    ['pharaoh', 'Ruft die Rätsel (Stäbe hoch)', { pose: { head: 'glare', crook: 'raised', flail: 'raised', 'orb-ring': 'spin2' } }],
+    ['pharaoh', 'Vergoldung bis zur Hüfte', { pose: { robe: 'gilded-half' }, hide: ['orb-ring'] }],
+    ['pharaoh', 'Ganz vergoldet', { all: 'gilded', hide: ['orb-ring'] }],
+    ['pharaoh', 'Maske birst (L40)', { pose: { head: 'cracked', 'orb-ring': 'spin3' } }],
+    ['astronaut', 'Sonnenspeer (Zielen)', { pose: { 'arm-front': 'aim', blade: 'spear' } }],
+    ['astronaut', 'Sternenhammer (Ausholen)', { pose: { 'arm-front': 'raise', 'blade-arc': 'hammer', helmet: 'dark' } }],
+  ];
+  const NAME = { forestGhost: 'Waldgeist', giantStone: 'Riesen-Stein', giantSandWorm: 'Sand-Wurm', guardianDog: 'Wächter-Hund', pharaoh: 'Pharao', astronaut: 'Astronautin' };
+  LIST.forEach(([id, lab, o]) => {
+    if (!RG[id]) return;
+    const s = 2, big = id === 'giantSandWorm', [c, ctx] = canvas(big ? 360 : 260, id === 'astronaut' ? 180 : 230);
+    const opt = Object.assign({ x: Math.round(c.width / 2) - (big ? 50 : 0), y: c.height - 16, s }, o);
+    if (o.pose2) opt.pose = Object.assign({}, o.pose, o.pose2);
+    if (id === 'giantSandWorm') { opt.y = c.height - 30; }
+    drawRig(ctx, id, opt);
+    ctx.fillStyle = T.ground; ctx.fillRect(0, c.height - 16, c.width, 1);
+    add('p-poses', c, `<b>${NAME[id]}</b> · ${lab}`);
+  });
+  // ink composite check (bright impact frame)
+  ['forestGhost', 'giantStone', 'guardianDog', 'pharaoh'].forEach((id) => {
+    const [c, ctx] = canvas(260, 230); ctx.fillStyle = T.paper; ctx.fillRect(0, 0, 260, 230);
+    drawRig(ctx, id, { x: 130, y: 214, s: 2, ink: true, hide: id === 'giantStone' ? chunks : id === 'guardianDog' ? sh3 : [] });
+    add('p-poses', c, `<b>${NAME[id]}</b> · Tinte auf Papier (helles Impact-Bild)`);
+  });
+
+  // ---------- 9 rig table ----------
+  (function () {
+    const el = document.getElementById('rigtab'); if (!el) return;
+    let h = '<table class="rig"><tr><th>Figur</th><th>order</th><th>Teil</th><th>Bogen</th><th>Größe</th><th>originX/Y</th><th>x/y</th><th>Eltern</th><th>Posen</th></tr>';
+    BOSSES.forEach((id) => RG[id].parts.forEach((p) => { h += `<tr><td>${id}</td><td>${p.order}</td><td>${p.id}</td><td>${p.frame}</td><td>${p.size.join('×')}</td><td>${p.originX} / ${p.originY}</td><td>${p.x} / ${p.y}</td><td>${p.parent || '–'}</td><td>${Object.keys(p.poses).join(', ')}</td></tr>`; }));
+    el.innerHTML = h + '</table>';
+  })();
+})();
+</script>
+</body>
+</html>
