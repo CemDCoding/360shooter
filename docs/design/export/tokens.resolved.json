@@ -341,7 +341,11 @@
       "rig-afterimages": 3,
       "rig-slash": "2px",
       "rig-slash-rim": "1px",
-      "rig-fine-rotate": 20
+      "rig-fine-rotate": 20,
+      "rig-astro-x-moment": "170px",
+      "rig-boss-x-moment": "470px",
+      "rig-astro-x-cinematic": "160px",
+      "rig-boss-x-cinematic": "480px"
     },
     "motion": {
       "duration": {
@@ -376,6 +380,11 @@
         "event-slide": "150ms",
         "event-tone": "250ms",
         "rig-smear": "33ms",
+        "rig-smear-arc": "66ms",
+        "rig-shake-step": "20ms",
+        "rig-shake-half": "80ms",
+        "rig-crumble-step": "120ms",
+        "rig-hit-white": "100ms",
         "rig-afterimage-gap": "33ms",
         "rig-afterimage-fade": "150ms",
         "rig-blade-step": "80ms"

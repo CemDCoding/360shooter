@@ -338,7 +338,11 @@ export const tokens = {
     "rig-afterimages": "var(--size-rig-afterimages)",
     "rig-slash": "var(--size-rig-slash)",
     "rig-slash-rim": "var(--size-rig-slash-rim)",
-    "rig-fine-rotate": "var(--size-rig-fine-rotate)"
+    "rig-fine-rotate": "var(--size-rig-fine-rotate)",
+    "rig-astro-x-moment": "var(--size-rig-astro-x-moment)",
+    "rig-boss-x-moment": "var(--size-rig-boss-x-moment)",
+    "rig-astro-x-cinematic": "var(--size-rig-astro-x-cinematic)",
+    "rig-boss-x-cinematic": "var(--size-rig-boss-x-cinematic)"
   },
   "motion": {
     "duration": {
@@ -373,6 +377,11 @@ export const tokens = {
       "event-slide": "var(--motion-duration-event-slide)",
       "event-tone": "var(--motion-duration-event-tone)",
       "rig-smear": "var(--motion-duration-rig-smear)",
+      "rig-smear-arc": "var(--motion-duration-rig-smear-arc)",
+      "rig-shake-step": "var(--motion-duration-rig-shake-step)",
+      "rig-shake-half": "var(--motion-duration-rig-shake-half)",
+      "rig-crumble-step": "var(--motion-duration-rig-crumble-step)",
+      "rig-hit-white": "var(--motion-duration-rig-hit-white)",
       "rig-afterimage-gap": "var(--motion-duration-rig-afterimage-gap)",
       "rig-afterimage-fade": "var(--motion-duration-rig-afterimage-fade)",
       "rig-blade-step": "var(--motion-duration-rig-blade-step)"

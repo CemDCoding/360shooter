@@ -203,7 +203,7 @@ window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'F
   function cam(ctx, cx, cy, z) { ctx.setTransform(z, 0, 0, z, Math.round(320 - cx * z), Math.round(180 - cy * z)); }
   function fx(ctx, i, x, y, s, a) { spr(ctx, 'rig-fx-root', i, x - 4 * s, y - 4 * s, s, { alpha: a }); }
   function burst(ctx, seed, cx, cy, n, list, rad, s) { const r = rnd(seed); for (let i = 0; i < n; i++) { const a = r() * Math.PI * 2, d = r() * rad; fx(ctx, list[(r() * list.length) | 0], cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.8, s); } }
-  function slashLine(ctx, x, y0, y1, s) { const w = num('--size-rig-slash') * s / 2, rim = num('--size-rig-slash-rim') * s / 2; ctx.fillStyle = T.rim; ctx.fillRect(Math.round(x - w - rim), y0, Math.round((w + rim) * 2), y1 - y0); ctx.fillStyle = T.slash; ctx.fillRect(Math.round(x - w), y0, Math.round(w * 2), y1 - y0); }
+  function slashLine(ctx, x, y0, y1, s) { const w = num('--size-rig-slash') * s / 2, rim = num('--size-rig-slash-rim') * s; /* H-48 (Q-92): 1 px x scale per side, as token and code */ ctx.fillStyle = T.rim; ctx.fillRect(Math.round(x - w - rim), y0, Math.round((w + rim) * 2), y1 - y0); ctx.fillStyle = T.slash; ctx.fillRect(Math.round(x - w), y0, Math.round(w * 2), y1 - y0); }
   function speedH(ctx, seed, n, col, y0, y1) { const r = rnd(seed); ctx.fillStyle = col; for (let i = 0; i < n; i++) ctx.fillRect(Math.round(r() * 640) - 60, Math.round(y0 + r() * (y1 - y0)), 40 + Math.round(r() * 140), r() < 0.2 ? 2 : 1); }
   function radial(ctx, seed, fx0, fy0, n, col) {
     const r = rnd(seed); ctx.fillStyle = col;

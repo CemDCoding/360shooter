@@ -1,7 +1,7 @@
 # Design-Brief – 360shooter
 
 **Status:** freigegeben am 2026-11-04 (Ergänzung H-46 „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“, vom Nutzer freigegeben am 2026-11-04, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-41 „M11: Quicktime-Fokus“ und H-43 „M12: Rand-Marker, Ankündigungston, Eliten“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
-**Stand H-48 (2026-11-04):** Interview „M13 Teil 2: übrige 5 Bosse“ läuft (Runde 1: 1b 2a 3a 4a; Runde 2: 5a 6a 7a 8a; Runde 3: 9a 10a 11a 12a; Runde 4: 13a 14a 15a 16a). Interview abgeschlossen, Teil 2a in Arbeit. H-47 ist noch offen; Teil 2a (Teile, Posen, Silhouetten, Effekte) beginnt vorher, Abhängiges ist `(angenommen)`. Ergänzung H-48 noch nicht freigegeben.
+**Stand H-48 (2026-11-04):** Interview „M13 Teil 2: übrige 5 Bosse“ läuft (Runde 1: 1b 2a 3a 4a; Runde 2: 5a 6a 7a 8a; Runde 3: 9a 10a 11a 12a; Runde 4: 13a 14a 15a 16a). Interview abgeschlossen. Teil 2a fertig (Sprites `assets/sprites-m13b.js`, Mockup `mockups/m13b-teile.html`, Q-92-Tokens, Kontrast grün), wartet auf Freigabe. H-47 ist noch offen; Teil 2a (Teile, Posen, Silhouetten, Effekte) beginnt vorher, Abhängiges ist `(angenommen)`. Ergänzung H-48 noch nicht freigegeben.
 **Stand H-46 (2026-11-04):** Interview „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ läuft, Runden 1 und 2 beantwortet (1a 2a 3a 4a, 5c 6a 7a 8b), Runde 3 beantwortet (9a 10a 11a). Interview abgeschlossen. Sprites `assets/sprites-m13.js`, Mockup `mockups/m13-rig-und-storyboard.html`, Tokens (Kontrast grün) und Übergabe sind fertig. Vom Nutzer freigegeben am 2026-11-04. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-182 bis AP-184; Entscheidung zu `anchors` von `arm-front`).
 **Stand H-41/H-43 (2026-11-02):** Interview läuft. Interview abgeschlossen (1a–7a). Tokens, Sprites `assets/sprites-m11.js`, Mockup `mockups/m11-m12-fokus-und-wellen.html` und Übergabe fertig, Kontrast grün. H-41 und H-43 vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-173, AP-177, AP-178; Hinweise zu Dateilisten und Ton-Schlüsseln beachten).
 **Stand H-39 (2026-11-02):** Interview „M10: Boss-Finisher“ läuft. Interview abgeschlossen (1b 2b 3a 4a, 5a–8a, 9a–12a). Teil 1 fertig (Tokens `finisher.*`, `assets/sprites-m10.js`, Mockup `mockups/m10-boss-finisher.html`, Kontrast grün), vom Nutzer freigegeben am 2026-11-02. Teil 2 fertig (Bildfolgen Level 20, 25, 30, 40 in `assets/sprites-m10b.js` und `sprites-m10c.js`, Level 40 als zwei Bögen) und vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-159 bis AP-162, offener Punkt `holdsMs`).
@@ -1008,7 +1008,7 @@ Das Wort steht in Funk 1× auf `hud.glass`, mit 1-px-Rand `event-marker` und Au�
    - Blätter in 2 Grüntönen, Holzsplitter in den Holztönen des Bosses.
    - Funken in Koralle und Weiß, nur für die Astronautin.
    - ≈ 6 Partikelbilder mit je 4 bis 8 px.
-7. **7a Kein Achswechsel in Level 4.** Die Astronautin bleibt links, der Abwärtsschlag kommt von oben links. Die Kamera fährt in Einstellung 1 von unten nach oben und zoomt in Einstellung 3 und 4 von 1 auf 2. Der Achswechsel bleibt für spätere Bosse frei.
+7. **7a Kein Achswechsel in Level 4.** Die Astronautin bleibt links, der Abwärtsschlag kommt von oben links. Die Kamera fährt in Einstellung 1 von unten nach oben und zoomt in Einstellung 3 von 1 auf 2; Einstellung 4 bleibt Zoom 1 (korrigiert mit H-48, Entscheidung 15a, wie Tabelle und Code). Der Achswechsel bleibt für spätere Bosse frei.
 8. **8b Nur statische Bretter.** Das Mockup `mockups/m13-rig-und-storyboard.html` enthält drei Teile:
    - Teile-Bögen mit Drehpunkten und Silhouetten
    - Schlüsselposen „Rosenschnitt“ mit Zeitleiste, Takten und ⚡
@@ -1148,5 +1148,48 @@ Hinweise:
     - Sand-Wurm: nach 11a.
     - Wächter-Hund: `body`, `head`, `jaw`, `collar`, `legs-front`, `legs-back`, `tail`, `shade-1` bis `shade-3`.
     - Pharao: `robe`, `torso`, `head`, `arm-left`, `arm-right`, `staff`, `orb-ring`; je Teil Pose `gilded`.
+
+**Annahmen des Designers in Teil 2a** (angenommen, Teil der Freigabe):
+- **Neue Quelldatei `assets/sprites-m13b.js`** statt Änderungen an `sprites-m13.js`. Die Bosse sind aus ihrem Spiel-Code (Bild 0) nachgezeichnet und gespiegelt (Blick nach links). Die Datei liest nur `rig-astro-blade`, `rig-astro-blade-arc` und `PX_RIGS.astronaut` aus `sprites-m13.js`.
+- **Speer und Hammer (7a) ändern Bildgröße und Ursprung** von `blade` (56×9) und `blade-arc` (63×50). Die alten Pose-Indizes bleiben. Die Datei baut beide Bögen beim Laden neu, deshalb bleibt `dev` grün, bis AP-185 sie in die Quellenliste aufnimmt; AP-185 übernimmt dann `size`/`originX/Y` beider Teile in `astronaut.ts` (der Vergleichstest in `rigs.test.ts` verlangt das).
+- **Pharao ohne Arme:** Das Spiel-Sprite hat keine Arme, nur gekreuzte Hände mit Krummstab und Geißel. Statt `arm-left`, `arm-right`, `staff`, `torso` hat er `robe`, `collar` (mit den unteren Kopftuch-Flügeln), `head` (mit Bart), `crook` (mit den Händen), `flail`, `orb-ring` = 6 Teile. „Stäbe hoch“ ist eine gezeichnete Pose `raised` (± 45°).
+- **Gold-Spirale als ein Teil:** hintere Kugeln klein und dunkel, vordere groß. Kein zweites Teil für „hinter dem Körper“.
+- **Waldgeist:** Gesicht ohne eigenen Umriss (liegt im Körper). `stretch` skaliert den Körper 0,8 × 1,4 um seinen Fuß; die Kinder folgen über `anchors.stretch` (Versätze je Teil). `dissolve1/2` lösen den Körper von unten in Mondlicht auf.
+- **Riesen-Stein:** Die Risse leuchten in drei Stufen im Morgenlicht (`cracked1..3`, neue Bildfarben `#fff2c0`/`#ffd27a`/`#e09a3a`, nur in Sprites). `chunk-1..4` sind der erstarrte Stein in 4 Brocken und werden erst beim Zerfall sichtbar (vorher Deckkraft 0).
+- **Sand-Wurm:** `seg-1..7` teilen einen Bogen `rig-worm-seg` (32 px wie im Spiel). Der Hals aus dem Spiel-Kopfbild entfällt, die Glieder ersetzen ihn. Standardkette schräg nach rechts unten; die Choreografie setzt die Glieder.
+- **Wächter-Hund:** `head` ist ein Wurzel-Teil (sonst wäre er Eltern und Kind zugleich). In `low` und `sleep` ist der Unterkiefer ins Kopfbild gezeichnet, die Choreografie blendet `jaw` dann aus. Liegen: `legs-*` Pose `lie`, `body` und `head` +8 px nach `anchors.lie`. `shade-1..3` teilen einen Bogen `rig-dog-shade` (Umriss Türkis, Inneres fast schwarz).
+- **Tinten-Silhouetten (Q-92):** jedes Rig-Teil hat zusätzlich `…-ink` (alles in `finisher.ink`), auch Astronautin und Baummonster. Feld `ink` je Teil in `PX_RIGS`. Neue Felder in `PX_RIGS` außerhalb des Vertrags: `anchors` (Waldgeist, Hund), `gildOrder` (Pharao), `crumbleStepMs` (Wurm) — Daten für die Choreografien, kein neues Vertragsfeld nötig.
+
+**Nachtrag Design-System M13 (Q-92, Entscheidung 2a):**
+| Lücke | Lösung |
+|---|---|
+| (1) Schnittrand | 1 px × Boss-Maßstab je Seite (Token `size.rig-slash-rim`, wie Code). Mockup H-46 korrigiert. |
+| (2) Smear-Standzeit | `rig-smear` 33 ms für alle Smear-Posen, neu `rig-smear-arc` 66 ms nur für `blade-arc` (14a) |
+| (3) Wackel-Rhythmus | neu `motion.duration.rig-shake-step` 20 ms und `rig-shake-half` 80 ms |
+| (4a) Tinten-Silhouetten | `…-ink`-Bögen für alle Rig-Teile (siehe oben) |
+| (4b) Zoom L4 | Einstellung 4 bleibt Zoom 1 (15a), H-46-Entscheidung 7a korrigiert |
+| (4c) Stehpunkte | neu `size.rig-astro-x-moment` 170, `rig-boss-x-moment` 470, `rig-astro-x-cinematic` 160, `rig-boss-x-cinematic` 480 |
+| (4d) Haupttreffer im Moment | nur Boss-Weiß 100 ms (`motion.duration.rig-hit-white`), Zittern, Speedline-Ring, kein Vollbild-Blitz (13a) |
+| neu | `motion.duration.rig-crumble-step` 120 ms (Segmentkette) |
+
+`contrast.js --tokens` grün (keine neuen Farbpaare; neue Farben nur in Sprites). Export css, ts, json neu gebaut (351 Tokens).
+
+**Ergebnis Teil 2a:**
+- `assets/sprites-m13b.js`: 5 Rigs (Waldgeist 7 Teile/24 Teilbilder, Riesen-Stein 9/20, Sand-Wurm 10/32 in 4 Bögen, Wächter-Hund 10/32 in 8 Bögen, Pharao 6/18), je Bogen `-sil` und `-ink`, Effekt-Bögen `rig-fx-ghost`, `rig-fx-stone`, `rig-fx-worm`, `rig-fx-dog`, `rig-fx-pharaoh`, Requisiten `rig-prop-sandwave`, `rig-prop-torch`, `rig-prop-riddle` (Kind/Mensch/Greis, je normal und leuchtend). 128 neue Sprite-Schlüssel, Pixelfläche ≈ 537² px (weit unter 4096), Laufzeit im Browser ≈ 90 ms.
+- Mockup `mockups/m13b-teile.html`: 0 Prüfung (aus den Daten), 1–5 Teile je Boss (Pose, Silhouette weiß, Tinte), 6 Speer und Hammer, 7 Effekte, 8 zusammengesetzte Posen, 9 Rig-Tabelle.
+- Screenshots: `screenshots/m13b-teile-desktop.png`, `-mobile.png`; Nahansichten `m13b-check-poses2-desktop.png` (alle Posen), `m13b-check-dog-desktop.png`, `m13b-check-rest-desktop.png`.
+
+**Übergabe Teil 2a an den Planner:**
+| Paket | Aufgabe |
+|---|---|
+| „Design übernehmen“ | Teile-, Posen- und Token-Namen aus dieser Ergänzung; neue Tokens aus dem Q-92-Nachtrag; Hinweis, dass `blade`/`blade-arc` neue Maße bekommen. |
+| AP-185 | `npm run theme:build` (neue Tokens). `assets/sprites-m13b.js` **nach** `sprites-m13.js` in `scripts/build-sprites.mjs`. Alle neuen Schlüssel (`rig-ghost-*`, `rig-stone-*`, `rig-worm-*`, `rig-dog-*`, `rig-pharaoh-*`, je mit `-sil` und `-ink`, dazu `-ink` für alle Astronautin- und Baummonster-Teile, `rig-fx-*`, `rig-prop-*`) in `src/config/assets.ts`, Sprite-Zahl im Test nachrechnen. Je Boss ein Atlas `finisher-rig-<BossId>`. `src/config/rigs/<BossId>.ts` aus `PX_RIGS` erzeugen, `astronaut.ts` für `blade`/`blade-arc` und das Feld `ink` aller Teile nachziehen. Geteilte Bögen (`rig-worm-seg`, `rig-dog-shade`) nur einmal in den Atlas. Laufzeit des Build-Skripts messen (Grenze 1000 ms). |
+| AP-182-Nachzug (klein, an AP-185 oder AP-191) | Impact hell mit `-ink`, Wackeln aus `rig-shake-*`, Smear-Zeiten aus `rig-smear`/`rig-smear-arc`, Stehpunkte aus `size.rig-*-x-*` statt Zahlen im Code (Q-92 (3)/(4)). |
+
+**Design-Review AP-185:** gegen die Ansichten 0 bis 7 von `m13b-teile.html`.
+
+Bekannte Schwäche (wie H-46): Auf 390 px wird der Kopftext des Mockups rechts abgeschnitten (Ursache im gemeinsamen Mockup-Grundstil, zwei Durchläufe ohne Erfolg). Betrifft nur das Arbeitsdokument, nicht das Spiel.
+
+**Teil 2b folgt:** Kampfmomente und Storyboards je Boss in `mockups/m13b-<boss>.html` (nach Freigabe von 2a).
 
 - keine weiteren (erste Fassung vom 2026-10-25)
