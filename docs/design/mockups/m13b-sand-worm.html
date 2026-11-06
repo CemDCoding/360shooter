@@ -80,7 +80,7 @@ window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'F
     sc(c); worm(c, AX + 120, { jaw: 'open' }, s3, { y: WY }); cover(c); B.astro(c, HX, A.shootDown, { y: HY, ang: { 'arm-front': 20 } }); B.bars(c);
   });
   B.board('moment', '<b>W5 · 1075 ms</b> · <span class="flash">⚡</span> Schuss senkrecht in den Kopf (Aktion 100), Treffer-Stopp 150: Wurm weiß (<code>-sil</code>), Speedline-Ring.', (c) => {
-    sc(c); worm(c, AX + 120, { jaw: 'open' }, s3, { y: WY, sil: 'all' }); cover(c); B.ring(c, 5, HX - 10, HY + 70, 80, 22);
+    sc(c); worm(c, AX + 120, { jaw: 'open' }, s3, { y: WY, sil: 'all' }); cover(c); B.ring(c, 5, HX - 10, HY + 70, B.ringR(64, B.SBM));
     B.astro(c, HX, A.shootDown, { y: HY, ang: { 'arm-front': 20 } }); B.beam(c, HX + 30, HY - 4, HX + 20, HY + 70, 4); B.bars(c);
   });
   B.board('moment', '<b>W6 · 1500 ms</b> · Reaktion (Zeitlupe 0,3 bis 1600, dann Echtzeit): Kopf und Kiefer zerfallen zu Sand (<code>crumble2</code>), das erste Glied beginnt (<code>crumble1</code>). Sie gleitet mit dem Zerfall abwärts.', (c) => {

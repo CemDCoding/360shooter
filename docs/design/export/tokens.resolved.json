@@ -345,7 +345,17 @@
       "rig-astro-x-moment": "170px",
       "rig-boss-x-moment": "470px",
       "rig-astro-x-cinematic": "160px",
-      "rig-boss-x-cinematic": "480px"
+      "rig-boss-x-cinematic": "480px",
+      "rig-hit-ring-rays": 24,
+      "rig-hit-ring-jitter": 6,
+      "rig-hit-ring-gap": "8px",
+      "rig-hit-ring-ray-min": "14px",
+      "rig-hit-ring-ray-max": "36px",
+      "rig-hit-ring-dot-in": "1px",
+      "rig-hit-ring-dot-out": "2px",
+      "rig-hit-ring-squash": 0.8,
+      "rig-hit-ring-steps": 3,
+      "rig-hit-ring-step-out": "8px"
     },
     "motion": {
       "duration": {
@@ -385,6 +395,7 @@
         "rig-shake-half": "80ms",
         "rig-crumble-step": "120ms",
         "rig-hit-white": "100ms",
+        "rig-hit-ring-step": "33ms",
         "rig-afterimage-gap": "33ms",
         "rig-afterimage-fade": "150ms",
         "rig-blade-step": "80ms"
@@ -407,7 +418,8 @@
       "focus-low-reduced": 0.25,
       "rig-afterimage-1": 0.55,
       "rig-afterimage-2": 0.35,
-      "rig-afterimage-3": 0.18
+      "rig-afterimage-3": 0.18,
+      "rig-hit-ring-last": 0.6
     }
   }
 }

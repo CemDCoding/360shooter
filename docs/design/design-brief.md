@@ -1,6 +1,7 @@
 # Design-Brief – 360shooter
 
-**Status:** freigegeben am 2026-11-04 (Ergänzung H-48 Teil 2a „Teile der übrigen fünf Bosse und Nachtrag Q-92“, vom Nutzer freigegeben am 2026-11-04, inklusive der Annahmen; Teil 2b freigegeben am 2026-11-04). Zuvor freigegeben am 2026-11-04 (Ergänzung H-46 „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“, vom Nutzer freigegeben am 2026-11-04, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-41 „M11: Quicktime-Fokus“ und H-43 „M12: Rand-Marker, Ankündigungston, Eliten“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Status:** geändert am 2026-11-06 (Ergänzung H-50 „Speedline-Ring“, wartet auf Freigabe durch den Head). Zuvor freigegeben am 2026-11-04 (Ergänzung H-48 Teil 2a „Teile der übrigen fünf Bosse und Nachtrag Q-92“, vom Nutzer freigegeben am 2026-11-04, inklusive der Annahmen; Teil 2b freigegeben am 2026-11-04). Zuvor freigegeben am 2026-11-04 (Ergänzung H-46 „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“, vom Nutzer freigegeben am 2026-11-04, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-41 „M11: Quicktime-Fokus“ und H-43 „M12: Rand-Marker, Ankündigungston, Eliten“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-39 „M10: Boss-Finisher“, Teil 1 und Teil 2 vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-02 (Ergänzung H-37 „M9: Märchen-Quicktimes“, vom Nutzer freigegeben am 2026-11-02, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-35 „M8: Shop, Diamanten, Rüstung, Pets“, vom Nutzer freigegeben am 2026-11-01, inklusive der Annahmen). Zuvor freigegeben am 2026-11-01 (Ergänzung H-33 „M7: Quicktime, Stufen, Restzeit, Hauptmenü“, vom Nutzer freigegeben am 2026-11-01). Zuvor freigegeben am 2026-10-31 (Ergänzung „Wüste und Level-Seiten“, vom Nutzer freigegeben am 2026-10-31). Zuvor freigegeben am 2026-10-28 (Ergänzung H-25 „Münzen 12 px, kleine Chips, NIEDERLAGE“ nach den Handtest-Antworten des Nutzers, vom Nutzer freigegeben am 2026-10-28; H-23 freigegeben am 2026-10-28; „Ingame-Sprites“ und H-14 freigegeben am 2026-10-26; erste Fassung freigegeben am 2026-10-25)
+**Stand H-50 (2026-11-06):** Interview „Speedline-Ring“ (Q-95 Option A, PE-256) im Head-Modus, Runde 1 beantwortet (1a 2a 3a 4a, Head). Tokens `size.rig-hit-ring-*`, `motion.duration.rig-hit-ring-step`, `opacity.rig-hit-ring-last`, Kontrast grün, Exporte neu, Mockup `mockups/m13-hit-ring.html`, Ring in `m13b-boards.js` und den fünf H-48-Brettern angeglichen. Wartet auf Freigabe. Danach: Planner-Auftrag „Design übernehmen“ (AP-194).
 **Stand H-48 (2026-11-04):** Interview „M13 Teil 2: übrige 5 Bosse“ läuft (Runde 1: 1b 2a 3a 4a; Runde 2: 5a 6a 7a 8a; Runde 3: 9a 10a 11a 12a; Runde 4: 13a 14a 15a 16a). Interview abgeschlossen. Teil 2a fertig (Sprites `assets/sprites-m13b.js`, Mockup `mockups/m13b-teile.html`, Q-92-Tokens, Kontrast grün), vom Nutzer freigegeben am 2026-11-04 (inklusive der Annahmen). Nächster Schritt für 2a: Planner-Auftrag „Design übernehmen“ (AP-185). Teil 2b (Kampfmomente, Storyboards: `mockups/m13b-forest-ghost.html`, `-giant-stone`, `-sand-worm`, `-guardian-dog`, `-pharaoh`) fertig, vom Nutzer freigegeben am 2026-11-04 (inklusive der Annahmen). Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-185 bis AP-190). H-47 ist noch offen; Abhängiges ist `(angenommen)`.
 **Stand H-46 (2026-11-04):** Interview „M13 Teil 1: Figurenteile, Laserklinge, Rosenschnitt, Storyboard Level 4“ läuft, Runden 1 und 2 beantwortet (1a 2a 3a 4a, 5c 6a 7a 8b), Runde 3 beantwortet (9a 10a 11a). Interview abgeschlossen. Sprites `assets/sprites-m13.js`, Mockup `mockups/m13-rig-und-storyboard.html`, Tokens (Kontrast grün) und Übergabe sind fertig. Vom Nutzer freigegeben am 2026-11-04. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-182 bis AP-184; Entscheidung zu `anchors` von `arm-front`).
 **Stand H-41/H-43 (2026-11-02):** Interview läuft. Interview abgeschlossen (1a–7a). Tokens, Sprites `assets/sprites-m11.js`, Mockup `mockups/m11-m12-fokus-und-wellen.html` und Übergabe fertig, Kontrast grün. H-41 und H-43 vom Nutzer freigegeben am 2026-11-02. Nächster Schritt: Planner-Auftrag „Design übernehmen“ (AP-173, AP-177, AP-178; Hinweise zu Dateilisten und Ton-Schlüsseln beachten).
@@ -1225,5 +1226,52 @@ Ein Mockup je Boss, jeweils Abschnitt 1 Kampfmoment (≈ 3,5 s, Zeitleiste und 8
 Alle Pakete: Haupttreffer im Kampfmoment nur Boss-Weiß 100 ms + Ring (13a), Smear 33/66 ms (14a), Stehpunkte aus `size.rig-*-x-*`, bei „Reduzieren“ entfallen Boss-Weiß, Impact-Paar, Ring und Wackeln.
 
 Mobile (390 px): Die Bretter werden rechts abgeschnitten wie beim Kopftext oben. Vermutete Ursache: Der Headless-Browser rendert nicht schmaler als ≈ 500 px und schneidet das Bild zu (nicht geprüft). Betrifft nur das Arbeitsdokument.
+
+### 2026-11-06 · Ergänzung H-50 „Speedline-Ring des Haupttreffers“ (Q-95 Option A, PE-256; wartet auf Freigabe)
+
+**Auftrag:** H-50 aus dem Plan (§13). Entscheidung 13a verlangt im Kampfmoment „Boss-Weiß 100 ms + Zittern + Speedline-Ring“, der Ring war aber nicht festgelegt. Jetzt gibt es eine Vorgabe für einen gemeinsamen Baustein (AP-194), der in allen sechs Kampfmomenten gleich aussieht. Rosenschnitt wird nachgezogen.
+
+**Entscheidungen (Head für den Nutzer, 2026-11-06):**
+1. **1a Form: Strahlenkranz** aus Pixel-Keilen wie in den H-48-Brettern und den H-39-Speedlines, kein geschlossener Ring.
+2. **2a Ablauf:** beginnt mit dem Boss-Weiß (gleiches `atMs`), springt in 3 Stufen zu je 33 ms nach außen, nach 99 ms weg. Er liegt damit in jedem Treffer-Stopp (100 bis 200 ms) und zittert nicht mit.
+3. **3a Größe aus dem Boss:** Mitte = Trefferpunkt, Innenradius = Bezugshöhe / 2 × Boss-Maßstab + 8.
+4. **4a Farbe und Ebene:** `color.finisher.speedline` (Creme), über dem Boss, unter Astronautin, Schnittlinie und Titel.
+
+**Vorgabe (Tokens in `tokens.json`):**
+| Merkmal | Wert | Token |
+|---|---|---|
+| Strahlen | 24, gleichmäßig verteilt, Startwinkel um einen halben Schritt versetzt, je Strahl ± 6° Zufall | `size.rig-hit-ring-rays` 24, `size.rig-hit-ring-jitter` 6 (Grad) |
+| Zufall | ein fester Seed je Treffer. Winkel und Längen werden einmal gezogen und gelten für alle 3 Stufen (kein Flackern) | – |
+| Innenradius r0 | Bezugshöhe / 2 × `size.rig-scale-boss-moment` + Abstand: 104 bei 64-px-Bossen (Baummonster, Riesen-Stein, Sand-Wurm-Kopf, Wächter-Hund, Pharao), 80 beim Waldgeist (48 px) | `size.rig-hit-ring-gap` 8 |
+| Strahllänge | 14 bis 36 (Seed) | `size.rig-hit-ring-ray-min` 14, `-ray-max` 36 |
+| Keil | Pixelpunkte entlang des Strahls, innere Hälfte 1 px, äußere Hälfte 2 px, auf ganze Pixel gerundet | `size.rig-hit-ring-dot-in` 1, `-dot-out` 2 |
+| Stauchung | senkrechte Versätze × 0,8 (wie die Funken-Bursts) | `size.rig-hit-ring-squash` 0,8 |
+| Stufen | Stufe 1 (0–33 ms) bei r0 · Stufe 2 (33–66) alle Strahlen + 8 px · Stufe 3 (66–99) + 16 px, halbe Länge, Deckkraft 0,6 · danach weg, ohne Ausblenden | `size.rig-hit-ring-steps` 3, `-step-out` 8, `motion.duration.rig-hit-ring-step` 33, `opacity.rig-hit-ring-last` 0,6 |
+| Mitte | Trefferpunkt aus der Choreografie. Standard: Boss-x, Boden − Bezugshöhe / 2 × 3 (64 px: 300 − 96 = 204; Waldgeist 228). Bosseigene Mitten zeigen die Bretter: Waldgeist hinter ihr, Sand-Wurm am Kopf, Wächter-Hund am Halsband | – |
+| Farbe | `color.finisher.speedline` (Creme `#fff4e8`), zeichnet als `Graphics`-Rechtecke, kein Tint | – |
+| Ebene | über dem Boss (auch über seinen `-sil`-Teilen), unter Astronautin, Schnittlinie und Titel; Bildschirm-Koordinaten des Moments, folgt nicht dem Zittern | – |
+| Blitz | kein Blitz (keine Vollbild-Helligkeit), zählt nicht gegen `flashMaxPerWindow` | – |
+| Reduzieren | entfällt ganz (`reduce:'drop'`), ebenso Boss-Weiß und Zittern | – |
+| Cinematic | kein Ring. Dort gehört der Haupttreffer dem Impact-Paar | – |
+
+Kontrast: neue Paare `finisher.speedline` auf `bg-forest`, `bg-night`, `bg-elf`, `bg-pyramid` und `biome.forest-ground`, alle ≥ 7:1. `contrast.js --tokens` grün, Exporte css, ts, json neu gebaut (363 Tokens).
+
+**Annahmen des Designers** (angenommen, Teil der Freigabe):
+- Stufe 3 halbiert die Länge und senkt die Deckkraft auf 0,6. So klingt der Ring ohne weiches Ausblenden aus (Pixel-Easing in Stufen, Grundsatz 7).
+- Bezugshöhe des Sand-Wurms ist der Kopf (64 px), nicht die Kette.
+- Der Ring beginnt mit dem Boss-Weiß. Ist der Treffer-Stopp kürzer als 99 ms (heute nirgends), wird Stufe 3 abgeschnitten.
+
+**Ergebnis:**
+- Mockup `mockups/m13-hit-ring.html`: 1 Ablauf am Riesen-Stein (Stufen 1–3, danach, Reduzieren), 2 alle sechs Bosse inklusive Rosenschnitt, 3 Maß- und Token-Tabelle. Screenshot `screenshots/m13-hit-ring-desktop.png`.
+- `mockups/m13b-boards.js`: `ring()` zeichnet nach den Tokens (Parameter `r0`, `step`), neu `ringR(refH, scale)`. Die fünf H-48-Bretter rufen den Ring mit `ringR` auf. Ihre Radien ändern sich leicht (bisher 80 bis 110 von Hand, jetzt 104 bzw. 80). Prüfbild `screenshots/m13b-sand-worm-ring-check-desktop.png`.
+
+**Übergabe an den Planner (H-50):**
+| Paket | Aufgabe |
+|---|---|
+| „Design übernehmen“ | Platzhalter in AP-194 füllen: Abschnitt „2026-11-06 · Ergänzung H-50“, Token-Gruppe `size.rig-hit-ring-*` plus `motion.duration.rig-hit-ring-step` und `opacity.rig-hit-ring-last`, Brett `mockups/m13-hit-ring.html` (Ansichten 1 bis 3). |
+| AP-194 | `npm run theme:build` (neue Tokens). Baustein in `fx/` (z. B. `hitRing(scene, x, y, refH, scale, seed)`), zeichnet 24 Strahlen als Rechtecke in einem `Graphics`, 3 Stufen nach `rig-hit-ring-step`, danach zerstören bzw. ausblenden. Keine Allokation pro Frame (Winkel und Längen einmal beim Start). Ebene über dem Boss, unter Astronautin und Schnittlinie, nicht im Zitter-Container. Bei „Reduzieren“ `reduce:'drop'`. Nachzug Rosenschnitt: Ring beim Haupttreffer (1000 ms), Mitte am Stamm (Boss-x, Boden − 96), r0 104. README: Aufrufform für AP-186 bis AP-190. |
+| AP-186 bis AP-190 | rufen nur den Baustein mit dem Trefferpunkt ihres Bretts und der Bezugshöhe auf (Waldgeist 48, sonst 64). |
+
+**Design-Review AP-194:** gegen `m13-hit-ring.html` Ansichten 1 bis 3 und Entscheidung 13a.
 
 - keine weiteren (erste Fassung vom 2026-10-25)

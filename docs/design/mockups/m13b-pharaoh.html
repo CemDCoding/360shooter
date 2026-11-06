@@ -80,7 +80,7 @@ window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'F
     B.beam(c, AX + 36, GROUND - 96, SX[1] - 6, SY + 4, 4); B.bars(c);
   });
   B.board('moment', '<b>R5 · 1200 ms</b> · <span class="flash">⚡</span> Treffer-Stopp 200: Pharao weiß (<code>-sil</code>), Speedline-Ring. Die Gold-Spirale kehrt um und zieht sich auf ihn zusammen.', (c) => {
-    sc(c); ph(c, BX, P(RAISED, { 'orb-ring': 'spin3' }), s3, { sil: 'all' }); B.ring(c, 5, BX, GROUND - 100, 100, 26); syms(c, 1, 0.6); B.astro(c, AX, A.aim); B.bars(c);
+    sc(c); ph(c, BX, P(RAISED, { 'orb-ring': 'spin3' }), s3, { sil: 'all' }); B.ring(c, 5, BX, GROUND - 96, B.ringR(64, B.SBM)); syms(c, 1, 0.6); B.astro(c, AX, A.aim); B.bars(c);
   });
   B.board('moment', '<b>R6 · 1700 ms</b> · Reaktion (Zeitlupe 0,3 bis 2000): Das Gold steigt von den Füßen auf (<code>robe: gilded-half</code>), die Spirale ist in ihm verschwunden.', (c) => {
     sc(c); ph(c, BX, gild(1, RAISED), s3, { hide: ['orb-ring'] }); B.rise(c, FX, 6, BX - 50, BX + 50, GROUND - 40, GROUND - 4, 6, [1], 3); B.astro(c, AX, A.aim); B.bars(c);

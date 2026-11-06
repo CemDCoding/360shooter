@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+<script>const t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.dataset.theme=t;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 H-50: Speedline-Ring des Haupttreffers im Kampfmoment · 360shooter</title>
+<link rel="stylesheet" href="../export/tokens.css">
+<link rel="stylesheet" href="../assets/mockup-base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="m13b-boards.css">
+<style>
+  table.spec { border-collapse: collapse; margin: 8px 0 24px; font-size: 14px; }
+  table.spec th, table.spec td { border: 1px solid currentColor; padding: 4px 8px; text-align: left; vertical-align: top; }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>Speedline-Ring · Haupttreffer im Kampfmoment (H-50, Q-95, Entscheidung 13a)</h1>
+  <p>Ein gemeinsamer Baustein für alle sechs Kampfmomente (Rosenschnitt und die fünf aus H-48). Strahlenkranz aus Pixel-Keilen in <code>finisher.speedline</code>, springt in 3 Stufen zu je 33 ms nach außen und ist nach 99 ms weg. Er beginnt mit dem Boss-Weiß (gleiches <code>atMs</code>), zittert nicht mit und liegt über dem Boss, unter Astronautin und Titel.</p>
+  <dl>
+    <dt>Blitz</dt><dd>Der Ring ist kein Blitz: keine Vollbild-Helligkeit, nur dünne Strahlen außerhalb des Bosses. Er zählt nicht gegen <code>flashMaxPerWindow</code>.</dd>
+    <dt>Reduziert</dt><dd>Der Ring entfällt ganz (<code>reduce:'drop'</code>), ebenso Boss-Weiß und Zittern. Schnittlinie, Risse usw. bleiben als Treffer-Merkmal.</dd>
+  </dl>
+  <p id="err"></p>
+</header>
+<section>
+  <h2>1 · ABLAUF (Riesen-Stein „Morgenlicht“, Treffer bei 1400 ms)</h2>
+  <div class="boards" id="steps"></div>
+</section>
+<section>
+  <h2>2 · ALLE SECHS BOSSE (Stufe 1, Innenradius = halbe Bezugshöhe × 3 + 8)</h2>
+  <div class="boards" id="bosses"></div>
+</section>
+<section>
+  <h2>3 · MASSE UND TOKENS</h2>
+  <table class="spec">
+    <tr><th>Merkmal</th><th>Wert</th><th>Token</th></tr>
+    <tr><td>Strahlen</td><td>24, gleichmäßig, Startwinkel um einen halben Schritt versetzt, je Strahl ± 6° Zufall (fester Seed je Treffer, gilt für alle 3 Stufen)</td><td><code>size.rig-hit-ring-rays</code>, <code>-jitter</code></td></tr>
+    <tr><td>Innenradius r0</td><td>Bezugshöhe / 2 × Boss-Maßstab + 8 → 104 (64-px-Bosse), 80 (Waldgeist 48 px)</td><td><code>size.rig-hit-ring-gap</code>, <code>size.rig-scale-boss-moment</code></td></tr>
+    <tr><td>Strahllänge</td><td>14 bis 36 (Seed)</td><td><code>-ray-min</code>, <code>-ray-max</code></td></tr>
+    <tr><td>Keil</td><td>Pixelpunkte entlang des Strahls: innere Hälfte 1 px, äußere Hälfte 2 px, ganze Pixel</td><td><code>-dot-in</code>, <code>-dot-out</code></td></tr>
+    <tr><td>Stauchung</td><td>senkrechte Versätze × 0,8</td><td><code>-squash</code></td></tr>
+    <tr><td>Stufen</td><td>3 × 33 ms: Stufe 1 bei r0, Stufe 2 + 8 px, Stufe 3 + 16 px mit halber Länge und Deckkraft 0,6; danach weg (kein Ausblenden)</td><td><code>-steps</code>, <code>-step-out</code>, <code>motion.duration.rig-hit-ring-step</code>, <code>opacity.rig-hit-ring-last</code></td></tr>
+    <tr><td>Mitte</td><td>Trefferpunkt aus der Choreografie (Standard: Boss-x, Boden − Bezugshöhe / 2 × 3)</td><td>–</td></tr>
+    <tr><td>Farbe, Ebene</td><td><code>finisher.speedline</code> (Creme); über dem Boss, unter Astronautin und Titel; bewegt sich nicht mit dem Zittern</td><td><code>color.finisher.speedline</code></td></tr>
+  </table>
+</section>
+<script src="../assets/fonts.js"></script>
+<script src="../assets/sprites.js"></script>
+<script src="../assets/sprites-world.js"></script>
+<script src="../assets/sprites-desert.js"></script>
+<script src="../assets/sprites-m8.js"></script>
+<script src="../assets/sprites-m9.js"></script>
+<script src="../assets/sprites-m10.js"></script>
+<script src="../assets/sprites-m13.js"></script>
+<script src="../assets/sprites-m13b.js"></script>
+<script src="m13b-boards.js"></script>
+<script>
+window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'Fehler: ' + m + ' (' + l + ')\n'; };
+(function () {
+  const B = window.M13B(), { A, GROUND, X } = B;
+  const AX = X.am, BX = X.bm, s3 = B.SBM, R64 = B.ringR(64, s3), R48 = B.ringR(48, s3);
+  const CY64 = GROUND - 32 * s3, CY48 = GROUND - 24 * s3;
+  const stone = (c, o = {}) => B.rig(c, 'giantStone', BX, { face: 'strain' }, s3, Object.assign({ hide: ['chunk-1', 'chunk-2', 'chunk-3', 'chunk-4'] }, o));
+
+  // 1 · steps
+  const step = (n, cap) => B.board('steps', cap, (c) => { B.world(c, 'elf'); stone(c, { sil: 'all' }); B.ring(c, 5, BX, CY64, R64, n); B.astro(c, AX, A.shootUp); B.bars(c); });
+  step(1, '<b>Stufe 1 · 0–33 ms</b> · <span class="flash">⚡</span> Boss-Weiß an, Ring bei r0 = 104.');
+  step(2, '<b>Stufe 2 · 33–66 ms</b> · alle Strahlen 8 px weiter außen, Boss bleibt weiß.');
+  step(3, '<b>Stufe 3 · 66–99 ms</b> · 16 px außen, halbe Länge, Deckkraft 0,6.');
+  B.board('steps', '<b>ab 100 ms</b> · Ring weg, Boss-Weiß endet; Treffer-Stopp läuft bis 200 ms weiter.', (c) => { B.world(c, 'elf'); stone(c); B.astro(c, AX, A.shootUp); B.bars(c); });
+  B.board('steps', '<b>Reduzieren</b> · kein Boss-Weiß, kein Ring, kein Zittern. Der Treffer liest sich über das Lichtband und die folgenden Risse.', (c) => { B.world(c, 'elf'); stone(c); B.astro(c, AX, A.shootUp); B.bars(c); });
+
+  // 2 · all six bosses
+  const one = (cap, w, id, pose, r0, cy, astro) => B.board('bosses', cap, (c) => { B.world(c, w); B.rig(c, id, BX, pose, s3, { sil: 'all' }); B.ring(c, 7, BX, cy, r0, 1); B.astro(c, AX, astro); B.bars(c); });
+  one('<b>Baummonster · Rosenschnitt</b> (Nachzug, AP-194) · 64 px, r0 104', 'forest', 'rootMonster', {}, R64, CY64, A.cut);
+  one('<b>Waldgeist · Erlkönigs Töchter</b> · 48 px, r0 80 (im Moment hinter ihr; Mitte folgt dem Trefferpunkt)', 'night', 'forestGhost', {}, R48, CY48, A.aim);
+  one('<b>Riesen-Stein · Morgenlicht</b> · 64 px, r0 104', 'elf', 'giantStone', { face: 'strain' }, R64, CY64, A.shootUp);
+  one('<b>Sand-Wurm · Segmentkette</b> · Bezug Kopf 64 px, r0 104; Mitte am Kopf', 'desert', 'giantSandWorm', {}, R64, CY64, A.shootDown);
+  one('<b>Wächter-Hund · Drei Takte</b> · 64 px, r0 104; Mitte am Halsband', 'pyramid', 'guardianDog', {}, R64, CY64, A.guard);
+  one('<b>Pharao · Rätsel</b> · 64 px, r0 104', 'oasis', 'pharaoh', {}, R64, CY64, A.aim);
+})();
+</script>
+</body>
+</html>

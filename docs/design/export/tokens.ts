@@ -342,7 +342,17 @@ export const tokens = {
     "rig-astro-x-moment": "var(--size-rig-astro-x-moment)",
     "rig-boss-x-moment": "var(--size-rig-boss-x-moment)",
     "rig-astro-x-cinematic": "var(--size-rig-astro-x-cinematic)",
-    "rig-boss-x-cinematic": "var(--size-rig-boss-x-cinematic)"
+    "rig-boss-x-cinematic": "var(--size-rig-boss-x-cinematic)",
+    "rig-hit-ring-rays": "var(--size-rig-hit-ring-rays)",
+    "rig-hit-ring-jitter": "var(--size-rig-hit-ring-jitter)",
+    "rig-hit-ring-gap": "var(--size-rig-hit-ring-gap)",
+    "rig-hit-ring-ray-min": "var(--size-rig-hit-ring-ray-min)",
+    "rig-hit-ring-ray-max": "var(--size-rig-hit-ring-ray-max)",
+    "rig-hit-ring-dot-in": "var(--size-rig-hit-ring-dot-in)",
+    "rig-hit-ring-dot-out": "var(--size-rig-hit-ring-dot-out)",
+    "rig-hit-ring-squash": "var(--size-rig-hit-ring-squash)",
+    "rig-hit-ring-steps": "var(--size-rig-hit-ring-steps)",
+    "rig-hit-ring-step-out": "var(--size-rig-hit-ring-step-out)"
   },
   "motion": {
     "duration": {
@@ -382,6 +392,7 @@ export const tokens = {
       "rig-shake-half": "var(--motion-duration-rig-shake-half)",
       "rig-crumble-step": "var(--motion-duration-rig-crumble-step)",
       "rig-hit-white": "var(--motion-duration-rig-hit-white)",
+      "rig-hit-ring-step": "var(--motion-duration-rig-hit-ring-step)",
       "rig-afterimage-gap": "var(--motion-duration-rig-afterimage-gap)",
       "rig-afterimage-fade": "var(--motion-duration-rig-afterimage-fade)",
       "rig-blade-step": "var(--motion-duration-rig-blade-step)"
@@ -404,7 +415,8 @@ export const tokens = {
     "focus-low-reduced": "var(--opacity-focus-low-reduced)",
     "rig-afterimage-1": "var(--opacity-rig-afterimage-1)",
     "rig-afterimage-2": "var(--opacity-rig-afterimage-2)",
-    "rig-afterimage-3": "var(--opacity-rig-afterimage-3)"
+    "rig-afterimage-3": "var(--opacity-rig-afterimage-3)",
+    "rig-hit-ring-last": "var(--opacity-rig-hit-ring-last)"
   }
 } as const;
 

@@ -150,7 +150,20 @@ window.M13B = function () {
       ctx.beginPath(); ctx.moveTo(fx0 + ca * r1, fy0 + sa * r1); ctx.lineTo(fx0 + ca * R - sa * w, fy0 + sa * R + ca * w); ctx.lineTo(fx0 + ca * R + sa * w, fy0 + sa * R - ca * w); ctx.fill(); }
   }
   // speedline ring around the boss: the moment's main hit without a full-screen flash (13a)
-  function ring(ctx, seed, cx, cy, r0, n) { const r = rnd(seed); ctx.fillStyle = T.speed; for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + r() * 0.2, l = 14 + r() * 22; for (let k = 0; k < l; k++) ctx.fillRect(Math.round(cx + Math.cos(a) * (r0 + k)), Math.round(cy + Math.sin(a) * (r0 + k) * 0.8), 2, 2); } }
+  // H-50 (Q-95): spec from size.rig-hit-ring-*; r0 = ringR(refHeight, bossScale); step 1..3 (each motion.duration.rig-hit-ring-step)
+  const ringR = (refH, s) => (refH / 2) * s + num('--size-rig-hit-ring-gap');
+  function ring(ctx, seed, cx, cy, r0, step = 1) {
+    const r = rnd(seed), n = num('--size-rig-hit-ring-rays'), jit = (num('--size-rig-hit-ring-jitter') * Math.PI) / 180;
+    const lMin = num('--size-rig-hit-ring-ray-min'), lMax = num('--size-rig-hit-ring-ray-max'), sq = num('--size-rig-hit-ring-squash');
+    const dIn = num('--size-rig-hit-ring-dot-in'), dOut = num('--size-rig-hit-ring-dot-out'), out = num('--size-rig-hit-ring-step-out') * (step - 1);
+    const last = step >= num('--size-rig-hit-ring-steps');
+    ctx.save(); ctx.fillStyle = T.speed; if (last) ctx.globalAlpha = num('--opacity-rig-hit-ring-last');
+    for (let i = 0; i < n; i++) {
+      const a = ((i + 0.5) / n) * Math.PI * 2 + (r() * 2 - 1) * jit, L0 = lMin + r() * (lMax - lMin), L = last ? L0 * 0.5 : L0, ca = Math.cos(a), sa = Math.sin(a);
+      for (let k = 0; k < L; k++) { const d = k < L / 2 ? dIn : dOut, rr = r0 + out + k; ctx.fillRect(Math.round(cx + ca * rr - d / 2), Math.round(cy + sa * rr * sq - d / 2), d, d); }
+    }
+    ctx.restore();
+  }
   // laser: white core with coral rim (Graphics band in the game)
   function beam(ctx, x0, y0, x1, y1, w = 4) {
     ctx.save(); ctx.lineCap = 'butt';
@@ -201,5 +214,5 @@ window.M13B = function () {
   only();
   const astro = (ctx, x, pose, o = {}) => drawRig(ctx, 'astronaut', Object.assign({ x, y: GROUND, s: SA, pose }, o));
   const rig = (ctx, id, x, pose, s, o = {}) => drawRig(ctx, id, Object.assign({ x, y: GROUND, s, pose }, o));
-  return { S, RG, T, SA, SBM, SBC, GROUND, BAR, X, AI, A, P, fr, spr, drawRig, trail, ktext, title, nameText, rnd, world, bars, cam, fx, burst, rise, speedH, radial, ring, beam, slashLine, slashH, cutIn, impact, board, timeline, astro, rig };
+  return { S, RG, T, SA, SBM, SBC, GROUND, BAR, X, AI, A, P, fr, spr, drawRig, trail, ktext, title, nameText, rnd, world, bars, cam, fx, burst, rise, speedH, radial, ring, ringR, beam, slashLine, slashH, cutIn, impact, board, timeline, astro, rig };
 };

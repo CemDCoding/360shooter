@@ -80,7 +80,7 @@ window.onerror = (m, s, l) => { document.getElementById('err').textContent += 'F
     B.astro(c, AX - 30, A.shootUp, { ang: { 'arm-front': -20 } }); B.beam(c, AX - 4, GROUND - 92, AX + 120, -40, 4); B.bars(c);
   });
   B.board('moment', '<b>S5 · 1400 ms</b> · <span class="flash">⚡</span> Das Morgenlicht fällt als schmales Band auf den Riesen. Treffer-Stopp 200: Riese weiß (<code>-sil</code>), Speedline-Ring.', (c) => {
-    sc(c); light(c, BX, 36); stone(c, BX, R.windup, s3, { sil: 'all', off: { 'fist-left': [-30, -6] } }); B.ring(c, 5, BX, GROUND - 100, 110, 26);
+    sc(c); light(c, BX, 36); stone(c, BX, R.windup, s3, { sil: 'all', off: { 'fist-left': [-30, -6] } }); B.ring(c, 5, BX, GROUND - 96, B.ringR(64, B.SBM));
     B.astro(c, AX - 30, A.shootUp, { ang: { 'arm-front': -20 } }); B.bars(c);
   });
   B.board('moment', '<b>S6 · 1900 ms</b> · Reaktion (Zeitlupe 0,3): Er erstarrt mitten in der Bewegung (<code>frozen</code>), die Risse leuchten nacheinander auf (<code>cracked1 → 3</code>, hier Stufe 2), die Kristalle fangen das Licht.', (c) => {
