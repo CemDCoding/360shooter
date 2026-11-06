@@ -2,17 +2,18 @@
 // `undefined` = no choreography yet, the M10 sequence plays (fallback until AP-191).
 // Later packages replace only their own entry (and add their own file next to this one).
 import type { ChoreoDef, ChoreoVariantId } from '../../contracts';
+import { CINEMATIC_9, MOMENT_FOREST_GHOST } from './forestGhost';
 import { CINEMATIC_4, MOMENT_ROOT_MONSTER } from './rootMonster';
 
 export const CHOREOS: Readonly<Record<ChoreoVariantId, ChoreoDef | undefined>> = {
   'moment-rootMonster': MOMENT_ROOT_MONSTER,
-  'moment-forestGhost': undefined,
+  'moment-forestGhost': MOMENT_FOREST_GHOST,
   'moment-giantStone': undefined,
   'moment-giantSandWorm': undefined,
   'moment-guardianDog': undefined,
   'moment-pharaoh': undefined,
   'cinematic-4': CINEMATIC_4,
-  'cinematic-9': undefined,
+  'cinematic-9': CINEMATIC_9,
   'cinematic-20': undefined,
   'cinematic-25': undefined,
   'cinematic-30': undefined,
