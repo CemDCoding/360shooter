@@ -1,5 +1,5 @@
 // Baut die Ingame-Sprites aus den Pixeldaten des Designs
-// (docs/design/assets/sprites.js, sprites-world.js, sprites-desert.js, sprites-m8.js, sprites-m9.js, sprites-m10.js, sprites-m10b.js, sprites-m10c.js, sprites-m11.js und sprites-m13.js, window.PX_SPRITES)
+// (docs/design/assets/sprites.js, sprites-world.js, sprites-desert.js, sprites-m8.js, sprites-m9.js, sprites-m10.js, sprites-m10b.js, sprites-m10c.js, sprites-m11.js, sprites-m13.js und sprites-m13b.js, window.PX_SPRITES)
 // nach public/assets/sprites/<key>.png (RGBA, Frames waagerecht nebeneinander). Die Figurenteile (M13) kommen zusaetzlich
 // in einen Atlas je Boss-Variante (finisher-rig-<BossId>.png plus .json, Phaser-JSON-Hash, Bildname <Bogen>-<Index>).
 // Die Framegroesse und -zahl werden gegen ASSETS (src/config/assets.ts) geprueft.
@@ -15,7 +15,7 @@ import { deflateSync } from 'node:zlib';
 import { ASSETS, FINISHER_ATLASES } from '../src/config/assets.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-// Reihenfolge ist wichtig: sprites-world.js, sprites-desert.js, sprites-m8.js bis sprites-m13.js ergaenzen window.PX_SPRITES aus sprites.js.
+// Reihenfolge ist wichtig: sprites-world.js, sprites-desert.js, sprites-m8.js bis sprites-m13b.js ergaenzen window.PX_SPRITES aus sprites.js.
 // PX_TOOLKIT aus sprites-desert.js ist kein Sprite-Schluessel und wird ignoriert (gebaut werden nur Manifest-Schluessel).
 const SOURCES = [
   join(root, 'docs', 'design', 'assets', 'sprites.js'),
@@ -28,6 +28,7 @@ const SOURCES = [
   join(root, 'docs', 'design', 'assets', 'sprites-m10c.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-m11.js'),
   join(root, 'docs', 'design', 'assets', 'sprites-m13.js'),
+  join(root, 'docs', 'design', 'assets', 'sprites-m13b.js'),
 ];
 const OUT_DIR = join(root, 'public', 'assets', 'sprites');
 
@@ -90,7 +91,7 @@ export function loadSprites(sourcePaths = SOURCES) {
   return runSources(sourcePaths).PX_SPRITES;
 }
 
-/** Liest window.PX_RIGS (Rig-Daten der Figuren aus sprites-m13.js) auf demselben Weg. */
+/** Liest window.PX_RIGS (Rig-Daten der Figuren aus sprites-m13.js und sprites-m13b.js) auf demselben Weg. */
 export function loadRigs(sourcePaths = SOURCES) {
   return runSources(sourcePaths).PX_RIGS;
 }

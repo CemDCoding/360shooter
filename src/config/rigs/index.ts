@@ -1,34 +1,20 @@
 // Register of the figures for the finisher choreographies (M13, AP-181, RS-06.1, PE-251).
-// astronaut and rootMonster are the real rigs (AP-183); the others are one placeholder part until AP-185 to AP-190.
-// Later packages change only their own entry; frame names come with "Design uebernehmen" (H-46).
+// All seven rigs are real: astronaut and rootMonster (AP-183, H-46), the other five bosses (AP-185, H-48).
 import type { RigDef, RigId } from '../../contracts';
 import { ASTRONAUT_RIG } from './astronaut';
+import { FOREST_GHOST_RIG } from './forestGhost';
+import { GIANT_SAND_WORM_RIG } from './giantSandWorm';
+import { GIANT_STONE_RIG } from './giantStone';
+import { GUARDIAN_DOG_RIG } from './guardianDog';
+import { PHARAOH_RIG } from './pharaoh';
 import { ROOT_MONSTER_RIG } from './rootMonster';
-
-function placeholder(id: RigId): RigDef {
-  return {
-    id,
-    parts: [
-      {
-        id: 'body',
-        frame: `${id}-body`,
-        silhouette: `${id}-body-white`,
-        originX: 0.5,
-        originY: 0.5,
-        x: 0,
-        y: 0,
-        order: 0,
-      },
-    ],
-  };
-}
 
 export const RIGS: Readonly<Record<RigId, RigDef>> = {
   astronaut: ASTRONAUT_RIG,
   rootMonster: ROOT_MONSTER_RIG,
-  forestGhost: placeholder('forestGhost'),
-  giantStone: placeholder('giantStone'),
-  giantSandWorm: placeholder('giantSandWorm'),
-  guardianDog: placeholder('guardianDog'),
-  pharaoh: placeholder('pharaoh'),
+  forestGhost: FOREST_GHOST_RIG,
+  giantStone: GIANT_STONE_RIG,
+  giantSandWorm: GIANT_SAND_WORM_RIG,
+  guardianDog: GUARDIAN_DOG_RIG,
+  pharaoh: PHARAOH_RIG,
 };

@@ -114,9 +114,14 @@ export const ASTRONAUT_RIG: RigDef = {
     {
       id: 'blade',
       frame: 'rig-astro-blade-0',
-      poses: { full: 'rig-astro-blade-0', grow2: 'rig-astro-blade-1', grow1: 'rig-astro-blade-2' },
+      poses: {
+        full: 'rig-astro-blade-0',
+        grow2: 'rig-astro-blade-1',
+        grow1: 'rig-astro-blade-2',
+        spear: 'rig-astro-blade-3',
+      },
       silhouette: 'rig-astro-blade-sil-0',
-      originX: 0.028,
+      originX: 0.018,
       originY: 0.556,
       x: 21,
       y: 3,
@@ -145,9 +150,13 @@ export const ASTRONAUT_RIG: RigDef = {
     {
       id: 'blade-arc',
       frame: 'rig-astro-blade-arc-0',
-      poses: { arc1: 'rig-astro-blade-arc-0', arc2: 'rig-astro-blade-arc-1' },
+      poses: {
+        arc1: 'rig-astro-blade-arc-0',
+        arc2: 'rig-astro-blade-arc-1',
+        hammer: 'rig-astro-blade-arc-2',
+      },
       silhouette: 'rig-astro-blade-arc-sil-0',
-      originX: 0.327,
+      originX: 0.27,
       originY: 0.7,
       x: 21,
       y: 3,

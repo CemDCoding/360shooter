@@ -44,27 +44,45 @@ function sound(name: string, description: string): AssetDef {
 /** Bogen eines Figurenteils: [Schluessel, Breite, Hoehe, Frames, Beschreibung]. */
 type RigSheet = readonly [string, number, number, number, string];
 
-/** Teil mit Posen (Frames) und sein Silhouetten-Bogen `<key>-sil` (alle Pixel weiss, gleicher Rahmen). */
+/** Figur eines Teils: Kurzname im Schluessel (`rig-<kurz>-<teil>`) und Anzeigename. */
+const RIG_WHO = {
+  astro: 'Astronautin',
+  root: 'Baummonster',
+  ghost: 'Waldgeist',
+  stone: 'Riesen-Stein',
+  worm: 'Sand-Wurm',
+  dog: 'Waechter-Hund',
+  pharaoh: 'Pharao',
+} as const;
+
+/**
+ * Teil mit Posen (Frames), sein Silhouetten-Bogen `<key>-sil` (alle Pixel weiss, gleicher Rahmen) und sein
+ * Tinten-Bogen `<key>-ink` (alle Pixel Tinte, helles Impact-Bild, Q-92).
+ */
 function partSheets(
-  rig: 'astro' | 'root',
+  rig: keyof typeof RIG_WHO,
   part: string,
   w: number,
   h: number,
   poses: string,
 ): RigSheet[] {
   const n = poses.split(' ').length;
-  const who = rig === 'astro' ? 'Astronautin' : 'Baummonster';
+  const who = RIG_WHO[rig];
   return [
     [`rig-${rig}-${part}`, w, h, n, `Figurenteil ${who} "${part}", Posen: ${poses}.`],
     [`rig-${rig}-${part}-sil`, w, h, n, `Silhouette (weiss) zu "${part}" (${who}), gleiche Posen.`],
+    [
+      `rig-${rig}-${part}-ink`,
+      w,
+      h,
+      n,
+      `Tinten-Bild (Tinte) zu "${part}" (${who}), gleiche Posen.`,
+    ],
   ];
 }
 
-/**
- * Die 39 Boegen der Figurenteile Teil 1 (Astronautin, Baummonster, Effekte). Sie landen zusaetzlich in einem
- * Atlas (`FINISHER_ATLASES`), Bildname im Atlas = `<Bogen>-<Index>`.
- */
-const RIG_SHEETS: readonly RigSheet[] = [
+/** Teile der Astronautin (10 Teile, je Bogen `-sil` und `-ink`). Klinge und Bogen haben seit H-48 neue Masse und eine Pose mehr. */
+const ASTRO_SHEETS: readonly RigSheet[] = [
   ...partSheets('astro', 'pack', 8, 37, 'rest thrust'),
   ...partSheets('astro', 'arm-back', 15, 23, 'rest back up'),
   ...partSheets('astro', 'leg-back', 21, 23, 'stand crouch tuck kneel smear'),
@@ -72,9 +90,13 @@ const RIG_SHEETS: readonly RigSheet[] = [
   ...partSheets('astro', 'torso', 25, 30, 'upright lean smear'),
   ...partSheets('astro', 'helmet', 35, 34, 'serious dark'),
   ...partSheets('astro', 'arm-front', 26, 29, 'rest aim raise slash-end smear'),
-  ...partSheets('astro', 'blade', 36, 9, 'full grow2 grow1'),
+  ...partSheets('astro', 'blade', 56, 9, 'full grow2 grow1 spear'),
   ...partSheets('astro', 'raygun', 32, 31, 'a0 up45 up90 back135 down45'),
-  ...partSheets('astro', 'blade-arc', 52, 50, 'arc1 arc2'),
+  ...partSheets('astro', 'blade-arc', 63, 50, 'arc1 arc2 hammer'),
+];
+
+/** Teile des Baummonsters (8 Teile) und seine Effekte (Teil 1, H-46). */
+const ROOT_SHEETS: readonly RigSheet[] = [
   ...partSheets('root', 'crown', 54, 36, 'upright bent'),
   ...partSheets('root', 'arm-right', 29, 56, 'rest raised stab'),
   ...partSheets('root', 'roots-right', 22, 17, 'rest'),
@@ -106,6 +128,130 @@ const RIG_SHEETS: readonly RigSheet[] = [
   ],
 ];
 
+/** Teile des Waldgeists (7 Teile) und sein Effekt-Bogen (Teil 2, H-48). */
+const GHOST_SHEETS: readonly RigSheet[] = [
+  ...partSheets('ghost', 'tail-wisp', 32, 10, 'rest flow stretch trug'),
+  ...partSheets('ghost', 'antenna-right', 15, 13, 'rest swept trug'),
+  ...partSheets('ghost', 'antenna-left', 15, 13, 'rest swept trug'),
+  ...partSheets('ghost', 'arm-right', 17, 14, 'rest reach trug'),
+  ...partSheets('ghost', 'arm-left', 17, 14, 'rest reach trug'),
+  ...partSheets('ghost', 'body', 32, 41, 'rest stretch dissolve1 dissolve2 trug'),
+  ...partSheets('ghost', 'face', 18, 18, 'rest wail trug'),
+  [
+    'rig-fx-ghost',
+    8,
+    8,
+    4,
+    'Partikel Waldgeist (vorgefaerbt): 0 Mondfunke, 1 Mondstaub, 2 Nebel, 3 Scherbe.',
+  ],
+];
+
+/** Teile des Riesen-Steins (9 Teile, 4 Brocken) und sein Effekt-Bogen. */
+const STONE_SHEETS: readonly RigSheet[] = [
+  ...partSheets('stone', 'fist-right', 20, 18, 'rest raised frozen'),
+  ...partSheets('stone', 'body', 58, 50, 'rest cracked1 cracked2 cracked3'),
+  ...partSheets('stone', 'crystals', 23, 15, 'rest lit'),
+  ...partSheets('stone', 'face', 31, 22, 'rest strain frozen'),
+  ...partSheets('stone', 'chunk-1', 34, 30, 'rest'),
+  ...partSheets('stone', 'chunk-2', 30, 33, 'rest'),
+  ...partSheets('stone', 'chunk-3', 35, 25, 'rest'),
+  ...partSheets('stone', 'chunk-4', 30, 43, 'rest'),
+  ...partSheets('stone', 'fist-left', 35, 18, 'rest raised punch frozen'),
+  [
+    'rig-fx-stone',
+    8,
+    8,
+    6,
+    'Partikel Riesen-Stein (vorgefaerbt): 0 Stein, 1 Kiesel, 2 Staub, 3 Morgenfunke, 4 Kristallsplitter, 5 Lichtfunke.',
+  ],
+];
+
+/** Teile des Sand-Wurms (10 Teile, `rig-worm-seg` gilt fuer alle sieben Glieder), Effekt und Sandwelle. */
+const WORM_SHEETS: readonly RigSheet[] = [
+  ...partSheets('worm', 'tail', 29, 22, 'rest crumble1 crumble2'),
+  ...partSheets('worm', 'seg', 26, 27, 'rest crumble1 crumble2'),
+  ...partSheets('worm', 'head', 52, 44, 'rest crumble1 crumble2'),
+  ...partSheets('worm', 'jaw', 22, 28, 'closed open roar crumble1 crumble2'),
+  [
+    'rig-fx-worm',
+    8,
+    8,
+    5,
+    'Partikel Sand-Wurm (vorgefaerbt): 0 Sandklumpen, 1 Sandkorn, 2 Staub, 3 Zahnsplitter, 4 Sonnenfunke.',
+  ],
+  [
+    'rig-prop-sandwave',
+    64,
+    20,
+    3,
+    'Sandwelle vor dem Durchbruch des Wurms: 0 Wellenschlag, 1 steigende Welle, 2 Kamm mit Gischt.',
+  ],
+];
+
+/** Teile des Waechter-Hunds (10 Teile, `rig-dog-shade` gilt fuer alle drei Schattenkoepfe), Effekt und Fackel. */
+const DOG_SHEETS: readonly RigSheet[] = [
+  ...partSheets('dog', 'legs-back', 17, 21, 'stand lie stone'),
+  ...partSheets('dog', 'legs-front', 20, 21, 'stand lie stone'),
+  ...partSheets('dog', 'tail', 12, 22, 'rest down stone'),
+  ...partSheets('dog', 'body', 46, 31, 'rest dark stone'),
+  ...partSheets('dog', 'head', 25, 30, 'rest low sleep stone'),
+  ...partSheets('dog', 'jaw', 12, 7, 'closed snap stone'),
+  ...partSheets('dog', 'collar', 18, 10, 'rest dark broken stone'),
+  ...partSheets('dog', 'shade', 20, 25, 'rest snap fade'),
+  [
+    'rig-fx-dog',
+    8,
+    8,
+    5,
+    'Partikel Waechter-Hund (vorgefaerbt): 0 Rune, 1 Runenfunke, 2 Schatten, 3 Funke, 4 Steinbrocken.',
+  ],
+  [
+    'rig-prop-torch',
+    8,
+    16,
+    3,
+    'Fackel der Grabkammer: 0 aus, 1 und 2 brennend (Cinematic Level 30).',
+  ],
+];
+
+/** Teile des Pharaos (6 Teile, ohne Arme), Effekt und Raetsel-Symbole. */
+const PHARAOH_SHEETS: readonly RigSheet[] = [
+  ...partSheets('pharaoh', 'robe', 40, 30, 'rest gilded-half gilded'),
+  ...partSheets('pharaoh', 'collar', 28, 15, 'rest gilded'),
+  ...partSheets('pharaoh', 'flail', 25, 27, 'rest raised gilded'),
+  ...partSheets('pharaoh', 'crook', 21, 26, 'rest raised gilded'),
+  ...partSheets('pharaoh', 'head', 28, 27, 'rest glare cracked gilded'),
+  ...partSheets('pharaoh', 'orb-ring', 67, 27, 'spin1 spin2 spin3'),
+  [
+    'rig-fx-pharaoh',
+    8,
+    8,
+    5,
+    'Partikel Pharao (vorgefaerbt): 0 Goldfunke, 1 Goldkorn, 2 Goldsplitter, 3 Stoffstreifen, 4 Lichtfunke.',
+  ],
+  [
+    'rig-prop-riddle',
+    16,
+    16,
+    6,
+    'Raetsel-Symbole des Pharaos: 0 Kind, 1 Mensch, 2 Greis; 3 bis 5 dieselben leuchtend.',
+  ],
+];
+
+/**
+ * Alle Boegen der Figurenteile (Teil 1 und 2). Jeder Bogen ist ein Spritesheet; Teile und Effekte landen zusaetzlich
+ * im Atlas ihres Bosses (`FINISHER_ATLASES`), Bildname im Atlas = `<Bogen>-<Index>`.
+ */
+const RIG_SHEETS: readonly RigSheet[] = [
+  ...ASTRO_SHEETS,
+  ...ROOT_SHEETS,
+  ...GHOST_SHEETS,
+  ...STONE_SHEETS,
+  ...WORM_SHEETS,
+  ...DOG_SHEETS,
+  ...PHARAOH_SHEETS,
+];
+
 /**
  * Atlas je Boss-Variante (PE-248, PE-252): ein PNG plus Phaser-JSON-Hash, gebaut von `npm run sprites:build`
  * aus den Boegen `sheets` (jedes Einzelbild heisst `<Bogen>-<Index>`). Die Szene leitet den Atlas aus dem Boss-Rig ab.
@@ -117,13 +263,23 @@ export interface FinisherAtlasDef {
   sheets: readonly string[];
 }
 
+/** Atlas eines Bosses: Teile der Astronautin plus Teile und Effekte des Bosses (geteilte Boegen nur einmal). */
+function atlas(boss: string, bossSheets: readonly RigSheet[]): FinisherAtlasDef {
+  return {
+    key: `finisher-rig-${boss}`,
+    path: `assets/sprites/finisher-rig-${boss}.png`,
+    jsonPath: `assets/sprites/finisher-rig-${boss}.json`,
+    sheets: [...ASTRO_SHEETS, ...bossSheets].map((x) => x[0]),
+  };
+}
+
 export const FINISHER_ATLASES: readonly FinisherAtlasDef[] = [
-  {
-    key: 'finisher-rig-rootMonster',
-    path: 'assets/sprites/finisher-rig-rootMonster.png',
-    jsonPath: 'assets/sprites/finisher-rig-rootMonster.json',
-    sheets: RIG_SHEETS.map((s) => s[0]),
-  },
+  atlas('rootMonster', ROOT_SHEETS),
+  atlas('forestGhost', GHOST_SHEETS),
+  atlas('giantStone', STONE_SHEETS),
+  atlas('giantSandWorm', WORM_SHEETS),
+  atlas('guardianDog', DOG_SHEETS),
+  atlas('pharaoh', PHARAOH_SHEETS),
 ];
 
 /** Assets mit eigener Datei. */

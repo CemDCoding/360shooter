@@ -289,6 +289,10 @@ const SIZE_PX = {
   'size.rig-ground': 300,
   'size.rig-slash': 2,
   'size.rig-slash-rim': 1,
+  'size.rig-astro-x-moment': 170,
+  'size.rig-boss-x-moment': 470,
+  'size.rig-astro-x-cinematic': 160,
+  'size.rig-boss-x-cinematic': 480,
 } as const;
 
 /** Größen als Anzahl. */
@@ -345,6 +349,11 @@ const MOTION_MS = {
   'motion.event-slide': 150,
   'motion.event-tone': 250,
   'motion.rig-smear': 33,
+  'motion.rig-smear-arc': 66,
+  'motion.rig-shake-step': 20,
+  'motion.rig-shake-half': 80,
+  'motion.rig-crumble-step': 120,
+  'motion.rig-hit-white': 100,
   'motion.rig-afterimage-gap': 33,
   'motion.rig-afterimage-fade': 150,
   'motion.rig-blade-step': 80,
