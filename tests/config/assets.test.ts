@@ -39,8 +39,8 @@ describe('asset manifest', () => {
     expect(new Set(ASSETS.map((a) => a.path)).size).toBe(ASSETS.length);
   });
 
-  it('has 139 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
-    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(139);
+  it('has 267 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
+    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(267);
     const expected: Record<string, [number, number, number]> = {
       'enemy-mummy': [32, 32, 4],
       'mummy-wrap': [16, 8, 2],
@@ -145,75 +145,125 @@ describe('asset manifest', () => {
     }
   });
 
-  it('has the 39 rig sheets of part 1 (AP-183): 18 parts, 18 silhouettes of equal size, 3 effects', () => {
+  it('has the 167 rig sheets of part 1 and 2 (AP-183, AP-185): parts with silhouette and ink sheet, effects, props', () => {
     const rig = ASSETS.filter((a) => a.key.startsWith('rig-'));
-    expect(rig).toHaveLength(39);
-    const sil = rig.filter((a) => a.key.endsWith('-sil'));
-    expect(sil).toHaveLength(18);
-    for (const s of sil) {
-      const base = ASSETS.find((a) => a.key === s.key.slice(0, -4));
-      expect(base, s.key).toBeDefined();
-      expect([s.frameWidth, s.frameHeight, s.frames], s.key).toEqual([
-        base?.frameWidth,
-        base?.frameHeight,
-        base?.frames,
-      ]);
+    // 10 + 8 + 7 + 9 + 4 + 8 + 6 = 52 part sheets (seg and shade count once), 3 sheets each, plus 11 effects and props
+    expect(rig).toHaveLength(52 * 3 + 11);
+    for (const suffix of ['-sil', '-ink']) {
+      const derived = rig.filter((a) => a.key.endsWith(suffix));
+      expect(derived).toHaveLength(52);
+      for (const s of derived) {
+        const base = ASSETS.find((a) => a.key === s.key.slice(0, -suffix.length));
+        expect(base, s.key).toBeDefined();
+        expect([s.frameWidth, s.frameHeight, s.frames], s.key).toEqual([
+          base?.frameWidth,
+          base?.frameHeight,
+          base?.frames,
+        ]);
+      }
     }
-    expect(
-      rig.filter((a) => a.key.startsWith('rig-astro-') && !a.key.endsWith('-sil')),
-    ).toHaveLength(10);
-    expect(
-      rig.filter((a) => a.key.startsWith('rig-root-') && !a.key.endsWith('-sil')),
-    ).toHaveLength(8);
+    const partCount = (prefix: string): number =>
+      rig.filter(
+        (a) => a.key.startsWith(prefix) && !a.key.endsWith('-sil') && !a.key.endsWith('-ink'),
+      ).length;
+    expect(partCount('rig-astro-')).toBe(10);
+    expect(partCount('rig-root-')).toBe(8);
+    expect(partCount('rig-ghost-')).toBe(7);
+    expect(partCount('rig-stone-')).toBe(9);
+    expect(partCount('rig-worm-')).toBe(4);
+    expect(partCount('rig-dog-')).toBe(8);
+    expect(partCount('rig-pharaoh-')).toBe(6);
     const fx: Record<string, [number, number, number]> = {
       'rig-fx-root': [8, 8, 8],
       'rig-prop-rosehedge': [80, 28, 3],
       'rig-fx-ground-bulge': [48, 16, 3],
+      'rig-fx-ghost': [8, 8, 4],
+      'rig-fx-stone': [8, 8, 6],
+      'rig-fx-worm': [8, 8, 5],
+      'rig-prop-sandwave': [64, 20, 3],
+      'rig-fx-dog': [8, 8, 5],
+      'rig-prop-torch': [8, 16, 3],
+      'rig-fx-pharaoh': [8, 8, 5],
+      'rig-prop-riddle': [16, 16, 6],
     };
     for (const [key, size] of Object.entries(fx)) {
       const a = ASSETS.find((x) => x.key === key);
       expect([a?.frameWidth, a?.frameHeight, a?.frames], key).toEqual(size);
     }
-    // 51 part images (10 + 8 parts, their poses) plus the same number of silhouettes
-    const partFrames = rig
-      .filter((a) => !a.key.endsWith('-sil') && /^rig-(astro|root)-/.test(a.key))
-      .reduce((n, a) => n + (a.frames ?? 0), 0);
-    expect(partFrames).toBe(51);
+    // blade and blade-arc got new sizes and one pose more (H-48, decision 7a)
+    expect(ASSETS.find((a) => a.key === 'rig-astro-blade')).toMatchObject({
+      frameWidth: 56,
+      frameHeight: 9,
+      frames: 4,
+    });
+    expect(ASSETS.find((a) => a.key === 'rig-astro-blade-arc')).toMatchObject({
+      frameWidth: 63,
+      frameHeight: 50,
+      frames: 3,
+    });
   });
 
-  it('has one atlas per boss variant within the texture limit (AP-183, PE-248, PE-252)', () => {
-    expect(FINISHER_ATLASES.map((x) => x.key)).toEqual(['finisher-rig-rootMonster']);
-    const atlas = FINISHER_ATLASES[0];
-    expect(atlas?.sheets).toHaveLength(39);
-    for (const s of atlas?.sheets ?? [])
-      expect(
-        ASSETS.some((a) => a.key === s),
-        s,
-      ).toBe(true);
-    const png = readFileSync(atlas?.path ?? '');
-    const w = png.readUInt32BE(16);
-    const h = png.readUInt32BE(20);
-    expect(w).toBeLessThanOrEqual(4096);
-    expect(h).toBeLessThanOrEqual(4096);
-    const json = JSON.parse(readFileSync(atlas?.jsonPath ?? '').toString('utf8')) as {
-      frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+  it('has one atlas per boss variant within the texture limit (AP-183, AP-185, PE-248, PE-252)', () => {
+    expect(FINISHER_ATLASES.map((x) => x.key)).toEqual([
+      'finisher-rig-rootMonster',
+      'finisher-rig-forestGhost',
+      'finisher-rig-giantStone',
+      'finisher-rig-giantSandWorm',
+      'finisher-rig-guardianDog',
+      'finisher-rig-pharaoh',
+    ]);
+    const imageCounts: Record<string, number> = {
+      'finisher-rig-rootMonster': 173,
+      'finisher-rig-forestGhost': 187,
+      'finisher-rig-giantStone': 177,
+      'finisher-rig-giantSandWorm': 161,
+      'finisher-rig-guardianDog': 197,
+      'finisher-rig-pharaoh': 176,
     };
-    const names = Object.keys(json.frames);
-    // 51 part images + 51 silhouettes + 14 effect images
-    expect(names).toHaveLength(116);
-    for (const sheet of atlas?.sheets ?? []) {
-      const def = ASSETS.find((a) => a.key === sheet);
-      for (let i = 0; i < (def?.frames ?? 0); i++) {
-        const name = `${sheet}-${i}`;
-        const f = json.frames[name]?.frame;
-        expect(f, name).toBeDefined();
-        expect([f?.w, f?.h]).toEqual([def?.frameWidth, def?.frameHeight]);
-        expect((f?.x ?? 0) + (f?.w ?? 0)).toBeLessThanOrEqual(w);
-        expect((f?.y ?? 0) + (f?.h ?? 0)).toBeLessThanOrEqual(h);
+    for (const atlas of FINISHER_ATLASES) {
+      expect(new Set(atlas.sheets).size, atlas.key).toBe(atlas.sheets.length);
+      for (const s of atlas.sheets)
+        expect(
+          ASSETS.some((a) => a.key === s),
+          s,
+        ).toBe(true);
+      // every atlas holds the astronaut with silhouettes and ink images
+      for (const part of ['torso', 'blade', 'blade-arc']) {
+        for (const suffix of ['', '-sil', '-ink'])
+          expect(atlas.sheets, atlas.key).toContain(`rig-astro-${part}${suffix}`);
       }
+      const png = readFileSync(atlas.path);
+      const w = png.readUInt32BE(16);
+      const h = png.readUInt32BE(20);
+      expect(w, atlas.key).toBeLessThanOrEqual(4096);
+      expect(h, atlas.key).toBeLessThanOrEqual(4096);
+      const json = JSON.parse(readFileSync(atlas.jsonPath).toString('utf8')) as {
+        frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+      };
+      const names = Object.keys(json.frames);
+      expect(names, atlas.key).toHaveLength(imageCounts[atlas.key] as number);
+      for (const sheet of atlas.sheets) {
+        const def = ASSETS.find((a) => a.key === sheet);
+        for (let i = 0; i < (def?.frames ?? 0); i++) {
+          const name = `${sheet}-${i}`;
+          const f = json.frames[name]?.frame;
+          expect(f, name).toBeDefined();
+          expect([f?.w, f?.h]).toEqual([def?.frameWidth, def?.frameHeight]);
+          expect((f?.x ?? 0) + (f?.w ?? 0)).toBeLessThanOrEqual(w);
+          expect((f?.y ?? 0) + (f?.h ?? 0)).toBeLessThanOrEqual(h);
+        }
+      }
+      expect(names).toContain('rig-astro-torso-sil-0');
+      expect(names).toContain('rig-astro-torso-ink-0');
     }
-    expect(names).toContain('rig-astro-torso-sil-0');
-    expect(names).toContain('rig-fx-root-7');
+    const root = FINISHER_ATLASES[0];
+    expect(root?.sheets).toHaveLength(57);
+    expect(root?.sheets).toContain('rig-fx-root');
+    // shared sheets only once per atlas
+    const worm = FINISHER_ATLASES.find((a) => a.key === 'finisher-rig-giantSandWorm');
+    expect(worm?.sheets.filter((k) => k === 'rig-worm-seg')).toHaveLength(1);
+    const dog = FINISHER_ATLASES.find((a) => a.key === 'finisher-rig-guardianDog');
+    expect(dog?.sheets.filter((k) => k === 'rig-dog-shade')).toHaveLength(1);
   });
 
   it('has valid mono 16-bit 44.1 kHz WAV files', () => {

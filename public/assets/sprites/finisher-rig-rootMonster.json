@@ -2,8 +2,8 @@
   "frames": {
     "rig-astro-arm-back-0": {
       "frame": {
-        "x": 243,
-        "y": 176,
+        "x": 378,
+        "y": 264,
         "w": 15,
         "h": 23
       },
@@ -22,8 +22,8 @@
     },
     "rig-astro-arm-back-1": {
       "frame": {
-        "x": 259,
-        "y": 176,
+        "x": 394,
+        "y": 264,
         "w": 15,
         "h": 23
       },
@@ -42,8 +42,68 @@
     },
     "rig-astro-arm-back-2": {
       "frame": {
-        "x": 275,
-        "y": 176,
+        "x": 410,
+        "y": 264,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-ink-0": {
+      "frame": {
+        "x": 426,
+        "y": 264,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-ink-1": {
+      "frame": {
+        "x": 442,
+        "y": 264,
+        "w": 15,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 23
+      }
+    },
+    "rig-astro-arm-back-ink-2": {
+      "frame": {
+        "x": 458,
+        "y": 264,
         "w": 15,
         "h": 23
       },
@@ -62,8 +122,8 @@
     },
     "rig-astro-arm-back-sil-0": {
       "frame": {
-        "x": 291,
-        "y": 176,
+        "x": 474,
+        "y": 264,
         "w": 15,
         "h": 23
       },
@@ -82,8 +142,8 @@
     },
     "rig-astro-arm-back-sil-1": {
       "frame": {
-        "x": 307,
-        "y": 176,
+        "x": 490,
+        "y": 264,
         "w": 15,
         "h": 23
       },
@@ -102,8 +162,8 @@
     },
     "rig-astro-arm-back-sil-2": {
       "frame": {
-        "x": 323,
-        "y": 176,
+        "x": 0,
+        "y": 294,
         "w": 15,
         "h": 23
       },
@@ -122,8 +182,8 @@
     },
     "rig-astro-arm-front-0": {
       "frame": {
-        "x": 189,
-        "y": 144,
+        "x": 234,
+        "y": 233,
         "w": 26,
         "h": 29
       },
@@ -142,8 +202,8 @@
     },
     "rig-astro-arm-front-1": {
       "frame": {
-        "x": 216,
-        "y": 144,
+        "x": 261,
+        "y": 233,
         "w": 26,
         "h": 29
       },
@@ -162,8 +222,8 @@
     },
     "rig-astro-arm-front-2": {
       "frame": {
-        "x": 243,
-        "y": 144,
+        "x": 288,
+        "y": 233,
         "w": 26,
         "h": 29
       },
@@ -182,8 +242,8 @@
     },
     "rig-astro-arm-front-3": {
       "frame": {
-        "x": 270,
-        "y": 144,
+        "x": 315,
+        "y": 233,
         "w": 26,
         "h": 29
       },
@@ -202,8 +262,108 @@
     },
     "rig-astro-arm-front-4": {
       "frame": {
-        "x": 297,
-        "y": 144,
+        "x": 342,
+        "y": 233,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-ink-0": {
+      "frame": {
+        "x": 369,
+        "y": 233,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-ink-1": {
+      "frame": {
+        "x": 396,
+        "y": 233,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-ink-2": {
+      "frame": {
+        "x": 423,
+        "y": 233,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-ink-3": {
+      "frame": {
+        "x": 450,
+        "y": 233,
+        "w": 26,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 29
+      }
+    },
+    "rig-astro-arm-front-ink-4": {
+      "frame": {
+        "x": 477,
+        "y": 233,
         "w": 26,
         "h": 29
       },
@@ -222,8 +382,8 @@
     },
     "rig-astro-arm-front-sil-0": {
       "frame": {
-        "x": 324,
-        "y": 144,
+        "x": 0,
+        "y": 264,
         "w": 26,
         "h": 29
       },
@@ -242,8 +402,8 @@
     },
     "rig-astro-arm-front-sil-1": {
       "frame": {
-        "x": 351,
-        "y": 144,
+        "x": 27,
+        "y": 264,
         "w": 26,
         "h": 29
       },
@@ -262,8 +422,8 @@
     },
     "rig-astro-arm-front-sil-2": {
       "frame": {
-        "x": 378,
-        "y": 144,
+        "x": 54,
+        "y": 264,
         "w": 26,
         "h": 29
       },
@@ -282,8 +442,8 @@
     },
     "rig-astro-arm-front-sil-3": {
       "frame": {
-        "x": 405,
-        "y": 144,
+        "x": 81,
+        "y": 264,
         "w": 26,
         "h": 29
       },
@@ -302,8 +462,8 @@
     },
     "rig-astro-arm-front-sil-4": {
       "frame": {
-        "x": 432,
-        "y": 144,
+        "x": 108,
+        "y": 264,
         "w": 26,
         "h": 29
       },
@@ -322,9 +482,9 @@
     },
     "rig-astro-blade-0": {
       "frame": {
-        "x": 149,
-        "y": 229,
-        "w": 36,
+        "x": 100,
+        "y": 342,
+        "w": 56,
         "h": 9
       },
       "rotated": false,
@@ -332,19 +492,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 36,
+        "w": 56,
         "h": 9
       },
       "sourceSize": {
-        "w": 36,
+        "w": 56,
         "h": 9
       }
     },
     "rig-astro-blade-1": {
       "frame": {
-        "x": 186,
-        "y": 229,
-        "w": 36,
+        "x": 157,
+        "y": 342,
+        "w": 56,
         "h": 9
       },
       "rotated": false,
@@ -352,19 +512,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 36,
+        "w": 56,
         "h": 9
       },
       "sourceSize": {
-        "w": 36,
+        "w": 56,
         "h": 9
       }
     },
     "rig-astro-blade-2": {
       "frame": {
-        "x": 223,
-        "y": 229,
-        "w": 36,
+        "x": 214,
+        "y": 342,
+        "w": 56,
         "h": 9
       },
       "rotated": false,
@@ -372,19 +532,39 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 36,
+        "w": 56,
         "h": 9
       },
       "sourceSize": {
-        "w": 36,
+        "w": 56,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-3": {
+      "frame": {
+        "x": 271,
+        "y": 342,
+        "w": 56,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 56,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 56,
         "h": 9
       }
     },
     "rig-astro-blade-arc-0": {
       "frame": {
-        "x": 366,
-        "y": 0,
-        "w": 52,
+        "x": 60,
+        "y": 57,
+        "w": 63,
         "h": 50
       },
       "rotated": false,
@@ -392,19 +572,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 52,
+        "w": 63,
         "h": 50
       },
       "sourceSize": {
-        "w": 52,
+        "w": 63,
         "h": 50
       }
     },
     "rig-astro-blade-arc-1": {
       "frame": {
-        "x": 419,
-        "y": 0,
-        "w": 52,
+        "x": 124,
+        "y": 57,
+        "w": 63,
         "h": 50
       },
       "rotated": false,
@@ -412,19 +592,99 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 52,
+        "w": 63,
         "h": 50
       },
       "sourceSize": {
-        "w": 52,
+        "w": 63,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-arc-2": {
+      "frame": {
+        "x": 188,
+        "y": 57,
+        "w": 63,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 63,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 63,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-arc-ink-0": {
+      "frame": {
+        "x": 252,
+        "y": 57,
+        "w": 63,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 63,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 63,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-arc-ink-1": {
+      "frame": {
+        "x": 316,
+        "y": 57,
+        "w": 63,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 63,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 63,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-arc-ink-2": {
+      "frame": {
+        "x": 380,
+        "y": 57,
+        "w": 63,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 63,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 63,
         "h": 50
       }
     },
     "rig-astro-blade-arc-sil-0": {
       "frame": {
-        "x": 0,
+        "x": 444,
         "y": 57,
-        "w": 52,
+        "w": 63,
         "h": 50
       },
       "rotated": false,
@@ -432,19 +692,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 52,
+        "w": 63,
         "h": 50
       },
       "sourceSize": {
-        "w": 52,
+        "w": 63,
         "h": 50
       }
     },
     "rig-astro-blade-arc-sil-1": {
       "frame": {
-        "x": 53,
-        "y": 57,
-        "w": 52,
+        "x": 0,
+        "y": 114,
+        "w": 63,
         "h": 50
       },
       "rotated": false,
@@ -452,19 +712,119 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 52,
+        "w": 63,
         "h": 50
       },
       "sourceSize": {
-        "w": 52,
+        "w": 63,
         "h": 50
+      }
+    },
+    "rig-astro-blade-arc-sil-2": {
+      "frame": {
+        "x": 64,
+        "y": 114,
+        "w": 63,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 63,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 63,
+        "h": 50
+      }
+    },
+    "rig-astro-blade-ink-0": {
+      "frame": {
+        "x": 328,
+        "y": 342,
+        "w": 56,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 56,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 56,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-ink-1": {
+      "frame": {
+        "x": 385,
+        "y": 342,
+        "w": 56,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 56,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 56,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-ink-2": {
+      "frame": {
+        "x": 442,
+        "y": 342,
+        "w": 56,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 56,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 56,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-ink-3": {
+      "frame": {
+        "x": 0,
+        "y": 359,
+        "w": 56,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 56,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 56,
+        "h": 9
       }
     },
     "rig-astro-blade-sil-0": {
       "frame": {
-        "x": 260,
-        "y": 229,
-        "w": 36,
+        "x": 57,
+        "y": 359,
+        "w": 56,
         "h": 9
       },
       "rotated": false,
@@ -472,19 +832,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 36,
+        "w": 56,
         "h": 9
       },
       "sourceSize": {
-        "w": 36,
+        "w": 56,
         "h": 9
       }
     },
     "rig-astro-blade-sil-1": {
       "frame": {
-        "x": 297,
-        "y": 229,
-        "w": 36,
+        "x": 114,
+        "y": 359,
+        "w": 56,
         "h": 9
       },
       "rotated": false,
@@ -492,19 +852,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 36,
+        "w": 56,
         "h": 9
       },
       "sourceSize": {
-        "w": 36,
+        "w": 56,
         "h": 9
       }
     },
     "rig-astro-blade-sil-2": {
       "frame": {
-        "x": 334,
-        "y": 229,
-        "w": 36,
+        "x": 171,
+        "y": 359,
+        "w": 56,
         "h": 9
       },
       "rotated": false,
@@ -512,18 +872,38 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 36,
+        "w": 56,
         "h": 9
       },
       "sourceSize": {
-        "w": 36,
+        "w": 56,
+        "h": 9
+      }
+    },
+    "rig-astro-blade-sil-3": {
+      "frame": {
+        "x": 228,
+        "y": 359,
+        "w": 56,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 56,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 56,
         "h": 9
       }
     },
     "rig-astro-helmet-0": {
       "frame": {
-        "x": 44,
-        "y": 108,
+        "x": 264,
+        "y": 165,
         "w": 35,
         "h": 34
       },
@@ -542,8 +922,48 @@
     },
     "rig-astro-helmet-1": {
       "frame": {
-        "x": 80,
-        "y": 108,
+        "x": 300,
+        "y": 165,
+        "w": 35,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 35,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 35,
+        "h": 34
+      }
+    },
+    "rig-astro-helmet-ink-0": {
+      "frame": {
+        "x": 336,
+        "y": 165,
+        "w": 35,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 35,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 35,
+        "h": 34
+      }
+    },
+    "rig-astro-helmet-ink-1": {
+      "frame": {
+        "x": 372,
+        "y": 165,
         "w": 35,
         "h": 34
       },
@@ -562,8 +982,8 @@
     },
     "rig-astro-helmet-sil-0": {
       "frame": {
-        "x": 116,
-        "y": 108,
+        "x": 408,
+        "y": 165,
         "w": 35,
         "h": 34
       },
@@ -582,8 +1002,8 @@
     },
     "rig-astro-helmet-sil-1": {
       "frame": {
-        "x": 152,
-        "y": 108,
+        "x": 444,
+        "y": 165,
         "w": 35,
         "h": 34
       },
@@ -602,8 +1022,8 @@
     },
     "rig-astro-leg-back-0": {
       "frame": {
-        "x": 339,
-        "y": 176,
+        "x": 16,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -622,8 +1042,8 @@
     },
     "rig-astro-leg-back-1": {
       "frame": {
-        "x": 361,
-        "y": 176,
+        "x": 38,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -642,8 +1062,8 @@
     },
     "rig-astro-leg-back-2": {
       "frame": {
-        "x": 383,
-        "y": 176,
+        "x": 60,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -662,8 +1082,8 @@
     },
     "rig-astro-leg-back-3": {
       "frame": {
-        "x": 405,
-        "y": 176,
+        "x": 82,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -682,8 +1102,108 @@
     },
     "rig-astro-leg-back-4": {
       "frame": {
-        "x": 427,
-        "y": 176,
+        "x": 104,
+        "y": 294,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-ink-0": {
+      "frame": {
+        "x": 126,
+        "y": 294,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-ink-1": {
+      "frame": {
+        "x": 148,
+        "y": 294,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-ink-2": {
+      "frame": {
+        "x": 170,
+        "y": 294,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-ink-3": {
+      "frame": {
+        "x": 192,
+        "y": 294,
+        "w": 21,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-back-ink-4": {
+      "frame": {
+        "x": 214,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -702,8 +1222,8 @@
     },
     "rig-astro-leg-back-sil-0": {
       "frame": {
-        "x": 449,
-        "y": 176,
+        "x": 236,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -722,8 +1242,8 @@
     },
     "rig-astro-leg-back-sil-1": {
       "frame": {
-        "x": 471,
-        "y": 176,
+        "x": 258,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -742,8 +1262,8 @@
     },
     "rig-astro-leg-back-sil-2": {
       "frame": {
-        "x": 0,
-        "y": 205,
+        "x": 280,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -762,8 +1282,8 @@
     },
     "rig-astro-leg-back-sil-3": {
       "frame": {
-        "x": 22,
-        "y": 205,
+        "x": 302,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -782,8 +1302,8 @@
     },
     "rig-astro-leg-back-sil-4": {
       "frame": {
-        "x": 44,
-        "y": 205,
+        "x": 324,
+        "y": 294,
         "w": 21,
         "h": 23
       },
@@ -802,8 +1322,8 @@
     },
     "rig-astro-leg-front-0": {
       "frame": {
-        "x": 66,
-        "y": 205,
+        "x": 346,
+        "y": 294,
         "w": 20,
         "h": 23
       },
@@ -822,8 +1342,8 @@
     },
     "rig-astro-leg-front-1": {
       "frame": {
-        "x": 87,
-        "y": 205,
+        "x": 367,
+        "y": 294,
         "w": 20,
         "h": 23
       },
@@ -842,8 +1362,8 @@
     },
     "rig-astro-leg-front-2": {
       "frame": {
-        "x": 108,
-        "y": 205,
+        "x": 388,
+        "y": 294,
         "w": 20,
         "h": 23
       },
@@ -862,8 +1382,8 @@
     },
     "rig-astro-leg-front-3": {
       "frame": {
-        "x": 129,
-        "y": 205,
+        "x": 409,
+        "y": 294,
         "w": 20,
         "h": 23
       },
@@ -882,8 +1402,108 @@
     },
     "rig-astro-leg-front-4": {
       "frame": {
-        "x": 150,
-        "y": 205,
+        "x": 430,
+        "y": 294,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-ink-0": {
+      "frame": {
+        "x": 451,
+        "y": 294,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-ink-1": {
+      "frame": {
+        "x": 472,
+        "y": 294,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-ink-2": {
+      "frame": {
+        "x": 0,
+        "y": 318,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-ink-3": {
+      "frame": {
+        "x": 21,
+        "y": 318,
+        "w": 20,
+        "h": 23
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 23
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 23
+      }
+    },
+    "rig-astro-leg-front-ink-4": {
+      "frame": {
+        "x": 42,
+        "y": 318,
         "w": 20,
         "h": 23
       },
@@ -902,8 +1522,8 @@
     },
     "rig-astro-leg-front-sil-0": {
       "frame": {
-        "x": 171,
-        "y": 205,
+        "x": 63,
+        "y": 318,
         "w": 20,
         "h": 23
       },
@@ -922,8 +1542,8 @@
     },
     "rig-astro-leg-front-sil-1": {
       "frame": {
-        "x": 192,
-        "y": 205,
+        "x": 84,
+        "y": 318,
         "w": 20,
         "h": 23
       },
@@ -942,8 +1562,8 @@
     },
     "rig-astro-leg-front-sil-2": {
       "frame": {
-        "x": 213,
-        "y": 205,
+        "x": 105,
+        "y": 318,
         "w": 20,
         "h": 23
       },
@@ -962,8 +1582,8 @@
     },
     "rig-astro-leg-front-sil-3": {
       "frame": {
-        "x": 234,
-        "y": 205,
+        "x": 126,
+        "y": 318,
         "w": 20,
         "h": 23
       },
@@ -982,8 +1602,8 @@
     },
     "rig-astro-leg-front-sil-4": {
       "frame": {
-        "x": 255,
-        "y": 205,
+        "x": 147,
+        "y": 318,
         "w": 20,
         "h": 23
       },
@@ -1002,8 +1622,8 @@
     },
     "rig-astro-pack-0": {
       "frame": {
-        "x": 106,
-        "y": 57,
+        "x": 128,
+        "y": 114,
         "w": 8,
         "h": 37
       },
@@ -1022,8 +1642,48 @@
     },
     "rig-astro-pack-1": {
       "frame": {
-        "x": 115,
-        "y": 57,
+        "x": 137,
+        "y": 114,
+        "w": 8,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 37
+      }
+    },
+    "rig-astro-pack-ink-0": {
+      "frame": {
+        "x": 146,
+        "y": 114,
+        "w": 8,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 37
+      }
+    },
+    "rig-astro-pack-ink-1": {
+      "frame": {
+        "x": 155,
+        "y": 114,
         "w": 8,
         "h": 37
       },
@@ -1042,8 +1702,8 @@
     },
     "rig-astro-pack-sil-0": {
       "frame": {
-        "x": 124,
-        "y": 57,
+        "x": 164,
+        "y": 114,
         "w": 8,
         "h": 37
       },
@@ -1062,8 +1722,8 @@
     },
     "rig-astro-pack-sil-1": {
       "frame": {
-        "x": 133,
-        "y": 57,
+        "x": 173,
+        "y": 114,
         "w": 8,
         "h": 37
       },
@@ -1082,8 +1742,8 @@
     },
     "rig-astro-raygun-0": {
       "frame": {
-        "x": 188,
-        "y": 108,
+        "x": 0,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1102,8 +1762,8 @@
     },
     "rig-astro-raygun-1": {
       "frame": {
-        "x": 221,
-        "y": 108,
+        "x": 33,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1122,8 +1782,8 @@
     },
     "rig-astro-raygun-2": {
       "frame": {
-        "x": 254,
-        "y": 108,
+        "x": 66,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1142,8 +1802,8 @@
     },
     "rig-astro-raygun-3": {
       "frame": {
-        "x": 287,
-        "y": 108,
+        "x": 99,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1162,8 +1822,108 @@
     },
     "rig-astro-raygun-4": {
       "frame": {
-        "x": 320,
-        "y": 108,
+        "x": 132,
+        "y": 201,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-ink-0": {
+      "frame": {
+        "x": 165,
+        "y": 201,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-ink-1": {
+      "frame": {
+        "x": 198,
+        "y": 201,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-ink-2": {
+      "frame": {
+        "x": 231,
+        "y": 201,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-ink-3": {
+      "frame": {
+        "x": 264,
+        "y": 201,
+        "w": 32,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 31
+      }
+    },
+    "rig-astro-raygun-ink-4": {
+      "frame": {
+        "x": 297,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1182,8 +1942,8 @@
     },
     "rig-astro-raygun-sil-0": {
       "frame": {
-        "x": 353,
-        "y": 108,
+        "x": 330,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1202,8 +1962,8 @@
     },
     "rig-astro-raygun-sil-1": {
       "frame": {
-        "x": 386,
-        "y": 108,
+        "x": 363,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1222,8 +1982,8 @@
     },
     "rig-astro-raygun-sil-2": {
       "frame": {
-        "x": 419,
-        "y": 108,
+        "x": 396,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1242,8 +2002,8 @@
     },
     "rig-astro-raygun-sil-3": {
       "frame": {
-        "x": 452,
-        "y": 108,
+        "x": 429,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1262,8 +2022,8 @@
     },
     "rig-astro-raygun-sil-4": {
       "frame": {
-        "x": 0,
-        "y": 144,
+        "x": 462,
+        "y": 201,
         "w": 32,
         "h": 31
       },
@@ -1282,8 +2042,8 @@
     },
     "rig-astro-torso-0": {
       "frame": {
-        "x": 33,
-        "y": 144,
+        "x": 0,
+        "y": 233,
         "w": 25,
         "h": 30
       },
@@ -1302,8 +2062,8 @@
     },
     "rig-astro-torso-1": {
       "frame": {
-        "x": 59,
-        "y": 144,
+        "x": 26,
+        "y": 233,
         "w": 25,
         "h": 30
       },
@@ -1322,8 +2082,68 @@
     },
     "rig-astro-torso-2": {
       "frame": {
-        "x": 85,
-        "y": 144,
+        "x": 52,
+        "y": 233,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-ink-0": {
+      "frame": {
+        "x": 78,
+        "y": 233,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-ink-1": {
+      "frame": {
+        "x": 104,
+        "y": 233,
+        "w": 25,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 25,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 25,
+        "h": 30
+      }
+    },
+    "rig-astro-torso-ink-2": {
+      "frame": {
+        "x": 130,
+        "y": 233,
         "w": 25,
         "h": 30
       },
@@ -1342,8 +2162,8 @@
     },
     "rig-astro-torso-sil-0": {
       "frame": {
-        "x": 111,
-        "y": 144,
+        "x": 156,
+        "y": 233,
         "w": 25,
         "h": 30
       },
@@ -1362,8 +2182,8 @@
     },
     "rig-astro-torso-sil-1": {
       "frame": {
-        "x": 137,
-        "y": 144,
+        "x": 182,
+        "y": 233,
         "w": 25,
         "h": 30
       },
@@ -1382,8 +2202,8 @@
     },
     "rig-astro-torso-sil-2": {
       "frame": {
-        "x": 163,
-        "y": 144,
+        "x": 208,
+        "y": 233,
         "w": 25,
         "h": 30
       },
@@ -1402,8 +2222,8 @@
     },
     "rig-fx-ground-bulge-0": {
       "frame": {
-        "x": 368,
-        "y": 205,
+        "x": 306,
+        "y": 318,
         "w": 48,
         "h": 16
       },
@@ -1422,8 +2242,8 @@
     },
     "rig-fx-ground-bulge-1": {
       "frame": {
-        "x": 417,
-        "y": 205,
+        "x": 355,
+        "y": 318,
         "w": 48,
         "h": 16
       },
@@ -1442,8 +2262,8 @@
     },
     "rig-fx-ground-bulge-2": {
       "frame": {
-        "x": 0,
-        "y": 229,
+        "x": 404,
+        "y": 318,
         "w": 48,
         "h": 16
       },
@@ -1462,8 +2282,8 @@
     },
     "rig-fx-root-0": {
       "frame": {
-        "x": 371,
-        "y": 229,
+        "x": 285,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1482,8 +2302,8 @@
     },
     "rig-fx-root-1": {
       "frame": {
-        "x": 380,
-        "y": 229,
+        "x": 294,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1502,8 +2322,8 @@
     },
     "rig-fx-root-2": {
       "frame": {
-        "x": 389,
-        "y": 229,
+        "x": 303,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1522,8 +2342,8 @@
     },
     "rig-fx-root-3": {
       "frame": {
-        "x": 398,
-        "y": 229,
+        "x": 312,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1542,8 +2362,8 @@
     },
     "rig-fx-root-4": {
       "frame": {
-        "x": 407,
-        "y": 229,
+        "x": 321,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1562,8 +2382,8 @@
     },
     "rig-fx-root-5": {
       "frame": {
-        "x": 416,
-        "y": 229,
+        "x": 330,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1582,8 +2402,8 @@
     },
     "rig-fx-root-6": {
       "frame": {
-        "x": 425,
-        "y": 229,
+        "x": 339,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1602,8 +2422,8 @@
     },
     "rig-fx-root-7": {
       "frame": {
-        "x": 434,
-        "y": 229,
+        "x": 348,
+        "y": 359,
         "w": 8,
         "h": 8
       },
@@ -1622,8 +2442,8 @@
     },
     "rig-prop-rosehedge-0": {
       "frame": {
-        "x": 0,
-        "y": 176,
+        "x": 135,
+        "y": 264,
         "w": 80,
         "h": 28
       },
@@ -1642,8 +2462,8 @@
     },
     "rig-prop-rosehedge-1": {
       "frame": {
-        "x": 81,
-        "y": 176,
+        "x": 216,
+        "y": 264,
         "w": 80,
         "h": 28
       },
@@ -1662,8 +2482,8 @@
     },
     "rig-prop-rosehedge-2": {
       "frame": {
-        "x": 162,
-        "y": 176,
+        "x": 297,
+        "y": 264,
         "w": 80,
         "h": 28
       },
@@ -1740,7 +2560,7 @@
         "h": 56
       }
     },
-    "rig-root-arm-left-sil-0": {
+    "rig-root-arm-left-ink-0": {
       "frame": {
         "x": 93,
         "y": 0,
@@ -1760,7 +2580,7 @@
         "h": 56
       }
     },
-    "rig-root-arm-left-sil-1": {
+    "rig-root-arm-left-ink-1": {
       "frame": {
         "x": 124,
         "y": 0,
@@ -1780,7 +2600,7 @@
         "h": 56
       }
     },
-    "rig-root-arm-left-sil-2": {
+    "rig-root-arm-left-ink-2": {
       "frame": {
         "x": 155,
         "y": 0,
@@ -1800,9 +2620,69 @@
         "h": 56
       }
     },
-    "rig-root-arm-right-0": {
+    "rig-root-arm-left-sil-0": {
       "frame": {
         "x": 186,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-left-sil-1": {
+      "frame": {
+        "x": 217,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-left-sil-2": {
+      "frame": {
+        "x": 248,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-0": {
+      "frame": {
+        "x": 279,
         "y": 0,
         "w": 29,
         "h": 56
@@ -1822,7 +2702,7 @@
     },
     "rig-root-arm-right-1": {
       "frame": {
-        "x": 216,
+        "x": 309,
         "y": 0,
         "w": 29,
         "h": 56
@@ -1842,7 +2722,67 @@
     },
     "rig-root-arm-right-2": {
       "frame": {
-        "x": 246,
+        "x": 339,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-ink-0": {
+      "frame": {
+        "x": 369,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-ink-1": {
+      "frame": {
+        "x": 399,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 29,
+        "h": 56
+      }
+    },
+    "rig-root-arm-right-ink-2": {
+      "frame": {
+        "x": 429,
         "y": 0,
         "w": 29,
         "h": 56
@@ -1862,7 +2802,7 @@
     },
     "rig-root-arm-right-sil-0": {
       "frame": {
-        "x": 276,
+        "x": 459,
         "y": 0,
         "w": 29,
         "h": 56
@@ -1882,8 +2822,8 @@
     },
     "rig-root-arm-right-sil-1": {
       "frame": {
-        "x": 306,
-        "y": 0,
+        "x": 0,
+        "y": 57,
         "w": 29,
         "h": 56
       },
@@ -1902,8 +2842,8 @@
     },
     "rig-root-arm-right-sil-2": {
       "frame": {
-        "x": 336,
-        "y": 0,
+        "x": 30,
+        "y": 57,
         "w": 29,
         "h": 56
       },
@@ -1922,8 +2862,8 @@
     },
     "rig-root-crown-0": {
       "frame": {
-        "x": 142,
-        "y": 57,
+        "x": 182,
+        "y": 114,
         "w": 54,
         "h": 36
       },
@@ -1942,8 +2882,48 @@
     },
     "rig-root-crown-1": {
       "frame": {
-        "x": 197,
-        "y": 57,
+        "x": 237,
+        "y": 114,
+        "w": 54,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 36
+      }
+    },
+    "rig-root-crown-ink-0": {
+      "frame": {
+        "x": 292,
+        "y": 114,
+        "w": 54,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 36
+      }
+    },
+    "rig-root-crown-ink-1": {
+      "frame": {
+        "x": 347,
+        "y": 114,
         "w": 54,
         "h": 36
       },
@@ -1962,8 +2942,8 @@
     },
     "rig-root-crown-sil-0": {
       "frame": {
-        "x": 252,
-        "y": 57,
+        "x": 402,
+        "y": 114,
         "w": 54,
         "h": 36
       },
@@ -1982,8 +2962,8 @@
     },
     "rig-root-crown-sil-1": {
       "frame": {
-        "x": 307,
-        "y": 57,
+        "x": 457,
+        "y": 114,
         "w": 54,
         "h": 36
       },
@@ -2002,8 +2982,8 @@
     },
     "rig-root-jaw-0": {
       "frame": {
-        "x": 49,
-        "y": 229,
+        "x": 453,
+        "y": 318,
         "w": 24,
         "h": 16
       },
@@ -2022,8 +3002,48 @@
     },
     "rig-root-jaw-1": {
       "frame": {
-        "x": 74,
-        "y": 229,
+        "x": 478,
+        "y": 318,
+        "w": 24,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 16
+      }
+    },
+    "rig-root-jaw-ink-0": {
+      "frame": {
+        "x": 0,
+        "y": 342,
+        "w": 24,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 16
+      }
+    },
+    "rig-root-jaw-ink-1": {
+      "frame": {
+        "x": 25,
+        "y": 342,
         "w": 24,
         "h": 16
       },
@@ -2042,8 +3062,8 @@
     },
     "rig-root-jaw-sil-0": {
       "frame": {
-        "x": 99,
-        "y": 229,
+        "x": 50,
+        "y": 342,
         "w": 24,
         "h": 16
       },
@@ -2062,8 +3082,8 @@
     },
     "rig-root-jaw-sil-1": {
       "frame": {
-        "x": 124,
-        "y": 229,
+        "x": 75,
+        "y": 342,
         "w": 24,
         "h": 16
       },
@@ -2082,8 +3102,28 @@
     },
     "rig-root-roots-left-0": {
       "frame": {
-        "x": 276,
-        "y": 205,
+        "x": 168,
+        "y": 318,
+        "w": 22,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 17
+      }
+    },
+    "rig-root-roots-left-ink-0": {
+      "frame": {
+        "x": 191,
+        "y": 318,
         "w": 22,
         "h": 17
       },
@@ -2102,8 +3142,8 @@
     },
     "rig-root-roots-left-sil-0": {
       "frame": {
-        "x": 299,
-        "y": 205,
+        "x": 214,
+        "y": 318,
         "w": 22,
         "h": 17
       },
@@ -2122,8 +3162,28 @@
     },
     "rig-root-roots-right-0": {
       "frame": {
-        "x": 322,
-        "y": 205,
+        "x": 237,
+        "y": 318,
+        "w": 22,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 17
+      }
+    },
+    "rig-root-roots-right-ink-0": {
+      "frame": {
+        "x": 260,
+        "y": 318,
         "w": 22,
         "h": 17
       },
@@ -2142,8 +3202,8 @@
     },
     "rig-root-roots-right-sil-0": {
       "frame": {
-        "x": 345,
-        "y": 205,
+        "x": 283,
+        "y": 318,
         "w": 22,
         "h": 17
       },
@@ -2162,8 +3222,8 @@
     },
     "rig-root-trunk-left-0": {
       "frame": {
-        "x": 362,
-        "y": 57,
+        "x": 0,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2182,8 +3242,48 @@
     },
     "rig-root-trunk-left-1": {
       "frame": {
-        "x": 384,
-        "y": 57,
+        "x": 22,
+        "y": 165,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-left-ink-0": {
+      "frame": {
+        "x": 44,
+        "y": 165,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-left-ink-1": {
+      "frame": {
+        "x": 66,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2202,8 +3302,8 @@
     },
     "rig-root-trunk-left-sil-0": {
       "frame": {
-        "x": 406,
-        "y": 57,
+        "x": 88,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2222,8 +3322,8 @@
     },
     "rig-root-trunk-left-sil-1": {
       "frame": {
-        "x": 428,
-        "y": 57,
+        "x": 110,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2242,8 +3342,8 @@
     },
     "rig-root-trunk-right-0": {
       "frame": {
-        "x": 450,
-        "y": 57,
+        "x": 132,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2262,8 +3362,48 @@
     },
     "rig-root-trunk-right-1": {
       "frame": {
-        "x": 472,
-        "y": 57,
+        "x": 154,
+        "y": 165,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-right-ink-0": {
+      "frame": {
+        "x": 176,
+        "y": 165,
+        "w": 21,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 21,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 21,
+        "h": 35
+      }
+    },
+    "rig-root-trunk-right-ink-1": {
+      "frame": {
+        "x": 198,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2282,8 +3422,8 @@
     },
     "rig-root-trunk-right-sil-0": {
       "frame": {
-        "x": 0,
-        "y": 108,
+        "x": 220,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2302,8 +3442,8 @@
     },
     "rig-root-trunk-right-sil-1": {
       "frame": {
-        "x": 22,
-        "y": 108,
+        "x": 242,
+        "y": 165,
         "w": 21,
         "h": 35
       },
@@ -2327,7 +3467,7 @@
     "format": "RGBA8888",
     "size": {
       "w": 512,
-      "h": 245
+      "h": 368
     },
     "scale": "1"
   }
