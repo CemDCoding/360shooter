@@ -297,6 +297,16 @@
   --size-rig-boss-x-moment: 470px;
   --size-rig-astro-x-cinematic: 160px;
   --size-rig-boss-x-cinematic: 480px;
+  --size-rig-hit-ring-rays: 24;
+  --size-rig-hit-ring-jitter: 6;
+  --size-rig-hit-ring-gap: 8px;
+  --size-rig-hit-ring-ray-min: 14px;
+  --size-rig-hit-ring-ray-max: 36px;
+  --size-rig-hit-ring-dot-in: 1px;
+  --size-rig-hit-ring-dot-out: 2px;
+  --size-rig-hit-ring-squash: 0.8;
+  --size-rig-hit-ring-steps: 3;
+  --size-rig-hit-ring-step-out: 8px;
   --motion-duration-fast: 80ms;
   --motion-duration-base: 150ms;
   --motion-duration-slow: 300ms;
@@ -333,6 +343,7 @@
   --motion-duration-rig-shake-half: 80ms;
   --motion-duration-rig-crumble-step: 120ms;
   --motion-duration-rig-hit-white: 100ms;
+  --motion-duration-rig-hit-ring-step: 33ms;
   --motion-duration-rig-afterimage-gap: 33ms;
   --motion-duration-rig-afterimage-fade: 150ms;
   --motion-duration-rig-blade-step: 80ms;
@@ -351,4 +362,5 @@
   --opacity-rig-afterimage-1: 0.55;
   --opacity-rig-afterimage-2: 0.35;
   --opacity-rig-afterimage-3: 0.18;
+  --opacity-rig-hit-ring-last: 0.6;
 }
