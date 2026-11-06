@@ -4,6 +4,7 @@
 // scroll 0 shows the whole arena. Pure, no Phaser import.
 import type { ChoreoCamera, ChoreoDef, ChoreoShot, ChoreoTrack } from '../../contracts';
 import { sampleTrack } from '../../logic/choreo';
+import { SHAKE_HALF_MS, SHAKE_STEP_MS } from './timing';
 
 /** Camera without shots and tracks. */
 export const DEFAULT_CAMERA: Readonly<ChoreoCamera> = { scrollX: 0, scrollY: 0, zoom: 1 };
@@ -61,8 +62,7 @@ export interface CameraLike {
   setZoom(x?: number, y?: number): unknown;
 }
 
-const SHAKE_STEP_MS = 20;
-const SHAKE_HALF_MS = 80;
+// SHAKE_STEP_MS / SHAKE_HALF_MS come from the tokens (timing.ts), one source.
 const SHAKE_DIRS_X = [1, -1, 0, -1];
 const SHAKE_DIRS_Y = [0, 1, -1, 0];
 

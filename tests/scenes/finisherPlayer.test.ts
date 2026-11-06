@@ -23,11 +23,13 @@ import { finisherLayout } from '../../src/scenes/finisher/layout';
 import {
   atlasKey,
   fineAngle,
+  inkFrame,
   isSmearPose,
   newSmearState,
   resolvePose,
   rigScale,
   silhouetteFrame,
+  smearMsOf,
 } from '../../src/scenes/finisher/rig';
 import { FINISHER_ATLASES } from '../../src/config/assets';
 import { atlasToLoad, choreoOf, debugFinisherData } from '../../src/scenes/finisher/startData';
@@ -47,6 +49,14 @@ import rigSrc from '../../src/scenes/finisher/rig.ts?raw';
 import trailsSrc from '../../src/scenes/finisher/trails.ts?raw';
 import sparksSrc from '../../src/scenes/finisher/sparks.ts?raw';
 import shotsSrc from '../../src/scenes/finisher/shots.ts?raw';
+import picturesSrc from '../../src/scenes/finisher/pictures.ts?raw';
+import rootFxSrc from '../../src/scenes/finisher/fx/rootMonster.ts?raw';
+import debugSrc from '../../src/scenes/finisher/debugChoreo.ts?raw';
+import rootChoreoSrc from '../../src/config/choreo/rootMonster.ts?raw';
+import { PORTRAIT_SCALE } from '../../src/scenes/finisher/layout';
+import { SHAKE_HALF_MS, SHAKE_STEP_MS } from '../../src/scenes/finisher/timing';
+import { shakeInto } from '../../src/scenes/finisher/shots';
+import { axisShake } from '../../src/scenes/finisher/rig';
 import fxSrc from '../../src/scenes/finisher/fx/index.ts?raw';
 
 // ---------------------------------------------------------------- fake scene
@@ -230,7 +240,11 @@ const PLACEHOLDER_TEXTURES: TextureList = {
 function rigFrames(rig: RigDef): string[] {
   return rig.parts.flatMap((p) => {
     const frames = [p.frame, ...Object.values(p.poses ?? {})];
-    return [...frames, ...frames.map((f) => silhouetteFrame(p, f))];
+    return [
+      ...frames,
+      ...frames.map((f) => silhouetteFrame(p, f)),
+      ...frames.map((f) => inkFrame(p, f)),
+    ];
   });
 }
 
@@ -726,5 +740,89 @@ describe('wiring', () => {
     expect(bodyOf(rigSrc, '  beginFrame(): void')).not.toMatch(/forEach|for \(const/);
     expect(playerSrc).toMatch(/if \(this\.ctx\.webgl\) label\.setTint\(/);
     expect(playerSrc.match(/setTint\(/g)).toHaveLength(1);
+  });
+});
+
+describe('ink silhouettes of the light impact picture (Q-92)', () => {
+  it('maps frames to <Bogen>-ink-<Index>, derived like the silhouette', () => {
+    const p = part('body', 'root-body-0');
+    expect(inkFrame(p, 'root-body-0')).toBe('root-body-ink-0');
+    expect(inkFrame(p, 'root-arm-12')).toBe('root-arm-ink-12');
+  });
+
+  it('every frame of the real rigs has its -ink- frame in the atlas list', () => {
+    for (const rig of [RIGS.astronaut, RIGS.rootMonster]) {
+      for (const p of rig.parts) {
+        for (const f of [p.frame, ...Object.values(p.poses ?? {})]) {
+          expect(inkFrame(p, f)).toMatch(/-ink-\d+$/);
+        }
+      }
+    }
+  });
+});
+
+describe('numbers come from the tokens (Q-92)', () => {
+  it('shake rhythm: one source, equal to rig-shake-step and rig-shake-half', () => {
+    expect(SHAKE_STEP_MS).toBe(THEME.motionMs['motion.rig-shake-step']);
+    expect(SHAKE_HALF_MS).toBe(THEME.motionMs['motion.rig-shake-half']);
+    for (const src of [rigSrc, shotsSrc]) {
+      expect(src).not.toMatch(/SHAKE_(STEP|HALF)_MS = \d/);
+    }
+    const out = { x: 0, y: 0 };
+    shakeInto(SHAKE_STEP_MS, 6, out);
+    expect(out).toEqual({ x: -6, y: 0 + 6 });
+    expect(axisShake(0, 6)).toBe(6);
+    expect(axisShake(SHAKE_STEP_MS, 6)).toBe(-6);
+    expect(axisShake(SHAKE_HALF_MS, 6)).toBe(3);
+  });
+
+  it('smear stands 33 ms for all parts and 66 ms for the blade arc only', () => {
+    expect(smearMsOf(part('torso', 'a-0'))).toBe(33);
+    expect(smearMsOf(part('arm-front', 'a-0'))).toBe(33);
+    expect(smearMsOf(part('blade-arc', 'a-0'))).toBe(66);
+    expect(THEME.motionMs['motion.rig-smear-arc']).toBe(66);
+    for (const [id, ms] of [
+      ['torso', 33],
+      ['blade-arc', 66],
+    ] as const) {
+      const st = newSmearState();
+      let first = -1;
+      let last = -1;
+      const dt = 1000 / 60;
+      for (let t = 0; t < 400; t += dt) {
+        const shown = resolvePose(
+          st,
+          t < 10 ? 'arc1' : 'stand',
+          'stand',
+          t,
+          smearMsOf(part(id, 'a-0')),
+        );
+        if (shown === 'arc1') {
+          if (first < 0) first = t;
+          last = t + dt;
+        }
+      }
+      expect(last - first).toBeGreaterThanOrEqual(ms);
+      expect(last - first).toBeLessThanOrEqual(ms + dt + 0.001);
+    }
+  });
+
+  it('stand points and the lean angle are token reads, not literals', () => {
+    expect(THEME.sizePx['size.rig-astro-x-moment']).toBe(170);
+    expect(THEME.sizePx['size.rig-boss-x-moment']).toBe(470);
+    expect(THEME.sizePx['size.rig-astro-x-cinematic']).toBe(160);
+    expect(THEME.sizePx['size.rig-boss-x-cinematic']).toBe(480);
+    for (const src of [debugSrc, rootChoreoSrc]) {
+      expect(src).not.toMatch(/\bx:\s*(170|470|160|480)\b/);
+      expect(src).not.toMatch(/\bvalue:\s*(170|470|160|480)\b/);
+    }
+    expect(rootChoreoSrc).not.toMatch(/sign \* 20\b/);
+    expect(rootChoreoSrc).not.toMatch(/crownFall, 20\)/);
+  });
+
+  it('PORTRAIT_SCALE has one source', () => {
+    expect(PORTRAIT_SCALE).toBe(2);
+    expect(picturesSrc).not.toMatch(/const PORTRAIT_SCALE/);
+    expect(rootFxSrc).not.toMatch(/const PORTRAIT_SCALE/);
   });
 });

@@ -32,6 +32,7 @@ import { ROOT_MONSTER_RIG } from '../rigs/rootMonster';
 const GROUND = THEME.sizePx['size.rig-ground'];
 const BLADE_STEP = THEME.motionMs['motion.rig-blade-step'];
 const SMEAR = THEME.motionMs['motion.rig-smear'];
+const HIT_WHITE = THEME.motionMs['motion.rig-hit-white'];
 const AFTERIMAGE_GAP = THEME.motionMs['motion.rig-afterimage-gap'];
 const AFTERIMAGE_FADE = THEME.motionMs['motion.rig-afterimage-fade'];
 const ANCH = ASTRONAUT_ANCHORS;
@@ -41,8 +42,16 @@ export const HIT_SOUND_KEY = 'sfx-finisher-hit';
 /** Slow motion of the reaction. */
 const SLOW = 0.3;
 /** Stand of the actors in the 640 px stage (tokens `size.rig-ground`: moment 170/470, cinematic 160/480). */
-const MOMENT_X = { astronaut: 170, boss: 470 } as const;
-const CINE_X = { astronaut: 160, boss: 480 } as const;
+const MOMENT_X = {
+  astronaut: THEME.sizePx['size.rig-astro-x-moment'],
+  boss: THEME.sizePx['size.rig-boss-x-moment'],
+} as const;
+const CINE_X = {
+  astronaut: THEME.sizePx['size.rig-astro-x-cinematic'],
+  boss: THEME.sizePx['size.rig-boss-x-cinematic'],
+} as const;
+/** Largest angle of a part without `freeRotate` (token `size.rig-fine-rotate`): the halves and the crown lean this far. */
+const LEAN = THEME.sizeCount['size.rig-fine-rotate'];
 
 // ---------------------------------------------------------------------------------------------------
 // Tools
@@ -289,7 +298,7 @@ interface Collapse {
   /** Halves have opened by `firstAngle` degrees. */
   open1: number;
   firstAngle: number;
-  /** Halves lean 20 degrees and fall apart. */
+  /** Halves lean (`size.rig-fine-rotate` degrees) and fall apart. */
   open2: number;
   /** Trunk, roots and arms fade out in 3 steps (leaves). */
   fadeFrom: number;
@@ -309,7 +318,7 @@ function collapse(t: Tracks, k: Collapse): void {
     t.key(`rootMonster.${id}`, 'pose', k.crack, 'cracked');
     t.key(`rootMonster.${id}`, 'angle', k.crack - 1, 0, 'sine.out');
     t.key(`rootMonster.${id}`, 'angle', k.open1, sign * k.firstAngle, 'sine.inOut');
-    t.key(`rootMonster.${id}`, 'angle', k.open2, sign * 20);
+    t.key(`rootMonster.${id}`, 'angle', k.open2, sign * LEAN);
     t.key(`rootMonster.${id}`, 'x', k.crack - 1, base.x, 'sine.out');
     t.key(`rootMonster.${id}`, 'x', k.open1, base.x + sign * 2, 'sine.inOut');
     t.key(`rootMonster.${id}`, 'x', k.open2, base.x + sign * 10);
@@ -320,7 +329,7 @@ function collapse(t: Tracks, k: Collapse): void {
   const crown = B('crown');
   t.key('rootMonster.crown', 'pose', k.crownBend, 'bent');
   t.key('rootMonster.crown', 'angle', k.crownBend, 0, 'sine.inOut');
-  t.key('rootMonster.crown', 'angle', k.crownFall, 20);
+  t.key('rootMonster.crown', 'angle', k.crownFall, LEAN);
   t.key('rootMonster.crown', 'x', k.crownBend, crown.x, 'sine.inOut');
   t.key('rootMonster.crown', 'x', k.crownFall, crown.x + 10);
   t.key('rootMonster.crown', 'y', k.crownBend, crown.y, 'sine.inOut');
@@ -427,8 +436,15 @@ function buildMoment(): ChoreoDef {
       flash: false,
     },
     { kind: 'timeScale', atMs: 1000, durationMs: slowChoreo, factor: SLOW, flash: false },
-    { kind: 'flash', atMs: 1000, durationMs: 100, color: 'finisher.paper', flash: true },
-    { kind: 'hitWhite', atMs: 1000, durationMs: 200, targets: ['rootMonster'], flash: false },
+    // Main hit (H-48 13a): only the boss turns white for 100 ms, no full-screen flash. This is the
+    // one flash of the moment, so "reduce effects" removes it.
+    {
+      kind: 'hitWhite',
+      atMs: 1000,
+      durationMs: HIT_WHITE,
+      targets: ['rootMonster'],
+      flash: true,
+    },
     { kind: 'shake', atMs: 1000, durationMs: 200, strength: 0.5, flash: false },
     { kind: 'fx', atMs: 1000, durationMs: 1600, name: 'slash', flash: false },
     {

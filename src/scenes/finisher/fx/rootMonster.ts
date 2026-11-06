@@ -6,7 +6,7 @@
 import type Phaser from 'phaser';
 import { THEME, themeColor } from '../../../config/theme';
 import { CHOREO_DEPTH } from '../context';
-import { CUTIN_EDGE, seededRandom } from '../layout';
+import { CUTIN_EDGE, PORTRAIT_SCALE, seededRandom } from '../layout';
 import { drawSpeedlines } from '../overlays';
 import { cutInOffset } from '../timing';
 import type { BossFxModule, FxApi, FxFactory, FxInstance } from './index';
@@ -17,7 +17,6 @@ const BULGE = 'rig-fx-ground-bulge';
 const HEDGE = 'rig-prop-rosehedge';
 const SPIKE = 'boss-root-spike';
 const PORTRAIT = 'finisher-portrait';
-const PORTRAIT_SCALE = 2;
 /** Particle images are drawn at this scale (8 px images). */
 const PARTICLE_SCALE = 2;
 
@@ -311,9 +310,10 @@ const cutLine: FxFactory = (api, event) => {
 
 /**
  * The one light-dark pair of the cinematic (decision 7a, board 4b), each half half of the event time: paper
- * with ink speedlines in front of the figures, then ink with paper speedlines behind them. The figures turn
- * into white silhouettes by the `hitWhite` event of the choreography. It is the flash of the cinematic
- * (the event carries `flash: true`), so "reduce effects" removes it with the event.
+ * with ink speedlines, then ink with paper speedlines, both behind the figures. The figures turn into ink
+ * silhouettes (`-ink`) in the light half and white ones in the dark half by the `hitWhite` event of the
+ * choreography (the player switches at the half). It is the flash of the cinematic (the event carries
+ * `flash: true`), so "reduce effects" removes it with the event.
  */
 const impactPair: FxFactory = (api, event) => {
   const { scene, layout } = api.ctx;
@@ -336,8 +336,12 @@ const impactPair: FxFactory = (api, event) => {
     api.ctx.addWorld(g);
     return g;
   };
-  const light = { bg: rect(paper.num, CHOREO_DEPTH.impact), lines: lines(CHOREO_DEPTH.impact + 1) };
-  // Behind the figures (depth 20), in front of the ground effects (14).
+  // Both halves lie behind the figures (depth 20), in front of the ground effects (14): the figures are
+  // drawn on top, as ink silhouettes in the light half and as white ones in the dark half.
+  const light = {
+    bg: rect(paper.num, CHOREO_DEPTH.figure - 5),
+    lines: lines(CHOREO_DEPTH.figure - 4),
+  };
   const dark = {
     bg: rect(ink.num, CHOREO_DEPTH.figure - 5),
     lines: lines(CHOREO_DEPTH.figure - 4),

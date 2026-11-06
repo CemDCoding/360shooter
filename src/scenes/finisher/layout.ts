@@ -50,6 +50,8 @@ export const HIT_IMAGE_SIZE = 96;
 export const HIT_SCRIM_ALPHA = 0.85;
 /** Edge of the cut-in band (brief: 2 px in coral, above and below the band). */
 export const CUTIN_EDGE = 2;
+/** Scale of the visor portrait in the cut-in strip (one source for pictures.ts and the boss effects). */
+export const PORTRAIT_SCALE = 2;
 /** Skip hint: padding, gap and the arrow (5 x 7 cells at 2x), as in the mockup. */
 export const HINT_PAD_X = 6;
 export const HINT_PAD_Y = 4;

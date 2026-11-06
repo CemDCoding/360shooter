@@ -14,6 +14,7 @@ import type {
 } from '../../contracts';
 import { THEME } from '../../config/theme';
 import { CHOREO_DEPTH, type ChoreoContext } from './context';
+import { SHAKE_HALF_MS, SHAKE_STEP_MS } from './timing';
 
 const C = THEME.sizeCount;
 const DEG = Math.PI / 180;
@@ -50,6 +51,13 @@ export function isSmearPose(pose: string | undefined): boolean {
   return pose !== undefined && (pose === 'smear' || /^arc\d+$/.test(pose));
 }
 
+/** Stand time of a smear pose of a part: 33 ms for all, 66 ms only for the blade arc (H-48 14a). */
+export function smearMsOf(part: Pick<RigPartDef, 'id'>): number {
+  return part.id === 'blade-arc'
+    ? THEME.motionMs['motion.rig-smear-arc']
+    : THEME.motionMs['motion.rig-smear'];
+}
+
 /** Frame of a pose; unknown or no pose = the base frame. */
 export function poseFrame(part: RigPartDef, pose: string | undefined): string {
   return (pose !== undefined && part.poses?.[pose]) || part.frame;
@@ -65,6 +73,18 @@ export function silhouetteFrame(part: RigPartDef, frame: string): string {
   const m = /^(.*)-(\d+)$/.exec(frame);
   return m ? `${m[1]}-sil-${m[2]}` : part.silhouette;
 }
+
+/**
+ * Ink frame of a part frame (Q-92, brief H-48): the silhouette name with `-ink-` instead of `-sil-`
+ * (`<Bogen>-ink-<Index>`, same index). Drawn in the light picture of the impact pair.
+ */
+export function inkFrame(part: RigPartDef, frame: string): string {
+  return silhouetteFrame(part, frame).replace(/-sil-(\d+)$/, '-ink-$1');
+}
+
+/** Values of `RigFigure.white`. */
+export const WHITE = 1;
+export const INK = 2;
 
 /** Hold state of a smear pose of one part (real time). */
 export interface SmearState {
@@ -128,12 +148,10 @@ export function nextPose(
 /** Whole-pixel decaying shake along one axis (same rhythm as the M10 shake: 20 ms steps, halves every 80 ms). */
 export function axisShake(tMs: number, amplitude: number): number {
   if (tMs < 0) return 0;
-  const a = Math.round(amplitude * 0.5 ** Math.floor(tMs / AXIS_SHAKE_HALF_MS));
+  const a = Math.round(amplitude * 0.5 ** Math.floor(tMs / SHAKE_HALF_MS));
   if (a <= 0) return 0;
-  return Math.floor(tMs / AXIS_SHAKE_STEP_MS) % 2 === 0 ? a : -a;
+  return Math.floor(tMs / SHAKE_STEP_MS) % 2 === 0 ? a : -a;
 }
-const AXIS_SHAKE_STEP_MS = 20;
-const AXIS_SHAKE_HALF_MS = 80;
 
 /** World transform of a part (stage coordinates of the world camera). */
 export interface PartWorld {
@@ -183,8 +201,11 @@ export class RigFigure {
   private readonly solveOrder: number[];
   /** Silhouette frame per frame of every part (built once). */
   private readonly silOf: Map<string, string>[];
+  /** Ink frame per frame of every part (built once, `<Bogen>-ink-<Index>`). */
+  private readonly inkOf: Map<string, string>[];
   private readonly useAtlas: boolean;
   private readonly fallbackSil: string | null;
+  private readonly fallbackInk: string | null;
   private readonly shownKey: string[];
   private readonly lastOrder: Int16Array;
   readonly smear: SmearState[];
@@ -199,6 +220,7 @@ export class RigFigure {
   readonly order: Int16Array;
   readonly shakeX: Float64Array;
   readonly shakeY: Float64Array;
+  /** 0 = normal, 1 = white silhouette (`WHITE`), 2 = ink silhouette (`INK`, light impact picture). */
   readonly white: Uint8Array;
   readonly pose: (string | undefined)[];
   /** Pose actually shown after the smear rule. */
@@ -244,6 +266,9 @@ export class RigFigure {
           fallback.frame,
           THEME.colors['finisher.paper'].css,
         );
+    this.fallbackInk = this.useAtlas
+      ? null
+      : ctx.textures.silhouette(fallback.texture, fallback.frame, THEME.colors['finisher.ink'].css);
     this.parent = new Int8Array(n).fill(-1);
     rig.parts.forEach((p, i) => {
       if (p.parent !== undefined) this.parent[i] = rig.parts.findIndex((q) => q.id === p.parent);
@@ -255,6 +280,11 @@ export class RigFigure {
     this.silOf = rig.parts.map((p) => {
       const m = new Map<string, string>();
       for (const f of [p.frame, ...Object.values(p.poses ?? {})]) m.set(f, silhouetteFrame(p, f));
+      return m;
+    });
+    this.inkOf = rig.parts.map((p) => {
+      const m = new Map<string, string>();
+      for (const f of [p.frame, ...Object.values(p.poses ?? {})]) m.set(f, inkFrame(p, f));
       return m;
     });
     this.ox = new Float64Array(n);
@@ -351,7 +381,6 @@ export class RigFigure {
 
   /** Solves the parents (one level) in figure space and writes containers and images. */
   apply(nowMs: number, poseTracks?: readonly (ChoreoTrack | null)[], choreoMs = 0): void {
-    const smearMs = THEME.motionMs['motion.rig-smear'];
     for (let s = 0; s < this.solveOrder.length; s++) {
       const i = this.solveOrder[s];
       const part = this.parts[i];
@@ -378,7 +407,7 @@ export class RigFigure {
       const track = poseTracks?.[i] ?? null;
       const sampled = this.pose[i];
       const next = track ? nextPose(track, choreoMs, sampled) : undefined;
-      this.shownPose[i] = resolvePose(this.smear[i], sampled, next, nowMs, smearMs);
+      this.shownPose[i] = resolvePose(this.smear[i], sampled, next, nowMs, smearMsOf(part));
       this.showFrame(i);
       this.images[i]
         .setPosition(this.lx[i], this.ly[i])
@@ -423,7 +452,13 @@ export class RigFigure {
     const img = this.images[i];
     const frame = this.frameOf(i);
     if (this.useAtlas) {
-      const want = this.white[i] ? (this.silOf[i].get(frame) ?? this.parts[i].silhouette) : frame;
+      const mode = this.white[i];
+      const want =
+        mode === INK
+          ? (this.inkOf[i].get(frame) ?? inkFrame(this.parts[i], frame))
+          : mode
+            ? (this.silOf[i].get(frame) ?? this.parts[i].silhouette)
+            : frame;
       if (this.shownKey[i] === want) return;
       this.shownKey[i] = want;
       const atlas = this.ctx.scene.textures.get(this.atlas);
@@ -431,8 +466,10 @@ export class RigFigure {
       return;
     }
     // Placeholder: the game sprite, and for hit-white its silhouette drawn once at the start.
-    const white = this.white[i] === 1 && this.fallbackSil !== null;
-    const want = white ? (this.fallbackSil as string) : this.fallback.texture;
+    const sil =
+      this.white[i] === INK ? this.fallbackInk : this.white[i] === 1 ? this.fallbackSil : null;
+    const white = sil !== null;
+    const want = white ? sil : this.fallback.texture;
     if (this.shownKey[i] === want) return;
     this.shownKey[i] = want;
     if (white) img.setTexture(want);

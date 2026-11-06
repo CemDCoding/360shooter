@@ -33,8 +33,10 @@ import {
   atlasKey,
   axisShake,
   bossRigOf,
+  INK,
   isPartProperty,
   rigScale,
+  WHITE,
   splitTarget,
   type PartWorld,
 } from './rig';
@@ -329,11 +331,18 @@ export class ChoreoPlayer {
       }
       case 'hitWhite': {
         const parts = this.partsOf(ev.targets);
+        // With the impact pair at the same time the figures are ink silhouettes in its light half
+        // (paper picture) and white silhouettes in its dark half (inverted, not drawn on its own).
+        const pair = this.def.events.find(
+          (e) => e.kind === 'fx' && e.name === 'impact-pair' && e.atMs === ev.atMs,
+        );
+        const inkMs = pair ? (pair.durationMs ?? ev.durationMs ?? rules.hitStopMinMs) / 2 : 0;
         return {
           ...base,
           durationMs: ev.durationMs ?? rules.hitStopMinMs,
-          pre: () => {
-            for (let i = 0; i < parts.length; i++) parts[i].fig.white[parts[i].part] = 1;
+          pre: (since) => {
+            const mode = since < inkMs ? INK : WHITE;
+            for (let i = 0; i < parts.length; i++) parts[i].fig.white[parts[i].part] = mode;
           },
         };
       }

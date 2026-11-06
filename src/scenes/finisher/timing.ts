@@ -23,9 +23,9 @@ export function titleScaleAt(t: number, finalScale: number): number {
 }
 
 /** Time of one shake direction step (four directions per halving). */
-export const SHAKE_STEP_MS = 20;
+export const SHAKE_STEP_MS = M['motion.rig-shake-step'];
 /** The shake amplitude halves every this many ms (brief: 6 px, halves every 80 ms). */
-export const SHAKE_HALF_MS = 80;
+export const SHAKE_HALF_MS = M['motion.rig-shake-half'];
 const SHAKE_DIRS = [
   { x: 1, y: 0 },
   { x: -1, y: 1 },

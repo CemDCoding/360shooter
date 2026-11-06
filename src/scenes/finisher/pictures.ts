@@ -15,6 +15,7 @@ import {
   BEAM_RIM_H,
   CUTIN_EDGE,
   HIT_SCRIM_ALPHA,
+  PORTRAIT_SCALE,
   STAGE_BG,
   centredX,
   hintBox,
@@ -27,7 +28,6 @@ import { cutInOffset, frameAt, isHitImage, panelsVisible, titleScaleAt } from '.
 const S = THEME.sizePx;
 const C = THEME.sizeCount;
 const PICTURE_SCALE = C['size.finisher-frame-scale'];
-const PORTRAIT_SCALE = 2;
 const PORTRAIT_KEY = 'finisher-portrait';
 const HIT_KEY = 'finisher-hit';
 
