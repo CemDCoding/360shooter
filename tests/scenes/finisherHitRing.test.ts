@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { CINEMATIC_4, MOMENT_ROOT_MONSTER } from '../../src/config/choreo/rootMonster';
 import { RIGS } from '../../src/config/rigs';
 import { OPACITY, THEME } from '../../src/config/theme';
+import { CHOREO_DEPTH } from '../../src/scenes/finisher/context';
 import { dropsWhenReduced, reduceChoreo, validateChoreo } from '../../src/logic/choreo';
 import {
   BOSS_FX,
@@ -33,7 +34,7 @@ interface FakeGraphics {
   destroyed: boolean;
 }
 
-function makeApi(bossDepth = 21) {
+function makeApi(bossDepth = 21, astroDepth: number | null = 20) {
   const graphics: FakeGraphics[] = [];
   let adds = 0;
   const makeGraphics = (): unknown => {
@@ -72,7 +73,8 @@ function makeApi(bossDepth = 21) {
     },
     atlas: 'a',
     bossScale: 3,
-    figure: () => null,
+    figure: (id: string) =>
+      id === 'astronaut' && astroDepth !== null ? { container: { depth: astroDepth } } : null,
     boss: () => ({ container: { x: 470, y: 300, depth: bossDepth }, top: () => 100 }),
   } as unknown as FxApi;
   return { api, graphics, adds: () => adds };
@@ -139,8 +141,14 @@ describe('shared speedline ring', () => {
     const inst = hitRingFx({ refH: BOSS_REF_H })(api, event());
     inst.start();
     expect([graphics[0].x, graphics[0].y]).toEqual([470, 300 - 96]);
-    expect(graphics[0].depth).toBeGreaterThan(21);
-    expect(graphics[0].depth).toBeLessThan(22);
+    // Under the astronaut (20) and the boss (21), over the afterimages (16).
+    expect(graphics[0].depth).toBe(19.5);
+    expect(graphics[0].depth).toBeGreaterThan(CHOREO_DEPTH.afterimage);
+    // Without an astronaut: just in front of the boss.
+    const solo = makeApi(21, null);
+    const soloInst = hitRingFx({ refH: BOSS_REF_H })(solo.api, event());
+    soloInst.start();
+    expect(solo.graphics[0].depth).toBe(21.5);
     const at = (t: number) => {
       inst.update(t, 16);
       return graphics.map((g) => g.visible);

@@ -110,8 +110,13 @@ export function hitRingFx(spec: HitRingSpec): FxFactory {
       start() {
         centre(api, at);
         const boss = api.boss();
-        // Right in front of the boss; behind a figure that stands in front of the boss by its order.
-        const depth = boss ? boss.container.depth + 0.5 : CHOREO_DEPTH.particles;
+        // Under the astronaut (so under both figures), over the afterimages; read now so `order` tracks count.
+        const astro = api.figure('astronaut');
+        const depth = astro
+          ? astro.container.depth - 0.5
+          : boss
+            ? boss.container.depth + 0.5
+            : CHOREO_DEPTH.particles;
         for (let i = 0; i < STEPS; i++) {
           steps[i].setPosition(Math.round(at.x), Math.round(at.y)).setDepth(depth);
         }

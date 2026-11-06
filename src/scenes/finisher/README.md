@@ -68,8 +68,7 @@ Sichtbarkeit (keine Allokation, Canvas-sicher, kein Tint, kein Blitz).
 3. „Reduzieren“: das Ereignis hat `reduce: 'drop'`, der Ring entfällt mit Boss-Weiß und Zittern. Er zählt
    nicht gegen `flashMaxPerWindow`.
 
-Tiefe: Ebene des Boss-Containers + 0,5, also vor dem Boss samt `-sil`-Teilen. Steht die Astronautin per
-`order` höher, liegt sie davor. Heute hat die Astronautin Ebene 20 und der Boss 21: der Ring liegt dann auch
-über ihr, überdeckt sie aber nicht, weil er an der Stelle des Bosses sitzt. Winkel und Längen werden einmal
+Tiefe: Ebene der Astronautin − 0,5 (in `start` gelesen, `order`-Spuren zählen), also unter beiden Figuren
+und über den Nachbildern (Ebene 16). Ohne Astronautin: Boss-Ebene + 0,5. Winkel und Längen werden einmal
 je Treffer gezogen (fester Seed aus `atMs`), alle drei Stufen teilen sie. Rosenschnitt: Ring bei 1000 ms,
 Mitte Boss-x / Boden − 96, r0 104.
