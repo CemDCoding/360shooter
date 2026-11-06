@@ -529,12 +529,20 @@ describe('validateChoreo', () => {
 });
 
 describe('registers', () => {
-  it('has 7 rigs: astronaut and root monster with real parts, 5 placeholders, within the budget', () => {
+  it('has 7 rigs with real parts, within the budget', () => {
     const ids = Object.keys(REAL_RIGS);
     expect(ids).toHaveLength(7);
     for (const rig of Object.values(REAL_RIGS)) {
-      const real = rig.id === 'astronaut' || rig.id === 'rootMonster';
-      expect(rig.parts).toHaveLength(real ? (rig.id === 'astronaut' ? 10 : 8) : 1);
+      const parts = {
+        astronaut: 10,
+        rootMonster: 8,
+        forestGhost: 7,
+        giantStone: 9,
+        giantSandWorm: 10,
+        guardianDog: 10,
+        pharaoh: 6,
+      };
+      expect(rig.parts).toHaveLength(parts[rig.id]);
       expect(rig.parts.length).toBeLessThanOrEqual(CHOREO_RULES.maxPartsPerRig);
     }
   });

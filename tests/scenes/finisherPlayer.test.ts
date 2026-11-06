@@ -683,7 +683,7 @@ describe('rig atlas loading', () => {
         { rigId: 'forestGhost', x: 470, y: 300 },
       ],
     });
-    expect(atlasToLoad(ghost, () => false)).toBeNull();
+    expect(atlasToLoad(ghost, () => false)?.key).toBe('finisher-rig-forestGhost');
   });
 
   it('FinisherScene loads it in preload, only for a choreography', () => {
