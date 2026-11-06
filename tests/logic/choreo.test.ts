@@ -546,11 +546,14 @@ describe('registers', () => {
       expect(rig.parts.length).toBeLessThanOrEqual(CHOREO_RULES.maxPartsPerRig);
     }
   });
-  it('has the 12 choreography ids, only the two root monster entries are set', () => {
+  it('has the 12 choreography ids, the root monster entries are set, set entries match their id', () => {
     expect(CHOREO_VARIANT_IDS).toHaveLength(12);
     expect(Object.keys(CHOREOS).sort()).toEqual([...CHOREO_VARIANT_IDS].sort());
+    expect(CHOREOS['moment-rootMonster']).toBeDefined();
+    expect(CHOREOS['cinematic-4']).toBeDefined();
     for (const id of CHOREO_VARIANT_IDS) {
-      expect(CHOREOS[id] === undefined).toBe(id !== 'moment-rootMonster' && id !== 'cinematic-4');
+      const def = CHOREOS[id];
+      if (def !== undefined) expect(def.variantId).toBe(id);
     }
   });
   it('recognises choreography ids', () => {

@@ -14,7 +14,8 @@ import type {
 import { CHOREO_RULES } from '../../src/config/finishers';
 import { RIGS } from '../../src/config/rigs';
 import { OPACITY, THEME } from '../../src/config/theme';
-import { buildFinisher } from '../../src/logic/finisher';
+import { CHOREOS } from '../../src/config/choreo';
+import { buildFinisher, choreoVariantId } from '../../src/logic/finisher';
 import { countFlashes, validateChoreo } from '../../src/logic/choreo';
 import { ChoreoPlayer, type ChoreoPlayerSource } from '../../src/scenes/finisher/choreoPlayer';
 import type { ChoreoContext } from '../../src/scenes/finisher/context';
@@ -377,13 +378,20 @@ describe('debug choreography (AP-183 rigs)', () => {
   it('is played for ?finisher=0 only; other levels keep the M10 plan', () => {
     expect(choreoOf(DATA.plan)).toBe(DATA.plan.choreo);
     expect(DATA.plan.realMs).toBeGreaterThan(DEBUG_CHOREO.durationMs);
-    expect(choreoOf(debugFinisherData(5, 640, 360, false).plan)).toBeNull();
+    // Level 5 is a moment of the forest ghost, which has its own choreography; the debug one is only for 0.
+    const other = debugFinisherData(5, 640, 360, false).plan;
+    expect(other.choreo?.variantId ?? null).toBe(CHOREOS[choreoVariantId(5)]?.variantId ?? null);
+    expect(other.choreo).not.toBe(DEBUG_CHOREO);
   });
 });
 
 describe('M10 fallback', () => {
   it('a plan without choreography plays the M10 steps', () => {
-    for (const level of [5, 14, 40]) {
+    // Only levels whose boss has no choreography in the register yet fall back to the M10 plan.
+    const levels = [5, 10, 14, 15, 20, 25, 30, 40].filter(
+      (level) => CHOREOS[choreoVariantId(level)] === undefined,
+    );
+    for (const level of levels) {
       const plan = buildFinisher(level, { reduceEffects: false, seen: [] });
       expect(plan.choreo).toBeUndefined();
       expect(choreoOf(plan)).toBeNull();
