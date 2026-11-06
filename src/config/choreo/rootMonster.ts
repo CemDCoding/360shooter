@@ -32,6 +32,7 @@ import { ROOT_MONSTER_RIG } from '../rigs/rootMonster';
 const GROUND = THEME.sizePx['size.rig-ground'];
 const BLADE_STEP = THEME.motionMs['motion.rig-blade-step'];
 const SMEAR = THEME.motionMs['motion.rig-smear'];
+const SMEAR_ARC = THEME.motionMs['motion.rig-smear-arc'];
 const HIT_WHITE = THEME.motionMs['motion.rig-hit-white'];
 const AFTERIMAGE_GAP = THEME.motionMs['motion.rig-afterimage-gap'];
 const AFTERIMAGE_FADE = THEME.motionMs['motion.rig-afterimage-fade'];
@@ -392,8 +393,8 @@ function buildMoment(): ChoreoDef {
   t.key('astronaut.torso', 'angle', 900, 0);
   t.key('astronaut.arm-front', 'angle', 900, 0);
   stance(t, 900 + SMEAR, { ...RAISE, armFront: 'slash-end' });
-  arc(t, 900 + SMEAR, 'arc2', 20);
-  arc(t, 900 + 2 * SMEAR, 'off');
+  arc(t, 900 + SMEAR_ARC, 'arc2', 20);
+  arc(t, 900 + 2 * SMEAR_ARC, 'off');
   stance(t, 1000, CUT);
   // Stand up (board M9): blade back in 3 steps, then the title.
   bladeSteps(t, c(3100), { ...STAND, armFront: 'aim' }, -1);
@@ -553,7 +554,7 @@ function buildCinematic(): ChoreoDef {
   stance(t, 4300, SMEARED);
   arc(t, 4300, 'arc2', -30);
   stance(t, 4300 + SMEAR, LEAP);
-  arc(t, 4300 + 2 * SMEAR, 'off');
+  arc(t, 4300 + SMEAR_ARC, 'off');
   stance(t, 4450, CROUCH);
   t.key('astronaut', 'x', 4450, 300, 'linear');
   t.key('astronaut', 'x', 5300, 280);
@@ -585,8 +586,8 @@ function buildCinematic(): ChoreoDef {
   arc(t, 9500, 'arc1', 20);
   t.key('astronaut.arm-front', 'angle', 9500, 0);
   stance(t, 9500 + SMEAR, { ...RAISE, armFront: 'slash-end' });
-  arc(t, 9500 + SMEAR, 'arc2', 20);
-  arc(t, 9500 + 2 * SMEAR, 'off');
+  arc(t, 9500 + SMEAR_ARC, 'arc2', 20);
+  arc(t, 9500 + 2 * SMEAR_ARC, 'off');
   stance(t, 9600, CUT);
   t.key('astronaut', 'x', c(9600), 330, 'sine.out');
   t.key('astronaut', 'x', c(10800), 356);

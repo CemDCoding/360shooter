@@ -43,7 +43,15 @@ import {
 } from '../../../src/scenes/finisher/fx/rootMonster';
 import { BOSS_FX, type FxApi, type FxEvent } from '../../../src/scenes/finisher/fx';
 import { finisherLayout } from '../../../src/scenes/finisher/layout';
-import { inkFrame, isSmearPose, silhouetteFrame } from '../../../src/scenes/finisher/rig';
+import {
+  inkFrame,
+  isSmearPose,
+  newSmearState,
+  nextPose,
+  resolvePose,
+  silhouetteFrame,
+  smearMsOf,
+} from '../../../src/scenes/finisher/rig';
 import { debugFinisherData } from '../../../src/scenes/finisher/startData';
 import { TextureBank } from '../../../src/scenes/finisher/textures';
 import { SOUND_HIT } from '../../../src/scenes/finisher/timing';
@@ -938,5 +946,47 @@ describe('register and plan', () => {
     expect(plan.variantId).toBe(id);
     expect(plan.choreo?.variantId).toBe(id);
     expect(plan.realMs).toBe(id === 'cinematic-4' ? 15000 : 3500);
+  });
+});
+
+describe('blade arc smear in the choreographies (H-48 14a)', () => {
+  const arcMs = THEME.motionMs['motion.rig-smear-arc'];
+  const poses = (def: ChoreoDef, from: number, to: number): string[] => {
+    const tr = track(def, 'astronaut.blade-arc', 'pose');
+    const st = newSmearState();
+    const shown: string[] = [];
+    for (let t = from; t < to; t += 1000 / 60) {
+      const v = sampleTrack(tr, t);
+      const sampled = typeof v === 'string' ? v : undefined;
+      const s = resolvePose(
+        st,
+        sampled,
+        nextPose(tr, t, sampled),
+        t,
+        smearMsOf({ id: 'blade-arc' }),
+      );
+      if (s !== undefined && shown[shown.length - 1] !== s) shown.push(s);
+    }
+    return shown;
+  };
+
+  it.each([
+    ['moment', MOMENT, 900],
+    ['cinematic', CINE, 9500],
+  ] as const)('%s: arc1 then arc2 are both shown', (_n, def, at) => {
+    const shown = poses(def, at - 50, at + 400);
+    expect(shown.indexOf('arc1')).toBeGreaterThanOrEqual(0);
+    expect(shown.indexOf('arc2')).toBeGreaterThan(shown.indexOf('arc1'));
+    const tr = track(def, 'astronaut.blade-arc', 'pose');
+    expect(tr.keys.find((k) => k.value === 'arc2' && k.atMs >= at)?.atMs).toBe(at + arcMs);
+  });
+
+  it('the counter arc2 (4300 ms) is shown', () => {
+    expect(poses(CINE, 4250, 4600)).toContain('arc2');
+  });
+
+  it('couples hit-white and impact pair at the same atMs for the ink switch', () => {
+    const pair = fxNamed(CINE, 'impact-pair')[0];
+    expect(events(CINE, 'hitWhite').some((w) => w.atMs === pair.atMs)).toBe(true);
   });
 });
