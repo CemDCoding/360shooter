@@ -45,3 +45,31 @@
   `size.rig-fine-rotate`. `PORTRAIT_SCALE` steht nur in `layout.ts`.
 - **Haupttreffer im Kampfmoment (13a):** nur Boss-Weiß (`motion.rig-hit-white`, 100 ms), Zittern, kein
   Vollbild-Blitz. Das Vollbild-Impact-Paar gehört nur dem Cinematic.
+
+## Gemeinsamer Speedline-Ring (AP-194, Q-95, H-50)
+
+Ein Baustein für alle sechs Bosse: `fx/hitRing.ts` (Export über `fx/index.ts`). 24 Pixel-Keile um den
+Trefferpunkt, 3 Stufen zu je `motion.rig-hit-ring-step` (33 ms), danach weg. Alle Zahlen stehen in den
+Tokens `size.rig-hit-ring-*`, `motion.rig-hit-ring-step`, `opacity.rig-hit-ring-last` und
+`color.finisher.speedline`. Je Stufe ein `Graphics`, in der Fabrik gezeichnet; `update` schaltet nur die
+Sichtbarkeit (keine Allokation, Canvas-sicher, kein Tint, kein Blitz).
+
+**Aufruf (ein Boss ruft nur auf):**
+
+1. Im Bossmodul `fx/<bossId>.ts`: `'hit-ring': hitRingFx({ refH: BOSS_REF_H })`. Bezugshöhe `BOSS_REF_H` (64)
+   oder `FOREST_GHOST_REF_H` (48; Sand-Wurm: Kopf, 64). Eigener Trefferpunkt über
+   `centre: (api, out) => { out.x = …; out.y = …; }` (Standard: Boss-x, Boden − refH / 2 × Boss-Maßstab,
+   also 204 bzw. 228). Optional `seed` für einen zweiten Ring in derselben Choreografie.
+2. In der Choreografie ein `fx`-Ereignis mit demselben `atMs` wie `hitWhite`:
+   `{ kind: 'fx', atMs, durationMs: HIT_RING, name: 'hit-ring', flash: false, reduce: 'drop' }`, wobei
+   `HIT_RING` = `size.rig-hit-ring-steps` × `motion.rig-hit-ring-step` = 99 ms (`HIT_RING_MS` in `fx/hitRing.ts`;
+   die Config liest die Tokens selbst, siehe `config/choreo/rootMonster.ts`). Innenradius r0 =
+   `ringRadius(refH, Maßstab)` (104 bzw. 80). Im Cinematic kein Ring (dort gehört der Haupttreffer dem Impact-Paar).
+3. „Reduzieren“: das Ereignis hat `reduce: 'drop'`, der Ring entfällt mit Boss-Weiß und Zittern. Er zählt
+   nicht gegen `flashMaxPerWindow`.
+
+Tiefe: Ebene des Boss-Containers + 0,5, also vor dem Boss samt `-sil`-Teilen. Steht die Astronautin per
+`order` höher, liegt sie davor. Heute hat die Astronautin Ebene 20 und der Boss 21: der Ring liegt dann auch
+über ihr, überdeckt sie aber nicht, weil er an der Stelle des Bosses sitzt. Winkel und Längen werden einmal
+je Treffer gezogen (fester Seed aus `atMs`), alle drei Stufen teilen sie. Rosenschnitt: Ring bei 1000 ms,
+Mitte Boss-x / Boden − 96, r0 104.

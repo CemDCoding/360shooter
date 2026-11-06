@@ -122,6 +122,7 @@ describe('OPACITY', () => {
       'rig-afterimage-1',
       'rig-afterimage-2',
       'rig-afterimage-3',
+      'rig-hit-ring-last',
     ]);
   });
 

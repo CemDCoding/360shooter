@@ -768,6 +768,7 @@ describe('effects of the boss', () => {
       [
         'cut-line',
         'ground-bulge',
+        'hit-ring',
         'impact-pair',
         'leaves',
         'petals',

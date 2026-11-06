@@ -9,6 +9,7 @@ import { CHOREO_DEPTH } from '../context';
 import { CUTIN_EDGE, PORTRAIT_SCALE, seededRandom } from '../layout';
 import { drawSpeedlines } from '../overlays';
 import { cutInOffset } from '../timing';
+import { BOSS_REF_H, hitRingFx } from './hitRing';
 import type { BossFxModule, FxApi, FxFactory, FxInstance } from './index';
 
 const GROUND = THEME.sizePx['size.rig-ground'];
@@ -456,4 +457,6 @@ export const ROOT_MONSTER_FX: BossFxModule = {
   'cut-line': cutLine,
   'impact-pair': impactPair,
   portrait,
+  // Speedline ring of the main hit of the moment (AP-194): hit point on the trunk, boss x, ground - 96.
+  'hit-ring': hitRingFx({ refH: BOSS_REF_H }),
 };
