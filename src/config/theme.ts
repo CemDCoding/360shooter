@@ -293,6 +293,12 @@ const SIZE_PX = {
   'size.rig-boss-x-moment': 470,
   'size.rig-astro-x-cinematic': 160,
   'size.rig-boss-x-cinematic': 480,
+  'size.rig-hit-ring-gap': 8,
+  'size.rig-hit-ring-ray-min': 14,
+  'size.rig-hit-ring-ray-max': 36,
+  'size.rig-hit-ring-dot-in': 1,
+  'size.rig-hit-ring-dot-out': 2,
+  'size.rig-hit-ring-step-out': 8,
 } as const;
 
 /** Größen als Anzahl. */
@@ -314,6 +320,10 @@ const SIZE_COUNT = {
   'size.rig-scale-boss-cinematic': 4,
   'size.rig-afterimages': 3,
   'size.rig-fine-rotate': 20,
+  'size.rig-hit-ring-rays': 24,
+  'size.rig-hit-ring-jitter': 6,
+  'size.rig-hit-ring-squash': 0.8,
+  'size.rig-hit-ring-steps': 3,
 } as const;
 
 /** Zeiten in ms. */
@@ -354,6 +364,7 @@ const MOTION_MS = {
   'motion.rig-shake-half': 80,
   'motion.rig-crumble-step': 120,
   'motion.rig-hit-white': 100,
+  'motion.rig-hit-ring-step': 33,
   'motion.rig-afterimage-gap': 33,
   'motion.rig-afterimage-fade': 150,
   'motion.rig-blade-step': 80,
@@ -384,6 +395,7 @@ const OPACITY = {
   'rig-afterimage-1': 0.55,
   'rig-afterimage-2': 0.35,
   'rig-afterimage-3': 0.18,
+  'rig-hit-ring-last': 0.6,
 } as const;
 
 /** Schrift: Familien (Fallback-Reihenfolge), Skalierungsstufen, Zeichenabstand und Zeilenabstand in px. */

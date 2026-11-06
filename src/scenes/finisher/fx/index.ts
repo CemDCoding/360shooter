@@ -12,6 +12,16 @@ import { GUARDIAN_DOG_FX } from './guardianDog';
 import { PHARAOH_FX } from './pharaoh';
 import { ROOT_MONSTER_FX } from './rootMonster';
 
+export {
+  BOSS_REF_H,
+  FOREST_GHOST_REF_H,
+  HIT_RING_MS,
+  defaultRingCentre,
+  hitRingFx,
+  ringRadius,
+  type HitRingSpec,
+} from './hitRing';
+
 export type FxEvent = Extract<ChoreoEvent, { kind: 'fx' }>;
 
 /** What an effect may use. */

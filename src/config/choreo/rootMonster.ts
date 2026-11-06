@@ -34,6 +34,9 @@ const BLADE_STEP = THEME.motionMs['motion.rig-blade-step'];
 const SMEAR = THEME.motionMs['motion.rig-smear'];
 const SMEAR_ARC = THEME.motionMs['motion.rig-smear-arc'];
 const HIT_WHITE = THEME.motionMs['motion.rig-hit-white'];
+/** Whole speedline ring: `size.rig-hit-ring-steps` steps of `motion.rig-hit-ring-step` (AP-194). */
+const HIT_RING =
+  THEME.sizeCount['size.rig-hit-ring-steps'] * THEME.motionMs['motion.rig-hit-ring-step'];
 const AFTERIMAGE_GAP = THEME.motionMs['motion.rig-afterimage-gap'];
 const AFTERIMAGE_FADE = THEME.motionMs['motion.rig-afterimage-fade'];
 const ANCH = ASTRONAUT_ANCHORS;
@@ -445,6 +448,15 @@ function buildMoment(): ChoreoDef {
       durationMs: HIT_WHITE,
       targets: ['rootMonster'],
       flash: true,
+    },
+    // Speedline ring (AP-194, H-50): with the boss white, same atMs; no flash, gone with "reduce effects".
+    {
+      kind: 'fx',
+      atMs: 1000,
+      durationMs: HIT_RING,
+      name: 'hit-ring',
+      flash: false,
+      reduce: 'drop',
     },
     { kind: 'shake', atMs: 1000, durationMs: 200, strength: 0.5, flash: false },
     { kind: 'fx', atMs: 1000, durationMs: 1600, name: 'slash', flash: false },
