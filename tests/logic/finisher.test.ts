@@ -5,6 +5,7 @@ import {
   FINISHER_STAGES,
   type FinisherTemplate,
 } from '../../src/config/finishers';
+import { CHOREOS } from '../../src/config/choreo';
 import { BOSS_OF_BATCH, LEVEL_COUNT, batchOf } from '../../src/config/levels';
 import {
   CHOREO_VARIANT_IDS,
@@ -388,8 +389,10 @@ describe('choreography plan (M13, AP-181)', () => {
   it('falls back to the unchanged M10 plan without a choreography', () => {
     for (let id = 0; id < LEVEL_COUNT; id++) {
       const plan = buildFinisher(id, NONE, M10);
-      if (id >= 5) expect(buildFinisher(id, NONE)).toEqual(plan);
-      else expect(buildFinisher(id, NONE).choreo).toBeDefined();
+      // Whether the default register holds a choreography for this level depends on the bosses registered.
+      const registered = CHOREOS[choreoVariantId(id)] !== undefined;
+      if (registered) expect(buildFinisher(id, NONE).choreo).toBeDefined();
+      else expect(buildFinisher(id, NONE)).toEqual(plan);
       expect(plan.choreo).toBeUndefined();
       expect(plan.realMs).toBeUndefined();
       expect(plan.variantId).toBe(finisherVariantId(id));
