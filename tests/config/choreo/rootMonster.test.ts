@@ -43,7 +43,15 @@ import {
 } from '../../../src/scenes/finisher/fx/rootMonster';
 import { BOSS_FX, type FxApi, type FxEvent } from '../../../src/scenes/finisher/fx';
 import { finisherLayout } from '../../../src/scenes/finisher/layout';
-import { isSmearPose, silhouetteFrame } from '../../../src/scenes/finisher/rig';
+import {
+  inkFrame,
+  isSmearPose,
+  newSmearState,
+  nextPose,
+  resolvePose,
+  silhouetteFrame,
+  smearMsOf,
+} from '../../../src/scenes/finisher/rig';
 import { debugFinisherData } from '../../../src/scenes/finisher/startData';
 import { TextureBank } from '../../../src/scenes/finisher/textures';
 import { SOUND_HIT } from '../../../src/scenes/finisher/timing';
@@ -161,11 +169,20 @@ describe('fight moment "Rosenschnitt" (table of the brief, boards M1 to M9)', ()
     expect(realAt(MOMENT, title.atMs)).toBe(3000);
   });
 
-  it('puts the flash and the hit-white into the final hit stop', () => {
-    const flash = events(MOMENT, 'flash')[0];
+  it('makes the main hit only the boss turning white for 100 ms, without a full-screen flash', () => {
     const white = events(MOMENT, 'hitWhite')[0];
-    expect(flash.atMs).toBe(1000);
-    expect(white).toMatchObject({ atMs: 1000, durationMs: 200, targets: ['rootMonster'] });
+    expect(events(MOMENT, 'flash')).toHaveLength(0);
+    expect(white).toMatchObject({
+      atMs: 1000,
+      durationMs: THEME.motionMs['motion.rig-hit-white'],
+      targets: ['rootMonster'],
+      flash: true,
+    });
+    expect(white.durationMs).toBe(100);
+    expect(validateChoreo(MOMENT, RIGS)).toEqual([]);
+    expect(validateChoreo(reduceChoreo(MOMENT), RIGS)).toEqual([]);
+    expect(validateChoreo(CINE, RIGS)).toEqual([]);
+    expect(validateChoreo(reduceChoreo(CINE), RIGS)).toEqual([]);
   });
 
   it('stands the actors on the ground line at x = 170 and 470', () => {
@@ -521,7 +538,11 @@ const ATLAS = 'finisher-rig-rootMonster';
 function rigFrames(rig: RigDef): string[] {
   return rig.parts.flatMap((p) => {
     const frames = [p.frame, ...Object.values(p.poses ?? {})];
-    return [...frames, ...frames.map((f) => silhouetteFrame(p, f))];
+    return [
+      ...frames,
+      ...frames.map((f) => silhouetteFrame(p, f)),
+      ...frames.map((f) => inkFrame(p, f)),
+    ];
   });
 }
 
@@ -613,13 +634,19 @@ describe('the choreography player plays both choreographies', () => {
       const player = new ChoreoPlayer(ctx, def, camera, { rigs: RIGS });
       const paper: number[] = [];
       const ink: number[] = [];
+      const halves = rec.objects.filter(
+        (o) => o.kind === 'rectangle' && o.st.depth === CHOREO_DEPTH.figure - 5,
+      );
+      expect(halves.length).toBeLessThanOrEqual(2);
       while (!player.done) {
         player.update(10);
         const t = Math.round(player.elapsedMs);
         for (const o of rec.objects) {
           if (o.kind !== 'rectangle' || o.st.visible !== true) continue;
-          if (o.st.depth === CHOREO_DEPTH.impact) paper.push(t);
-          if (o.st.depth === CHOREO_DEPTH.figure - 5) ink.push(t);
+          // both halves lie behind the figures; the paper half is created first
+          const k = halves.indexOf(o);
+          if (k === 0) paper.push(t);
+          if (k === 1) ink.push(t);
         }
       }
       return { paper, ink };
@@ -634,6 +661,41 @@ describe('the choreography player plays both choreographies', () => {
     const reduced = visibleAt(reduceChoreo(CINE), true);
     expect(reduced.paper).toEqual([]);
     expect(reduced.ink).toEqual([]);
+  });
+
+  it('draws the figures as ink silhouettes in the light half and white ones in the dark half', () => {
+    const { ctx, rec } = makeContext(TEXTURES, false);
+    const camera = { setZoom: () => camera, setScroll: () => camera };
+    const player = new ChoreoPlayer(ctx, CINE, camera, { rigs: RIGS });
+    const frames_ = (): string[] =>
+      rec.objects
+        .filter(
+          (o) => o.kind === 'image' && o.st.texture === ATLAS && typeof o.st.frame === 'string',
+        )
+        .map((o) => o.st.frame as string);
+    const count = (re: RegExp): number => frames_().filter((f) => re.test(f)).length;
+    const parts = RIGS.astronaut.parts.length + RIGS.rootMonster.parts.length;
+    const seen = { ink: 0, sil: 0, inkInDark: 0, silInLight: 0, inkBefore: 0, silBefore: 0 };
+    while (!player.done) {
+      player.update(10);
+      const t = Math.round(player.elapsedMs);
+      if (t < 9590) {
+        seen.inkBefore += count(/-ink-\d+$/);
+        seen.silBefore += count(/-sil-\d+$/);
+      } else if (t >= 9620 && t <= 9680) {
+        seen.ink = Math.max(seen.ink, count(/-ink-\d+$/));
+        seen.silInLight += count(/-sil-\d+$/);
+      } else if (t >= 9720 && t <= 9780) {
+        seen.sil = Math.max(seen.sil, count(/-sil-\d+$/));
+        seen.inkInDark += count(/-ink-\d+$/);
+      }
+    }
+    expect(seen.ink).toBeGreaterThanOrEqual(parts);
+    expect(seen.sil).toBeGreaterThanOrEqual(parts);
+    expect(seen.silInLight).toBe(0);
+    expect(seen.inkInDark).toBe(0);
+    expect(seen.inkBefore).toBe(0);
+    expect(seen.silBefore).toBe(0);
   });
 
   it('moves the camera as in the storyboard: zoom 2 on the roots, 1 in the long shot, 2 on her, 1', () => {
@@ -884,5 +946,47 @@ describe('register and plan', () => {
     expect(plan.variantId).toBe(id);
     expect(plan.choreo?.variantId).toBe(id);
     expect(plan.realMs).toBe(id === 'cinematic-4' ? 15000 : 3500);
+  });
+});
+
+describe('blade arc smear in the choreographies (H-48 14a)', () => {
+  const arcMs = THEME.motionMs['motion.rig-smear-arc'];
+  const poses = (def: ChoreoDef, from: number, to: number): string[] => {
+    const tr = track(def, 'astronaut.blade-arc', 'pose');
+    const st = newSmearState();
+    const shown: string[] = [];
+    for (let t = from; t < to; t += 1000 / 60) {
+      const v = sampleTrack(tr, t);
+      const sampled = typeof v === 'string' ? v : undefined;
+      const s = resolvePose(
+        st,
+        sampled,
+        nextPose(tr, t, sampled),
+        t,
+        smearMsOf({ id: 'blade-arc' }),
+      );
+      if (s !== undefined && shown[shown.length - 1] !== s) shown.push(s);
+    }
+    return shown;
+  };
+
+  it.each([
+    ['moment', MOMENT, 900],
+    ['cinematic', CINE, 9500],
+  ] as const)('%s: arc1 then arc2 are both shown', (_n, def, at) => {
+    const shown = poses(def, at - 50, at + 400);
+    expect(shown.indexOf('arc1')).toBeGreaterThanOrEqual(0);
+    expect(shown.indexOf('arc2')).toBeGreaterThan(shown.indexOf('arc1'));
+    const tr = track(def, 'astronaut.blade-arc', 'pose');
+    expect(tr.keys.find((k) => k.value === 'arc2' && k.atMs >= at)?.atMs).toBe(at + arcMs);
+  });
+
+  it('the counter arc2 (4300 ms) is shown', () => {
+    expect(poses(CINE, 4250, 4600)).toContain('arc2');
+  });
+
+  it('couples hit-white and impact pair at the same atMs for the ink switch', () => {
+    const pair = fxNamed(CINE, 'impact-pair')[0];
+    expect(events(CINE, 'hitWhite').some((w) => w.atMs === pair.atMs)).toBe(true);
   });
 });

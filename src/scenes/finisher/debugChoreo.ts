@@ -9,6 +9,8 @@ import { SOUND_CHARGE } from './timing';
 import { AFTERIMAGE_COPIES, AFTERIMAGE_FADE_MS, AFTERIMAGE_GAP_MS, SLASH_FX } from './trails';
 
 const GROUND = THEME.sizePx['size.rig-ground'];
+const ASTRO_X = THEME.sizePx['size.rig-astro-x-moment'];
+const BOSS_X = THEME.sizePx['size.rig-boss-x-moment'];
 const BLADE_STEP = THEME.motionMs['motion.rig-blade-step'];
 /** Pre-coloured spark of the root monster atlas (`rig-fx-root-6`, coral). */
 const SPARK_FRAME = 'rig-fx-root-6';
@@ -19,8 +21,8 @@ export const DEBUG_CHOREO_LEVEL = 0;
 export const DEBUG_CHOREO: ChoreoDef = {
   variantId: 'moment-rootMonster',
   actors: [
-    { rigId: 'astronaut', x: 170, y: GROUND },
-    { rigId: 'rootMonster', x: 470, y: GROUND },
+    { rigId: 'astronaut', x: ASTRO_X, y: GROUND },
+    { rigId: 'rootMonster', x: BOSS_X, y: GROUND },
   ],
   durationMs: 2300,
   tracks: [
@@ -39,8 +41,8 @@ export const DEBUG_CHOREO: ChoreoDef = {
       target: 'astronaut',
       property: 'x',
       keys: [
-        { atMs: 0, value: 170, ease: 'hold' },
-        { atMs: 900, value: 170, ease: 'expo.in' },
+        { atMs: 0, value: ASTRO_X, ease: 'hold' },
+        { atMs: 900, value: ASTRO_X, ease: 'expo.in' },
         { atMs: 1000, value: 400, ease: 'hold' },
       ],
     },
