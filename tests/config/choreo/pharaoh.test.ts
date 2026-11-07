@@ -33,10 +33,16 @@ import {
   validateChoreo,
 } from '../../../src/logic/choreo';
 import { ChoreoPlayer } from '../../../src/scenes/finisher/choreoPlayer';
-import type { ChoreoContext } from '../../../src/scenes/finisher/context';
+import { CHOREO_DEPTH, type ChoreoContext } from '../../../src/scenes/finisher/context';
 import { BOSS_FX } from '../../../src/scenes/finisher/fx';
 import { BOSS_REF_H, ringRadius } from '../../../src/scenes/finisher/fx/hitRing';
-import { FLASHBACK, FLASHBACK_BOSSES, PHARAOH_FX } from '../../../src/scenes/finisher/fx/pharaoh';
+import {
+  FLASHBACK,
+  FLASHBACK_BOSSES,
+  PAST,
+  PHARAOH_FX,
+  STRIP_COLORS,
+} from '../../../src/scenes/finisher/fx/pharaoh';
 import { ROOT_MONSTER_FX } from '../../../src/scenes/finisher/fx/rootMonster';
 import { finisherLayout } from '../../../src/scenes/finisher/layout';
 import {
@@ -308,12 +314,19 @@ describe('effects of the pharaoh', () => {
 
 // ---------------------------------------------------------------- fake scene
 
+interface FakeObject {
+  kind: string;
+  st: Record<string, unknown>;
+  log: { name: string; args: unknown[] }[];
+}
+
 interface FakeRecord {
+  objects: FakeObject[];
   adds: number;
   sounds: string[];
 }
 
-function fakeObject(): unknown {
+function fakeObject(kind: string, rec: FakeRecord): unknown {
   const st: Record<string, unknown> = {
     x: 0,
     y: 0,
@@ -326,12 +339,15 @@ function fakeObject(): unknown {
     width: 16,
     height: 24,
   };
+  const obj: FakeObject = { kind, st, log: [] };
+  rec.objects.push(obj);
   const proxy: unknown = new Proxy(st, {
     get(t, p) {
       if (typeof p === 'symbol' || p === 'then') return undefined;
       if (p === 'getTextBounds') return () => ({ local: { width: 40, height: 8 } });
       if (p in t) return t[p];
       return (...args: unknown[]) => {
+        obj.log.push({ name: p, args });
         if (p === 'setPosition') {
           t.x = args[0];
           t.y = args[1] ?? args[0];
@@ -351,7 +367,7 @@ function fakeObject(): unknown {
 }
 
 function fakeScene(textures: Readonly<Record<string, readonly string[]>>) {
-  const rec: FakeRecord = { adds: 0, sounds: [] };
+  const rec: FakeRecord = { objects: [], adds: 0, sounds: [] };
   const known = new Map<string, Set<string>>(
     Object.entries(textures).map(([k, f]) => [k, new Set(f)]),
   );
@@ -362,7 +378,7 @@ function fakeScene(textures: Readonly<Record<string, readonly string[]>>) {
         if (typeof p === 'symbol') return undefined;
         return () => {
           rec.adds += 1;
-          return fakeObject();
+          return fakeObject(p, rec);
         };
       },
     },
@@ -478,4 +494,59 @@ describe('the choreography player plays both choreographies', () => {
       player.destroy();
     },
   );
+});
+
+describe('the flashback (shot 3)', () => {
+  const build = () => {
+    const { ctx, rec } = makeContext(WITH_FLASHBACK);
+    const camera = { setZoom: () => camera, setScroll: () => camera };
+    const player = new ChoreoPlayer(ctx, CINE, camera, { rigs: RIGS });
+    return { rec, player };
+  };
+  const fills = (rec: FakeRecord) =>
+    rec.objects
+      .filter((o) => o.kind === 'graphics')
+      .flatMap((o) => {
+        const out: { color: unknown; alpha: unknown; w: unknown }[] = [];
+        let style: unknown[] = [];
+        for (const l of o.log) {
+          if (l.name === 'fillStyle') style = l.args;
+          if (l.name === 'fillRect') out.push({ color: style[0], alpha: style[1], w: l.args[2] });
+        }
+        return out;
+      });
+
+  it('draws one strip per boss in the dark colour of its world, never white or full width', () => {
+    const { rec, player } = build();
+    const stripW = FLASHBACK.stripW;
+    const strips = fills(rec).filter((f) => f.w === stripW);
+    expect(strips.map((f) => f.color)).toEqual(STRIP_COLORS.map((c) => THEME.colors[c].num));
+    expect(strips.every((f) => f.alpha === 1)).toBe(true);
+    expect(fills(rec).some((f) => f.color === THEME.colors['finisher.paper'].num)).toBe(false);
+    player.destroy();
+  });
+
+  it('keeps the strips under the figures so the astronaut stays in front', () => {
+    const { rec, player } = build();
+    const depths = rec.objects
+      .filter((o) => o.kind === 'container' && o.log.some((l) => l.name === 'setDepth'))
+      .map((o) => o.st.depth as number);
+    const strip = CHOREO_DEPTH.figure - 2;
+    expect(depths.filter((d) => d === strip)).toHaveLength(FLASHBACK.groups.length);
+    // Over the ground effects and afterimages, under every figure (pharaoh 20, astronaut 21).
+    expect(strip).toBeGreaterThan(CHOREO_DEPTH.afterimage);
+    expect(strip).toBeLessThan(CHOREO_DEPTH.figure);
+    player.destroy();
+  });
+
+  it('shows the defeat poses of the bosses and hides the parts of the mockup', () => {
+    expect(PAST).toHaveLength(FLASHBACK_BOSSES.length);
+    FLASHBACK_BOSSES.forEach((id, i) => {
+      const ids = RIGS[id].parts.map((p) => p.id);
+      for (const part of Object.keys(PAST[i].pose)) expect(ids, `${id}.${part}`).toContain(part);
+      for (const part of PAST[i].hide) expect(ids, `${id}.${part}`).toContain(part);
+    });
+    expect(PAST[2].hide).toEqual(['chunk-1', 'chunk-2', 'chunk-3', 'chunk-4']);
+    expect(PAST[4].pose['legs-front']).toBe('lie');
+  });
 });

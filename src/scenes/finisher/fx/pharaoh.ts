@@ -137,7 +137,15 @@ function beam(
 // ---------------------------------------------------------------------------------------------------
 
 /** Three symbols above him (child, human, old man): offsets from his feet, the one that is hit, the time it lights. */
-export const RIDDLE = { dx: [-50, 0, 50], dy: -250, scale: 2, right: 1, litAtMs: 700 } as const;
+export const RIDDLE = {
+  dx: [-84, 0, 84],
+  dy: -220,
+  scale: 3,
+  right: 1,
+  litAtMs: 700,
+  /** The two symbols not hit dim to this alpha after the shot (board R4). */
+  dimAlpha: 0.45,
+} as const;
 
 /** The symbols hang above the pharaoh; the right one lights up before the shot. */
 const riddle: FxFactory = (api) => {
@@ -176,7 +184,7 @@ const riddle: FxFactory = (api) => {
     litNow = isLit;
     for (let i = 0; i < n; i++) {
       const right = i === RIDDLE.right;
-      dark[i].setVisible(!(isLit && right));
+      dark[i].setVisible(!(isLit && right)).setAlpha(isLit ? RIDDLE.dimAlpha : 1);
       lit[i].setVisible(isLit && right);
     }
   };
@@ -276,17 +284,21 @@ const gleam: FxFactory = (api, event) => {
 // Throne dais (cinematic boards 1a to 8a)
 // ---------------------------------------------------------------------------------------------------
 
-/** Flat plate under a figure: width and height (px of the stage), the lighter edge on top. */
-export const DAIS = { w: 150, h: 12, edge: 2 } as const;
+/** Flat plate under a figure (mockup `dais`): width, height, alpha, offset from the ground line. */
+export const DAIS = { w: 220, h: 8, alpha: 0.7, dy: -4 } as const;
 
 function daisAt(centre: number): FxFactory {
   return (api) => {
     const g = graphics(api, CHOREO_DEPTH.ground);
-    g.fillStyle(themeColor('finisher.ink').num, 1).fillRect(-DAIS.w / 2, 0, DAIS.w, DAIS.h);
-    g.fillStyle(themeColor('finisher.paper').num, 0.5).fillRect(-DAIS.w / 2, 0, DAIS.w, DAIS.edge);
+    g.fillStyle(themeColor('finisher.ink').num, DAIS.alpha).fillRect(
+      -DAIS.w / 2,
+      0,
+      DAIS.w,
+      DAIS.h,
+    );
     return {
       start() {
-        g.setPosition(Math.round(api.ctx.stageX + centre), GROUND).setVisible(true);
+        g.setPosition(Math.round(api.ctx.stageX + centre), GROUND + DAIS.dy).setVisible(true);
       },
       update() {},
       stop() {
@@ -405,13 +417,46 @@ export const FLASHBACK = {
   groups: [[0, 1], [2, 3], [4]],
   groupMs: 1130,
   scrollPxPerS: 60,
-  /** Light strip behind the silhouettes (px of the stage): top above the ground and height. */
-  stripTop: -160,
-  stripH: 140,
-  /** Centres of the silhouettes (stage px at the start of the group) and the scale of the figures. */
-  centres: [280, 410],
+  /** Strip of one boss (px of the stage): width and top; it runs down to the ground line. */
+  stripW: 168,
+  stripTop: 46,
+  /** Centres of the strips (stage px at the start of the group) and the scale of the figures. */
+  centres: [250, 440],
+  /** The figure of the sand worm stands this far left of its strip centre (board 3a). */
+  wormDx: -20,
   scale: 2,
 } as const;
+/** Colour of the strip of each boss: the dark backdrop colour of its world (decision 12a), in the order of FLASHBACK_BOSSES. */
+export const STRIP_COLORS = [
+  'finisher.bg-forest',
+  'finisher.bg-night',
+  'finisher.bg-elf',
+  'finisher.bg-desert',
+  'finisher.bg-pyramid',
+] as const;
+/** Defeat poses and hidden parts of the five bosses (mockup `past`), in the order of FLASHBACK_BOSSES. */
+export const PAST: readonly {
+  pose: Readonly<Record<string, string>>;
+  hide: readonly string[];
+}[] = [
+  { pose: { 'trunk-left': 'cracked', 'trunk-right': 'cracked', jaw: 'roar' }, hide: [] },
+  { pose: { body: 'dissolve1' }, hide: [] },
+  {
+    pose: {
+      body: 'cracked3',
+      face: 'frozen',
+      crystals: 'lit',
+      'fist-left': 'frozen',
+      'fist-right': 'frozen',
+    },
+    hide: ['chunk-1', 'chunk-2', 'chunk-3', 'chunk-4'],
+  },
+  { pose: { jaw: 'roar' }, hide: [] },
+  {
+    pose: { 'legs-front': 'lie', 'legs-back': 'lie', head: 'sleep', tail: 'down' },
+    hide: ['jaw', 'shade-1', 'shade-2', 'shade-3'],
+  },
+];
 const flashbackDogLie: Readonly<Record<string, readonly [number, number]>> = {
   body: GUARDIAN_DOG_ANCHORS.lie.body,
   head: GUARDIAN_DOG_ANCHORS.lie.head,
@@ -428,6 +473,7 @@ function inkFigure(
   mirror: boolean,
   lie: Readonly<Record<string, readonly [number, number]>>,
   poseOf: (part: RigPartDef) => string | undefined,
+  hide: readonly string[] = [],
 ): Phaser.GameObjects.Image[] | null {
   const textures = api.ctx.scene.textures;
   if (!textures.exists(atlas)) return null;
@@ -436,6 +482,7 @@ function inkFigure(
   const imgs: Phaser.GameObjects.Image[] = [];
   const sorted = [...rig.parts].sort((a, b) => a.order - b.order);
   for (const part of sorted) {
+    if (hide.includes(part.id)) continue;
     const frame = inkFrame(part, poseFrame(part, poseOf(part)));
     if (!textures.get(atlas).has(frame)) continue;
     const parent = part.parent ? byId.get(part.parent) : undefined;
@@ -459,53 +506,55 @@ function inkFigure(
  * ink block, so the shot never stays empty. No flash, no brightness jump.
  */
 const flashback: FxFactory = (api) => {
-  const g = graphics(api, CHOREO_DEPTH.figure + 3);
+  // One strip per boss in the dark colour of its world, under the figures (depth < 20), over the world.
   const strips = FLASHBACK.groups.map(() => {
     const strip = api.ctx.scene.add
       .container(0, 0)
-      .setDepth(CHOREO_DEPTH.figure + 3)
+      .setDepth(CHOREO_DEPTH.figure - 2)
       .setVisible(false);
     api.ctx.addWorld(strip);
     return strip;
   });
   const figs: { box: Phaser.GameObjects.Container; cx: number }[] = [];
   const ink = themeColor('finisher.ink').num;
+  const stripH = GROUND - FLASHBACK.stripTop;
   FLASHBACK.groups.forEach((group, gi) => {
     group.forEach((bi, k) => {
       const id = FLASHBACK_BOSSES[bi];
-      const rig = RIGS[id];
       const lie = id === 'guardianDog' ? flashbackDogLie : {};
+      const past = PAST[bi];
       const imgs = inkFigure(
         api,
-        rig,
+        RIGS[id],
         `finisher-rig-${id}`,
         FLASHBACK.scale,
         false,
         lie,
-        () => undefined,
+        (part) => past.pose[part.id],
+        past.hide,
       );
       const box = api.ctx.scene.add.container(0, GROUND);
+      const band = api.ctx.scene.add.graphics();
+      band
+        .fillStyle(themeColor(STRIP_COLORS[bi]).num, 1)
+        .fillRect(-FLASHBACK.stripW / 2, -stripH, FLASHBACK.stripW, stripH);
+      box.add(band);
+      const body = api.ctx.scene.add.container(id === 'giantSandWorm' ? FLASHBACK.wormDx : 0, 0);
       if (imgs && imgs.length > 0) {
-        box.add(imgs);
+        body.add(imgs);
         for (const img of imgs) img.setVisible(true);
       } else {
         const block = api.ctx.scene.add.graphics();
         block
           .fillStyle(ink, 1)
           .fillRect(-FALLBACK_BLOCK.w / 2, -FALLBACK_BLOCK.h, FALLBACK_BLOCK.w, FALLBACK_BLOCK.h);
-        box.add(block);
+        body.add(block);
       }
+      box.add(body);
       strips[gi].add(box);
       figs.push({ box, cx: FLASHBACK.centres[k] ?? FLASHBACK.centres[0] });
     });
   });
-  // The light strip of every group is one Graphics (drawn once), placed under its figures.
-  g.fillStyle(themeColor('finisher.paper').num, 1).fillRect(
-    0,
-    GROUND + FLASHBACK.stripTop,
-    STAGE_W,
-    FLASHBACK.stripH,
-  );
   let shown = -1;
   const count = FLASHBACK.groups.length;
   let figIndex: number[][] = [];
@@ -515,7 +564,6 @@ const flashback: FxFactory = (api) => {
   }
   return {
     start() {
-      g.setPosition(api.ctx.stageX, 0).setVisible(true);
       shown = -1;
     },
     update(since) {
@@ -531,12 +579,10 @@ const flashback: FxFactory = (api) => {
       }
     },
     stop() {
-      g.setVisible(false);
       for (const s of strips) s.setVisible(false);
       shown = -1;
     },
     destroy() {
-      g.destroy();
       for (const s of strips) s.destroy();
     },
   };
@@ -678,31 +724,54 @@ const portrait: FxFactory = (api, event) => {
 // ---------------------------------------------------------------------------------------------------
 
 /**
- * The band of dawn behind the figures grows in hard steps (no soft ramp): top above the ground, height,
- * alpha per step, time per step. Gold of the gilding (`gold.400`).
+ * The glow of dawn over the horizon (mockup `dawn`): `bands` stripes of `bandH` px from `fromDy` above the ground
+ * line upwards, each fainter than the one below (alpha x (1 - i / bands)); the base alpha rises in two hard steps
+ * (6b, 6c), no soft ramp. Gold of the gilding (`gold.400`), drawn behind the figures.
  */
-export const DAWN = { top: -170, h: 26, alphas: [0.12, 0.22, 0.32, 0.42], stepMs: 450 } as const;
+export const DAWN = {
+  bands: 6,
+  bandH: 14,
+  fromDy: -12,
+  alphas: [0.25, 0.4],
+  stepMs: 1000,
+  /** The stripes reach this far past both sides of the stage (the arena is wider than the stage). */
+  margin: 400,
+} as const;
 
 const dawn: FxFactory = (api) => {
-  const g = graphics(api, CHOREO_DEPTH.ground);
-  g.fillStyle(themeColor('gold.400').num, 1).fillRect(0, GROUND + DAWN.top, STAGE_W, DAWN.h);
+  const levels = DAWN.alphas.map((a) => {
+    const g = graphics(api, CHOREO_DEPTH.ground);
+    const gold = themeColor('gold.400').num;
+    for (let i = 0; i < DAWN.bands; i++) {
+      g.fillStyle(gold, a * (1 - i / DAWN.bands)).fillRect(
+        -DAWN.margin,
+        GROUND + DAWN.fromDy - i * DAWN.bandH,
+        STAGE_W + 2 * DAWN.margin,
+        DAWN.bandH,
+      );
+    }
+    return g;
+  });
   let last = -1;
+  const show = (i: number): void => {
+    last = i;
+    for (let k = 0; k < levels.length; k++) levels[k].setVisible(k === i);
+  };
   return {
     start() {
-      g.setPosition(api.ctx.stageX, 0).setAlpha(DAWN.alphas[0]).setVisible(true);
-      last = 0;
+      for (const g of levels) g.setPosition(api.ctx.stageX, 0);
+      show(0);
     },
     update(since) {
-      const i = Math.min(DAWN.alphas.length - 1, Math.floor(since / DAWN.stepMs));
-      if (i === last) return;
-      last = i;
-      g.setAlpha(DAWN.alphas[i]);
+      const i = Math.min(levels.length - 1, Math.floor(since / DAWN.stepMs));
+      if (i !== last) show(i);
     },
     stop() {
-      g.setVisible(false);
+      for (const g of levels) g.setVisible(false);
+      last = -1;
     },
     destroy() {
-      g.destroy();
+      for (const g of levels) g.destroy();
     },
   };
 };
