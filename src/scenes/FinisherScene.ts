@@ -1,71 +1,37 @@
-// Boss finisher overlay (M10, AP-160, RS-04.1 to RS-04.3, design brief H-39, PE-203).
-// Plays one FinisherPlan with its own camera and its own copies of boss and astronaut over the paused
-// game scene, full arena width, also with the Canvas renderer. Ends after `plan.totalMs` or on skip:
-// with `result` it stops GameScene (and the HUD) and starts ResultScene, without it (debug) the menu.
-// M13 (AP-182): a plan with a choreography is played by the ChoreoPlayer instead (figures from parts,
-// world camera with zoom and scroll, screen camera for flash, text and hint); without one the M10 blocks run.
+// Boss finisher overlay (M10 AP-160, M13 AP-182, AP-191, RS-04.1 to RS-04.3, design brief H-39, PE-203).
+// Plays one FinisherPlan over the paused game scene with the ChoreoPlayer (figures from parts, world
+// camera with zoom and scroll, screen camera for flash, text and hint), also with the Canvas renderer.
+// Ends when the player is done or on skip: with `result` it stops GameScene (and the HUD) and starts
+// ResultScene, without it (debug) the menu. The M10 block timeline was removed in AP-191.
 import Phaser from 'phaser';
-import {
-  FINISHER_SCENE_KEY,
-  type ChoreoDef,
-  type FinisherPlan,
-  type FinisherStartData,
-  type FinisherStep,
-} from '../contracts';
-import { FINISHER_RULES } from '../config/finishers';
+import { FINISHER_SCENE_KEY, type ChoreoDef, type FinisherStartData } from '../contracts';
 import { RIGS } from '../config/rigs';
-import { OPACITY } from '../config/theme';
 import { canSkip } from '../logic/finisher';
 import { getSoundService } from '../platform/audio';
 import { FONT_KEY } from './menu/kassette';
 import { readSafeInsets } from './safeInsets';
-import { hitstop, shake, slowmo, zoom } from './finisher/camera';
 import { ChoreoPlayer } from './finisher/choreoPlayer';
-import {
-  DEPTH,
-  type ActorCopies,
-  type BlockEffect,
-  type BossMode,
-  type ChoreoContext,
-  type FinisherContext,
-} from './finisher/context';
-import { actorScreen, finisherLayout, hitPoint } from './finisher/layout';
-import { beam, bgColor, flash, impactFrame, letterbox, speedlines } from './finisher/overlays';
-import { ParticleSystem, particles, shatter } from './finisher/particles';
-import { createSkipHint, cutIn, frames, panels, title } from './finisher/pictures';
-import { releaseTimeline } from './finisher/shutdown';
+import type { ChoreoContext } from './finisher/context';
+import { finisherLayout } from './finisher/layout';
+import { createSkipHint } from './finisher/pictures';
 import { atlasToLoad, choreoOf, isFinisherStartData } from './finisher/startData';
 import { TextureBank } from './finisher/textures';
-import { beamWindow, effectRate, soundCues } from './finisher/timing';
 
 const GAME_KEY = 'GameScene';
 const HUD_KEY = 'HudScene';
 const RESULT_KEY = 'ResultScene';
 const MENU_KEY = 'MenuScene';
-/** Fallback texture of a missing actor (transparent, built into Phaser). */
-const EMPTY_TEXTURE = '__DEFAULT';
 /** Width of the choreography stage (arena px of the H-46 boards); wider arenas centre it. */
 const CHOREO_STAGE_W = 640;
-
-interface Running {
-  effect: BlockEffect;
-  seqStart: number;
-  fxStart: number;
-}
 
 export class FinisherScene extends Phaser.Scene {
   private startData: FinisherStartData | null = null;
   /** `result` of the start data, kept even when the rest is unusable, so a boss win never hangs. */
   private result: unknown = undefined;
-  private ctx: FinisherContext | null = null;
-  private timeline: Phaser.Time.Timeline | null = null;
-  private readonly running = new Set<Running>();
-  private particleSystem: ParticleSystem | null = null;
   private hint: Phaser.GameObjects.Container | null = null;
-  private fxNow = 0;
   private done = false;
   private inputBound = false;
-  /** M13: player of `plan.choreo`, its context and the screen camera (null on the M10 path). */
+  /** Player of `plan.choreo`, its context and the screen camera. */
   private player: ChoreoPlayer | null = null;
   private choreoCtx: ChoreoContext | null = null;
   private uiCam: Phaser.Cameras.Scene2D.Camera | null = null;
@@ -78,12 +44,7 @@ export class FinisherScene extends Phaser.Scene {
     this.startData = isFinisherStartData(data) ? data : null;
     this.result =
       data && typeof data === 'object' ? (data as { result?: unknown }).result : undefined;
-    this.ctx = null;
-    this.timeline = null;
-    this.running.clear();
-    this.particleSystem = null;
     this.hint = null;
-    this.fxNow = 0;
     this.done = false;
     this.inputBound = false;
     this.player = null;
@@ -103,58 +64,19 @@ export class FinisherScene extends Phaser.Scene {
   create(): void {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
     const data = this.startData;
-    if (!data) {
+    const choreo = data ? choreoOf(data.plan) : null;
+    if (!data || !choreo) {
       this.finish();
       return;
     }
     this.cameras.main.setBackgroundColor('rgba(0,0,0,0)');
-    const plan = data.plan;
-    const choreo = choreoOf(plan);
-    if (choreo) {
-      this.createChoreo(data, choreo);
-      return;
-    }
-    const width = this.scale.width;
-    const height = this.scale.height;
-    const insets = readSafeInsets(this.registry);
-    const layout = finisherLayout(
-      width,
-      height,
-      insets,
-      plan.steps.some((s) => s.block === 'letterbox'),
-    );
-    const hit = hitPoint(data.boss, width, height);
-    const back = this.add.container(0, 0).setDepth(DEPTH.back);
-    const world = this.add.container(0, 0).setDepth(DEPTH.world);
-    const ctx: FinisherContext = {
-      scene: this,
-      data,
-      plan,
-      layout,
-      insets,
-      hit,
-      bossIndex: Math.min(5, Math.max(0, plan.stage - 1)),
-      back,
-      world,
-      textures: new TextureBank(this),
-      webgl: this.sys.renderer.type === Phaser.WEBGL,
-      zoom: 1,
-      shake: { x: 0, y: 0 },
-      actors: null as unknown as ActorCopies,
-    };
-    ctx.actors = this.createActors(ctx);
-    this.ctx = ctx;
-    this.particleSystem = new ParticleSystem(ctx);
-    this.hint = createSkipHint(ctx);
-    this.timeline = this.add.timeline(this.timelineEvents(plan));
-    this.bindInput();
-    this.timeline.play();
+    this.createChoreo(data, choreo);
   }
 
   /**
-   * M13 path: the choreography is played by the ChoreoPlayer on the main camera (world: zoom, scroll,
-   * shake), a second camera shows the screen layer (flash, text, skip hint) unzoomed. Both cameras are
-   * removed by Phaser on SHUTDOWN (the camera manager rebuilds the main camera on the next start).
+   * The choreography is played by the ChoreoPlayer on the main camera (world: zoom, scroll, shake), a
+   * second camera shows the screen layer (flash, text, skip hint) unzoomed. Both cameras are removed by
+   * Phaser on SHUTDOWN (the camera manager rebuilds the main camera on the next start).
    */
   private createChoreo(data: FinisherStartData, def: ChoreoDef): void {
     const width = this.scale.width;
@@ -192,186 +114,19 @@ export class FinisherScene extends Phaser.Scene {
     this.bindInput();
   }
 
-  /** Timeline from `plan.steps`: start and end of every block, the beam, the sounds and the end. */
-  private timelineEvents(plan: FinisherPlan): Phaser.Types.Time.TimelineEventConfig[] {
-    const events: Phaser.Types.Time.TimelineEventConfig[] = [];
-    const block = (atMs: number, durationMs: number, make: () => BlockEffect | null): void => {
-      let entry: Running | null = null;
-      events.push({
-        at: atMs,
-        run: () => {
-          entry = this.startBlock(make);
-        },
-      });
-      events.push({
-        at: atMs + durationMs,
-        run: () => {
-          if (entry) this.stopBlock(entry);
-        },
-      });
-    };
-    for (const step of plan.steps) {
-      block(step.atMs, step.durationMs, () => this.makeBlock(step));
-    }
-    const beamAt = beamWindow(plan);
-    if (beamAt) block(beamAt.atMs, beamAt.durationMs, () => (this.ctx ? beam(this.ctx) : null));
-    const sound = getSoundService(this.game);
-    for (const cue of soundCues(plan)) {
-      events.push({
-        at: cue.atMs,
-        run: () => {
-          if (!this.done) sound.play(cue.key);
-        },
-      });
-    }
-    events.push({ at: plan.totalMs, run: () => this.finish() });
-    return events;
-  }
-
-  private makeBlock(step: FinisherStep): BlockEffect | null {
-    const ctx = this.ctx;
-    const ps = this.particleSystem;
-    if (!ctx || !ps) return null;
-    switch (step.block) {
-      case 'hitstop':
-        return hitstop();
-      case 'slowmo':
-        return slowmo(ctx, step);
-      case 'zoom':
-        return zoom(ctx);
-      case 'shake':
-        return shake(ctx);
-      case 'letterbox':
-        return letterbox(ctx, step);
-      case 'speedlines':
-        return speedlines(ctx, step);
-      case 'bgColor':
-        return bgColor(ctx, step);
-      case 'impactFrame':
-        return impactFrame(ctx, step);
-      case 'flash':
-        return flash(ctx, step);
-      case 'cutIn':
-        return cutIn(ctx, step);
-      case 'panels':
-        return panels(ctx, step);
-      case 'particles':
-        return particles(ctx, step, ps);
-      case 'shatter':
-        return shatter(ctx, step, ps);
-      case 'title':
-        return title(ctx, step);
-      case 'frames':
-        return frames(ctx, step);
-      default:
-        return null;
-    }
-  }
-
-  private startBlock(make: () => BlockEffect | null): Running | null {
-    if (this.done || !this.timeline) return null;
-    const effect = make();
-    if (!effect) return null;
-    const entry: Running = { effect, seqStart: this.timeline.elapsed, fxStart: this.fxNow };
-    this.running.add(entry);
-    effect.update(0, 0);
-    return entry;
-  }
-
-  private stopBlock(entry: Running): void {
-    if (!this.running.delete(entry)) return;
-    entry.effect.destroy();
-  }
-
-  private createActors(ctx: FinisherContext): ActorCopies {
-    const { data, layout, hit } = ctx;
-    const make = (a: FinisherStartData['boss']): Phaser.GameObjects.Image => {
-      const ok = this.textures.exists(a.texture);
-      const img = this.add
-        .image(0, 0, ok ? a.texture : EMPTY_TEXTURE, ok ? (a.frame ?? 0) : undefined)
-        .setFlipX(a.flipX === true)
-        .setVisible(false);
-      ctx.world.add(img);
-      return img;
-    };
-    const boss = make(data.boss);
-    const player = make(data.player);
-    // One result object per actor, reused every frame (read it right away, it changes on the next call).
-    const screen = (
-      img: Phaser.GameObjects.Image,
-      a: FinisherStartData['boss'],
-      out: { x: number; y: number; scale: number },
-    ) => {
-      out.scale = a.scale * ctx.zoom;
-      actorScreen(
-        a,
-        hit,
-        ctx.zoom,
-        layout.width,
-        layout.height,
-        (img.width * out.scale) / 2,
-        (img.height * out.scale) / 2,
-        out,
-      );
-      return out;
-    };
-    const bossAt = { x: 0, y: 0, scale: 1 };
-    const playerAt = { x: 0, y: 0, scale: 1 };
-    const actors: ActorCopies = {
-      boss,
-      player,
-      bossMode: 'hidden',
-      setBossMode(mode: BossMode) {
-        actors.bossMode = mode;
-        boss.setVisible(mode !== 'hidden').setAlpha(mode === 'ghost' ? OPACITY.ghost : 1);
-      },
-      setPlayerShown(shown: boolean) {
-        player.setVisible(shown && !ctx.plan.isFinale);
-      },
-      bossScreen: () => screen(boss, data.boss, bossAt),
-      playerScreen: () => screen(player, data.player, playerAt),
-    };
-    // Finales show their own pictures; the stages start on the boss copy.
-    actors.setBossMode(ctx.plan.isFinale ? 'hidden' : 'shown');
-    return actors;
-  }
-
   update(_time: number, delta: number): void {
     const player = this.player;
-    if (player) {
-      if (this.done) return;
-      player.update(Math.max(0, delta));
-      const plan = this.choreoCtx?.plan;
-      this.hint?.setVisible(!!plan && canSkip(plan, player.elapsedMs));
-      if (player.done) this.finish();
-      return;
-    }
-    const ctx = this.ctx;
-    const tl = this.timeline;
-    if (this.done || !ctx || !tl) return;
-    const seq = tl.elapsed;
-    const dtFx = Math.max(0, delta) * effectRate(ctx.plan.steps, seq);
-    this.fxNow += dtFx;
-    for (const r of this.running) r.effect.update(seq - r.seqStart, this.fxNow - r.fxStart);
-    this.particleSystem?.update(dtFx);
-    ctx.back.setPosition(ctx.shake.x, ctx.shake.y);
-    ctx.world.setPosition(ctx.shake.x, ctx.shake.y);
-    const b = ctx.actors.bossScreen();
-    ctx.actors.boss.setPosition(b.x, b.y).setScale(b.scale);
-    const p = ctx.actors.playerScreen();
-    ctx.actors.player.setPosition(p.x, p.y).setScale(p.scale);
-    this.hint?.setVisible(ctx.plan.skippable && seq >= FINISHER_RULES.skipLockMs);
+    if (!player || this.done) return;
+    player.update(Math.max(0, delta));
+    const plan = this.choreoCtx?.plan;
+    this.hint?.setVisible(!!plan && canSkip(plan, player.elapsedMs));
+    if (player.done) this.finish();
   }
 
   private readonly onSkip = (): void => {
     const plan = this.startData?.plan;
-    if (this.done || !plan) return;
-    if (this.player) {
-      if (canSkip(plan, this.player.elapsedMs)) this.finish();
-      return;
-    }
-    if (!this.timeline) return;
-    if (canSkip(plan, this.timeline.elapsed)) this.finish();
+    if (this.done || !plan || !this.player) return;
+    if (canSkip(plan, this.player.elapsedMs)) this.finish();
   };
 
   private bindInput(): void {
@@ -394,7 +149,6 @@ export class FinisherScene extends Phaser.Scene {
   private finish(): void {
     if (this.done) return;
     this.done = true;
-    this.timeline?.stop();
     this.unbindInput();
     if (this.result !== undefined && this.result !== null) {
       for (const key of [GAME_KEY, HUD_KEY]) {
@@ -408,25 +162,13 @@ export class FinisherScene extends Phaser.Scene {
     }
   }
 
-  /** SHUTDOWN: removes every block, object, generated texture, the timeline and the input listeners. */
+  /** SHUTDOWN: removes the player objects, generated textures and the input listeners. */
   private cleanup(): void {
     this.done = true;
     this.unbindInput();
-    for (const r of this.running) r.effect.destroy();
-    this.running.clear();
-    this.particleSystem?.destroy();
-    this.particleSystem = null;
     this.hint?.destroy();
     this.hint = null;
-    // Phaser destroys the timeline itself on SHUTDOWN; a second destroy() would throw.
-    this.timeline = releaseTimeline(this.timeline);
-    if (this.ctx) {
-      this.ctx.back.destroy();
-      this.ctx.world.destroy();
-      this.ctx.textures.destroy();
-      this.ctx = null;
-    }
-    // M13: player objects and generated textures; the cameras go with the camera manager (SHUTDOWN).
+    // Player objects and generated textures; the cameras go with the camera manager (SHUTDOWN).
     this.player?.destroy();
     this.player = null;
     this.choreoCtx?.textures.destroy();

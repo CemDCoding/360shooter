@@ -113,7 +113,7 @@ export function parseSave(data: unknown): SaveGame | null {
     muted: d.muted,
     // Only a real boolean counts, anything else (or a missing field) is off (AP-152).
     easyParry: d.easyParry === true,
-    // Strict (AP-161, R6): only valid, unique variant ids; only a real boolean counts.
+    // Strict (AP-161, R6): only valid, unique choreography ids (the old M10 ids are dropped, AP-191); only a real boolean counts.
     seenFinishers: parseSeenFinishers(d.seenFinishers),
     reduceEffects: d.reduceEffects === true,
   };

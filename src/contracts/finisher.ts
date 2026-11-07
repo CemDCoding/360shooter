@@ -1,103 +1,24 @@
-// Contracts of the boss finisher sequences (M10, RS-04.1, PE-196 to PE-200).
+// Contracts of the boss finisher sequences (M10 plan and M13 choreography, RS-04.1, PE-196 to PE-200, PE-241).
 // No Phaser imports: plain data only. Numbers live in src/config/finishers.ts.
 import type { BossId } from './boss';
 
-/** Building blocks of a finisher sequence. `impactFrame` and `flash` are the flash blocks (RS-04.5). */
-export type FinisherBlock =
-  | 'hitstop'
-  | 'slowmo'
-  | 'zoom'
-  | 'shake'
-  | 'letterbox'
-  | 'speedlines'
-  | 'bgColor'
-  | 'impactFrame'
-  | 'flash'
-  | 'cutIn'
-  | 'panels'
-  | 'particles'
-  | 'shatter'
-  | 'title'
-  | 'frames';
-
-/** One timed step of a sequence. */
-export interface FinisherStep {
-  block: FinisherBlock;
-  /** Start relative to the sequence start (ms), at least 0. */
-  atMs: number;
-  durationMs: number;
-  /** Intensity 0..1. */
-  strength?: number;
-  /** Theme token key `finisher.*`, never a raw colour. */
-  color?: string;
-  /** Texture key (cut-in portrait, frame strip). */
-  texture?: string;
-  /** Number of hand-drawn frames of a `frames` block, 0 = block is skipped. */
-  frameCount?: number;
-  fps?: number;
-  /** Hold time (ms) per frame of a `frames` block, length = `frameCount`; takes precedence over `fps`. */
-  holdsMs?: readonly number[];
-  /**
-   * Hold times (ms) with "reduce effects", same length as `holdsMs`; 0 = frame is dropped.
-   * Frames with 0 are impact frames and count for the flash rule.
-   */
-  reducedHoldsMs?: readonly number[];
-  /** First frame of the strip used by a `frames` block (e.g. boss index in `finisher-hit`); default 0. */
-  firstFrame?: number;
-  /** Title kind: the word "BEZWUNGEN!" or the name of the final-hit boss; default 'title'. */
-  titleKind?: 'title' | 'name';
-  /** Title text. */
-  text?: string;
-}
-
 export type FinisherStage = 1 | 2 | 3 | 4 | 5 | 6;
 
-export type FinisherVariantId =
-  | 'stage-1'
-  | 'stage-2'
-  | 'stage-3'
-  | 'stage-4'
-  | 'stage-5'
-  | 'stage-6'
-  | 'finale-4'
-  | 'finale-9'
-  | 'finale-20'
-  | 'finale-25'
-  | 'finale-30'
-  | 'finale-40';
-
-export const FINISHER_VARIANT_IDS: readonly FinisherVariantId[] = [
-  'stage-1',
-  'stage-2',
-  'stage-3',
-  'stage-4',
-  'stage-5',
-  'stage-6',
-  'finale-4',
-  'finale-9',
-  'finale-20',
-  'finale-25',
-  'finale-30',
-  'finale-40',
-];
-
-/** A ready sequence for one boss defeat. */
+/** A ready sequence for one boss defeat: always a choreography (M13). */
 export interface FinisherPlan {
-  /** M10 id, or a choreography id when `choreo` is set (M13). */
-  variantId: FinisherVariantId | ChoreoVariantId;
+  variantId: ChoreoVariantId;
+  /** Batch index 1..6 (frame of the hit image and the portrait). */
   stage: FinisherStage;
-  isFinale: boolean;
-  steps: readonly FinisherStep[];
+  /** Real length (ms), equals `realMs`. */
   totalMs: number;
-  skippable: boolean;
-  /** True when "reduce effects" was applied to the steps. */
+  /** True when "reduce effects" was applied to the choreography. */
   reduced: boolean;
-  /** Choreography to play (M13); missing = play the M10 `steps`. With "reduce effects" already reduced. */
-  choreo?: ChoreoDef;
+  /** Choreography to play; with "reduce effects" already reduced. */
+  choreo: ChoreoDef;
   /** Real length (ms) of `choreo` including `timeScale` and `hitStop`. */
-  realMs?: number;
-  /** Time (ms) from which skipping is allowed; set with `choreo` (PE-234), otherwise `skippable` decides. */
-  skipFromMs?: number;
+  realMs: number;
+  /** Time (ms) from which skipping is allowed (PE-234). */
+  skipFromMs: number;
 }
 
 /** A sprite shown by the sequence (boss or player). */
@@ -122,23 +43,16 @@ export interface FinisherStartData<R = unknown> {
   result?: R;
 }
 
-/** Fixed rules for all sequences (RS-04.4, RS-04.5). */
+/** Fixed rules for the skip lock of all sequences (RS-04.4, PE-234). */
 export interface FinisherRules {
-  /** At most this many flash blocks inside one window (WCAG 2.3.1). */
-  flashMaxPerWindow: number;
-  flashWindowMs: number;
-  /** Skip is ignored during the first ms. */
+  /** Skip is ignored during the first ms of a variant seen before. */
   skipLockMs: number;
   /** Skip is ignored during the first ms when the variant is seen for the first time (M13, PE-234). */
   skipFirstViewMs: number;
-  /** Blocks removed by "reduce effects". */
-  reducedRemoves: readonly FinisherBlock[];
-  flashBlocks: readonly FinisherBlock[];
-  maxParticles: number;
 }
 
 // ---------------------------------------------------------------------------
-// Rig and choreography (M13, AP-181, RS-06.1, PE-244 to PE-251). Additive: the M10 types above stay.
+// Rig and choreography (M13, AP-181, RS-06.1, PE-244 to PE-251). The M10 blocks and variant ids are gone (AP-191).
 // All times are in ms, never in frames (RS-06.5). Numbers live in src/config/finishers.ts.
 // ---------------------------------------------------------------------------
 

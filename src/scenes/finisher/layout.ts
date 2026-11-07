@@ -1,4 +1,4 @@
-// Pure layout of the finisher scene (M10, AP-160, design brief H-39, mockup m10-boss-finisher.html).
+// Pure layout of the finisher scene (M10 AP-160, design brief H-39, mockup m10-boss-finisher.html; M10 picture helpers removed in AP-191).
 // Functions of arena width, height 360 and SafeInsets; no Phaser import.
 import type { SafeInsets } from '../../contracts';
 import { THEME, themeColor, type ColorName } from '../../config/theme';
@@ -13,16 +13,6 @@ export function tokenColor(key: string | undefined, fallback: ColorName): ThemeC
   return themeColor(fallback);
 }
 
-/** Colour background per stage (finales fill the sides of a wide arena with it). */
-export const STAGE_BG: readonly ColorName[] = [
-  'finisher.bg-forest',
-  'finisher.bg-night',
-  'finisher.bg-elf',
-  'finisher.bg-desert',
-  'finisher.bg-pyramid',
-  'finisher.bg-oasis',
-];
-
 export interface Point {
   x: number;
   y: number;
@@ -36,18 +26,11 @@ export interface Rect {
 }
 
 const S = THEME.sizePx;
-const C = THEME.sizeCount;
 
 /** Height of one cinema bar (`size.finisher-letterbox`). */
 export const BAR_H = S['size.finisher-letterbox'];
 /** Gap between the top bar and the title (brief H-39, assumptions: 12 px under the top bar). */
 export const TITLE_GAP = 12;
-/** Frame size of a picture sheet and of the hit image (sprite sheets, AP-159). */
-export const PICTURE_W = 320;
-export const PICTURE_H = 180;
-export const HIT_IMAGE_SIZE = 96;
-/** Darkening of the scene under the hit image in stage 1 and 2 (brief: 85 % ink). */
-export const HIT_SCRIM_ALPHA = 0.85;
 /** Edge of the cut-in band (brief: 2 px in coral, above and below the band). */
 export const CUTIN_EDGE = 2;
 /** Scale of the visor portrait in the cut-in strip (one source for pictures.ts and the boss effects). */
@@ -70,10 +53,6 @@ export interface FinisherLayout {
   width: number;
   height: number;
   center: Point;
-  /** The 640 x 360 picture (sheet frame at 2x), centred; wider arenas have room left and right. */
-  picture: Rect;
-  barTop: Rect;
-  barBottom: Rect;
   /** Top edge of the title and of the name, and the x it is centred on (inside the insets). */
   titleY: number;
   titleCenterX: number;
@@ -104,17 +83,12 @@ export function finisherLayout(
   const right = inset(insets.right);
   const bottom = inset(insets.bottom);
   const left = inset(insets.left);
-  const pw = PICTURE_W * C['size.finisher-frame-scale'];
-  const ph = PICTURE_H * C['size.finisher-frame-scale'];
   const skipInset = S['size.finisher-skip-inset'];
   const cutInH = S['size.finisher-portrait-h'];
   return {
     width,
     height,
     center: { x: Math.round(width / 2), y: Math.round(height / 2) },
-    picture: { x: Math.round((width - pw) / 2), y: Math.round((height - ph) / 2), w: pw, h: ph },
-    barTop: { x: 0, y: 0, w: width, h: BAR_H },
-    barBottom: { x: 0, y: height - BAR_H, w: width, h: BAR_H },
     titleY: Math.max(BAR_H + TITLE_GAP, top + TITLE_GAP),
     titleCenterX: Math.round((left + width - right) / 2),
     hintRight: width - right - skipInset,
@@ -152,37 +126,6 @@ export function hintBox(layout: FinisherLayout, textW: number, textH: number): H
 /** Left x of a text of width `w` centred on `cx`, whole pixels. */
 export function centredX(cx: number, w: number): number {
   return Math.round(cx - w / 2);
-}
-
-function clampHalf(v: number, half: number, size: number): number {
-  return half * 2 >= size ? size / 2 : Math.min(size - half, Math.max(half, v));
-}
-
-/**
- * Screen position of an actor copy with the camera zoomed on the hit point, kept inside the arena.
- * Writes into `out` when given (the scene reuses one object per frame).
- */
-export function actorScreen(
-  actor: Point,
-  hit: Point,
-  zoom: number,
-  width: number,
-  height: number,
-  halfW: number,
-  halfH: number,
-  out?: Point,
-): Point {
-  const p = out ?? { x: 0, y: 0 };
-  p.x = Math.round(clampHalf(hit.x + (actor.x - hit.x) * zoom, halfW, width));
-  p.y = Math.round(clampHalf(hit.y + (actor.y - hit.y) * zoom, halfH, height));
-  return p;
-}
-
-/** Hit point (boss position) inside the arena. */
-export function hitPoint(boss: Point, width: number, height: number): Point {
-  const ok = (v: number, size: number): number =>
-    Number.isFinite(v) ? Math.min(size, Math.max(0, Math.round(v))) : Math.round(size / 2);
-  return { x: ok(boss.x, width), y: ok(boss.y, height) };
 }
 
 /** Deterministic random numbers 0..1 (mulberry32), so a sequence looks the same every time. */
@@ -240,106 +183,4 @@ export function speedlineWedges(
     ]);
   }
   return out;
-}
-
-/** Beam of the final blow (decision 10a): white core, 3 px coral rim per side, 50 % dithered outer band. */
-export const BEAM_CORE_H = 6;
-export const BEAM_RIM_H = 3;
-export const BEAM_GLOW_H = 4;
-export const BEAM_TOTAL_H = BEAM_CORE_H + 2 * BEAM_RIM_H + 2 * BEAM_GLOW_H;
-
-export interface BeamBands {
-  glowTop: Rect;
-  rimTop: Rect;
-  core: Rect;
-  rimBottom: Rect;
-  glowBottom: Rect;
-}
-
-/** Bands of the beam across x..x+w, centred on `cy`. */
-export function beamBands(cy: number, x: number, w: number): BeamBands {
-  const top = Math.round(cy - BEAM_TOTAL_H / 2);
-  const band = (y: number, h: number): Rect => ({ x, y, w, h });
-  return {
-    glowTop: band(top, BEAM_GLOW_H),
-    rimTop: band(top + BEAM_GLOW_H, BEAM_RIM_H),
-    core: band(top + BEAM_GLOW_H + BEAM_RIM_H, BEAM_CORE_H),
-    rimBottom: band(top + BEAM_GLOW_H + BEAM_RIM_H + BEAM_CORE_H, BEAM_RIM_H),
-    glowBottom: band(top + BEAM_GLOW_H + 2 * BEAM_RIM_H + BEAM_CORE_H, BEAM_GLOW_H),
-  };
-}
-
-/**
- * Horizontal span of the growing beam: it starts at the side of the astronaut and crosses the
- * whole picture; `progress` 0..1.
- */
-export function beamSpan(
-  fromLeft: boolean,
-  width: number,
-  progress: number,
-): { x: number; w: number } {
-  const p = Math.min(1, Math.max(0, progress));
-  const w = Math.round(width * p);
-  return { x: fromLeft ? 0 : width - w, w };
-}
-
-export interface PanelDef {
-  /** Outline of the panel (slanted field). */
-  points: Point[];
-  /** Anchor of its content. */
-  anchor: Point;
-}
-
-export interface PanelLayout {
-  /** Portrait panel (top left), hit image panel (top right), beam panel (bottom). */
-  portrait: PanelDef;
-  hit: PanelDef;
-  beam: PanelDef;
-  /** In the beam panel: beam y, its start and end x, astronaut top left and boss centre. */
-  beamY: number;
-  beamFromX: number;
-  beamToX: number;
-  astronaut: Point;
-  boss: Point;
-}
-
-/** Three slanted panels (mockup view 5, base 640, x scaled with the arena width). */
-export function panelLayout(width: number, insets: SafeInsets): PanelLayout {
-  const k = width / 640;
-  const x = (v: number): number => Math.round(v * k);
-  const portraitX = Math.max(4, inset(insets.left) + 4);
-  return {
-    portrait: {
-      points: [
-        { x: 0, y: 0 },
-        { x: x(330), y: 0 },
-        { x: x(300), y: 170 },
-        { x: 0, y: 170 },
-      ],
-      anchor: { x: portraitX, y: 65 },
-    },
-    hit: {
-      points: [
-        { x: x(340), y: 0 },
-        { x: width, y: 0 },
-        { x: width, y: 170 },
-        { x: x(310), y: 170 },
-      ],
-      anchor: { x: x(480), y: 85 },
-    },
-    beam: {
-      points: [
-        { x: 0, y: 180 },
-        { x: width, y: 180 },
-        { x: width, y: 360 },
-        { x: 0, y: 360 },
-      ],
-      anchor: { x: x(470), y: 270 },
-    },
-    beamY: 270,
-    beamFromX: x(120),
-    beamToX: x(470),
-    astronaut: { x: Math.max(x(40), inset(insets.left) + 4), y: 230 },
-    boss: { x: x(500), y: 270 },
-  };
 }

@@ -24,23 +24,16 @@ function isPlan(v: unknown): v is FinisherPlan {
   const p = v as Partial<FinisherPlan>;
   return (
     typeof p.variantId === 'string' &&
-    Array.isArray(p.steps) &&
     finite(p.totalMs) &&
     p.totalMs >= 0 &&
-    p.steps.every(
-      (s: unknown) =>
-        !!s &&
-        typeof s === 'object' &&
-        typeof (s as { block?: unknown }).block === 'string' &&
-        finite((s as { atMs?: unknown }).atMs) &&
-        finite((s as { durationMs?: unknown }).durationMs),
-    )
+    finite(p.skipFromMs) &&
+    choreoOf(p as FinisherPlan) !== null
   );
 }
 
 /**
- * The choreography of a plan when it has the shape the player needs (M13, AP-182); null = play the M10
- * steps (fallback). Content rules are checked by `validateChoreo` in the tests of each choreography.
+ * The choreography of a plan when it has the shape the player needs (M13, AP-182); null = unusable plan.
+ * Content rules are checked by `validateChoreo` in the tests of each choreography.
  */
 export function choreoOf(plan: FinisherPlan): ChoreoDef | null {
   const c = plan.choreo as Partial<ChoreoDef> | undefined;
@@ -71,7 +64,7 @@ export function atlasToLoad(
   return atlases.find((a) => a.key === key) ?? null;
 }
 
-/** True when `v` can be played: a plan with timed steps and two actors with finite positions. */
+/** True when `v` can be played: a plan with a usable choreography and two actors with finite positions. */
 export function isFinisherStartData(v: unknown): v is FinisherStartData {
   if (!v || typeof v !== 'object') return false;
   const d = v as Partial<FinisherStartData>;

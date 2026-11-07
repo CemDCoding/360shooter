@@ -405,14 +405,6 @@ const OWN_ASSETS: readonly AssetDef[] = [
     'Finisher: Visier-Streifen der Astronautin (Bild = Boss).',
   ),
   sprite('finisher-hit', 96, 96, 6, 'Finisher: Nahaufnahme des Bosses beim Schlusstreffer.'),
-  sprite('finisher-shards', 4, 4, 18, 'Finisher: Splitter (3 je Boss).'),
-  sprite('finisher-finale-4', 320, 180, 11, 'Finisher: Bildfolge Level 4 (Baummonster).'),
-  sprite('finisher-finale-9', 320, 180, 11, 'Finisher: Bildfolge Level 9 (Waldgeist).'),
-  sprite('finisher-finale-20', 320, 180, 11, 'Finisher: Bildfolge Level 20 (Riesen-Stein).'),
-  sprite('finisher-finale-25', 320, 180, 11, 'Finisher: Bildfolge Level 25 (Sand-Wurm).'),
-  sprite('finisher-finale-30', 320, 180, 11, 'Finisher: Bildfolge Level 30 (Waechter-Hund).'),
-  sprite('finisher-finale-40a', 320, 180, 9, 'Finisher: Bildfolge Level 40, Bogen a (Bild 0-8).'),
-  sprite('finisher-finale-40b', 320, 180, 9, 'Finisher: Bildfolge Level 40, Bogen b (Bild 9-17).'),
   // M11/M12 (H-43): Pixel in docs/design/assets/sprites-m11.js.
   sprite('elite-crown', 9, 7, 1, 'Elite-Krone ueber dem Gegner (farbig, nicht getoent).'),
   sprite(
