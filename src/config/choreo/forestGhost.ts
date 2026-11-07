@@ -412,6 +412,11 @@ function buildMoment(): ChoreoDef {
   });
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-196, Q-97): night with the moon top right, the ground mist thins out at G8 and is gone at G9.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: 0, name: 'stage-world:forestGhost-moment', flash: false },
+    { kind: 'fx', atMs: c(2400), name: 'stage-world:forestGhost-moment-8', flash: false },
+    { kind: 'fx', atMs: c(3200), name: 'stage-world:forestGhost-moment-9', flash: false },
     // Boss anticipation: two decoys glide out of the ghost and circle her; they stay until the shot.
     { kind: 'fx', atMs: 150, durationMs: 850, name: 'decoy-moment-1', flash: false },
     { kind: 'fx', atMs: 150, durationMs: 850, name: 'decoy-moment-2', flash: false },
@@ -635,6 +640,15 @@ function buildCinematic(): ChoreoDef {
   });
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-196, Q-97): night, moon on the left. E1 dense mist that thins out, board 3b (zoom 2, from the
+    // camera key at 7000) a larger moon, back at the end of the zoom (8200), E5 clear sky without mist.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: 0, name: 'stage-world:forestGhost-1', flash: false },
+    { kind: 'fx', atMs: 1500, name: 'stage-world:forestGhost-1b', flash: false },
+    { kind: 'fx', atMs: 2600, name: 'stage-world:forestGhost-1c', flash: false },
+    { kind: 'fx', atMs: 7000, name: 'stage-world:forestGhost-3b', flash: false },
+    { kind: 'fx', atMs: 8200, name: 'stage-world:forestGhost-1c', flash: false },
+    { kind: 'fx', atMs: c(13400), name: 'stage-world:forestGhost-5b', flash: false },
     // E2: the decoys of the blows
     { kind: 'fx', atMs: 3000, durationMs: 400, name: 'decoy-cine-1', flash: false },
     trail(3250, 300),

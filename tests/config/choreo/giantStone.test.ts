@@ -22,6 +22,7 @@ import { CHOREO_RULES } from '../../../src/config/finishers';
 import { ASTRONAUT_ANCHORS, ASTRONAUT_RIG } from '../../../src/config/rigs/astronaut';
 import { GIANT_STONE_RIG } from '../../../src/config/rigs/giantStone';
 import { RIGS } from '../../../src/config/rigs';
+import { STAGES } from '../../../src/config/choreo/stages';
 import { THEME } from '../../../src/config/theme';
 import {
   countFlashes,
@@ -36,6 +37,7 @@ import { ChoreoPlayer } from '../../../src/scenes/finisher/choreoPlayer';
 import type { ChoreoContext } from '../../../src/scenes/finisher/context';
 import {
   BOSS_FX,
+  findStageFx,
   BOSS_REF_H,
   HIT_RING_MS,
   ringRadius,
@@ -474,7 +476,8 @@ describe('rules for the data of the rig (PE-252, brief H-48)', () => {
           expect(new Set(times).size).toBe(times.length);
         }
       }
-      for (const e of events(def, 'fx')) expect(e.name in GIANT_STONE_FX, e.name).toBe(true);
+      for (const e of events(def, 'fx'))
+        expect(e.name in GIANT_STONE_FX || findStageFx(e.name) !== null, e.name).toBe(true);
     }
     expect(BOSS_FX.giantStone).toBe(GIANT_STONE_FX);
   });
@@ -980,5 +983,55 @@ describe('register and plan', () => {
     expect(plan.variantId).toBe(id);
     expect(plan.choreo?.variantId).toBe(id);
     expect(plan.realMs).toBe(id === 'cinematic-20' ? 15000 : 3500);
+  });
+});
+
+describe('stage world and letterbox (AP-196, Q-97)', () => {
+  const worlds = (def: ChoreoDef) =>
+    events(def, 'fx').filter((e) => e.name.startsWith('stage-world:'));
+  const MOMENT_IDS = ['giantStone-moment'];
+  const CINE_IDS = ['giantStone-1'];
+
+  it('enters the worlds in order, each a known preset, never a flash', () => {
+    expect(worlds(MOMENT).map((e) => e.name.slice('stage-world:'.length))).toEqual(MOMENT_IDS);
+    expect(worlds(CINE).map((e) => e.name.slice('stage-world:'.length))).toEqual(CINE_IDS);
+    for (const def of BOTH) {
+      for (const e of worlds(def)) {
+        const id = e.name.slice('stage-world:'.length);
+        expect(Object.prototype.hasOwnProperty.call(STAGES, id), id).toBe(true);
+        expect(id.startsWith('giantStone-'), id).toBe(true);
+        expect(e.flash).toBe(false);
+        expect(e.durationMs).toBeUndefined();
+      }
+    }
+  });
+
+  it('starts the first world and the one letterbox at 0', () => {
+    for (const def of BOTH) {
+      expect(worlds(def)[0].atMs).toBe(0);
+      const bars = fxNamed(def, 'letterbox');
+      expect(bars).toHaveLength(1);
+      expect(bars[0].atMs).toBe(0);
+      expect(bars[0].flash).toBe(false);
+    }
+  });
+
+  it('changes the world at the shot boundaries of the storyboard', () => {
+    expect(worlds(CINE).map((e) => e.atMs)).toEqual([0]);
+    const moment = worlds(MOMENT).map((e) => e.atMs);
+    expect(moment).toEqual([...moment].sort((a, b) => a - b));
+    expect(moment[moment.length - 1]).toBeLessThan(MOMENT.durationMs);
+  });
+
+  it('keeps world and bars when reduced and adds no flash', () => {
+    for (const def of BOTH) {
+      const reduced = reduceChoreo(def);
+      expect(worlds(reduced)).toHaveLength(worlds(def).length);
+      expect(fxNamed(reduced, 'letterbox')).toHaveLength(1);
+      expect(reduced.events.filter((e) => e.flash)).toHaveLength(0);
+      expect(
+        def.events.filter((e) => e.flash && e.kind === 'fx' && e.name.includes('stage')),
+      ).toHaveLength(0);
+    }
   });
 });

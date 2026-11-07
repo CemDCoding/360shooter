@@ -458,6 +458,9 @@ function buildMoment(): ChoreoDef {
   const crumbleEnd = crumbleChain(t, reactionStart, c);
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-196, Q-97): dunes with the sun, plus cinema bars, once at the start.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: 0, name: 'stage-world:giantSandWorm-moment', flash: false },
     // The wave runs towards her (600 ms), then the worm bursts out of the sand.
     { kind: 'fx', atMs: 0, durationMs: 600, name: 'sand-wave', flash: false },
     {
@@ -713,6 +716,11 @@ function buildCinematic(): ChoreoDef {
   const chainEnd = crumbleChain(t, chainStart, c);
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-196, Q-97): dunes; board 3b (zoom 2, camera keys 7000 to 8200) a larger sun, then back.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: 0, name: 'stage-world:giantSandWorm-1', flash: false },
+    { kind: 'fx', atMs: 7000, name: 'stage-world:giantSandWorm-3b', flash: false },
+    { kind: 'fx', atMs: 8200, name: 'stage-world:giantSandWorm-1', flash: false },
     // E1: the wave comes closer (3 stages); E2: sand fountains of the breakthroughs
     { kind: 'fx', atMs: 0, durationMs: 3000, name: 'sand-wave-in', flash: false },
     { kind: 'fx', atMs: 3300, durationMs: chainEnd - 3300, name: 'sand-cover', flash: false },

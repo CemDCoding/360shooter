@@ -20,6 +20,7 @@ import { CHOREOS } from '../../../src/config/choreo';
 import { CHOREO_RULES } from '../../../src/config/finishers';
 import { RIGS } from '../../../src/config/rigs';
 import { ASTRONAUT_ANCHORS } from '../../../src/config/rigs/astronaut';
+import { STAGES } from '../../../src/config/choreo/stages';
 import { THEME } from '../../../src/config/theme';
 import {
   countFlashes,
@@ -30,7 +31,7 @@ import {
 } from '../../../src/logic/choreo';
 import { ChoreoPlayer } from '../../../src/scenes/finisher/choreoPlayer';
 import type { ChoreoContext } from '../../../src/scenes/finisher/context';
-import { BOSS_FX, type FxApi, type FxEvent } from '../../../src/scenes/finisher/fx';
+import { BOSS_FX, findStageFx, type FxApi, type FxEvent } from '../../../src/scenes/finisher/fx';
 import {
   CUT_LINE_Y,
   DECOY_CINE_1,
@@ -224,7 +225,10 @@ describe('rules for the data of the rig (PE-252)', () => {
   it('names only effects the boss module (or the built-in slash) provides', () => {
     for (const def of BOTH) {
       for (const e of events(def, 'fx')) {
-        expect(e.name === 'slash' || e.name in FOREST_GHOST_FX, e.name).toBe(true);
+        expect(
+          e.name === 'slash' || e.name in FOREST_GHOST_FX || findStageFx(e.name) !== null,
+          e.name,
+        ).toBe(true);
       }
     }
     expect(BOSS_FX.forestGhost).toBe(FOREST_GHOST_FX);
@@ -535,5 +539,69 @@ describe('effects of the boss', () => {
     inst.update(50, 16);
     inst.stop();
     inst.destroy();
+  });
+});
+
+describe('stage world and letterbox (AP-196, Q-97)', () => {
+  const worlds = (def: ChoreoDef) =>
+    events(def, 'fx').filter((e) => e.name.startsWith('stage-world:'));
+  const MOMENT_IDS = ['forestGhost-moment', 'forestGhost-moment-8', 'forestGhost-moment-9'];
+  const CINE_IDS = [
+    'forestGhost-1',
+    'forestGhost-1b',
+    'forestGhost-1c',
+    'forestGhost-3b',
+    'forestGhost-1c',
+    'forestGhost-5b',
+  ];
+
+  it('enters the worlds in order, each a known preset, never a flash', () => {
+    expect(worlds(MOMENT).map((e) => e.name.slice('stage-world:'.length))).toEqual(MOMENT_IDS);
+    expect(worlds(CINE).map((e) => e.name.slice('stage-world:'.length))).toEqual(CINE_IDS);
+    for (const def of BOTH) {
+      for (const e of worlds(def)) {
+        const id = e.name.slice('stage-world:'.length);
+        expect(Object.prototype.hasOwnProperty.call(STAGES, id), id).toBe(true);
+        expect(id.startsWith('forestGhost-'), id).toBe(true);
+        expect(e.flash).toBe(false);
+        expect(e.durationMs).toBeUndefined();
+      }
+    }
+  });
+
+  it('starts the first world and the one letterbox at 0', () => {
+    for (const def of BOTH) {
+      expect(worlds(def)[0].atMs).toBe(0);
+      const bars = fxNamed(def, 'letterbox');
+      expect(bars).toHaveLength(1);
+      expect(bars[0].atMs).toBe(0);
+      expect(bars[0].flash).toBe(false);
+    }
+  });
+
+  it('changes the world at the shot boundaries of the storyboard', () => {
+    expect(worlds(CINE).map((e) => e.atMs)).toEqual([
+      0,
+      1500,
+      2600,
+      7000,
+      8200,
+      (CINE.shots?.[4]?.atMs ?? 0) + 1400,
+    ]);
+    const moment = worlds(MOMENT).map((e) => e.atMs);
+    expect(moment).toEqual([...moment].sort((a, b) => a - b));
+    expect(moment[moment.length - 1]).toBeLessThan(MOMENT.durationMs);
+  });
+
+  it('keeps world and bars when reduced and adds no flash', () => {
+    for (const def of BOTH) {
+      const reduced = reduceChoreo(def);
+      expect(worlds(reduced)).toHaveLength(worlds(def).length);
+      expect(fxNamed(reduced, 'letterbox')).toHaveLength(1);
+      expect(reduced.events.filter((e) => e.flash)).toHaveLength(0);
+      expect(
+        def.events.filter((e) => e.flash && e.kind === 'fx' && e.name.includes('stage')),
+      ).toHaveLength(0);
+    }
   });
 });
