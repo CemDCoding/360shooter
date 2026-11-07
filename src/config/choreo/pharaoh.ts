@@ -427,6 +427,9 @@ function buildMoment(): ChoreoDef {
   t.key('pharaoh', 'alpha', c(2800), 0);
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-197): world of the oasis and the letterbox of the storyboard, once at the start.
+    { kind: 'fx', atMs: 0, name: 'stage-world:pharaoh-moment', flash: false },
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
     // Three riddle symbols above him (400 to 1300), the shot hits the right one.
     { kind: 'fx', atMs: 300, durationMs: 1000, name: 'riddle', flash: false },
     { kind: 'fx', atMs: 1000, durationMs: MOMENT_HIT - 1000, name: 'shot-beam', flash: false },
@@ -630,6 +633,15 @@ function buildCinematic(): ChoreoDef {
   });
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-197): world per shot at the shot boundary (a new world cuts the previous one), letterbox once.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: SHOT_STARTS[0], name: 'stage-world:pharaoh-1', flash: false },
+    { kind: 'fx', atMs: SHOT_STARTS[2], name: 'stage-world:pharaoh-3', flash: false },
+    { kind: 'fx', atMs: SHOT_STARTS[3], name: 'stage-world:pharaoh-1', flash: false },
+    { kind: 'fx', atMs: SHOT_STARTS[4], name: 'stage-world:pharaoh-5', flash: false },
+    { kind: 'fx', atMs: c(SHOT6), name: 'stage-world:pharaoh-6', flash: false },
+    { kind: 'fx', atMs: c(18200), name: 'stage-world:pharaoh-6b', flash: false },
+    { kind: 'fx', atMs: c(19200), name: 'stage-world:pharaoh-6c', flash: false },
     // The throne dais: a flat plate in finisher ink; not in the flashback (E3).
     dais('dais-right', 0, SHOT_STARTS[2]),
     dais('dais-right', SHOT_STARTS[3], flipAt),

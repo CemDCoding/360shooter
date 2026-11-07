@@ -511,6 +511,9 @@ function buildMoment(): ChoreoDef {
 
   const span = (a: number, b: number): number => c(b) - c(a);
   const events: ChoreoEvent[] = [
+    // Stage (AP-197): world of the tomb and the letterbox of the storyboard, once at the start.
+    { kind: 'fx', atMs: 0, name: 'stage-world:guardianDog-moment', flash: false },
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
     { kind: 'fx', atMs: 0, durationMs: c(3500), name: 'torches-moment', flash: false },
     // H2 to H4: dodge with afterimages, counter with sparks only (no flash).
     trail(SNAP_ANTIC, SNAP_ACTION),
@@ -711,6 +714,16 @@ function buildCinematic(): ChoreoDef {
 
   const span = (a: number, b: number): number => c(b) - c(a);
   const events: ChoreoEvent[] = [
+    // Stage (AP-197): world per board of the storyboard (a new world cuts the previous one), letterbox once.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: 0, name: 'stage-world:guardianDog-1', flash: false },
+    { kind: 'fx', atMs: 2400, name: 'stage-world:guardianDog-1c', flash: false },
+    { kind: 'fx', atMs: 3000, name: 'stage-world:guardianDog-2', flash: false },
+    { kind: 'fx', atMs: 6000, name: 'stage-world:guardianDog-3', flash: false },
+    { kind: 'fx', atMs: 7000, name: 'stage-world:guardianDog-3b', flash: false },
+    { kind: 'fx', atMs: 8200, name: 'stage-world:guardianDog-3c', flash: false },
+    { kind: 'fx', atMs: c(10800), name: 'stage-world:guardianDog-4c', flash: false },
+    { kind: 'fx', atMs: c(13400), name: 'stage-world:guardianDog-3c', flash: false },
     { kind: 'fx', atMs: 0, durationMs: c(15000), name: 'torches-cine', flash: false },
     // E2: parries with sparks only.
     ...sparks(snap(0) + 30, CINE_SPARKS[0]),
