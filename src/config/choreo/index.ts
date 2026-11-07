@@ -5,6 +5,7 @@ import type { ChoreoDef, ChoreoVariantId } from '../../contracts';
 import { CINEMATIC_9, MOMENT_FOREST_GHOST } from './forestGhost';
 import { CINEMATIC_25, MOMENT_GIANT_SAND_WORM } from './giantSandWorm';
 import { CINEMATIC_20, MOMENT_GIANT_STONE } from './giantStone';
+import { CINEMATIC_40, MOMENT_PHARAOH } from './pharaoh';
 import { CINEMATIC_4, MOMENT_ROOT_MONSTER } from './rootMonster';
 
 export const CHOREOS: Readonly<Record<ChoreoVariantId, ChoreoDef | undefined>> = {
@@ -13,11 +14,11 @@ export const CHOREOS: Readonly<Record<ChoreoVariantId, ChoreoDef | undefined>> =
   'moment-giantStone': MOMENT_GIANT_STONE,
   'moment-giantSandWorm': MOMENT_GIANT_SAND_WORM,
   'moment-guardianDog': undefined,
-  'moment-pharaoh': undefined,
+  'moment-pharaoh': MOMENT_PHARAOH,
   'cinematic-4': CINEMATIC_4,
   'cinematic-9': CINEMATIC_9,
   'cinematic-20': CINEMATIC_20,
   'cinematic-25': CINEMATIC_25,
   'cinematic-30': undefined,
-  'cinematic-40': undefined,
+  'cinematic-40': CINEMATIC_40,
 };
