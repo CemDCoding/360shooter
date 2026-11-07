@@ -20,6 +20,8 @@ import {
   SLOW_FINAL,
 } from '../../../src/config/choreo/pharaoh';
 import { CHOREOS } from '../../../src/config/choreo';
+import { STAGES, stageOf } from '../../../src/config/choreo/stages';
+import { findStageFx } from '../../../src/scenes/finisher/fx/stage';
 import { CHOREO_RULES } from '../../../src/config/finishers';
 import { RIGS } from '../../../src/config/rigs';
 import { ASTRONAUT_RIG } from '../../../src/config/rigs/astronaut';
@@ -296,11 +298,68 @@ describe('smear spacing', () => {
   });
 });
 
+describe('stage world and letterbox (AP-197, Q-97)', () => {
+  const stageNames = (def: ChoreoDef) =>
+    events(def, 'fx').filter((e) => e.name === 'letterbox' || e.name.startsWith('stage-world:'));
+
+  it.each(NAMED)('%s has one letterbox at 0 and a world at 0, all flash-free', (_id, def) => {
+    const bars = stageNames(def).filter((e) => e.name === 'letterbox');
+    expect(bars).toHaveLength(1);
+    expect(bars[0].atMs).toBe(0);
+    expect(bars[0].durationMs).toBeUndefined();
+    const worlds = stageNames(def).filter((e) => e.name !== 'letterbox');
+    expect(worlds[0].atMs).toBe(0);
+    for (const e of stageNames(def)) {
+      expect(e.flash, e.name).toBe(false);
+      expect(e.atMs).toBeGreaterThanOrEqual(0);
+      expect(e.atMs).toBeLessThan(def.durationMs);
+    }
+    for (const e of worlds) {
+      const id = e.name.slice('stage-world:'.length);
+      expect(stageOf(id), id).not.toBeNull();
+      expect(findStageFx(e.name), id).not.toBeNull();
+      expect(id.startsWith('pharaoh-'), id).toBe(true);
+    }
+    const times = worlds.map((e) => e.atMs);
+    expect(times).toEqual([...times].sort((a, b) => a - b));
+    expect(new Set(times).size).toBe(times.length);
+  });
+
+  it('keeps the moment in one world and changes the cinematic world at the shot boundaries', () => {
+    expect(stageNames(MOMENT_PHARAOH).map((e) => e.name)).toEqual([
+      'stage-world:pharaoh-moment',
+      'letterbox',
+    ]);
+    const cine = stageNames(CINEMATIC_40).filter((e) => e.name !== 'letterbox');
+    const shots = (CINEMATIC_40.shots ?? []).map((s) => s.atMs);
+    expect(cine.map((e) => e.name.slice('stage-world:'.length))).toEqual([
+      'pharaoh-1',
+      'pharaoh-3',
+      'pharaoh-1',
+      'pharaoh-5',
+      'pharaoh-6',
+      'pharaoh-6b',
+      'pharaoh-6c',
+    ]);
+    for (const e of cine.slice(0, 5)) expect(shots, e.name).toContain(e.atMs);
+  });
+
+  it('keeps the flashback (shot 3) dark and the sun of the dawn in the world presets', () => {
+    expect(STAGES['pharaoh-3'].dark).toBeGreaterThanOrEqual(0.75);
+    expect(STAGES['pharaoh-3'].moon).toBeUndefined();
+    expect(STAGES['pharaoh-6b'].sun).toBeDefined();
+    expect(STAGES['pharaoh-6c'].sun).toBeDefined();
+    const flash = CINEMATIC_40.events.filter((e) => e.flash);
+    for (const e of stageNames(CINEMATIC_40)) expect(flash).not.toContain(e);
+  });
+});
+
 describe('effects of the pharaoh', () => {
   it('has every effect the choreographies name, in the module of the boss', () => {
     expect(BOSS_FX.pharaoh).toBe(PHARAOH_FX);
     for (const def of BOTH) {
-      for (const e of events(def, 'fx')) expect(PHARAOH_FX[e.name], e.name).toBeTypeOf('function');
+      for (const e of events(def, 'fx'))
+        expect(PHARAOH_FX[e.name] ?? findStageFx(e.name), e.name).toBeTypeOf('function');
     }
     expect(PHARAOH_FX['impact-pair']).toBe(ROOT_MONSTER_FX['impact-pair']);
   });

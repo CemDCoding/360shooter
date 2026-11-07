@@ -19,6 +19,9 @@ import {
   MOMENT_TAKT,
 } from '../../../src/config/choreo/guardianDog';
 import { CHOREOS } from '../../../src/config/choreo';
+import { stageOf } from '../../../src/config/choreo/stages';
+import { CHOREO_DEPTH } from '../../../src/scenes/finisher/context';
+import { findStageFx } from '../../../src/scenes/finisher/fx/stage';
 import { CHOREO_RULES } from '../../../src/config/finishers';
 import { ASTRONAUT_ANCHORS, ASTRONAUT_RIG } from '../../../src/config/rigs/astronaut';
 import { GUARDIAN_DOG_ANCHORS, GUARDIAN_DOG_RIG } from '../../../src/config/rigs/guardianDog';
@@ -429,6 +432,53 @@ describe('cinematic level 30 "GRABESLICHT" (boards 1a to 5c)', () => {
   });
 });
 
+describe('stage world and letterbox (AP-197, Q-97)', () => {
+  const NAMED = BOTH.map((d) => [d.variantId, d] as const);
+  const stageNames = (def: ChoreoDef) =>
+    events(def, 'fx').filter((e) => e.name === 'letterbox' || e.name.startsWith('stage-world:'));
+
+  it.each(NAMED)('%s has one letterbox at 0 and a world at 0, all flash-free', (_id, def) => {
+    const bars = stageNames(def).filter((e) => e.name === 'letterbox');
+    expect(bars).toHaveLength(1);
+    expect(bars[0].atMs).toBe(0);
+    expect(bars[0].durationMs).toBeUndefined();
+    const worlds = stageNames(def).filter((e) => e.name !== 'letterbox');
+    expect(worlds[0].atMs).toBe(0);
+    for (const e of stageNames(def)) {
+      expect(e.flash, e.name).toBe(false);
+      expect(e.atMs).toBeGreaterThanOrEqual(0);
+      expect(e.atMs).toBeLessThan(def.durationMs);
+    }
+    for (const e of worlds) {
+      const id = e.name.slice('stage-world:'.length);
+      expect(stageOf(id), id).not.toBeNull();
+      expect(findStageFx(e.name), id).not.toBeNull();
+      expect(id.startsWith('guardianDog-'), id).toBe(true);
+    }
+    const times = worlds.map((e) => e.atMs);
+    expect(times).toEqual([...times].sort((a, b) => a - b));
+    expect(new Set(times).size).toBe(times.length);
+  });
+
+  it('keeps the moment in one world and the cinematic at the camera and zoom keys of the storyboard', () => {
+    expect(stageNames(MOMENT_GUARDIAN_DOG).map((e) => e.name)).toEqual([
+      'stage-world:guardianDog-moment',
+      'letterbox',
+    ]);
+    const cine = stageNames(CINEMATIC_30)
+      .filter((e) => e.name !== 'letterbox')
+      .map((e) => [e.atMs, e.name.slice('stage-world:'.length)]);
+    expect(cine.slice(0, 6)).toEqual([
+      [0, 'guardianDog-1'],
+      [2400, 'guardianDog-1c'],
+      [3000, 'guardianDog-2'],
+      [6000, 'guardianDog-3'],
+      [7000, 'guardianDog-3b'],
+      [8200, 'guardianDog-3c'],
+    ]);
+  });
+});
+
 describe('rules for the data of the rig (PE-252, brief H-48)', () => {
   it.each(BOTH.map((d) => [d.variantId, d] as const))(
     '%s moves the arm children with the arm pose (ASTRONAUT_ANCHORS)',
@@ -521,7 +571,9 @@ describe('rules for the data of the rig (PE-252, brief H-48)', () => {
           expect(new Set(times).size).toBe(times.length);
         }
       }
-      for (const e of events(def, 'fx')) expect(e.name in GUARDIAN_DOG_FX, e.name).toBe(true);
+      for (const e of events(def, 'fx')) {
+        expect(e.name in GUARDIAN_DOG_FX || findStageFx(e.name) !== null, e.name).toBe(true);
+      }
       expect(validateChoreo(def, RIGS).filter((v) => v.rule === 'rotation')).toEqual([]);
     }
     expect(BOSS_FX.guardianDog).toBe(GUARDIAN_DOG_FX);
@@ -763,7 +815,10 @@ describe('the choreography player plays both choreographies', () => {
       });
       const rings = (): FakeObject[] =>
         rec.objects.filter(
-          (o) => o.kind === 'graphics' && o.log.filter((l) => l.name === 'fillRect').length > 200,
+          (o) =>
+            o.kind === 'graphics' &&
+            Number(o.st.depth) !== CHOREO_DEPTH.stage &&
+            o.log.filter((l) => l.name === 'fillRect').length > 200,
         );
       const seen: number[] = [];
       const depths: number[] = [];
