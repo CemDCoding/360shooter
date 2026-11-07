@@ -14,8 +14,12 @@ import { BOSS_FX, STAGE_FX, findStageFx } from '../../src/scenes/finisher/fx';
 import { BAR_H, finisherLayout } from '../../src/scenes/finisher/layout';
 import { letterboxVisible } from '../../src/scenes/finisher/timing';
 import { TextureBank } from '../../src/scenes/finisher/textures';
-import stageSrc from '../../src/scenes/finisher/fx/stage.ts?raw';
-import overlaysSrc from '../../src/scenes/finisher/overlays.ts?raw';
+import stageRaw from '../../src/scenes/finisher/fx/stage.ts?raw';
+import overlaysRaw from '../../src/scenes/finisher/overlays.ts?raw';
+
+/** Source texts with LF line endings, so the checks hold in CRLF checkouts too. */
+const stageSrc = stageRaw.replace(/\r\n/g, '\n');
+const overlaysSrc = overlaysRaw.replace(/\r\n/g, '\n');
 
 interface Fill {
   colour: number;
