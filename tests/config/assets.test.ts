@@ -39,8 +39,8 @@ describe('asset manifest', () => {
     expect(new Set(ASSETS.map((a) => a.path)).size).toBe(ASSETS.length);
   });
 
-  it('has 267 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
-    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(267);
+  it('has 259 sprites and the 20 desert sprites with their frames and sizes (AP-106)', () => {
+    expect(ASSETS.filter((a) => a.kind === 'spritesheet')).toHaveLength(259);
     const expected: Record<string, [number, number, number]> = {
       'enemy-mummy': [32, 32, 4],
       'mummy-wrap': [16, 8, 2],

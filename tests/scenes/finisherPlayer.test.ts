@@ -15,7 +15,7 @@ import { CHOREO_RULES } from '../../src/config/finishers';
 import { RIGS } from '../../src/config/rigs';
 import { OPACITY, THEME } from '../../src/config/theme';
 import { CHOREOS } from '../../src/config/choreo';
-import { buildFinisher, choreoVariantId } from '../../src/logic/finisher';
+import { choreoVariantId } from '../../src/logic/finisher';
 import { countFlashes, validateChoreo } from '../../src/logic/choreo';
 import { ChoreoPlayer, type ChoreoPlayerSource } from '../../src/scenes/finisher/choreoPlayer';
 import type { ChoreoContext } from '../../src/scenes/finisher/context';
@@ -229,12 +229,11 @@ const images = (rec: FakeRecord): FakeObject[] => rec.objects.filter((o) => o.ki
 // ---------------------------------------------------------------- data
 
 const DATA = debugFinisherData(0, 640, 360, false);
-/** Textures of the placeholder run: game sprites and the M10 hit and shard images, no rig atlas. */
+/** Textures of the placeholder run: game sprites and the hit images, no rig atlas. */
 const PLACEHOLDER_TEXTURES: TextureList = {
   [DATA.boss.texture]: [],
   [DATA.player.texture]: [],
   'finisher-hit': ['0', '1', '2', '3', '4', '5'],
-  'finisher-shards': [],
 };
 
 /** Every frame of a rig: pose frames and their `<Bogen>-sil-<Index>` silhouettes. */
@@ -375,7 +374,7 @@ describe('debug choreography (AP-183 rigs)', () => {
     expect(countFlashes(DEBUG_CHOREO)).toBe(1);
   });
 
-  it('is played for ?finisher=0 only; other levels keep the M10 plan', () => {
+  it('is played for ?finisher=0 only; other levels play their registered choreography', () => {
     expect(choreoOf(DATA.plan)).toBe(DATA.plan.choreo);
     expect(DATA.plan.realMs).toBeGreaterThan(DEBUG_CHOREO.durationMs);
     // Level 5 is a moment of the forest ghost, which has its own choreography; the debug one is only for 0.
@@ -385,20 +384,7 @@ describe('debug choreography (AP-183 rigs)', () => {
   });
 });
 
-describe('M10 fallback', () => {
-  it('a plan without choreography plays the M10 steps', () => {
-    // Only levels whose boss has no choreography in the register yet fall back to the M10 plan.
-    const levels = [5, 10, 14, 15, 20, 25, 30, 40].filter(
-      (level) => CHOREOS[choreoVariantId(level)] === undefined,
-    );
-    for (const level of levels) {
-      const plan = buildFinisher(level, { reduceEffects: false, seen: [] });
-      expect(plan.choreo).toBeUndefined();
-      expect(choreoOf(plan)).toBeNull();
-      expect(plan.steps.length).toBeGreaterThan(0);
-    }
-  });
-
+describe('start data shape', () => {
   it('rejects a choreography without the shape the player needs', () => {
     const plan = DATA.plan;
     const broken = { ...plan, choreo: { ...DEBUG_CHOREO, events: 'x' } };
@@ -723,8 +709,8 @@ const bodyOf = (src: string, head: string): string => {
 };
 
 describe('wiring', () => {
-  it('FinisherScene plays a choreography with the player and keeps the M10 path', () => {
-    expect(sceneSrc).toMatch(/const choreo = choreoOf\(plan\);\s*if \(choreo\) \{/);
+  it('FinisherScene plays the choreography with the player (no M10 path left)', () => {
+    expect(sceneSrc).toMatch(/const choreo = data \? choreoOf\(data\.plan\) : null;/);
     expect(sceneSrc).toContain('new ChoreoPlayer(ctx, def, main, { rigs: RIGS })');
     expect(sceneSrc).toContain('player.update(');
     expect(sceneSrc).toMatch(/canSkip\(plan, this\.player\.elapsedMs\)\) this\.finish\(\)/);
@@ -733,7 +719,7 @@ describe('wiring', () => {
     expect(sceneSrc).toContain('this.choreoCtx?.textures.destroy()');
     // Cameras go with the camera manager on SHUTDOWN; removing them here would double-destroy.
     expect(sceneSrc).not.toMatch(/cameras\.remove\(/);
-    expect(sceneSrc).toContain('this.add.timeline(this.timelineEvents(plan))');
+    expect(sceneSrc).not.toContain('this.add.timeline(');
   });
 
   it('the player modules stay Canvas-safe and Phaser-free at run time', () => {

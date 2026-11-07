@@ -426,8 +426,8 @@ describe('contract and rules', () => {
     expect(bars).not.toMatch(/new |\.add\.|=>|\[|\{\s*\w+:/);
   });
 
-  it('keeps overlays.ts and the M10 letterbox as they are (imported, not changed)', () => {
-    expect(overlaysSrc).toContain('letterboxVisible');
+  it('the stage imports `letterboxVisible` from timing.ts, not from the removed M10 overlays', () => {
+    expect(overlaysSrc).not.toContain('letterbox');
     expect(stageSrc).toContain("from '../timing'");
     expect(stageSrc).not.toContain('overlays');
   });
