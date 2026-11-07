@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   FINISHER_SCENE_KEY,
-  FINISHER_VARIANT_IDS,
+  CHOREO_VARIANT_IDS,
   type FinisherPlan,
-  type FinisherStep,
+  type ChoreoDef,
   type FinisherStartData,
   EASY_PARRY_KEY,
   GameEvents,
@@ -320,23 +320,31 @@ describe('M10 contracts (AP-157)', () => {
     expect(old.seenFinishers).toBeUndefined();
     expect(old.reduceEffects).toBeUndefined();
     const fresh: Pick<SaveGame, 'seenFinishers' | 'reduceEffects'> = {
-      seenFinishers: ['stage-1'],
+      seenFinishers: ['moment-rootMonster'],
       reduceEffects: true,
     };
-    expect(fresh.seenFinishers).toEqual(['stage-1']);
+    expect(fresh.seenFinishers).toEqual(['moment-rootMonster']);
   });
 
   it('has the scene key and start data without result for the debug start', () => {
     expect(FINISHER_SCENE_KEY).toBe('FinisherScene');
-    expect(FINISHER_VARIANT_IDS).toHaveLength(12);
+    expect(CHOREO_VARIANT_IDS).toHaveLength(12);
+    const choreo: ChoreoDef = {
+      variantId: 'moment-rootMonster',
+      actors: [],
+      durationMs: 1000,
+      tracks: [],
+      events: [],
+      beats: [],
+    };
     const plan: FinisherPlan = {
-      variantId: 'stage-1',
+      variantId: 'moment-rootMonster',
       stage: 1,
-      isFinale: false,
-      steps: [{ block: 'hitstop', atMs: 0, durationMs: 100 }],
-      totalMs: 2000,
-      skippable: false,
+      totalMs: 3500,
       reduced: false,
+      choreo,
+      realMs: 3500,
+      skipFromMs: 3000,
     };
     const actor = { texture: 't', x: 0, y: 0, scale: 1 };
     const data: FinisherStartData = {
@@ -347,25 +355,6 @@ describe('M10 contracts (AP-157)', () => {
       player: actor,
     };
     expect(data.result).toBeUndefined();
-  });
-
-  it('has optional per-frame hold fields (PE-203) so old steps stay valid', () => {
-    const old: FinisherStep = { block: 'frames', atMs: 0, durationMs: 100, frameCount: 2, fps: 10 };
-    expect(old.holdsMs).toBeUndefined();
-    expect(old.reducedHoldsMs).toBeUndefined();
-    expect(old.firstFrame).toBeUndefined();
-    expect(old.titleKind).toBeUndefined();
-    const fresh: FinisherStep = {
-      ...old,
-      holdsMs: [100, 50],
-      reducedHoldsMs: [150, 0],
-      firstFrame: 3,
-      titleKind: 'name',
-    };
-    expect(fresh.holdsMs).toEqual([100, 50]);
-    expect(fresh.reducedHoldsMs).toEqual([150, 0]);
-    expect(fresh.firstFrame).toBe(3);
-    expect(fresh.titleKind).toBe('name');
   });
 
   it('has optional M12 wave fields so old data stay valid (AP-174)', () => {

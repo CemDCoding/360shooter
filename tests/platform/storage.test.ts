@@ -362,24 +362,24 @@ describe('seenFinishers and reduceEffects (AP-161)', () => {
     const s = memory();
     const save = {
       ...valid,
-      seenFinishers: ['stage-1', 'finale-4', 'stage-1'],
+      seenFinishers: ['moment-pharaoh', 'cinematic-4', 'moment-pharaoh'],
       reduceEffects: true,
     };
     expect(writeSave(save, s)).toBe(true);
     const l = loadSave(s);
-    expect(l.seenFinishers).toEqual(['stage-1', 'finale-4']);
+    expect(l.seenFinishers).toEqual(['moment-pharaoh', 'cinematic-4']);
     expect(l.reduceEffects).toBe(true);
   });
-  it.each([null, 'stage-1', 5, {}, true])('treats %j as no seen list', (bad) => {
+  it.each([null, 'cinematic-4', 5, {}, true])('treats %j as no seen list', (bad) => {
     const l = loadSave(memory(JSON.stringify({ ...valid, seenFinishers: bad })));
     expect(l.seenFinishers).toEqual([]);
     expect(l.gold).toBe(120);
   });
   it('drops foreign ids and non-strings', () => {
-    const raw = { ...valid, seenFinishers: ['stage-2', 'evil', 7, null, '__proto__'] };
-    expect(loadSave(memory(JSON.stringify(raw))).seenFinishers).toEqual(['stage-2']);
+    const raw = { ...valid, seenFinishers: ['moment-giantStone', 'evil', 7, null, '__proto__'] };
+    expect(loadSave(memory(JSON.stringify(raw))).seenFinishers).toEqual(['moment-giantStone']);
   });
-  it('accepts the 12 choreography ids next to the old ids (M13, AP-181) and drops unknown ones', () => {
+  it('accepts the 12 choreography ids and drops unknown ones', () => {
     const ids = [
       'moment-rootMonster',
       'moment-forestGhost',
@@ -394,11 +394,24 @@ describe('seenFinishers and reduceEffects (AP-161)', () => {
       'cinematic-30',
       'cinematic-40',
     ];
-    const raw = { ...valid, seenFinishers: ['stage-1', ...ids, 'moment-nobody', 'cinematic-5'] };
-    expect(loadSave(memory(JSON.stringify(raw))).seenFinishers).toEqual(['stage-1', ...ids]);
+    const raw = { ...valid, seenFinishers: [...ids, 'moment-nobody', 'cinematic-5'] };
+    expect(loadSave(memory(JSON.stringify(raw))).seenFinishers).toEqual(ids);
     const s = memory(JSON.stringify(valid));
     expect(markFinisherSeen('cinematic-40', s)).toBe(true);
     expect(loadSave(s).seenFinishers).toEqual(['cinematic-40']);
+  });
+  it('drops the old M10 ids on load, the rest of the save stays (AP-191, PE-251 d)', () => {
+    const old = [...[1, 2, 3, 4, 5, 6].map((n) => `stage-${n}`), 'finale-4', 'finale-40'];
+    const raw = { ...valid, seenFinishers: [...old, 'cinematic-9', ...old] };
+    const l = loadSave(memory(JSON.stringify(raw)));
+    expect(l.seenFinishers).toEqual(['cinematic-9']);
+    expect(l.gold).toBe(120);
+    const onlyOld = loadSave(memory(JSON.stringify({ ...valid, seenFinishers: old })));
+    expect(onlyOld.seenFinishers).toEqual([]);
+    // writing the migrated save does not bring the old ids back
+    const s = memory(JSON.stringify(raw));
+    expect(markFinisherSeen('moment-pharaoh', s)).toBe(true);
+    expect(loadSave(s).seenFinishers).toEqual(['cinematic-9', 'moment-pharaoh']);
   });
   it.each([1, 'true', null, [], {}, 0])('treats reduceEffects %j as false', (bad) => {
     const l = loadSave(memory(JSON.stringify({ ...valid, reduceEffects: bad })));
@@ -406,11 +419,11 @@ describe('seenFinishers and reduceEffects (AP-161)', () => {
   });
   it('markFinisherSeen adds once and ignores invalid ids', () => {
     const s = memory(JSON.stringify(valid));
-    expect(markFinisherSeen('stage-3', s)).toBe(true);
-    markFinisherSeen('stage-3', s);
+    expect(markFinisherSeen('moment-giantStone', s)).toBe(true);
+    markFinisherSeen('moment-giantStone', s);
     markFinisherSeen('nope', s);
     const l = loadSave(s);
-    expect(l.seenFinishers).toEqual(['stage-3']);
+    expect(l.seenFinishers).toEqual(['moment-giantStone']);
     expect(l.gold).toBe(120);
   });
   it('setReduceEffects stores the flag and keeps the rest', () => {
@@ -423,7 +436,7 @@ describe('seenFinishers and reduceEffects (AP-161)', () => {
   });
   it('reset clears both fields', () => {
     const s = memory();
-    markFinisherSeen('stage-1', s);
+    markFinisherSeen('moment-rootMonster', s);
     setReduceEffects(true, s);
     resetSave(s);
     const l = loadSave(s);

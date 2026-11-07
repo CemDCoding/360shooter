@@ -1,12 +1,12 @@
 # Finisher – Aufbau Abspieler (M13, AP-182)
 
-`FinisherScene` spielt einen `FinisherPlan` ab:
+`FinisherScene` spielt einen `FinisherPlan` ab (immer eine Choreografie, seit AP-191 ohne M10-Rückfall):
 
-- **Mit `plan.choreo`** (Prüfung `choreoOf` in `startData.ts`) läuft der `ChoreoPlayer`
+- **`plan.choreo`** (Prüfung `choreoOf` in `startData.ts`) spielt der `ChoreoPlayer`
   (`choreoPlayer.ts`). Die Hauptkamera zeigt die Welt (Figuren, Nachbilder, Funken, Schnittlinie,
   Einschlagbild) mit Zoom, Scroll und Wackeln. Eine zweite Kamera zeigt die Bildschirmebene
   (Blitz, Text, Hinweis „Überspringen“) ohne Zoom. Beide Kameras räumt Phaser bei SHUTDOWN ab.
-- **Ohne Choreografie** laufen unverändert die M10-Bausteine über die Timeline (Rückfall).
+- Ein Plan ohne brauchbare Choreografie beendet die Szene sofort (Menü bzw. Ergebnis). Die M10-Bausteine (Timeline, Zwischenbilder, Bildfolgen, Splitter) sind entfernt; von `overlays.ts` und `pictures.ts` bleiben `drawSpeedlines` und der Hinweis „Überspringen“.
 
 ## Module
 
