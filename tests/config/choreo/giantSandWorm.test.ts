@@ -19,6 +19,7 @@ import {
   GIANT_SAND_WORM_CRUMBLE_STEP_MS,
   GIANT_SAND_WORM_RIG,
 } from '../../../src/config/rigs/giantSandWorm';
+import { STAGES } from '../../../src/config/choreo/stages';
 import { THEME } from '../../../src/config/theme';
 import {
   prepareChoreo,
@@ -28,7 +29,7 @@ import {
   validateChoreo,
 } from '../../../src/logic/choreo';
 import { buildFinisher } from '../../../src/logic/finisher';
-import { BOSS_FX } from '../../../src/scenes/finisher/fx';
+import { BOSS_FX, findStageFx } from '../../../src/scenes/finisher/fx';
 import { GIANT_SAND_WORM_FX } from '../../../src/scenes/finisher/fx/giantSandWorm';
 
 const GROUND = THEME.sizePx['size.rig-ground'];
@@ -270,7 +271,10 @@ describe('rig data rules', () => {
         expect(times).toEqual([...times].sort((a, b) => a - b));
       }
       for (const e of events(def, 'fx')) {
-        expect(e.name === 'slash' || e.name in GIANT_SAND_WORM_FX, e.name).toBe(true);
+        expect(
+          e.name === 'slash' || e.name in GIANT_SAND_WORM_FX || findStageFx(e.name) !== null,
+          e.name,
+        ).toBe(true);
       }
     }
     expect(BOSS_FX.giantSandWorm).toBe(GIANT_SAND_WORM_FX);
@@ -310,5 +314,55 @@ describe('effects of the boss', () => {
         'shot-beam',
       ].sort(),
     );
+  });
+});
+
+describe('stage world and letterbox (AP-196, Q-97)', () => {
+  const worlds = (def: ChoreoDef) =>
+    events(def, 'fx').filter((e) => e.name.startsWith('stage-world:'));
+  const MOMENT_IDS = ['giantSandWorm-moment'];
+  const CINE_IDS = ['giantSandWorm-1', 'giantSandWorm-3b', 'giantSandWorm-1'];
+
+  it('enters the worlds in order, each a known preset, never a flash', () => {
+    expect(worlds(MOMENT).map((e) => e.name.slice('stage-world:'.length))).toEqual(MOMENT_IDS);
+    expect(worlds(CINE).map((e) => e.name.slice('stage-world:'.length))).toEqual(CINE_IDS);
+    for (const def of BOTH) {
+      for (const e of worlds(def)) {
+        const id = e.name.slice('stage-world:'.length);
+        expect(Object.prototype.hasOwnProperty.call(STAGES, id), id).toBe(true);
+        expect(id.startsWith('giantSandWorm-'), id).toBe(true);
+        expect(e.flash).toBe(false);
+        expect(e.durationMs).toBeUndefined();
+      }
+    }
+  });
+
+  it('starts the first world and the one letterbox at 0', () => {
+    for (const def of BOTH) {
+      expect(worlds(def)[0].atMs).toBe(0);
+      const bars = fxNamed(def, 'letterbox');
+      expect(bars).toHaveLength(1);
+      expect(bars[0].atMs).toBe(0);
+      expect(bars[0].flash).toBe(false);
+    }
+  });
+
+  it('changes the world at the shot boundaries of the storyboard', () => {
+    expect(worlds(CINE).map((e) => e.atMs)).toEqual([0, 7000, 8200]);
+    const moment = worlds(MOMENT).map((e) => e.atMs);
+    expect(moment).toEqual([...moment].sort((a, b) => a - b));
+    expect(moment[moment.length - 1]).toBeLessThan(MOMENT.durationMs);
+  });
+
+  it('keeps world and bars when reduced and adds no flash', () => {
+    for (const def of BOTH) {
+      const reduced = reduceChoreo(def);
+      expect(worlds(reduced)).toHaveLength(worlds(def).length);
+      expect(fxNamed(reduced, 'letterbox')).toHaveLength(1);
+      expect(reduced.events.filter((e) => e.flash)).toHaveLength(0);
+      expect(
+        def.events.filter((e) => e.flash && e.kind === 'fx' && e.name.includes('stage')),
+      ).toHaveLength(0);
+    }
   });
 });

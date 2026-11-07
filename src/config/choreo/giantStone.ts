@@ -451,6 +451,9 @@ function buildMoment(): ChoreoDef {
   );
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-196, Q-97): elf wood with stars and spikes, plus cinema bars, once at the start.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: 0, name: 'stage-world:giantStone-moment', flash: false },
     // S3: the punch hits the ground where she stood; dust and gravel, the ground trembles.
     trail(800, 120),
     { kind: 'shake', atMs: 860, durationMs: 120, strength: 0.3, flash: false },
@@ -718,6 +721,9 @@ function buildCinematic(): ChoreoDef {
   );
 
   const events: ChoreoEvent[] = [
+    // Stage (AP-196, Q-97): elf wood with stars and spikes, plus cinema bars, once at the start.
+    { kind: 'fx', atMs: 0, name: 'letterbox', flash: false },
+    { kind: 'fx', atMs: 0, name: 'stage-world:giantStone-1', flash: false },
     // E1: his shadow falls over her (board 1c).
     { kind: 'fx', atMs: 2600, durationMs: 700, name: 'shadow', flash: false },
     // E2: the punch (board 2a), the hops (afterimages), dust and gravel.
