@@ -276,12 +276,9 @@ describe('fight moment "Drei Takte" (boards H1 to H9)', () => {
     const x = Number(sampleTrack(track(MOMENT, 'astronaut', 'x'), hit.atMs));
     expect(x).toBe(MOMENT_STAB_X);
     const cx = DOG_X.moment + RING_OFFSET.dx;
-    const cy = GROUND + RING_OFFSET.dy;
     const r0 = ringRadius(BOSS_REF_H, THEME.sizeCount['size.rig-scale-boss-moment']);
-    const squash = THEME.sizeCount['size.rig-hit-ring-squash'];
-    // Her stand point (feet) lies outside the inner ellipse of the ring.
-    const norm = Math.hypot((x - cx) / r0, (GROUND - cy) / (r0 * squash));
-    expect(norm).toBeGreaterThan(1);
+    // At her body height (ring centre) the inner ellipse reaches r0 to the left: she stands outside it.
+    expect(cx - x).toBeGreaterThanOrEqual(r0);
   });
 
   it('lies down with the anchor: legs lie, head sleep, tail down, body and head +8 px', () => {
