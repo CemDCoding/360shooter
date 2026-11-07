@@ -22,6 +22,8 @@ export {
   type HitRingSpec,
 } from './hitRing';
 
+export { LETTERBOX_FX, STAGE_FX, STAGE_WORLD_FX, findStageFx, stageIdOf } from './stage';
+
 export type FxEvent = Extract<ChoreoEvent, { kind: 'fx' }>;
 
 /** What an effect may use. */

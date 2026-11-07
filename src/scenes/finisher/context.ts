@@ -56,6 +56,8 @@ export interface FinisherContext {
 
 /** Draw order of the choreography objects (one world camera, one screen camera). */
 export const CHOREO_DEPTH = {
+  /** Stage world (AP-195): sky, silhouettes, ground; behind everything else. */
+  stage: 4,
   /** Boss effects on the ground (bulge, hedge). */
   ground: 14,
   /** Afterimage copies, behind the figures. */
@@ -67,6 +69,8 @@ export const CHOREO_DEPTH = {
   impact: 60,
   /** Screen camera from here on. */
   flash: 70,
+  /** Cinema bars (AP-195): over ring, impact and flash, under the texts. */
+  bars: 80,
   text: 90,
 } as const;
 

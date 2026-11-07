@@ -26,7 +26,7 @@ import {
   type ChoreoClockSample,
 } from '../../logic/choreo';
 import { CHOREO_DEPTH, type ChoreoContext } from './context';
-import { BOSS_FX, findFx, type BossFxModule, type FxApi, type FxInstance } from './fx';
+import { BOSS_FX, findFx, findStageFx, type BossFxModule, type FxApi, type FxInstance } from './fx';
 import { centredX, tokenColor } from './layout';
 import {
   RigFigure,
@@ -411,7 +411,9 @@ export class ChoreoPlayer {
           start: () => this.ctx.playSound(ev.key),
         };
       case 'fx': {
-        const factory = ev.name === SLASH_FX ? slashFx : findFx(bossFx, ev.name);
+        // Boss module first, then the shared stage (`stage-world:<id>`, `letterbox`, AP-195).
+        const factory =
+          ev.name === SLASH_FX ? slashFx : (findFx(bossFx, ev.name) ?? findStageFx(ev.name));
         if (!factory) return null;
         const inst: FxInstance = factory(this.fxApi, ev);
         return {
