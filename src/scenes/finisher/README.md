@@ -72,3 +72,33 @@ Tiefe: Ebene der Astronautin − 0,5 (in `start` gelesen, `order`-Spuren zählen
 und über den Nachbildern (Ebene 16). Ohne Astronautin: Boss-Ebene + 0,5. Winkel und Längen werden einmal
 je Treffer gezogen (fester Seed aus `atMs`), alle drei Stufen teilen sie. Rosenschnitt: Ring bei 1000 ms,
 Mitte Boss-x / Boden − 96, r0 104.
+
+## Gemeinsame Bühne: Welt und Kinoleisten (AP-195, Q-97, PE-259)
+
+Ein Baustein für alle Bosse: `fx/stage.ts` (`STAGE_FX`, Export über `fx/index.ts`). Der Abspieler sucht einen
+`fx`-Namen zuerst im Bossmodul, dann in `STAGE_FX` (wie `SLASH_FX`); kein Bossmodul braucht einen Eintrag.
+Keine Vertragsänderung: das `fx`-Ereignis hat nur `name`.
+
+**Aufruf (in der Choreografie, nur Ereignisse):**
+
+- `{ kind: 'fx', atMs: 0, name: 'stage-world:forestGhost-1', flash: false }` – Welt der Vorgabe
+  `forestGhost-1` aus `src/config/choreo/stages.ts` (`STAGES`: Welt, Mond/Sonne mit Mitte und Radius,
+  Bodennebel, Abdunklung `dark`, Seed). Namen: `<bossId>-moment` bzw. `<bossId>-moment-<n>` im Kampfmoment,
+  `<bossId>-<Einstellung>` bzw. `<bossId>-<Einstellung><Buchstabe>` im Cinematic (nach dem Brett im Mockup,
+  z. B. `forestGhost-1b` = Brett 1b). Ein neues `stage-world` schneidet hart: die vorige Welt wird
+  ausgeblendet. Unbekannte Vorgabe-ID: keine Bühne, kein Fehler (`stageOf` liefert `null`).
+- `{ kind: 'fx', atMs: 0, name: 'letterbox', flash: false }` – zwei Leisten (`color.finisher.letterbox`,
+  `size.finisher-letterbox`), fahren über `letterboxVisible` (`timing.ts`, 3 Stufen in `motion.finisher-bars`)
+  ein. Ohne `durationMs` bis zum Ende der Choreografie.
+
+Die Welt wird einmal in der Fabrik als `Graphics` gezeichnet (Rechtecke, Pixelkreise, Dreiecke; fester
+Seed, kein Tint, kein Flackern) und liegt in der Welt-Ebene (zoomt und wandert mit der Kamera, Fläche
+−400…1040 × −400…760 um die Bühne, im breiten Feld um `stageX` verschoben). `update` tut bei der Welt nichts.
+Bosseigene Zutaten (Fackeln, Morgenröte, Rückblick-Streifen) bleiben im Bossmodul.
+
+**Tiefe (`CHOREO_DEPTH`):** `stage` 4 (unter Boden 14, Nachbildern 16, Figuren 20 + Index und Ring), `bars`
+80 in der Bildschirm-Ebene (über Ring, Impact 60 und Blitz 70, unter Text 90).
+
+**„Reduzieren“:** beide Ereignisse bleiben (`flash: false`, kein `reduce`, also `keep`): die Welt ist ohnehin
+statisch, die Leisten stehen sofort in voller Höhe (kein Einfahren). Beide zählen nicht gegen
+`flashMaxPerWindow`.
