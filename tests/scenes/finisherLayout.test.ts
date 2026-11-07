@@ -8,7 +8,13 @@ import {
   type FinisherPlan,
   type SafeInsets,
 } from '../../src/contracts';
-import { buildFinisher, isFlashSafe } from '../../src/logic/finisher';
+import { CHOREOS } from '../../src/config/choreo';
+import {
+  DEFAULT_FINISHER_SOURCE,
+  buildFinisher,
+  choreoVariantId,
+  isFlashSafe,
+} from '../../src/logic/finisher';
 import {
   ARROW_H,
   BAR_H,
@@ -278,8 +284,16 @@ describe('beam window and sounds (AP-160 decisions)', () => {
   });
 
   it('places the sounds on the matching moments', () => {
+    // The M10 expectations hold for the M10 sequence (no register); a level with a choreography in CHOREOS
+    // plays that one instead, so only its presence is checked there.
+    const M10 = { ...DEFAULT_FINISHER_SOURCE, choreos: undefined };
+    for (const level of [0, 4, 21, 40]) {
+      const registered = CHOREOS[choreoVariantId(level)] !== undefined;
+      const plan = buildFinisher(level, { reduceEffects: false, seen: [] });
+      expect(plan.choreo !== undefined, `level ${level}`).toBe(registered);
+    }
     const at = (level: number, key: string, reduce = false): number[] =>
-      soundCues(buildFinisher(level, { reduceEffects: reduce, seen: [] }))
+      soundCues(buildFinisher(level, { reduceEffects: reduce, seen: [] }, M10))
         .filter((c) => c.key === key)
         .map((c) => c.atMs);
     expect(at(0, SOUND_HIT)).toEqual([120]); // hit image
@@ -288,7 +302,7 @@ describe('beam window and sounds (AP-160 decisions)', () => {
     expect(at(21, SOUND_HIT)).toEqual([900]); // impact frame
     expect(at(21, SOUND_HIT, true)).toEqual([1100]); // without impact: hit image
     expect(at(4, SOUND_CHARGE)).toEqual([600 + 500]); // picture 1
-    const plan40 = buildFinisher(40, { reduceEffects: false, seen: [] });
+    const plan40 = buildFinisher(40, { reduceEffects: false, seen: [] }, M10);
     const starts = pictureStarts(plan40);
     expect(starts).toHaveLength(18);
     expect(at(40, SOUND_CHARGE)).toEqual([starts[3], starts[11]]);
